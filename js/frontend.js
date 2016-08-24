@@ -19,6 +19,15 @@
                     $field = $form.find('#firstname');
                 }
                 $field.parent().before($(str));
+            } else {
+                $form = $('form#form_onepagecheckoutps');
+                if ($form.length > 0) {
+                    var $tab_content = $form.find('.tab-content #delivery_address_container .fields_container');
+                    if ($tab_content.length > 0) {
+                        str = '<div class="row">' + str + '</div>';
+                        $tab_content.before(str);
+                    }
+                }
             }
         }
     });

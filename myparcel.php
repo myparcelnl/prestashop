@@ -13,6 +13,7 @@ class MyParcel extends Module
 {
     const CONF_REMOVE_AFTER_UNINSTALL_NAME_V_15 = 'MYPARCEL_REMOVE_ON_UNINSTALL';
     const CONF_REMOVE_AFTER_UNINSTALL_NAME = 'MYPARCEL_REMOVE_DATA_AFTER_UNINSTALL';
+	const FRONTEND_PLUGIN = 'MYPARCEL_FRONTEND_PLUGIN';
 
     public static $conf_username = 'MYPARCEL_USERNAME';
     public static $conf_api_key = 'MYPARCEL_API_KEY';
@@ -31,10 +32,10 @@ class MyParcel extends Module
         $this->tab = 'shipping_logistics';
 
         if ('1.5' == substr(_PS_VERSION_, 0, 3)) {
-            $this->version = 'v1.1.5';
+            $this->version = 'v1.2.5';
             self::$conf_remove_after_uninstall = self::CONF_REMOVE_AFTER_UNINSTALL_NAME_V_15;
         } elseif ('1.6' == substr(_PS_VERSION_, 0, 3)) {
-            $this->version = '1.1.5';
+            $this->version = '1.2.5';
         }
 
         $this->author = 'MyParcel';
@@ -82,8 +83,23 @@ class MyParcel extends Module
                                       PRIMARY KEY (`myparcel_id`)
                                     ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;");
 
+		Db::getInstance()->Execute("CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "myparcel_pg_address` (
+									  `pg_address_id` int(11) NOT NULL AUTO_INCREMENT,
+									  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+									  `street` varchar(255) COLLATE utf8_unicode_ci NULL,
+									  `house_number` varchar(255) COLLATE utf8_unicode_ci NULL,
+									  `number_addition` varchar(255) COLLATE utf8_unicode_ci NULL,
+									  `postcode` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+									  `town` varchar(255) COLLATE utf8_unicode_ci NULL,
+									  PRIMARY KEY (`pg_address_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;");
+		
         Configuration::updateValue('MYPARCEL_ACTIVE', 'true');
 
+		 /* * Since version 1.1.8 */
+        $this->registerHook('displayHeader');
+        /* * End version 1.1.8 */
+		
         $this->registerHook('displayBackOfficeHeader');
         // Use hook for prestashop 1.5 only
         if($this->isPrestashop15())
@@ -180,6 +196,43 @@ class MyParcel extends Module
         return true;
     }
 
+	/**
+     * Since version 1.1.8
+     * Adds JavaScript files to front office
+     *
+     * @return string
+     */
+    public function hookDisplayHeader()
+    {
+        if ($this->context->controller->php_self === 'address' ||
+            $this->context->controller->php_self === 'auth' ||
+			$this->context->controller->php_self === 'authentication' ||
+            $this->context->controller->php_self === 'order-opc') {
+            $frontend_plugin = Configuration::get(self::FRONTEND_PLUGIN);
+
+            if (empty($frontend_plugin)) {
+                return '';
+            }
+
+            $myparcel = Module::getInstanceByName('myparcel');
+            $url = $myparcel->getMyParcelUrl();
+
+            if (!$myparcel->isPrestashop15()) {
+                Media::addJsDef(array(
+                    'MYPARCEL_PAKJEGEMAK_URL' => $url,
+                ));
+            }
+
+            $this->context->controller->addJquery();
+            $this->context->controller->addJS($this->_path.'/js/frontend.js', 'all');
+
+            return '';
+        }
+
+        return '';
+    }
+    /* * End version 1.1.8 */
+	
     /**
      * Adds JavaScript files
      *
@@ -189,6 +242,22 @@ class MyParcel extends Module
     {
         $this->context->controller->addJS($this->_path . 'js/myparcel.js', 'all');
         $this->context->controller->addCSS($this->_path . 'css/myparcel.css', 'all');
+		
+		/*----Since version 1.1.9----*/
+        $base_uri = __PS_BASE_URI__;
+        if ($base_uri == '/') {
+            $base_uri = '';
+        } else {
+            if (substr($base_uri, 0, 1) != '/') {
+                $base_uri = '/' . $base_uri;
+            }
+            $base_uri = rtrim($base_uri, '/');
+        }
+
+        Media::addJsDef(array(
+            'MYPARCEL_WEBSHOP_BASE_URL' => $base_uri,
+        ));
+        /* * End version 1.1.9 */
     }
 
     /**
@@ -448,5 +517,25 @@ $fields_form[1]['form'] = array(
         } elseif ('1.6' == substr(_PS_VERSION_, 0, 3)) {
             return false;
         }
+    }
+	
+	public function isPgAddress($address, $street)
+    {
+        $results = Db::getInstance()->ExecuteS(
+            sprintf('
+                SELECT * FROM '._DB_PREFIX_.'myparcel_pg_address WHERE `name`="%s" AND `street`="%s" AND `house_number`="%s" AND `postcode`="%s" AND `town`="%s" LIMIT 1'
+                ,
+                $address->company,                                              // Name
+                isset($street['street']) ? $street['street'] : '',              // Street
+                isset($street['house_number']) ? $street['house_number'] : '',  // House number
+                $address->postcode,                                             // Postcode
+                $address->city                                                  // City
+            )
+        );
+
+        if (!empty($results) && is_array($results)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -2,7 +2,7 @@
 <module>
 	<name>myparcel</name>
 	<displayName><![CDATA[MyParcel]]></displayName>
-	<version><![CDATA[1.1.5]]></version>
+	<version><![CDATA[1.2.6]]></version>
 	<description><![CDATA[Assistance with the parcel service through MyParcel.nl]]></description>
 	<author><![CDATA[MyParcel]]></author>
 	<tab><![CDATA[shipping_logistics]]></tab>

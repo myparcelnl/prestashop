@@ -4,6 +4,10 @@ var popup; // Handle to popup window
 var consignments = {}; // Hyperlinks to consignments that haven't been processed yet
 var locked = false; // Lock to prevent more than one consignment being created at a time
 
+if (typeof MYPARCEL_WEBSHOP_BASE_URL == 'undefined') {
+    var MYPARCEL_WEBSHOP_BASE_URL = '';
+}
+
 function onClickOnUnprocessedConsignment(event) {
     if (!popup || popup.closed) {
         // User closed the popup
@@ -81,8 +85,10 @@ function createNewConsignment(orderId, retour)
     var retourparam = '';
     if(retour == true) retourparam = '&retour=true';
     
+	/*----Since v1.1.9----*/
+    /* Add MYPARCEL_WEBSHOP_BASE_URL */
     popup = window.open(
-        '/modules/myparcel/process.php?action=post' + '&order_id=' + orderId + '&timestamp=' + timestamp + retourparam,
+        MYPARCEL_WEBSHOP_BASE_URL + '/modules/myparcel/process.php?action=post' + '&order_id=' + orderId + '&timestamp=' + timestamp + retourparam,
         'myparcel',
         'width=730,height=830,dependent,resizable,scrollbars'
         );
@@ -103,8 +109,10 @@ function printConsignments(consignmentList)
     locked = true;
     var timestamp = _getTimestamp();
     
+	/*----Since v1.1.9----*/
+    /* Add MYPARCEL_WEBSHOP_BASE_URL */
     popup = window.open(
-        '/modules/myparcel/process.php?action=print' + '&consignments=' + consignmentList + '&timestamp=' + timestamp,
+        MYPARCEL_WEBSHOP_BASE_URL + '/modules/myparcel/process.php?action=print' + '&consignments=' + consignmentList + '&timestamp=' + timestamp,
         'myparcel',
         'width=415,height=365,dependent,resizable,scrollbars'
         );
@@ -155,8 +163,10 @@ function processConsignments(consignmentList)
     locked = true;
     var timestamp = _getTimestamp();
     
+	/*----Since v1.1.9----*/
+    /* Add MYPARCEL_WEBSHOP_BASE_URL */
     popup = window.open(
-        '/modules/myparcel/process.php?action=process' + '&order_ids=' + consignmentList + '&timestamp=' + timestamp,
+        MYPARCEL_WEBSHOP_BASE_URL + '/modules/myparcel/process.php?action=process' + '&order_ids=' + consignmentList + '&timestamp=' + timestamp,
         'myparcel',
         'width=415,height=365,dependent,resizable,scrollbars'
         );

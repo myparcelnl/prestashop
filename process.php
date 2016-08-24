@@ -24,21 +24,47 @@ function getAddressComponents($address)
     $ret = array();
     $ret['house_number'] = '';
     $ret['number_addition'] = '';
-
+    //$address = 'Markerkant 10 11E';
     $address = str_replace(array('?', '*', '[', ']', ',', '!'), ' ', $address);
     $address = preg_replace('/\s\s+/', ' ', $address);
 
-    preg_match('/^([0-9]*)(.*?)([0-9]+)(.*)/', $address, $matches);
+    $matches = _splitStreet($address);
 
     if (!empty($matches[2])) {
-        $ret['street'] = trim($matches[1] . $matches[2]);
+        $ret['street'] = trim($matches[1]);
         $ret['house_number'] = trim($matches[3]);
         $ret['number_addition'] = trim($matches[4]);
     } else {
         $ret['street'] = $address;
     }
 
+	/** START @Since the fix for negative house number (64-69) **/
+    if (strlen($ret['street']) && substr($ret['street'], -1) == '-') {
+        $ret['street'] = str_replace(' -', '', $ret['street']);
+        return getAddressComponents( $ret['street']);
+    }
+    /** END @Since the fix for negative house number (64-69) **/
+	
     return $ret;
+}
+
+function _splitStreet($fullStreet)
+{
+    $split_street_regex = '~(?P<street>.*?)\s?(?P<street_suffix>(?P<number>[\d]+)-?(?P<number_suffix>[a-zA-Z/\s]{0,5}$|[0-9/]{0,5}$|\s[a-zA-Z]{1}[0-9]{0,3}$))$~';
+    $fullStreet = preg_replace("/[\n\r]/", "", $fullStreet);
+    $result = preg_match($split_street_regex, $fullStreet, $matches);
+
+    if (!$result || !is_array($matches) || $fullStreet != $matches[0]) {
+        if ($fullStreet != $matches[0]) {
+            // Characters are gone by preg_match
+            exit('Something went wrong with splitting up address ' . $fullStreet);
+        } else {
+            // Invalid full street supplied
+            exit('Invalid full street supplied: ' . $fullStreet);
+        }
+    }
+
+    return $matches;
 }
 
 /**
@@ -55,6 +81,8 @@ if (isset($_GET['action'])) {
      *       Please save our bandwidth and use the Track&Trace link to get the actual status. Thanks
      */
 
+	$myparcel = Module::getInstanceByName('myparcel');
+	 
     if (isset($_SESSION['MYPARCEL_VISIBLE_CONSIGNMENTS'])
         && !empty($_SESSION['MYPARCEL_VISIBLE_CONSIGNMENTS'])
     ) {
@@ -74,27 +102,31 @@ if (isset($_GET['action'])) {
             $consignments[] = $row['consignment_id'];
         }
 
+        /** START Fix consignment update TNT error when one of the ids is invalid **/
         if (count($consignments) > 0) {
-            $statusFile = file(MYPARCEL_URL . 'status/tnt/' . implode('|', $consignments));
+            foreach ($consignments as $consignment) {
+                $statusFile = file(MYPARCEL_URL . 'status/tnt/' . $consignment);
+                if ($statusFile) {
+                    $row = $statusFile[0];
+                    $row = explode('|', $row);
 
-            foreach($statusFile as $row) {
-                $row = explode('|', $row);
+                    if (count($row) != 3) {
+                        continue;
+                    }
 
-                if (count($row) != 3) {
-                    exit;
+                    Db::getInstance()->update(
+                        'myparcel',
+                        array(
+                            'tnt_status' => trim($row[2]),
+                            'tnt_updated_on' => date('Y-m-d H:i:s'),
+                            'tnt_final' => (int)$row[1],
+                        ),
+                        '`consignment_id` = "' . $row[0] . '"'
+                    );
                 }
-
-                Db::getInstance()->update(
-                    'myparcel',
-                    array(
-                    	'tnt_status'     => trim($row[2]),
-                    	'tnt_updated_on' => date('Y-m-d H:i:s'),
-                        'tnt_final'      => (int) $row[1],
-                    ),
-                    '`consignment_id` = "' . $row[0] . '"'
-                );
             }
         }
+        /** END Fix consignment update TNT error when one of the ids is invalid **/
     }
 
     /**
@@ -125,6 +157,13 @@ if (isset($_GET['action'])) {
 
         if (in_array($isoCode, array('NL', null))) {
             $street = getAddressComponents($address->address1 . ', ' . $address->address2);
+			
+			/*----------------Since version 1.2.1----------------*/
+			$pg_address = $myparcel->isPgAddress($address, $street);
+            if ($pg_address) {
+                $street['number_addition'] = '';
+            }
+			/*--------------------------------------------v1.2.1*/
             $consignment = array(
             	'ToAddress[country_code]'    => $isoCode,
             	'ToAddress[name]'            => $address->firstname . ' ' . $address->lastname,
@@ -135,6 +174,8 @@ if (isset($_GET['action'])) {
             	'ToAddress[street]'          => $street['street'],
             	'ToAddress[town]'            => $address->city,
             	'ToAddress[email]'           => $customer->email,
+				'ToAddress[phone_number]'    => !empty($address->phone) ? $address->phone : $address->phone_mobile
+				
             );
         } else {
             $weight = 0;
@@ -275,6 +316,13 @@ if (isset($_GET['action'])) {
             if (in_array($isoCode, array('NL', null))) {
                 $street = getAddressComponents($address->address1 . ', ' . $address->address2);
 
+				/*----------------Since version 1.2.1----------------*/
+				$pg_address = $myparcel->isPgAddress($address, $street);
+				if ($pg_address) {
+					$street['number_addition'] = '';
+				}
+				/*--------------------------------------------v1.2.1*/
+
                 $consignment = array(
                     'ToAddress' => array(
                     	'country_code'    => $isoCode,
@@ -286,6 +334,7 @@ if (isset($_GET['action'])) {
                     	'street'          => $street['street'],
                     	'town'            => $address->city,
                     	'email'           => $customer->email,
+						'phone_number'    => !empty($address->phone) ? $address->phone : $address->phone_mobile,
                     )
                 );
             } else {
@@ -383,5 +432,47 @@ if (isset($_GET['action'])) {
         </html>
 <?php
         exit;
+    }
+	
+	if ($_GET['action'] == 'save_pg_address')
+    {
+       /* if (version_compare(phpversion(), '5.4.0', '<')) {
+            if (session_id() == '') session_start();
+        } else {
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+        }*/
+
+        $data_array = array(
+            //'order_id' => session_id(),
+            'name' => pSQL($_GET['pg_extra_name']),
+            'street' => pSQL($_GET['pg_extra_street']),
+            'house_number' => pSQL($_GET['pg_extra_house_number']),
+            'number_addition' => pSQL($_GET['pg_extra_number_addition']),
+            'postcode' => pSQL($_GET['pg_extra_postcode']),
+            'town' => pSQL($_GET['pg_extra_town']),
+        );
+
+        $results = Db::getInstance()->ExecuteS(
+            sprintf(
+                "SELECT * FROM '._DB_PREFIX_.'myparcel_pg_address WHERE `name` = '%s' AND `postcode`='%s'",
+                $data_array['name'],
+                $data_array['postcode']
+            )
+        );
+
+        if (!empty($results)) {
+            Db::getInstance()->update(
+                'myparcel_pg_address',
+                $data_array,
+                'order_id="' . $session_id . '"'
+            );
+        } else {
+            // Insert into myparcel_pg_address
+            Db::getInstance()->insert('myparcel_pg_address', $data_array);
+        }
+        echo '1';
+        die;
     }
 }

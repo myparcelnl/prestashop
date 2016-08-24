@@ -104,8 +104,58 @@
                     fireEvent(formulier.getElementsByName("id_country")[0], 'change');
                 }catch(ex){
                     // Possbile IE 11
-                    formulier.getElementById('add_address').submit();
+                    var add_address_button = formulier.getElementById('add_address');
+					if (add_address_button) {
+						add_address_button.submit();
+					}
                 }
+				
+				// *************************Fixes for OnePageCheckout plugin*************************
+                // *******************This fix for alarm-winkel.nl and mytools.nl********************
+                // **********************************************************************************
+                if (formulier.getElementById("form_onepagecheckoutps")) {
+                    try {
+                        formulier.getElementById("delivery_company").value   = shopname;
+                    } catch (err) {}
+
+                    try {
+                        formulier.getElementById("delivery_postcode").value       = postalCodeNum + postalCodeAlpha;
+                    } catch (err) {}
+
+                    try {
+                        formulier.getElementById("delivery_address1").value = street + ' ' + houseNr + ' ' + houseNrAdd;
+                    } catch (err) {}
+
+                    try {
+                        formulier.getElementById("delivery_city").value = city;
+                    } catch (err) {}
+
+                    try {
+                        var country_select =  formulier.getElementById("delivery_id_country");
+                        country_select.value = 13;
+
+                        for (var i = 0; i < country_select.options.length; i++) {
+                            if (country_select.options[i].text === ' Nederland') {
+                                country_select.selectedIndex = i;
+                                fireEvent(formulier.getElementById("delivery_id_country"), 'change');
+                                break;
+                            }
+                        }
+                    } catch (err) {}
+
+                    try{
+                        fireEvent(formulier.getElementById("delivery_id_country"), 'change');
+                        formulier.getElementById('shipping_container').getElementsByTagName('button')[0].click();
+                    }catch(ex){
+                        // Possbile IE 11
+                        //formulier.getElementById('add_address').submit();
+                    }
+                }
+
+
+                // **********************************************************************************
+                // ************************ Set data for pg extra fields ****************************
+                // **********************************************************************************
             }
         }
         parent.parent.window.close();
