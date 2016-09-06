@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>myparcel</name>
+	<displayName><![CDATA[MyParcel]]></displayName>
+	<version><![CDATA[1.2.6]]></version>
+	<description><![CDATA[Assistance with the parcel service through MyParcel.nl]]></description>
+	<author><![CDATA[MyParcel]]></author>
+	<tab><![CDATA[shipping_logistics]]></tab>
+	<confirmUninstall><![CDATA[Are you sure you want to uninstall the MyParcel module?]]></confirmUninstall>
+	<is_configurable>1</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>
