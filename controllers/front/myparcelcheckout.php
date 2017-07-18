@@ -71,7 +71,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         }
 
         $address = new Address((int) $cart->id_address_delivery);
-        if (!preg_match('/^(.*?)\s+(\d+)(.*)$/', $address->address1, $m)) {
+        if (!preg_match('/^(.*?)\s+(\d+)(.*)$/', $address->address1.' '.$address->address2, $m)) {
             // No house number
             echo $context->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
             die();

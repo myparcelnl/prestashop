@@ -16,79 +16,63 @@
  * @copyright  2010-2017 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<iframe name="myparcelcheckoutframe" id="myparcelcheckoutframe" src="{$myparcel_checkout_link|escape:'htmlall':'UTF-8' nofilter}" width="100%" height="600px" frameBorder="0"></iframe>
+<iframe name="myparcelcheckoutframe" id="myparcelcheckoutframe" src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), true)}" width="100%" height="600px" frameBorder="0"></iframe>
 <div id="myparcel"></div>
 <script type="text/javascript">
-  (function () {
-    function initMyParcelCheckFrame() {
-      if (typeof $ === 'undefined') {
-        setTimeout(initMyParcelCheckFrame, 100);
+  $(document).ready(function () {
+    var myparcelFrame = frames['myparcelcheckoutframe'];
+    var xhr = null;
 
-        return;
+    window.addEventListener('message', function (event) {
+      if (event.data
+        && event.data.messageOrigin === 'myparcelcheckout'
+        && event.data.subject === 'height'
+      ) {
+        $('#myparcelcheckoutframe').height(parseInt(event.data.height, 10));
       }
+    });
 
-      $(document).ready(function () {
-        var xhr = null;
+    window.addEventListener('message', function (event) {
+      if (event.data
+        && event.data.messageOrigin === 'myparcelcheckout'
+        && event.data.subject === 'selection_changed'
+      ) {
+        if (xhr) {
+          xhr.abort();
+        }
 
-        window.addEventListener('message', function (event) {
-          if (event.data
-            && event.data.messageOrigin === 'myparcelcheckout'
-            && event.data.subject === 'height'
-          ) {
-            var newHeight = parseInt(event.data.height, 10);
-            if (newHeight < 0) {
-              $('#myparcelcheckoutframe').remove();
-            } else {
-              $('#myparcelcheckoutframe').height(parseInt(event.data.height, 10));
-            }
-          }
-        });
+        var selection = event.data.selection;
 
-        window.addEventListener('message', function (event) {
-          if (event.data
-            && event.data.messageOrigin === 'myparcelcheckout'
-            && event.data.subject === 'selection_changed'
-          ) {
-            if (xhr) {
-              xhr.abort();
-            }
+        xhr = $.ajax({
+          url: '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), true)|escape:'javascript':'UTF-8'}',
+          type: 'post',
+          data: {
+            ajax: true,
+            updateOption: true,
+            deliveryOption: selection,
+          },
+          success: function (data) {
+            if (data.carrier_data) {
+              var $carrierHtml = $(data.carrier_data.carrier_block);
+              $carrierHtml = $carrierHtml.find('.delivery_options');
+              $('.delivery_options').html($carrierHtml[0]);
 
-            var selection = event.data.selection;
-
-            xhr = $.ajax({
-              url: '{$myparcel_deliveryoptions_link|escape:'javascript':'UTF-8' nofilter}',
-              type: 'post',
-              data: {
-                ajax: true,
-                updateOption: true,
-                deliveryOption: selection,
-              },
-              success: function (data) {
-                if (data && data.shouldRefresh && data.carrier_data) {
-                  var $carrierHtml = $(data.carrier_data.carrier_block);
-                  $carrierHtml = $carrierHtml.find('#myparcelcheckoutframe');
-                  $('#myparcelcheckoutframe').html($carrierHtml[0]);
-
-                  if (typeof window.updateCartSummary === 'function') {
-                    window.updateCartSummary(data.summary);
-                  }
-                  if (typeof window.bindUniform === 'function') {
-                    window.bindUniform();
-                  }
-                  if (typeof window.bindInputs === 'function') {
-                    window.bindInputs();
-                  }
-                }
-              },
-              error: function () {
-                xhr = null;
+              if (typeof window.updateCartSummary === 'function') {
+                window.updateCartSummary(data.summary);
               }
-            });
+              if (typeof window.bindUniform === 'function') {
+                window.bindUniform();
+              }
+              if (typeof window.bindInputs === 'function') {
+                window.bindInputs();
+              }
+            }
+          },
+          error: function () {
+            xhr = null;
           }
         });
-      });
-    }
-
-    initMyParcelCheckFrame();
-  }());
+      }
+    });
+  });
 </script>

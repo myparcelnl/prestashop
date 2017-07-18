@@ -25,7 +25,6 @@ function upgrade_module_1_2($module)
     try {
         $module->uninstallOverrides();
     } catch (Exception $e) {
-        die(sprintf(Tools::displayError('Unable to uninstall overrides: %s'), $e->getMessage()));
     }
 
     // Remove overridden admin templates and unnecessary files
@@ -33,24 +32,23 @@ function upgrade_module_1_2($module)
 
     $srcDir = $overrideAdminDir.'/templates/orders/helpers/list';
 
-    if (is_file($srcDir.'/list_content.tpl')) {
+    if (file_exists($srcDir.'/list_content.tpl')) {
         unlink($srcDir.'/list_content.tpl');
     }
 
-    if (is_file($srcDir.'/list_header.tpl')) {
+    if (file_exists($srcDir.'/list_header.tpl')) {
         unlink($srcDir.'/list_header.tpl');
     }
-
-    // Install tab to register controllers
-    $module->installTab();
 
     // Clear cache
     if (version_compare(_PS_VERSION_, '1.6', '>=')) {
         Tools::clearSmartyCache();
-        PrestaShopAutoload::getInstance()->generateIndex();
     } else {
         Tools::clearCache();
-        Autoload::getInstance()->generateIndex();
+    }
+    Autoload::getInstance()->generateIndex();
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
     }
 
     return true;

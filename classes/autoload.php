@@ -63,7 +63,6 @@ spl_autoload_register(
             'MyParcelObjectModel',
             'MyParcelOrder',
             'MyParcelOrderHistory',
-            'MyParcelTour',
         ))) {
             // base directory for the namespace prefix
             $baseDir = dirname(__FILE__).'/';

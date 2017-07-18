@@ -115,7 +115,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.2';
+        $this->version = '2.0.3';
 
         $this->author = 'MyParcel';
         $this->need_instance = 1;
@@ -571,7 +571,6 @@ class MyParcel extends Module
     {
         if (!(MyParcelCarrierDeliverySetting::createDatabase()
             && MyParcelDeliveryOption::createDatabase()
-            && MyParcelTour::createDatabase()
             && MyParcelOrder::createDatabase()
             && MyParcelOrderHistory::createDatabase())
         ) {
@@ -869,7 +868,6 @@ class MyParcel extends Module
         $this->context->smarty->assign(
             array(
                 'menutabs'         => $this->initNavigation(),
-                'configTourStatus' => MyParcelTour::getTourStep(self::CONFIG_TOUR, (int) $this->context->employee->id),
                 'ajaxUrl'          => $this->moduleUrlWithoutToken,
             )
         );
@@ -3300,9 +3298,9 @@ class MyParcel extends Module
             )
         );
 
-        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-            return $this->display(__FILE__, 'views/templates/hooks/beforecarrier17.tpl');
-        }
+//        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+//            return $this->display(__FILE__, 'views/templates/hooks/beforecarrier17.tpl');
+//        }
 
         /** @var Cart $cart */
         $cart = $this->context->cart;
@@ -3316,7 +3314,7 @@ class MyParcel extends Module
         $currency = Currency::getCurrencyInstance($cart->id_currency);
 
         $address = new Address((int) $cart->id_address_delivery);
-        if (!preg_match('/^(.*?)\s+(\d+)(.*)$/', $address->address1, $m)) {
+        if (!preg_match('/^(.*?)\s+(\d+)(.*)$/', $address->address1.' '.$address->address2, $m)) {
             // No house number
 
             Logger::addLog("{$this->displayName}: No housenumber for Cart {$cart->id}");

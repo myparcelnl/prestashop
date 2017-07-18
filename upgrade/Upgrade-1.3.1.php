@@ -21,7 +21,10 @@
 function upgrade_module_1_3_1($module)
 {
     // Support foreign postcodes
-    Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'myparcel` MODIFY postcode VARCHAR(32) NOT NULL');
+    try {
+        Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'myparcel` MODIFY postcode VARCHAR(32) NOT NULL');
+    } catch (Exception $e) {
+    }
 
     return true;
 }
