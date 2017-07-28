@@ -23,7 +23,7 @@ if (!defined('_PS_VERSION_') && !defined('_TB_VERSION_')) {
 }
 
 /**
- * Class MyParcelWebhooksModuleFrontController
+ * Class MyParcelHookModuleFrontController
  */
 class MyParcelHookModuleFrontController extends ModuleFrontController
 {
@@ -69,17 +69,23 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     protected function processWebhook()
     {
         $content = file_get_contents('php://input');
+        if (Configuration::get(MyParcel::LOG_API)) {
+            $logContent = pSQL($content);
+            Logger::addLog("MyParcel webhook: $logContent");
+        }
 
         $data = Tools::jsonDecode($content, true);
-
-        if (isset($data['shipment_id'])
-            && isset($data['status'])
-            && isset($data['barcode'])
-            && isset($data['date'])
-        ) {
-            if (MyParcelOrder::updateStatus($data['shipment_id'], $data['barcode'], $data['status'], $data['date'])) {
-                die('0');
+        if (isset($data['data']['hooks']) && is_array($data['data']['hooks'])) {
+            foreach ($data['data']['hooks'] as &$item) {
+                if (isset($item['shipment_id'])
+                    && isset($item['status'])
+                    && isset($item['barcode'])
+                ) {
+                    MyParcelOrder::updateStatus($item['shipment_id'], $item['barcode'], $item['status']);
+                }
             }
+
+            die('0');
         }
 
         die('1');

@@ -74,12 +74,20 @@ class MyParcel extends Module
     const TYPE_MAILBOX_PACKAGE = 2;
     const TYPE_UNSTAMPED = 3;
     const TYPE_POST_OFFICE = 4;
+    /**
+     * This constant has a confusing name.
+     * Webhooks are always processed regardless of this setting.
+     * When this setting is enabled, order statuses in PrestaShop itself are updated as well.
+     */
     const WEBHOOK_ENABLED = 'MYPARCEL_WEBHOOK_ENABLED';
     const WEBHOOK_CHECK_INTERVAL = 86400;
     const WEBHOOK_LAST_CHECK = 'MYPARCEL_WEBHOOK_UPD';
     const WEBHOOK_ID = 'MYPARCEL_WEBHOOK_ID'; //daily check
     const CONFIG_TOUR = 'config';
     const CONNECTION_ATTEMPTS = 3;
+    const LOG_API = 'MYPARCEL_LOG_API';
+    const SHIPPED_STATUS = 'MYPARCEL_SHIPPED_STATUS';
+    const RECEIVED_STATUS = 'MYPARCEL_RECEIVED_STATUS';
 
     // @codingStandardsIgnoreStart
     protected static $cachedCarriers = array();
@@ -115,10 +123,9 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.3';
+        $this->version = '2.0.5';
 
         $this->author = 'MyParcel';
-        $this->need_instance = 1;
 
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
 
@@ -151,7 +158,7 @@ class MyParcel extends Module
      */
     protected function checkWebhooks()
     {
-        $lastCheck = (int) Configuration::get(self::WEBHOOK_LAST_CHECK, null, 0, 0);
+        $lastCheck = (int) Configuration::get(self::WEBHOOK_LAST_CHECK, (int) Configuration::get('PS_LANG_DEFAULT'), Shop::getGroupFromShop((int) Configuration::get('PS_SHOP_DEFAULT')), (int) Configuration::get('PS_SHOP_DEFAULT'));
         $webHookId = Configuration::get(self::WEBHOOK_ID);
 
         if (time() > $lastCheck + self::WEBHOOK_CHECK_INTERVAL || !$webHookId || Tools::getValue($this->name.'CheckForUpdates')) {
@@ -173,7 +180,7 @@ class MyParcel extends Module
                 $idWebhook = (int) Configuration::get(self::WEBHOOK_ID);
                 $data = Tools::jsonDecode($response, true);
                 $sslEnabled = (bool) Configuration::get('PS_SSL_ENABLED');
-                $webhookUrl = Context::getContext()->link->getModuleLink('hook', $this->name, array(), $sslEnabled);
+                $webhookUrl = Context::getContext()->link->getModuleLink($this->name, 'hook', array(), $sslEnabled);
                 if (isset($data['data']['webhook_subscriptions']) && is_array($data['data']['webhook_subscriptions'])) {
                     foreach ($data['data']['webhook_subscriptions'] as $subscription) {
                         if ((int) $subscription['id'] !== $idWebhook) {
@@ -551,6 +558,8 @@ class MyParcel extends Module
         Configuration::updateGlobalValue(self::CHECKOUT_HL_COLOR, '#FF8C00');
         Configuration::updateGlobalValue(self::CHECKOUT_FONT, 'Exo');
         Configuration::updateGlobalValue(self::LABEL_DESCRIPTION, '{order.reference}');
+        Configuration::updateGlobalValue(self::SHIPPED_STATUS, (int) Configuration::get('PS_OS_SHIPPING'));
+        Configuration::updateGlobalValue(self::RECEIVED_STATUS, (int) Configuration::get('PS_OS_DELIVERED'));
         Configuration::updateValue(self::AUTO_UPDATE, true, false, 0, 0);
 
         if (method_exists('Tools', 'clearCache')) {
@@ -1837,6 +1846,9 @@ class MyParcel extends Module
             Configuration::updateValue(self::CHECKOUT_HL_COLOR, Tools::getValue(self::CHECKOUT_HL_COLOR));
             Configuration::updateValue(self::CHECKOUT_FONT, Tools::getValue(self::CHECKOUT_FONT));
             Configuration::updateValue(self::WEBHOOK_ENABLED, (bool) Tools::getValue(self::WEBHOOK_ENABLED));
+            Configuration::updateValue(self::LOG_API, (bool) Tools::getValue(self::LOG_API));
+            Configuration::updateValue(self::SHIPPED_STATUS, (int) Tools::getValue(self::SHIPPED_STATUS));
+            Configuration::updateValue(self::RECEIVED_STATUS, (int) Tools::getValue(self::RECEIVED_STATUS));
         }
     }
 
@@ -2267,24 +2279,6 @@ class MyParcel extends Module
             'languages'    => $this->context->controller->getLanguages(),
             'id_language'  => $this->context->language->id,
         );
-
-        $carrier = Carrier::getCarrierByReference((int) MyParcelCarrierDeliverySetting::getCarrierReferenceById((int) Tools::getValue(MyParcelCarrierDeliverySetting::$definition['primary'])));
-
-//        if (Validate::isLoadedObject($carrier)&& $carrier->external_module_name !== $this->name) {
-//            if (!$carrier->external_module_name) {
-//                // TODO: avoid this
-//                $externalModule = (object) array(
-//                    'displayName' => '',
-//                );
-//            } else {
-//                $externalModule = Module::getInstanceByName($carrier->external_module_name);
-//            }
-//            $this->context->smarty->assign(array(
-//                'carrierName' => $carrier->name,
-//                'externalModuleName' => $externalModule->displayName,
-//            ));
-//            $this->context->controller->warnings[] = $this->display(__FILE__, 'views/templates/admin/managedby.tpl');
-//        }
 
         return $helper->generateForm(array($this->getDeliverySettingForm(), $this->getCutoffForm()));
     }
@@ -3112,7 +3106,7 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        return $helper->generateForm(array($this->getApiForm(), $this->getCheckoutForm()));
+        return $helper->generateForm(array($this->getApiForm(), $this->getCheckoutForm(), $this->getAdvancedForm()));
     }
 
     /**
@@ -3134,6 +3128,9 @@ class MyParcel extends Module
             self::CHECKOUT_HL_COLOR  => Configuration::get(self::CHECKOUT_HL_COLOR),
             self::CHECKOUT_FONT      => Configuration::get(self::CHECKOUT_FONT),
             self::WEBHOOK_ENABLED    => Configuration::get(self::WEBHOOK_ENABLED),
+            self::LOG_API            => Configuration::get(self::LOG_API),
+            self::SHIPPED_STATUS     => Configuration::get(self::SHIPPED_STATUS),
+            self::RECEIVED_STATUS    => Configuration::get(self::RECEIVED_STATUS),
         );
     }
 
@@ -3278,6 +3275,88 @@ class MyParcel extends Module
     }
 
     /**
+     * Get the advanced form
+     *
+     * @return array Form
+     */
+    protected function getAdvancedForm()
+    {
+        $orderStatuses = array(
+            array(
+                'name'           => $this->l('Disable this status'),
+                'id_order_state' => '0',
+            ),
+        );
+        $orderStatuses = array_merge($orderStatuses, OrderState::getOrderStates($this->context->language->id));
+
+        for ($i = 0; $i < count($orderStatuses); $i++) {
+            $orderStatuses[$i]['name'] = $orderStatuses[$i]['id_order_state'].' - '.$orderStatuses[$i]['name'];
+        }
+
+        $this->aasort($orderStatuses, 'id_order_state');
+
+        return array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Advanced'),
+                    'icon'  => 'icon-cogs',
+                ),
+                'input'  => array(
+                    array(
+                        'type'     => 'select',
+                        'label'    => $this->l('Shipped status'),
+                        'desc'     => $this->l('Choose this status when the order has been received by PostNL'),
+                        'name'     => self::SHIPPED_STATUS,
+                        'required' => true,
+                        'options'  => array(
+                            'query'   => $orderStatuses,
+                            'id'      => 'id_order_state',
+                            'name'    => 'name',
+                            'orderby' => 'id_order_state',
+                        ),
+                        'class'    => 'fixed-width-xxl',
+                    ),
+                    array(
+                        'type'     => 'select',
+                        'label'    => $this->l('Received'),
+                        'desc'     => $this->l('Choose this status when the order has been received by the customer'),
+                        'name'     => self::RECEIVED_STATUS,
+                        'required' => true,
+                        'options'  => array(
+                            'query' => $orderStatuses,
+                            'id'    => 'id_order_state',
+                            'name'  => 'name',
+                        ),
+                        'class'    => 'fixed-width-xxl',
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Api logger'),
+                        'desc'    => $this->l('By enabling this option, API calls are being logged. They can be found on the page `Advanced Parameters > Logs`.'),
+                        'name'    => self::LOG_API,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            ),
+        );
+    }
+
+    /**
      * Display before carrier
      *
      * @return string
@@ -3298,9 +3377,9 @@ class MyParcel extends Module
             )
         );
 
-//        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-//            return $this->display(__FILE__, 'views/templates/hooks/beforecarrier17.tpl');
-//        }
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            return $this->display(__FILE__, 'views/templates/hooks/beforecarrier17.tpl');
+        }
 
         /** @var Cart $cart */
         $cart = $this->context->cart;
@@ -3341,7 +3420,6 @@ class MyParcel extends Module
         if (Tools::strtoupper($currency->iso_code) === 'EUR'
             && ($mcds->delivery || $mcds->pickup)
         ) {
-
             return $this->display(__FILE__, 'views/templates/hooks/beforecarrier.tpl');
         }
 

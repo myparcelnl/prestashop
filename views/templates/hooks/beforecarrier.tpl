@@ -56,7 +56,6 @@
               var $carrierHtml = $(data.carrier_data.carrier_block);
               $carrierHtml = $carrierHtml.find('.delivery_options');
               $('.delivery_options').html($carrierHtml[0]);
-
               if (typeof window.updateCartSummary === 'function') {
                 window.updateCartSummary(data.summary);
               }

@@ -327,10 +327,12 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcel::TYPE_PARCEL;
         }
 
-        preg_match('/(^.*?)(\d+)(.*?$)/', $address->address1, $matches);
-
+        preg_match('/(^.*?)(\d+)(.*?$)/', trim($address->address1.' '.$address->address2), $matches);
         $street = (isset($matches[1]) ? $matches[1] : '');
         $houseNumber = (isset($matches[2]) ? $matches[2] : '');
+        if (isset($matches[3])) {
+            $houseNumber .= $matches[3];
+        }
 
         if ($configuration[MyParcel::DEFAULT_CONCEPT_INSURED]) {
             switch ($configuration[MyParcel::DEFAULT_CONCEPT_INSURED_TYPE]) {
@@ -389,6 +391,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 'street'      => $street,
                 'number'      => $houseNumber,
                 'postal_code' => $address->postcode,
+                'company'     => $address->company,
                 'person'      => $address->firstname.' '.$address->lastname,
                 'phone'       => $configuration[MyParcel::LINK_PHONE] ? ($address->phone_mobile ? $address->phone_mobile : $address->phone) : '',
                 'email'       => ($configuration[MyParcel::LINK_EMAIL]) ? $email : '',
@@ -474,10 +477,12 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $configuration[MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT] = 0;
         }
 
-        preg_match('/(^.*?)(\d+)(.*?$)/', $address->address1, $matches);
-
+        preg_match('/(^.*?)(\d+)(.*?$)/', trim($address->address1.' '.$address->address2), $matches);
         $street = (isset($matches[1]) ? $matches[1] : '');
         $houseNumber = (isset($matches[2]) ? $matches[2] : '');
+        if (isset($matches[3])) {
+            $houseNumber .= $matches[3];
+        }
 
         if ($configuration[MyParcel::DEFAULT_CONCEPT_INSURED]) {
             switch ($configuration[MyParcel::DEFAULT_CONCEPT_INSURED_TYPE]) {
@@ -544,6 +549,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 'street'      => $street,
                 'number'      => $houseNumber,
                 'postal_code' => $address->postcode,
+                'company'     => $address->company,
                 'person'      => $address->firstname.' '.$address->lastname,
                 'phone'       => $configuration[MyParcel::LINK_PHONE] ? ($address->phone_mobile ? $address->phone_mobile : $address->phone) : '',
                 'email'       => ($configuration[MyParcel::LINK_EMAIL]) ? $email : '',
@@ -598,8 +604,9 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             'recipient'           => (object) array(
                 'cc'          => Tools::strtoupper(Country::getIsoById($address->id_country)),
                 'city'        => $address->city,
-                'street'      => $address->address1,
+                'street'      => trim($address->address1.' '.$address->address2),
                 'postal_code' => $address->postcode,
+                'company'     => $address->company,
                 'person'      => $address->firstname.' '.$address->lastname,
                 'phone'       => Configuration::get(MyParcel::LINK_PHONE) ? ($address->phone ? $address->phone : $address->phone_mobile) : '',
                 'email'       => (Configuration::get(MyParcel::LINK_EMAIL)) ? $email : '',

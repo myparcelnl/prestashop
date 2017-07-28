@@ -20,7 +20,7 @@
 <html>
 <body>
 <div id="myparcelapp" class="myparcelcheckout"></div>
-<script type="text/javascript" src="{$checkoutJs|escape:'htmlall':'UTF-8'}"></script>
+<script type="text/javascript" src="{$checkoutJs|escape:'htmlall':'UTF-8' nofilter}"></script>
 <script type="text/javascript">
   (function () {
     function initMyParcelCheckout() {
@@ -39,8 +39,8 @@
         street: '{$streetName|escape:'javascript':'UTF-8' nofilter}',
         houseNumber: '{$houseNumber|escape:'javascript':'UTF-8' nofilter}',
         postalCode: '{$postcode|escape:'javascript':'UTF-8' nofilter}',
-        deliveryDaysWindow: {$deliveryDaysWindow|intval},
-        dropoffDelay: {$dropoffDelay|intval},
+        deliveryDaysWindow: {$deliveryDaysWindow|intval nofilter},
+        dropoffDelay: {$dropoffDelay|intval nofilter},
         dropoffDays: '{$dropoffDays|escape:'javascript':'UTF-8' nofilter}',
         cutoffTime: '{if $cutoffTime}{$cutoffTime|escape:'javascript':'UTF-8' nofilter}:00{else}15:30:00{/if}',
         methodsAvailable: {
@@ -63,14 +63,14 @@
           fontFamily: '{$fontfamily|escape:'javascript':'UTF-8' nofilter}'
         },
         price: {
-          morning: {$morningFeeTaxIncl|floatVal},
+          morning: {$morningFeeTaxIncl|floatVal nofilter},
           standard: 0,
-          night: {$nightFeeTaxIncl|floatVal},
-          signed: {$signedFeeTaxIncl|floatVal},
-          recipientOnly: {$recipientOnlyFeeTaxIncl|floatVal},
-          signedRecipientOnly: {$signedRecipientOnlyFeeTaxIncl|floatVal},
+          night: {$nightFeeTaxIncl|floatVal nofilter},
+          signed: {$signedFeeTaxIncl|floatVal nofilter},
+          recipientOnly: {$recipientOnlyFeeTaxIncl|floatVal nofilter},
+          signedRecipientOnly: {$signedRecipientOnlyFeeTaxIncl|floatVal nofilter},
           pickup: 0,
-          expressPickup: {$morningPickupFeeTaxIncl|floatVal}
+          expressPickup: {$morningPickupFeeTaxIncl|floatVal nofilter}
         },
         baseUrl: '{$myparcel_ajax_checkout_link|escape:'javascript':'UTF-8' nofilter}',
         locale: 'nl',

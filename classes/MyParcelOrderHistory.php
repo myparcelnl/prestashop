@@ -30,14 +30,6 @@ require_once dirname(__FILE__).'/autoload.php';
 class MyParcelOrderHistory extends MyParcelObjectModel
 {
     // @codingStandardsIgnoreStart
-    /** @var int $id_shipment MyParcel consignment ID */
-    public $id_shipment;
-    /** @var string $postnl_status */
-    public $postnl_status;
-    /** @var string $date_upd */
-    public $date_upd;
-    // @codingStandardsIgnoreEnd
-
     /**
      * @see ObjectModel::$definition
      */
@@ -50,24 +42,35 @@ class MyParcelOrderHistory extends MyParcelObjectModel
             'date_upd'      => array('type' => self::TYPE_DATE,   'validate' => 'isDate',   'required' => true,                    'db_type' => 'DATETIME'),
         ),
     );
+    /** @var int $id_shipment MyParcel consignment ID */
+    public $id_shipment;
+    /** @var string $postnl_status */
+    public $postnl_status;
+    /** @var string $date_upd */
+    public $date_upd;
+    // @codingStandardsIgnoreEnd
 
     /**
      * Log a status update
      *
-     * @param int    $idShipment   MyParcel shipment ID
-     * @param int    $postnlStatus PostNL status
-     * @param string $date         Date
+     * @param int         $idShipment   MyParcel shipment ID
+     * @param int         $postnlStatus PostNL status
+     * @param string|null $date         Date
      *
      * @return bool Indicates whether the update was successfully logged
      */
-    public static function log($idShipment, $postnlStatus, $date)
+    public static function log($idShipment, $postnlStatus, $date = null)
     {
+        if (!$date) {
+            $date = date('Y-m-d H:i:s');
+        }
+
         return (bool) Db::getInstance()->insert(
             bqSQL(self::$definition['table']),
             array(
-                'id_shipment' => (int) $idShipment,
+                'id_shipment'   => (int) $idShipment,
                 'postnl_status' => (int) $postnlStatus,
-                'date_upd' => date('Y-m-d H:i:s', strtotime($date)),
+                'date_upd'      => pSQL($date),
             )
         );
     }
@@ -97,6 +100,69 @@ class MyParcelOrderHistory extends MyParcelObjectModel
     }
 
     /**
+     * Set shipped status
+     *
+     * @param int $idShipment
+     */
+    public static function setShipped($idShipment)
+    {
+        $targetOrderState = (int) Configuration::get(MyParcel::SHIPPED_STATUS);
+        if (!$targetOrderState) {
+            return;
+        }
+
+        self::setOrderStatus($idShipment, $targetOrderState);
+    }
+
+    /**
+     * Set received status
+     *
+     * @param int $idShipment
+     */
+    public static function setReceived($idShipment)
+    {
+        $targetOrderState = (int) Configuration::get(MyParcel::RECEIVED_STATUS);
+        if (!$targetOrderState) {
+            return;
+        }
+
+        self::setOrderStatus($idShipment, $targetOrderState);
+    }
+
+    /**
+     * @param int $idShipment Shipment ID
+     * @param int $status     Target order state
+     *
+     * @return void
+     * @since 1.0.0
+     */
+    public static function setOrderStatus($idShipment, $status)
+    {
+        $targetOrderState = (int) $status;
+        if (!$targetOrderState) {
+            return;
+        }
+
+        $order = MyParcelOrder::getOrderByShipmentId($idShipment);
+        if (Validate::isLoadedObject($order)) {
+            $history = $order->getHistory(Context::getContext()->language->id);
+            $found = false;
+            foreach ($history as $item) {
+                if ((int) $item['id_order_state'] === $targetOrderState) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $history = new OrderHistory();
+                $history->id_order = (int) $order->id;
+                $history->changeIdOrderState($targetOrderState, (int) $order->id, !$order->hasInvoice());
+                $history->addWithemail(true);
+            }
+        }
+    }
+
+    /**
      * Sort results from getShipmentHistoryByOrderId
      *
      * @param array $results
@@ -110,15 +176,15 @@ class MyParcelOrderHistory extends MyParcelObjectModel
         foreach ($results as $result) {
             if (!array_key_exists($result['id_shipment'], $shipments)) {
                 $shipments[$result['id_shipment']] = array(
-                    'shipment' => Tools::jsonDecode($result['shipment'], true),
+                    'shipment'   => Tools::jsonDecode($result['shipment'], true),
                     'tracktrace' => $result['tracktrace'],
-                    'postcode' => $result['postcode'],
-                    'history' => array(),
+                    'postcode'   => $result['postcode'],
+                    'history'    => array(),
                 );
             }
             $shipments[$result['id_shipment']]['history'][] = array(
                 'postnl_status' => $result['postnl_status'],
-                'date_upd' => $result['date_upd'],
+                'date_upd'      => $result['date_upd'],
             );
         }
 

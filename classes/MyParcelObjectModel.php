@@ -59,7 +59,7 @@ class MyParcelObjectModel extends ObjectModel
             $sql .= ',';
         }
         $sql = trim($sql, ',');
-        $sql .= ')';
+        $sql .= ') ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
 
         try {
             $success &= \Db::getInstance()->execute($sql);
@@ -97,7 +97,7 @@ class MyParcelObjectModel extends ObjectModel
             $sql .= 'PRIMARY KEY (`'.bqSQL($definition['primary']).'`, `id_lang`)';
 
 
-            $sql .= ')';
+            $sql .= ') ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
 
             try {
                 $success &= \Db::getInstance()->execute($sql);
@@ -132,7 +132,7 @@ class MyParcelObjectModel extends ObjectModel
             // Primary key
             $sql .= 'PRIMARY KEY (`'.bqSQL($definition['primary']).'`, `id_shop`)';
 
-            $sql .= ')';
+            $sql .= ') ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
 
             try {
                 $success &= \Db::getInstance()->execute($sql);
