@@ -228,6 +228,30 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
     }
 
     /**
+     * @param int      $idReference
+     * @param int|null $idShop
+     *
+     * @return MyParcelCarrierDeliverySetting
+     */
+    public static function createDefault($idReference, $idShop = null)
+    {
+        if (!$idShop) {
+            $idShop = (int) Context::getContext()->shop->id;
+        }
+
+        $mcds = new self();
+        foreach (self::$definition['fields'] as $key => $field) {
+            if ($field['required'] && $field['default']) {
+                $mcds->{$key} = $field['default'];
+            }
+        }
+        $mcds->id_reference = $idReference;
+        $mcds->id_shop = $idShop;
+
+        return $mcds;
+    }
+
+    /**
      * Get delivery option by Carrier Reference
      *
      * @param int $idReference Carrier reference

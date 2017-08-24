@@ -285,6 +285,13 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     {
         $carrier = new Carrier($cart->id_carrier);
         $mcds = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
+        if (!Validate::isLoadedObject($mcds)) {
+            $mcds = MyParcelCarrierDeliverySetting::createDefault($carrier->id_reference);
+            try {
+                $mcds->save();
+            } catch (Exception $e) {
+            }
+        }
 
         return (bool) $mcds->mailbox_package;
     }

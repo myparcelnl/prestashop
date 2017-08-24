@@ -123,7 +123,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.5';
+        $this->version = '2.0.6';
 
         $this->author = 'MyParcel';
 
