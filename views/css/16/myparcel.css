@@ -1,0 +1,105 @@
+@CHARSET "UTF-8";
+
+.myparcel_table {
+	width: 100%;
+}
+
+.myparcel_table td {
+	text-align: right;
+}
+
+.myparcel_table td.mypafunc {
+	width: 55px;
+	vertical-align: top;
+	padding-left: 10px;
+}
+
+.myparcel_table div {
+	white-space: nowrap;
+	width: 100%;
+}
+
+.myparcel_table img {
+	width: 18px;
+	height: 20px;
+	margin-left: 5px;
+	vertical-align: top;
+}
+
+.myparcel_table tr td {
+	border-bottom: none !important;
+}
+
+.mypaleft {
+	float: left;
+	margin-left: 10px;
+}
+
+.myparcel_align_right {
+	text-align: right !important;
+}
+
+.myparcel-action-column {
+	width: 240px;
+}
+
+.nobootstrap label[for=MYPARCEL_FRONTEND_PLUGIN], .nobootstrap label[for=MYPARCEL_REMOVE_DATA_AFTER_UNINSTALL] {
+	width: 25px;
+}
+
+.mypa_item {
+	min-width: 200px;
+}
+
+.mypa_item_check {
+	float: left;
+	width: 50px;
+}
+.mypa_item_check input[type=checkbox] {
+	vertical-align: middle;
+	display: inline-block;
+	margin-top: 25%;
+	margin-bottom: 25%;
+}
+
+.mypa_item_info {
+	float: left;
+	width: 100%;
+	min-width: 100px;
+}
+.mypa_item_btns {
+	float: right;
+	width: 50px;
+}
+
+@media (max-width: 992px) {
+	.mypa_url {
+		white-space: pre-wrap; /* css-3 */
+		white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+		white-space: -pre-wrap; /* Opera 4-6 */
+		white-space: -o-pre-wrap; /* Opera 7 */
+		word-wrap: break-word;
+	}
+	.myparcel-header-icon {
+		display: none !important;
+	}
+
+	.myparcel_align_right {
+		text-align: center !important;
+	}
+
+	.mypa_item {
+		min-width: 200px;
+	}
+
+	.mypa_item_info {
+		width: calc(100% - 50px);
+		min-width: 100px;
+	}
+	.mypa_item_check {
+		display: none;
+	}
+	.table-responsive-row td:nth-last-of-type(2):before {
+		content: "MyParcel";
+	}
+}
