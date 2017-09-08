@@ -43,6 +43,7 @@
         dropoffDelay: {$dropoffDelay|intval nofilter},
         dropoffDays: '{$dropoffDays|escape:'javascript':'UTF-8' nofilter}',
         cutoffTime: '{if $cutoffTime}{$cutoffTime|escape:'javascript':'UTF-8' nofilter}:00{else}15:30:00{/if}',
+        cc: '{$countryIso|escape:'javascript':'UTF-8'}',
         methodsAvailable: {
           timeframes: true,
           pickup: {if $pickup}true{else}false{/if},

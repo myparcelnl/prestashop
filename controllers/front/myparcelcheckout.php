@@ -66,15 +66,13 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         /** @var Cart $cart */
         $cart = $this->context->cart;
         if (!Validate::isLoadedObject($cart)) {
-            echo $context->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
-            die();
+            $this->hideMe();
         }
 
         $address = new Address((int) $cart->id_address_delivery);
         if (!preg_match('/^(.*?)\s+(\d+)(.*)$/', $address->address1.' '.$address->address2, $m)) {
             // No house number
-            echo $context->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
-            die();
+            $this->hideMe();
         }
 
         $streetName = trim($m[1]);
@@ -92,21 +90,18 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
 
         $carrier = new Carrier($cart->id_carrier);
         if (!Validate::isLoadedObject($carrier)) {
-            echo $context->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
-            die();
+            $this->hideMe();
         }
 
         $this->myParcelCarrierDeliverySetting = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
         if (!$this->myParcelCarrierDeliverySetting) {
-            echo $context->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
-            die();
+            $this->hideMe();
         }
 
         if (version_compare(_PS_VERSION_, '1.7.0.0', '>')
             && !($this->myParcelCarrierDeliverySetting->delivery || $this->myParcelCarrierDeliverySetting->pickup)
         ) {
-            echo $context->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
-            die();
+            $this->hideMe();
         }
 
         $cutoffTimes = $this->myParcelCarrierDeliverySetting->getCutOffTimes(date('Y-m-d'), MyParcelCarrierDeliverySetting::ENUM_DELIVERY);
@@ -116,12 +111,18 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             $cutoffTime = MyParcelCarrierDeliverySetting::DEFAULT_CUTOFF;
         }
 
+        $countryIso = Tools::strtolower(Country::getIsoById($address->id_country));
+        if (!in_array($countryIso, array('nl', 'be'))) {
+            $this->hideMe();
+        }
+
         $this->context->smarty->assign(
             array(
                 'streetName'                    => $streetName,
                 'houseNumber'                   => $houseNumber,
                 'postcode'                      => $address->postcode,
                 'langIso'                       => Tools::strtolower(Context::getContext()->language->iso_code),
+                'countryIso'                    => $countryIso,
                 'express'                       => (bool) $this->myParcelCarrierDeliverySetting->morning_pickup,
                 'delivery'                      => (bool) $this->useTimeframes(),
                 'pickup'                        => (bool) $this->myParcelCarrierDeliverySetting->pickup,
@@ -246,5 +247,16 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             'success'  => true,
             'response' => Tools::jsonDecode($response),
         )));
+    }
+
+    /**
+     * Hide the iframe
+     *
+     * @return void
+     */
+    protected function hideMe()
+    {
+        echo Context::getContext()->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
+        die();
     }
 }

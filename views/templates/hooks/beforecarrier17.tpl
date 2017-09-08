@@ -50,6 +50,12 @@
     }
 
     function checkCarrierList() {
+      // Only check the carrier list when we are at step 3
+      var currentStep = parseInt($('.checkout-step.js-current-step').find('.step-number').text(), 10);
+      if (currentStep !== 3) {
+        return;
+      }
+
       // PrestaShop lacks an event in its API that tells us whether the carrier was actually changed on the server
       // We can only wait for all XHR events to have finished and then start requesting the new hook HTML
       if ($.active) {
