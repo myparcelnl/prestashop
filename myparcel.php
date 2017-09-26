@@ -123,7 +123,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.7';
+        $this->version = '2.0.8';
 
         $this->author = 'MyParcel';
 
@@ -3426,9 +3426,7 @@ class MyParcel extends Module
             return '';
         }
 
-        if (Tools::strtoupper($currency->iso_code) === 'EUR'
-            && ($mcds->delivery || $mcds->pickup)
-        ) {
+        if ($mcds->delivery || $mcds->pickup) {
             return $this->display(__FILE__, 'views/templates/hooks/beforecarrier.tpl');
         }
 
@@ -3637,8 +3635,30 @@ class MyParcel extends Module
                 $extraCosts = (float) $deliverySetting->morning_pickup_fee_tax_incl;
             }
         }
+        // Calculate the conversion to make before displaying prices
+        // It is comprised of taxes and currency conversions
+        /** @var Currency $defaultCurrency */
+        $defaultCurrency = Currency::getCurrencyInstance(Configuration::get(' PS_CURRENCY_DEFAULT'));
+        /** @var Currency $currentCurrency */
+        $currentCurrency = $this->context->currency;
+        $conversion = $defaultCurrency->conversion_rate * $currentCurrency->conversion_rate;
+        // Extra costs are entered with 21% VAT
+        $taxRate = 1 / 1.21;
 
-        return (($extraCosts / 1.21) + $this->calcPackageShippingCost($cart, $carrier->id, false, null, null, null, false));
+        // Calculate tax rate
+        $useTax = (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) && Configuration::get('PS_TAX');
+        $carrierTax = 1;
+        if (Configuration::get('PS_ATCP_SHIPWRAP')) {
+            if ($useTax) {
+                $carrierTax = (1 + $cart->getAverageProductsTaxRate());
+            }
+        } else {
+            if ($useTax && $carrier->getTaxesRate($address)) {
+                $carrierTax = (1 + ($carrier->getTaxesRate($address) / 100));
+            }
+        }
+
+        return $extraCosts * $conversion * $taxRate + ($this->calcPackageShippingCost($cart, $carrier->id, $useTax, null, null, null, false) / $carrierTax);
     }
 
     /**

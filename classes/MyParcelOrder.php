@@ -193,10 +193,10 @@ class MyParcelOrder extends MyParcelObjectModel
         }
 
         if (Configuration::get(MyParcel::WEBHOOK_ENABLED)) {
-            if ((int) $statusCode >= 3 && (int) $statusCode <= 5 && Configuration::get(MyParcel::SHIPPED_STATUS)) {
+            if ($statusCode >= 3 && $statusCode <= 5 && Configuration::get(MyParcel::SHIPPED_STATUS)) {
                 MyParcelOrderHistory::setShipped($idShipment);
             }
-            if ((int) $statusCode === 7 && Configuration::get(MyParcel::SHIPPED_STATUS)) {
+            if ($statusCode >= 7 && $statusCode <= 11 && Configuration::get(MyParcel::RECEIVED_STATUS)) {
                 MyParcelOrderHistory::setReceived($idShipment);
             }
         }

@@ -116,12 +116,35 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             $this->hideMe();
         }
 
+        // Calculate the conversion to make before displaying prices
+        // It is comprised of taxes and currency conversions
+        /** @var Currency $defaultCurrency */
+        $defaultCurrency = Currency::getCurrencyInstance(Configuration::get(' PS_CURRENCY_DEFAULT'));
+        /** @var Currency $currentCurrency */
+        $currentCurrency = $this->context->currency;
+        $conversion = $defaultCurrency->conversion_rate * $currentCurrency->conversion_rate;
+        // Extra costs are entered with 21% VAT
+        $conversion /= 1.21;
+
+        // Calculate tax rate
+        $useTax = (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) && Configuration::get('PS_TAX');
+        if (Configuration::get('PS_ATCP_SHIPWRAP')) {
+            if ($useTax) {
+                $conversion *= (1 + $cart->getAverageProductsTaxRate());
+            }
+        } else {
+            if ($useTax && $carrier->getTaxesRate($address)) {
+                $conversion *= (1 + ($carrier->getTaxesRate($address) / 100));
+            }
+        }
+
         $this->context->smarty->assign(
             array(
                 'streetName'                    => $streetName,
                 'houseNumber'                   => $houseNumber,
                 'postcode'                      => $address->postcode,
                 'langIso'                       => Tools::strtolower(Context::getContext()->language->iso_code),
+                'currencyIso'                   => Tools::strtolower(Context::getContext()->currency->iso_code),
                 'countryIso'                    => $countryIso,
                 'express'                       => (bool) $this->myParcelCarrierDeliverySetting->morning_pickup,
                 'delivery'                      => (bool) $this->useTimeframes(),
@@ -153,6 +176,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 'cutoffTime'                    => $cutoffTime,
                 'myparcel_ajax_checkout_link'   => $this->context->link->getModuleLink('myparcel', 'myparcelcheckout', array('ajax' => true), true),
                 'myparcel_deliveryoptions_link' => $this->context->link->getModuleLink('myparcel', 'deliveryoptions', array(), true),
+                'price_conversion'              => (float) $conversion,
             )
         );
 
