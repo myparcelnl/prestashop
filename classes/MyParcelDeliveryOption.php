@@ -263,12 +263,13 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             }
         }
 
-        if (Tools::strtoupper(Country::getIsoById($address->id_country)) === 'NL') {
-            if (isset($deliveryOption->type) && $deliveryOption->type === 'pickup') {
-                return self::createPickupConcept($address, $deliveryOption, $order);
-            } else {
-                return self::createNationalConcept($address, $deliveryOption, $order, $mailboxPackage);
-            }
+
+        $countryIso = Tools::strtolower(Country::getIsoById($address->id_country));
+
+        if (isset($deliveryOption->type) && $deliveryOption->type === 'pickup' && in_array($countryIso, array('nl', 'be'))) {
+            return self::createPickupConcept($address, $deliveryOption, $order);
+        } elseif ($countryIso === 'nl') {
+            return self::createNationalConcept($address, $deliveryOption, $order, $mailboxPackage);
         } else {
             return self::createInternationalConcept($address, $order);
         }
@@ -404,12 +405,14 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 'email'       => ($configuration[MyParcel::LINK_EMAIL]) ? $email : '',
             ),
             'options'   => (object) $options,
-            'pickup'    => (object) array(
-                'postal_code'   => (string) $deliveryOption->data->postal_code,
-                'street'        => (string) $deliveryOption->data->street,
-                'city'          => (string) $deliveryOption->data->city,
-                'number'        => (string) $deliveryOption->data->number,
-                'location_name' => (string) $deliveryOption->data->location,
+            'pickup' => (object) array(
+                'postal_code'       => (string) $deliveryOption->data->postal_code,
+                'street'            => (string) $deliveryOption->data->street,
+                'city'              => (string) $deliveryOption->data->city,
+                'number'            => (string) $deliveryOption->data->number,
+                'location_name'     => (string) $deliveryOption->data->location,
+                'location_code'     => (string) $deliveryOption->data->location_code,
+                'retail_network_id' => (string) $deliveryOption->data->retail_network_id,
             ),
             'carrier'   => 1,
         );

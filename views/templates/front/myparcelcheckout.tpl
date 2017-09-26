@@ -43,6 +43,7 @@
         dropoffDelay: {$dropoffDelay|intval nofilter},
         dropoffDays: '{$dropoffDays|escape:'javascript':'UTF-8' nofilter}',
         cutoffTime: '{if $cutoffTime}{$cutoffTime|escape:'javascript':'UTF-8' nofilter}:00{else}15:30:00{/if}',
+        cc: '{$countryIso|escape:'javascript':'UTF-8'}',
         methodsAvailable: {
           timeframes: true,
           pickup: {if $pickup}true{else}false{/if},
@@ -63,17 +64,19 @@
           fontFamily: '{$fontfamily|escape:'javascript':'UTF-8' nofilter}'
         },
         price: {
-          morning: {$morningFeeTaxIncl|floatVal nofilter},
+          morning: {$morningFeeTaxIncl|floatval nofilter},
           standard: 0,
-          night: {$nightFeeTaxIncl|floatVal nofilter},
-          signed: {$signedFeeTaxIncl|floatVal nofilter},
-          recipientOnly: {$recipientOnlyFeeTaxIncl|floatVal nofilter},
-          signedRecipientOnly: {$signedRecipientOnlyFeeTaxIncl|floatVal nofilter},
+          night: {$nightFeeTaxIncl|floatval nofilter},
+          signed: {$signedFeeTaxIncl|floatval nofilter},
+          recipientOnly: {$recipientOnlyFeeTaxIncl|floatval nofilter},
+          signedRecipientOnly: {$signedRecipientOnlyFeeTaxIncl|floatval nofilter},
           pickup: 0,
-          expressPickup: {$morningPickupFeeTaxIncl|floatVal nofilter}
+          expressPickup: {$morningPickupFeeTaxIncl|floatval nofilter}
         },
+        priceConversion: {$price_conversion|floatval},
         baseUrl: '{$myparcel_ajax_checkout_link|escape:'javascript':'UTF-8' nofilter}',
-        locale: 'nl',
+        locale: 'nl-NL',
+        currency: '{$currencyIso|escape:'javascript':'UTF-8'}',
         translations: {
           'en-US': {
             morning: 'Ochtend',

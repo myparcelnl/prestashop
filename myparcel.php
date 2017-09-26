@@ -123,7 +123,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.6';
+        $this->version = '2.0.8';
 
         $this->author = 'MyParcel';
 
@@ -807,7 +807,7 @@ class MyParcel extends Module
                 )
             );
 
-            Media::addJsDef(['myparcel_module_url' => __PS_BASE_URI__."modules/{$this->name}/"]);
+            Media::addJsDef(array('myparcel_module_url' => __PS_BASE_URI__."modules/{$this->name}/"));
 
             $html .= $this->display(__FILE__, 'views/templates/admin/export/adminvars.tpl');
 
@@ -880,6 +880,10 @@ class MyParcel extends Module
                 'ajaxUrl'          => $this->moduleUrlWithoutToken,
             )
         );
+
+        foreach ($this->basicCheck() as $error) {
+            $this->context->controller->errors[] = $error;
+        }
 
         $output = '';
 
@@ -3144,14 +3148,14 @@ class MyParcel extends Module
         $shippedStatus = new OrderState(Configuration::get('PS_OS_SHIPPING'), $this->context->language->id);
         $deliveredStatus = new OrderState(Configuration::get('PS_OS_DELIVERED'), $this->context->language->id);
         if (!Validate::isLoadedObject($shippedStatus)) {
-            $shippedStatus = (object) [
+            $shippedStatus = array(
                 'name' => 'Verzonden',
-            ];
+            );
         }
         if (!Validate::isLoadedObject($deliveredStatus)) {
-            $deliveredStatus = (object) [
+            $deliveredStatus = array(
                 'name' => 'Afgeleverd',
-            ];
+            );
         }
 
         return array(
@@ -3384,7 +3388,9 @@ class MyParcel extends Module
         /** @var Cart $cart */
         $cart = $this->context->cart;
         if (!Validate::isLoadedObject($cart)) {
-            Logger::addLog("{$this->displayName}: No valid cart found");
+            if (Configuration::get(self::LOG_API)) {
+                Logger::addLog("{$this->displayName}: No valid cart found");
+            }
 
             return '';
         }
@@ -3395,8 +3401,9 @@ class MyParcel extends Module
         $address = new Address((int) $cart->id_address_delivery);
         if (!preg_match('/^(.*?)\s+(\d+)(.*)$/', $address->address1.' '.$address->address2, $m)) {
             // No house number
-
-            Logger::addLog("{$this->displayName}: No housenumber for Cart {$cart->id}");
+            if (Configuration::get(self::LOG_API)) {
+                Logger::addLog("{$this->displayName}: No housenumber for Cart {$cart->id}");
+            }
 
             return '';
         }
@@ -3412,14 +3419,14 @@ class MyParcel extends Module
 
         $mcds = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
         if (!Validate::isLoadedObject($mcds)) {
-            Logger::addLog("{$this->displayName}: Cannot retrieve settings from the database");
+            if (Configuration::get(self::LOG_API)) {
+                Logger::addLog("{$this->displayName}: Cannot retrieve settings from the database");
+            }
 
             return '';
         }
 
-        if (Tools::strtoupper($currency->iso_code) === 'EUR'
-            && ($mcds->delivery || $mcds->pickup)
-        ) {
+        if ($mcds->delivery || $mcds->pickup) {
             return $this->display(__FILE__, 'views/templates/hooks/beforecarrier.tpl');
         }
 
@@ -3571,14 +3578,16 @@ class MyParcel extends Module
         $deliveryOption = MyParcelDeliveryOption::getRawByCartId($cart->id, false);
         $deliverySetting = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
         $address = new Address($cart->id_address_delivery);
+        $countryIso = (string) Country::getIsoById($address->id_country);
+        if (!$countryIso) {
+            $countryIso = Context::getContext()->country->iso_code;
+        }
+        $countryIso = Tools::strtolower($countryIso);
 
         if ($deliverySetting->mailbox_package) {
             // Disable if not delivering to the Netherlands
-            if ($address->id_country) {
-                $iso = Country::getIsoById($address->id_country);
-                if (Tools::strtoupper($iso) !== 'NL') {
-                    return false;
-                }
+            if ($countryIso !== 'nl') {
+                return false;
             }
 
             $amountOfBoxes = (int) $this->howManyMailboxPackages($cart->getProducts(), true);
@@ -3588,7 +3597,7 @@ class MyParcel extends Module
         }
 
         $extraCosts = 0;
-        if (isset($deliveryOption->type)) {
+        if (in_array($countryIso, array('nl', 'be')) && isset($deliveryOption->type)) {
             if ($deliveryOption->type === 'delivery') {
                 if (isset($deliveryOption->extraOptions->signed) && $deliveryOption->extraOptions->signed === 'true'
                 && isset($deliveryOption->extraOptions->recipientOnly) && $deliveryOption->extraOptions->recipientOnly === 'true') {
@@ -3626,8 +3635,30 @@ class MyParcel extends Module
                 $extraCosts = (float) $deliverySetting->morning_pickup_fee_tax_incl;
             }
         }
+        // Calculate the conversion to make before displaying prices
+        // It is comprised of taxes and currency conversions
+        /** @var Currency $defaultCurrency */
+        $defaultCurrency = Currency::getCurrencyInstance(Configuration::get(' PS_CURRENCY_DEFAULT'));
+        /** @var Currency $currentCurrency */
+        $currentCurrency = $this->context->currency;
+        $conversion = $defaultCurrency->conversion_rate * $currentCurrency->conversion_rate;
+        // Extra costs are entered with 21% VAT
+        $taxRate = 1 / 1.21;
 
-        return (($extraCosts / 1.21) + $this->calcPackageShippingCost($cart, $carrier->id, false, null, null, null, false));
+        // Calculate tax rate
+        $useTax = (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) && Configuration::get('PS_TAX');
+        $carrierTax = 1;
+        if (Configuration::get('PS_ATCP_SHIPWRAP')) {
+            if ($useTax) {
+                $carrierTax = (1 + $cart->getAverageProductsTaxRate());
+            }
+        } else {
+            if ($useTax && $carrier->getTaxesRate($address)) {
+                $carrierTax = (1 + ($carrier->getTaxesRate($address) / 100));
+            }
+        }
+
+        return $extraCosts * $conversion * $taxRate + ($this->calcPackageShippingCost($cart, $carrier->id, $useTax, null, null, null, false) / $carrierTax);
     }
 
     /**
@@ -4312,5 +4343,23 @@ class MyParcel extends Module
 
             return $orderCarrier->update();
         }
+    }
+
+    /**
+     * Performs a basic check and return an array with errors
+     *
+     * @return array
+     */
+    protected function basicCheck()
+    {
+        $errors = array();
+        if (!Country::getByIso('NL') && !Country::getByIso('BE')) {
+            $errors[] = $this->l('At least one of the following countries should be enabled: the Netherlands or Belgium.');
+        }
+        if (!Currency::getIdByIsoCode('EUR')) {
+            $errors[] = $this->l('At least this currency has to be enabled: EUR');
+        }
+
+        return $errors;
     }
 }
