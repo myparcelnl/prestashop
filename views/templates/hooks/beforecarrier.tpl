@@ -51,6 +51,7 @@
             updateOption: true,
             deliveryOption: selection,
           },
+          {if !Module::isEnabled('onepagecheckoutps')}
           success: function (data) {
             if (data.carrier_data) {
               var $carrierHtml = $(data.carrier_data.carrier_block);
@@ -67,6 +68,7 @@
               }
             }
           },
+          {/if}
           error: function () {
             xhr = null;
           }

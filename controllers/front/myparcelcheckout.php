@@ -79,7 +79,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         $houseNumber = trim($m[2]);
 
         // id_carrier is not defined in database before choosing a carrier, set it to a default one to match a potential cart _rule
-        if (empty($cart->id_carrier)) {
+        if (empty($cart->id_carrier) || !in_array($cart->id_carrier, array_filter(explode(',', Cart::desintifier($cart->simulateCarrierSelectedOutput()))))) {
             $checked = $cart->simulateCarrierSelectedOutput();
             $checked = ((int) Cart::desintifier($checked));
             $cart->id_carrier = $checked;
@@ -146,21 +146,25 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 'langIso'                       => Tools::strtolower(Context::getContext()->language->iso_code),
                 'currencyIso'                   => Tools::strtolower(Context::getContext()->currency->iso_code),
                 'countryIso'                    => $countryIso,
+
                 'express'                       => (bool) $this->myParcelCarrierDeliverySetting->morning_pickup,
                 'delivery'                      => (bool) $this->useTimeframes(),
                 'pickup'                        => (bool) $this->myParcelCarrierDeliverySetting->pickup,
                 'morning'                       => (bool) $this->myParcelCarrierDeliverySetting->morning,
-                'morningFeeTaxIncl'             => $carrier->is_free ? 0 : (float) $this->myParcelCarrierDeliverySetting->morning_fee_tax_incl,
-                'morningPickupFeeTaxIncl'       => $carrier->is_free ? 0 : (float) $this->myParcelCarrierDeliverySetting->morning_pickup_fee_tax_incl,
                 'night'                         => (bool) $this->myParcelCarrierDeliverySetting->evening,
-                'nightFeeTaxIncl'               => $carrier->is_free ? 0 : (float) $this->myParcelCarrierDeliverySetting->evening_fee_tax_incl,
                 'signed'                        => (bool) $this->myParcelCarrierDeliverySetting->signed,
-                'signedFeeTaxIncl'              => $carrier->is_free ? 0 : (float) $this->myParcelCarrierDeliverySetting->signed_fee_tax_incl,
                 'recipientOnly'                 => (bool) $this->myParcelCarrierDeliverySetting->recipient_only,
-                'recipientOnlyFeeTaxIncl'       => $this->myParcelCarrierDeliverySetting->recipient_only_fee_tax_incl,
-                'signedRecipientOnly'           => (bool) $this->myParcelCarrierDeliverySetting->signed_recipient_only,
-                'signedRecipientOnlyFeeTaxIncl' => $carrier->is_free ? 0 : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl,
+
+                'morningFeeTaxIncl'             => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->morning_fee_tax_incl * $conversion,
+                'morningPickupFeeTaxIncl'       => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->morning_pickup_fee_tax_incl * $conversion,
+                'nightFeeTaxIncl'               => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->evening_fee_tax_incl * $conversion,
+                'signedFeeTaxIncl'              => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->signed_fee_tax_incl * $conversion,
+                'recipientOnlyFeeTaxIncl'       => $this->myParcelCarrierDeliverySetting->recipient_only_fee_tax_incl * $conversion,
+                'signedRecipientOnly'           => (bool) $this->myParcelCarrierDeliverySetting->signed_recipient_only * $conversion,
+                'signedRecipientOnlyFeeTaxIncl' => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
+
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT),
+
                 'checkoutJs'                    => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/myparcelcheckout/dist/myparcelcheckout.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
@@ -174,9 +178,9 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 'dropoffDelay'                  => (int) $this->myParcelCarrierDeliverySetting->dropoff_delay,
                 'dropoffDays'                   => implode(';', $this->myParcelCarrierDeliverySetting->getDropoffDays(date('Y-m-d H:i:s'))),
                 'cutoffTime'                    => $cutoffTime,
+                'price_conversion'              => 1, // Backwards compatibility
                 'myparcel_ajax_checkout_link'   => $this->context->link->getModuleLink('myparcel', 'myparcelcheckout', array('ajax' => true), true),
                 'myparcel_deliveryoptions_link' => $this->context->link->getModuleLink('myparcel', 'deliveryoptions', array(), true),
-                'price_conversion'              => (float) $conversion,
             )
         );
 

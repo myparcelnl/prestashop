@@ -8,6 +8,7 @@ $_MODULE['<{myparcel}prestashop>myparcel_43f3c5a157c67de9b6faf42b637f963a'] = 'D
 $_MODULE['<{myparcel}prestashop>myparcel_1125ffa49b05dba03c6e97055629b40a'] = 'Er is een fout opgetreden bij het bijwerken van de module (bestand kan beschadigd zijn).';
 $_MODULE['<{myparcel}prestashop>myparcel_2d2c4b710382f05c8cb697187f381f7c'] = 'Het bestand om de module mee bij te werken is mogelijk beschadigd.';
 $_MODULE['<{myparcel}prestashop>myparcel_1959e3c8b64555830f33ab0b9febfaaf'] = 'De MyParcel-module kon niet worden geïnstalleerd op uw systeem. Schakel PHP 5.3.3 of hoger in.';
+$_MODULE['<{myparcel}prestashop>myparcel_8bb6633444bb076d62e221763192ac58'] = 'De `One Page Checkout` module van PresTeamShop staat geen extra kosten toe op vervoerders in de checkout. Deze functionaliteit is daarom uitgeschakeld.';
 $_MODULE['<{myparcel}prestashop>myparcel_f4f70727dc34561dfde1a3c529b6205c'] = 'Instellingen';
 $_MODULE['<{myparcel}prestashop>myparcel_1a11db3d2781e8ee1401eab17b296b6a'] = 'Module-instellingen';
 $_MODULE['<{myparcel}prestashop>myparcel_3537ab82f293d660eb1c551d1e804bbe'] = 'Standaardverzendinstellingen';

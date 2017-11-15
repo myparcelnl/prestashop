@@ -23,18 +23,72 @@ function upgrade_module_2_0_0($module)
     /** @var MyParcel $module */
 
     $sql = array();
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel` RENAME TO `'._DB_PREFIX_.'myparcel_order`';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `myparcel_id` `id_myparcel_order` INT(11) NOT NULL AUTO_INCREMENT';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `order_id` `id_order` INT(11) NOT NULL';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_status` `postnl_status` VARCHAR(255) NOT NULL';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_updated_on` `date_upd` DATETIME NOT NULL';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_final` `postnl_final` TINYINT(1) NOT NULL DEFAULT \'0\'';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `consignment_id` `id_shipment` BIGINT(20) NOT NULL DEFAULT \'0\'';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `postnl_status` `postnl_status` VARCHAR(255) DEFAULT \'1\'';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `retour` `retour` TINYINT(1) NOT NULL DEFAULT \'0\'';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tracktrace` `tracktrace` VARCHAR(32)';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` ADD `shipment` TEXT';
-    $sql[] = 'ALTER IGNORE TABLE `'._DB_PREFIX_.'myparcel_order` ADD `type` TINYINT(1) NOT NULL DEFAULT \'1\'';
+
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel` RENAME TO `'._DB_PREFIX_.'myparcel_order`';
+    }
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+            AND COLUMN_NAME = \'id_myparcel_order\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `myparcel_id` `id_myparcel_order` INT(11) NOT NULL AUTO_INCREMENT';
+    }
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+            AND COLUMN_NAME = \'id_order\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `order_id` `id_order` INT(11) NOT NULL';
+    }
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+            AND COLUMN_NAME = \'postnl_status\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_status` `postnl_status` VARCHAR(255) NOT NULL';
+    }
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+            AND COLUMN_NAME = \'date_upd\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_updated_on` `date_upd` DATETIME NOT NULL';
+
+    }
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+            AND COLUMN_NAME = \'postnl_final\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_final` `postnl_final` TINYINT(1) NOT NULL DEFAULT \'0\'';
+
+    }
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+            AND COLUMN_NAME = \'id_shipment\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `consignment_id` `id_shipment` BIGINT(20) NOT NULL DEFAULT \'0\'';
+
+    }
+
+    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `postnl_status` `postnl_status` VARCHAR(255) DEFAULT \'1\'';
+    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tracktrace` `tracktrace` VARCHAR(32)';
+    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `shipment` TEXT';
+    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `type` TINYINT(1) NOT NULL DEFAULT \'1\'';
+    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `retour` `retour` TINYINT(1) NOT NULL DEFAULT \'0\'';
+
     $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'myparcel_order_history` (
   `id_myparcel_order_history` INT(11) UNSIGNED           NOT NULL AUTO_INCREMENT,
   `id_shipment`               BIGINT(20)                 NOT NULL,
@@ -114,6 +168,19 @@ function upgrade_module_2_0_0($module)
     foreach ($hooks as $hook) {
         $module->registerHook($hook);
     }
+
+    // Remove the old template files
+    foreach (array(
+        _PS_OVERRIDE_DIR_.'controllers/admin/templates/orders/helpers/list/list_content.tpl',
+        _PS_OVERRIDE_DIR_.'controllers/admin/templates/orders/helpers/list/list_header.tpl',
+    ) as $file) {
+        if (file_exists($file)) {
+            unlink($file);
+        }
+    }
+
+    // Clear the smarty cache hereafter
+    Tools::clearCache();
 
     foreach ($sql as $query) {
         if (!Db::getInstance()->execute($query)) {

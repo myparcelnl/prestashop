@@ -123,7 +123,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.8';
+        $this->version = '2.0.9';
 
         $this->author = 'MyParcel';
 
@@ -263,21 +263,24 @@ class MyParcel extends Module
     protected function checkForUpdates()
     {
         foreach ($this->gitHubRepos as $repo) {
-            $status = Tools::file_get_contents("https://api.github.com/repos/{$repo}/releases/latest");
-            if ($status
-                && $status = Tools::jsonDecode($status, true)
-                    && isset($status['tag_name'])
-                    && isset($status['assets'][0]['browser_download_url'])
-            ) {
-                if (version_compare($status['tag_name'], $this->version, '>')) {
-                    $zipLocation = _PS_MODULE_DIR_.$this->name.'.zip';
-                    if (@!file_exists($zipLocation)) {
-                        file_put_contents($zipLocation, fopen($status['assets'][0]['browser_download_url'], 'r'));
-                    }
-                    if (@file_exists($zipLocation)) {
-                        $this->extractArchive($zipLocation);
+            try {
+                @$status = Tools::file_get_contents("https://api.github.com/repos/{$repo}/releases/latest");
+                if ($status
+                    && $status = Tools::jsonDecode($status, true)
+                        && isset($status['tag_name'])
+                        && isset($status['assets'][0]['browser_download_url'])
+                ) {
+                    if (version_compare($status['tag_name'], $this->version, '>')) {
+                        $zipLocation = _PS_MODULE_DIR_.$this->name.'.zip';
+                        if (@!file_exists($zipLocation)) {
+                            file_put_contents($zipLocation, fopen($status['assets'][0]['browser_download_url'], 'r'));
+                        }
+                        if (@file_exists($zipLocation)) {
+                            $this->extractArchive($zipLocation);
+                        }
                     }
                 }
+            } catch (Exception $e) {
             }
         }
     }
@@ -885,6 +888,10 @@ class MyParcel extends Module
             $this->context->controller->errors[] = $error;
         }
 
+        if (Module::isEnabled('onepagecheckoutps')) {
+            $this->addWarning($this->l('The `One Page Checkout` by PresTeamShop does not support additional fees on carriers. This functionality has therefore been disabled.'));
+        }
+
         $output = '';
 
         $this->postProcess();
@@ -1341,7 +1348,7 @@ class MyParcel extends Module
 
         $context = stream_context_create($opts);
 
-        $responseContent = Tools::file_get_contents("https://api.myparcel.nl/shipment_labels/{$shipments}?positions=1;2;3;4&format=A4", false, $context);
+        $responseContent = Tools::file_get_contents("https://api.myparcel.nl/shipment_labels/{$shipments}?format=A6", false, $context);
 
         if ($response = Tools::jsonDecode($responseContent, true)) {
             $response['success'] = true;
@@ -1901,6 +1908,8 @@ class MyParcel extends Module
      */
     protected function getDefaultConceptsForm()
     {
+        $currency = Currency::getDefaultCurrency();
+
         return array(
             'form' => array(
                 'legend'      => array(
@@ -2055,7 +2064,7 @@ class MyParcel extends Module
                         'label'    => $this->l('> 500'),
                         'name'     => self::DEFAULT_CONCEPT_INSURED_AMOUNT,
                         'size'     => 10,
-                        'prefix'   => '€',
+                        'prefix'   => $currency->sign,
                         'currency' => (version_compare(_PS_VERSION_, '1.6', '<')) ? false : true,
                     ),
                     array(
@@ -2456,6 +2465,7 @@ class MyParcel extends Module
                         'prefix'   => $currency->sign,
                         'suffix'   => $this->l('incl. 21% VAT'),
                         'required' => true,
+//                        'disabled' => Module::isEnabled('onepagecheckoutps'),
                     ),
                     array(
                         'type'    => 'switch',
@@ -2485,6 +2495,7 @@ class MyParcel extends Module
                         'prefix'   => $currency->sign,
                         'suffix'   => $this->l('incl. 21% VAT'),
                         'required' => true,
+                        'disabled' => Module::isEnabled('onepagecheckoutps'),
                     ),
                     array(
                         'type'    => 'switch',
@@ -2513,6 +2524,7 @@ class MyParcel extends Module
                         'prefix'   => $currency->sign,
                         'suffix'   => $this->l('incl. 21% VAT'),
                         'required' => true,
+                        'disabled' => Module::isEnabled('onepagecheckoutps'),
                     ),
                     array(
                         'type'    => 'switch',
@@ -2541,6 +2553,7 @@ class MyParcel extends Module
                         'prefix'   => $currency->sign,
                         'suffix'   => $this->l('incl. 21% VAT'),
                         'required' => true,
+                        'disabled' => Module::isEnabled('onepagecheckoutps'),
                     ),
                     array(
                         'type'    => 'switch',
@@ -2569,6 +2582,7 @@ class MyParcel extends Module
                         'prefix'   => $currency->sign,
                         'suffix'   => $this->l('incl. 21% VAT'),
                         'required' => true,
+                        'disabled' => Module::isEnabled('onepagecheckoutps'),
                     ),
                     array(
                         'type'     => 'text',
@@ -2579,6 +2593,7 @@ class MyParcel extends Module
                         'prefix'   => $currency->sign,
                         'suffix'   => $this->l('incl. 21% VAT'),
                         'required' => true,
+                        'disabled' => Module::isEnabled('onepagecheckoutps'),
                     ),
                 ),
                 'submit' => array(
@@ -3537,6 +3552,22 @@ class MyParcel extends Module
     }
 
     /**
+     * Get MyParcel locale
+     *
+     * @return string
+     *
+     * @since 2.0.9
+     */
+    public static function getLocale()
+    {
+        $language = Context::getContext()->language;
+
+        return (strlen($language->language_code) >= 5)
+            ? strtolower(substr($language->language_code, 0, 2)).'-'.strtoupper(substr($language->language_code, 3, 2))
+            : strtolower(substr($language->language_code, 0, 2)).'-'.strtoupper(substr($language->language_code, 0, 2));
+    }
+
+    /**
      * Get order shipping costs external
      *
      * @param array $params Hook parameters
@@ -3597,7 +3628,7 @@ class MyParcel extends Module
         }
 
         $extraCosts = 0;
-        if (in_array($countryIso, array('nl', 'be')) && isset($deliveryOption->type)) {
+        if (in_array($countryIso, array('nl', 'be')) && isset($deliveryOption->type) && !Module::isEnabled('onepagecheckoutps')) {
             if ($deliveryOption->type === 'delivery') {
                 if (isset($deliveryOption->extraOptions->signed) && $deliveryOption->extraOptions->signed === 'true'
                 && isset($deliveryOption->extraOptions->recipientOnly) && $deliveryOption->extraOptions->recipientOnly === 'true') {

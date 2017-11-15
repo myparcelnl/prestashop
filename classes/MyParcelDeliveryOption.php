@@ -49,7 +49,6 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             'street2'                  => array('type' => self::TYPE_STRING, 'validate' => 'isString',      'required' => false,                   'db_type' => 'TEXT'),
             'email'                    => array('type' => self::TYPE_STRING, 'validate' => 'isString',      'required' => false,                   'db_type' => 'VARCHAR(255)'),
             'phone'                    => array('type' => self::TYPE_STRING, 'validate' => 'isString',      'required' => false,                   'db_type' => 'VARCHAR(255)'),
-            'identifier'               => array('type' => self::TYPE_STRING, 'validate' => 'isString',      'required' => false,                   'db_type' => 'VARCHAR(255)'),
         ),
     );
     /** @var int $id_cart */
@@ -76,8 +75,6 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     public $email;
     /** @var string $phone */
     public $phone;
-    /** @var string $identifier */
-    public $identifier;
     // @codingStandardsIgnoreEnd
 
     /**

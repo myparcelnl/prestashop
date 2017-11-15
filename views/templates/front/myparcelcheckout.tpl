@@ -30,6 +30,8 @@
         return;
       }
 
+      window.myparcelLocale = '{Context::getContext()->language->iso_code|strtolower|escape:'javascript':'UTF-8'}';
+
       window.checkout = new MyParcelCheckout({
         target: 'myparcelapp',
         form: null,
@@ -45,7 +47,7 @@
         cutoffTime: '{if $cutoffTime}{$cutoffTime|escape:'javascript':'UTF-8' nofilter}:00{else}15:30:00{/if}',
         cc: '{$countryIso|escape:'javascript':'UTF-8'}',
         methodsAvailable: {
-          timeframes: true,
+          timeframes: {if $delivery}true{else}false{/if},
           pickup: {if $pickup}true{else}false{/if},
           expressPickup: {if $express}true{else}false{/if},
           morning: {if $morning}true{else}false{/if},
@@ -73,9 +75,8 @@
           pickup: 0,
           expressPickup: {$morningPickupFeeTaxIncl|floatval nofilter}
         },
-        priceConversion: {$price_conversion|floatval},
         baseUrl: '{$myparcel_ajax_checkout_link|escape:'javascript':'UTF-8' nofilter}',
-        locale: 'nl-NL',
+        locale: '{MyParcel::getLocale()|escape:'javascript':'UTF-8'}',
         currency: '{$currencyIso|escape:'javascript':'UTF-8'}',
         translations: {
           'en-US': {
