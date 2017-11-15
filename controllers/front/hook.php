@@ -76,7 +76,7 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
 
         $data = Tools::jsonDecode($content, true);
         if (isset($data['data']['hooks']) && is_array($data['data']['hooks'])) {
-            foreach ($data['data']['hooks'] as &$item) {
+            foreach ($data['data']['hooks'] as $item) {
                 if (isset($item['shipment_id'])
                     && isset($item['status'])
                     && isset($item['barcode'])

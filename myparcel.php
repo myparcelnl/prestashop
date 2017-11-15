@@ -789,7 +789,7 @@ class MyParcel extends Module
             $supportedCountries = self::getSupportedCountries();
             if (isset($supportedCountries['data']['countries'][0])) {
                 $countryIsos = array_keys($supportedCountries['data']['countries'][0]);
-                foreach (Country::getCountries($this->context->language->id) as &$country) {
+                foreach (Country::getCountries($this->context->language->id) as $country) {
                     if (in_array(Tools::strtoupper($country['iso_code']), $countryIsos)) {
                         $countries[Tools::strtoupper($country['iso_code'])] = array(
                             'iso_code' => Tools::strtoupper($country['iso_code']),
@@ -1348,7 +1348,7 @@ class MyParcel extends Module
 
         $context = stream_context_create($opts);
 
-        $responseContent = Tools::file_get_contents("https://api.myparcel.nl/shipment_labels/{$shipments}?format=A6", false, $context);
+        $responseContent = Tools::file_get_contents("https://api.myparcel.nl/shipment_labels/{$shipments}?positions=1;2;3;4&format=A4", false, $context);
 
         if ($response = Tools::jsonDecode($responseContent, true)) {
             $response['success'] = true;
@@ -3160,19 +3160,6 @@ class MyParcel extends Module
      */
     protected function getApiForm()
     {
-        $shippedStatus = new OrderState(Configuration::get('PS_OS_SHIPPING'), $this->context->language->id);
-        $deliveredStatus = new OrderState(Configuration::get('PS_OS_DELIVERED'), $this->context->language->id);
-        if (!Validate::isLoadedObject($shippedStatus)) {
-            $shippedStatus = array(
-                'name' => 'Verzonden',
-            );
-        }
-        if (!Validate::isLoadedObject($deliveredStatus)) {
-            $deliveredStatus = array(
-                'name' => 'Afgeleverd',
-            );
-        }
-
         return array(
             'form' => array(
                 'legend' => array(
@@ -3187,25 +3174,6 @@ class MyParcel extends Module
                         'size'      => 50,
                         'maxlength' => 50,
                         'required'  => true,
-                    ),
-                    array(
-                        'type'    => 'switch',
-                        'label'   => $this->l('Automate order statuses'),
-                        'desc'    => sprintf($this->l('By enabling this options the statuses `%s` and `%s` will automatically be set after exporting an order.'), $shippedStatus->name, $deliveredStatus->name),
-                        'name'    => self::WEBHOOK_ENABLED,
-                        'is_bool' => true,
-                        'values'  => array(
-                            array(
-                                'id'    => 'active_on',
-                                'value' => true,
-                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
-                            ),
-                            array(
-                                'id'    => 'active_off',
-                                'value' => false,
-                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
-                            ),
-                        ),
                     ),
                 ),
                 'cancel' => array(
@@ -3300,6 +3268,18 @@ class MyParcel extends Module
      */
     protected function getAdvancedForm()
     {
+        $shippedStatus = new OrderState(Configuration::get('PS_OS_SHIPPING'), $this->context->language->id);
+        $deliveredStatus = new OrderState(Configuration::get('PS_OS_DELIVERED'), $this->context->language->id);
+        if (!Validate::isLoadedObject($shippedStatus)) {
+            $shippedStatus = array(
+                'name' => 'Verzonden',
+            );
+        }
+        if (!Validate::isLoadedObject($deliveredStatus)) {
+            $deliveredStatus = array(
+                'name' => 'Afgeleverd',
+            );
+        }
         $orderStatuses = array(
             array(
                 'name'           => $this->l('Disable this status'),
@@ -3321,6 +3301,25 @@ class MyParcel extends Module
                     'icon'  => 'icon-cogs',
                 ),
                 'input'  => array(
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Automate order statuses'),
+                        'desc'    => sprintf($this->l('By enabling this options the statuses `%s` and `%s` will automatically be set after exporting an order.'), $shippedStatus->name, $deliveredStatus->name),
+                        'name'    => self::WEBHOOK_ENABLED,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
                     array(
                         'type'     => 'select',
                         'label'    => $this->l('Shipped status'),
