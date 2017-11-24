@@ -158,7 +158,7 @@ class MyParcel extends Module
      */
     protected function checkWebhooks()
     {
-        $lastCheck = (int) Configuration::get(self::WEBHOOK_LAST_CHECK, (int) Configuration::get('PS_LANG_DEFAULT'), Shop::getGroupFromShop((int) Configuration::get('PS_SHOP_DEFAULT')), (int) Configuration::get('PS_SHOP_DEFAULT'));
+        $lastCheck = (int) Configuration::get(self::WEBHOOK_LAST_CHECK);
         $webHookId = Configuration::get(self::WEBHOOK_ID);
 
         if (time() > $lastCheck + self::WEBHOOK_CHECK_INTERVAL || !$webHookId || Tools::getValue($this->name.'CheckForUpdates')) {
@@ -223,12 +223,12 @@ class MyParcel extends Module
                     if ($response) {
                         $data = Tools::jsonDecode($response, true);
                         if (isset($data['data']['ids'][0]['id'])) {
-                            Configuration::updateValue(self::WEBHOOK_ID, (int) $data['data']['ids'][0]['id'], false, 0, 0);
+                            Configuration::updateValue(self::WEBHOOK_ID, (int) $data['data']['ids'][0]['id']);
                         }
                     }
                 }
 
-                Configuration::updateValue(self::WEBHOOK_LAST_CHECK, time(), false, 0, 0);
+                Configuration::updateValue(self::WEBHOOK_LAST_CHECK, time());
             }
 
             self::retrieveSupportedCountries();
@@ -3688,7 +3688,7 @@ class MyParcel extends Module
             }
         }
 
-        return $extraCosts * $conversion * $taxRate + ($this->calcPackageShippingCost($cart, $carrier->id, $useTax, null, null, null, false) / $carrierTax);
+        return $extraCosts * $conversion * $taxRate + ($this->calcPackageShippingCost($cart, $carrier->id, $useTax, null, null, null, false) / ($useTax ? 1 : $carrierTax));
     }
 
     /**
