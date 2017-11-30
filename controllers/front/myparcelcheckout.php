@@ -165,7 +165,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
 
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT),
 
-                'checkoutJs'                    => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/myparcelcheckout/dist/myparcelcheckout.js'),
+                'checkoutJs'                    => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/myparcelcheckout/dist/myparcelcheckout2.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),

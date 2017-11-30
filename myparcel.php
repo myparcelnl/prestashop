@@ -3683,8 +3683,18 @@ class MyParcel extends Module
                 $carrierTax = (1 + $cart->getAverageProductsTaxRate());
             }
         } else {
-            if ($useTax && $carrier->getTaxesRate($address)) {
-                $carrierTax = (1 + ($carrier->getTaxesRate($address) / 100));
+            if ($useTax) {
+                $possibleTaxRulesGroups = (int) Carrier::getIdTaxRulesGroupByIdCarrier($this->id_carrier);
+                if (empty($possibleTaxRulesGroups)) {
+                    $possibleTaxRulesGroups = (int) Carrier::getIdTaxRulesGroupMostUsed();
+                }
+                if ($possibleTaxRulesGroups) {
+                    $taxRules = TaxRule::getTaxRulesByGroupId($this->context->language->id, $possibleTaxRulesGroups);
+                    if (!empty($taxRules)) {
+                        $taxRule = $taxRules[0];
+                        $carrierTax = (1 + ($taxRule['rate'] / 100));
+                    }
+                }
             }
         }
 
