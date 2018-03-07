@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2017 thirty bees
+ * Copyright (C) 2017-2018 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to license@thirtybees.com so we can send you a copy immediately.
  *
  * @author    thirty bees <modules@thirtybees.com>
- * @copyright 2017 thirty bees
+ * @copyright 2017-2018 thirty bees
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -37,14 +37,14 @@ spl_autoload_register(
             $baseDir = dirname(__FILE__).'/BoxPacker/';
 
             // does the class use the namespace prefix?
-            $len = strlen($prefix);
+            $len = Tools::strlen($prefix);
             if (strncmp($prefix, $class, $len) !== 0) {
                 // no, move to the next registered autoloader
                 return;
             }
 
             // get the relative class name
-            $relativeClass = substr($class, $len);
+            $relativeClass = Tools::substr($class, $len);
 
             // replace the namespace prefix with the base directory, replace namespace
             // separators with directory separators in the relative class name, append
@@ -63,6 +63,7 @@ spl_autoload_register(
             'MyParcelObjectModel',
             'MyParcelOrder',
             'MyParcelOrderHistory',
+            'MyParcelTools',
         ))) {
             // base directory for the namespace prefix
             $baseDir = dirname(__FILE__).'/';

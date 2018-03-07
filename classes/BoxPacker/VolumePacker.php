@@ -1,10 +1,18 @@
 <?php
 /**
  * Box packing (3D bin packing, knapsack problem)
- * @package BoxPacker
  * @author Doug Wright
+ * @copyright 2012-2016 Doug Wright
+ * @license MIT
  */
+
 namespace MyParcelModule\BoxPacker;
+
+if (!defined('_PS_VERSION_')) {
+    return;
+}
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * Actual packer
@@ -73,17 +81,26 @@ class VolumePacker
                     $layerLength += $itemWidth;
                     $layerWidth = max($itemLength, $layerWidth);
                 }
-                $layerDepth = max($layerDepth, $itemToPack->getDepth()); //greater than 0, items will always be less deep
+                $layerDepth = max($layerDepth, $itemToPack->getDepth()); //greater than 0
 
                 //allow items to be stacked in place within the same footprint up to current layerdepth
                 $maxStackDepth = $layerDepth - $itemToPack->getDepth();
-                while (!$this->items->isEmpty() && $this->canStackItemInLayer($itemToPack, $this->items->top(), $maxStackDepth, $remainingWeight)) {
+                while (!$this->items->isEmpty() && $this->canStackItemInLayer(
+                    $itemToPack,
+                    $this->items->top(),
+                    $maxStackDepth,
+                    $remainingWeight
+                )) {
                     $remainingWeight -= $this->items->top()->getWeight();
                     $maxStackDepth -= $this->items->top()->getDepth();
                     $packedItems->insert($this->items->extract());
                 }
             } else {
-                if ($remainingWidth >= min($itemWidth, $itemLength) && $this->isLayerStarted($layerWidth, $layerLength, $layerDepth)) {
+                if ($remainingWidth >= min($itemWidth, $itemLength) && $this->isLayerStarted(
+                    $layerWidth,
+                    $layerLength,
+                    $layerDepth
+                )) {
                     $remainingLength += $layerLength;
                     $remainingWidth -= $layerWidth;
                     $layerWidth = $layerLength = 0;
@@ -93,15 +110,26 @@ class VolumePacker
                     continue;
                 }
 
-                $remainingWidth = $layerWidth ? min(floor($layerWidth * 1.1), $this->box->getInnerWidth()) : $this->box->getInnerWidth();
-                $remainingLength = $layerLength ? min(floor($layerLength * 1.1), $this->box->getInnerLength()) : $this->box->getInnerLength();
+                $remainingWidth = $layerWidth
+                    ? min(floor($layerWidth * 1.1), $this->box->getInnerWidth())
+                    : $this->box->getInnerWidth();
+                $remainingLength = $layerLength
+                    ? min(floor($layerLength * 1.1), $this->box->getInnerLength())
+                    : $this->box->getInnerLength();
                 $remainingDepth -= $layerDepth;
 
                 $layerWidth = $layerLength = $layerDepth = 0;
             }
         }
 
-        return new PackedBox($this->box, $packedItems, $remainingWidth, $remainingLength, $remainingDepth, $remainingWeight);
+        return new PackedBox(
+            $this->box,
+            $packedItems,
+            $remainingWidth,
+            $remainingLength,
+            $remainingDepth,
+            $remainingWeight
+        );
     }
 
     /**

@@ -1,10 +1,18 @@
 <?php
 /**
  * Box packing (3D bin packing, knapsack problem)
- * @package BoxPacker
  * @author Doug Wright
+ * @copyright 2012-2016 Doug Wright
+ * @license MIT
  */
+
 namespace MyParcelModule\BoxPacker;
+
+if (!defined('_PS_VERSION_')) {
+    return;
+}
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * Actual packer
@@ -82,8 +90,8 @@ class WeightRedistributor
                             $newHeavierBoxPacker->setItems($overWeightBoxItems);
 
                             $newHeavierBoxes = $newHeavierBoxPacker->doVolumePacking();
-                            if (count($newHeavierBoxes) > 1) { //found an edge case in packing algorithm that *increased* box count
-
+                            //found an edge case in packing algorithm that *increased* box count
+                            if (count($newHeavierBoxes) > 1) {
                                 return $originalBoxes;
                             }
 

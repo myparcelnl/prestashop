@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 DM Productions B.V.
+ * 2017-2018 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,17 +12,16 @@
  * obtain it through the world-wide-web, please send an email
  * to info@dmp.nl so we can send you a copy immediately.
  *
- * @author     DM Productions B.V. <info@dmp.nl>
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2017 DM Productions B.V.
+ * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_') && !defined('_TB_VERSION_')) {
-    exit;
+if (!defined('_PS_VERSION_')) {
+    return;
 }
 
-require_once dirname(__FILE__).'/../classes/autoload.php';
+require_once dirname(__FILE__).'/../myparcel.php';
 
 /**
  * Class MyParcelCarrierDeliverySetting
@@ -78,43 +77,280 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
     public static $definition = array(
         'table'   => 'myparcel_carrier_delivery_setting',
         'primary' => 'id_myparcel_carrier_delivery_setting',
-        'fields'  => array(
-            'id_reference'                       => array('type' => self::TYPE_INT,    'validate' => 'isInt',    'required' => true,  'default' => '0',   'db_type' => 'INT(11) UNSIGNED'),
-            'delivery'                           => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'pickup'                             => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'mailbox_package'                    => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'monday_enabled'                     => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'tuesday_enabled'                    => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'wednesday_enabled'                  => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'thursday_enabled'                   => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'friday_enabled'                     => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'saturday_enabled'                   => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'sunday_enabled'                     => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'cutoff_exceptions'                  => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'TEXT'),
-            'monday_cutoff'                      => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'VARCHAR(5)'),
-            'tuesday_cutoff'                     => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'VARCHAR(5)'),
-            'wednesday_cutoff'                   => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'VARCHAR(5)'),
-            'thursday_cutoff'                    => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'VARCHAR(5)'),
-            'friday_cutoff'                      => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'VARCHAR(5)'),
-            'saturday_cutoff'                    => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'VARCHAR(5)'),
-            'sunday_cutoff'                      => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false,                     'db_type' => 'VARCHAR(5)'),
-            'daytime'                            => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'morning'                            => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'morning_pickup'                     => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'evening'                            => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'signed'                             => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'recipient_only'                     => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'signed_recipient_only'              => array('type' => self::TYPE_BOOL,   'validate' => 'isBool',   'required' => true,  'default' => '0',   'db_type' => 'TINYINT(1) UNSIGNED'),
-            'timeframe_days'                     => array('type' => self::TYPE_INT,    'validate' => 'isInt',    'required' => true,  'default' => '1',   'db_type' => 'INT(2) UNSIGNED'),
-            'dropoff_delay'                      => array('type' => self::TYPE_INT,    'validate' => 'isInt',    'required' => true,  'default' => '0',   'db_type' => 'INT(2) UNSIGNED'),
-            'id_shop'                            => array('type' => self::TYPE_INT,    'validate' => 'isInt',    'required' => true,  'default' => '0',   'db_type' => 'INT(11) UNSIGNED'),
-            'morning_fee_tax_incl'               => array('type' => self::TYPE_FLOAT,  'validate' => 'isFloat',  'required' => true,  'default' => '0',   'db_type' => 'DECIMAL(15, 5)'),
-            'morning_pickup_fee_tax_incl'        => array('type' => self::TYPE_FLOAT,  'validate' => 'isFloat',  'required' => true,  'default' => '0',   'db_type' => 'DECIMAL(15, 5)'),
-            'default_fee_tax_incl'               => array('type' => self::TYPE_FLOAT,  'validate' => 'isFloat',  'required' => true,  'default' => '0',   'db_type' => 'DECIMAL(15, 5)'),
-            'evening_fee_tax_incl'               => array('type' => self::TYPE_FLOAT,  'validate' => 'isFloat',  'required' => true,  'default' => '0',   'db_type' => 'DECIMAL(15, 5)'),
-            'signed_fee_tax_incl'                => array('type' => self::TYPE_FLOAT,  'validate' => 'isFloat',  'required' => true,  'default' => '0',   'db_type' => 'DECIMAL(15, 5)'),
-            'recipient_only_fee_tax_incl'        => array('type' => self::TYPE_FLOAT,  'validate' => 'isFloat',  'required' => true,  'default' => '0',   'db_type' => 'DECIMAL(15, 5)'),
-            'signed_recipient_only_fee_tax_incl' => array('type' => self::TYPE_FLOAT,  'validate' => 'isFloat',  'required' => true,  'default' => '0',   'db_type' => 'DECIMAL(15, 5)'),
+        'fields' => array(
+            'id_reference'                       => array(
+                'type'     => self::TYPE_INT,
+                'validate' => 'isInt',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'INT(11) UNSIGNED',
+            )
+            ,
+            'delivery'                           => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'pickup'                             => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'mailbox_package'                    => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'monday_enabled'                     => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'tuesday_enabled'                    => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'wednesday_enabled'                  => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'thursday_enabled'                   => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'friday_enabled'                     => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'saturday_enabled'                   => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'sunday_enabled'                     => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'cutoff_exceptions'                  => array(
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'TEXT',
+            ),
+            'monday_cutoff'                      => array(
+
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'VARCHAR(5)',
+            ),
+            'tuesday_cutoff'                     =>
+                array(
+                    'type'     => self::TYPE_STRING,
+                    'validate' => 'isString',
+                    'required' => false,
+                    'db_type'  => 'VARCHAR(5)',
+                ),
+            'wednesday_cutoff'                   =>
+                array(
+                    'type'     => self::TYPE_STRING,
+                    'validate' => 'isString',
+                    'required' => false,
+                    'db_type'  => 'VARCHAR(5)',
+                ),
+            'thursday_cutoff'                    =>
+                array(
+                    'type'     => self::TYPE_STRING,
+                    'validate' => 'isString',
+                    'required' => false,
+                    'db_type'  => 'VARCHAR(5)',
+                ),
+            'friday_cutoff'                      =>
+                array(
+                    'type'     => self::TYPE_STRING,
+                    'validate' => 'isString',
+                    'required' => false,
+                    'db_type'  => 'VARCHAR(5)',
+                ),
+            'saturday_cutoff'                    =>
+                array(
+                    'type'     => self::TYPE_STRING,
+                    'validate' => 'isString',
+                    'required' => false,
+                    'db_type'  => 'VARCHAR(5)',
+                ),
+            'sunday_cutoff'                      =>
+                array(
+                    'type'     => self::TYPE_STRING,
+                    'validate' => 'isString',
+                    'required' => false,
+                    'db_type'  => 'VARCHAR(5)',
+                ),
+            'daytime'                            =>
+                array(
+                    'type'     => self::TYPE_BOOL,
+                    'validate' => 'isBool',
+                    'required' => true,
+                    'default'  => '0',
+                    'db_type'  => 'TINYINT(1) UNSIGNED',
+                )
+            ,
+            'morning'                            => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'morning_pickup'                     => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'evening'                            => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'signed'                             => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'recipient_only'                     => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'signed_recipient_only'              => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            )
+            ,
+            'timeframe_days'                     => array(
+                'type'     => self::TYPE_INT,
+                'validate' => 'isInt',
+                'required' => true,
+                'default'  => '1',
+                'db_type'  => 'INT(2) UNSIGNED',
+            )
+            ,
+            'dropoff_delay'                      => array(
+                'type'     => self::TYPE_INT,
+                'validate' => 'isInt',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'INT(2) UNSIGNED',
+            )
+            ,
+            'id_shop'                            => array(
+                'type'     => self::TYPE_INT,
+                'validate' => 'isInt',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'INT(11) UNSIGNED',
+            )
+            ,
+            'morning_fee_tax_incl'               => array(
+                'type'     => self::TYPE_FLOAT,
+                'validate' => 'isFloat',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'DECIMAL(15, 5)',
+            ),
+            'morning_pickup_fee_tax_incl'        => array(
+                'type'     => self::TYPE_FLOAT,
+                'validate' => 'isFloat',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'DECIMAL(15, 5)',
+            ),
+            'default_fee_tax_incl'               => array(
+                'type'     => self::TYPE_FLOAT,
+                'validate' => 'isFloat',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'DECIMAL(15, 5)',
+            ),
+            'evening_fee_tax_incl'               => array(
+                'type'     => self::TYPE_FLOAT,
+                'validate' => 'isFloat',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'DECIMAL(15, 5)',
+            ),
+            'signed_fee_tax_incl'                => array(
+                'type'     => self::TYPE_FLOAT,
+                'validate' => 'isFloat',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'DECIMAL(15, 5)',
+            ),
+            'recipient_only_fee_tax_incl'        => array(
+                'type'     => self::TYPE_FLOAT,
+                'validate' => 'isFloat',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'DECIMAL(15, 5)',
+            ),
+            'signed_recipient_only_fee_tax_incl' => array(
+                'type'     => self::TYPE_FLOAT,
+                'validate' => 'isFloat',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'DECIMAL(15, 5)',
+            ),
         ),
     );
     /** @var int $id_reference */
@@ -200,6 +436,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      *
      * @throws Adapter_Exception
      * @throws PrestaShopException
+     *
+     * @since 2.0.0
      */
     public function __construct($id = null, $idLang = null, $idShop = null)
     {
@@ -232,6 +470,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int|null $idShop
      *
      * @return MyParcelCarrierDeliverySetting
+     *
+     * @since 2.0.0
      */
     public static function createDefault($idReference, $idShop = null)
     {
@@ -240,7 +480,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
         }
 
         $mcds = new self();
-        foreach (self::$definition['fields'] as $key => $field) {
+        foreach (static::$definition['fields'] as $key => $field) {
             if ($field['required'] && $field['default']) {
                 $mcds->{$key} = $field['default'];
             }
@@ -257,6 +497,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int $idReference Carrier reference
      *
      * @return bool|MyParcelCarrierDeliverySetting
+     *
+     * @since 2.0.0
      */
     public static function getByCarrierReference($idReference)
     {
@@ -265,7 +507,13 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
         $sql->from(bqSQL(MyParcelCarrierDeliverySetting::$definition['table']), 'pcds');
         $sql->where('pcds.`id_reference` = '.(int) $idReference);
 
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+        try {
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+        } catch (PrestaShopException $e) {
+            Logger::addLog("MyParcel module error: {$e->getMessage()}");
+
+            return false;
+        }
         if (empty($result)) {
             return false;
         }
@@ -285,15 +533,23 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int $idMyParcelCarrierDeliverySetting MyParcelCarrierDeliverySetting ID
      *
      * @return bool|MyParcelCarrierDeliverySetting
+     *
+     * @since 2.0.0
      */
     public static function getCarrierReferenceById($idMyParcelCarrierDeliverySetting)
     {
         $sql = new DbQuery();
         $sql->select('pcds.`id_reference`');
-        $sql->from(bqSQL(self::$definition['table']), 'pcds');
-        $sql->where('pcds.`'.bqSQL(self::$definition['primary']).'` = '.(int) $idMyParcelCarrierDeliverySetting);
+        $sql->from(bqSQL(static::$definition['table']), 'pcds');
+        $sql->where('pcds.`'.bqSQL(static::$definition['primary']).'` = '.(int) $idMyParcelCarrierDeliverySetting);
 
-        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+        try {
+            return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+        } catch (PrestaShopException $e) {
+            Logger::addLog("MyParcel module error: {$e->getMessage()}");
+
+            return 0;
+        }
     }
 
     /**
@@ -302,6 +558,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int $idMyParcelCarrierDeliverySetting
      *
      * @return bool Indicates whether the delivery status has been successfully toggled
+     *
+     * @since 2.0.0
      */
     public static function toggleDelivery($idMyParcelCarrierDeliverySetting)
     {
@@ -324,44 +582,80 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param bool $autoDate
      *
      * @return bool
+     *
+     * @since 2.0.0
      */
     public function save($nullValues = false, $autoDate = true)
     {
-        self::associateCarrierToModule($this->id_reference);
+        try {
+            // Need to be associated with an active carrier
+            $carrier = Carrier::getCarrierByReference($this->id_reference);
+            if (!Validate::isLoadedObject($carrier)) {
+                return false;
+            }
+            // Cannot associate with this carrier if it is already managage by another module
+            if ($carrier->external_module_name && $carrier->external_module_name !== 'myparcel') {
+                return false;
+            }
+            // No delivery options for this carrier => release carrier
+            if (!$this->pickup && !$this->delivery && !$this->mailbox_package) {
+                static::associateCarrierToModule($this->id_reference, false);
+            } else {
+                static::associateCarrierToModule($this->id_reference);
+            }
 
-        return parent::save($nullValues, $autoDate);
+            return parent::save($nullValues, $autoDate);
+        } catch (PrestaShopException $e) {
+            Logger::addLog("MyParcel module error: {$e->getMessage()}");
+
+            return false;
+        }
     }
 
     /**
+     * Associate a carrier with a module
+     *
      * @param int  $idReference Carrier reference ID
      * @param bool $associate   Associate/disassociate the module
      *
      * @return bool
+     *
+     * @since 2.0.0
      */
     public static function associateCarrierToModule($idReference, $associate = true)
     {
-        if ($associate) {
-            return Db::getInstance()->update(
-                'carrier',
-                array(
-                    'external_module_name' => 'myparcel',
-                    'shipping_external'    => 1,
-                    'is_module'            => 1,
-                    'shipping_handling'    => 1,
-                    'need_range'           => 1,
-                ),
-                '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
-            );
-        } else {
-            return Db::getInstance()->update(
-                'carrier',
-                array(
-                    'external_module_name' => '',
-                    'shipping_external'    => 0,
-                    'is_module'            => 0,
-                ),
-                '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
-            );
+        try {
+            if ($associate) {
+                return Db::getInstance()->update(
+                    'carrier',
+                    array(
+                        'external_module_name' => 'myparcel',
+                        'shipping_external'    => 1,
+                        'is_module'            => 1,
+                        'need_range'           => 1,
+                        'range_behavior'       => 1,
+                        'max_width'            => 0,
+                        'max_height'           => 0,
+                        'max_depth'            => 0,
+                        'max_weight'           => 0,
+                    ),
+                    '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
+                );
+            } else {
+                return Db::getInstance()->update(
+                    'carrier',
+                    array(
+                        'external_module_name' => '',
+                        'shipping_external'    => 0,
+                        'is_module'            => 0,
+                    ),
+                    '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
+                );
+            }
+        } catch (PrestaShopException $e) {
+            Logger::addLog("MyParcel module error: {$e->getMessage()}");
+
+            return false;
         }
     }
 
@@ -371,6 +665,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int $idMyParcelCarrierDeliverySetting
      *
      * @return bool Indicates whether the pickup status has been successfully toggled
+     *
+     * @since 2.0.0
      */
     public static function togglePickup($idMyParcelCarrierDeliverySetting)
     {
@@ -392,6 +688,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int $idMyParcelCarrierDeliverySetting
      *
      * @return bool Indicates whether the mailbox package status has been successfully toggled
+     *
+     * @since 2.0.0
      */
     public static function toggleMailboxPackage($idMyParcelCarrierDeliverySetting)
     {
@@ -410,13 +708,15 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int    $method   Method
      *
      * @return array Array with cut off times
+     *
+     * @since 2.0.0
      */
     public function getCutOffTimes($dateFrom, $method)
     {
         $cutoffTimes = array();
-        if ($method === self::ENUM_DELIVERY) {
+        if ($method === static::ENUM_DELIVERY) {
             $date = new DateTime($dateFrom);
-            $cutoffExceptions = Tools::jsonDecode($this->cutoff_exceptions, true);
+            $cutoffExceptions = json_decode($this->cutoff_exceptions, true);
             if (!is_array($cutoffExceptions)) {
                 $cutoffExceptions = array();
             }
@@ -432,21 +732,35 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
                     }
 
                     $cutoffTimes[$i] = array(
-                        'name'       => Translate::getModuleTranslation('mpmyparceldeliveryopts', $date->format('D'), 'dates'),
-                        'time'       => (array_key_exists('cutoff', $exceptionInfo) ? $exceptionInfo['cutoff'] : ''),
+                        'name'       => Translate::getModuleTranslation(
+                            'mpmyparceldeliveryopts',
+                            $date->format('D'),
+                            'dates'
+                        ),
+                        'time'       => (array_key_exists('cutoff', $exceptionInfo)
+                            ? $exceptionInfo['cutoff']
+                            : ''),
                         'exception'  => true,
                         'nodispatch' => $nodispatch,
                     );
                 } elseif ((bool) $this->{Tools::strtolower($date->format('l')).'_enabled'}) {
                     $cutoffTimes[$i] = array(
-                        'name'       => Translate::getModuleTranslation('mpmyparceldeliveryopts', $date->format('D'), 'dates'),
+                        'name'       => Translate::getModuleTranslation(
+                            'mpmyparceldeliveryopts',
+                            $date->format('D'),
+                            'dates'
+                        ),
                         'time'       => $this->{Tools::strtolower($date->format('l')).'_cutoff'},
                         'exception'  => false,
                         'nodispatch' => false,
                     );
                 } else {
                     $cutoffTimes[$i] = array(
-                        'name'       => Translate::getModuleTranslation('mpmyparceldeliveryopts', $date->format('D'), 'dates'),
+                        'name'       => Translate::getModuleTranslation(
+                            'mpmyparceldeliveryopts',
+                            $date->format('D'),
+                            'dates'
+                        ),
                         'time'       => '',
                         'exception'  => false,
                         'nodispatch' => true,
@@ -465,13 +779,15 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param string $dateFrom From date
      *
      * @return array Array with cut off times
+     *
+     * @since 2.0.0
      */
     public function getDropoffDays($dateFrom)
     {
         $cutoffTimes = array();
 
         $date = new DateTime($dateFrom);
-        $cutoffExceptions = Tools::jsonDecode($this->cutoff_exceptions, true);
+        $cutoffExceptions = json_decode($this->cutoff_exceptions, true);
         if (!is_array($cutoffExceptions)) {
             $cutoffExceptions = array();
         }
@@ -500,57 +816,31 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
     }
 
     /**
-     * Get delay in days
-     *
-     * @param int    $type
-     * @param string $deliveryDate
-     * @param int    $maxDays
-     *
-     * @return int amount of days delay, negative if not found
-     */
-    public function getDelay($type, $deliveryDate, $maxDays)
-    {
-        $delay = -1;
-        if (empty($deliveryDate)) {
-            $deliveryDate = new DateTime($deliveryDate);
-        }
-
-        $cutoffExceptions = Tools::jsonDecode($this->cutoff_exceptions, true);
-
-        for ($i = 0; $i < $maxDays; $i++) {
-            if ($this->{Tools::strtolower($deliveryDate->format('l')).'_enabled'}) {
-                if ($delay < 0) {
-                    $delay = 0;
-                }
-
-                return $delay;
-            }
-            if (is_array($cutoffExceptions) && array_key_exists($deliveryDate->format('d-m-Y'), $cutoffExceptions)) {
-                if ($delay < 0) {
-                    $delay = 0;
-                }
-
-                return $delay;
-            }
-
-            $delay++;
-            $deliveryDate->modify('+1 day');
-        }
-
-        return -1;
-    }
-
-    /**
      * Get delivery options array
      *
      * @return array Array
+     *
+     * @since 2.0.0
      */
     public function getOptions()
     {
         return array(
-            self::MORNING => $this->{self::MORNING},
-            self::EVENING => $this->{self::EVENING},
-            self::DAYTIME => $this->{self::DAYTIME},
+            static::MORNING => $this->{static::MORNING},
+            static::EVENING => $this->{static::EVENING},
+            static::DAYTIME => $this->{static::DAYTIME},
         );
+    }
+
+    /**
+     * Get the cutoff exceptions hash
+     * Useful to invalidate caching
+     *
+     * @return string
+     *
+     * @since 2.1.0
+     */
+    public function getCutoffExceptionsHash()
+    {
+        return md5($this->cutoff_exceptions);
     }
 }

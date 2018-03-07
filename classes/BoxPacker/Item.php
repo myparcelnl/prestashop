@@ -1,10 +1,18 @@
 <?php
 /**
  * Box packing (3D bin packing, knapsack problem)
- * @package BoxPacker
  * @author Doug Wright
+ * @copyright 2012-2016 Doug Wright
+ * @license MIT
  */
+
 namespace MyParcelModule\BoxPacker;
+
+if (!defined('_PS_VERSION_')) {
+    return;
+}
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * An item to be packed
@@ -13,7 +21,6 @@ namespace MyParcelModule\BoxPacker;
  */
 interface Item
 {
-
     /**
      * Item SKU etc
      * @return string
@@ -56,5 +63,4 @@ interface Item
      * @return bool
      */
     public function getKeepFlat();
-  }
-
+}

@@ -1,10 +1,18 @@
 <?php
 /**
  * Box packing (3D bin packing, knapsack problem)
- * @package BoxPacker
  * @author Doug Wright
+ * @copyright 2012-2016 Doug Wright
+ * @license MIT
  */
+
 namespace MyParcelModule\BoxPacker;
+
+if (!defined('_PS_VERSION_')) {
+    return;
+}
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * List of possible packed box choices, ordered by utilisation (item count, volume)
@@ -13,7 +21,6 @@ namespace MyParcelModule\BoxPacker;
  */
 class PackedBoxList extends \SplMinHeap
 {
-
     /**
      * Average (mean) weight of boxes
      * @var float
@@ -68,7 +75,6 @@ class PackedBoxList extends \SplMinHeap
         }
 
         return $this->meanWeight /= $this->count();
-
     }
 
     /**
@@ -85,7 +91,6 @@ class PackedBoxList extends \SplMinHeap
         }
 
         return $weightVariance / $this->count();
-
     }
 
     /**

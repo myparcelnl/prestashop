@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 DM Productions B.V.
+ * 2017-2018 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,11 +12,14 @@
  * obtain it through the world-wide-web, please send an email
  * to info@dmp.nl so we can send you a copy immediately.
  *
- * @author     DM Productions B.V. <info@dmp.nl>
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2017 DM Productions B.V.
+ * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+
+if (!defined('_PS_VERSION_') && !defined('_PS_VERSION_')) {
+    exit;
+}
 
 function upgrade_module_2_0_0($module)
 {
@@ -24,66 +27,110 @@ function upgrade_module_2_0_0($module)
 
     $sql = array();
 
-    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT COUNT(*)
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
-            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'')) {
-        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel` RENAME TO `'._DB_PREFIX_.'myparcel_order`';
-    }
-    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT COUNT(*)
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
-            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
-            AND COLUMN_NAME = \'id_myparcel_order\'')) {
-        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `myparcel_id` `id_myparcel_order` INT(11) NOT NULL AUTO_INCREMENT';
-    }
-    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT COUNT(*)
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
-            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
-            AND COLUMN_NAME = \'id_order\'')) {
-        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `order_id` `id_order` INT(11) NOT NULL';
-    }
-    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT COUNT(*)
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
-            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
-            AND COLUMN_NAME = \'postnl_status\'')) {
-        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_status` `postnl_status` VARCHAR(255) NOT NULL';
-    }
-    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT COUNT(*)
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
-            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
-            AND COLUMN_NAME = \'date_upd\'')) {
-        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_updated_on` `date_upd` DATETIME NOT NULL';
+    try {
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'')) {
+            $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel` RENAME TO `'._DB_PREFIX_.'myparcel_order`';
+        }
+    } catch (PrestaShopException $e) {
+        Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
 
+        return false;
     }
-    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT COUNT(*)
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
-            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
-            AND COLUMN_NAME = \'postnl_final\'')) {
-        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_final` `postnl_final` TINYINT(1) NOT NULL DEFAULT \'0\'';
+    try {
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'id_myparcel_order\'')) {
+            $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `myparcel_id`'
+                .' `id_myparcel_order` INT(11) NOT NULL AUTO_INCREMENT';
+        }
+    } catch (PrestaShopException $e) {
+        Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
 
+        return false;
     }
-    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT COUNT(*)
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
-            AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
-            AND COLUMN_NAME = \'id_shipment\'')) {
-        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `consignment_id` `id_shipment` BIGINT(20) NOT NULL DEFAULT \'0\'';
+    try {
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'id_order\'')) {
+            $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `order_id` `id_order` INT(11) NOT NULL';
+        }
+    } catch (PrestaShopException $e) {
+        Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
 
+        return false;
+    }
+    try {
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'postnl_status\'')) {
+            $sql[] =
+                'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_status` `postnl_status` VARCHAR(255) NOT NULL';
+        }
+    } catch (PrestaShopException $e) {
+        Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
+
+        return false;
+    }
+    try {
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'date_upd\'')) {
+            $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_updated_on` `date_upd` DATETIME NOT NULL';
+        }
+    } catch (PrestaShopException $e) {
+        Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
+
+        return false;
+    }
+    try {
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'postnl_final\'')) {
+            $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tnt_final` `postnl_final`'
+                .' TINYINT(1) NOT NULL DEFAULT \'0\'';
+        }
+    } catch (PrestaShopException $e) {
+        Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
+
+        return false;
+    }
+    try {
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'id_shipment\'')) {
+            $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `consignment_id`'
+                .' `id_shipment` BIGINT(20) NOT NULL DEFAULT \'0\'';
+        }
+    } catch (PrestaShopException $e) {
+        Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
+
+        return false;
     }
 
-    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `postnl_status` `postnl_status` VARCHAR(255) DEFAULT \'1\'';
+    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `postnl_status` `postnl_status`'
+        .' VARCHAR(255) DEFAULT \'1\'';
     $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tracktrace` `tracktrace` VARCHAR(32)';
     $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `shipment` TEXT';
     $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `type` TINYINT(1) NOT NULL DEFAULT \'1\'';
@@ -166,7 +213,10 @@ function upgrade_module_2_0_0($module)
     );
 
     foreach ($hooks as $hook) {
-        $module->registerHook($hook);
+        try {
+            $module->registerHook($hook);
+        } catch (PrestaShopException $e) {
+        }
     }
 
     // Remove the old template files
@@ -175,7 +225,10 @@ function upgrade_module_2_0_0($module)
         _PS_OVERRIDE_DIR_.'controllers/admin/templates/orders/helpers/list/list_header.tpl',
     ) as $file) {
         if (file_exists($file)) {
-            unlink($file);
+            if (!@unlink($file)) {
+                Context::getContext()->controller->warnings[] =
+                    "Unable to remove file {$file} due to a permission error. Please remove this file manually!";
+            }
         }
     }
 
@@ -183,12 +236,31 @@ function upgrade_module_2_0_0($module)
     Tools::clearCache();
 
     foreach ($sql as $query) {
-        if (!Db::getInstance()->execute($query)) {
-            Logger::addLog($module->l('Could not upgrade the MyParcel module due to a MySQL error: ').Db::getInstance()->getMsgError());
+        try {
+            if (!Db::getInstance()->execute($query)) {
+                $errorMessage = Db::getInstance()->getMsgError();
+                Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$errorMessage}";
+
+                return false;
+            }
+        } catch (PrestaShopException $e) {
+            Context::getContext()->controller->errors[] = "Unable to update the MyParcel module: {$e->getMessage()}";
 
             return false;
         }
     }
+
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_FG_COLOR1', '#FFFFFF');
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_FG_COLOR2', '#000000');
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_BG_COLOR1', '#FBFBFB');
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_BG_COLOR2', '#01BBC5');
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_BG_COLOR3', '#75D3D8');
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_HL_COLOR', '#FF8C00');
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_FONT', 'Exo');
+    Configuration::updateGlobalValue('MYPARCEL_CHECKOUT_FSIZE', 2);
+    Configuration::updateGlobalValue('MYPARCEL_LABEL_DESCRIPTION', '{order.reference}');
+    Configuration::updateGlobalValue('MYPARCEL_SHIPPED_STATUS', (int) Configuration::get('PS_OS_SHIPPING'));
+    Configuration::updateGlobalValue('MYPARCEL_RECEIVED_STATUS', (int) Configuration::get('PS_OS_DELIVERED'));
 
     return true;
 }

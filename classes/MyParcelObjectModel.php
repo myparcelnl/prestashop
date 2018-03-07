@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 DM Productions B.V.
+ * 2017-2018 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,15 +12,16 @@
  * obtain it through the world-wide-web, please send an email
  * to info@dmp.nl so we can send you a copy immediately.
  *
- * @author     DM Productions B.V. <info@dmp.nl>
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2017 DM Productions B.V.
+ * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_') && !defined('_TB_VERSION_')) {
-    exit;
+if (!defined('_PS_VERSION_')) {
+    return;
 }
+
+require_once dirname(__FILE__).'/../myparcel.php';
 
 /**
  * Class MyParcelObjectModel
@@ -33,6 +34,7 @@ class MyParcelObjectModel extends ObjectModel
      * @param string|null $className Class name
      *
      * @return bool Indicates whether the database was successfully added
+     * @throws PrestaShopException
      */
     public static function createDatabase($className = null)
     {
@@ -42,7 +44,7 @@ class MyParcelObjectModel extends ObjectModel
             $className = get_called_class();
         }
 
-        $definition = self::getDefinition($className);
+        $definition = static::getDefinition($className);
         $sql = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'` (';
         $sql .= '`'.$definition['primary'].'` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,';
         foreach ($definition['fields'] as $fieldName => $field) {
@@ -63,8 +65,8 @@ class MyParcelObjectModel extends ObjectModel
 
         try {
             $success &= \Db::getInstance()->execute($sql);
-        } catch (\PrestaShopDatabaseException $exception) {
-            self::dropDatabase($className);
+        } catch (\PrestaShopException $exception) {
+            static::dropDatabase($className);
 
             return false;
         }
@@ -101,8 +103,8 @@ class MyParcelObjectModel extends ObjectModel
 
             try {
                 $success &= \Db::getInstance()->execute($sql);
-            } catch (\PrestaShopDatabaseException $exception) {
-                self::dropDatabase($className);
+            } catch (\PrestaShopException $exception) {
+                static::dropDatabase($className);
 
                 return false;
             }
@@ -136,8 +138,8 @@ class MyParcelObjectModel extends ObjectModel
 
             try {
                 $success &= \Db::getInstance()->execute($sql);
-            } catch (\PrestaShopDatabaseException $exception) {
-                self::dropDatabase($className);
+            } catch (\PrestaShopException $exception) {
+                static::dropDatabase($className);
 
                 return false;
             }
@@ -152,6 +154,7 @@ class MyParcelObjectModel extends ObjectModel
      * @param string|null $className Class name
      *
      * @return bool Indicates whether the database was successfully dropped
+     * @throws PrestaShopException
      */
     public static function dropDatabase($className = null)
     {
@@ -162,16 +165,19 @@ class MyParcelObjectModel extends ObjectModel
 
         $definition = \ObjectModel::getDefinition($className);
 
-        $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'`');
+        $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_
+            .bqSQL($definition['table']).'`');
 
         if (isset($definition['multilang']) && $definition['multilang']
             || isset($definition['multilang_shop']) && $definition['multilang_shop']) {
-            $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'_lang`');
+            $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_
+                .bqSQL($definition['table']).'_lang`');
         }
 
         if (isset($definition['multishop']) && $definition['multishop']
             || isset($definition['multilang_shop']) && $definition['multilang_shop']) {
-            $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'_shop`');
+            $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_
+                .bqSQL($definition['table']).'_shop`');
         }
 
         return $success;
@@ -191,7 +197,8 @@ class MyParcelObjectModel extends ObjectModel
         }
 
         $definition = \ObjectModel::getDefinition($className);
-        $sql = 'SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=\''._DB_NAME_.'\' AND TABLE_NAME=\''._DB_PREFIX_.pSQL($definition['table']).'\'';
+        $sql = 'SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=\''._DB_NAME_.'\' AND TABLE_NAME=\''
+            ._DB_PREFIX_.pSQL($definition['table']).'\'';
 
         return \Db::getInstance()->executeS($sql);
     }
@@ -205,9 +212,9 @@ class MyParcelObjectModel extends ObjectModel
      * 'table'        => 'tablename',
      * 'primary'      => 'id',
      * 'fields'       => array(
-     *     'id'     => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+     *     'id'     => array('type' => static::TYPE_INT, 'validate' => 'isInt'),
      *     'number' => array(
-     *         'type'     => self::TYPE_STRING,
+     *         'type'     => static::TYPE_STRING,
      *         'db_type'  => 'varchar(20)',
      *         'required' => true,
      *         'default'  => '25'
@@ -222,6 +229,7 @@ class MyParcelObjectModel extends ObjectModel
      * @param string|null $className        Class name
      *
      * @return bool Indicates whether the column was successfully date_add
+     * @throws PrestaShopException
      */
     public static function createColumn($name, $columnDefinition, $className = null)
     {
@@ -229,7 +237,7 @@ class MyParcelObjectModel extends ObjectModel
             $className = get_called_class();
         }
 
-        $definition = self::getDefinition($className);
+        $definition = static::getDefinition($className);
         $sql = 'ALTER TABLE `'._DB_PREFIX_.bqSQL($definition['table']).'`';
         $sql .= ' ADD COLUMN `'.bqSQL($name).'` '.bqSQL($columnDefinition['db_type']).'';
         if ($name === $definition['primary']) {
@@ -264,8 +272,8 @@ class MyParcelObjectModel extends ObjectModel
 
         $success = true;
 
-        $definition = self::getDefinition($className);
-        $columns = self::getDatabaseColumns();
+        $definition = static::getDefinition($className);
+        $columns = static::getDatabaseColumns();
         foreach ($definition['fields'] as $columnName => $columnDefinition) {
             //column exists in database
             $exists = false;
@@ -276,7 +284,7 @@ class MyParcelObjectModel extends ObjectModel
                 }
             }
             if (!$exists) {
-                $success &= self::createColumn($columnName, $columnDefinition);
+                $success &= static::createColumn($columnName, $columnDefinition);
             }
         }
 

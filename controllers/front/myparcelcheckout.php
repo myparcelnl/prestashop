@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 DM Productions B.V.
+ * 2017-2018 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,15 +12,16 @@
  * obtain it through the world-wide-web, please send an email
  * to info@dmp.nl so we can send you a copy immediately.
  *
- * @author     DM Productions B.V. <info@dmp.nl>
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2017 DM Productions B.V.
+ * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_') && !defined('_TB_VERSION_')) {
-    exit;
+if (!defined('_PS_VERSION_')) {
+    return;
 }
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * Class MyParcelmyparcelcheckoutModuleFrontController
@@ -38,6 +39,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      * MyParcelmyparcelcheckoutModuleFrontController constructor.
      *
      * @since 2.0.0
+     * @throws PrestaShopException
      */
     public function __construct()
     {
@@ -51,10 +53,17 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      *
      * @return string
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     public function initContent()
     {
+        if (!Configuration::get(MyParcel::API_KEY)) {
+            exit;
+        }
+
         if (Tools::isSubmit('ajax')) {
             $this->getDeliveryOptions();
 
@@ -70,16 +79,22 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         }
 
         $address = new Address((int) $cart->id_address_delivery);
-        if (!preg_match('/^(.*?)\s+(\d+)(.*)$/', $address->address1.' '.$address->address2, $m)) {
+
+        if (!preg_match(MyParcel::SPLIT_STREET_REGEX, MyParcelTools::getAddressLine($address), $m)) {
             // No house number
             $this->hideMe();
         }
 
-        $streetName = trim($m[1]);
-        $houseNumber = trim($m[2]);
+        $streetName = isset($m['street']) ? $m['street'] : '';
+        $houseNumber = isset($m['street_suffix']) ? $m['street_suffix'] : '';
 
-        // id_carrier is not defined in database before choosing a carrier, set it to a default one to match a potential cart _rule
-        if (empty($cart->id_carrier) || !in_array($cart->id_carrier, array_filter(explode(',', Cart::desintifier($cart->simulateCarrierSelectedOutput()))))) {
+        // id_carrier is not defined in database before choosing a carrier,
+        // set it to a default one to match a potential cart _rule
+        if (empty($cart->id_carrier) ||
+            !in_array(
+                $cart->id_carrier,
+                array_filter(explode(',', Cart::desintifier($cart->simulateCarrierSelectedOutput())))
+            )) {
             $checked = $cart->simulateCarrierSelectedOutput();
             $checked = ((int) Cart::desintifier($checked));
             $cart->id_carrier = $checked;
@@ -93,8 +108,11 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             $this->hideMe();
         }
 
-        $this->myParcelCarrierDeliverySetting = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
-        if (!$this->myParcelCarrierDeliverySetting) {
+        $this->myParcelCarrierDeliverySetting =
+            MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
+        if (!$this->myParcelCarrierDeliverySetting
+            || !Validate::isLoadedObject($this->myParcelCarrierDeliverySetting)
+        ) {
             $this->hideMe();
         }
 
@@ -104,7 +122,10 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             $this->hideMe();
         }
 
-        $cutoffTimes = $this->myParcelCarrierDeliverySetting->getCutOffTimes(date('Y-m-d'), MyParcelCarrierDeliverySetting::ENUM_DELIVERY);
+        $cutoffTimes = $this->myParcelCarrierDeliverySetting->getCutOffTimes(
+            date('Y-m-d'),
+            MyParcelCarrierDeliverySetting::ENUM_DELIVERY
+        );
         if (isset($cutoffTimes[0]['time'])) {
             $cutoffTime = $cutoffTimes[0]['time'];
         } else {
@@ -127,7 +148,8 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         $conversion /= 1.21;
 
         // Calculate tax rate
-        $useTax = (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) && Configuration::get('PS_TAX');
+        $useTax = (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC)
+            && Configuration::get('PS_TAX');
         if (Configuration::get('PS_ATCP_SHIPWRAP')) {
             if ($useTax) {
                 $conversion *= (1 + $cart->getAverageProductsTaxRate());
@@ -138,34 +160,46 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             }
         }
 
-        $this->context->smarty->assign(
-            array(
+        $smartyVars = array(
+                'base_dir_ssl'                  => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
+                    .Tools::getShopDomainSsl().__PS_BASE_URI__,
                 'streetName'                    => $streetName,
                 'houseNumber'                   => $houseNumber,
                 'postcode'                      => $address->postcode,
                 'langIso'                       => Tools::strtolower(Context::getContext()->language->iso_code),
+                'language_code'                 => Context::getContext()->language->language_code,
                 'currencyIso'                   => Tools::strtolower(Context::getContext()->currency->iso_code),
                 'countryIso'                    => $countryIso,
-
                 'express'                       => (bool) $this->myParcelCarrierDeliverySetting->morning_pickup,
                 'delivery'                      => (bool) $this->useTimeframes(),
                 'pickup'                        => (bool) $this->myParcelCarrierDeliverySetting->pickup,
                 'morning'                       => (bool) $this->myParcelCarrierDeliverySetting->morning,
+                'morningFeeTaxIncl'             => ($carrier->is_free)
+                    ? 0
+                    : (float) $this->myParcelCarrierDeliverySetting->morning_fee_tax_incl * $conversion,
+                'morningPickupFeeTaxIncl'       => ($carrier->is_free)
+                    ? 0
+                    : (float) $this->myParcelCarrierDeliverySetting->morning_pickup_fee_tax_incl * $conversion,
                 'night'                         => (bool) $this->myParcelCarrierDeliverySetting->evening,
+                'nightFeeTaxIncl'               => ($carrier->is_free)
+                    ? 0
+                    : (float) $this->myParcelCarrierDeliverySetting->evening_fee_tax_incl * $conversion,
                 'signed'                        => (bool) $this->myParcelCarrierDeliverySetting->signed,
+                'signedFeeTaxIncl'              => ($carrier->is_free)
+                    ? 0
+                    : (float) $this->myParcelCarrierDeliverySetting->signed_fee_tax_incl * $conversion,
                 'recipientOnly'                 => (bool) $this->myParcelCarrierDeliverySetting->recipient_only,
-
-                'morningFeeTaxIncl'             => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->morning_fee_tax_incl * $conversion,
-                'morningPickupFeeTaxIncl'       => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->morning_pickup_fee_tax_incl * $conversion,
-                'nightFeeTaxIncl'               => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->evening_fee_tax_incl * $conversion,
-                'signedFeeTaxIncl'              => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->signed_fee_tax_incl * $conversion,
-                'recipientOnlyFeeTaxIncl'       => $this->myParcelCarrierDeliverySetting->recipient_only_fee_tax_incl * $conversion,
-                'signedRecipientOnly'           => (bool) $this->myParcelCarrierDeliverySetting->signed_recipient_only * $conversion,
-                'signedRecipientOnlyFeeTaxIncl' => ($carrier->is_free || Module::isEnabled('onepagecheckoutps')) ? 0 : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
-
-                'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT),
-
-                'checkoutJs'                    => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/myparcelcheckout/dist/myparcelcheckout2.js'),
+                'recipientOnlyFeeTaxIncl'       => ($carrier->is_free)
+                    ? 0
+                    : (float) $this->myParcelCarrierDeliverySetting->recipient_only_fee_tax_incl * $conversion,
+                'signedRecipientOnly'           => (bool) $this->myParcelCarrierDeliverySetting->signed_recipient_only,
+                'signedRecipientOnlyFeeTaxIncl' => ($carrier->is_free)
+                    ? 0
+                    : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
+                'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
+                'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
+                'checkoutJs'                    =>
+                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-89de0dc04f63df99.bundle.min.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
@@ -176,11 +210,36 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 'fontfamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT),
                 'deliveryDaysWindow'            => (int) $this->myParcelCarrierDeliverySetting->timeframe_days,
                 'dropoffDelay'                  => (int) $this->myParcelCarrierDeliverySetting->dropoff_delay,
-                'dropoffDays'                   => implode(';', $this->myParcelCarrierDeliverySetting->getDropoffDays(date('Y-m-d H:i:s'))),
+                'dropoffDays'                   => implode(
+                    ';',
+                    $this->myParcelCarrierDeliverySetting->getDropoffDays(date('Y-m-d H:i:s'))
+                ),
                 'cutoffTime'                    => $cutoffTime,
-                'price_conversion'              => 1, // Backwards compatibility
-                'myparcel_ajax_checkout_link'   => $this->context->link->getModuleLink('myparcel', 'myparcelcheckout', array('ajax' => true), true),
-                'myparcel_deliveryoptions_link' => $this->context->link->getModuleLink('myparcel', 'deliveryoptions', array(), true),
+                'signedPreferred'               =>
+                    (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
+                'recipientOnlyPreferred'        =>
+                    (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
+                'myparcel_ajax_checkout_link'   => $this->context->link->getModuleLink(
+                    'myparcel',
+                    'myparcelcheckout',
+                    array('ajax' => true),
+                    Tools::usingSecureMode()
+                ),
+                'myparcel_deliveryoptions_link' => $this->context->link->getModuleLink(
+                    'myparcel',
+                    'deliveryoptions',
+                    array(),
+                    Tools::usingSecureMode()
+                ),
+        );
+        $cacheKey = md5(
+            json_encode($smartyVars, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            .$this->myParcelCarrierDeliverySetting->getCutoffExceptionsHash()
+        );
+        $this->context->smarty->assign(
+            array_merge(
+                $smartyVars,
+                array('cacheKey' => $cacheKey)
             )
         );
 
@@ -193,6 +252,8 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      *
      * @return bool
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     protected function useTimeframes()
@@ -219,15 +280,17 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
     protected function getDeliveryOptions()
     {
         if (!Tools::isSubmit('ajax')) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'success' => false,
             )));
         }
 
+        // @codingStandardsIgnoreStart
         $input = file_get_contents('php://input');
-        $request = Tools::jsonDecode($input, true);
+        // @codingStandardsIgnoreEnd
+        $request = json_decode($input, true);
         if (!$request) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'success' => false,
             )));
         }
@@ -252,29 +315,42 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             if (!isset($request[$param])) {
                 continue;
             }
+            if ($param === 'excluded_delivery_type') {
+                if (empty($request[$param])) {
+                    continue;
+                }
+            }
 
-            $query[$param] = $request[$param];
+            $value = $request[$param];
+            if ($param === 'number') {
+                $value = (int) preg_replace('/[^\d]*(\d+).*$/', '$1', $value);
+            }
+
+            $query[$param] = $value;
         }
 
-        $url = self::BASE_URI.'?'.http_build_query($query);
-        $attempts = MyParcel::CONNECTION_ATTEMPTS;
+        $url = static::BASE_URI.'?'.http_build_query($query);
+        $requestHeaders = array();
+        $requestHeaders[] = trim(MyParcel::getUserAgent());
 
-        do {
-            $response = Tools::file_get_contents($url, false, null, 20);
-            $attempts--;
-        } while (!$response && $attempts > 0);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        $response = curl_exec($ch);
+        curl_close($ch);
 
         if (!$response) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'success' => false,
             )));
         }
 
         header('Content-Type: application/json;charset=utf-8');
-        die(Tools::jsonEncode(array(
+        die(json_encode(array(
             'success'  => true,
-            'response' => Tools::jsonDecode($response),
-        )));
+            'response' => json_decode($response),
+        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
     /**

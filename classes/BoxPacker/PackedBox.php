@@ -1,10 +1,18 @@
 <?php
 /**
  * Box packing (3D bin packing, knapsack problem)
- * @package BoxPacker
  * @author Doug Wright
+ * @copyright 2012-2016 Doug Wright
+ * @license MIT
  */
+
 namespace MyParcelModule\BoxPacker;
+
+if (!defined('_PS_VERSION_')) {
+    return;
+}
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * A "box" with items
@@ -156,8 +164,14 @@ class PackedBox
      * @param int      $remainingDepth
      * @param int      $remainingWeight
      */
-    public function __construct(Box $box, ItemList $itemList, $remainingWidth, $remainingLength, $remainingDepth, $remainingWeight)
-    {
+    public function __construct(
+        Box $box,
+        ItemList $itemList,
+        $remainingWidth,
+        $remainingLength,
+        $remainingDepth,
+        $remainingWeight
+    ) {
         $this->box = $box;
         $this->items = $itemList;
         $this->remainingWidth = $remainingWidth;

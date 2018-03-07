@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 DM Productions B.V.
+ * 2017-2018 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,15 +12,16 @@
  * obtain it through the world-wide-web, please send an email
  * to info@dmp.nl so we can send you a copy immediately.
  *
- * @author     DM Productions B.V. <info@dmp.nl>
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2017 DM Productions B.V.
+ * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_') && !defined('_TB_VERSION_')) {
-    exit;
+if (!defined('_PS_VERSION_')) {
+    return;
 }
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * Class MyParcelHookModuleFrontController
@@ -31,16 +32,6 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
-     * MyParcelWebhooksModuleFrontController constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->ssl = Tools::usingSecureMode();
-    }
-
-    /**
      * Initialize content and block unauthorized calls
      *
      * @since 2.0.0
@@ -49,11 +40,11 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     {
         if (!Module::isEnabled('myparcel')) {
             header('Content-Type: application/json; charset=utf8');
-            die(Tools:: jsonEncode(array('data' => array('message' => 'Module is not enabled'))));
+            die(json_encode(array('data' => array('message' => 'Module is not enabled'))));
         }
-        if (!Configuration::get(MyParcel::WEBHOOK_ENABLED)) {
+        if (!Configuration::get(MyParcel::UPDATE_ORDER_STATUSES)) {
             header('Content-Type: application/json; charset=utf8');
-            die(Tools:: jsonEncode(array('data' => array('message' => 'Webhooks are not enabled'))));
+            die(json_encode(array('data' => array('message' => 'Webhooks are not enabled'))));
         }
 
         $this->processWebhook();
@@ -68,15 +59,17 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
      */
     protected function processWebhook()
     {
+        // @codingStandardsIgnoreStart
         $content = file_get_contents('php://input');
+        // @codingStandardsIgnoreEnd
         if (Configuration::get(MyParcel::LOG_API)) {
             $logContent = pSQL($content);
             Logger::addLog("MyParcel webhook: $logContent");
         }
 
-        $data = Tools::jsonDecode($content, true);
+        $data = json_decode($content, true);
         if (isset($data['data']['hooks']) && is_array($data['data']['hooks'])) {
-            foreach ($data['data']['hooks'] as $item) {
+            foreach ($data['data']['hooks'] as &$item) {
                 if (isset($item['shipment_id'])
                     && isset($item['status'])
                     && isset($item['barcode'])

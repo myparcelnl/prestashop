@@ -1,10 +1,18 @@
 <?php
 /**
  * Box packing (3D bin packing, knapsack problem)
- * @package BoxPacker
  * @author Doug Wright
+ * @copyright 2012-2016 Doug Wright
+ * @license MIT
  */
+
 namespace MyParcelModule\BoxPacker;
+
+if (!defined('_PS_VERSION_')) {
+    return;
+}
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -138,7 +146,8 @@ class Packer
 
             //Check iteration was productive
             if ($packedBoxesIteration->isEmpty()) {
-                throw new \RuntimeException('Item ' . $this->items->top()->getDescription() . ' is too large to fit into any box');
+                throw new \RuntimeException('Item '.$this->items->top()->getDescription()
+                    .' is too large to fit into any box');
             }
 
             //Find best box of iteration, and remove packed items from unpacked list
@@ -158,7 +167,6 @@ class Packer
             }
             $this->items = $unpackedItemList;
             $packedBoxes->insert($bestBox);
-
         }
 
         return $packedBoxes;

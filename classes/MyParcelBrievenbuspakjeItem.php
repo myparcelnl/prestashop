@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 DM Productions B.V.
+ * 2017-2018 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,13 +12,16 @@
  * obtain it through the world-wide-web, please send an email
  * to info@dmp.nl so we can send you a copy immediately.
  *
- * @author     DM Productions B.V. <info@dmp.nl>
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2017 DM Productions B.V.
+ * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-require_once dirname(__FILE__).'/autoload.php';
+if (!defined('_PS_VERSION_')) {
+    return;
+}
+
+require_once dirname(__FILE__).'/../myparcel.php';
 
 use MyParcelModule\BoxPacker\Item;
 
@@ -27,12 +30,19 @@ use MyParcelModule\BoxPacker\Item;
  */
 class MyParcelBrievenbuspakjeItem implements Item
 {
+    /** @var string $description */
     protected $description;
+    /** @var float $width */
     protected $width;
+    /** @var float $length */
     protected $length;
+    /** @var float $depth */
     protected $depth;
+    /** @var float $weight */
     protected $weight;
+    /** @var bool $keepFlat */
     protected $keepFlat;
+    /** @var float $volume */
     protected $volume;
 
     /**
@@ -44,6 +54,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * @param float  $depth       Depth
      * @param float  $weight      Weight
      * @param bool   $keepFlat
+     *
+     * @since 2.0.0
      */
     public function __construct($description, $width, $length, $depth, $weight, $keepFlat)
     {
@@ -61,6 +73,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * Get description
      *
      * @return string Description
+     *
+     * @since 2.0.0
      */
     public function getDescription()
     {
@@ -71,6 +85,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * Get width
      *
      * @return float Width
+     *
+     * @since 2.0.0
      */
     public function getWidth()
     {
@@ -81,6 +97,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * Get length
      *
      * @return float Length
+     *
+     * @since 2.0.0
      */
     public function getLength()
     {
@@ -91,6 +109,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * Get depth
      *
      * @return float Depth
+     *
+     * @since 2.0.0
      */
     public function getDepth()
     {
@@ -101,6 +121,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * Get weight
      *
      * @return float Weight
+     *
+     * @since 2.0.0
      */
     public function getWeight()
     {
@@ -111,6 +133,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * Get volume
      *
      * @return float Volume
+     *
+     * @since 2.0.0
      */
     public function getVolume()
     {
@@ -121,6 +145,8 @@ class MyParcelBrievenbuspakjeItem implements Item
      * Get keep flat
      *
      * @return bool
+     *
+     * @since 2.0.0
      */
     public function getKeepFlat()
     {

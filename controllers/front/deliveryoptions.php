@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 DM Productions B.V.
+ * 2017-2018 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,15 +12,16 @@
  * obtain it through the world-wide-web, please send an email
  * to info@dmp.nl so we can send you a copy immediately.
  *
- * @author     DM Productions B.V. <info@dmp.nl>
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2017 DM Productions B.V.
+ * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_') && !defined('_TB_VERSION_')) {
-    exit;
+if (!defined('_PS_VERSION_')) {
+    return;
 }
+
+require_once dirname(__FILE__).'/../../myparcel.php';
 
 /**
  * Class MyParcelDeliveryoptionsModuleFrontController
@@ -48,26 +49,25 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
-     * MyParcelDeliveryoptionsModuleFrontController constructor.
-     *
-     * @since 2.0.0
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->ssl = Tools::usingSecureMode();
-    }
-
-    /**
      * Initialize content
      *
      * @since 2.0.0
+     * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     public function initContent()
     {
+        if (!Configuration::get(MyParcel::API_KEY)) {
+            die(json_encode(
+                array(
+                    'data' => array(
+                        'message' => 'Module has not been configured',
+                    ),
+                )
+            ));
+        }
         if (!Module::isEnabled('myparcel')) {
-            die(Tools:: jsonEncode(
+            die(json_encode(
                 array(
                     'data' => array(
                         'message' => 'Module is not enabled',
@@ -75,61 +75,79 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
                 )
             ));
         }
-        if (Tools::getValue('ajax')) {
+        // @codingStandardsIgnoreStart
+        $content = json_decode(file_get_contents('php://input'), true);
+        // @codingStandardsIgnoreEnd
+        if (isset($content['ajax']) && $content['ajax']) {
             $this->displayAjax();
         }
     }
 
     /**
-     * Invoked when ajax call is received
-     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
     public function displayAjax()
     {
         header('Content-Type: application/json');
 
-        if (Tools::getValue('updateOption')) {
+        // @codingStandardsIgnoreStart
+        $content = json_decode(file_get_contents('php://input'), true);
+        // @codingStandardsIgnoreEnd
+        if (!empty($content['updateOption'])) {
             $context = Context::getContext();
             $cart = $context->cart;
             if (!Validate::isLoadedObject($cart)) {
                 die(
-                Tools::jsonEncode(
-                    array(
-                        'success' => false,
-                        'status'  => self::ERR_NO_CART,
-                        'message' => $this->module->l('Cart not found', 'deliveryoptions'),
+                    json_encode(
+                        array(
+                            'success' => false,
+                            'status'  => static::ERR_NO_CART,
+                            'message' => $this->module->l('Cart not found', 'deliveryoptions'),
+                        ),
+                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
                     )
-                )
                 );
             }
             if (empty($context->customer)) {
                 die(
-                Tools::jsonEncode(
-                    array(
-                        'success' => false,
-                        'status'  => self::ERR_NOT_LOGGED_IN,
-                        'message' => $this->module->l('Customer not logged in', 'deliveryoptions'),
+                    json_encode(
+                        array(
+                            'success' => false,
+                            'status'  => static::ERR_NOT_LOGGED_IN,
+                            'message' => $this->module->l('Customer not logged in', 'deliveryoptions'),
+                        ),
+                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
                     )
-                )
                 );
             }
 
-            $deliveryOption = Tools::getValue('deliveryOption');
+            $deliveryOption = $content['deliveryOption'];
             $deliveryOptionObject = MyParcelDeliveryOption::getByCartId($cart);
 
             if (!empty($deliveryOption)) {
                 if (!Validate::isLoadedObject($deliveryOptionObject)) {
                     $option = new MyParcelDeliveryOption();
                     $option->id_cart = $cart->id;
-                    $option->myparcel_delivery_option = Tools::jsonEncode($deliveryOption);
+                    $option->myparcel_delivery_option = json_encode(
+                        $deliveryOption,
+                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                    );
 
                     $option->add();
                 } else {
                     Db::getInstance()->execute(
-                        'INSERT INTO `'._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table']).'` (`id_myparcel_delivery_option`, `myparcel_delivery_option`)
-                     VALUES ('.(int) $deliveryOptionObject->id.', \''.Tools::jsonEncode($deliveryOption).'\')
-                         ON DUPLICATE KEY UPDATE `myparcel_delivery_option` = \''.Tools::jsonEncode($deliveryOption).'\''
+                        'INSERT INTO `'._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])
+                        .'` (`id_myparcel_delivery_option`, `myparcel_delivery_option`)
+                     VALUES ('.(int) $deliveryOptionObject->id.', \''.json_encode(
+                         $deliveryOption, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                        ).'\')
+                         ON DUPLICATE KEY UPDATE `myparcel_delivery_option` = \''.json_encode(
+                             $deliveryOption,
+                             JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                        )
+                        .'\''
                     );
                 }
 
@@ -137,50 +155,87 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
                 $return = array_merge(
                     array(
                         'HOOK_TOP_PAYMENT'   => Hook::exec('displayPaymentTop'),
-                        'HOOK_PAYMENT'       => (version_compare(_PS_VERSION_, '1.7.0.0', '<') ? $this->getPaymentMethods(): ''),
-                        'carrier_data'       => (version_compare(_PS_VERSION_, '1.7.0.0', '<') ? $this->getCarrierList() : $cart->getDeliveryOptionList(null, true)),
+                        'HOOK_PAYMENT'       => (version_compare(_PS_VERSION_, '1.7.0.0', '<')
+                            ? $this->getPaymentMethods()
+                            : ''
+                        ),
+                        'carrier_data'       => (version_compare(_PS_VERSION_, '1.7.0.0', '<')
+                            ? $this->getCarrierList()
+                            : $this->getDeliveryOptionList()
+                        ),
                         'HOOK_BEFORECARRIER' => Hook::exec('displayBeforeCarrier', array('carriers' => $carriers)),
                         'shouldRefresh'      => true,
                     ),
-                    (version_compare(_PS_VERSION_, '1.7.0.0', '<') ? $this->getFormattedSummaryDetail() : array())
+                    (version_compare(_PS_VERSION_, '1.7.0.0', '<')
+                        ? $this->getFormattedSummaryDetail()
+                        : array()
+                    )
                 );
                 Cart::addExtraCarriers($return);
-                $this->ajaxDie(Tools::jsonEncode($return));
-                exit;
+                die(json_encode($return, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
             }
 
             die(
-            Tools::jsonEncode(
-                array(
-                    'success' => false,
-                    'status'  => self::ERR_DELIVERY_OPTION_NOT_FOUND,
+                json_encode(
+                    array(
+                        'success' => false,
+                        'status'  => static::ERR_DELIVERY_OPTION_NOT_FOUND,
+                    )
                 )
-            )
             );
         }
     }
 
+    /**
+     * @return array|string
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     protected function getPaymentMethods()
     {
         if ($this->context->cart->orderExists()) {
-            return '<p class="warning">'.Tools::displayError('Error: This order has already been validated.').'</p>';
+            return '<p class="warning">'
+                .Tools::displayError('Error: This order has already been validated.').'</p>';
         }
-        if (!$this->context->cart->id_customer || !Customer::customerIdExistsStatic($this->context->cart->id_customer) || Customer::isBanned($this->context->cart->id_customer)) {
+        if (!$this->context->cart->id_customer
+            || !Customer::customerIdExistsStatic($this->context->cart->id_customer)
+            || Customer::isBanned($this->context->cart->id_customer)
+        ) {
             return '<p class="warning">'.Tools::displayError('Error: No customer.').'</p>';
         }
         $addressDelivery = new Address($this->context->cart->id_address_delivery);
-        $addressInvoice = ($this->context->cart->id_address_delivery == $this->context->cart->id_address_invoice ? $addressDelivery : new Address($this->context->cart->id_address_invoice));
-        if (!$this->context->cart->id_address_delivery || !$this->context->cart->id_address_invoice || !Validate::isLoadedObject($addressDelivery) || !Validate::isLoadedObject($addressInvoice) || $addressInvoice->deleted || $addressDelivery->deleted) {
+        $addressInvoice = ($this->context->cart->id_address_delivery == $this->context->cart->id_address_invoice
+            ? $addressDelivery
+            : new Address($this->context->cart->id_address_invoice)
+        );
+        if (!$this->context->cart->id_address_delivery
+            || !$this->context->cart->id_address_invoice
+            || !Validate::isLoadedObject($addressDelivery)
+            || !Validate::isLoadedObject($addressInvoice)
+            || $addressInvoice->deleted
+            || $addressDelivery->deleted
+        ) {
             return '<p class="warning">'.Tools::displayError('Error: Please select an address.').'</p>';
         }
         if (count($this->context->cart->getDeliveryOptionList()) == 0 && !$this->context->cart->isVirtualCart()) {
             if ($this->context->cart->isMultiAddressDelivery()) {
-                return '<p class="warning">'.Tools::displayError('Error: None of your chosen carriers deliver to some of the addresses you have selected.').'</p>';
+                return '<p class="warning">'
+                    .Tools::displayError(
+                        'Error: None of your chosen carriers deliver '.
+                        'to some of the addresses you have selected.'
+                    ).'</p>';
             } else {
-                return '<p class="warning">'.Tools::displayError('Error: None of your chosen carriers deliver to the address you have selected.').'</p>';
+                return '<p class="warning">'
+                    .Tools::displayError(
+                        'Error: None of your chosen carriers deliver '.
+                        'to the address you have selected.'
+                    ).'</p>';
             }
         }
-        if (!$this->context->cart->getDeliveryOption(null, false) && !$this->context->cart->isVirtualCart()) {
+        if (!$this->context->cart->getDeliveryOption(null, false)
+            && !$this->context->cart->isVirtualCart()
+        ) {
             return '<p class="warning">'.Tools::displayError('Error: Please choose a carrier.').'</p>';
         }
         if (!$this->context->cart->id_currency) {
@@ -192,11 +247,23 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
 
         /* If some products have disappear */
         if (is_array($product = $this->context->cart->checkQuantities(true))) {
-            return '<p class="warning">'.sprintf(Tools::displayError('An item (%s) in your cart is no longer available in this quantity. You cannot proceed with your order until the quantity is adjusted.'), $product['name']).'</p>';
+            return '<p class="warning">'.sprintf(
+                Tools::displayError(
+                    'An item (%s) in your cart is no longer '.
+                    'available in this quantity. You cannot proceed with your order until the quantity is adjusted.'
+                ),
+                $product['name']
+            ).'</p>';
         }
 
         if ((int) $idProduct = $this->context->cart->checkProductsAccess()) {
-            return '<p class="warning">'.sprintf(Tools::displayError('An item in your cart is no longer available (%s). You cannot proceed with your order.'), Product::getProductName((int) $idProduct)).'</p>';
+            return '<p class="warning">'.sprintf(
+                Tools::displayError(
+                    'An item in your cart is no longer '.
+                    'available (%s). You cannot proceed with your order.'
+                ),
+                Product::getProductName((int) $idProduct)
+            ).'</p>';
         }
 
         /* Check minimal amount */
@@ -205,34 +272,47 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
         $minimalPurchase = Tools::convertPrice((float) Configuration::get('PS_PURCHASE_MINIMUM'), $currency);
         if ($this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS) < $minimalPurchase) {
             return '<p class="warning">'.sprintf(
-                    Tools::displayError('A minimum purchase total of %1s (tax excl.) is required to validate your order, current purchase total is %2s (tax excl.).'),
-                    Tools::displayPrice($minimalPurchase, $currency),
-                    Tools::displayPrice($this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS), $currency)
-                ).'</p>';
+                Tools::displayError(
+                    'A minimum purchase total of %1s (tax excl.) is required to validate '.
+                    'your order, current purchase total is %2s (tax excl.).'
+                ),
+                Tools::displayPrice($minimalPurchase, $currency),
+                Tools::displayPrice($this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS), $currency)
+            ).'</p>';
         }
 
         /* Bypass payment step if total is 0 */
         if ($this->context->cart->getOrderTotal() <= 0) {
-            return '<p class="center"><button class="button btn btn-default button-medium" name="confirmOrder" id="confirmOrder" onclick="confirmFreeOrder();" type="submit"> <span>'.Tools::displayError('I confirm my order.').'</span></button></p>';
+            return '<p class="center"><button class="button btn btn-default button-medium" name="confirmOrder" '.
+                'id="confirmOrder" onclick="confirmFreeOrder();" type="submit"> <span>'
+                .Tools::displayError('I confirm my order.').'</span></button></p>';
         }
 
         $return = Hook::exec('displayPayment');
         if (!$return) {
-            return '<p class="warning">'.Tools::displayError('No payment method is available for use at this time. ').'</p>';
+            return '<p class="warning">'.
+                Tools::displayError('No payment method is available for use at this time. ').'</p>';
         }
 
         return $return;
     }
 
     /**
-     * @return false|array
+     * @return array|bool
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function getCarrierList()
     {
         $addressDelivery = new Address($this->context->cart->id_address_delivery);
 
         $cms = new CMS(Configuration::get('PS_CONDITIONS_CMS_ID'), $this->context->language->id);
-        $linkConditions = $this->context->link->getCMSLink($cms, $cms->link_rewrite, Configuration::get('PS_SSL_ENABLED'));
+        $linkConditions = $this->context->link->getCMSLink(
+            $cms,
+            $cms->link_rewrite,
+            Configuration::get('PS_SSL_ENABLED')
+        );
         if (!strpos($linkConditions, '?')) {
             $linkConditions .= '?content_only=1';
         } else {
@@ -240,7 +320,11 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
         }
 
         $carriers = $this->context->cart->simulateCarriersOutput();
-        $deliveryOption = $this->context->cart->getDeliveryOption(null, false, false);
+        $deliveryOption = $this->context->cart->getDeliveryOption(
+            null,
+            false,
+            false
+        );
 
         $wrappingFees = $this->context->cart->getGiftWrappingPrice(false);
         $wrappingFeesTaxInc = $this->context->cart->getGiftWrappingPrice();
@@ -290,9 +374,13 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
 
         $this->context->smarty->assign($vars);
 
-        if (!Address::isCountryActiveById((int) $this->context->cart->id_address_delivery) && $this->context->cart->id_address_delivery != 0) {
+        if (!Address::isCountryActiveById((int) $this->context->cart->id_address_delivery)
+            && $this->context->cart->id_address_delivery != 0
+        ) {
             $this->errors[] = Tools::displayError('This address is not in a valid area.');
-        } elseif ((!Validate::isLoadedObject($addressDelivery) || $addressDelivery->deleted) && $this->context->cart->id_address_delivery != 0) {
+        } elseif ((!Validate::isLoadedObject($addressDelivery) || $addressDelivery->deleted)
+            && $this->context->cart->id_address_delivery != 0
+        ) {
             $this->errors[] = Tools::displayError('This address is invalid.');
         } else {
             $result = array(
@@ -301,7 +389,8 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
                     array(
                         'carriers'             => $carriers,
                         'delivery_option_list' => $this->context->cart->getDeliveryOptionList(),
-                        'delivery_option'      => $this->context->cart->getDeliveryOption(null, true),
+                        'delivery_option'      =>
+                            $this->context->cart->getDeliveryOption(null, true),
                     )
                 ),
                 'carrier_block'      => $this->context->smarty->fetch(_PS_THEME_DIR_.'order-carrier.tpl'),
@@ -322,6 +411,12 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
         return false;
     }
 
+    /**
+     * @return array
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     protected function getFormattedSummaryDetail()
     {
         $result = array(
@@ -329,11 +424,13 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
             'customizedDatas' => Product::getAllCustomizedDatas($this->context->cart->id, null, true),
         );
 
-        foreach ($result['summary']['products'] as $key => &$product) {
+        foreach ($result['summary']['products'] as &$product) {
             $product['quantity_without_customization'] = $product['quantity'];
             if ($result['customizedDatas']) {
-                if (isset($result['customizedDatas'][(int) $product['id_product']][(int) $product['id_product_attribute']])) {
-                    foreach ($result['customizedDatas'][(int) $product['id_product']][(int) $product['id_product_attribute']] as $addresses) {
+                $ip = (int) $product['id_product'];
+                $ipa = (int) $product['id_product_attribute'];
+                if (isset($result['customizedDatas'][$ip][$ipa])) {
+                    foreach ($result['customizedDatas'][$ip][$ipa] as $addresses) {
                         foreach ($addresses as $customization) {
                             $product['quantity_without_customization'] -= (int) $customization['quantity'];
                         }
@@ -349,6 +446,11 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
         return $result;
     }
 
+    /**
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     protected function assignWrappingAndTOS()
     {
         // Wrapping fees
@@ -357,7 +459,11 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
 
         // TOS
         $cms = new CMS(Configuration::get('PS_CONDITIONS_CMS_ID'), $this->context->language->id);
-        $this->link_conditions = $this->context->link->getCMSLink($cms, $cms->link_rewrite, (bool) Configuration::get('PS_SSL_ENABLED'));
+        $this->link_conditions = $this->context->link->getCMSLink(
+            $cms,
+            $cms->link_rewrite,
+            (bool) Configuration::get('PS_SSL_ENABLED')
+        );
 
         $freeShipping = false;
         foreach ($this->context->cart->getCartRules() as $rule) {
@@ -380,12 +486,28 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
                 'carriers'                    => $this->context->cart->simulateCarriersOutput(),
                 'checked'                     => $this->context->cart->simulateCarrierSelectedOutput(),
                 'address_collection'          => $this->context->cart->getAddressCollection(),
-                'delivery_option'             => $this->context->cart->getDeliveryOption(null, false),
+                'delivery_option'             =>
+                    $this->context->cart->getDeliveryOption(null, false),
                 'gift_wrapping_price'         => (float) $wrappingFees,
                 'total_wrapping_cost'         => Tools::convertPrice($wrappingFeesTaxInc, $this->context->currency),
                 'override_tos_display'        => Hook::exec('overrideTOSDisplay'),
                 'total_wrapping_tax_exc_cost' => Tools::convertPrice($wrappingFees, $this->context->currency),
             )
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDeliveryOptionList()
+    {
+        $finder = new DeliveryOptionsFinder(
+            $this->context,
+            $this->getTranslator(),
+            $this->objectPresenter,
+            new PrestaShop\PrestaShop\Adapter\Product\PriceFormatter()
+        );
+
+        return $finder->getDeliveryOptions();
     }
 }
