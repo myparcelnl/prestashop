@@ -167,7 +167,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.1.3';
+        $this->version = '2.1.4';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -921,7 +921,7 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-9d544aaab9b774da.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-e158425a37f486d2.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
         } elseif (Tools::getValue('controller') == 'AdminModules'
             && Tools::getValue('configure') == $this->name
@@ -3319,8 +3319,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-9d544aaab9b774da.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-9d544aaab9b774da.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-e158425a37f486d2.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-e158425a37f486d2.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -4220,7 +4220,7 @@ class MyParcel extends Module
                 return false;
             }
 
-            $amountOfBoxes = (int) $this->howManyMailboxPackages($cart->getProducts(), true);
+            $amountOfBoxes = (int) $this->howManyMailboxPackages($cart->getProducts());
             if ($amountOfBoxes < 1) {
                 return false;
             }

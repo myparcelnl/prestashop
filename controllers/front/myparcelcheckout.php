@@ -201,7 +201,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
                 'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
                 'checkoutJs'                    =>
-                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-9d544aaab9b774da.bundle.min.js'),
+                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-e158425a37f486d2.bundle.min.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),

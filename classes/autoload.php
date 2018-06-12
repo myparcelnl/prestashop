@@ -28,7 +28,7 @@ spl_autoload_register(
             'MyParcelModule\\BoxPacker\\PackedBoxList',
             'MyParcelModule\\BoxPacker\\Packer',
             'MyParcelModule\\BoxPacker\\VolumePacker',
-            'MyParcelModule\\BoxPacker\\WeightRedistribution',
+            'MyParcelModule\\BoxPacker\\WeightRedistributor',
         ))) {
             // project-specific namespace prefix
             $prefix = 'MyParcelModule\\BoxPacker\\';
