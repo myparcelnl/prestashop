@@ -32,9 +32,23 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
+     * Prevent displaying the maintenance page
+     *
+     * @return void
+     */
+    protected function displayMaintenancePage()
+    {
+        // Disable the maintenance page
+    }
+
+    /**
      * Initialize content and block unauthorized calls
      *
      * @since 2.0.0
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     public function initContent()
     {
@@ -55,7 +69,9 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     /**
      * Process webhook
      *
-     * @since 2.0.0
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function processWebhook()
     {

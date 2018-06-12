@@ -302,6 +302,7 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function getCarrierList()
     {

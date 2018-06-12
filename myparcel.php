@@ -165,7 +165,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.1.1';
+        $this->version = '2.1.2';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -528,6 +528,7 @@ class MyParcel extends Module
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @since 1.0.0
+     * @throws Adapter_Exception
      */
     public function install()
     {
@@ -918,7 +919,7 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-5d9567971fcaaffa.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-a47c55b383f5ef9f.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
         } elseif (Tools::getValue('controller') == 'AdminModules'
             && Tools::getValue('configure') == $this->name
@@ -1064,6 +1065,7 @@ class MyParcel extends Module
      *
      * @return void
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     protected function ajaxProcess()
     {
@@ -1123,6 +1125,7 @@ class MyParcel extends Module
      * @returns array
      *
      * @since 2.1.0
+     * @return array
      */
     protected function processNewLabels($response, $idOrders, $concepts)
     {
@@ -1203,6 +1206,7 @@ class MyParcel extends Module
      * @throws PrestaShopException
      *
      * @since 2.0.0
+     * @throws Adapter_Exception
      */
     protected function getShipmentInfo()
     {
@@ -1310,6 +1314,7 @@ class MyParcel extends Module
 
     /**
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     protected function createLabel()
     {
@@ -1331,7 +1336,7 @@ class MyParcel extends Module
         $idOrders = $shipments = array();
         if (isset($request->moduleData->shipments) && is_array($request->moduleData->shipments)) {
             foreach ($request->moduleData->shipments as $shipment) {
-                $idOrders[] = (int) $shipment->idOrder;
+                $idOrders[] = (int) $shipment->id_order;
                 $shipments[] = $shipment->concept;
             }
         } else {
@@ -1382,6 +1387,7 @@ class MyParcel extends Module
      *
      * @since 2.0.0
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     protected function printLabel()
     {
@@ -1685,6 +1691,7 @@ class MyParcel extends Module
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @since 2.0.0
+     * @throws Adapter_Exception
      */
     protected function postProcess()
     {
@@ -1799,6 +1806,8 @@ class MyParcel extends Module
      *
      * @return void
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     protected function postProcessDeliverySettingsPage()
@@ -1837,6 +1846,9 @@ class MyParcel extends Module
      *
      * @return void
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     protected function postProcessDeliverySettingForm()
@@ -2405,6 +2417,8 @@ class MyParcel extends Module
      *
      * @return void
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     protected function updateCarriers()
@@ -2480,6 +2494,9 @@ class MyParcel extends Module
      *
      * @return void
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     protected function removeOldExceptions($idMyParcelDeliveryOption)
@@ -2548,6 +2565,8 @@ class MyParcel extends Module
      *
      * @return array Array with current values
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     protected function getDeliveryOptionsFormValues($idMyParcelCarrierDeliverySetting)
@@ -3298,8 +3317,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-5d9567971fcaaffa.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-5d9567971fcaaffa.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-a47c55b383f5ef9f.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-a47c55b383f5ef9f.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -3381,6 +3400,7 @@ class MyParcel extends Module
      * @return array Form
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     protected function getNotificationForm()
     {
@@ -4759,6 +4779,7 @@ class MyParcel extends Module
      *
      * @since 2.0.0
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     protected function orderHasShippingNumber($order)
     {
@@ -4892,6 +4913,7 @@ class MyParcel extends Module
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @since 2.0.0
+     * @throws Adapter_Exception
      */
     protected function addPriceRange($carrier)
     {

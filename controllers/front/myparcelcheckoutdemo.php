@@ -34,6 +34,10 @@ class MyParcelmyparcelcheckoutdemoModuleFrontController extends ModuleFrontContr
      * MyParcelmyparcelcheckoutdemoModuleFrontController constructor.
      *
      * @since 2.0.0
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function __construct()
     {
@@ -55,6 +59,7 @@ class MyParcelmyparcelcheckoutdemoModuleFrontController extends ModuleFrontContr
      */
     protected function displayMaintenancePage()
     {
+        // Disable the maintenance page
     }
 
     /**
@@ -64,6 +69,7 @@ class MyParcelmyparcelcheckoutdemoModuleFrontController extends ModuleFrontContr
      *
      * @since 2.0.0
      * @throws PrestaShopException
+     * @throws SmartyException
      */
     public function initContent()
     {
@@ -72,7 +78,7 @@ class MyParcelmyparcelcheckoutdemoModuleFrontController extends ModuleFrontContr
         $smarty->assign(array(
             'language_code'          => Tools::strtolower(Context::getContext()->language->language_code),
             'checkoutJs'             => Media::getJSPath(
-                _PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-5d9567971fcaaffa.bundle.min.js'
+                _PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-a47c55b383f5ef9f.bundle.min.js'
             ),
             'base_dir_ssl'           => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
                 .Tools::getShopDomainSsl().__PS_BASE_URI__,

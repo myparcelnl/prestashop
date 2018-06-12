@@ -40,6 +40,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      *
      * @since 2.0.0
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     public function __construct()
     {
@@ -57,6 +58,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @since 2.0.0
+     * @throws SmartyException
      */
     public function initContent()
     {
@@ -199,7 +201,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
                 'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
                 'checkoutJs'                    =>
-                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-5d9567971fcaaffa.bundle.min.js'),
+                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-a47c55b383f5ef9f.bundle.min.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
@@ -357,6 +359,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      * Hide the iframe
      *
      * @return void
+     * @throws SmartyException
      */
     protected function hideMe()
     {
