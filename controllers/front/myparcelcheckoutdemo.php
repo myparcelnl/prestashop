@@ -78,7 +78,7 @@ class MyParcelmyparcelcheckoutdemoModuleFrontController extends ModuleFrontContr
         $smarty->assign(array(
             'language_code'          => Tools::strtolower(Context::getContext()->language->language_code),
             'checkoutJs'             => Media::getJSPath(
-                _PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-a47c55b383f5ef9f.bundle.min.js'
+                _PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-9d544aaab9b774da.bundle.min.js'
             ),
             'base_dir_ssl'           => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
                 .Tools::getShopDomainSsl().__PS_BASE_URI__,

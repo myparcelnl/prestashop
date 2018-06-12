@@ -201,7 +201,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
                 'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
                 'checkoutJs'                    =>
-                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-a47c55b383f5ef9f.bundle.min.js'),
+                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-9d544aaab9b774da.bundle.min.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
@@ -237,6 +237,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         $cacheKey = md5(
             json_encode($smartyVars, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
             .$this->myParcelCarrierDeliverySetting->getCutoffExceptionsHash()
+            .$carrier->id
         );
         $this->context->smarty->assign(
             array_merge(

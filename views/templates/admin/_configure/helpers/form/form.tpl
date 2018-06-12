@@ -70,88 +70,92 @@
       }());
     </script>
   {elseif $input.type == 'checkout'}
-    <iframe id="checkoutexample"
-            style="border: 1px solid #C7D6DB; border-radius: 3px; padding: 0"
-            class="col-xs-12 col-sm-12 col-md-9"
-            height="580"
-            src="../index.php?fc=module&module=myparcel&controller=myparcelcheckoutdemo"
-            frameborder="0"
-    ></iframe>
-    <script type="text/javascript">
-      (function () {
-        var currentStyle = null;
+    {if !Module::isEnabled('myparcel')}
+      {l s='Preview not available. Module has been disabled.' mod='myparcel'}
+    {else}
+      <iframe id="checkoutexample"
+              style="border: 1px solid #C7D6DB; border-radius: 3px; padding: 0"
+              frameborder="0"
+              class="col-xs-12 col-sm-12 col-md-9"
+              height="580"
+              src="../index.php?fc=module&module=myparcel&controller=myparcelcheckoutdemo"
+      ></iframe>
+      <script type="text/javascript">
+        (function () {
+          var currentStyle = null;
 
-        function ready(fn) {
-          if (document.readyState !== 'loading'){
-            fn();
-          } else if (document.addEventListener) {
-            window.addEventListener('DOMContentLoaded', fn);
-          } else {
-            document.attachEvent('onreadystatechange', function() {
-              if (document.readyState !== 'loading')
-                fn();
-            });
-          }
-        }
-
-        function sendStyle() {
-          var iframeWindow = document.getElementById('checkoutexample').contentWindow;
-
-          var style = {
-            foreground1Color: document.querySelector('[name={MyParcel::CHECKOUT_FG_COLOR1|escape:'htmlall':'UTF-8'}]').value,
-            foreground2Color: document.querySelector('[name={MyParcel::CHECKOUT_FG_COLOR2|escape:'htmlall':'UTF-8'}]').value,
-            background1Color: document.querySelector('[name={MyParcel::CHECKOUT_BG_COLOR1|escape:'htmlall':'UTF-8'}]').value,
-            background2Color: document.querySelector('[name={MyParcel::CHECKOUT_BG_COLOR2|escape:'htmlall':'UTF-8'}]').value,
-            background3Color: document.querySelector('[name={MyParcel::CHECKOUT_BG_COLOR3|escape:'htmlall':'UTF-8'}]').value,
-            highlightColor: document.querySelector('[name={MyParcel::CHECKOUT_HL_COLOR|escape:'htmlall':'UTF-8'}]').value,
-            fontFamily: document.querySelector('[name={MyParcel::CHECKOUT_FONT|escape:'htmlall':'UTF-8'}]').value,
-            fontSize: document.querySelector('[name={MyParcel::CHECKOUT_FONT_SIZE|escape:'htmlall':'UTF-8'}]').value,
-          };
-
-          if (JSON.stringify(currentStyle) === JSON.stringify(style)) {
-            return;
+          function ready(fn) {
+            if (document.readyState !== 'loading'){
+              fn();
+            } else if (document.addEventListener) {
+              window.addEventListener('DOMContentLoaded', fn);
+            } else {
+              document.attachEvent('onreadystatechange', function() {
+                if (document.readyState !== 'loading')
+                  fn();
+              });
+            }
           }
 
-          var newEvent = {
-            subject: 'sendStyle',
-            style: style
-          };
-          iframeWindow.postMessage(JSON.stringify(newEvent), window.location.href);
-        }
+          function sendStyle() {
+            var iframeWindow = document.getElementById('checkoutexample').contentWindow;
 
-        function receiveStyle(event) {
-          var originLink = document.createElement('a');
-          originLink.href = event.origin;
-          var currentLink = document.createElement('a');
-          currentLink.href = window.location.href;
+            var style = {
+              foreground1Color: document.querySelector('[name={MyParcel::CHECKOUT_FG_COLOR1|escape:'htmlall':'UTF-8'}]').value,
+              foreground2Color: document.querySelector('[name={MyParcel::CHECKOUT_FG_COLOR2|escape:'htmlall':'UTF-8'}]').value,
+              background1Color: document.querySelector('[name={MyParcel::CHECKOUT_BG_COLOR1|escape:'htmlall':'UTF-8'}]').value,
+              background2Color: document.querySelector('[name={MyParcel::CHECKOUT_BG_COLOR2|escape:'htmlall':'UTF-8'}]').value,
+              background3Color: document.querySelector('[name={MyParcel::CHECKOUT_BG_COLOR3|escape:'htmlall':'UTF-8'}]').value,
+              highlightColor: document.querySelector('[name={MyParcel::CHECKOUT_HL_COLOR|escape:'htmlall':'UTF-8'}]').value,
+              fontFamily: document.querySelector('[name={MyParcel::CHECKOUT_FONT|escape:'htmlall':'UTF-8'}]').value,
+              fontSize: document.querySelector('[name={MyParcel::CHECKOUT_FONT_SIZE|escape:'htmlall':'UTF-8'}]').value,
+            };
 
-          if (!event.data) {
-            return;
+            if (JSON.stringify(currentStyle) === JSON.stringify(style)) {
+              return;
+            }
+
+            var newEvent = {
+              subject: 'sendStyle',
+              style: style
+            };
+            iframeWindow.postMessage(JSON.stringify(newEvent), window.location.href);
           }
 
-          try {
-            var data = JSON.parse(event.data);
-          } catch (e) {
-            return;
+          function receiveStyle(event) {
+            var originLink = document.createElement('a');
+            originLink.href = event.origin;
+            var currentLink = document.createElement('a');
+            currentLink.href = window.location.href;
+
+            if (!event.data) {
+              return;
+            }
+
+            try {
+              var data = JSON.parse(event.data);
+            } catch (e) {
+              return;
+            }
+
+            if (originLink.host === currentLink.host
+              && typeof data === 'object'
+              && data.subject === 'receivedStyle'
+            ) {
+              currentStyle = data.style;
+            }
           }
 
-          if (originLink.host === currentLink.host
-            && typeof data === 'object'
-            && data.subject === 'receivedStyle'
-          ) {
-            currentStyle = data.style;
-          }
-        }
+          ready(function() {
+            {* Send the style every 100ms when it has changed *}
+            {* Request an update from the target frame to verify the style has been applied *}
+            window.addEventListener('message', receiveStyle, false);
 
-        ready(function() {
-          {* Send the style every 100ms when it has changed *}
-          {* Request an update from the target frame to verify the style has been applied *}
-          window.addEventListener('message', receiveStyle, false);
-
-          setInterval(sendStyle, 100);
-        });
-      }());
-    </script>
+            setInterval(sendStyle, 100);
+          });
+        }());
+      </script>
+    {/if}
   {elseif $input.type == 'paperselector'}
     <input type="hidden" name="{$input.name|escape:'htmlall':'UTF-8'}" value="{if isset($fields_value[$input.name])}{$fields_value[$input.name]|escape:'htmlall':'UTF-8'}{/if}">
     <div id="paper-selector"></div>

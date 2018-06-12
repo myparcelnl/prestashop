@@ -135,6 +135,8 @@ class MyParcel extends Module
     protected static $cachedCarriers = array();
     /** @var int $id_carrier */
     public $id_carrier;
+    /** @var Carrier $carrier */
+    public $carrier;
     /** @var array $hooks */
     public $hooks = array(
         'displayCarrierList',
@@ -165,7 +167,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.1.2';
+        $this->version = '2.1.3';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -919,7 +921,7 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-a47c55b383f5ef9f.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-9d544aaab9b774da.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
         } elseif (Tools::getValue('controller') == 'AdminModules'
             && Tools::getValue('configure') == $this->name
@@ -3317,8 +3319,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-a47c55b383f5ef9f.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-a47c55b383f5ef9f.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-9d544aaab9b774da.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-9d544aaab9b774da.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -3437,6 +3439,7 @@ class MyParcel extends Module
         try {
             $orderStatusDescription = $this->display(__FILE__, 'views/templates/hook/orderstatusinfo.tpl');
         } catch (Exception $e) {
+            $orderStatusDescription = '';
             Logger::addLog("MyParcel module error: {$e->getMessage()}");
         }
 
@@ -3804,14 +3807,9 @@ class MyParcel extends Module
         }
 
         $mcds = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
-        if (!Validate::isLoadedObject($mcds)) {
-            if (Configuration::get(static::LOG_API)) {
-                Logger::addLog("{$this->displayName}: Cannot retrieve settings from the database");
-            }
-
+        if (!Validate::isLoadedObject($mcds) || $carrier->external_module_name !== $this->name) {
             return '';
         }
-
 
         if ($mcds->delivery || $mcds->pickup) {
             return $this->display(__FILE__, 'views/templates/hook/beforecarrier.tpl');
@@ -4064,6 +4062,37 @@ class MyParcel extends Module
                 "mpdo ON (mpdo.`id_cart` = a.`id_cart`)";
         }
         if (isset($params['fields'])) {
+            $supportedCarrierModules = array_filter(Hook::getHookModuleExecList(Tools::substr(lcfirst(__FUNCTION__), 4, Tools::strlen(__FUNCTION__))), function ($item) {
+                $module = Module::getInstanceByName($item['module']);
+                if (!Validate::isLoadedObject($module)) {
+                    return false;
+                }
+                
+                return in_array($item['module'], ['myparcel', 'myparcelbpost', 'postnl'])
+                    && version_compare($module->version, '2.2.0', '>=');
+            });
+            if (!empty($supportedCarrierModules) && end($supportedCarrierModules)['module'] !== $this->name) {
+                return;
+            }
+            $carrierNames = [];
+            foreach ($supportedCarrierModules as $supportedCarrierModule) {
+                $name = '';
+                switch ($supportedCarrierModule['module']) {
+                    case 'myparcel':
+                        $name = 'MyParcel';
+                        break;
+                    case 'myparcelbpost':
+                        $name = 'bpost';
+                        break;
+                    case 'postnl':
+                        $name = 'PostNL';
+                        break;
+                }
+                if ($name) {
+                    $carrierNames[$supportedCarrierModule['module']] = $name;
+                }
+            }
+
             $params['fields']['myparcel_date_delivery'] = array(
                 'title'           => $this->l('Preferred delivery date'),
                 'class'           => 'fixed-width-lg',
@@ -4073,7 +4102,7 @@ class MyParcel extends Module
                 'type'            => 'date',
             );
             $params['fields']['myparcel_void_1'] = array(
-                'title'           => $this->l('MyParcel'),
+                'title'           => implode(' / ', array_values($carrierNames)),
                 'class'           => 'fixed-width-lg',
                 'callback'        => 'printMyParcelTrackTrace',
                 'callback_object' => 'MyParcelTools',
@@ -4083,7 +4112,7 @@ class MyParcel extends Module
             );
             $params['fields']['myparcel_void_2'] = array(
                 'title'           => '',
-                'class'           => 'fixed-width-xs',
+                'class'           => 'text-nowrap',
                 'callback'        => 'printMyParcelIcon',
                 'callback_object' => 'MyParcelTools',
                 'search'          => false,
@@ -4111,6 +4140,20 @@ class MyParcel extends Module
             : Tools::strtolower(Tools::substr($language->language_code, 0, 2)).'-'.Tools::strtoupper(
                 Tools::substr($language->language_code, 0, 2)
             );
+    }
+
+    /**
+     * Get columns to display on the back office ordergrid
+     *
+     * @return array
+     */
+    public function getColumns()
+    {
+        return [
+            'delivery_date' => ['MyParcelTools', 'printOrderGridPreference'],
+            'status'        => ['MyParcelTools', 'printMyParcelTrackTrace'],
+            'concept'       => ['MyParcelTools', 'printMyParcelIcon'],
+        ];
     }
 
     /**

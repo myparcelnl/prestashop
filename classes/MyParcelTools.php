@@ -30,6 +30,8 @@ require_once dirname(__FILE__).'/../myparcel.php';
  */
 class MyParcelTools
 {
+    public static $supportedModules = ['postnl', 'myparcel', 'myparcelbpost'];
+
     /**
      * Prints the preferred delivery date on a HelperList
      *
@@ -46,6 +48,33 @@ class MyParcelTools
     public static function printOrderGridPreference($id, $tr)
     {
         // @codingStandardsIgnoreEnd
+        $output = '';
+
+        $supportedCarrierModules = array_filter(Hook::getHookModuleExecList('actionAdminOrdersListingFieldsModifier'), function ($item) {
+            return in_array($item['module'], static::$supportedModules);
+        });
+        if (!empty($supportedCarrierModules) && end($supportedCarrierModules)['module'] === 'myparcel') {
+            foreach ($supportedCarrierModules as $supportedCarrierModule) {
+                if ($supportedCarrierModule['module'] === 'myparcel') {
+                    continue;
+                }
+
+                $module = Module::getInstanceByName($supportedCarrierModule['module']);
+                if (!Validate::isLoadedObject($module)) {
+                    continue;
+                }
+
+                $result = call_user_func($module->getColumns()['delivery_date'], $id, $tr);
+                if ($result !== '--') {
+                    $output .= $result;
+                }
+            }
+        }
+
+        if ($tr['myparcel_date_delivery'] <= '1970-01-02 00:00:00') {
+            return $output ?: '--';
+        }
+
         $option = json_decode($tr['myparcel_delivery_option'], true);
 
         if (in_array($tr['myparcel_country_iso'], array('NL', 'BE'))) {
@@ -57,7 +86,7 @@ class MyParcelTools
             $shippingDaysRemaining = 0;
         }
 
-        if ($tr['myparcel_country_iso'] !== 'NL' || $tr['myparcel_date_delivery'] <= '1970-01-02 00:00:00') {
+        if ($tr['myparcel_country_iso'] !== 'NL') {
             $badgeType = 'info';
         } elseif ($shippingDaysRemaining < 0) {
             $badgeType = 'danger';
@@ -101,7 +130,7 @@ class MyParcelTools
         $reflection = new ReflectionClass('MyParcel');
         $moduleOverridden = !file_exists(dirname($reflection->getFileName()).'/'.$location);
 
-        return $module->display(
+        return $output.$module->display(
             $moduleOverridden ? _PS_MODULE_DIR_.'myparcel/myparcel.php' : $reflection->getFileName(),
             $location
         );
@@ -123,6 +152,29 @@ class MyParcelTools
     public static function printMyParcelTrackTrace($id, $tr)
     {
         // @codingStandardsIgnoreEnd
+        $output = '';
+
+        $supportedCarrierModules = array_filter(Hook::getHookModuleExecList('actionAdminOrdersListingFieldsModifier'), function ($item) {
+            return in_array($item['module'], static::$supportedModules);
+        });
+        if (!empty($supportedCarrierModules) && end($supportedCarrierModules)['module'] === 'myparcel') {
+            foreach ($supportedCarrierModules as $supportedCarrierModule) {
+                if ($supportedCarrierModule['module'] === 'myparcel') {
+                    continue;
+                }
+
+                $module = Module::getInstanceByName($supportedCarrierModule['module']);
+                if (!Validate::isLoadedObject($module)) {
+                    continue;
+                }
+
+                $result = call_user_func($module->getColumns()['status'], $id, $tr);
+                if ($result !== '--') {
+                    $output .= $result;
+                }
+            }
+        }
+
         Context::getContext()->smarty->assign(array(
             'tr'           => $tr,
         ));
@@ -132,7 +184,7 @@ class MyParcelTools
         $reflection = new ReflectionClass('MyParcel');
         $moduleOverridden = !file_exists(dirname($reflection->getFileName()).'/'.$location);
 
-        return $module->display(
+        return $output.$module->display(
             $moduleOverridden ? _PS_MODULE_DIR_.'myparcel/myparcel.php' : $reflection->getFileName(),
             $location
         );
@@ -154,8 +206,37 @@ class MyParcelTools
     public static function printMyParcelIcon($id, $tr)
     {
         // @codingStandardsIgnoreEnd
+        $output = '';
+
+        $supportedCarrierModules = array_filter(Hook::getHookModuleExecList('actionAdminOrdersListingFieldsModifier'), function ($item) {
+            $module = Module::getInstanceByName($item['module']);
+            if (!Validate::isLoadedObject($module)) {
+                return false;
+            }
+
+            return in_array($item['module'], static::$supportedModules)
+                && version_compare($module->version, '2.2.0', '>=');
+        });
+        if (!empty($supportedCarrierModules) && end($supportedCarrierModules)['module'] === 'myparcel') {
+            foreach ($supportedCarrierModules as $supportedCarrierModule) {
+                if ($supportedCarrierModule['module'] === 'myparcel') {
+                    continue;
+                }
+
+                $module = Module::getInstanceByName($supportedCarrierModule['module']);
+                if (!Validate::isLoadedObject($module)) {
+                    continue;
+                }
+
+                $result = call_user_func($module->getColumns()['concept'], $id, $tr);
+                if ($result) {
+                    $output .= $result;
+                }
+            }
+        }
+
         Context::getContext()->smarty->assign(array(
-            'tr'           => $tr,
+            'tr' => $tr,
         ));
 
         $location = 'views/templates/admin/ordergrid/icon-concept.tpl';
@@ -163,7 +244,7 @@ class MyParcelTools
         $reflection = new ReflectionClass('MyParcel');
         $moduleOverridden = !file_exists(dirname($reflection->getFileName()).'/'.$location);
 
-        return $module->display(
+        return $output.$module->display(
             $moduleOverridden ? _PS_MODULE_DIR_.'myparcel/myparcel.php' : $reflection->getFileName(),
             $location
         );

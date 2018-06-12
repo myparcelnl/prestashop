@@ -224,6 +224,8 @@ class MyParcelOrderHistory extends MyParcelObjectModel
      * @param int $idShipment
      *
      * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function sendShippedNotification($idShipment)
     {
@@ -250,17 +252,26 @@ class MyParcelOrderHistory extends MyParcelObjectModel
 
                 $customer = new Customer($order->id_customer);
                 $address = new Address($order->id_address_delivery);
+                $shipment = json_decode($myParcelOrder->shipment, true);
+                if (isset($shipment['recipient']['postal_code'])) {
+                    $postcode = Tools::strtoupper(str_replace(' ', '', $shipment['recipient']['postal_code']));
+                } else {
+                    $postcode = $address->postcode;
+                }
 
-                $mailIso = \Language::getIsoById($order->id_lang);
+                $mailIso = Language::getIsoById($order->id_lang);
                 $mailIsoUpper = Tools::strtoupper($mailIso);
                 $countryIso = Tools::strtoupper(Country::getIsoById($address->id_country));
 
                 $templateVars = array(
-                    '{firstname}'       => $address->firstname,
-                    '{lastname}'        => $address->lastname,
-                    '{shipping_number}' => $order->shipping_number,
-                    '{followup}'        => "http://postnl.nl/tracktrace/?L={$mailIsoUpper}&B={$order->shipping_number}".
-                        "&P={$address->postcode}&D={$countryIso}&T=C",
+                    '{firstname}'           => $address->firstname,
+                    '%7Bfirstname%7D'       => $address->firstname,
+                    '{lastname}'            => $address->lastname,
+                    '%7Blastname%7D'        => $address->lastname,
+                    '{shipping_number}'     => $order->shipping_number,
+                    '%7Bshipping_number%7D' => $order->shipping_number,
+                    '{followup}'            => "http://postnl.nl/tracktrace/?L={$mailIsoUpper}&B={$order->shipping_number}&P={$postcode}&D={$countryIso}&T=C",
+                    '%7Bfollowup%7D'        => "http://postnl.nl/tracktrace/?L={$mailIsoUpper}&B={$order->shipping_number}&P={$postcode}&D={$countryIso}&T=C",
                 );
 
                 $mailType = 'standard';
