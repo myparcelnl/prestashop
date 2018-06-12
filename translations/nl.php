@@ -209,7 +209,7 @@ $_MODULE['<{myparcel}prestashop>translations_0d9175fe89fb80d815e7d03698b6e83a'] 
 $_MODULE['<{myparcel}prestashop>translations_f28128b38efbc6134dc40751ee21fd29'] = 'Documenten';
 $_MODULE['<{myparcel}prestashop>translations_d4c7d21d9aa7a7efc5986bc113c06241'] = 'Retourgoederen';
 $_MODULE['<{myparcel}prestashop>translations_8ae4286d38bb2235def98fd68d7420d2'] = 'Factuurnummer';
-$_MODULE['<{myparcel}prestashop>translations_8ed46c312d6864c40a36ec725fa7e267'] = 'Totaalgewicht (in kg.)';
+$_MODULE['<{myparcel}prestashop>translations_8397d4f8f54fd2edf7282fe242694ec2'] = 'Totaalgewicht (in grammen)';
 $_MODULE['<{myparcel}prestashop>translations_3786a37b2d63de6ab81ad0a20c91a415'] = 'Verzekerd';
 $_MODULE['<{myparcel}prestashop>translations_221767d8999bcc0d8804daac98b90841'] = 'Voor een verzekerde zending is altijd een handtekening vereist en kan alleen door de geadresseerde worden ontvangen';
 $_MODULE['<{myparcel}prestashop>translations_b0d044ba5bd7f0850a83a426aa26be46'] = 'Retour bij geen gehoor';
@@ -238,7 +238,7 @@ $_MODULE['<{myparcel}prestashop>translations_ec211f7c20af43e742bf2570c3cb84f9'] 
 $_MODULE['<{myparcel}prestashop>translations_f2a6c498fb90ee345d997f888fce3b18'] = 'Verwijderen';
 $_MODULE['<{myparcel}prestashop>translations_804f78a847dff54ee1624d199505029b'] = 'Producten in pakket';
 $_MODULE['<{myparcel}prestashop>translations_94ec6bc2ed063006a70882cd740203ce'] = 'Aantal producten';
-$_MODULE['<{myparcel}prestashop>translations_4f3992ba9902851abb60dfc4f8e5c20d'] = 'Gewicht in kg';
+$_MODULE['<{myparcel}prestashop>translations_bd06a537820cc501f9748be62a92fe66'] = 'Gewicht in grammen';
 $_MODULE['<{myparcel}prestashop>translations_322c0269d20cbeebc843fc8cbe06baca'] = 'Waarde in EUR';
 $_MODULE['<{myparcel}prestashop>translations_d1834694a82521e358d68c039e6f54dd'] = 'Douanecode';
 $_MODULE['<{myparcel}prestashop>translations_bec9c39f4b6813f72f29397727dcd5aa'] = 'Land van herkomst';

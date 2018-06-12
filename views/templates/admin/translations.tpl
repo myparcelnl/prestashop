@@ -71,7 +71,7 @@
   documents: '{l s='Documents' mod='myparcel' js=1}',
   returnedGoods: '{l s='Returned goods' mod='myparcel' js=1}',
   invoiceNo: '{l s='Invoice number' mod='myparcel' js=1}',
-  totalWeight: '{l s='Total weight (in kg.)' mod='myparcel' js=1}',
+  totalWeight: '{l s='Total weight (in grams)' mod='myparcel' js=1}',
   //  Een verzekerde zending bevat altijd een handtekening voor ontvangst en wordt alleen afgeleverd bij ontvanger.
   insured: '{l s='Insured' mod='myparcel' js=1}',
   insuranceInfo: '{l s='An insured shipment always requires a signature and will only be shipped to the recipient\'s address' mod='myparcel' js=1}',
@@ -103,7 +103,7 @@
   delete: '{l s='Delete' mod='myparcel' js=1}',
   productsInParcel: '{l s='Products in parcel' mod='myparcel' js=1}',
   amountOfProducts: '{l s='Amount of products' mod='myparcel' js=1}',
-  weightInKg: '{l s='Weight in kg' mod='myparcel' js=1}',
+  weightInGrams: '{l s='Weight in grams' mod='myparcel' js=1}',
   valueInEur: '{l s='Value in EUR' mod='myparcel' js=1}',
   tariffCode: '{l s='Tariff code' mod='myparcel' js=1}',
   countryOfOrigin: '{l s='Country of origin' mod='myparcel' js=1}',

@@ -379,7 +379,11 @@ class MyParcelOrderHistory extends MyParcelObjectModel
                 $history = new OrderHistory();
                 $history->id_order = (int) $order->id;
                 $history->changeIdOrderState($targetOrderState, (int) $order->id, !$order->hasInvoice());
-                $history->addWithemail($addWithEmail);
+                if ($addWithEmail) {
+                    $history->addWithemail();
+                } else {
+                    $history->add();
+                }
             }
         }
     }

@@ -326,4 +326,1180 @@ class MyParcelTools
 
         return $weight;
     }
+
+    /**
+     * Get supported countries when offline
+     *
+     * @since 2.1.1
+     *
+     * @return array
+     */
+    public static function getSupportedCountriesOffline()
+    {
+        return array(
+            'data' => array(
+                    'countries' =>
+                        array(
+                            0 =>
+                                array(
+                                    'NL' =>
+                                        array(
+                                            'label'  => 'Nederland',
+                                            'region' => 'NL',
+                                        ),
+                                    'AT' =>
+                                        array(
+                                            'label'  => 'Oostenrijk',
+                                            'region' => 'EU',
+                                        ),
+                                    'BE' =>
+                                        array(
+                                            'label'  => 'België',
+                                            'region' => 'EU',
+                                        ),
+                                    'BG' =>
+                                        array(
+                                            'label'  => 'Bulgarije',
+                                            'region' => 'EU',
+                                        ),
+                                    'CZ' =>
+                                        array(
+                                            'label'  => 'Tsjechië',
+                                            'region' => 'EU',
+                                        ),
+                                    'DE' =>
+                                        array(
+                                            'label'  => 'Duitsland',
+                                            'region' => 'EU',
+                                        ),
+                                    'DK' =>
+                                        array(
+                                            'label'  => 'Denemarken',
+                                            'region' => 'EU',
+                                        ),
+                                    'EE' =>
+                                        array(
+                                            'label'  => 'Estland',
+                                            'region' => 'EU',
+                                        ),
+                                    'ES' =>
+                                        array(
+                                            'label'  => 'Spanje',
+                                            'region' => 'EU',
+                                        ),
+                                    'FI' =>
+                                        array(
+                                            'label'  => 'Finland',
+                                            'region' => 'EU',
+                                        ),
+                                    'FR' =>
+                                        array(
+                                            'label'  => 'Frankrijk',
+                                            'region' => 'EU',
+                                        ),
+                                    'GB' =>
+                                        array(
+                                            'label'  => 'Verenigd Koninkrijk',
+                                            'region' => 'EU',
+                                        ),
+                                    'GR' =>
+                                        array(
+                                            'label'  => 'Griekenland',
+                                            'region' => 'EU',
+                                        ),
+                                    'HU' =>
+                                        array(
+                                            'label'  => 'Hongarije',
+                                            'region' => 'EU',
+                                        ),
+                                    'IE' =>
+                                        array(
+                                            'label'  => 'Ierland',
+                                            'region' => 'EU',
+                                        ),
+                                    'IT' =>
+                                        array(
+                                            'label'  => 'Italië',
+                                            'region' => 'EU',
+                                        ),
+                                    'LT' =>
+                                        array(
+                                            'label'  => 'Litouwen',
+                                            'region' => 'EU',
+                                        ),
+                                    'LU' =>
+                                        array(
+                                            'label'  => 'Luxemburg',
+                                            'region' => 'EU',
+                                        ),
+                                    'LV' =>
+                                        array(
+                                            'label'  => 'Letland',
+                                            'region' => 'EU',
+                                        ),
+                                    'MC' =>
+                                        array(
+                                            'label'  => 'Monaco',
+                                            'region' => 'EU',
+                                        ),
+                                    'PL' =>
+                                        array(
+                                            'label'  => 'Polen',
+                                            'region' => 'EU',
+                                        ),
+                                    'PT' =>
+                                        array(
+                                            'label'  => 'Portugal',
+                                            'region' => 'EU',
+                                        ),
+                                    'RO' =>
+                                        array(
+                                            'label'  => 'Roemenië',
+                                            'region' => 'EU',
+                                        ),
+                                    'SE' =>
+                                        array(
+                                            'label'  => 'Zweden',
+                                            'region' => 'EU',
+                                        ),
+                                    'SI' =>
+                                        array(
+                                            'label'  => 'Slovenië',
+                                            'region' => 'EU',
+                                        ),
+                                    'SK' =>
+                                        array(
+                                            'label'  => 'Slowakije',
+                                            'region' => 'EU',
+                                        ),
+                                    'AD' =>
+                                        array(
+                                            'label'  => 'Andora',
+                                            'region' => 'EU',
+                                        ),
+                                    'AL' =>
+                                        array(
+                                            'label'  => 'Albanië',
+                                            'region' => 'EU',
+                                        ),
+                                    'BA' =>
+                                        array(
+                                            'label'  => 'Bosnië-Herzegovina',
+                                            'region' => 'EU',
+                                        ),
+                                    'BY' =>
+                                        array(
+                                            'label'  => 'Wit-Rusland',
+                                            'region' => 'EU',
+                                        ),
+                                    'CH' =>
+                                        array(
+                                            'label'  => 'Zwitserland',
+                                            'region' => 'EU',
+                                        ),
+                                    'FO' =>
+                                        array(
+                                            'label'  => 'Faeröer Eilanden',
+                                            'region' => 'EU',
+                                        ),
+                                    'GG' =>
+                                        array(
+                                            'label'  => 'Guernsey',
+                                            'region' => 'EU',
+                                        ),
+                                    'GI' =>
+                                        array(
+                                            'label'  => 'Gibraltar',
+                                            'region' => 'EU',
+                                        ),
+                                    'GL' =>
+                                        array(
+                                            'label'  => 'Groenland',
+                                            'region' => 'EU',
+                                        ),
+                                    'HR' =>
+                                        array(
+                                            'label'  => 'Kroatië',
+                                            'region' => 'EU',
+                                        ),
+                                    'IC' =>
+                                        array(
+                                            'label'  => 'Canarische Eilanden',
+                                            'region' => 'EU',
+                                        ),
+                                    'IS' =>
+                                        array(
+                                            'label'  => 'IJsland',
+                                            'region' => 'EU',
+                                        ),
+                                    'JE' =>
+                                        array(
+                                            'label'  => 'Jersey',
+                                            'region' => 'EU',
+                                        ),
+                                    'LI' =>
+                                        array(
+                                            'label'  => 'Liechtenstein',
+                                            'region' => 'EU',
+                                        ),
+                                    'MD' =>
+                                        array(
+                                            'label'  => 'Moldavië',
+                                            'region' => 'EU',
+                                        ),
+                                    'ME' =>
+                                        array(
+                                            'label'  => 'Montenegro',
+                                            'region' => 'EU',
+                                        ),
+                                    'MK' =>
+                                        array(
+                                            'label'  => 'Macedonië',
+                                            'region' => 'EU',
+                                        ),
+                                    'NO' =>
+                                        array(
+                                            'label'  => 'Noorwegen',
+                                            'region' => 'EU',
+                                        ),
+                                    'RS' =>
+                                        array(
+                                            'label'  => 'Servië',
+                                            'region' => 'EU',
+                                        ),
+                                    'SM' =>
+                                        array(
+                                            'label'  => 'San Marino',
+                                            'region' => 'EU',
+                                        ),
+                                    'TR' =>
+                                        array(
+                                            'label'  => 'Turkije',
+                                            'region' => 'EU',
+                                        ),
+                                    'UA' =>
+                                        array(
+                                            'label'  => 'Oekraïne',
+                                            'region' => 'EU',
+                                        ),
+                                    'VA' =>
+                                        array(
+                                            'label'  => 'Vaticaanstad',
+                                            'region' => 'EU',
+                                        ),
+                                    'AE' =>
+                                        array(
+                                            'label'  => 'Ver. Arabische Emiraten',
+                                            'region' => 'CD',
+                                        ),
+                                    'AF' =>
+                                        array(
+                                            'label'  => 'Afghanistan',
+                                            'region' => 'CD',
+                                        ),
+                                    'AG' =>
+                                        array(
+                                            'label'  => 'Antigua en Barbuda',
+                                            'region' => 'CD',
+                                        ),
+                                    'AM' =>
+                                        array(
+                                            'label'  => 'Armenië',
+                                            'region' => 'CD',
+                                        ),
+                                    'AN' =>
+                                        array(
+                                            'label'  => 'Nederlandse Antillen',
+                                            'region' => 'CD',
+                                        ),
+                                    'AO' =>
+                                        array(
+                                            'label'  => 'Angola',
+                                            'region' => 'CD',
+                                        ),
+                                    'AQ' =>
+                                        array(
+                                            'label'  => 'Antarctica',
+                                            'region' => 'CD',
+                                        ),
+                                    'AR' =>
+                                        array(
+                                            'label'  => 'Argentinië',
+                                            'region' => 'CD',
+                                        ),
+                                    'AU' =>
+                                        array(
+                                            'label'  => 'Australië',
+                                            'region' => 'CD',
+                                        ),
+                                    'AW' =>
+                                        array(
+                                            'label'  => 'Aruba',
+                                            'region' => 'CD',
+                                        ),
+                                    'AZ' =>
+                                        array(
+                                            'label'  => 'Azerbeidzjan',
+                                            'region' => 'CD',
+                                        ),
+                                    'BB' =>
+                                        array(
+                                            'label'  => 'Barbados',
+                                            'region' => 'CD',
+                                        ),
+                                    'BD' =>
+                                        array(
+                                            'label'  => 'Bangladesh',
+                                            'region' => 'CD',
+                                        ),
+                                    'BF' =>
+                                        array(
+                                            'label'  => 'Burkina Faso',
+                                            'region' => 'CD',
+                                        ),
+                                    'BH' =>
+                                        array(
+                                            'label'  => 'Bahrein',
+                                            'region' => 'CD',
+                                        ),
+                                    'BI' =>
+                                        array(
+                                            'label'  => 'Burundi',
+                                            'region' => 'CD',
+                                        ),
+                                    'BJ' =>
+                                        array(
+                                            'label'  => 'Benin',
+                                            'region' => 'CD',
+                                        ),
+                                    'BM' =>
+                                        array(
+                                            'label'  => 'Bermuda',
+                                            'region' => 'CD',
+                                        ),
+                                    'BN' =>
+                                        array(
+                                            'label'  => 'Brunei Darussalam',
+                                            'region' => 'CD',
+                                        ),
+                                    'BO' =>
+                                        array(
+                                            'label'  => 'Bolivia',
+                                            'region' => 'CD',
+                                        ),
+                                    'BQ' =>
+                                        array(
+                                            'label'  => 'Bonaire, Sint Eustatius en Saba',
+                                            'region' => 'CD',
+                                        ),
+                                    'BR' =>
+                                        array(
+                                            'label'  => 'Brazilië',
+                                            'region' => 'CD',
+                                        ),
+                                    'BS' =>
+                                        array(
+                                            'label'  => 'Bahama’s',
+                                            'region' => 'CD',
+                                        ),
+                                    'BT' =>
+                                        array(
+                                            'label'  => 'Bhutan',
+                                            'region' => 'CD',
+                                        ),
+                                    'BW' =>
+                                        array(
+                                            'label'  => 'Botswana',
+                                            'region' => 'CD',
+                                        ),
+                                    'BZ' =>
+                                        array(
+                                            'label'  => 'Belize',
+                                            'region' => 'CD',
+                                        ),
+                                    'CA' =>
+                                        array(
+                                            'label'  => 'Canada',
+                                            'region' => 'CD',
+                                        ),
+                                    'CD' =>
+                                        array(
+                                            'label'  => 'Congo-Kinshasa',
+                                            'region' => 'CD',
+                                        ),
+                                    'CF' =>
+                                        array(
+                                            'label'  => 'Centraal-Afrikaanse Rep.',
+                                            'region' => 'CD',
+                                        ),
+                                    'CG' =>
+                                        array(
+                                            'label'  => 'Congo-Brazzaville',
+                                            'region' => 'CD',
+                                        ),
+                                    'CI' =>
+                                        array(
+                                            'label'  => 'Ivoorkust',
+                                            'region' => 'CD',
+                                        ),
+                                    'CL' =>
+                                        array(
+                                            'label'  => 'Chili',
+                                            'region' => 'CD',
+                                        ),
+                                    'CM' =>
+                                        array(
+                                            'label'  => 'Kameroen',
+                                            'region' => 'CD',
+                                        ),
+                                    'CN' =>
+                                        array(
+                                            'label'  => 'China',
+                                            'region' => 'CD',
+                                        ),
+                                    'CO' =>
+                                        array(
+                                            'label'  => 'Colombia',
+                                            'region' => 'CD',
+                                        ),
+                                    'CR' =>
+                                        array(
+                                            'label'  => 'Costa Rica',
+                                            'region' => 'CD',
+                                        ),
+                                    'CU' =>
+                                        array(
+                                            'label'  => 'Cuba',
+                                            'region' => 'CD',
+                                        ),
+                                    'CV' =>
+                                        array(
+                                            'label'  => 'Kaapverdië',
+                                            'region' => 'CD',
+                                        ),
+                                    'CW' =>
+                                        array(
+                                            'label'  => 'Curaçao',
+                                            'region' => 'CD',
+                                        ),
+                                    'CY' =>
+                                        array(
+                                            'label'  => 'Cyprus',
+                                            'region' => 'CD',
+                                        ),
+                                    'DJ' =>
+                                        array(
+                                            'label'  => 'Djibouti',
+                                            'region' => 'CD',
+                                        ),
+                                    'DM' =>
+                                        array(
+                                            'label'  => 'Dominica',
+                                            'region' => 'CD',
+                                        ),
+                                    'DO' =>
+                                        array(
+                                            'label'  => 'Dominicaanse Republiek',
+                                            'region' => 'CD',
+                                        ),
+                                    'DZ' =>
+                                        array(
+                                            'label'  => 'Algerije',
+                                            'region' => 'CD',
+                                        ),
+                                    'EC' =>
+                                        array(
+                                            'label'  => 'Ecuador',
+                                            'region' => 'CD',
+                                        ),
+                                    'EG' =>
+                                        array(
+                                            'label'  => 'Egypte',
+                                            'region' => 'CD',
+                                        ),
+                                    'ER' =>
+                                        array(
+                                            'label'  => 'Eritrea',
+                                            'region' => 'CD',
+                                        ),
+                                    'ET' =>
+                                        array(
+                                            'label'  => 'Ethiopië',
+                                            'region' => 'CD',
+                                        ),
+                                    'FJ' =>
+                                        array(
+                                            'label'  => 'Fiji',
+                                            'region' => 'CD',
+                                        ),
+                                    'FK' =>
+                                        array(
+                                            'label'  => 'Falklandeilanden',
+                                            'region' => 'CD',
+                                        ),
+                                    'GA' =>
+                                        array(
+                                            'label'  => 'Gabon',
+                                            'region' => 'CD',
+                                        ),
+                                    'GD' =>
+                                        array(
+                                            'label'  => 'Grenada',
+                                            'region' => 'CD',
+                                        ),
+                                    'GE' =>
+                                        array(
+                                            'label'  => 'Georgië',
+                                            'region' => 'CD',
+                                        ),
+                                    'GF' =>
+                                        array(
+                                            'label'  => 'Frans Guyana',
+                                            'region' => 'CD',
+                                        ),
+                                    'GH' =>
+                                        array(
+                                            'label'  => 'Ghana',
+                                            'region' => 'CD',
+                                        ),
+                                    'GM' =>
+                                        array(
+                                            'label'  => 'Gambia',
+                                            'region' => 'CD',
+                                        ),
+                                    'GN' =>
+                                        array(
+                                            'label'  => 'Guinee',
+                                            'region' => 'CD',
+                                        ),
+                                    'GP' =>
+                                        array(
+                                            'label'  => 'Guadeloupe',
+                                            'region' => 'CD',
+                                        ),
+                                    'GQ' =>
+                                        array(
+                                            'label'  => 'Equatoriaal-Guinea',
+                                            'region' => 'CD',
+                                        ),
+                                    'GT' =>
+                                        array(
+                                            'label'  => 'Guatemala',
+                                            'region' => 'CD',
+                                        ),
+                                    'GW' =>
+                                        array(
+                                            'label'  => 'Guinee-Bissau',
+                                            'region' => 'CD',
+                                        ),
+                                    'GY' =>
+                                        array(
+                                            'label'  => 'Guyana',
+                                            'region' => 'CD',
+                                        ),
+                                    'HK' =>
+                                        array(
+                                            'label'  => 'Hongkong',
+                                            'region' => 'CD',
+                                        ),
+                                    'HN' =>
+                                        array(
+                                            'label'  => 'Honduras',
+                                            'region' => 'CD',
+                                        ),
+                                    'HT' =>
+                                        array(
+                                            'label'  => 'Haïti',
+                                            'region' => 'CD',
+                                        ),
+                                    'ID' =>
+                                        array(
+                                            'label'  => 'Indonesië',
+                                            'region' => 'CD',
+                                        ),
+                                    'IL' =>
+                                        array(
+                                            'label'  => 'Israël',
+                                            'region' => 'CD',
+                                        ),
+                                    'IM' =>
+                                        array(
+                                            'label'  => 'Isle of Man',
+                                            'region' => 'CD',
+                                        ),
+                                    'IN' =>
+                                        array(
+                                            'label'  => 'India',
+                                            'region' => 'CD',
+                                        ),
+                                    'IQ' =>
+                                        array(
+                                            'label'  => 'Irak',
+                                            'region' => 'CD',
+                                        ),
+                                    'IR' =>
+                                        array(
+                                            'label'  => 'Iran',
+                                            'region' => 'CD',
+                                        ),
+                                    'JM' =>
+                                        array(
+                                            'label'  => 'Jamaica',
+                                            'region' => 'CD',
+                                        ),
+                                    'JO' =>
+                                        array(
+                                            'label'  => 'Jordanië',
+                                            'region' => 'CD',
+                                        ),
+                                    'JP' =>
+                                        array(
+                                            'label'  => 'Japan',
+                                            'region' => 'CD',
+                                        ),
+                                    'KE' =>
+                                        array(
+                                            'label'  => 'Kenya',
+                                            'region' => 'CD',
+                                        ),
+                                    'KG' =>
+                                        array(
+                                            'label'  => 'Kirgizië',
+                                            'region' => 'CD',
+                                        ),
+                                    'KH' =>
+                                        array(
+                                            'label'  => 'Cambodja',
+                                            'region' => 'CD',
+                                        ),
+                                    'KI' =>
+                                        array(
+                                            'label'  => 'Kiribati',
+                                            'region' => 'CD',
+                                        ),
+                                    'KM' =>
+                                        array(
+                                            'label'  => 'Comoren',
+                                            'region' => 'CD',
+                                        ),
+                                    'KN' =>
+                                        array(
+                                            'label'  => 'Saint Kitts en Nevis',
+                                            'region' => 'CD',
+                                        ),
+                                    'KP' =>
+                                        array(
+                                            'label'  => 'Noord-Korea',
+                                            'region' => 'CD',
+                                        ),
+                                    'KR' =>
+                                        array(
+                                            'label'  => 'Zuid-Korea',
+                                            'region' => 'CD',
+                                        ),
+                                    'KW' =>
+                                        array(
+                                            'label'  => 'Koeweit',
+                                            'region' => 'CD',
+                                        ),
+                                    'KY' =>
+                                        array(
+                                            'label'  => 'Caymaneilanden',
+                                            'region' => 'CD',
+                                        ),
+                                    'KZ' =>
+                                        array(
+                                            'label'  => 'Kazachstan',
+                                            'region' => 'CD',
+                                        ),
+                                    'LA' =>
+                                        array(
+                                            'label'  => 'Laos',
+                                            'region' => 'CD',
+                                        ),
+                                    'LB' =>
+                                        array(
+                                            'label'  => 'Libanon',
+                                            'region' => 'CD',
+                                        ),
+                                    'LC' =>
+                                        array(
+                                            'label'  => 'Saint Lucia',
+                                            'region' => 'CD',
+                                        ),
+                                    'LK' =>
+                                        array(
+                                            'label'  => 'Sri Lanka',
+                                            'region' => 'CD',
+                                        ),
+                                    'LR' =>
+                                        array(
+                                            'label'  => 'Liberia',
+                                            'region' => 'CD',
+                                        ),
+                                    'LS' =>
+                                        array(
+                                            'label'  => 'Lesotho',
+                                            'region' => 'CD',
+                                        ),
+                                    'LY' =>
+                                        array(
+                                            'label'  => 'Libië',
+                                            'region' => 'CD',
+                                        ),
+                                    'MA' =>
+                                        array(
+                                            'label'  => 'Marokko',
+                                            'region' => 'CD',
+                                        ),
+                                    'MG' =>
+                                        array(
+                                            'label'  => 'Madagaskar',
+                                            'region' => 'CD',
+                                        ),
+                                    'ML' =>
+                                        array(
+                                            'label'  => 'Mali',
+                                            'region' => 'CD',
+                                        ),
+                                    'MM' =>
+                                        array(
+                                            'label'  => 'Myanmar',
+                                            'region' => 'CD',
+                                        ),
+                                    'MN' =>
+                                        array(
+                                            'label'  => 'Mongolië',
+                                            'region' => 'CD',
+                                        ),
+                                    'MO' =>
+                                        array(
+                                            'label'  => 'Macao',
+                                            'region' => 'CD',
+                                        ),
+                                    'MQ' =>
+                                        array(
+                                            'label'  => 'Martinique',
+                                            'region' => 'CD',
+                                        ),
+                                    'MR' =>
+                                        array(
+                                            'label'  => 'Mauretanië',
+                                            'region' => 'CD',
+                                        ),
+                                    'MS' =>
+                                        array(
+                                            'label'  => 'Montserrat',
+                                            'region' => 'CD',
+                                        ),
+                                    'MT' =>
+                                        array(
+                                            'label'  => 'Malta',
+                                            'region' => 'CD',
+                                        ),
+                                    'MU' =>
+                                        array(
+                                            'label'  => 'Mauritius',
+                                            'region' => 'CD',
+                                        ),
+                                    'MV' =>
+                                        array(
+                                            'label'  => 'Maldiven',
+                                            'region' => 'CD',
+                                        ),
+                                    'MW' =>
+                                        array(
+                                            'label'  => 'Malawi',
+                                            'region' => 'CD',
+                                        ),
+                                    'MX' =>
+                                        array(
+                                            'label'  => 'Mexico',
+                                            'region' => 'CD',
+                                        ),
+                                    'MY' =>
+                                        array(
+                                            'label'  => 'Maleisië',
+                                            'region' => 'CD',
+                                        ),
+                                    'MZ' =>
+                                        array(
+                                            'label'  => 'Mozambique',
+                                            'region' => 'CD',
+                                        ),
+                                    'NA' =>
+                                        array(
+                                            'label'  => 'Namibië',
+                                            'region' => 'CD',
+                                        ),
+                                    'NC' =>
+                                        array(
+                                            'label'  => 'Nieuw-Caledonië',
+                                            'region' => 'CD',
+                                        ),
+                                    'NE' =>
+                                        array(
+                                            'label'  => 'Niger',
+                                            'region' => 'CD',
+                                        ),
+                                    'NG' =>
+                                        array(
+                                            'label'  => 'Nigeria',
+                                            'region' => 'CD',
+                                        ),
+                                    'NI' =>
+                                        array(
+                                            'label'  => 'Nicaragua',
+                                            'region' => 'CD',
+                                        ),
+                                    'NP' =>
+                                        array(
+                                            'label'  => 'Nepal',
+                                            'region' => 'CD',
+                                        ),
+                                    'NR' =>
+                                        array(
+                                            'label'  => 'Nauru',
+                                            'region' => 'CD',
+                                        ),
+                                    'NZ' =>
+                                        array(
+                                            'label'  => 'Nieuw-Zeeland',
+                                            'region' => 'CD',
+                                        ),
+                                    'OM' =>
+                                        array(
+                                            'label'  => 'Oman',
+                                            'region' => 'CD',
+                                        ),
+                                    'PA' =>
+                                        array(
+                                            'label'  => 'Panama',
+                                            'region' => 'CD',
+                                        ),
+                                    'PE' =>
+                                        array(
+                                            'label'  => 'Peru',
+                                            'region' => 'CD',
+                                        ),
+                                    'PF' =>
+                                        array(
+                                            'label'  => 'Frans Polynesië',
+                                            'region' => 'CD',
+                                        ),
+                                    'PG' =>
+                                        array(
+                                            'label'  => 'Papoea-Nieuw-Guinea',
+                                            'region' => 'CD',
+                                        ),
+                                    'PH' =>
+                                        array(
+                                            'label'  => 'Filipijnen',
+                                            'region' => 'CD',
+                                        ),
+                                    'PK' =>
+                                        array(
+                                            'label'  => 'Pakistan',
+                                            'region' => 'CD',
+                                        ),
+                                    'PM' =>
+                                        array(
+                                            'label'  => 'Saint-Pierre en Miquelon',
+                                            'region' => 'CD',
+                                        ),
+                                    'PN' =>
+                                        array(
+                                            'label'  => 'Pitcairneilanden',
+                                            'region' => 'CD',
+                                        ),
+                                    'PR' =>
+                                        array(
+                                            'label'  => 'Puerto Rico',
+                                            'region' => 'CD',
+                                        ),
+                                    'PY' =>
+                                        array(
+                                            'label'  => 'Paraguay',
+                                            'region' => 'CD',
+                                        ),
+                                    'QA' =>
+                                        array(
+                                            'label'  => 'Qatar',
+                                            'region' => 'CD',
+                                        ),
+                                    'RE' =>
+                                        array(
+                                            'label'  => 'Reunion',
+                                            'region' => 'CD',
+                                        ),
+                                    'RU' =>
+                                        array(
+                                            'label'  => 'Rusland',
+                                            'region' => 'CD',
+                                        ),
+                                    'RW' =>
+                                        array(
+                                            'label'  => 'Rwanda',
+                                            'region' => 'CD',
+                                        ),
+                                    'SA' =>
+                                        array(
+                                            'label'  => 'Saoedi-Arabië',
+                                            'region' => 'CD',
+                                        ),
+                                    'SC' =>
+                                        array(
+                                            'label'  => 'Seychellen',
+                                            'region' => 'CD',
+                                        ),
+                                    'SD' =>
+                                        array(
+                                            'label'  => 'Sudan',
+                                            'region' => 'CD',
+                                        ),
+                                    'SG' =>
+                                        array(
+                                            'label'  => 'Singapore',
+                                            'region' => 'CD',
+                                        ),
+                                    'SL' =>
+                                        array(
+                                            'label'  => 'Sierra Leone',
+                                            'region' => 'CD',
+                                        ),
+                                    'SN' =>
+                                        array(
+                                            'label'  => 'Senegal',
+                                            'region' => 'CD',
+                                        ),
+                                    'SO' =>
+                                        array(
+                                            'label'  => 'Somalië',
+                                            'region' => 'CD',
+                                        ),
+                                    'SR' =>
+                                        array(
+                                            'label'  => 'Suriname',
+                                            'region' => 'CD',
+                                        ),
+                                    'ST' =>
+                                        array(
+                                            'label'  => 'Sao Tomé en Principe',
+                                            'region' => 'CD',
+                                        ),
+                                    'SV' =>
+                                        array(
+                                            'label'  => 'El Salvador',
+                                            'region' => 'CD',
+                                        ),
+                                    'SX' =>
+                                        array(
+                                            'label'  => 'Sint Maarten',
+                                            'region' => 'CD',
+                                        ),
+                                    'SY' =>
+                                        array(
+                                            'label'  => 'Syrië',
+                                            'region' => 'CD',
+                                        ),
+                                    'SZ' =>
+                                        array(
+                                            'label'  => 'Swaziland',
+                                            'region' => 'CD',
+                                        ),
+                                    'TC' =>
+                                        array(
+                                            'label'  => 'Turks en Caicoseilanden',
+                                            'region' => 'CD',
+                                        ),
+                                    'TD' =>
+                                        array(
+                                            'label'  => 'Tsjaad',
+                                            'region' => 'CD',
+                                        ),
+                                    'TG' =>
+                                        array(
+                                            'label'  => 'Togo',
+                                            'region' => 'CD',
+                                        ),
+                                    'TH' =>
+                                        array(
+                                            'label'  => 'Thailand',
+                                            'region' => 'CD',
+                                        ),
+                                    'TJ' =>
+                                        array(
+                                            'label'  => 'Tadzjikistan',
+                                            'region' => 'CD',
+                                        ),
+                                    'TL' =>
+                                        array(
+                                            'label'  => 'Oost Timor',
+                                            'region' => 'CD',
+                                        ),
+                                    'TM' =>
+                                        array(
+                                            'label'  => 'Turkmenistan',
+                                            'region' => 'CD',
+                                        ),
+                                    'TN' =>
+                                        array(
+                                            'label'  => 'Tunesië',
+                                            'region' => 'CD',
+                                        ),
+                                    'TO' =>
+                                        array(
+                                            'label'  => 'Tonga',
+                                            'region' => 'CD',
+                                        ),
+                                    'TT' =>
+                                        array(
+                                            'label'  => 'Trinidad en Tobago',
+                                            'region' => 'CD',
+                                        ),
+                                    'TV' =>
+                                        array(
+                                            'label'  => 'Tuvalu',
+                                            'region' => 'CD',
+                                        ),
+                                    'TW' =>
+                                        array(
+                                            'label'  => 'Taiwan',
+                                            'region' => 'CD',
+                                        ),
+                                    'TZ' =>
+                                        array(
+                                            'label'  => 'Tanzania',
+                                            'region' => 'CD',
+                                        ),
+                                    'UG' =>
+                                        array(
+                                            'label'  => 'Uganda',
+                                            'region' => 'CD',
+                                        ),
+                                    'US' =>
+                                        array(
+                                            'label'  => 'Verenigde Staten',
+                                            'region' => 'CD',
+                                        ),
+                                    'UY' =>
+                                        array(
+                                            'label'  => 'Uruguay',
+                                            'region' => 'CD',
+                                        ),
+                                    'UZ' =>
+                                        array(
+                                            'label'  => 'Oezbekistan',
+                                            'region' => 'CD',
+                                        ),
+                                    'VC' =>
+                                        array(
+                                            'label'  => 'Saint Vincent & Gren.',
+                                            'region' => 'CD',
+                                        ),
+                                    'VE' =>
+                                        array(
+                                            'label'  => 'Venezuela',
+                                            'region' => 'CD',
+                                        ),
+                                    'VG' =>
+                                        array(
+                                            'label'  => 'Britse Maagdeneilanden',
+                                            'region' => 'CD',
+                                        ),
+                                    'VI' =>
+                                        array(
+                                            'label'  => 'Amerikaanse Maagdeneil.',
+                                            'region' => 'CD',
+                                        ),
+                                    'VN' =>
+                                        array(
+                                            'label'  => 'Vietnam',
+                                            'region' => 'CD',
+                                        ),
+                                    'VU' =>
+                                        array(
+                                            'label'  => 'Vanuatu',
+                                            'region' => 'CD',
+                                        ),
+                                    'WS' =>
+                                        array(
+                                            'label'  => 'Samoa',
+                                            'region' => 'CD',
+                                        ),
+                                    'XK' =>
+                                        array(
+                                            'label'  => 'Kosovo',
+                                            'region' => 'CD',
+                                        ),
+                                    'YE' =>
+                                        array(
+                                            'label'  => 'Jemen',
+                                            'region' => 'CD',
+                                        ),
+                                    'ZA' =>
+                                        array(
+                                            'label'  => 'Zuid-Afrika',
+                                            'region' => 'CD',
+                                        ),
+                                    'ZM' =>
+                                        array(
+                                            'label'  => 'Zambia',
+                                            'region' => 'CD',
+                                        ),
+                                    'ZW' =>
+                                        array(
+                                            'label'  => 'Zimbabwe',
+                                            'region' => 'CD',
+                                        ),
+                                ),
+                        ),
+                ),
+        );
+    }
+
+    /**
+     * Get EU countries
+     *
+     * @since 2.1.1
+     *
+     * @return array
+     */
+    public static function getEUCountriesOffline()
+    {
+        return array(
+            array('alpha2Code' => 'AX',),
+            array('alpha2Code' => 'AT',),
+            array('alpha2Code' => 'BE',),
+            array('alpha2Code' => 'BG',),
+            array('alpha2Code' => 'HR',),
+            array('alpha2Code' => 'CY',),
+            array('alpha2Code' => 'CZ',),
+            array('alpha2Code' => 'DK',),
+            array('alpha2Code' => 'EE',),
+            array('alpha2Code' => 'FO',),
+            array('alpha2Code' => 'FI',),
+            array('alpha2Code' => 'FR',),
+            array('alpha2Code' => 'GF',),
+            array('alpha2Code' => 'DE',),
+            array('alpha2Code' => 'GI',),
+            array('alpha2Code' => 'GR',),
+            array('alpha2Code' => 'HU',),
+            array('alpha2Code' => 'IE',),
+            array('alpha2Code' => 'IM',),
+            array('alpha2Code' => 'IT',),
+            array('alpha2Code' => 'LV',),
+            array('alpha2Code' => 'LT',),
+            array('alpha2Code' => 'LU',),
+            array('alpha2Code' => 'MT',),
+            array('alpha2Code' => 'PL',),
+            array('alpha2Code' => 'PT',),
+            array('alpha2Code' => 'RO',),
+            array('alpha2Code' => 'SK',),
+            array('alpha2Code' => 'SI',),
+            array('alpha2Code' => 'ES',),
+            array('alpha2Code' => 'SE',),
+            array('alpha2Code' => 'GB',),
+        );
+    }
 }

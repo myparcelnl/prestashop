@@ -47,6 +47,7 @@ class MyParcel extends Module
     const POSTNL_DEFAULT_MAILBOX_PACKAGE_CARRIER = 'MYPARCEL_DEFAULT_MAILPACK';
     const MYPARCEL_BASE_URL = 'https://www.myparcel.nl/';
     const SUPPORTED_COUNTRIES_URL = 'https://backoffice.myparcel.nl/api/system_country_codes';
+    const EU_COUNTRIES_URL = 'https://restcountries.eu/rest/v2/regionalbloc/eu?fields=alpha2Code';
 
     const API_KEY = 'MYPARCEL_API_KEY';
 
@@ -81,6 +82,7 @@ class MyParcel extends Module
     const DEFAULT_CONCEPT_INSURED_TYPE = 'MYPARCEL_DEFCON_I_TYPE';
     const DEFAULT_CONCEPT_INSURED_AMOUNT = 'MYPARCEL_DEFCON_I_AMOUNT';
     const SUPPORTED_COUNTRIES = 'MYPARCEL_SUPPORTED';
+    const EU_COUNTRIES = 'MYPARCEL_EU';
 
     const INSURED_TYPE_50 = 1;
     const INSURED_TYPE_250 = 2;
@@ -163,7 +165,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.1.0';
+        $this->version = '2.1.1';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -284,6 +286,7 @@ class MyParcel extends Module
             Configuration::updateValue(static::WEBHOOK_LAST_CHECK, time());
 
             static::retrieveSupportedCountries();
+            static::retrieveEuCountries();
         }
     }
 
@@ -301,15 +304,47 @@ class MyParcel extends Module
         $ch = curl_init(static::SUPPORTED_COUNTRIES_URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        $countries = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$countries) {
+            $countries = json_encode(MyParcelTools::getSupportedCountriesOffline(), JSON_UNESCAPED_UNICODE);
+        }
+        Configuration::updateValue(static::SUPPORTED_COUNTRIES, $countries);
+
+        return $countries;
+    }
+
+    /**
+     * Retrieve suported countries from MyParcel API
+     *
+     * @return bool|mixed|string Raw json or false if not found
+     *
+     * @since 2.0.0
+     * @throws PrestaShopException
+     */
+    protected static function retrieveEuCountries()
+    {
+        // Time to update country list
+        $ch = curl_init(static::EU_COUNTRIES_URL);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         $countries = curl_exec($ch);
         curl_close($ch);
 
         if ($countries) {
-            Configuration::updateValue(static::SUPPORTED_COUNTRIES, $countries);
+            Configuration::updateValue(static::EU_COUNTRIES, $countries);
+        } else {
+            Configuration::updateValue(static::EU_COUNTRIES, json_encode(MyParcelTools::getEUCountriesOffline()));
         }
 
         return $countries;
     }
+
 
     /**
      * Add error message
@@ -369,6 +404,8 @@ class MyParcel extends Module
      *
      * @return bool Whether the store dispatches on this date
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     public static function getShipmentAvailableOnDay($idMyParcelCarrierDeliverySetting, $date = null)
@@ -642,6 +679,7 @@ class MyParcel extends Module
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @since 2.0.0
+     * @throws Adapter_Exception
      */
     protected function addCarrier($name, $key = self::POSTNL_DEFAULT_CARRIER)
     {
@@ -834,6 +872,22 @@ class MyParcel extends Module
             $countries = array();
             $supportedCountries = static::getSupportedCountries();
             if (isset($supportedCountries['data']['countries'][0])) {
+                $euCountries = array_map(function ($item) {
+                    $values = array_values($item);
+
+                    return Tools::strtoupper($values[0]);
+                }, static::getEUCountries());
+                foreach (array_keys($supportedCountries['data']['countries'][0]) as $iso) {
+                    if (Tools::strtoupper($iso) === 'NL') {
+                        continue;
+                    }
+
+                    if (!in_array(Tools::strtoupper($iso), $euCountries)) {
+                        $supportedCountries['data']['countries'][0][$iso]['region'] = 'CD';
+                    } else {
+                        $supportedCountries['data']['countries'][0][$iso]['region'] = 'EU';
+                    }
+                }
                 $countryIsos = array_keys($supportedCountries['data']['countries'][0]);
                 foreach (Country::getCountries($this->context->language->id) as &$country) {
                     if (in_array(Tools::strtoupper($country['iso_code']), $countryIsos)) {
@@ -864,7 +918,7 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-89de0dc04f63df99.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-5d9567971fcaaffa.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
         } elseif (Tools::getValue('controller') == 'AdminModules'
             && Tools::getValue('configure') == $this->name
@@ -897,7 +951,7 @@ class MyParcel extends Module
     public static function getSupportedCountries()
     {
         $supportedCountries = json_decode(
-            Configuration::get(static::SUPPORTED_COUNTRIES, null, 0, 0),
+            Configuration::get(static::SUPPORTED_COUNTRIES),
             true
         );
         if (!$supportedCountries) {
@@ -907,6 +961,27 @@ class MyParcel extends Module
         }
 
         return $supportedCountries;
+    }
+
+    /**
+     * Get EU countries
+     *
+     * @return array
+     * @throws PrestaShopException
+     */
+    public static function getEUCountries()
+    {
+        $euCountries = json_decode(
+            Configuration::get(static::EU_COUNTRIES),
+            true
+        );
+        if (!$euCountries) {
+            if ($euCountries = static::retrieveEUCountries()) {
+                return json_decode($euCountries, true);
+            }
+        }
+
+        return MyParcelTools::getEUCountriesOffline();
     }
 
     /**
@@ -3223,8 +3298,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-89de0dc04f63df99.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-89de0dc04f63df99.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-5d9567971fcaaffa.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-5d9567971fcaaffa.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -3775,6 +3850,22 @@ class MyParcel extends Module
         $countries = array();
         $supportedCountries = static::getSupportedCountries();
         if (isset($supportedCountries['data']['countries'][0])) {
+            $euCountries = array_map(function ($item) {
+                $values = array_values($item);
+
+                return Tools::strtoupper($values[0]);
+            }, static::getEUCountries());
+            foreach (array_keys($supportedCountries['data']['countries'][0]) as $iso) {
+                if (Tools::strtoupper($iso) === 'NL') {
+                    continue;
+                }
+
+                if (!in_array(Tools::strtoupper($iso), $euCountries)) {
+                    $supportedCountries['data']['countries'][0][$iso]['region'] = 'CD';
+                } else {
+                    $supportedCountries['data']['countries'][0][$iso]['region'] = 'EU';
+                }
+            }
             $countryIsos = array_keys($supportedCountries['data']['countries'][0]);
             foreach (Country::getCountries($this->context->language->id) as $country) {
                 if (in_array(Tools::strtoupper($country['iso_code']), $countryIsos)) {
