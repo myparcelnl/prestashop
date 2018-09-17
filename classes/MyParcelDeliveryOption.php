@@ -21,8 +21,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../myparcel.php';
-
 /**
  * Class MyParcelDeliveryOption
  *
@@ -37,7 +35,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     public static $definition = array(
         'table'   => 'myparcel_delivery_option',
         'primary' => 'id_myparcel_delivery_option',
-        'fields' => array(
+        'fields'  => array(
             'id_cart'                  => array(
                 'type'     => self::TYPE_INT,
                 'validate' => 'isUnsignedInt',
@@ -49,66 +47,6 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 'validate' => 'isString',
                 'required' => true,
                 'db_type'  => 'TEXT',
-            ),
-            'country_iso'              => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'CHAR(2)',
-            ),
-            'company'                  => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'VARCHAR(255)',
-            ),
-            'name'                     => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'TEXT',
-            ),
-            'postcode'                 => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'VARCHAR(16)',
-            ),
-            'house_number'             => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'VARCHAR(16)',
-            ),
-            'house_number_add'         => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'VARCHAR(16)',
-            ),
-            'street1'                  => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'TEXT',
-            ),
-            'street2'                  => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'TEXT',
-            ),
-            'email'                    => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'VARCHAR(255)',
-            ),
-            'phone'                    => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
-                'required' => false,
-                'db_type'  => 'VARCHAR(255)',
             ),
             'date_delivery'            => array(
                 'type'     => self::TYPE_STRING,
@@ -139,66 +77,6 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      */
     public $myparcel_delivery_option;
     /**
-     * Uppercase 2-letter Country ISO
-     *
-     * @var string $country_iso
-     */
-    public $country_iso;
-    /**
-     * Company
-     *
-     * @var string $company
-     */
-    public $company;
-    /**
-     * Full name as should appear on the shipping label
-     *
-     * @var string $name
-     */
-    public $name;
-    /**
-     * Postcode
-     *
-     * @var string $postcode
-     */
-    public $postcode;
-    /**
-     * House number (numerical)
-     *
-     * @var string $house_number
-     */
-    public $house_number;
-    /**
-     * House number addition
-     *
-     * @var string $house_number_add
-     */
-    public $house_number_add;
-    /**
-     * Addres line 1
-     *
-     * @var string $street1
-     */
-    public $street1;
-    /**
-     * Address line 2
-     *
-     * @var string $street2
-     */
-    public $street2;
-    /**
-     * Email
-     *
-     * @var string $email
-     */
-    public $email;
-    /**
-     * Fixed or mobile phone number
-     *
-     * @var string $phone
-     */
-    public $phone;
-    /**
      * Preferred date of delivery
      *
      * @var string $date_delivery
@@ -222,6 +100,9 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      * @param bool     $cache
      *
      * @return false|self
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function getByCartId($cart, $cache = true)
     {
@@ -246,7 +127,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             return false;
         }
 
-        $option = new self();
+        $option = new static();
         $option->hydrate($result);
 
         return $option;
@@ -258,9 +139,10 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      * @param int|Cart $cart  Cart ID or object
      * @param bool     $cache Enable DB cache
      *
-     * @return false|object Delivery from DB
+     * @return false|array Delivery from DB
      *
      * @since 2.0.0
+     * @since 2.2.0 Returns an associative array instead of a class
      */
     public static function getRawByCartId($cart, $cache = true)
     {
@@ -282,7 +164,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         }
 
         if ($result) {
-            return json_decode($result);
+            return @json_decode($result, true);
         }
 
         return false;
@@ -313,7 +195,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 return (bool) Db::getInstance()->update(
                     bqSQL(static::$definition['table']),
                     array(
-                        'myparcel_delivery_option' => $deliveryOption,
+                        'myparcel_delivery_option' => array('type' => 'sql', 'value' => "'".pSQL(mypa_json_encode(json_decode($deliveryOption)), true)."'"),
                         'date_delivery'            => date('Y-m-d H:i:s', strtotime($preferredDeliveryDay)),
                         'pickup'                   => bqSQL($preferredPickup),
                     ),
@@ -323,7 +205,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 return (bool) Db::getInstance()->insert(
                     bqSQL(static::$definition['table']),
                     array(
-                        'myparcel_delivery_option' => $deliveryOption,
+                        'myparcel_delivery_option' => array('type' => 'sql', 'value' => "'".pSQL(mypa_json_encode(json_decode($deliveryOption)), true)."'"),
                         'id_cart'                  => (int) $idCart,
                         'date_delivery'            => date('Y-m-d H:i:s', strtotime($preferredDeliveryDay)),
                         'pickup'                   => bqSQL($preferredPickup),
@@ -362,17 +244,44 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     }
 
     /**
+     * Get by Order ID
+     *
+     * @param int $range
+     *
+     * @return mixed
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
+     * @since 2.2.0
+     */
+    public static function getByOrderId($range)
+    {
+        $values = array_values(array_pad(static::getByOrderIds(array($range)), 1, array()));
+
+        return $values[0];
+    }
+
+    /**
      * Get by Order IDs
      *
      * @param array $range Range of Order IDs
      *
      * @return array Array with `MyParcelDeliveryoption`s
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     public static function getByOrderIds($range)
     {
-        if (empty($range)) {
+        if (is_int($range)) {
+            $range = array($range);
+        } elseif (is_string($range)) {
+            $range = array((int) $range);
+        }
+        if (!is_array($range)) {
             return array();
         }
 
@@ -395,16 +304,16 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
 
         $deliveryOptions = array();
         foreach ($results as $result) {
-            $deliveryOption = json_decode($result['myparcel_delivery_option'], true);
-            $deliveryOption['id_order'] = (string) $result['id_order'];
+            $deliveryOption = @json_decode($result['myparcel_delivery_option'], true);
+            $deliveryOption['idOrder'] = (int) $result['id_order'];
 
-            if (empty($deliveryOption['concept']) || !static::validateDeliveryOption($deliveryOption, true)) {
+            if (!static::validateDeliveryOption($deliveryOption, true)) {
                 $order = new Order($result['id_order']);
                 $address = new Address($order->id_address_delivery);
                 $cart = new Cart($order->id_cart);
                 $deliveryOption['concept'] = static::createConcept(
                     $order,
-                    static::getByOrder($order),
+                    mypa_dot(@json_decode(static::getByOrder($order))),
                     $address,
                     static::checkMailboxPackage($cart)
                 );
@@ -412,30 +321,41 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
 
             if ($deliveryOption['concept']) {
                 $deliveryOptions[] = $deliveryOption;
-            }
 
-            // Remove ID from range array
-            if (($key = array_search($result['id_order'], $range)) !== false) {
-                unset($range[$key]);
+                // Remove ID from range array
+                if (array_search($result['id_order'], $range) !== false) {
+                    $key = array_search($result['id_order'], $range);
+                    unset($range[$key]);
+                }
             }
         }
 
         if (!empty($range)) {
-            $deliveryOptions = array_merge($deliveryOptions, static::getConceptsByOrderIds($range));
+            $deliveryOptions = array_merge($deliveryOptions, static::getConceptsByOrderIds(array_values($range)));
         }
 
-        return $deliveryOptions;
+        $results = array();
+        foreach ($deliveryOptions as $deliveryOption) {
+            $deliveryOption['idOrder'] = (int) $deliveryOption['idOrder'];
+            $results[$deliveryOption['idOrder']] = $deliveryOption;
+        }
+        return $results;
     }
 
     /**
-     * @param Order                       $order
-     * @param bool|MyParcelDeliveryOption $deliveryOption
-     * @param Address                     $address
-     * @param bool                        $mailboxPackage
+     * @param Order                            $order
+     * @param MyParcelModule\Firstred\Dot|null $deliveryOption
+     * @param Address                          $address
+     * @param bool                             $mailboxPackage
      *
      * @return null|array
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws Adapter_Exception
+     *
      * @since 2.0.0
+     * @since 2.2.0 Requires a mypa_dot instance instead of a json_encoded delivery option
      */
     public static function createConcept($order, $deliveryOption = null, $address = null, $mailboxPackage = null)
     {
@@ -444,12 +364,11 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         }
         if (is_null($mailboxPackage)) {
             if ($deliveryOption instanceof MyParcelDeliveryOption) {
-                $mailboxPackage = $deliveryOption->concept->options->package_type == 2;
+                $mailboxPackage = $deliveryOption->get('concept.options.package_type') == 2;
             } else {
                 $mailboxPackage = static::checkMailboxPackage(new Cart($order->id_cart));
             }
         }
-
 
         try {
             $countryIso = Tools::strtolower(Country::getIsoById($address->id_country));
@@ -460,7 +379,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         }
 
         try {
-            if (isset($deliveryOption->type) && $deliveryOption->type === 'pickup'
+            if ($deliveryOption instanceof MyParcelModule\Firstred\Dot
+                && in_array($deliveryOption->get('data.time.0.type'), array(4, 5))
                 && in_array($countryIso, array('nl', 'be'))
             ) {
                 return static::createPickupConcept($address, $deliveryOption, $order);
@@ -482,6 +402,9 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      * @param Cart $cart
      *
      * @return bool Indicates whether the associated order can be sent with a mailbox package
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function checkMailboxPackage($cart)
     {
@@ -501,14 +424,15 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     /**
      * Create concept for national shipments
      *
-     * @param Address                $address
-     * @param MyParcelDeliveryOption $deliveryOption
-     * @param Order|null             $order
+     * @param Address                          $address
+     * @param MyParcelModule\Firstred\Dot|null $deliveryOption
+     * @param Order|null                       $order
      *
      * @return array
      *
      * @since 2.0.0
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     public static function createPickupConcept($address, $deliveryOption, $order = null)
     {
@@ -521,24 +445,17 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             }
         }
 
-        try {
-            $configuration = Configuration::getMultiple(
-                array(
-                    MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE,
-                    MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE,
-                    MyParcel::DEFAULT_CONCEPT_RETURN,
-                    MyParcel::DEFAULT_CONCEPT_INSURED,
-                    MyParcel::DEFAULT_CONCEPT_INSURED_TYPE,
-                    MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT,
-                    MyParcel::LINK_EMAIL,
-                    MyParcel::LINK_PHONE,
-                )
-            );
-        } catch (PrestaShopException $e) {
-        }
-        if (isset($deliveryOption->type) && $deliveryOption->type === 'pickup') {
-            $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcel::TYPE_PARCEL;
-        }
+        $configuration = array(
+            MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE    => Configuration::get(MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE),
+            MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE  => Configuration::get(MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE),
+            MyParcel::DEFAULT_CONCEPT_RETURN         => Configuration::get(MyParcel::DEFAULT_CONCEPT_RETURN),
+            MyParcel::DEFAULT_CONCEPT_INSURED        => Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED),
+            MyParcel::DEFAULT_CONCEPT_INSURED_TYPE   => Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED_TYPE),
+            MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT => Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT),
+            MyParcel::LINK_EMAIL                     => Configuration::get(MyParcel::LINK_EMAIL),
+            MyParcel::LINK_PHONE                     => Configuration::get(MyParcel::LINK_PHONE),
+        );
+        $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcel::TYPE_PARCEL;
 
         preg_match(MyParcel::SPLIT_STREET_REGEX, MyParcelTools::getAddressLine($address), $matches);
         $street = isset($matches['street']) ? $matches['street'] : '';
@@ -568,18 +485,17 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $insuranceAmount = 0;
         }
 
-        if (isset($deliveryOption->extraOptions->recipientOnly)) {
-            $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] =
-                !empty($deliveryOption->extraOptions->recipientOnly);
+        if ($deliveryOption->has('extraOptions.recipientOnly')) {
+            $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = (bool) $deliveryOption->get('extraOptions.recipientOnly');
         }
-        if (isset($deliveryOption->extraOptions->signed)) {
-            $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = !empty($deliveryOption->extraOptions->signed);
+        if ($deliveryOption->has('extraOptions.signed')) {
+            $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = (bool) $deliveryOption->get('extraOptions.signed');
         }
 
         $options = array(
             'package_type'      => (int) $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] ?: 1,
-            'delivery_type'     => (int) $deliveryOption->data->time[0]->type,
-            'delivery_date'     => (string) date('Y-m-d 00:00:00', strtotime($deliveryOption->data->date)),
+            'delivery_type'     => (int) $deliveryOption->get('data.time.0.type'),
+            'delivery_date'     => (string) date('Y-m-d 00:00:00', strtotime($deliveryOption->get('data.date'))),
             'only_recipient'    => (int) $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY],
             'signature'         => (int) $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED],
             'insurance'         => array(
@@ -590,11 +506,14 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             'label_description' => static::getLabelConcept($order),
         );
 
-        if (isset($deliveryOption->data->date) && $deliveryOption->data->date) {
-            $options['delivery_date'] = date('Y-m-d 00:00:00', strtotime($deliveryOption->data->date));
+        if ($deliveryOptionDate = $deliveryOption->get('data.date')) {
+            $options['delivery_date'] = date('Y-m-d 00:00:00', strtotime($deliveryOptionDate));
         }
-        if (isset($deliveryOption->data->type) && $deliveryOption->data->type) {
-            $options['delivery_type'] = (int) $deliveryOption->data->type;
+        if ($deliveryOptionType = $deliveryOption->get('data.time.0.type')) {
+            $options['delivery_type'] = (int) $deliveryOptionType;
+        }
+        if ($options['delivery_type'] == 5) {
+            $options['only_recipient'] = 0;
         }
 
         return array(
@@ -615,13 +534,13 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             ),
             'options'   => $options,
             'pickup'    => array(
-                'postal_code'       => (string) $deliveryOption->data->postal_code,
-                'street'            => (string) $deliveryOption->data->street,
-                'number'            => (string) $deliveryOption->data->number,
-                'city'              => (string) $deliveryOption->data->city,
-                'location_name'     => (string) $deliveryOption->data->location,
-                'location_code'     => (string) $deliveryOption->data->location_code,
-                'retail_network_id' => (string) $deliveryOption->data->retail_network_id,
+                'postal_code'       => (string) $deliveryOption->get('data.postal_code'),
+                'street'            => (string) $deliveryOption->get('data.street'),
+                'number'            => (string) $deliveryOption->get('data.number'),
+                'city'              => (string) $deliveryOption->get('data.city'),
+                'location_name'     => (string) $deliveryOption->get('data.location'),
+                'location_code'     => (string) $deliveryOption->get('data.location_code'),
+                'retail_network_id' => (string) $deliveryOption->get('data.retail_network_id'),
             ),
             'carrier'   => 1,
         );
@@ -633,6 +552,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      * @param Order $order
      *
      * @return bool|mixed|string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function getLabelConcept($order)
     {
@@ -656,22 +577,20 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     /**
      * Create concept for national shipments
      *
-     * @param Address       $address
-     * @param stdClass|null $deliveryOption
-     * @param Order|null    $order
-     * @param bool          $mailboxPackage
+     * @param Address                          $address
+     * @param MyParcelModule\Firstred\Dot|null $deliveryOption
+     * @param Order|null                       $order
+     * @param bool                             $mailboxPackage
      *
      * @return null|array
      *
      * @since 2.0.0
+     * @since 2.2.0 Requires a mypa_dot instance instead of a json_encoded delivery option
+     *
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
-    public static function createNationalConcept(
-        $address,
-        $deliveryOption = null,
-        $order = null,
-        $mailboxPackage = false
-    ) {
+    public static function createNationalConcept($address, $deliveryOption = null, $order = null, $mailboxPackage = false) {
         $email = '';
         if ($order) {
             $customer = new Customer($order->id_customer);
@@ -681,38 +600,19 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             }
         }
 
-        try {
-            $configuration = Configuration::getMultiple(
-                array(
-                    MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE,
-                    MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE,
-                    MyParcel::DEFAULT_CONCEPT_RETURN,
-                    MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY,
-                    MyParcel::DEFAULT_CONCEPT_SIGNED,
-                    MyParcel::DEFAULT_CONCEPT_INSURED,
-                    MyParcel::DEFAULT_CONCEPT_INSURED_TYPE,
-                    MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT,
-                    MyParcel::LINK_EMAIL,
-                    MyParcel::LINK_PHONE,
-                )
-            );
-        } catch (PrestaShopException $e) {
-            $configuration = array(
-                MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE => MyParcel::TYPE_PARCEL,
-                MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE => false,
-                MyParcel::DEFAULT_CONCEPT_RETURN => false,
-                MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY => false,
-                MyParcel::DEFAULT_CONCEPT_SIGNED => false,
-                MyParcel::DEFAULT_CONCEPT_INSURED => false,
-                MyParcel::DEFAULT_CONCEPT_INSURED_TYPE => 1,
-                MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT => 0,
-                MyParcel::LINK_EMAIL => true,
-                MyParcel::LINK_PHONE => true,
-            );
-        }
-        if (isset($deliveryOption->type) && in_array($deliveryOption->type, array('delivery', 'pickup'))) {
-            $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcel::TYPE_PARCEL;
-        }
+        $configuration = array(
+            MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE        => Configuration::get(MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE),
+            MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE      => Configuration::get(MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE),
+            MyParcel::DEFAULT_CONCEPT_RETURN             => Configuration::get(MyParcel::DEFAULT_CONCEPT_RETURN),
+            MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY => Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
+            MyParcel::DEFAULT_CONCEPT_SIGNED             => Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
+            MyParcel::DEFAULT_CONCEPT_INSURED            => Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED),
+            MyParcel::DEFAULT_CONCEPT_INSURED_TYPE       => Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED_TYPE),
+            MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT     => Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT),
+            MyParcel::LINK_EMAIL                         => Configuration::get(MyParcel::LINK_EMAIL),
+            MyParcel::LINK_PHONE                         => Configuration::get(MyParcel::LINK_PHONE),
+        );
+
         if ($mailboxPackage) {
             $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcel::TYPE_MAILBOX_PACKAGE;
             $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = false;
@@ -748,13 +648,18 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $insuranceAmount = 0;
         }
 
-        if (!empty($deliveryOption->extraOptions->recipientOnly)
-        || (isset($deliveryOption->data->price_comment) && ($deliveryOption->data->price_comment === 'morning' || in_array($deliveryOption->data->price_comment, array('night', 'avond', 'evening'))))
-        ) {
-            $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = true;
-        }
-        if (isset($deliveryOption->extraOptions->signed)) {
-            $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = !empty($deliveryOption->extraOptions->signed);
+        if ($deliveryOption instanceof MyParcelModule\Firstred\Dot) {
+            if ($deliveryOption->get('extraOptions.recipientOnly')
+                || in_array($deliveryOption->get('data.time.0.type'), array(1, 3))
+            ) {
+                $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = true;
+            }
+            if ($deliveryOption->get('extraOptions.recipientOnly')) {
+                $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = (bool) $deliveryOption->get('extraOptions.signed', false);
+            }
+            if ($deliveryType = $deliveryOption->get('concept.options.delivery_type')) {
+                $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcel::TYPE_PARCEL;
+            }
         }
 
         $options = array(
@@ -769,11 +674,13 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             'label_description' => static::getLabelConcept($order),
         );
 
-        if (!empty($deliveryOption->data->date)) {
-            $options['delivery_date'] = date('Y-m-d 00:00:00', strtotime($deliveryOption->data->date));
-        }
-        if (!empty($deliveryOption->data->time[0]->type)) {
-            $options['delivery_type'] = (int) $deliveryOption->data->time[0]->type;
+        if ($deliveryOption instanceof MyParcelModule\Firstred\Dot) {
+            if ($deliveryDate = $deliveryOption->get('data.date')) {
+                $options['delivery_date'] = date('Y-m-d 00:00:00', strtotime($deliveryDate));
+            }
+            if ($deliveryType = $deliveryOption->get('data.time.0.type')) {
+                $options['delivery_type'] = (int) $deliveryType;
+            }
         }
         if ($configuration[MyParcel::DEFAULT_CONCEPT_RETURN]) {
             $options['return'] = 1;
@@ -808,6 +715,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      *
      * @return array
      * @throws PrestaShopException
+     * @throws Adapter_Exception
      */
     public static function createInternationalConcept($address, $order = null)
     {
@@ -901,6 +809,11 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      * @return string Delivery from DB
      *
      * @since 2.0.0
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws Exception
+     * @throws Adapter_Exception
      */
     public static function getByOrder($order)
     {
@@ -923,18 +836,18 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         }
 
         if ($result) {
-            $concept = json_decode($result, true);
+            $concept = @json_decode($result, true);
             static::validateDeliveryOption($concept, true);
 
-            return json_encode($concept, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            return mypa_json_encode($concept);
         }
 
         $concepts = static::getConceptsByOrderIds(array($idOrder));
         if (is_array($concepts)) {
-            $concept = $concepts[0];
+            $concept = reset($concepts);
             static::validateDeliveryOption($concept, true);
 
-            return json_encode($concept, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            return mypa_json_encode($concept);
         }
 
         return new stdClass();
@@ -947,7 +860,10 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      *
      * @return array Concepts
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
+     * @throws Adapter_Exception
      */
     public static function getConceptsByOrderIds($range)
     {
@@ -968,7 +884,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $concept = array();
             $order = new Order($result['id_order']);
             $concept['concept'] = static::createConcept($order);
-            $concept['id_order'] = (string) $order->id;
+            $concept['idOrder'] = (int) $order->id;
 
             $concepts[] = $concept;
         }
@@ -986,6 +902,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws Exception
      * @since 2.0.0
      */
     public static function saveConcept($order, $concept)
@@ -1000,7 +917,81 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             return false;
         }
 
-        $concept = json_decode($concept, true);
+        $concept = @json_decode($concept, true);
+
+        $idCart = Cart::getCartIdByOrderId($idOrder);
+
+        $sql = new DbQuery();
+        $sql->select('`id_cart`');
+        $sql->select(bqSQL(static::$definition['table']));
+        $sql->from(bqSQL(static::$definition['table']), 'mdo');
+        $sql->where('mdo.`id_cart` = '.(int) $idCart);
+
+        if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql)) {
+            $deliveryOption = @json_decode($result[static::$definition['table']], true);
+            if (!empty($deliveryOption['concept']) && static::validateDeliveryOption($deliveryOption)) {
+                $deliveryOption['concept'] = $concept;
+                return Db::getInstance()->update(
+                    bqSQL(static::$definition['table']),
+                    array(
+                        bqSQL(static::$definition['table']) => array('type' => 'sql', 'value' => "'".pSQL(mypa_json_encode($deliveryOption), true)."'"),
+                    ),
+                    '`id_cart` = '.(int) $idCart
+                );
+            } else {
+                $deliveryOption = array('concept' => $concept, 'idOrder' => (int) $idOrder);
+                return Db::getInstance()->update(
+                    bqSQL(static::$definition['table']),
+                    array(
+                        bqSQL(static::$definition['table']) => array('type' => 'sql', 'value' => "'".pSQL(mypa_json_encode($deliveryOption), true)."'"),
+                    ),
+                    '`id_cart` = '.(int) $idCart
+                );
+            }
+        }
+
+        $deliveryOption = mypa_json_encode(
+            array(
+                'concept' => $concept,
+            )
+        );
+
+        return Db::getInstance()->insert(
+            bqSQL(static::$definition['table']),
+            array(
+                bqSQL(static::$definition['table']) => array('type' => 'sql', 'value' => "'".pSQL($deliveryOption, true)."'"),
+                'id_cart'                           => (int) $idCart,
+            )
+        );
+    }
+
+    /**
+     * Save concept data
+     *
+     * @param Order|int $order
+     * @param string    $conceptData
+     *
+     * @return bool
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws Exception
+     *
+     * @since 2.2.0
+     */
+    public static function saveConceptData($order, $conceptData)
+    {
+        if ($order instanceof Order) {
+            $idOrder = $order->id;
+        } else {
+            $idOrder = $order;
+        }
+
+        if (!$idOrder) {
+            return false;
+        }
+
+        $conceptData = @json_decode($conceptData, true);
 
         $idCart = Cart::getCartIdByOrderId($idOrder);
 
@@ -1012,70 +1003,25 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
 
         try {
             if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql)) {
-                $deliveryOption = json_decode($result[static::$definition['table']], true);
-                if (!empty($deliveryOption['concept']) && static::validateDeliveryOption($deliveryOption)) {
-                    $deliveryOption['concept'] = $concept;
-                    if (isset($deliveryOption['concept']['options']['delivery_type'])
-                        && in_array($deliveryOption['concept']['options']['delivery_type'], array(4, 5))
-                    ) {
-                        $deliveryOption['type'] = 'pickup';
-                    } else {
-                        $deliveryOption['type'] = 'delivery';
-                    }
-                    try {
-                        return Db::getInstance()->update(
-                            bqSQL(static::$definition['table']),
-                            array(
-                                bqSQL(static::$definition['table']) => json_encode(
-                                    $deliveryOption,
-                                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                                ),
-                            ),
-                            '`id_cart` = '.(int) $idCart
-                        );
-                    } catch (PrestaShopException $e) {
-                        return false;
-                    }
-                } else {
-                    $deliveryOption = array('concept' => $concept);
-                    try {
-                        return Db::getInstance()->update(
-                            bqSQL(static::$definition['table']),
-                            array(
-                                bqSQL(static::$definition['table']) => json_encode(
-                                    $deliveryOption,
-                                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                                ),
-                            ),
-                            '`id_cart` = '.(int) $idCart
-                        );
-                    } catch (PrestaShopException $e) {
-                        return false;
-                    }
+                $deliveryOption = @json_decode($result[static::$definition['table']], true);
+                $deliveryOption['data'] = $conceptData;
+                try {
+                    return Db::getInstance()->update(
+                        bqSQL(static::$definition['table']),
+                        array(
+                            bqSQL(static::$definition['table']) => array('type' => 'sql', 'value' => "'".pSQL(mypa_json_encode($deliveryOption), true)."'"),
+                        ),
+                        '`id_cart` = '.(int) $idCart
+                    );
+                } catch (PrestaShopException $e) {
+                    return false;
                 }
             }
         } catch (PrestaShopException $e) {
             return false;
         }
 
-        $deliveryOption = json_encode(
-            array(
-                'concept' => $concept,
-            ),
-            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-        );
-
-        try {
-            return Db::getInstance()->insert(
-                bqSQL(static::$definition['table']),
-                array(
-                    bqSQL(static::$definition['table']) => $deliveryOption,
-                    'id_cart'                         => (int) $idCart,
-                )
-            );
-        } catch (PrestaShopException $e) {
-            return false;
-        }
+        return false;
     }
 
     /**
@@ -1086,6 +1032,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      * @param string $date Shipping date (format: `Y-m-d H:i:s`)
      *
      * @return string (format: `Y-m-d H:i:s`)
+     * @throws Exception
      */
     public static function getDeliveryDay($date)
     {
@@ -1114,12 +1061,16 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     {
         if (isset($option['data']['date'])) {
             $deliveryDate = $option['data']['date'];
-
             if (isset($option['data']['time'][0]['start'])) {
-                $deliveryDate .= " {$option['data']['time'][0]['start']}";
+                $time = "{$option['data']['time'][0]['start']}";
             } else {
-                $deliveryDate .= ' 15:00:00';
+                $time = '15:00:00';
             }
+            if ($time === '16:00:00') {
+                $time = '15:00:00';
+            }
+
+            $deliveryDate = "{$deliveryDate} {$time}";
         } else {
             $deliveryDate = '1970-01-01 00:00:00';
         }
@@ -1137,8 +1088,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
     public static function getPreferredPickup($option)
     {
         if (isset($option['data']['location_code'])) {
-            return "{$option['data']['location']}, {$option['data']['street']} {$option['data']['number']}".
-            ", {$option['data']['city']}";
+            return "{$option['data']['location']}, {$option['data']['street']} {$option['data']['number']}, {$option['data']['city']}";
         }
 
         return null;
@@ -1158,6 +1108,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      * @param string $preferredDeliveryDate Customer preference
      *
      * @return int
+     * @throws Exception
      */
     public static function getShippingDaysRemaining($shippingDate, $preferredDeliveryDate)
     {
@@ -1196,7 +1147,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      */
     protected static function isPickup($option)
     {
-        return isset($option['type']) && $option['type'] === 'pickup';
+        return in_array(mypa_dot($option)->get('data.time.0.type', MyParcel::DELIVERY_OPTION_DEFAULT), array(4, 5));
     }
 
     /**
@@ -1210,165 +1161,288 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
      */
     protected static function getHolidaysForYear($year)
     {
-        // Avoid holidays
-        // Fixed
-        $nieuwjaar = new DateTime($year.'-01-01');
-        $eersteKerstDag = new DateTime($year.'-12-25');
-        $tweedeKerstDag = new DateTime($year.'-12-25');
-        $koningsdag = new DateTime($year.'-04-27');
-        // Dynamic
-        $pasen = new DateTime();
-        $pasen->setTimestamp(easter_date($year)); // thanks PHP!
-        $paasMaandag = clone $pasen;
+        if (!extension_loaded('calendar')) {
+            return array();
+        }
+
         try {
+            // Avoid holidays
+            // Fixed
+            $nieuwjaar = new DateTime($year.'-01-01');
+            $eersteKerstDag = new DateTime($year.'-12-25');
+            $tweedeKerstDag = new DateTime($year.'-12-25');
+            $koningsdag = new DateTime($year.'-04-27');
+            // Dynamic
+            $pasen = new DateTime();
+            $pasen->setTimestamp(easter_date($year)); // thanks PHP!
+            $paasMaandag = clone $pasen;
             $paasMaandag->add(new DateInterVal('P1D'));
-        } catch (Exception $e) {
-        }
-        $hemelvaart = clone $pasen;
-        try {
+            $hemelvaart = clone $pasen;
             $hemelvaart->add(new DateInterVal('P39D'));
-        } catch (Exception $e) {
-        }
-        $pinksteren = clone $hemelvaart;
-        try {
+            $pinksteren = clone $hemelvaart;
             $pinksteren->add(new DateInterVal('P10D'));
-        } catch (Exception $e) {
-        }
-        $pinksterMaandag = clone $pinksteren;
-        try {
+            $pinksterMaandag = clone $pinksteren;
             $pinksterMaandag->add(new DateInterVal('P1D'));
+
+            $holidays = array(
+                $nieuwjaar->format('Y-m-d'),
+                $pasen->format('Y-m-d'),
+                $koningsdag->format('Y-m-d'),
+                $paasMaandag->format('Y-m-d'),
+                $hemelvaart->format('Y-m-d'),
+                $pinksteren->format('Y-m-d'),
+                $pinksterMaandag->format('Y-m-d'),
+                $eersteKerstDag->format('Y-m-d'),
+                $tweedeKerstDag->format('Y-m-d'),
+            );
+
+            return $holidays;
         } catch (Exception $e) {
+            return array();
         }
-
-        $holidays = array(
-            $nieuwjaar->format('Y-m-d'),
-            $pasen->format('Y-m-d'),
-            $koningsdag->format('Y-m-d'),
-            $paasMaandag->format('Y-m-d'),
-            $hemelvaart->format('Y-m-d'),
-            $pinksteren->format('Y-m-d'),
-            $pinksterMaandag->format('Y-m-d'),
-            $eersteKerstDag->format('Y-m-d'),
-            $tweedeKerstDag->format('Y-m-d'),
-        );
-
-        return $holidays;
     }
 
     /**
      * Delivery option validator
      *
      * @param array $deliveryOption
-     * @param bool  $autofix        Try to restore the delivery option if possible
+     * @param bool  $autofix Try to restore the delivery option if possible
      *
      * @return bool
+     *
+     * @throws Exception
      */
     protected static function validateDeliveryOption(&$deliveryOption, $autofix = false)
     {
+        $dot = mypa_dot($deliveryOption);
         // Skip concepts without basic info
-        if (!isset($deliveryOption['concept']['recipient'])
-            || !isset($deliveryOption['concept']['recipient']['cc'])
-            || !isset($deliveryOption['concept']['recipient']['city'])
-            || !isset($deliveryOption['concept']['recipient']['street'])
-            || !isset($deliveryOption['concept']['recipient']['person'])) {
+        if (!$dot->has('concept.recipient')
+            || !$dot->has('concept.recipient.cc')
+            || !$dot->has('concept.recipient.city')
+            || !$dot->has('concept.recipient.street')
+            || !$dot->has('concept.recipient.person')
+        ) {
             return false;
         }
 
         // Skip concepts in NL,BE,DE w/o postcode info
-        if (in_array(Tools::strtolower($deliveryOption['concept']['recipient']['cc']), array('nl', 'be', 'de'))) {
-            if (!isset($deliveryOption['concept']['recipient']['number'])
-                || !isset($deliveryOption['concept']['recipient']['postal_code'])) {
-                return false;
-            }
-        }
-
-        // Fix missing `delivery_type`
-        if (isset($deliveryOption['concept']['options']['delivery_date'])
-            && $deliveryOption['concept']['options']['delivery_date']) {
-            if (!isset($deliveryOption['concept']['options']['delivery_type'])
-                || !$deliveryOption['concept']['options']['delivery_type']
+        if (in_array(strtolower($dot->get('concept.recipient.cc')), array('nl', 'be', 'de'))) {
+            if (!$dot->has('concept.recipient.number')
+                || !$dot->has('concept.recipient.postal_code')
             ) {
-                if ($autofix) {
-                    if (isset($deliveryOption['data']['type']) && $deliveryOption['data']['type'] === 'delivery') {
-                        $deliveryOption['concept']['options']['delivery_type'] = 2;
-                    } elseif (isset($deliveryOption['data']['type']) && $deliveryOption['data']['type'] === 'pickup') {
-                        $deliveryOption['concept']['options']['delivery_type'] = 4;
-                    } else {
-                        $deliveryOption['concept']['options']['delivery_type'] = 2;
-                    }
-                    if (isset($deliveryOption['data']['time'][0]['type'])) {
-                        $deliveryOption['data']['time'][0]['type'] = $deliveryOption['concept']['options']['delivery_type'];
-                        switch ($deliveryOption['data']['time'][0]['type']) {
-                            case 2:
-                                $deliveryOption['data']['time'][0]['price_comment'] = 'standard';
-                                break;
-                            case 4:
-                                $deliveryOption['data']['time'][0]['price_comment'] = 'retail';
-                                break;
-                        }
-                    }
-                } else {
-                    return false;
-                }
+                return false;
             }
         }
 
         // Fix `delivery_date`s in the past
         $checkDate = null;
-        if (!empty($deliveryOption['concept']['options']['delivery_date'])) {
-            $checkDate = date('Y-m-d', strtotime($deliveryOption['concept']['options']['delivery_date']));
-        } elseif (!empty($deliveryOption['data']['date'])) {
-            $checkDate = date('Y-m-d', strtotime($deliveryOption['data']['date']));
+        if (!$dot->isEmpty('concept.options.delivery_date')) {
+            $checkDate = date('Y-m-d', strtotime($dot->get('concept.options.delivery_date')));
+        } elseif (!$dot->isEmpty('data.date')) {
+            $checkDate = date('Y-m-d', strtotime($dot->get('data.date')));
         }
 
         if ($checkDate && $checkDate <= date('Y-m-d')) {
-            // Restore the original delivery type when available (in order to survive Saturdays, and Mondays in particular, brrr)
-            if (isset($deliveryOption['old_data']['time'][0]['type'])) {
-                $deliveryOption['concept']['options']['delivery_type'] = $deliveryOption['old_data']['time'][0]['type'];
+            // Restore the original delivery type when available
+            if ($dot->has('oldData.time.0.type')) {
+                $dot->set('concept.options.delivery_type', $dot->get('oldData.time.0.type'));
             }
 
-            // Copy a deep clone of data to old_data
-            $deliveryOption['old_data'] = $deliveryOption['data'];
+            // Copy a deep clone of data to oldData
+            $dot->set('oldData', $dot->get('data'));
 
-            $deliveryOption['concept']['options']['delivery_date'] = $newDeliveryDate = date('Y-m-d', strtotime(static::getDeliveryDay(date('Y-m-d H:i:s'))));
-            if (in_array($deliveryOption['concept']['options']['delivery_type'], array(1, 3, 5))) {
-                $deliveryOption['concept']['options']['delivery_date'] = $newDeliveryDate;
-            }
+            $newDeliveryDate = date('Y-m-d', strtotime(static::getDeliveryDay(date('Y-m-d H:i:s'))));
+            $dot->set('concept.options.delivery_date', $newDeliveryDate);
 
             // Reset date in data if set
-            if (isset($deliveryOption['data']['date'])) {
-                $deliveryOption['data']['date'] = $newDeliveryDate;
+            if ($dot->has('data.date')) {
+                $dot->set('data.date', $newDeliveryDate);
             }
 
             // Correct delivery type if necessary
             if (in_array(date('D', strtotime($newDeliveryDate)), array('Mon', 'Sat'))) {
-                if (in_array($deliveryOption['concept']['options']['delivery_type'], array(1, 3))) {
-                    $deliveryOption['concept']['options']['delivery_type'] = 2;
-                    if (isset($deliveryOption['data']['time'][0])) {
-                        $deliveryOption['data']['time'][0]['start'] = '08:00:00';
-                        $deliveryOption['data']['time'][0]['end'] = '21:00:00';
-                        $deliveryOption['data']['time'][0]['price_comment'] = 'standard';
+                if (in_array($dot->get('concept.options.delivery_type'), array(1, 3))) {
+                    $dot->set('concept.options.delivery_type', 2);
+                    if ($dot->has('data.time.0')) {
+                        $dot->set('data.time.0.start', '08:00:00');
+                        $dot->set('data.time.0.end', '21:00:00');
+                        $dot->set('data.time.0.price_comment', 'standard');
                     }
-                    $deliveryOption['extraOptions']['removedSpecialOption'] = true;
-
-                } elseif (in_array($deliveryOption['concept']['options']['delivery_type'], array(5))) {
-                    $deliveryOption['concept']['options']['delivery_type'] = 4;
-                    if (isset($deliveryOption['data']['time'][0])) {
-                        $deliveryOption['data']['time'][0]['start'] = '08:00:00';
-                        $deliveryOption['data']['time'][0]['end'] = '21:00:00';
-                        $deliveryOption['data']['time'][0]['price_comment'] = 'retail';
+                    $dot->set('extraOptions.removedSpecialOption', true);
+                } elseif (in_array($dot->get('concept.options.delivery_type'), array(5))) {
+                    $dot->set('concept.options.delivery_type', 4);
+                    if ($dot->has('data.time.0')) {
+                        $dot->set('data.time.0.start', '08:00:00');
+                        $dot->set('data.time.0.end', '21:00:00');
+                        $dot->set('data.time.0.price_comment', 'retail');
                     }
-                    $deliveryOption['extraOptions']['removedSpecialOption'] = true;
+                    $dot->set('extraOptions.removedSpecialOption', true);
                 }
                 // Set the new type in data
-                if (isset($deliveryOption['data']['time'][0]['type'])) {
-                    $deliveryOption['data']['time'][0]['type'] = $deliveryOption['concept']['options']['delivery_type'];
+                if ($dot->has('data.time.0.type')) {
+                    $dot->set('data.time.0.type', $dot->get('concept.options.delivery_type'));
                 }
             }
 
-            $deliveryOption['extraOptions']['moved'] = true;
+            $dot->set('extraOptions.moved', true);
+        }
+        if ($dot->has('concept.options.delivery_type')
+            && in_array($dot->get('concept.options.delivery_type'), array(4, 5))
+            && $dot->isEmpty('concept.options.delivery_date')
+            && strtolower($dot->get('concept.recipient.cc')) === 'nl'
+        ) {
+            if ($dot->get('data.date')
+                && date('Y-m-d', strtotime($dot->get('data.date'))) > date('Y-m-d')
+            ) {
+                $dot->set('concept.options.delivery_date', $dot->get('data.date'));
+            }
         }
 
+        $deliveryOption = $dot->jsonSerialize();
+
         return true;
+    }
+
+    /**
+     * Filter concept (ported from JavaScript)
+     *
+     * @param array $concept
+     *
+     * @return array
+     */
+    public static function filterConcept($concept)
+    {
+        $euCountries = array_column(MyParcelTools::getEUCountries(), 'alpha2Code');
+        $concept = mypa_dot($concept);
+
+        $concept->delete('recipient.label');
+        if ($concept->has('options.delivery_date')) {
+            if (date('Y-m-d', strtotime($concept->get('options.delivery_date'))) <= date('Y-m-d')) {
+                $concept->delete('option.delivery_date');
+            } else {
+                $concept->set('options.delivery_date', date('Y-m-d 00:00:00', strtotime($concept->get('options.delivery_date'))));
+            }
+        }
+
+        if ($concept->get('options.package_type') == MyParcel::TYPE_PARCEL
+            && $concept->get('recipient.cc')
+            && in_array(strtolower($concept->get('recipient.cc')), array('nl', 'be'))
+        ) {
+            if (!$concept->get('options.delivery_type')) {
+                $concept->set('options.delivery_type', 2);
+            }
+            // Only keep the location code and retail network ID for shipments to Belgium
+            if (strtolower($concept->get('recipient.cc')) === 'nl' && !$concept->isEmpty('pickup')) {
+                $concept->delete('pickup.location_code');
+                $concept->delete('pickup.retail_network_id');
+            }
+
+            switch ((int) $concept->get('options.delivery_type')) {
+                case 1:
+                    // morning
+                    $concept->set('options.only_recipient', 1);
+                    break;
+                case 3:
+                    // evening
+                    $concept->set('options.only_recipient', 1);
+                    break;
+                case 4:
+                case 5:
+                    // pickup / express pickup
+                    $concept->set('options.signature', 1);
+                    $concept->set('options.only_recipient', 0);
+                    $concept->set('options.return', 0);
+                    break;
+                default:
+                    break;
+            }
+        } elseif ($concept->get('options.package_type') != MyParcel::TYPE_PARCEL
+            || !in_array(strtoupper($concept->get('recipient.cc')), array('NL', 'BE'))
+        ) {
+            $concept->delete('options.delivery_type');
+            $concept->delete('pickup');
+            $concept->delete('options.delivery_date');
+        }
+
+        if ($concept->get('options.insurance.amount') && strtoupper($concept->get('recipient.cc')) === 'NL') {
+            if (!in_array((int) $concept->get('options.delivery_type'), array(4, 5))) {
+                $concept->set('options.only_recipient', 1);
+            }
+            $concept->set('options.signature', 1);
+        }
+
+        if (!$concept->isEmpty('recipient.cc')
+            && in_array(strtolower($concept->get('recipient.cc')), array('nl', 'be', 'de'))
+        ) {
+            if (preg_match('/^(\d+)(.*?$)/', trim($concept->get('recipient.number')), $m)) {
+                if (count($m) > 1) {
+                    $concept->set('recipient.number', $m[1]);
+                    if (isset($m[2]) && is_bool($m[2])) {
+                        $concept->set('recipient.number_suffix', $m[2]);
+                    } else {
+                        $concept->delete('recipient.number_suffix');
+                    }
+                }
+            }
+        } else {
+            $concept->delete('recipient.number');
+            $concept->delete('recipient.number_suffix');
+        }
+
+        if (in_array(strtoupper($concept->get('recipient.cc')), $euCountries)) {
+            $concept->set('options.insurance', array(
+                'currency' => 'EUR',
+                'amount'   => 50000,
+            ));
+        } elseif (strtoupper($concept->get('recipient.cc')) !== 'NL') {
+            $concept->set('options.insurance', array(
+                'currency' => 'EUR',
+                'amount'   => 20000,
+            ));
+        }
+
+        if (!$concept->isEmpty('recipient.cc') && !in_array(strtoupper($concept->get('recipient.cc')), array('NL', 'BE'))
+            || $concept->get('options.package_type') > 1
+        ) {
+            $concept->delete('options.only_recipient');
+            $concept->delete('options.signature');
+            $concept->delete('options.large_format');
+
+            if (strtoupper($concept->get('recipient.cc')) === 'BE' || $concept->get('options.package_type') > 1) {
+                $concept->delete('options.return');
+            }
+        }
+
+        if (in_array(strtoupper($concept->get('recipient.cc')), $euCountries)
+            || strtoupper($concept->get('recipient.cc')) === 'NL'
+        ) {
+            $concept->delete('customs_declaration');
+            $concept->delete('physical_properties');
+        } elseif ($concept->isEmpty('physical_properties') || $concept->isEmpty('physical_properties.weight')) {
+            $concept->set('physical_properties', array(
+                'weight' => 1000,
+            ));
+        } else {
+            $concept->set('physical_properties.weight', (int) $concept->get('physical_properties.weight'));
+        }
+
+        if ($concept->get('recipient.number_suffix')) {
+            $concept->set('recipient.number_suffix', substr($concept->get('recipient.number_suffix'), 0, 4));
+        }
+
+        if ($concept->get('options.package_type') == MyParcel::TYPE_MAILBOX_PACKAGE) {
+            $concept->delete('options.delivery_date');
+            $concept->delete('options.insurance');
+        }
+        if ($concept->get('options.package_type') == MyParcel::TYPE_UNSTAMPED) {
+            $concept->delete('options.delivery_type');
+            $concept->delete('customs_declaration');
+            $concept->delete('physical_properties');
+        }
+        if ($concept->isEmpty('data.location_name')) {
+            $concept->delete('concept.pickup');
+        }
+
+        return $concept->jsonSerialize();
     }
 }

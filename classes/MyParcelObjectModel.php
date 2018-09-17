@@ -21,8 +21,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../myparcel.php';
-
 /**
  * Class MyParcelObjectModel
  */
@@ -35,6 +33,7 @@ class MyParcelObjectModel extends ObjectModel
      *
      * @return bool Indicates whether the database was successfully added
      * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public static function createDatabase($className = null)
     {
@@ -230,6 +229,7 @@ class MyParcelObjectModel extends ObjectModel
      *
      * @return bool Indicates whether the column was successfully date_add
      * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public static function createColumn($name, $columnDefinition, $className = null)
     {
@@ -262,6 +262,9 @@ class MyParcelObjectModel extends ObjectModel
      *
      * @return bool Indicates whether the missing columns were successfully date_add
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
      * @todo: Support multishop and multilang
      */
     public static function createMissingColumns($className = null)

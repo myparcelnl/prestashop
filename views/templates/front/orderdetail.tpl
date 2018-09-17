@@ -21,9 +21,11 @@
     <h4>{l s='Shipment' mod='myparcel'} {$smarty.foreach.shipmentLoop.index + 1|intval nofilter}</h4>
     {if isset($shipment['tracktrace']) && $shipment['tracktrace']}
       <strong>{l s='Track & Trace:' mod='myparcel'}</strong>
-      <a href="http://postnl.nl/tracktrace/?L={$languageIso|escape:'htmlall':'UTF-8' nofilter}&B={$shipment['tracktrace']|escape:'htmlall':'UTF-8' nofilter}&P={$shipment['postcode']|escape:'htmlall':'UTF-8' nofilter}&D=NL&T=C"
-         target="_blank">
-        {$shipment['tracktrace']|escape:'htmlall':'UTF-8' nofilter}
+      <a href="http://postnl.nl/tracktrace/?L={$languageIso|escape:'htmlall' nofilter}&B={$shipment['tracktrace']|escape:'htmlall' nofilter}&P={$shipment['postcode']|escape:'htmlall' nofilter}&D=NL&T=C"
+         target="_blank"
+         rel="noopener noreferrer"
+      >
+        {$shipment['tracktrace']|escape:'htmlall' nofilter}
       </a>
     {/if}
     <table class="table table-bordered">
@@ -43,7 +45,7 @@
             </td>
             <td class="bold">
               <label for="cb_59">
-                {$historyDetail['date_upd']|escape:'htmlall':'UTF-8' nofilter nofilter}
+                {$historyDetail['date_upd']|escape:'htmlall' nofilter nofilter}
               </label>
             </td>
           </tr>

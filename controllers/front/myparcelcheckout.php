@@ -59,6 +59,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      * @throws PrestaShopException
      * @since 2.0.0
      * @throws SmartyException
+     * @throws ErrorException
      */
     public function initContent()
     {
@@ -75,7 +76,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         $context = Context::getContext();
 
         /** @var Cart $cart */
-        $cart = $this->context->cart;
+        $cart = $context->cart;
         if (!Validate::isLoadedObject($cart)) {
             $this->hideMe();
         }
@@ -200,21 +201,22 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                     : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
                 'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
-                'checkoutJs'                    =>
-                    Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-e158425a37f486d2.bundle.min.js'),
+                'mypaCheckoutJs'                => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/checkout-378e4d1cf8ab3806.bundle.min.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
+                'foreground3color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR3),
                 'background1color'              => Configuration::get(MyParcel::CHECKOUT_BG_COLOR1),
                 'background2color'              => Configuration::get(MyParcel::CHECKOUT_BG_COLOR2),
                 'background3color'              => Configuration::get(MyParcel::CHECKOUT_BG_COLOR3),
                 'highlightcolor'                => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
+                'inactivecolor'                 => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
                 'fontfamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT),
-                'deliveryDaysWindow'            => (int) $this->myParcelCarrierDeliverySetting->timeframe_days,
-                'dropoffDelay'                  => (int) $this->myParcelCarrierDeliverySetting->dropoff_delay,
+                'deliveryDaysWindow'            => (int) $this->getActualDeliveryDaysWindow($this->myParcelCarrierDeliverySetting->timeframe_days, $this->myParcelCarrierDeliverySetting->dropoff_delay),
+                'dropoffDelay'                  => (int) $this->getActualDropOffDelay($this->myParcelCarrierDeliverySetting->dropoff_delay),
                 'dropoffDays'                   => implode(
                     ';',
-                    $this->myParcelCarrierDeliverySetting->getDropoffDays(date('Y-m-d H:i:s'))
+                    $this->getDropOffDays()
                 ),
                 'cutoffTime'                    => $cutoffTime,
                 'signedPreferred'               =>
@@ -233,13 +235,17 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                     array(),
                     Tools::usingSecureMode()
                 ),
+                'mpAsync'                       => (bool) Configuration::get(MyParcel::DEV_MODE_ASYNC),
+                'mpLogApi'                      => (bool) Configuration::get(MyParcel::LOG_API),
         );
         $cacheKey = md5(
-            json_encode($smartyVars, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            mypa_json_encode($smartyVars)
             .$this->myParcelCarrierDeliverySetting->getCutoffExceptionsHash()
             .$carrier->id
+            .date('d-m-Y')
+            .$context->cookie->id_guest
         );
-        $this->context->smarty->assign(
+        $context->smarty->assign(
             array_merge(
                 $smartyVars,
                 array('cacheKey' => $cacheKey)
@@ -278,22 +284,22 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      *
      * @return void
      *
+     * @throws ErrorException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     protected function getDeliveryOptions()
     {
         if (!Tools::isSubmit('ajax')) {
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => false,
             )));
         }
 
-        // @codingStandardsIgnoreStart
         $input = file_get_contents('php://input');
-        // @codingStandardsIgnoreEnd
-        $request = json_decode($input, true);
+        $request = @json_decode($input, true);
         if (!$request) {
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => false,
             )));
         }
@@ -318,7 +324,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             if (!isset($request[$param])) {
                 continue;
             }
-            if ($param === 'excluded_delivery_type') {
+            if ($param === 'exclude_delivery_type') {
                 if (empty($request[$param])) {
                     continue;
                 }
@@ -332,28 +338,113 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             $query[$param] = $value;
         }
 
+        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
         $url = static::BASE_URI.'?'.http_build_query($query);
-        $requestHeaders = array();
-        $requestHeaders[] = trim(MyParcel::getUserAgent());
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
+        $response = $curl->get($url);
         if (!$response) {
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => false,
             )));
         }
 
         header('Content-Type: application/json;charset=utf-8');
-        die(json_encode(array(
+        die(mypa_json_encode(array(
             'success'  => true,
-            'response' => json_decode($response),
-        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            'response' => $response,
+        )));
+    }
+
+    /**
+     * Get drop off days
+     *
+     * @param int $dropOffDelay
+     *
+     * @return array
+     *
+     * @since 2.2.0
+     */
+    public function getDropOffDays($dropOffDelay = 0)
+    {
+        if ($dropOffDelay > 14) {
+            return array();
+        }
+
+        $days = $this->myParcelCarrierDeliverySetting->getDropoffDays(date('Y-m-d H:i:s', strtotime("+{$dropOffDelay} days")), 14 - $dropOffDelay);
+        if (empty($days)) {
+            return array();
+        }
+
+        // Check if the first week is available
+        $firstWeek = array();
+        $secondWeek = array();
+        foreach ($days as $fullDate => $day) {
+            if ($fullDate < date('Y-m-d', strtotime('+7 days'))) {
+                $firstWeek[$fullDate] = $day;
+            } else {
+                $secondWeek[$fullDate] = $day;
+            }
+        }
+        if (!empty($firstWeek)) {
+            return array_unique(array_values($firstWeek));
+        }
+
+        return array_unique(array_values($secondWeek));
+    }
+
+    /**
+     * Get the actual drop off delay
+     *
+     * @param int $dropOffDelay
+     *
+     * @return int
+     *
+     * @since 2.2.0
+     */
+    public function getActualDropOffDelay($dropOffDelay = 0)
+    {
+        $days = $this->myParcelCarrierDeliverySetting->getDropoffDays(date('Y-m-d H:i:s', strtotime("+{$dropOffDelay} days")), 14 - $dropOffDelay);
+        if (empty($days)) {
+            return $dropOffDelay;
+        }
+
+        // Check if the first week is available
+        $firstWeek = array();
+        $secondWeek = array();
+        foreach ($days as $fullDate => $day) {
+            if ($fullDate < date('Y-m-d', strtotime('+7 days'))) {
+                $firstWeek[$fullDate] = $day;
+            } else {
+                $secondWeek[$fullDate] = $day;
+            }
+        }
+
+        if (!empty($firstWeek)) {
+            return $dropOffDelay;
+        }
+
+        return $dropOffDelay + 7;
+    }
+
+    /**
+     * Get actual delivery days window
+     *
+     * @param int $deliveryDaysWindow
+     * @param int $dropOffDelay
+     *
+     * @return int
+     */
+    public function getActualDeliveryDaysWindow($deliveryDaysWindow = 0, $dropOffDelay = 0)
+    {
+        if ($deliveryDaysWindow === 0) {
+            return 0;
+        }
+
+        $dropOffDelay = $this->getActualDropOffDelay($dropOffDelay);
+        if ($dropOffDelay + $deliveryDaysWindow > 14) {
+            return 10;
+        }
+
+        return $deliveryDaysWindow;
     }
 
     /**
@@ -364,7 +455,9 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      */
     protected function hideMe()
     {
+        header('Content-Type: text/html');
+        ob_clean();
         echo Context::getContext()->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
-        die();
+        exit;
     }
 }

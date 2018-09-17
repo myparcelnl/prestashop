@@ -20,9 +20,9 @@
     {if isset($menutabs)}
       {foreach from=$menutabs item=tab}
         <li class="{if $tab.active}active{/if}">
-          <a id="{$tab.short|escape:'htmlall':'UTF-8' nofilter}" href="{$tab.href|escape:'htmlall':'UTF-8' nofilter}">
-            <span class="icon {$tab.icon|escape:'htmlall':'UTF-8' nofilter}"></span>
-            {$tab.short|escape:'htmlall':'UTF-8' nofilter}
+          <a id="{$tab.short|escape:'htmlall' nofilter}" href="{$tab.href|escape:'htmlall' nofilter}">
+            <span class="icon {$tab.icon|escape:'htmlall' nofilter}"></span>
+            {$tab.short|escape:'htmlall' nofilter}
           </a>
         </li>
       {/foreach}

@@ -133,7 +133,7 @@ function upgrade_module_2_1_0($module)
             if (!$order['option']) {
                 continue;
             }
-            $orderData = json_decode($order['option'], true);
+            $orderData = @json_decode($order['option'], true);
             if (!isset($orderData['type'])) {
                 continue;
             }
@@ -166,7 +166,7 @@ function upgrade_module_2_1_0($module)
 
     Configuration::updateValue('MYPARCEL_CHECKOUT_FSIZE', 2);
     Configuration::updateValue('MYPARCEL_NOTIF_MOMENT', 1);
-    Configuration::updateValue('MYPARCEL_PAPER_SELECTION', json_encode(array(
+    Configuration::updateValue('MYPARCEL_PAPER_SELECTION', mypa_json_encode(array(
         'size' => 'standard',
         'labels' => array(
             1 => true,
@@ -174,7 +174,7 @@ function upgrade_module_2_1_0($module)
             3 => true,
             4 => true,
         ),
-    ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    )));
 
     try {
         $module->registerHook('actionAdminOrdersListingFieldsModifier');

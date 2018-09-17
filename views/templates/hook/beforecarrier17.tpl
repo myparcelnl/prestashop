@@ -17,7 +17,7 @@
 *}
 <iframe name="myparcelcheckoutframe"
         id="myparcelcheckoutframe"
-        src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), Tools::usingSecureMode())|escape:'htmlall':'UTF-8'}"
+        src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), Tools::usingSecureMode())|escape:'htmlall'}"
         width="100%"
         height="0"
         frameBorder="0">
@@ -25,6 +25,7 @@
 <div id="myparcel"></div>
 <script type="text/javascript">
   (function () {
+    var timeout;
     window.mypaNotified = window.mypaNotified || false;
     var pendingXhrs = [];
 
@@ -63,7 +64,14 @@
     }
 
     function refreshIframe() {
-      document.getElementById('myparcelcheckoutframe').src = document.getElementById('myparcelcheckoutframe').src;
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      timeout = setTimeout(function () {
+        document.getElementById('myparcelcheckoutframe').src = document.getElementById('myparcelcheckoutframe').src;
+      }, 500);
+
     }
 
     function refreshSummary() {
@@ -115,6 +123,7 @@
           try {
             var data = JSON.parse(event.data);
           } catch (e) {
+            return;
           }
 
           if (data
@@ -136,7 +145,11 @@
             return;
           }
 
-          var data = JSON.parse(event.data);
+          try {
+            var data = JSON.parse(event.data);
+          } catch (e) {
+            return;
+          }
           if (data
             && data.messageOrigin === 'myparcelcheckout'
             && data.subject === 'selection_changed'
@@ -168,7 +181,7 @@
             var xhr = new XMLHttpRequest();
             xhr.open(
               'POST',
-              '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript':'UTF-8'}',
+              '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript'}',
               true
             );
 

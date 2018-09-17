@@ -12,8 +12,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../../myparcel.php';
-
 /**
  * Actual packer
  * @author Doug Wright

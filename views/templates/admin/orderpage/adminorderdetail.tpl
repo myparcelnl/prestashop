@@ -16,35 +16,55 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div id="myparcel-export-panel"></div>
-<script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8' nofilter}views/js/app/dist/orderpage-e158425a37f486d2.bundle.min.js"></script>
+<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/orderpage-378e4d1cf8ab3806.bundle.min.js"></script>
 <script type="text/javascript">
   (function () {
     function initAdminOrderDetail() {
-      if (typeof $ === 'undefined' || typeof MyParcelModule === 'undefined') {
+      if (typeof $ === 'undefined'
+          || typeof MyParcelModule === 'undefined'
+          || typeof MyParcelModule.orderpage === 'undefined'
+          || typeof MyParcelModule.orderpage.default === 'undefined'
+      ) {
         setTimeout(initAdminOrderDetail, 10);
 
         return;
       }
 
       window.MyParcelModule.misc = window.MyParcelModule.misc || {ldelim}{rdelim};
-      window.MyParcelModule.misc.process_url = '{$myparcelProcessUrl|escape:'javascript':'UTF-8' nofilter}';
-      window.MyParcelModule.misc.module_url = '{$myparcel_module_url|escape:'javascript':'UTF-8' nofilter}';
-      window.MyParcelModule.misc.countries = {$jsCountries|json_encode};
-      window.MyParcelModule.invoiceSuggestion = '{$invoiceSuggestion|escape:'javascript':'UTF-8' nofilter}';
-      window.MyParcelModule.weightSuggestion = '{$weightSuggestion|escape:'javascript':'UTF-8' nofilter}';
+      window.MyParcelModule.misc.process_url = '{$mpProcessUrl|escape:'javascript' nofilter}';
+      window.MyParcelModule.misc.module_url = '{$mpModuleDir|escape:'javascript' nofilter}';
+      window.MyParcelModule.misc.countries = {mypa_json_encode($mpJsCountries)};
+      window.MyParcelModule.invoiceSuggestion = '{$mpInvoiceSuggestion|escape:'javascript':'UTF-8'}';
+      window.MyParcelModule.weightSuggestion = {$mpWeightSuggestion|intval};
       try {
-        window.MyParcelModule.paperSize = {$papersize|json_encode};
+        window.MyParcelModule.paperSize = {mypa_json_encode($mpPaperSize)};
       } catch (e) {
         window.MyParcelModule.paperSize = false;
       }
-      window.MyParcelModule.debug = {if Configuration::get(MyParcel::LOG_API)}true{else}false{/if};
+      window.MyParcelModule.askPaperSize = {if $mpAskPaperSize}true{else}false{/if};
+      window.MyParcelModule.async = {if $mpAsync}true{else}false{/if};
+      window.MyParcelModule.askReturnConfig = {if $mpAskReturnConfig}true{else}false{/if};
+      window.MyParcelModule.debug = {if $mpLogApi}true{else}false{/if};
+      window.MyParcelModule.currency = {
+        blank: '{$mpCurrency->blank|escape:'javascript':'UTF-8'}',
+        format: '{$mpCurrency->format|escape:'javascript':'UTF-8'}',
+        sign: '{$mpCurrency->sign|escape:'javascript':'UTF-8'}',
+        iso: '{$mpCurrency->iso_code|escape:'javascript':'UTF-8'}'
+      };
 
-        new window.MyParcelModule.orderpage(
-          {$idOrder|intval nofilter},
-          JSON.parse('{$concept|escape:'javascript':'UTF-8' nofilter}'),
-          JSON.parse('{$preAlerted|escape:'javascript':'UTF-8' nofilter}'),
-          {include file="../translations.tpl"}
-        );
+      new window.MyParcelModule.orderpage.default(
+        {$mpIdOrder|intval nofilter},
+        JSON.parse('{$mpConcept|escape:'javascript' nofilter}'),
+        JSON.parse('{$mpPreAlerted|escape:'javascript' nofilter}'),
+        {include file="../translations.tpl"},
+        {
+          insurance: {$mpReturnInsuranceAmount|intval},
+          recipientOnly: {if $mpRecipientOnly}true{else}false{/if},
+          signature: {if $mpSignature}true{else}false{/if},
+          extraLarge: {if $mpExtraLarge}true{else}false{/if},
+          returnUndeliverable: {if $mpReturnUndeliverable}true{else}false{/if},
+        }
+      );
     }
 
     initAdminOrderDetail();

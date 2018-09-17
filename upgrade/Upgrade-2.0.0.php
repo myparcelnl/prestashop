@@ -132,8 +132,22 @@ function upgrade_module_2_0_0($module)
     $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `postnl_status` `postnl_status`'
         .' VARCHAR(255) DEFAULT \'1\'';
     $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `tracktrace` `tracktrace` VARCHAR(32)';
-    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `shipment` TEXT';
-    $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `type` TINYINT(1) NOT NULL DEFAULT \'1\'';
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'shipment\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `shipment` TEXT';
+    }
+    if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = \''._DB_NAME_.'\'
+                AND TABLE_NAME = \''._DB_PREFIX_.'myparcel_order\'
+                AND COLUMN_NAME = \'type\'')) {
+        $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` ADD `type` TINYINT(1) NOT NULL DEFAULT \'1\'';
+    }
     $sql[] = 'ALTER TABLE `'._DB_PREFIX_.'myparcel_order` CHANGE `retour` `retour` TINYINT(1) NOT NULL DEFAULT \'0\'';
 
     $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'myparcel_order_history` (
@@ -174,13 +188,13 @@ function upgrade_module_2_0_0($module)
   `timeframe_days`                         INT(2) DEFAULT \'1\'              NOT NULL,
   `dropoff_delay`                          INT(2) DEFAULT \'0\'              NOT NULL,
   `id_shop`                                INT(11) UNSIGNED DEFAULT \'0\'    NOT NULL,
-  `morning_fee_tax_incl`                   DECIMAL(15,5) DEFAULT \'0.00000\' NOT NULL,
-  `morning_pickup_fee_tax_incl`            DECIMAL(15,5) DEFAULT \'0.00000\' NOT NULL,
-  `default_fee_tax_incl`                   DECIMAL(15,5) DEFAULT \'0.00000\' NOT NULL,
-  `evening_fee_tax_incl`                   DECIMAL(15,5) DEFAULT \'0.00000\' NOT NULL,
-  `signed_fee_tax_incl`                    DECIMAL(15,5) DEFAULT \'0.00000\' NOT NULL,
-  `recipient_only_fee_tax_incl`            DECIMAL(15,5) DEFAULT \'0.00000\' NOT NULL,
-  `signed_recipient_only_fee_tax_incl`     DECIMAL(15,5) DEFAULT \'0.00000\' NOT NULL,
+  `morning_fee_tax_incl`                   DECIMAL(15,6) DEFAULT \'0.00000\' NOT NULL,
+  `morning_pickup_fee_tax_incl`            DECIMAL(15,6) DEFAULT \'0.00000\' NOT NULL,
+  `default_fee_tax_incl`                   DECIMAL(15,6) DEFAULT \'0.00000\' NOT NULL,
+  `evening_fee_tax_incl`                   DECIMAL(15,6) DEFAULT \'0.00000\' NOT NULL,
+  `signed_fee_tax_incl`                    DECIMAL(15,6) DEFAULT \'0.00000\' NOT NULL,
+  `recipient_only_fee_tax_incl`            DECIMAL(15,6) DEFAULT \'0.00000\' NOT NULL,
+  `signed_recipient_only_fee_tax_incl`     DECIMAL(15,6) DEFAULT \'0.00000\' NOT NULL,
 	PRIMARY KEY (`id_myparcel_carrier_delivery_setting`)
 )';
 

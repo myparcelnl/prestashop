@@ -21,8 +21,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../myparcel.php';
-
 /**
  * Class MyParcelOrderHistory
  */
@@ -106,7 +104,7 @@ class MyParcelOrderHistory extends MyParcelObjectModel
         $sql = new DbQuery();
         $sql->select('moh.`id_shipment`, moh.`postnl_status`');
         $sql->select('moh.`date_upd`, mo.`tracktrace`, mo.`shipment`, mo.`postcode`');
-        $sql->from('myparcel_order', 'mo');
+        $sql->from(bqSQL(MyParcelOrder::$definition['table']), 'mo');
         $sql->innerJoin(bqSQL(static::$definition['table']), 'moh', 'mo.`id_shipment` = moh.`id_shipment`');
         $sql->where('mo.`id_shipment` = '.(int) $idShipment);
 
@@ -159,6 +157,7 @@ class MyParcelOrderHistory extends MyParcelObjectModel
      *
      * @throws Adapter_Exception
      * @throws PrestaShopException
+     * @throws ErrorException
      */
     public static function setPrinted($idShipment)
     {
@@ -169,16 +168,17 @@ class MyParcelOrderHistory extends MyParcelObjectModel
 
             return;
         }
-        if (!$targetOrderState) {
-            return;
-        }
 
         if (Configuration::get(MyParcel::NOTIFICATION_MOMENT)) {
             static::sendShippedNotification($idShipment);
         }
 
+        if (!$targetOrderState) {
+            return;
+        }
+
         try {
-            static::setOrderStatus($idShipment, $targetOrderState, !Configuration::get(MyParcel::NOTIFICATIONS));
+            static::setOrderStatus($idShipment, $targetOrderState);
         } catch (Exception $e) {
             Logger::addLog("MyParcel module error: {$e->getMessage()}");
 
@@ -193,6 +193,7 @@ class MyParcelOrderHistory extends MyParcelObjectModel
      *
      * @throws Adapter_Exception
      * @throws PrestaShopException
+     * @throws ErrorException
      */
     public static function setShipped($idShipment)
     {
@@ -203,16 +204,17 @@ class MyParcelOrderHistory extends MyParcelObjectModel
 
             return;
         }
-        if (!$targetOrderState) {
-            return;
-        }
 
         if (!Configuration::get(MyParcel::NOTIFICATION_MOMENT)) {
             static::sendShippedNotification($idShipment);
         }
 
+        if (!$targetOrderState) {
+            return;
+        }
+
         try {
-            static::setOrderStatus($idShipment, $targetOrderState, !Configuration::get(MyParcel::NOTIFICATIONS));
+            static::setOrderStatus($idShipment, $targetOrderState);
         } catch (Exception $e) {
             Logger::addLog("MyParcel module error: {$e->getMessage()}");
 
@@ -221,108 +223,262 @@ class MyParcelOrderHistory extends MyParcelObjectModel
     }
 
     /**
-     * @param int $idShipment
+     * @param string $idShipment
      *
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ErrorException
      */
     public static function sendShippedNotification($idShipment)
     {
+        if (!Configuration::get(MyParcel::NOTIFICATIONS)) {
+            return;
+        }
         try {
-            if (Configuration::get(MyParcel::NOTIFICATIONS)) {
-                $order = MyParcelOrder::getOrderByShipmentId($idShipment);
-                if (!Validate::isLoadedObject($order)) {
-                    return;
+            $order = MyParcelOrder::getOrderByShipmentId($idShipment);
+            if (!Validate::isLoadedObject($order)) {
+                return;
+            }
+            $myParcelOrder = MyParcelOrder::getByShipmentId($idShipment);
+            if (!Validate::isLoadedObject($myParcelOrder)) {
+
+                return;
+            }
+            $shipmentHistory = MyParcelOrderHistory::getShipmentHistoryByShipmentId($idShipment);
+            $previousStates = array_pad(array_column($shipmentHistory, 'postnl_status'), 1, 0);
+
+            if ((Configuration::get(MyParcel::NOTIFICATION_MOMENT) && max($previousStates) >= 2
+                || !Configuration::get(MyParcel::NOTIFICATION_MOMENT) && max($previousStates) >= 3)
+            ) {
+                return;
+            }
+
+            $customer = new Customer($order->id_customer);
+            if (!Validate::isEmail($customer->email)) {
+                return;
+            }
+            $address = new Address($order->id_address_delivery);
+            $shipment = mypa_dot(@json_decode($myParcelOrder->shipment, true));
+            if (!($shipment->isEmpty('recipient.postal_code'))) {
+                $postcode = strtoupper(str_replace(' ', '', $shipment->get('recipient.postal_code')));
+            } else {
+                $postcode = strtoupper(str_replace(' ', '', $address->postcode));
+            }
+            $deliveryRequest = mypa_dot(MyParcelDeliveryOption::getByOrderId($order->id));
+
+            $mailIso = Language::getIsoById($order->id_lang);
+            $mailIsoUpper = strtoupper($mailIso);
+            $countryIso = strtoupper(Country::getIsoById($address->id_country));
+            $templateVars = array(
+                '{firstname}'           => $address->firstname,
+                '{lastname}'            => $address->lastname,
+                '{shipping_number}'     => $order->shipping_number,
+                '{followup}'            => "http://postnl.nl/tracktrace/?L={$mailIsoUpper}&B={$order->shipping_number}&P={$postcode}&D={$countryIso}&T=C",
+                '{order_name}'          => $order->getUniqReference(),
+                '{order_id}'            => $order->id,
+                '{utc_offset}'          => date('P'),
+            );
+            // Assume PHP localization is not available
+            $nlDays = array(
+                1 => 'maandag',
+                2 => 'dinsdag',
+                3 => 'woensdag',
+                4 => 'donderdag',
+                5 => 'vrijdag',
+                6 => 'zaterdag',
+                0 => 'zondag',
+            );
+            $nlMonths = array(
+                1  => 'januari',
+                2  => 'februari',
+                3  => 'maart',
+                4  => 'april',
+                5  => 'mei',
+                6  => 'juni',
+                7  => 'juli',
+                8  => 'augustus',
+                9  => 'september',
+                10 => 'oktober',
+                11 => 'november',
+                12 => 'december',
+            );
+            $tracktraceInfo = mypa_dot(MyParcelOrder::getTracktraceOnline($idShipment));
+            $deliveryDateFrom = $tracktraceInfo->get('deliveryExpectation.deliveryDateFrom');
+            $deliveryDateTo = $tracktraceInfo->get('deliveryExpectation.deliveryDateUntil');
+            $dayNumber = (int) date('w', strtotime($deliveryDateFrom));
+            $monthNumber = (int) date('n', strtotime($deliveryDateFrom));
+            $templateVars['{delivery_street}'] = $shipment->get('recipient.street');
+            $templateVars['{delivery_number}'] = "{$shipment->get('recipient.number')}{$shipment->get('recipient.number_suffix')}";
+            $templateVars['{delivery_postcode}'] = $shipment->get('recipient.postal_code');
+            $templateVars['{delivery_city}'] = $shipment->get('recipient.city');
+            $templateVars['{delivery_region}'] = $shipment->get('recipient.region') ?: '-';
+            $templateVars['{delivery_cc}'] = $shipment->get('recipient.cc');
+            $templateVars['{pickup_name}'] = $shipment->get('pickup.location_name');
+            $templateVars['{pickup_street}'] = $shipment->get('pickup.street');
+            $templateVars['{pickup_number}'] = $shipment->get('pickup.number');
+            $templateVars['{pickup_postcode}'] = strtoupper(str_replace(' ', '', $shipment->get('pickup.postal_code')));
+            $templateVars['{pickup_region}'] = $shipment->get('pickup.region') ?: '-';
+            $templateVars['{pickup_city}'] = $shipment->get('pickup.city');
+            $templateVars['{pickup_cc}'] = $shipment->get('recipient.cc');
+            $templateVars['{pickup_phone}'] = $deliveryRequest->get('data.phone_number');
+            if ($tracktraceInfo->get('barcode')) {
+                if ($shipment->isEmpty('options.delivery_type') || in_array($shipment->get('options.delivery_type'), array(1, 2, 3))) {
+                    if ($mailIsoUpper === 'NL') {
+                        $templateVars['{delivery_day_name}'] = $nlDays[$dayNumber];
+                        $templateVars['{delivery_day}'] = date('j', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_day_leading_zero}'] = date('d', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month}'] = date('n', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_leading_zero}'] = date('m', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_name}'] = $nlMonths[$monthNumber];
+                        $templateVars['{delivery_year}'] = date('Y', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_from}'] = date('H:i', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_from_localized}'] = date('H:i', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_to}'] = date('H:i', strtotime($deliveryDateTo));
+                        $templateVars['{delivery_time_to_localized}'] = date('H:i', strtotime($deliveryDateTo));
+                    } else {
+                        $templateVars['{delivery_day_name}'] = date('l', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_day}'] = date('j', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_day_leading_zero}'] = date('d', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month}'] = date('n', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_leading_zero}'] = date('m', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_name}'] = date('F', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_year}'] = date('Y', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_from}'] = date('H:i', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_from_localized}'] = date('h:i A', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_to}'] = date('H:i', strtotime($deliveryDateTo));
+                        $templateVars['{delivery_time_to_localized}'] = date('h:i A', strtotime($deliveryDateTo));
+                    }
+                } elseif (in_array($shipment->get('options.delivery_type'), array(4, 5))) {
+                    if (!$deliveryRequest->isEmpty('data.latitude') && !$deliveryRequest->isEmpty('data.longitude')) {
+                        $googleMapsLocation = implode(
+                            ',',
+                            array(
+                                $deliveryRequest->get('data.latitude'),
+                                $deliveryRequest->get('data.longitude'),
+                            )
+                        );
+                    } else {
+                        $googleMapsLocation = implode(
+                            ',',
+                            array(
+                                str_replace(' ', '+', $shipment->get('pickup.street')).' '.str_replace(' ', '+', $shipment->get('pickup.number').$shipment->get('pickup.number_suffix')),
+                                str_replace(' ', '+', $shipment->get('pickup.city')),
+                                strtoupper($shipment->get('recipient.cc')),
+                            )
+                        );
+                    }
+                    $markerImage = rtrim(Tools::getHttpHost(true), '/').__PS_BASE_URI__.ltrim(Media::getMediaPath(_PS_MODULE_DIR_.'myparcel/views/img/LocationPin_PostNL.png'), '/');
+                    $image = "https://maps.googleapis.com/maps/api/staticmap?center={$googleMapsLocation}&zoom=14&size=600x300&maptype=roadmap&format=png&markers=icon:{$markerImage}%7Clabel:%7C{$googleMapsLocation}";
+                    if ($googleMapsKey = (Configuration::get('PS_API_KEY') ?: Configuration::get('TB_GOOGLE_MAPS_API_KEY'))) {
+                        $image .= "&key={$googleMapsKey}";
+                    }
+
+                    if ($mailIsoUpper === 'NL') {
+                        $dayNumber = (int) date('w', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_day_name}'] = $nlDays[$dayNumber];
+                        $templateVars['{delivery_day}'] = date('j', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_day_leading_zero}'] = date('d', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month}'] = date('n', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_leading_zero}'] = date('m', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_name}'] = $nlMonths[$monthNumber];
+                        $templateVars['{delivery_year}'] = date('Y', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_from}'] = '15:00';
+                        $templateVars['{delivery_time_from_localized}'] = '15:00';
+                    } else {
+                        $templateVars['{delivery_day_name}'] = date('l', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_day}'] = date('d', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_day_leading_zero}'] = date('d', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month}'] = date('m', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_leading_zero}'] = date('m', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_month_name}'] = date('F', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_year}'] = date('Y', strtotime($deliveryDateFrom));
+                        $templateVars['{delivery_time_from}'] = '15:00';
+                        $templateVars['{delivery_time_from_localized}'] = '03:00 PM';
+                    }
+                    foreach (array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') as $day) {
+                        $dayFrom = $deliveryRequest->get("data.opening_hours.{$day}.0");
+                        if (strpos($dayFrom, '-') !== false) {
+                            list($dayFrom) = explode('-', $dayFrom);
+                        }
+                        $dayTo = $deliveryRequest->get("data.opening_hours.{$day}.".($deliveryRequest->count("data.opening_hours.{$day}") - 1));
+                        if (strpos($dayTo, '-') !== false) {
+                            list(,$dayTo) = array_pad(explode('-', $dayTo), 2, '');
+                        }
+                        if ($dayFrom) {
+                            $dayFull = "{$dayFrom} - {$dayTo}";
+                        } else {
+                            $dayFull = Translate::getModuleTranslation('myparcel', 'Closed', 'myparcel');
+                        }
+                        $templateVars["{opening_hours_{$day}_from}"] = $dayFrom;
+                        $templateVars["{opening_hours_{$day}_to}"] = $dayTo;
+                        $templateVars["{opening_hours_{$day}}"] = $dayFull;
+                    }
+
+                    $templateVars['{pickup_img}'] = "<img src='{$image}' alt='Pickup location'>";
+                    $templateVars['{pickup_img_src}'] = "{$image}";
                 }
-                $myParcelOrder = MyParcelOrder::getByShipmentId($idShipment);
-                if (!Validate::isLoadedObject($myParcelOrder)) {
-                    return;
-                }
-                $shipmentHistory = MyParcelOrderHistory::getShipmentHistoryByShipmentId($idShipment);
-                $previousStates = array_map(function ($item) {
-                    return (int) $item['postnl_status'];
-                }, $shipmentHistory);
+            } else {
+                $unknown = Translate::getModuleTranslation('myparcel', 'unknown', 'myparcel');
+                $templateVars['{delivery_day_name}'] = "{{$unknown}}";
+                $templateVars['{delivery_day}'] = "{{$unknown}}";
+                $templateVars['{delivery_day_leading_zero}'] = "{{$unknown}}";
+                $templateVars['{delivery_month}'] = "{{$unknown}}";
+                $templateVars['{delivery_month_leading_zero}'] = "{{$unknown}}";
+                $templateVars['{delivery_month_name}'] = "{{$unknown}}";
+                $templateVars['{delivery_year}'] = "{{$unknown}}";
+                $templateVars['{delivery_time_from}'] = "{{$unknown}}";
+                $templateVars['{delivery_time_from_localized}'] = "{{$unknown}}";
+                $templateVars['{delivery_time_to}'] = "{{$unknown}}";
+                $templateVars['{delivery_time_to_localized}'] = "{{$unknown}}";
+            }
 
-                if ((!Configuration::get(MyParcel::NOTIFICATION_MOMENT) && max($previousStates) >= 2
-                    || Configuration::get(MyParcel::NOTIFICATION_MOMENT) && max($previousStates) >= 3)
-                ) {
-                    return;
-                }
+            $mailType = ($shipment->get('options.package_type') == MyParcel::TYPE_MAILBOX_PACKAGE)
+                ? 'mailboxpackage'
+                : ($tracktraceInfo->get('barcode') ? 'standard' : 'standard_noinfo');
+            if ($shipment->get('pickup')) {
+                $mailType = $tracktraceInfo->get('barcode') ? 'pickup' : 'pickup_noinfo';
+            }
 
-                $customer = new Customer($order->id_customer);
-                $address = new Address($order->id_address_delivery);
-                $shipment = json_decode($myParcelOrder->shipment, true);
-                if (isset($shipment['recipient']['postal_code'])) {
-                    $postcode = Tools::strtoupper(str_replace(' ', '', $shipment['recipient']['postal_code']));
-                } else {
-                    $postcode = $address->postcode;
-                }
+            $mailDir = false;
+            if (file_exists(_PS_THEME_DIR_."modules/myparcel/mails/$mailIso/myparcel_{$mailType}_shipped.txt")
+                && file_exists(
+                    _PS_THEME_DIR_."modules/myparcel/mails/$mailIso/myparcel_{$mailType}_shipped.html"
+                )
+            ) {
+                $mailDir = _PS_THEME_DIR_."modules/myparcel/mails/";
+            } elseif (file_exists(dirname(__FILE__)."/../mails/$mailIso/myparcel_{$mailType}_shipped.txt")
+                && file_exists(dirname(__FILE__)."/../mails/$mailIso/myparcel_{$mailType}_shipped.html")
+            ) {
+                $mailDir = dirname(__FILE__).'/../mails/';
+            }
 
-                $mailIso = Language::getIsoById($order->id_lang);
-                $mailIsoUpper = Tools::strtoupper($mailIso);
-                $countryIso = Tools::strtoupper(Country::getIsoById($address->id_country));
-
-                $templateVars = array(
-                    '{firstname}'           => $address->firstname,
-                    '%7Bfirstname%7D'       => $address->firstname,
-                    '{lastname}'            => $address->lastname,
-                    '%7Blastname%7D'        => $address->lastname,
-                    '{shipping_number}'     => $order->shipping_number,
-                    '%7Bshipping_number%7D' => $order->shipping_number,
-                    '{followup}'            => "http://postnl.nl/tracktrace/?L={$mailIsoUpper}&B={$order->shipping_number}&P={$postcode}&D={$countryIso}&T=C",
-                    '%7Bfollowup%7D'        => "http://postnl.nl/tracktrace/?L={$mailIsoUpper}&B={$order->shipping_number}&P={$postcode}&D={$countryIso}&T=C",
-                );
-
-                $mailType = 'standard';
-                $deliveryOption = json_decode($myParcelOrder->myparcel_delivery_option, true);
-                if (isset($deliveryOption['options']['package_type'])
-                    && $deliveryOption['options']['package_type'] == 2
-                ) {
-                    $mailType = 'mailboxpackage';
-                }
-
-
-                $dirMail = false;
-                if (file_exists(_PS_THEME_DIR_."modules/myparcel/mails/$mailIso/myparcel_{$mailType}_shipped.txt")
-                    && file_exists(
-                        _PS_THEME_DIR_."modules/myparcel/mails/$mailIso/myparcel_{$mailType}_shipped.html"
-                    )
-                ) {
-                    $dirMail = _PS_THEME_DIR_."modules/myparcel/mails/";
-                } elseif (file_exists(dirname(__FILE__)."/../mails/$mailIso/myparcel_{$mailType}_shipped.txt")
-                    && file_exists(dirname(__FILE__)."/../mails/$mailIso/myparcel_{$mailType}_shipped.html")
-                ) {
-                    $dirMail = dirname(__FILE__).'/../mails/';
-                }
-
-                if ($dirMail) {
-                    Mail::Send(
-                        $order->id_lang,
-                        "myparcel_{$mailType}_shipped",
-                        Mail::l('Your order is on its way', $order->id_lang),
-                        $templateVars,
-                        (string) $customer->email,
+            if ($mailDir) {
+                Mail::Send(
+                    $order->id_lang,
+                    "myparcel_{$mailType}_shipped",
+                    $mailIsoUpper === 'NL' ? "Bestelling {$order->getUniqReference()} is verzonden" : "Order {$order->getUniqReference()} has been shipped",
+                    $templateVars,
+                    (string) $customer->email,
+                    null,
+                    (string) Configuration::get(
+                        'PS_SHOP_EMAIL',
                         null,
-                        (string) Configuration::get(
-                            'PS_SHOP_EMAIL',
-                            null,
-                            null,
-                            Context::getContext()->shop->id
-                        ),
-                        (string) Configuration::get(
-                            'PS_SHOP_NAME',
-                            null,
-                            null,
-                            Context::getContext()->shop->id
-                        ),
                         null,
-                        null,
-                        $dirMail,
-                        false,
                         Context::getContext()->shop->id
-                    );
-                }
+                    ),
+                    (string) Configuration::get(
+                        'PS_SHOP_NAME',
+                        null,
+                        null,
+                        Context::getContext()->shop->id
+                    ),
+                    null,
+                    null,
+                    $mailDir,
+                    false,
+                    Context::getContext()->shop->id
+                );
             }
         } catch (PrestaShopException $e) {
             Logger::addLog("MyParcel module error: {$e->getMessage()}");
@@ -335,6 +491,9 @@ class MyParcelOrderHistory extends MyParcelObjectModel
      * Set received status
      *
      * @param int $idShipment
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function setReceived($idShipment)
     {
@@ -378,6 +537,9 @@ class MyParcelOrderHistory extends MyParcelObjectModel
 
         $order = MyParcelOrder::getOrderByShipmentId($idShipment);
         if (Validate::isLoadedObject($order)) {
+            if (in_array($order->getCurrentState(), MyParcel::getIgnoredStatuses())) {
+                return;
+            }
             $history = $order->getHistory(Context::getContext()->language->id);
             $found = false;
             foreach ($history as $item) {
@@ -413,7 +575,7 @@ class MyParcelOrderHistory extends MyParcelObjectModel
         foreach ($results as $result) {
             if (!array_key_exists($result['id_shipment'], $shipments)) {
                 $shipments[$result['id_shipment']] = array(
-                    'shipment'   => json_decode($result['shipment'], true),
+                    'shipment'   => @json_decode($result['shipment'], true),
                     'tracktrace' => $result['tracktrace'],
                     'postcode'   => $result['postcode'],
                     'history'    => array(),

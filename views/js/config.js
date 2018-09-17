@@ -20,6 +20,8 @@ function addLabelVar(text) {
 }
 
 (function () {
+  var clicks = 8;
+
   // Install .closest polyfill
   if (window.Element && !Element.prototype.closest) {
     Element.prototype.closest =
@@ -174,6 +176,27 @@ function addLabelVar(text) {
     }
   }
 
+  function devClick() {
+    clicks--;
+    if (clicks) {
+      if (clicks > 0 && clicks < 5) {
+        window.showSuccessMessage(clicks + ' clicks left before dev mode is enabled');
+      }
+    } else if (clicks === 0) {
+      window.showSuccessMessage('dev mode enabled');
+      [].slice.call(document.querySelectorAll('.myparcel-dev-hidden, .myparcel-dev-always-hidden')).forEach(function (elem) {
+        elem.className = elem.className.replace('myparcel-dev-hidden', '').replace('myparcel-dev-always-hidden', '');
+      });
+    }
+  }
+
+  function devButton() {
+    var button = document.getElementById('myparcel-dev-btn');
+    if (button) {
+      button.addEventListener('click', devClick);
+    }
+  }
+
   function addResetButton() {
     if (!parseInt(findGetParameter('menu'), 10)) {
       var html = document.createElement('a');
@@ -191,11 +214,13 @@ function addLabelVar(text) {
           try {
             $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_FG_COLOR1]').attr('id'), '#FFFFFF');
             $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_FG_COLOR2]').attr('id'), '#000000');
+            $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_FG_COLOR3]').attr('id'), '#000000');
             $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_BG_COLOR1]').attr('id'), '#FBFBFB');
             $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_BG_COLOR2]').attr('id'), '#01BBC5');
             $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_BG_COLOR3]').attr('id'), '#75D3D8');
             $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_HL_COLOR]').attr('id'), '#FF8C00');
-            window.stripeFontselect.checkout.setFont('Exo');
+            $.fn.mColorPicker.setInputColor($('[name=MYPARCEL_CHECKOUT_IA_COLOR]').attr('id'), '#848484');
+            window.myparcelFontselect.checkout.setFont('Exo');
             $('[name=MYPARCEL_CHECKOUT_FSIZE]').val(2);
           } catch (e) {
           }
@@ -206,6 +231,7 @@ function addLabelVar(text) {
 
   ready(function () {
     addResetButton();
+    devButton();
     checkOptionsAvailability();
 
     Array.prototype.slice.call(document.querySelectorAll('input')).forEach(function (item) {

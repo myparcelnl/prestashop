@@ -21,71 +21,45 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../../myparcel.php';
-
 /**
- * Class MyParcelmyparcelcheckoutdemoModuleFrontController
- *
- * @since 2.0.0
+ * Class MyParcelDemo
  */
-class MyParcelmyparcelcheckoutdemoModuleFrontController extends ModuleFrontController
+class MyParcelDemo
 {
-    /**
-     * MyParcelmyparcelcheckoutdemoModuleFrontController constructor.
-     *
-     * @since 2.0.0
-     *
-     * @throws Adapter_Exception
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->ssl = Tools::usingSecureMode();
-
-        // Check if employee is logged in
-        $cookie = new Cookie('psAdmin');
-        if (!$cookie->id_employee) {
-            Tools::redirectLink($this->context->link->getPageLink('index'));
-        }
-    }
-
-    /**
-     * Prevent displaying the maintenance page
-     *
-     * @return void
-     */
-    protected function displayMaintenancePage()
-    {
-        // Disable the maintenance page
-    }
-
     /**
      * Initialize content
      *
      * @return string
      *
-     * @since 2.0.0
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @since 2.0.0
      * @throws SmartyException
+     * @throws ErrorException
      */
-    public function initContent()
+    public static function renderDemo()
     {
-        $smarty = $this->context->smarty;
+        header('Content-Type: text/html');
 
+        $smarty = Context::getContext()->smarty;
         $smarty->assign(array(
             'language_code'          => Tools::strtolower(Context::getContext()->language->language_code),
-            'checkoutJs'             => Media::getJSPath(
-                _PS_MODULE_DIR_.'myparcel/views/js/app/dist/checkout-e158425a37f486d2.bundle.min.js'
-            ),
-            'base_dir_ssl'           => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
-                .Tools::getShopDomainSsl().__PS_BASE_URI__,
+            'mypaCheckoutJs'         => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/checkout-378e4d1cf8ab3806.bundle.min.js'),
+            'base_dir_ssl'           => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').Tools::getShopDomainSsl().__PS_BASE_URI__,
             'signedPreferred'        => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
             'recipientOnlyPreferred' => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
+            'foreground1color'       => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
+            'foreground2color'       => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
+            'foreground3color'       => Configuration::get(MyParcel::CHECKOUT_FG_COLOR3),
+            'background1color'       => Configuration::get(MyParcel::CHECKOUT_BG_COLOR1),
+            'background2color'       => Configuration::get(MyParcel::CHECKOUT_BG_COLOR2),
+            'background3color'       => Configuration::get(MyParcel::CHECKOUT_BG_COLOR3),
+            'highlightcolor'         => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
+            'inactivecolor'          => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
+            'fontfamily'             => Configuration::get(MyParcel::CHECKOUT_FONT),
         ));
-
+        ob_clean();
         echo $smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/admin/examplecheckout/checkout.tpl');
         exit;
     }

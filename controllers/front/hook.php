@@ -32,7 +32,28 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
-     * Prevent displaying the maintenance page
+     * Initialize content and block unauthorized calls
+     *
+     * @since 2.0.0
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public function initContent()
+    {
+        if (!Module::isEnabled('myparcel')) {
+            header('Content-Type: application/json; charset=utf8');
+            die(mypa_json_encode(array('data' => array('message' => 'Module is not enabled'))));
+        }
+
+        $this->processWebhook();
+
+        die('1');
+    }
+
+    /**
+     * Prevent from displaying the maintenance page
      *
      * @return void
      */
@@ -42,32 +63,9 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Initialize content and block unauthorized calls
+     * Process webhook
      *
      * @since 2.0.0
-     *
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     * @throws Adapter_Exception
-     */
-    public function initContent()
-    {
-        if (!Module::isEnabled('myparcel')) {
-            header('Content-Type: application/json; charset=utf8');
-            die(json_encode(array('data' => array('message' => 'Module is not enabled'))));
-        }
-        if (!Configuration::get(MyParcel::UPDATE_ORDER_STATUSES)) {
-            header('Content-Type: application/json; charset=utf8');
-            die(json_encode(array('data' => array('message' => 'Webhooks are not enabled'))));
-        }
-
-        $this->processWebhook();
-
-        die('1');
-    }
-
-    /**
-     * Process webhook
      *
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
@@ -83,7 +81,7 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
             Logger::addLog("MyParcel webhook: $logContent");
         }
 
-        $data = json_decode($content, true);
+        $data = @json_decode($content, true);
         if (isset($data['data']['hooks']) && is_array($data['data']['hooks'])) {
             foreach ($data['data']['hooks'] as &$item) {
                 if (isset($item['shipment_id'])

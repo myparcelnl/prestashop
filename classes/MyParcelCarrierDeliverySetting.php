@@ -21,8 +21,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../myparcel.php';
-
 /**
  * Class MyParcelCarrierDeliverySetting
  */
@@ -84,88 +82,77 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'INT(11) UNSIGNED',
-            )
-            ,
+            ),
             'delivery'                           => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'pickup'                             => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'mailbox_package'                    => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'monday_enabled'                     => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'tuesday_enabled'                    => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'wednesday_enabled'                  => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'thursday_enabled'                   => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'friday_enabled'                     => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'saturday_enabled'                   => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
-                'default'  => '0',
-                'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+                'default' => '0',
+                'db_type' => 'TINYINT(1) UNSIGNED',
+            ),
             'sunday_enabled'                     => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'cutoff_exceptions'                  => array(
                 'type'     => self::TYPE_STRING,
                 'validate' => 'isString',
@@ -179,177 +166,160 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
                 'required' => false,
                 'db_type'  => 'VARCHAR(5)',
             ),
-            'tuesday_cutoff'                     =>
-                array(
-                    'type'     => self::TYPE_STRING,
-                    'validate' => 'isString',
-                    'required' => false,
-                    'db_type'  => 'VARCHAR(5)',
-                ),
-            'wednesday_cutoff'                   =>
-                array(
-                    'type'     => self::TYPE_STRING,
-                    'validate' => 'isString',
-                    'required' => false,
-                    'db_type'  => 'VARCHAR(5)',
-                ),
-            'thursday_cutoff'                    =>
-                array(
-                    'type'     => self::TYPE_STRING,
-                    'validate' => 'isString',
-                    'required' => false,
-                    'db_type'  => 'VARCHAR(5)',
-                ),
-            'friday_cutoff'                      =>
-                array(
-                    'type'     => self::TYPE_STRING,
-                    'validate' => 'isString',
-                    'required' => false,
-                    'db_type'  => 'VARCHAR(5)',
-                ),
-            'saturday_cutoff'                    =>
-                array(
-                    'type'     => self::TYPE_STRING,
-                    'validate' => 'isString',
-                    'required' => false,
-                    'db_type'  => 'VARCHAR(5)',
-                ),
-            'sunday_cutoff'                      =>
-                array(
-                    'type'     => self::TYPE_STRING,
-                    'validate' => 'isString',
-                    'required' => false,
-                    'db_type'  => 'VARCHAR(5)',
-                ),
-            'daytime'                            =>
-                array(
-                    'type'     => self::TYPE_BOOL,
-                    'validate' => 'isBool',
-                    'required' => true,
-                    'default'  => '0',
-                    'db_type'  => 'TINYINT(1) UNSIGNED',
-                )
-            ,
+            'tuesday_cutoff'                     => array(
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'VARCHAR(5)',
+            ),
+            'wednesday_cutoff'                   => array(
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'VARCHAR(5)',
+            ),
+            'thursday_cutoff'                    => array(
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'VARCHAR(5)',
+            ),
+            'friday_cutoff'                      => array(
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'VARCHAR(5)',
+            ),
+            'saturday_cutoff'                    => array(
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'VARCHAR(5)',
+            ),
+            'sunday_cutoff'                      => array(
+                'type'     => self::TYPE_STRING,
+                'validate' => 'isString',
+                'required' => false,
+                'db_type'  => 'VARCHAR(5)',
+            ),
+            'daytime'                            => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            ),
             'morning'                            => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'morning_pickup'                     => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'evening'                            => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'signed'                             => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'recipient_only'                     => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'signed_recipient_only'              => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'TINYINT(1) UNSIGNED',
-            )
-            ,
+            ),
             'timeframe_days'                     => array(
                 'type'     => self::TYPE_INT,
                 'validate' => 'isInt',
                 'required' => true,
                 'default'  => '1',
                 'db_type'  => 'INT(2) UNSIGNED',
-            )
-            ,
+            ),
             'dropoff_delay'                      => array(
                 'type'     => self::TYPE_INT,
                 'validate' => 'isInt',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'INT(2) UNSIGNED',
-            )
-            ,
+            ),
             'id_shop'                            => array(
                 'type'     => self::TYPE_INT,
                 'validate' => 'isInt',
                 'required' => true,
                 'default'  => '0',
                 'db_type'  => 'INT(11) UNSIGNED',
-            )
-            ,
+            ),
             'morning_fee_tax_incl'               => array(
                 'type'     => self::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'required' => true,
                 'default'  => '0',
-                'db_type'  => 'DECIMAL(15, 5)',
+                'db_type'  => 'DECIMAL(15, 6)',
             ),
             'morning_pickup_fee_tax_incl'        => array(
                 'type'     => self::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'required' => true,
                 'default'  => '0',
-                'db_type'  => 'DECIMAL(15, 5)',
+                'db_type'  => 'DECIMAL(15, 6)',
             ),
             'default_fee_tax_incl'               => array(
                 'type'     => self::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'required' => true,
                 'default'  => '0',
-                'db_type'  => 'DECIMAL(15, 5)',
+                'db_type'  => 'DECIMAL(15, 6)',
             ),
             'evening_fee_tax_incl'               => array(
                 'type'     => self::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'required' => true,
                 'default'  => '0',
-                'db_type'  => 'DECIMAL(15, 5)',
+                'db_type'  => 'DECIMAL(15, 6)',
             ),
             'signed_fee_tax_incl'                => array(
                 'type'     => self::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'required' => true,
                 'default'  => '0',
-                'db_type'  => 'DECIMAL(15, 5)',
+                'db_type'  => 'DECIMAL(15, 6)',
             ),
             'recipient_only_fee_tax_incl'        => array(
                 'type'     => self::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'required' => true,
                 'default'  => '0',
-                'db_type'  => 'DECIMAL(15, 5)',
+                'db_type'  => 'DECIMAL(15, 6)',
             ),
             'signed_recipient_only_fee_tax_incl' => array(
                 'type'     => self::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'required' => true,
                 'default'  => '0',
-                'db_type'  => 'DECIMAL(15, 5)',
+                'db_type'  => 'DECIMAL(15, 6)',
             ),
         ),
     );
@@ -460,7 +430,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
 
         foreach ($cutoffs as $cutoff) {
             if (empty($this->{$cutoff})) {
-                $this->{$cutoff} = '22:00';
+                $this->{$cutoff} = '15:30';
             }
         }
     }
@@ -471,6 +441,9 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      *
      * @return MyParcelCarrierDeliverySetting
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public static function createDefault($idReference, $idShop = null)
@@ -479,7 +452,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
             $idShop = (int) Context::getContext()->shop->id;
         }
 
-        $mcds = new self();
+        $mcds = new static();
         foreach (static::$definition['fields'] as $key => $field) {
             if ($field['required'] && $field['default']) {
                 $mcds->{$key} = $field['default'];
@@ -497,6 +470,10 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int $idReference Carrier reference
      *
      * @return bool|MyParcelCarrierDeliverySetting
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      *
      * @since 2.0.0
      */
@@ -534,6 +511,9 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      *
      * @return bool|MyParcelCarrierDeliverySetting
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public static function getCarrierReferenceById($idMyParcelCarrierDeliverySetting)
@@ -559,11 +539,15 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      *
      * @return bool Indicates whether the delivery status has been successfully toggled
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public static function toggleDelivery($idMyParcelCarrierDeliverySetting)
     {
-        $mpcds = new self($idMyParcelCarrierDeliverySetting);
+        $mpcds = new static($idMyParcelCarrierDeliverySetting);
         $mpcds->delivery = !$mpcds->delivery;
 
         if ($mpcds->delivery) {
@@ -582,6 +566,9 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param bool $autoDate
      *
      * @return bool
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      *
      * @since 2.0.0
      */
@@ -602,6 +589,18 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
                 static::associateCarrierToModule($this->id_reference, false);
             } else {
                 static::associateCarrierToModule($this->id_reference);
+                if ($this->mailbox_package) {
+                    Db::getInstance()->update(
+                        'carrier',
+                        array(
+                            'max_width'  => 0,
+                            'max_height' => 0,
+                            'max_depth'  => 0,
+                            'max_weight' => 0,
+                        ),
+                        '`id_reference` = '.(int) $this->id_reference.' AND `deleted` = 0'
+                    );
+                }
             }
 
             return parent::save($nullValues, $autoDate);
@@ -620,6 +619,9 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      *
      * @return bool
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public static function associateCarrierToModule($idReference, $associate = true)
@@ -633,11 +635,6 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
                         'shipping_external'    => 1,
                         'is_module'            => 1,
                         'need_range'           => 1,
-                        'range_behavior'       => 1,
-                        'max_width'            => 0,
-                        'max_height'           => 0,
-                        'max_depth'            => 0,
-                        'max_weight'           => 0,
                     ),
                     '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
                 );
@@ -666,6 +663,10 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      *
      * @return bool Indicates whether the pickup status has been successfully toggled
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public static function togglePickup($idMyParcelCarrierDeliverySetting)
@@ -688,6 +689,10 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int $idMyParcelCarrierDeliverySetting
      *
      * @return bool Indicates whether the mailbox package status has been successfully toggled
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      *
      * @since 2.0.0
      */
@@ -716,7 +721,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
         $cutoffTimes = array();
         if ($method === static::ENUM_DELIVERY) {
             $date = new DateTime($dateFrom);
-            $cutoffExceptions = json_decode($this->cutoff_exceptions, true);
+            $cutoffExceptions = @json_decode($this->cutoff_exceptions, true);
             if (!is_array($cutoffExceptions)) {
                 $cutoffExceptions = array();
             }
@@ -777,21 +782,23 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * Get cut off times
      *
      * @param string $dateFrom From date
+     * @param int    $days     For how many days?
      *
      * @return array Array with cut off times
      *
      * @since 2.0.0
+     * @since 2.2.0 Returned array key is now `Y-m-d` date
      */
-    public function getDropoffDays($dateFrom)
+    public function getDropoffDays($dateFrom, $days = 7)
     {
         $cutoffTimes = array();
 
         $date = new DateTime($dateFrom);
-        $cutoffExceptions = json_decode($this->cutoff_exceptions, true);
+        $cutoffExceptions = @json_decode($this->cutoff_exceptions, true);
         if (!is_array($cutoffExceptions)) {
             $cutoffExceptions = array();
         }
-        for ($i = 0; $i < 7; $i++) {
+        for ($i = 0; $i < $days; $i++) {
             if (array_key_exists($date->format('d-m-Y'), $cutoffExceptions)) {
                 $exceptionInfo = $cutoffExceptions[$date->format('d-m-Y')];
                 if ((array_key_exists('nodispatch', $exceptionInfo) && $exceptionInfo['nodispatch'])
@@ -803,10 +810,10 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
                 }
 
                 if (!$nodispatch) {
-                    $cutoffTimes[] = $date->format('N');
+                    $cutoffTimes[$date->format('Y-m-d')] = $date->format('N');
                 }
             } elseif ((bool) $this->{Tools::strtolower($date->format('l')).'_enabled'}) {
-                $cutoffTimes[] = $date->format('N');
+                $cutoffTimes[$date->format('Y-m-d')] = $date->format('N');
             }
 
             $date->modify('+1 day');

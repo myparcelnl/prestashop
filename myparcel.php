@@ -21,21 +21,16 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-// JSON constants for PHP 5.3
-if (!defined('JSON_UNESCAPED_SLASHES')) {
-    define('JSON_UNESCAPED_SLASHES', 64);
-}
-
-if (!defined('JSON_UNESCAPED_UNICODE')) {
-    define('JSON_UNESCAPED_UNICODE', 256);
-}
-
-require_once dirname(__FILE__).'/classes/autoload.php';
+require_once dirname(__FILE__).'/vendor/autoload.php';
 
 /**
  * Class MyParcel
  *
  * @since 1.0.0
+ *
+ * Translation block:
+ * $this->l('Closed');
+ * $this->l('unknown');
  */
 class MyParcel extends Module
 {
@@ -46,8 +41,6 @@ class MyParcel extends Module
     const POSTNL_DEFAULT_CARRIER = 'MYPARCEL_DEFAULT_CARRIER';
     const POSTNL_DEFAULT_MAILBOX_PACKAGE_CARRIER = 'MYPARCEL_DEFAULT_MAILPACK';
     const MYPARCEL_BASE_URL = 'https://www.myparcel.nl/';
-    const SUPPORTED_COUNTRIES_URL = 'https://backoffice.myparcel.nl/api/system_country_codes';
-    const EU_COUNTRIES_URL = 'https://restcountries.eu/rest/v2/regionalbloc/eu?fields=alpha2Code';
 
     const API_KEY = 'MYPARCEL_API_KEY';
 
@@ -57,21 +50,21 @@ class MyParcel extends Module
 
     const LABEL_DESCRIPTION = 'MYPARCEL_LABEL_DESCRIPTION';
     const PAPER_SELECTION = 'MYPARCEL_PAPER_SELECTION';
+    const ASK_PAPER_SELECTION = 'MYPARCEL_ASK_PAPER_SELECT';
+
+    const ASK_RETURN_SELECTION = 'MYPARCEL_ASK_RETURN_SELECT';
 
     const CHECKOUT_LIVE = 'MYPARCEL_LIVE_CHECKOUT';
     const CHECKOUT_FG_COLOR1 = 'MYPARCEL_CHECKOUT_FG_COLOR1';
     const CHECKOUT_FG_COLOR2 = 'MYPARCEL_CHECKOUT_FG_COLOR2';
+    const CHECKOUT_FG_COLOR3 = 'MYPARCEL_CHECKOUT_FG_COLOR3';
     const CHECKOUT_BG_COLOR1 = 'MYPARCEL_CHECKOUT_BG_COLOR1';
     const CHECKOUT_BG_COLOR2 = 'MYPARCEL_CHECKOUT_BG_COLOR2';
     const CHECKOUT_BG_COLOR3 = 'MYPARCEL_CHECKOUT_BG_COLOR3';
     const CHECKOUT_HL_COLOR = 'MYPARCEL_CHECKOUT_HL_COLOR';
+    const CHECKOUT_INACTIVE_COLOR = 'MYPARCEL_CHECKOUT_IA_COLOR';
     const CHECKOUT_FONT = 'MYPARCEL_CHECKOUT_FONT';
     const CHECKOUT_FONT_SIZE = 'MYPARCEL_CHECKOUT_FSIZE';
-
-    const ENUM_NONE = 0;
-    const ENUM_SAMEDAY = 1;
-    const ENUM_DELIVERY = 2;
-    const ENUM_DELIVERY_SELF_DELAY = 3;
 
     const DEFAULT_CONCEPT_PARCEL_TYPE = 'MYPARCEL_DEFCON_PT';
     const DEFAULT_CONCEPT_LARGE_PACKAGE = 'MYPARCEL_DEFCON_LP';
@@ -81,8 +74,15 @@ class MyParcel extends Module
     const DEFAULT_CONCEPT_INSURED = 'MYPARCEL_DEFCON_I';
     const DEFAULT_CONCEPT_INSURED_TYPE = 'MYPARCEL_DEFCON_I_TYPE';
     const DEFAULT_CONCEPT_INSURED_AMOUNT = 'MYPARCEL_DEFCON_I_AMOUNT';
-    const SUPPORTED_COUNTRIES = 'MYPARCEL_SUPPORTED';
-    const EU_COUNTRIES = 'MYPARCEL_EU';
+
+    const DEFAULT_RETURN_CONCEPT_LARGE_PACKAGE = 'MYPARCEL_RETDEFCON_LP';
+    const DEFAULT_RETURN_CONCEPT_HOME_DELIVERY_ONLY = 'MYPARCEL_RETDEFCON_HDO';
+    const DEFAULT_RETURN_CONCEPT_RETURN = 'MYPARCEL_RETDEFCON_RETURN';
+    const DEFAULT_RETURN_CONCEPT_SIGNED = 'MYPARCEL_RETDEFCON_S';
+    const DEFAULT_RETURN_CONCEPT_INSURED = 'MYPARCEL_RETDEFCON_I';
+    const DEFAULT_RETURN_CONCEPT_INSURED_TYPE = 'MYPARCEL_RETDEFCON_I_TYPE';
+    const DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT = 'MYPARCEL_RETDEFCON_I_AMOUNT';
+    const MONDAY_DELIVERY_SUPPORTED = 'MYPARCEL_MON_DEL';
 
     const INSURED_TYPE_50 = 1;
     const INSURED_TYPE_250 = 2;
@@ -93,18 +93,32 @@ class MyParcel extends Module
     const TYPE_UNSTAMPED = 3;
     const TYPE_POST_OFFICE = 4;
 
-    const WEBHOOK_CHECK_INTERVAL = 86400;
+    const WEBHOOK_CHECK_INTERVAL = 86400; //daily check
     const WEBHOOK_LAST_CHECK = 'MYPARCEL_WEBHOOK_UPD';
-    const WEBHOOK_ID = 'MYPARCEL_WEBHOOK_ID'; //daily check
+    const WEBHOOK_ID = 'MYPARCEL_WEBHOOK_ID';
 
-    const UPDATE_ORDER_STATUSES = 'MYPARCEL_UPDATE_OS';
-    const CONFIG_TOUR = 'config';
-    const CONNECTION_ATTEMPTS = 3;
+    const TOUR_CURRENT_STEP = 'MYPARCEL_TOUR_STEP';
+    const TOUR_STEP_MAIN = 1;
+    const TOUR_STEP_DELIVERY_OPTIONS = 2;
+    const TOUR_STEP_DESIGN = 3;
+    const TOUR_STEP_LABELS_NOTIFICATIONS = 4;
+    const TOUR_STEP_CARRIER_CONFIG = 5;
+    const TOUR_STEP_START_SHIPPING = 6;
+
+    const DEV_MODE_SET_VERSION = 'MYPARCEL_SET_VERSION';
+    const DEV_MODE_RESET_TOUR = 'MYPARCEL_RESET_TOUR';
+    const DEV_MODE_CHECK_WEBHOOKS = 'MYPARCEL_CHECK_WEBHOOKS';
+    const DEV_MODE_REMOVE_WEBHOOK = 'MYPARCEL_REMOVE_WEBHOOK';
+    const DEV_MODE_ASYNC = 'MYPARCEL_ASYNC';
+
+    const API_TIMEOUT = 20;
+    const CONNECTION_ATTEMPTS = 5;
     const LOG_API = 'MYPARCEL_LOG_API';
 
     const PRINTED_STATUS = 'MYPARCEL_PRINTED_STATUS';
     const SHIPPED_STATUS = 'MYPARCEL_SHIPPED_STATUS';
     const RECEIVED_STATUS = 'MYPARCEL_RECEIVED_STATUS';
+    const IGNORE_ORDER_STATUSES = 'MYPARCEL_IGNORE_STATUSES';
     const NOTIFICATIONS = 'MYPARCEL_NOTIFS';
     const NOTIFICATION_MOMENT = 'MYPARCEL_NOTIF_MOMENT';
     const MOMENT_SCANNED = 0;
@@ -114,7 +128,7 @@ class MyParcel extends Module
     const FONT_MEDIUM = 2;
     const FONT_LARGE = 3;
 
-    // @codingStandardsIgnoreStart
+    const DELIVERY_OPTION_DEFAULT = 2;
     /**
      * Split street RegEx
      *
@@ -128,7 +142,18 @@ class MyParcel extends Module
      * This is a RegEx that can be used to grab the address fields from the AddressFormat object
      */
     const ADDRESS_FORMAT_REGEX = '~^(address1)(?: +([a-zA-Z0-9_]+))?(?: +([a-zA-Z0-9_]+))?~m';
-    // @codingStandardsIgnoreEnd
+
+    // DEPRECATED CONSTS SINCE 2.2.0
+    const SUPPORTED_COUNTRIES_URL = 'https://backoffice.myparcel.nl/api/system_country_codes';
+    const EU_COUNTRIES_URL = 'https://restcountries.eu/rest/v2/regionalbloc/eu?fields=alpha2Code';
+    const SUPPORTED_COUNTRIES = 'MYPARCEL_SUPPORTED';
+    const EU_COUNTRIES = 'MYPARCEL_EU';
+    const UPDATE_ORDER_STATUSES = 'MYPARCEL_UPDATE_OS';
+    const ENUM_NONE = 0;
+    const ENUM_SAMEDAY = 1;
+    const ENUM_DELIVERY = 2;
+    const ENUM_DELIVERY_SELF_DELAY = 3;
+    // END DEPRECATED CONSTS SINCE 2.2.0
 
     // @codingStandardsIgnoreStart
     /** @var array $cachedCarriers */
@@ -142,10 +167,15 @@ class MyParcel extends Module
         'displayCarrierList',
         'displayHeader',
         'displayBackOfficeHeader',
+        'displayBackOfficeFooter',
         'adminOrder',
         'orderDetail',
         'actionValidateOrder',
-        'actionAdminOrdersListingFieldsModifier'
+        'actionAdminOrdersListingFieldsModifier',
+        'actionAdminLogsListingFieldsModifier',
+        'registerGDPRConsent',
+        'actionDeleteGDPRCustomer',
+        'actionExportGDPRData',
     );
     /** @var array $statuses */
     protected $statuses = array();
@@ -153,8 +183,8 @@ class MyParcel extends Module
     protected $menu = self::MENU_MAIN_SETTINGS;
     /** @var string $baseUrl */
     protected $baseUrl;
-    /** @var string $moduleUrlWithoutToken */
-    protected $moduleUrlWithoutToken;
+    /** @var string $baseUrlWithoutToken */
+    protected $baseUrlWithoutToken;
     // @codingStandardsIgnoreEnd
 
     /**
@@ -167,7 +197,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.1.4';
+        $this->version = '2.2.0';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -176,7 +206,7 @@ class MyParcel extends Module
         parent::__construct();
 
         if (!empty(Context::getContext()->employee->id)) {
-            $this->moduleUrlWithoutToken =
+            $this->baseUrlWithoutToken =
                 Context::getContext()->link->getAdminLink('AdminModules', false)
                 .'&'
                 .http_build_query(
@@ -186,12 +216,28 @@ class MyParcel extends Module
                         'module_name' => $this->name,
                     )
                 );
-
-            $this->checkWebhooks();
+            $this->baseUrl = Context::getContext()->link->getAdminLink('AdminModules', true)
+                .'&'
+                .http_build_query(array(
+                    'configure'   => $this->name,
+                    'module_name' => $this->name,
+                    'tab_module'  => $this->tab,
+                ));
         }
 
         $this->displayName = $this->l('MyParcel');
-        $this->description = $this->l('Assistance with the parcel service through MyParcel.nl');
+        $this->description = $this->l('Shipping made easy with MyParcel.nl');
+    }
+
+    /**
+     * @return void
+     *
+     * @throws PrestaShopException
+     * @throws ErrorException
+     */
+    public function ajaxProcessCheckWebhooks()
+    {
+        $this->checkWebhooks();
     }
 
     /**
@@ -201,25 +247,18 @@ class MyParcel extends Module
      *
      * @since 2.0.0
      * @throws PrestaShopException
+     * @throws ErrorException
      */
     protected function checkWebhooks()
     {
         $lastCheck = (int) Configuration::get(static::WEBHOOK_LAST_CHECK);
         $webHookId = trim(Configuration::get(static::WEBHOOK_ID));
+        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
 
         if ((time() > ($lastCheck + static::WEBHOOK_CHECK_INTERVAL)) || empty($webHookId)) {
             // Time to update webhooks
-            $ch = curl_init('https://api.myparcel.nl/webhook_subscriptions/'.(string) $webHookId);
-            // @codingStandardsIgnoreStart
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                "Authorization: basic ".base64_encode(Configuration::get(static::API_KEY)),
-                trim(static::getUserAgent())
-            ));
-            // @codingStandardsIgnoreEnd
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            $response = curl_exec($ch);
-            curl_close($ch);
+            $curl->setHeader('Accept', 'application/json');
+            $response = $curl->get("https://api.myparcel.nl/webhook_subscriptions/$webHookId");
 
             $sslEnabled = (bool) Configuration::get('PS_SSL_ENABLED');
             $webhookUrl = Context::getContext()->link->getModuleLink(
@@ -230,14 +269,13 @@ class MyParcel extends Module
                 (int) Configuration::get('PS_LANG_DEFAULT')
             );
             $found = false;
-            $idWebhook = (int) Configuration::get(static::WEBHOOK_ID);
-            $data = json_decode($response, true);
-            if ($data) {
-                if (isset($data['data']['webhook_subscriptions']) && is_array($data['data']['webhook_subscriptions'])) {
-                    foreach ($data['data']['webhook_subscriptions'] as $subscription) {
-                        if ((int) $subscription['id'] !== $idWebhook) {
+            $data = mypa_dot($response);
+            if (!$data->isEmpty()) {
+                if (!$data->isEmpty('data.webhook_subscriptions') && is_array($data->get('data.webhook_subscriptions'))) {
+                    foreach ($data->get('data.webhook_subscriptions') as $subscription) {
+                        if ((int) $subscription['id'] !== $webHookId) {
                             continue;
-                        } elseif ($subscription['url'] == $webhookUrl) {
+                        } elseif ($subscription['url'] === $webhookUrl) {
                             $found = true;
 
                             break;
@@ -247,22 +285,8 @@ class MyParcel extends Module
             }
 
             if (!$found) {
-                // @codingStandardsIgnoreStart
-                $apiKey = base64_encode(Configuration::get(static::API_KEY));
-                // @codingStandardsIgnoreEnd
-                $ch = curl_init('https://api.myparcel.nl/webhook_subscriptions');
-                curl_setopt(
-                    $ch,
-                    CURLOPT_HTTPHEADER,
-                    array(
-                        "Authorization: basic $apiKey",
-                        'Content-Type: application/json; charset=utf-8',
-                        trim(static::getUserAgent()),
-                    )
-                );
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HEADER, false);
-                $postData = json_encode(array(
+                $curl->setHeader('Content-Type', 'application/json;charset=UTF-8');
+                $response = $curl->post('https://api.myparcel.nl/webhook_subscriptions', mypa_json_encode(array(
                     'data' => array(
                         'webhook_subscriptions' => array(
                             array(
@@ -271,82 +295,19 @@ class MyParcel extends Module
                             ),
                         ),
                     ),
-                ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-                $response = curl_exec($ch);
-                curl_close($ch);
+                )));
 
                 if ($response) {
-                    $data = json_decode($response, true);
-                    if (isset($data['data']['ids'][0]['id'])) {
-                        Configuration::updateValue(static::WEBHOOK_ID, (int) $data['data']['ids'][0]['id']);
+                    $data = mypa_dot($response);
+                    if ($data->get('data.ids.0.id')) {
+                        Configuration::updateValue(static::WEBHOOK_ID, (int) $data->get('data.ids.0.id'));
                     }
                 }
             }
 
             Configuration::updateValue(static::WEBHOOK_LAST_CHECK, time());
-
-            static::retrieveSupportedCountries();
-            static::retrieveEuCountries();
         }
     }
-
-    /**
-     * Retrieve suported countries from MyParcel API
-     *
-     * @return bool|mixed|string Raw json or false if not found
-     *
-     * @since 2.0.0
-     * @throws PrestaShopException
-     */
-    protected static function retrieveSupportedCountries()
-    {
-        // Time to update country list
-        $ch = curl_init(static::SUPPORTED_COUNTRIES_URL);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        $countries = curl_exec($ch);
-        curl_close($ch);
-
-        if (!$countries) {
-            $countries = json_encode(MyParcelTools::getSupportedCountriesOffline(), JSON_UNESCAPED_UNICODE);
-        }
-        Configuration::updateValue(static::SUPPORTED_COUNTRIES, $countries);
-
-        return $countries;
-    }
-
-    /**
-     * Retrieve suported countries from MyParcel API
-     *
-     * @return bool|mixed|string Raw json or false if not found
-     *
-     * @since 2.0.0
-     * @throws PrestaShopException
-     */
-    protected static function retrieveEuCountries()
-    {
-        // Time to update country list
-        $ch = curl_init(static::EU_COUNTRIES_URL);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        $countries = curl_exec($ch);
-        curl_close($ch);
-
-        if ($countries) {
-            Configuration::updateValue(static::EU_COUNTRIES, $countries);
-        } else {
-            Configuration::updateValue(static::EU_COUNTRIES, json_encode(MyParcelTools::getEUCountriesOffline()));
-        }
-
-        return $countries;
-    }
-
 
     /**
      * Add error message
@@ -386,7 +347,7 @@ class MyParcel extends Module
             $objects = scandir($dir);
             foreach ($objects as $object) {
                 if ($object != '.' && $object != '..') {
-                    if (filetype($dir.'/'.$object) == 'dir') {
+                    if (filetype($dir.'/'.$object) === 'dir') {
                         $this->recursiveDeleteOnDisk($dir.'/'.$object);
                     } else {
                         @unlink($dir.'/'.$object);
@@ -531,6 +492,7 @@ class MyParcel extends Module
      * @throws PrestaShopException
      * @since 1.0.0
      * @throws Adapter_Exception
+     * @throws ReflectionException
      */
     public function install()
     {
@@ -543,9 +505,27 @@ class MyParcel extends Module
             return false;
         }
 
-        if (!function_exists('curl_init')) {
+        if (!extension_loaded('curl')) {
             $this->addError(
                 $this->l('Unable to install the MyParcel module. Please enable the PHP cURL extension.'),
+                false
+            );
+
+            return false;
+        }
+
+        if (!extension_loaded('pcre')) {
+            $this->addError(
+                $this->l('Unable to install the MyParcel module. Please enable the PHP PCRE (RegEx) extension.'),
+                false
+            );
+
+            return false;
+        }
+
+        if (!extension_loaded('date')) {
+            $this->addError(
+                $this->l('Unable to install the MyParcel module. Please enable the date extension.'),
                 false
             );
 
@@ -580,6 +560,7 @@ class MyParcel extends Module
 
         Configuration::updateValue(static::CHECKOUT_FG_COLOR1, '#FFFFFF');
         Configuration::updateValue(static::CHECKOUT_FG_COLOR2, '#000000');
+        Configuration::updateValue(static::CHECKOUT_FG_COLOR3, '#000000');
         Configuration::updateValue(
             static::CHECKOUT_BG_COLOR1,
             version_compare(_PS_VERSION_, '1.7.0.0', '>=') ? 'transparent' : '#FBFBFB'
@@ -587,18 +568,20 @@ class MyParcel extends Module
         Configuration::updateValue(static::CHECKOUT_BG_COLOR2, '#01BBC5');
         Configuration::updateValue(static::CHECKOUT_BG_COLOR3, '#75D3D8');
         Configuration::updateValue(static::CHECKOUT_HL_COLOR, '#FF8C00');
+        Configuration::updateValue(static::CHECKOUT_INACTIVE_COLOR, '#848484');
         Configuration::updateValue(static::CHECKOUT_FONT, 'Exo');
         Configuration::updateValue(static::CHECKOUT_FONT_SIZE, 2);
         Configuration::updateValue(static::LABEL_DESCRIPTION, '{order.reference}');
         Configuration::updateValue(static::PRINTED_STATUS, 0);
         Configuration::updateValue(static::SHIPPED_STATUS, (int) Configuration::get('PS_OS_SHIPPING'));
         Configuration::updateValue(static::RECEIVED_STATUS, (int) Configuration::get('PS_OS_DELIVERED'));
+        Configuration::updateValue(static::IGNORE_ORDER_STATUSES, '[]');
         Configuration::updateValue(static::LINK_EMAIL, true);
         Configuration::updateValue(static::LINK_PHONE, true);
         Configuration::updateValue(static::USE_PICKUP_ADDRESS, true);
         Configuration::updateValue(static::NOTIFICATIONS, true);
         Configuration::updateValue(static::NOTIFICATION_MOMENT, static::MOMENT_SCANNED);
-        Configuration::updateValue(static::PAPER_SELECTION, json_encode(array(
+        Configuration::updateValue(static::PAPER_SELECTION, mypa_json_encode(array(
             'size' => 'standard',
             'labels' => array(
                 1 => true,
@@ -606,7 +589,9 @@ class MyParcel extends Module
                 3 => true,
                 4 => true,
             ),
-        )), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        )));
+        Configuration::updateValue(static::ASK_PAPER_SELECTION, true);
+        Configuration::updateValue(static::ASK_RETURN_SELECTION, true);
 
         if (method_exists('Tools', 'clearCache')) {
             Tools::clearCache();
@@ -622,6 +607,7 @@ class MyParcel extends Module
      *
      * @since 1.0.0
      * @throws PrestaShopException
+     * @throws ReflectionException
      */
     protected function installSql()
     {
@@ -819,6 +805,18 @@ class MyParcel extends Module
             $this->unregisterHook($hook);
         }
 
+        Db::getInstance()->update(
+            bqSQL(Carrier::$definition['table']),
+            array(
+                'is_module'            => false,
+                'shipping_external'    => false,
+                'external_module_name' => null,
+            ),
+            '`external_module_name` = \'myparcel\'',
+            0,
+            true
+        );
+
         if (parent::uninstall() === false) {
             return false;
         }
@@ -859,11 +857,26 @@ class MyParcel extends Module
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws SmartyException
+     *                        
      * @since 1.0.0
      */
     public function hookDisplayBackOfficeHeader()
     {
         if (!Module::isEnabled($this->name)) {
+            return '';
+        }
+
+        if ($this->shouldShowTour()) {
+            $this->context->smarty->assign(array(
+                'current_step' => Configuration::get(static::TOUR_CURRENT_STEP),
+                'employee'     => $this->context->employee,
+                'module_dir'   => __PS_BASE_URI__."modules/{$this->name}/",
+            ));
+            $this->context->controller->addCSS($this->_path.'views/css/tour.css');
+        }
+        $this->context->controller->addCSS($this->_path.'views/css/back.css', 'screen');
+
+        if (!Configuration::get(static::API_KEY)) {
             return '';
         }
         $html = '';
@@ -873,13 +886,13 @@ class MyParcel extends Module
             && !Tools::isSubmit('vieworder')
         ) {
             $countries = array();
-            $supportedCountries = static::getSupportedCountries();
+            $supportedCountries = MyParcelTools::getSupportedCountries();
             if (isset($supportedCountries['data']['countries'][0])) {
                 $euCountries = array_map(function ($item) {
                     $values = array_values($item);
 
                     return Tools::strtoupper($values[0]);
-                }, static::getEUCountries());
+                }, MyParcelTools::getEUCountries());
                 foreach (array_keys($supportedCountries['data']['countries'][0]) as $iso) {
                     if (Tools::strtoupper($iso) === 'NL') {
                         continue;
@@ -892,7 +905,7 @@ class MyParcel extends Module
                     }
                 }
                 $countryIsos = array_keys($supportedCountries['data']['countries'][0]);
-                foreach (Country::getCountries($this->context->language->id) as &$country) {
+                foreach (Country::getCountries($this->context->language->id) as $country) {
                     if (in_array(Tools::strtoupper($country['iso_code']), $countryIsos)) {
                         $countries[Tools::strtoupper($country['iso_code'])] = array(
                             'iso_code' => Tools::strtoupper($country['iso_code']),
@@ -904,31 +917,37 @@ class MyParcel extends Module
                 }
             }
 
-            // @codingStandardsIgnoreStart
+            $lastWebhookCheck = (int) Configuration::get(static::WEBHOOK_LAST_CHECK);
+            $webHookId = trim(Configuration::get(static::WEBHOOK_ID));
             $this->context->smarty->assign(
                 array(
-                    'myParcel'             => 'true',
-                    'prestaShopVersion'    => Tools::substr(_PS_VERSION_, 0, 3),
-                    'myparcel_process_url' => $this->moduleUrlWithoutToken.'&token='
-                        .Tools::getAdminTokenLite('AdminModules').'&ajax=1',
-                    'myparcel_module_url'  => __PS_BASE_URI__."modules/{$this->name}/",
-                    'apiKey'               => base64_encode(Configuration::get(static::API_KEY)),
-                    'jsCountries'          => $countries,
-                    'paperSize'            => json_decode(Configuration::get(static::PAPER_SELECTION)),
+                    'mpProcessUrl'            => $this->baseUrlWithoutToken.'&token='.Tools::getAdminTokenLite('AdminModules').'&ajax=1',
+                    'mpModuleDir'             => __PS_BASE_URI__."modules/{$this->name}/",
+                    'mpJsCountries'           => $countries,
+                    'mpPaperSize'             => @json_decode(Configuration::get(static::PAPER_SELECTION)),
+                    'mpAskPaperSize'          => (bool) Configuration::get(static::ASK_PAPER_SELECTION),
+                    'mpAsync'                 => (bool) Configuration::get(static::DEV_MODE_ASYNC),
+                    'mpAskReturnConfig'       => (bool) Configuration::get(static::ASK_RETURN_SELECTION),
+                    'mpCheckWebhooks'         => (time() > ($lastWebhookCheck + static::WEBHOOK_CHECK_INTERVAL)) || empty($webHookId),
+                    'mpReturnInsuranceAmount' => MyParcelTools::getInsuranceAmount(true),
+                    'mpLogApi'                => (bool) Configuration::get(static::LOG_API),
+                    'mpRecipientOnly'         => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_HOME_DELIVERY_ONLY),
+                    'mpSignature'             => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_SIGNED),
+                    'mpExtraLarge'            => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_LARGE_PACKAGE),
+                    'mpReturnUndeliverable'   => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_RETURN),
+                    'mpCurrency'              => Context::getContext()->currency,
                 )
             );
-            // @codingStandardsIgnoreEnd
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/app/dist/ordergrid-e158425a37f486d2.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/dist/ordergrid-378e4d1cf8ab3806.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
-        } elseif (Tools::getValue('controller') == 'AdminModules'
-            && Tools::getValue('configure') == $this->name
+        } elseif (Tools::getValue('controller') === 'AdminModules'
+            && Tools::getValue('configure') === $this->name
         ) {
             $this->context->controller->addJquery();
             $this->context->controller->addJqueryUI('datepicker-nl');
-            $this->context->controller->addCSS($this->_path.'views/css/forms.css');
 
             $this->context->smarty->assign(
                 array(
@@ -943,50 +962,93 @@ class MyParcel extends Module
     }
 
     /**
-     * Get supported counties
+     * Back office top banner
      *
-     * @return array|bool Supported countries as associative array
-     *                    false if not found
-     *
-     * @since 2.0.0
+     * @return string
      * @throws PrestaShopException
+     * @throws SmartyException
      */
-    public static function getSupportedCountries()
+    public function hookDisplayBackOfficeFooter()
     {
-        $supportedCountries = json_decode(
-            Configuration::get(static::SUPPORTED_COUNTRIES),
-            true
-        );
-        if (!$supportedCountries) {
-            if ($supportedCountries = static::retrieveSupportedCountries()) {
-                $supportedCountries = json_decode($supportedCountries, true);
-            }
+        if (!$this->shouldShowTour()) {
+            return '';
         }
 
-        return $supportedCountries;
+        $tourElement = false;
+        $submitForm = false;
+        $extraSubmits = array();
+        switch ((int) Configuration::get(static::TOUR_CURRENT_STEP, null, 0, 0)) {
+            case static::TOUR_STEP_MAIN:
+                if ((int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS) {
+                    $tourElement = '#fieldset_0';
+                    $submitForm = '#configuration_form';
+                    $extraSubmits = array(
+                        'configuration_form_submit_btn' => 1,
+                    );
+                }
+                break;
+            case static::TOUR_STEP_DELIVERY_OPTIONS:
+                $tourElement = '#module_form .panel';
+                $submitForm = '#module_form';
+                $extraSubmits = array(
+                    'module_form_submit_btn' => 1,
+                );
+                break;
+            case static::TOUR_STEP_DESIGN:
+                $tourElement = '#fieldset_1_1';
+                $submitForm = '#configuration_form';
+                $extraSubmits = array(
+                    'configuration_form_submit_btn' => 1,
+                );
+                break;
+            case static::TOUR_STEP_LABELS_NOTIFICATIONS:
+                if ((int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS) {
+                    $tourElement = '#fieldset_2_2, #fieldset_3_3';
+                    $submitForm = '#configuration_form';
+                    $extraSubmits = array(
+                        'configuration_form_submit_btn' => 1,
+                    );
+                }
+                break;
+            case static::TOUR_STEP_CARRIER_CONFIG:
+                break;
+            case static::TOUR_STEP_START_SHIPPING:
+                break;
+        }
+
+        $this->context->smarty->assign(array(
+            'link'             => $this->context->link,
+            'moduleCode'       => $this->name,
+            'moduleTab'        => $this->tab,
+            'moduleUrl'        => $this->baseUrl,
+            'shouldResume'     => $this->shouldResumeTour(),
+            'tourElement'      => $tourElement,
+            'submitForm'       => $submitForm,
+            'extraSubmits'     => $extraSubmits,
+        ));
+
+        return $this->display(__FILE__, 'views/templates/admin/tour/backoffice_top.tpl');
     }
 
     /**
-     * Get EU countries
+     * Process tour step ajax call
      *
-     * @return array
      * @throws PrestaShopException
      */
-    public static function getEUCountries()
+    public function ajaxProcessSetTourStep()
     {
-        $euCountries = json_decode(
-            Configuration::get(static::EU_COUNTRIES),
-            true
-        );
-        if (!$euCountries) {
-            if ($euCountries = static::retrieveEUCountries()) {
-                return json_decode($euCountries, true);
-            }
+        $tourStep = (int) Tools::getValue('tour_step');
+        $success = true;
+        if ($tourStep) {
+            $success &= Configuration::updateValue(static::TOUR_CURRENT_STEP, $tourStep, false, 0, 0);
         }
 
-        return MyParcelTools::getEUCountriesOffline();
+        header('Content-Type: application/json;charset=UTF-8');
+        die(mypa_json_encode(array(
+            'success' => $success,
+        )));
     }
-
+    
     /**
      * Configuration Page: get content of the form
      *
@@ -1000,21 +1062,15 @@ class MyParcel extends Module
      */
     public function getContent()
     {
-        if (Tools::getValue('ajax')) {
-            $this->ajaxProcess();
-
-            return;
+        if (Tools::getValue('demo')) {
+            MyParcelDemo::renderDemo();
         }
 
-        MyParcelCarrierDeliverySetting::createMissingColumns();
-        $this->baseUrl = Context::getContext()->link->getAdminLink('AdminModules', false).'?'
-            .http_build_query(array('configure' => $this->name, 'module_name' => $this->name));
-        $this->moduleUrlWithoutToken = $this->baseUrl.'&token='.Tools::getAdminTokenLite('AdminModules');
-
+        $output = '';
         $this->context->smarty->assign(
             array(
-                'menutabs'         => $this->initNavigation(),
-                'ajaxUrl'          => $this->moduleUrlWithoutToken,
+                'menutabs' => $this->initNavigation(),
+                'ajaxUrl'  => $this->baseUrlWithoutToken,
             )
         );
 
@@ -1022,14 +1078,21 @@ class MyParcel extends Module
             $this->context->controller->errors[] = $error;
         }
 
-        $output = '';
-
         $this->postProcess();
-
+        if ($this->shouldShowTour()) {
+            // Redundant but necessary on the module config page
+            $this->context->smarty->assign(array(
+                'current_step' => Configuration::get(static::TOUR_CURRENT_STEP),
+                'employee'     => $this->context->employee,
+                'module_dir'   => __PS_BASE_URI__."modules/{$this->name}/",
+            ));
+            $this->context->controller->addCSS($this->_path.'views/css/tour.css');
+        }
         $output .= $this->display(__FILE__, 'views/templates/admin/navbar.tpl');
 
         $this->context->controller->addJquery();
-        $this->context->controller->addJS($this->_path.'views/js/back.js');
+        $this->context->controller->addJS($this->_path.'views/js/config.js');
+        $this->context->controller->addCSS($this->_path.'views/css/forms.css');
 
         switch (Tools::getValue('menu')) {
             case static::MENU_DEFAULT_SETTINGS:
@@ -1056,67 +1119,10 @@ class MyParcel extends Module
     public static function getUserAgent()
     {
         if (defined('_TB_VERSION_')) {
-            return 'User-Agent: thirty bees/'._TB_VERSION_."\r\n";
+            return 'thirty bees/'._TB_VERSION_;
         }
 
-        return 'User-Agent: PrestaShop/'._PS_VERSION_."\r\n";
-    }
-
-    /**
-     * Main function to process ajax calls
-     *
-     * @return void
-     * @throws PrestaShopException
-     * @throws Adapter_Exception
-     */
-    protected function ajaxProcess()
-    {
-        $action = '';
-        if (Tools::isSubmit('action')) {
-            $action = Tools::getValue('action');
-        } else {
-            // @codingStandardsIgnoreStart
-            $input = file_get_contents('php://input');
-            // @codingStandardsIgnoreEnd
-            if ($input) {
-                $input = json_decode($input);
-                if (isset($input->action)) {
-                    $action = $input->action;
-                }
-            }
-        }
-
-        switch ($action) {
-            case 'OrderInfo':
-                $this->processOrderInfo();
-                break;
-            case 'GetShipment':
-                $this->getShipmentInfo();
-                break;
-            case 'DeleteShipment':
-                $this->deleteShipment();
-                break;
-            case 'CreateLabel':
-                $this->createLabel();
-                break;
-            case 'PrintLabel':
-                $this->printLabel();
-                break;
-            case 'CreateRelatedReturnLabel':
-                $this->createRelatedReturnLabel();
-                break;
-            case 'CreateUnrelatedReturnLabel':
-                $this->createUnrelatedReturnLabel();
-                break;
-            case 'SaveConcept':
-                $this->saveConcept();
-                break;
-            default:
-                header('Content-Type: text/plain');
-                http_response_code(401);
-                die('Unauthorized');
-        }
-        exit;
+        return 'PrestaShop/'._PS_VERSION_;
     }
 
     /**
@@ -1124,33 +1130,36 @@ class MyParcel extends Module
      * @param int[]    $idOrders
      * @param array    $concepts
      *
-     * @returns array
-     *
-     * @since 2.1.0
      * @return array
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @since 2.1.0
      */
     protected function processNewLabels($response, $idOrders, $concepts)
     {
+        $response = mypa_dot($response);
         $processedLabels = array();
 
         $i = 0;
-        if (isset($response->data->ids) && is_array($response->data->ids)) {
-            foreach ($response->data->ids as $idShipment) {
-                $idShipment = $idShipment->id;
+        if (is_array($response->get('data.ids'))) {
+            foreach ($response->get('data.ids') as $idShipment) {
+                $idShipment = $idShipment['id'];
                 $idOrder = (int) $idOrders[$i];
 
                 $myparcelOrder = new MyParcelOrder();
                 $myparcelOrder->id_order = $idOrder;
                 $myparcelOrder->id_shipment = $idShipment;
-                $myparcelOrder->postnl_status = '1';
+                $myparcelOrder->postnl_status = 1;
                 $myparcelOrder->retour = false;
-                $myparcelOrder->postcode = $concepts[$i]->concept->recipient->postal_code;
+                $myparcelOrder->postcode = mypa_dot($concepts)->get("$i.concept.recipient.postal_code");
                 $myparcelOrder->postnl_final = false;
-                $myparcelOrder->shipment = json_encode($concepts[$i]->concept, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                if (isset($concepts[$i]->concept->pickup)) {
+                $myparcelOrder->shipment = mypa_json_encode(mypa_dot($concepts)->get("$i.concept"));
+                if (!mypa_dot($concepts)->isEmpty("$i.concept.pickup")) {
                     $myparcelOrder->type = static::TYPE_POST_OFFICE;
-                } elseif (isset($concepts[$i]->concept->option->delivery_type)) {
-                    $myparcelOrder->type = $concepts[$i]->concept->option->delivery_type;
+                } elseif (!mypa_dot($concepts)->isEmpty("$i.concept.option.delivery_type")) {
+                    $myparcelOrder->type = mypa_dot($concepts)->get("$i.concept.option.delivery_type");
                 } else {
                     $myparcelOrder->type = static::TYPE_PARCEL;
                 }
@@ -1159,8 +1168,9 @@ class MyParcel extends Module
 
                 try {
                     $processedLabel = $myparcelOrder->getFields();
-                    $processedLabel['shipment'] = $concepts[$i]->concept;
-                    $processedLabel[MyParcelOrder::$definition['primary']] = $myparcelOrder->id;
+                    $processedLabel['shipment'] = mypa_dot($concepts)->get("$i.concept");
+                    $processedLabel[MyParcelOrder::$definition['primary']] = (int) $myparcelOrder->id;
+                    $processedLabel['id_shipment'] = (int) $processedLabel['id_shipment'];
                     $processedLabels[] = $processedLabel;
                 } catch (PrestaShopException $e) {
                     $processedLabels[] = array();
@@ -1177,31 +1187,108 @@ class MyParcel extends Module
      * Retrieve order info
      *
      * @since 2.0.0
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    protected function processOrderInfo()
+    public function ajaxProcessOrderInfo()
     {
         if (!$this->active) {
             header('Content-Type: text/plain');
-            http_response_code(404);
+            if (function_exists('http_response_code')) {
+                http_response_code(404);
+            } else {
+                $protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+                header("$protocol 404 Not Found");
+            }
             die('MyParcel module has been disabled');
         }
 
         header('Content-Type: application/json');
         // @codingStandardsIgnoreStart
-        $payload = json_decode(file_get_contents('php://input'), true);
+        $payload = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
         $orderIds = $payload['ids'];
 
         // Retrieve customer preferences
         die(
-            json_encode(
+            mypa_json_encode(
                 array(
                     'preAlerted' => MyParcelOrder::getByOrderIds($orderIds),
                     'concepts'   => MyParcelDeliveryOption::getByOrderIds($orderIds),
-                ),
-                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                )
             )
         );
+    }
+
+    /**
+     * Get delivery options (BO)
+     *
+     * @throws ErrorException
+     * @throws PrestaShopException
+     *
+     * @since 2.2.0
+     */
+    public function ajaxProcessDeliveryOptions()
+    {
+        $input = file_get_contents('php://input');
+        $request = @json_decode($input, true);
+        if (!$request) {
+            die(mypa_json_encode(array(
+                'success' => false,
+            )));
+        }
+        $request = array_merge($request, array(
+            'carrier'         => 1,
+            'cutoff_time'     => '23:59:00',
+            'monday_delivery' => 1,
+            'dropoff_days'    => '0;1;2;3;4;5;6',
+        ));
+
+        $allowedParams = array(
+            'cc',
+            'postal_code',
+            'number',
+            'carrier',
+            'cutoff_time',
+            'monday_delivery',
+            'dropoff_days',
+        );
+
+        $query = array();
+        foreach ($allowedParams as &$param) {
+            if (!isset($request[$param])) {
+                continue;
+            }
+            if ($param === 'exclude_delivery_type') {
+                if (empty($request[$param])) {
+                    continue;
+                }
+            }
+
+            $value = $request[$param];
+            if ($param === 'number') {
+                $value = (int) preg_replace('/[^\d]*(\d+).*$/', '$1', $value);
+            }
+
+            $query[$param] = $value;
+        }
+
+        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
+        $url = 'https://api.myparcel.nl/delivery_options?'.http_build_query($query);
+        $response = $curl->get($url);
+        if (!$response) {
+            die(mypa_json_encode(array(
+                'success' => false,
+            )));
+        }
+
+        header('Content-Type: application/json;charset=utf-8');
+        die(mypa_json_encode(array(
+            'success'  => true,
+            'response' => $response,
+        )));
     }
 
     /**
@@ -1209,28 +1296,20 @@ class MyParcel extends Module
      *
      * @since 2.0.0
      * @throws Adapter_Exception
+     * @throws ErrorException
      */
-    protected function getShipmentInfo()
+    public function ajaxProcessGetShipment()
     {
-        // @codingStandardsIgnoreStart
-        $apiKey = base64_encode(Configuration::get(static::API_KEY));
-        // @codingStandardsIgnoreEnd
+        $requestBody = @json_decode(file_get_contents('php://input'), true);
+        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
 
-        $requestHeaders = array();
-        $requestHeaders[] = "Authorization: Basic {$apiKey}";
-
-        // @codingStandardsIgnoreStart
-        $requestBody = file_get_contents('php://input');
-        // @codingStandardsIgnoreEnd
-
-        if (json_decode($requestBody)) {
-            $requestBody = json_decode($requestBody);
+        if ($requestBody) {
             $moduleData = new stdClass();
-            if (isset($requestBody->moduleData)) {
-                $moduleData = $requestBody->moduleData;
-                unset($requestBody->moduleData);
+            if (isset($requestBody['moduleData'])) {
+                $moduleData = $requestBody['moduleData'];
+                unset($requestBody['moduleData']);
             }
-            $requestBody = json_encode($requestBody, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $requestBody = mypa_json_encode($requestBody);
         } else {
             $moduleData = null;
         }
@@ -1241,39 +1320,65 @@ class MyParcel extends Module
             unset($requestBody['controllerUri']);
         }
 
-        $requestHeaders = array_values($requestHeaders);
-        $requestHeaders[] = trim(MyParcel::getUserAgent());
-
-        $shipments = implode(';', $moduleData->shipments);
-        $ch = curl_init("https://api.myparcel.nl/shipments/{$shipments}");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        $responseContent = curl_exec($ch);
-        curl_close($ch);
+        $shipments = implode(';', $moduleData['shipments']);
+        $responseContent = $curl->get("https://api.myparcel.nl/shipments/{$shipments}");
 
         $this->getShipmentApiInterceptor($responseContent);
 
+        $response = mypa_dot($responseContent);
+        foreach ($response->get('data.shipments') as $index => $shipment) {
+            $newShipment = array();
+            $newShipment['id_shipment'] = (int) $shipment['id'];
+            $mypaOrder = MyParcelOrder::getByShipmentId($shipment['id']);
+            if (Validate::isLoadedObject($mypaOrder)) {
+                $order = new Order($mypaOrder->id_order);
+                $state = new OrderState($order->getCurrentState(), $this->context->language->id);
+
+                $newShipment['id_order'] = (int) $mypaOrder->id_order;
+                $newShipment['id_myparcel_order'] = (int) $mypaOrder->id;
+                $newShipment['backgroundColor'] = $state->color;
+                $newShipment['color'] = Tools::getBrightness($state->color) < 128 ? '#ffffff' : '#383838';
+                $newShipment['state_text'] = $state->name;
+                $newShipment['date_upd'] = $mypaOrder->date_upd;
+            } else {
+                $newShipment['id_order'] = null;
+                $newShipment['id_myparcel_order'] = null;
+                $newShipment['backgroundColor'] = null;
+                $newShipment['color'] = null;
+                $newShipment['state_text'] = null;
+                $newShipment['date_upd'] = date('Y-m-d H:i:s', strtotime($shipment['created']));
+            }
+            $newShipment['postcode'] = $shipment['recipient']['postal_code'];
+            $newShipment['tracktrace'] = $shipment['barcode'];
+            $newShipment['postnl_status'] = $shipment['status'];
+            $newShipment['postnl_final'] = $shipment['status'] >= 7;
+            $newShipment['shipment'] = $shipment;
+            $response->set("data.shipments.{$index}", $newShipment);
+        }
+            
         // finally, output the content
         header('Content-Type: application/json; charset=utf-8');
-        die($responseContent);
+        die(mypa_json_encode($response->jsonSerialize()));
     }
 
     /**
      * Delete shipment
      *
      * @since 2.1.0
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    protected function deleteShipment()
+    public function ajaxProcessDeleteShipment()
     {
         // @codingStandardsIgnoreStart
-        $request = json_decode(file_get_contents('php://input'), true);
+        $request = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
         if (isset($request['idShipment'])) {
             $idShipment = (int) $request['idShipment'][0];
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => MyParcelOrder::deleteShipment($idShipment),
-            ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            )));
         }
     }
 
@@ -1288,24 +1393,28 @@ class MyParcel extends Module
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @since 2.0.0
+     * @throws ErrorException
      */
     protected function getShipmentApiInterceptor($responseContent)
     {
         if ($responseContent) {
-            $responseContent = json_decode($responseContent);
-            if (isset($responseContent->data->shipments) & is_array($responseContent->data->shipments)) {
-                foreach ($responseContent->data->shipments as $shipment) {
-                    $myparcelOrder = MyParcelOrder::getByShipmentId($shipment->id);
+            if (!is_array($responseContent)) {
+                $responseContent = @json_decode($responseContent, true);
+            }
+            if (is_array(mypa_dot($responseContent)->get('data.shipments'))) {
+                foreach (mypa_dot($responseContent)->get('data.shipments') as $shipment) {
+                    $shipment = mypa_dot($shipment);
+                    $myparcelOrder = MyParcelOrder::getByShipmentId($shipment->get('id'));
                     if (Validate::isLoadedObject($myparcelOrder)) {
-                        if (isset($shipment->barcode) && $shipment->barcode) {
+                        if ($shipment->get('barcode') || $shipment->get('status') == 12) {
                             MyParcelOrder::updateStatus(
                                 $myparcelOrder->id_shipment,
-                                $shipment->barcode,
-                                $shipment->status,
-                                $shipment->modified
+                                $shipment->get('barcode'),
+                                $shipment->get('status'),
+                                $shipment->get('modified')
                             );
                             if (!$myparcelOrder->tracktrace) {
-                                MyParcelOrder::updateOrderTrackingNumber($myparcelOrder->id_order, $shipment->barcode);
+                                MyParcelOrder::updateOrderTrackingNumber($myparcelOrder->id_order, $shipment->get('barcode'));
                             }
                         }
                     }
@@ -1317,69 +1426,50 @@ class MyParcel extends Module
     /**
      * @throws PrestaShopException
      * @throws Adapter_Exception
+     * @throws ErrorException
      */
-    protected function createLabel()
+    public function ajaxProcessCreateLabel()
     {
-        // @codingStandardsIgnoreStart
-        $apiKey = base64_encode(Configuration::get(static::API_KEY));
-        // @codingStandardsIgnoreEnd
-
-        $requestHeaders = array();
-        $requestHeaders[] = "Authorization: Basic {$apiKey}";
-        $requestHeaders[] = 'Accept: application/json; charset=utf-8';
-        $requestHeaders[] = 'Content-Type: application/vnd.shipment+json; charset=utf-8';
-        $requestHeaders[] = trim(static::getUserAgent());
-
-        // @codingStandardsIgnoreStart
-        $requestBody = file_get_contents('php://input');
-        // @codingStandardsIgnoreEnd
-
-        $request = json_decode($requestBody);
+        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
+        $curl->setHeader('Accept', 'application/json; charset=utf-8');
+        $curl->setHeader('Content-Type', 'application/vnd.shipment+json; charset=utf-8');
+        $request = @json_decode(file_get_contents('php://input'), true);
         $idOrders = $shipments = array();
-        if (isset($request->moduleData->shipments) && is_array($request->moduleData->shipments)) {
-            foreach ($request->moduleData->shipments as $shipment) {
-                $idOrders[] = (int) $shipment->id_order;
-                $shipments[] = $shipment->concept;
+        if (is_array(mypa_dot($request)->get('moduleData.shipments'))) {
+            foreach (mypa_dot($request)->get('moduleData.shipments') as $shipment) {
+                $idOrders[] = (int) $shipment['idOrder'];
+                $shipments[] = MyParcelDeliveryOption::filterConcept($shipment['concept']);
             }
         } else {
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => false,
-            ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            )));
         }
 
-        if (is_array($requestBody)) {
-            unset($requestBody['controller']);
-            unset($requestBody['token']);
-            unset($requestBody['controllerUri']);
+        if (is_array($request)) {
+            unset($request['controller']);
+            unset($request['token']);
+            unset($request['controllerUri']);
         }
 
-        $requestHeaders = array_values($requestHeaders);
-
-        $ch = curl_init('https://api.myparcel.nl/shipments');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array(
+        $response = $curl->post('https://api.myparcel.nl/shipments', mypa_json_encode(array(
             'data' => array(
                 'shipments' => $shipments,
             ),
-        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        $responseContent = curl_exec($ch);
-        curl_close($ch);
-
-        if ($response = json_decode($responseContent)) {
-            $labelData = $this->processNewLabels($response, $idOrders, $request->moduleData->shipments);
+        )));
+        
+        if ($response) {
+            $labelData = $this->processNewLabels($response, $idOrders, mypa_dot($request)->get('moduleData.shipments'));
             if (empty($labelData)) {
-                die(json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                die(mypa_json_encode($response));
             }
 
-            die(json_encode($labelData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            die(mypa_json_encode($labelData));
         }
 
-        die(json_encode(array(
+        die(mypa_json_encode(array(
             'success' => false,
-        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        )));
     }
 
     /**
@@ -1390,30 +1480,21 @@ class MyParcel extends Module
      * @since 2.0.0
      * @throws PrestaShopException
      * @throws Adapter_Exception
+     * @throws ErrorException
      */
-    protected function printLabel()
+    public function ajaxProcessPrintLabel()
     {
-        // @codingStandardsIgnoreStart
-        $apiKey = base64_encode(Configuration::get(static::API_KEY));
-        // @codingStandardsIgnoreEnd
-
-        $requestHeaders = array();
-        $requestHeaders[] = "Authorization: Basic {$apiKey}";
-        $requestHeaders[] = 'Accept: application/json; charset=utf-8';
-        $requestHeaders[] = trim(static::getUserAgent());
-
-        // @codingStandardsIgnoreStart
+        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
+        $curl->setHeader('Accept', 'application/json; charset=utf-8');
         $requestBody = file_get_contents('php://input');
-        // @codingStandardsIgnoreEnd
-
-        $request = json_decode($requestBody, true);
+        $request = @json_decode($requestBody, true);
         if (is_array($request) && array_key_exists('idShipments', $request)) {
             $idShipments = $request['idShipments'];
             $shipments = implode(';', $idShipments);
         } else {
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => false,
-            ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            )));
         }
 
         if (is_array($requestBody)) {
@@ -1422,12 +1503,7 @@ class MyParcel extends Module
             unset($requestBody['controllerUri']);
         }
 
-        $requestHeaders = array_values($requestHeaders);
-
-        // @codingStandardsIgnoreStart
-        $request = file_get_contents('php://input');
-        // @codingStandardsIgnoreEnd
-        $request = json_decode($request, true);
+        $request = @json_decode(file_get_contents('php://input'), true);
         $positions = implode(';', array(1, 2, 3, 4));
         $pageSize = 'A4';
         if (isset($request['paperSize'])) {
@@ -1441,15 +1517,8 @@ class MyParcel extends Module
             $positions = implode(';', $positions);
         }
 
-        $ch = curl_init("https://api.myparcel.nl/shipment_labels/{$shipments}"
-            ."?positions={$positions}&format={$pageSize}");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        $responseContent = curl_exec($ch);
-        curl_close($ch);
-
-        if ($response = json_decode($responseContent, true)) {
+        $response = $curl->get("https://api.myparcel.nl/shipment_labels/{$shipments}?positions={$positions}&format={$pageSize}");
+        if ($response) {
             $response['success'] = true;
             foreach ($idShipments as $idShipment) {
                 $mpo = MyParcelOrder::getByShipmentId($idShipment);
@@ -1460,12 +1529,12 @@ class MyParcel extends Module
                 }
             }
 
-            die(json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            die(mypa_json_encode($response));
         }
 
-        die(json_encode(array(
+        die(mypa_json_encode(array(
             'success' => false,
-        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        )));
     }
 
     /**
@@ -1473,18 +1542,17 @@ class MyParcel extends Module
      *
      * @since 2.0.0
      * @throws PrestaShopException
+     * @throws ErrorException
      */
-    protected function createRelatedReturnLabel()
+    public function ajaxProcessCreateRelatedReturnLabel()
     {
-        // @codingStandardsIgnoreStart
-        $request = json_decode(file_get_contents('php://input'), true);
-        // @codingStandardsIgnoreEnd
-        if (isset($request['moduleData']['parent'])) {
-            $parent = (int) $request['moduleData']['parent'];
+        $request = mypa_dot(@json_decode(file_get_contents('php://input'), true));
+        if ($request->has('moduleData.parent')) {
+            $parent = (int) $request->get('moduleData.parent');
         } else {
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => false,
-            ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            )));
         }
 
         $sql = new DbQuery();
@@ -1500,99 +1568,60 @@ class MyParcel extends Module
         }
 
         if (!$result) {
-            die(json_encode(array(
+            die(mypa_json_encode(array(
                 'success' => false,
                 'error'   => 'No shipments found in db',
-            ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            )));
         }
 
         // @codingStandardsIgnoreStart
-        $ch = curl_init('https://api.myparcel.nl/shipments');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/vnd.return_shipment+json;charset=utf-8',
-            'Authorization: basic '.base64_encode(Configuration::get(static::API_KEY)),
-            trim(static::getUserAgent()),
-        ));
-        // @codingStandardsIgnoreEnd
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array(
-            'data' => array(
-                'return_shipments' => array(
-                    array(
-                        'parent'  => $parent,
-                        'carrier' => 1,
-                        'name'    => $result['firstname'].' '.$result['lastname'],
-                        'email'   => $result['email'],
-                        'options' => array(
-                            'package_type'   => 1,
-                            'only_recipient' => 0,
-                            'signature'      => 0,
-                            'return'         => 0,
-                            'insurance'      => array(
-                                'amount'   => 50,
-                                'currency' => 'EUR',
-                            ),
-                        ),
-                    ),
+        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
+        $curl->setHeader('Content-Type', 'application/vnd.return_shipment+json;charset=utf-8');
+        $returnShipment = array(
+            'parent'  => $parent,
+            'carrier' => 1,
+            'name'    => $request->get('moduleData.returnConfig.name'),
+            'email'   => $request->get('moduleData.returnConfig.email'),
+            'options' => array(
+                'package_type'        => 1,
+                'label_description'   => (string) $request->get('moduleData.returnConfig.labelDescription'),
+                'only_recipient'      => (int) $request->get('moduleData.returnConfig.recipientOnly'),
+                'signature'           => (int) $request->get('moduleData.returnConfig.signature'),
+                'return'              => (int) $request->get('moduleData.returnConfig.returnUndeliverable'),
+                'insurance'           => array(
+                    'amount'   => (int) $request->get('moduleData.returnConfig.insurance'),
+                    'currency' => 'EUR',
                 ),
             ),
-        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        $response = curl_exec($ch);
-        curl_close($ch);
-        $response = json_decode($response, true);
+        );
+        if ($request->get('moduleData.returnConfig.customReturnContribution')) {
+            $returnShipment['options']['contribution'] = array(
+                'amount'   => (int) ($request->get('moduleData.returnConfig.returnContribution') * 100),
+                'currency' => 'EUR',
+            );
+        }
+        $response = $curl->post('https://api.myparcel.nl/shipments', mypa_json_encode(array(
+            'data' => array(
+                'return_shipments' => array($returnShipment),
+            ),
+        )));
         header('Content-Type: application/json;charset=utf-8');
         if ($response && isset($response['data'])) {
-            die(json_encode(
+            Db::getInstance()->update(
+                bqSQL(MyParcelOrder::$definition['table']),
+                array(
+                    'retour' => true,
+                ),
+                '`id_shipment` = '.(int) $parent
+            );
+            die(mypa_json_encode(
                 array(
                     'success' => true,
-                ),
-                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-            ));
+            )));
         }
 
-        die(json_encode(array(
+        die(mypa_json_encode(array(
             'success' => false,
-        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-    }
-
-    /**
-     * @return false|string
-     *
-     * @since 2.0.0
-     * @throws PrestaShopException
-     */
-    protected function createUnrelatedReturnLabel()
-    {
-        // @codingStandardsIgnoreStart -- no API connection without base64
-        $ch = curl_init('https://api.myparcel.nl/shipments');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/vnd.return_shipment+json;charset=utf-8',
-            'Authorization: basic '.base64_encode(Configuration::get(static::API_KEY)),
-            trim(static::getUserAgent()),
-        ));
-        // @codingStandardsIgnoreEnd
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $response = json_decode($response, true);
-        if ($response && isset($response['data']['download_url']['link'])) {
-            die(json_encode(
-                array(
-                    'success' => true,
-                    'data'    => array(
-                        'url' => $response['data']['download_url']['link'],
-                    ),
-                ),
-                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-            ));
-        }
-
-        return die(json_encode(array(
-             'success' => false,
         )));
     }
 
@@ -1605,28 +1634,59 @@ class MyParcel extends Module
      * @throws PrestaShopException
      * @since 1.0.0
      */
-    protected function saveConcept()
+    public function ajaxProcessSaveConcept()
     {
         // @codingStandardsIgnoreStart
-        $data = json_decode(file_get_contents('php://input'));
+        $data = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
 
         header('Content-Type: application/json');
-        if (isset($data->data->concept)) {
+        if (isset($data['data']['concept'])) {
             die(
-                json_encode(
+                mypa_json_encode(
                     array(
                         'success' => (bool) MyParcelDeliveryOption::saveConcept(
-                            (int) $data->data->idOrder,
-                            json_encode($data->data->concept, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                            (int) $data['data']['idOrder'],
+                            mypa_json_encode($data['data']['concept'])
                         ),
-                    ),
-                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                    )
                 )
             );
         }
 
-        die(json_encode(array(
+        die(mypa_json_encode(array(
+            'success' => false,
+        )));
+    }
+
+    /**
+     * Save concept
+     *
+     * @return void
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @since 1.0.0
+     */
+    public function ajaxProcessSaveConceptData()
+    {
+        // @codingStandardsIgnoreStart
+        $data = @json_decode(file_get_contents('php://input'), true);
+        // @codingStandardsIgnoreEnd
+
+        header('Content-Type: application/json');
+        if (!empty($data['idOrder']) && !empty($data['data'])) {
+            die(mypa_json_encode(
+                array(
+                    'success' => (bool) MyParcelDeliveryOption::saveConceptData(
+                        (int) $data['idOrder'],
+                        mypa_json_encode($data['data'])
+                    ),
+                )
+            ));
+        }
+
+        die(mypa_json_encode(array(
             'success' => false,
         )));
     }
@@ -1644,24 +1704,21 @@ class MyParcel extends Module
             'main'            => array(
                 'short'  => $this->l('Settings'),
                 'desc'   => $this->l('Module settings'),
-                'href'   => $this->baseUrl.'&menu='.static::MENU_MAIN_SETTINGS.'&token='
-                    .Tools::getAdminTokenLite('AdminModules'),
+                'href'   => $this->baseUrl.'&menu='.static::MENU_MAIN_SETTINGS,
                 'active' => false,
                 'icon'   => 'icon-gears',
             ),
             'defaultsettings' => array(
                 'short'  => $this->l('Shipping settings'),
                 'desc'   => $this->l('Default shipping settings'),
-                'href'   => $this->baseUrl.'&menu='.static::MENU_DEFAULT_SETTINGS.'&token='
-                    .Tools::getAdminTokenLite('AdminModules'),
+                'href'   => $this->baseUrl.'&menu='.static::MENU_DEFAULT_SETTINGS,
                 'active' => false,
                 'icon'   => 'icon-truck',
             ),
             'deliveryoptions' => array(
                 'short'  => $this->l('Delivery options'),
                 'desc'   => $this->l('Available delivery options'),
-                'href'   => $this->baseUrl.'&menu='.static::MENU_DEFAULT_DELIVERY_OPTIONS.'&token='
-                    .Tools::getAdminTokenLite('AdminModules'),
+                'href'   => $this->baseUrl.'&menu='.static::MENU_DEFAULT_DELIVERY_OPTIONS,
                 'active' => false,
                 'icon'   => 'icon-truck',
             ),
@@ -1694,9 +1751,14 @@ class MyParcel extends Module
      * @throws PrestaShopException
      * @since 2.0.0
      * @throws Adapter_Exception
+     * @throws ErrorException
      */
     protected function postProcess()
     {
+        if (Tools::isSubmit('tour_step')) {
+            $this->postProcessTour();
+        }
+        
         switch (Tools::getValue('menu')) {
             case static::MENU_DEFAULT_SETTINGS:
                 $this->postProcessDefaultSettingsPage();
@@ -1707,6 +1769,66 @@ class MyParcel extends Module
             default:
                 $this->postProcessMainSettingsPage();
                 break;
+        }
+    }
+
+    /**
+     * @return void
+     *
+     * @throws PrestaShopException
+     * @throws Adapter_Exception
+     */
+    protected function postProcessTour()
+    {
+        $tourStep = (int) Tools::getValue('tour_step');
+
+        Configuration::updateValue(static::TOUR_CURRENT_STEP, (int) Tools::getValue('tour_step'), false, 0, 0);
+
+        if (Tools::isSubmit('tour_redirect')) {
+            switch ($tourStep) {
+                case static::TOUR_STEP_MAIN:
+                case static::TOUR_STEP_DESIGN:
+                case static::TOUR_STEP_LABELS_NOTIFICATIONS:
+                    Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true)
+                        .'&'
+                        .http_build_query(
+                            array(
+                                'configure'   => $this->name,
+                                'module_name' => $this->name,
+                                'tour_step'   => $tourStep,
+                                'menu'        => static::MENU_MAIN_SETTINGS,
+                            )
+                        ));
+                    break;
+                case static::TOUR_STEP_DELIVERY_OPTIONS:
+                    Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true)
+                        .'&'
+                        .http_build_query(
+                            array(
+                                'configure'                                                   => $this->name,
+                                'module_name'                                                 => $this->name,
+                                'tour_step'                                                   => $tourStep,
+                                'menu'                                                        => static::MENU_DEFAULT_DELIVERY_OPTIONS,
+                                MyParcelCarrierDeliverySetting::$definition['primary']        => MyParcelCarrierDeliverySetting::getByCarrierReference(Configuration::get(static::POSTNL_DEFAULT_CARRIER))->id,
+                                'update'.MyParcelCarrierDeliverySetting::$definition['table'] => '',
+                            )
+                        ));
+                    break;
+                case static::TOUR_STEP_CARRIER_CONFIG:
+                    Tools::redirectAdmin($this->context->link->getAdminLink('AdminCarrierWizard', true)
+                        .'&'
+                        .http_build_query(
+                            array(
+                                'id_carrier' => Carrier::getCarrierByReference(Configuration::get(static::POSTNL_DEFAULT_CARRIER))->id,
+                            )
+                        ));
+                    break;
+                case static::TOUR_STEP_START_SHIPPING:
+                    Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrders', true));
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -1726,6 +1848,7 @@ class MyParcel extends Module
             if (Tools::isSubmit($key)) {
                 $submitted = true;
                 switch ($key) {
+                    case static::DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT:
                     case static::DEFAULT_CONCEPT_INSURED_AMOUNT:
                         $value = (int) Tools::getValue($key);
                         if ($value < 500) {
@@ -1756,28 +1879,28 @@ class MyParcel extends Module
     protected function getDefaultSettingsFormValues()
     {
         return array(
-            static::LINK_EMAIL                                =>
-                Configuration::get(static::LINK_EMAIL),
-            static::LINK_PHONE                                =>
-                Configuration::get(static::LINK_PHONE),
-            static::USE_PICKUP_ADDRESS                        =>
-                Configuration::get(static::USE_PICKUP_ADDRESS),
-            static::DEFAULT_CONCEPT_PARCEL_TYPE               =>
-                Configuration::get(static::DEFAULT_CONCEPT_PARCEL_TYPE),
-            static::DEFAULT_CONCEPT_LARGE_PACKAGE             =>
-                Configuration::get(static::DEFAULT_CONCEPT_LARGE_PACKAGE),
-            static::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY        =>
-                Configuration::get(static::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
-            static::DEFAULT_CONCEPT_SIGNED                    =>
-                Configuration::get(static::DEFAULT_CONCEPT_SIGNED),
-            static::DEFAULT_CONCEPT_RETURN                    =>
-                Configuration::get(static::DEFAULT_CONCEPT_RETURN),
-            static::DEFAULT_CONCEPT_INSURED                   =>
-                Configuration::get(static::DEFAULT_CONCEPT_INSURED),
-            static::DEFAULT_CONCEPT_INSURED_TYPE              =>
-                Configuration::get(static::DEFAULT_CONCEPT_INSURED_TYPE),
-            static::DEFAULT_CONCEPT_INSURED_AMOUNT            =>
-                (int) Configuration::get(static::DEFAULT_CONCEPT_INSURED_AMOUNT) / 100,
+            static::LINK_EMAIL         => Configuration::get(static::LINK_EMAIL),
+            static::LINK_PHONE         => Configuration::get(static::LINK_PHONE),
+            static::USE_PICKUP_ADDRESS => Configuration::get(static::USE_PICKUP_ADDRESS),
+
+            static::DEFAULT_CONCEPT_PARCEL_TYPE        => Configuration::get(static::DEFAULT_CONCEPT_PARCEL_TYPE),
+            static::DEFAULT_CONCEPT_LARGE_PACKAGE      => Configuration::get(static::DEFAULT_CONCEPT_LARGE_PACKAGE),
+            static::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY => Configuration::get(static::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
+            static::DEFAULT_CONCEPT_SIGNED             => Configuration::get(static::DEFAULT_CONCEPT_SIGNED),
+            static::DEFAULT_CONCEPT_RETURN             => Configuration::get(static::DEFAULT_CONCEPT_RETURN),
+            static::DEFAULT_CONCEPT_INSURED            => Configuration::get(static::DEFAULT_CONCEPT_INSURED),
+            static::DEFAULT_CONCEPT_INSURED_TYPE       => Configuration::get(static::DEFAULT_CONCEPT_INSURED_TYPE),
+            static::DEFAULT_CONCEPT_INSURED_AMOUNT     => (int) Configuration::get(static::DEFAULT_CONCEPT_INSURED_AMOUNT) / 100,
+
+            static::ASK_RETURN_SELECTION                      => Configuration::get(static::ASK_RETURN_SELECTION),
+            static::DEFAULT_RETURN_CONCEPT_LARGE_PACKAGE      => Configuration::get(static::DEFAULT_RETURN_CONCEPT_LARGE_PACKAGE),
+            static::DEFAULT_RETURN_CONCEPT_HOME_DELIVERY_ONLY => Configuration::get(static::DEFAULT_RETURN_CONCEPT_HOME_DELIVERY_ONLY),
+            static::DEFAULT_RETURN_CONCEPT_SIGNED             => Configuration::get(static::DEFAULT_RETURN_CONCEPT_SIGNED),
+            static::DEFAULT_RETURN_CONCEPT_RETURN             => Configuration::get(static::DEFAULT_RETURN_CONCEPT_RETURN),
+            static::DEFAULT_RETURN_CONCEPT_INSURED            => Configuration::get(static::DEFAULT_RETURN_CONCEPT_INSURED),
+            static::DEFAULT_RETURN_CONCEPT_INSURED_TYPE       => Configuration::get(static::DEFAULT_RETURN_CONCEPT_INSURED_TYPE),
+            static::DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT     => (int) Configuration::get(static::DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT) / 100,
+            static::MONDAY_DELIVERY_SUPPORTED                 => (bool) Configuration::get(static::MONDAY_DELIVERY_SUPPORTED),
         );
     }
 
@@ -1860,10 +1983,32 @@ class MyParcel extends Module
                 MyParcelCarrierDeliverySetting::$definition['primary']
             )
         );
-        if (!Validate::isLoadedObject($mss)) {
+        /** @var Carrier $carrier */
+        $carrier = Carrier::getCarrierByReference($mss->id_reference);
+        // PrestaShop does not load a full Carrier object by default
+        $carrier = new Carrier($carrier->id);
+        if (!Validate::isLoadedObject($mss) || !Validate::isLoadedObject($carrier)) {
             $this->addError($this->l('Could not process delivery setting'));
 
             return;
+        }
+        if (array_sum(array(
+            Tools::getValue(MyParcelCarrierDeliverySetting::DELIVERY),
+            Tools::getValue(MyParcelCarrierDeliverySetting::PICKUP),
+            Tools::getValue(MyParcelCarrierDeliverySetting::MAILBOX_PACKAGE)
+        ))) {
+            $carrier->external_module_name = $this->name;
+            $carrier->shipping_external = true;
+            $carrier->is_module = true;
+        } else {
+            $carrier->external_module_name = '';
+            $carrier->shipping_external = false;
+            $carrier->is_module = false;
+        }
+        try {
+            $carrier->save();
+        } catch (PrestaShopException $e) {
+            Logger::addLog("MyParcel module error, unable to prepare carrier {$carrier->id}: {$e->getMessage()}}", 3);
         }
 
         $mss->{MyParcelCarrierDeliverySetting::DELIVERY} =
@@ -1948,17 +2093,17 @@ class MyParcel extends Module
         }
 
         $mss->{MyParcelCarrierDeliverySetting::MORNING_FEE} =
-            (float) Tools::getValue(MyParcelCarrierDeliverySetting::MORNING_FEE);
+            (float) str_replace(',', '.', Tools::getValue(MyParcelCarrierDeliverySetting::MORNING_FEE));
         $mss->{MyParcelCarrierDeliverySetting::MORNING_PICKUP_FEE} =
-            (float) Tools::getValue(MyParcelCarrierDeliverySetting::MORNING_PICKUP_FEE);
+            (float) str_replace(',', '.', Tools::getValue(MyParcelCarrierDeliverySetting::MORNING_PICKUP_FEE));
         $mss->{MyParcelCarrierDeliverySetting::EVENING_FEE} =
-            (float) Tools::getValue(MyParcelCarrierDeliverySetting::EVENING_FEE);
+            (float) str_replace(',', '.', Tools::getValue(MyParcelCarrierDeliverySetting::EVENING_FEE));
         $mss->{MyParcelCarrierDeliverySetting::SIGNED_FEE} =
-            (float) Tools::getValue(MyParcelCarrierDeliverySetting::SIGNED_FEE);
+            (float) str_replace(',', '.', Tools::getValue(MyParcelCarrierDeliverySetting::SIGNED_FEE));
         $mss->{MyParcelCarrierDeliverySetting::RECIPIENT_ONLY_FEE} =
-            (float) Tools::getValue(MyParcelCarrierDeliverySetting::RECIPIENT_ONLY_FEE);
+            (float) str_replace(',', '.', Tools::getValue(MyParcelCarrierDeliverySetting::RECIPIENT_ONLY_FEE));
         $mss->{MyParcelCarrierDeliverySetting::SIGNED_RECIPIENT_ONLY_FEE} =
-            (float) Tools::getValue(MyParcelCarrierDeliverySetting::SIGNED_RECIPIENT_ONLY_FEE);
+            (float) str_replace(',', '.', Tools::getValue(MyParcelCarrierDeliverySetting::SIGNED_RECIPIENT_ONLY_FEE));
 
         static::processCarrierDeliverySettingsRestrictions($mss);
         $mss->save();
@@ -2000,9 +2145,11 @@ class MyParcel extends Module
      *
      * @return void
      *
+     * @since 2.0.0
+     *
+     * @throws ErrorException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @since 2.0.0
      */
     protected function postProcessMainSettingsPage()
     {
@@ -2026,6 +2173,7 @@ class MyParcel extends Module
                 }
 
                 Configuration::updateValue(static::API_KEY, $apiKey);
+                \MyParcelModule\MyParcelHttpClient::getInstance()->setHeader('Authorization', 'basic '.base64_encode($apiKey));
             }
 
             if ($validUser && $validApi) {
@@ -2034,29 +2182,63 @@ class MyParcel extends Module
 
             Configuration::updateValue(static::CHECKOUT_FG_COLOR1, Tools::getValue(static::CHECKOUT_FG_COLOR1));
             Configuration::updateValue(static::CHECKOUT_FG_COLOR2, Tools::getValue(static::CHECKOUT_FG_COLOR2));
+            Configuration::updateValue(static::CHECKOUT_FG_COLOR3, Tools::getValue(static::CHECKOUT_FG_COLOR3));
             Configuration::updateValue(static::CHECKOUT_BG_COLOR1, Tools::getValue(static::CHECKOUT_BG_COLOR1));
             Configuration::updateValue(static::CHECKOUT_BG_COLOR2, Tools::getValue(static::CHECKOUT_BG_COLOR2));
             Configuration::updateValue(static::CHECKOUT_BG_COLOR3, Tools::getValue(static::CHECKOUT_BG_COLOR3));
             Configuration::updateValue(static::CHECKOUT_HL_COLOR, Tools::getValue(static::CHECKOUT_HL_COLOR));
+            Configuration::updateValue(static::CHECKOUT_INACTIVE_COLOR, Tools::getValue(static::CHECKOUT_INACTIVE_COLOR));
             Configuration::updateValue(static::CHECKOUT_FONT, Tools::getValue(static::CHECKOUT_FONT));
             Configuration::updateValue(
                 static::CHECKOUT_FONT_SIZE,
-                (int) Tools::getValue(static::CHECKOUT_FONT_SIZE)
-                    ? (int) Tools::getValue(static::CHECKOUT_FONT_SIZE)
-                    : 14
-            );
-            Configuration::updateValue(
-                static::UPDATE_ORDER_STATUSES,
-                (bool) Tools::getValue(static::UPDATE_ORDER_STATUSES)
+                (int) Tools::getValue(static::CHECKOUT_FONT_SIZE) ?: 14
             );
             Configuration::updateValue(static::LOG_API, (bool) Tools::getValue(static::LOG_API));
+            Configuration::updateValue(static::DEV_MODE_ASYNC, (bool) Tools::getValue(static::DEV_MODE_ASYNC));
             Configuration::updateValue(static::PRINTED_STATUS, (int) Tools::getValue(static::PRINTED_STATUS));
             Configuration::updateValue(static::SHIPPED_STATUS, (int) Tools::getValue(static::SHIPPED_STATUS));
             Configuration::updateValue(static::RECEIVED_STATUS, (int) Tools::getValue(static::RECEIVED_STATUS));
+            Configuration::updateValue(static::IGNORE_ORDER_STATUSES, mypa_json_encode($this->getStatusesValue(static::IGNORE_ORDER_STATUSES)));
             Configuration::updateValue(static::NOTIFICATIONS, (bool) Tools::getValue(static::NOTIFICATIONS));
             Configuration::updateValue(static::NOTIFICATION_MOMENT, Tools::getValue(static::NOTIFICATION_MOMENT) ? 1 : 0);
             Configuration::updateValue(static::LABEL_DESCRIPTION, Tools::getValue(static::LABEL_DESCRIPTION));
             Configuration::updateValue(static::PAPER_SELECTION, Tools::getValue(static::PAPER_SELECTION));
+            Configuration::updateValue(static::ASK_PAPER_SELECTION, Tools::getValue(static::ASK_PAPER_SELECTION));
+
+            if (Tools::isSubmit(static::DEV_MODE_SET_VERSION)) {
+                $version = Tools::getValue(static::DEV_MODE_SET_VERSION);
+                if ($version) {
+                    // Reset the module version in the database
+                    Db::getInstance()->update(
+                        'module',
+                        array(
+                            'version' => pSQL($version),
+                        ),
+                        '`name` = \''.pSQL($this->name).'\''
+                    );
+
+                    // Invalidate OPCache if necessary
+                    if (function_exists('opcache_invalidate')) {
+                        opcache_invalidate(_PS_MODULE_DIR_."{$this->name}/{$this->name}.php");
+                    }
+
+                    // Remove config xml files
+                    foreach(scandir(_PS_MODULE_DIR_."{$this->name}/") as $file) {
+                        if (preg_match('/^config([_a-zA-Z]{3})?\.xml$/', $file)) {
+                            @unlink(_PS_MODULE_DIR_."{$this->name}/{$file}");
+                        }
+                    }
+
+                    $this->context->controller->confirmations[] =
+                        sprintf($this->l('Module %s successfully downgraded/upgraded to %s'), $this->name, $version);
+                }
+            }
+
+            if (Tools::isSubmit(static::DEV_MODE_RESET_TOUR)) {
+                if (Tools::getValue(static::DEV_MODE_RESET_TOUR)) {
+                    Configuration::updateValue(static::TOUR_CURRENT_STEP, 0, false, 0, 0);
+                }
+            }
         }
     }
 
@@ -2096,6 +2278,7 @@ class MyParcel extends Module
 
         $forms = array(
             $this->getDefaultConceptsForm(),
+            $this->getDefaultReturnConceptsForm(),
             $this->getDefaultSettingsForm(),
         );
 
@@ -2118,7 +2301,7 @@ class MyParcel extends Module
             'form' => array(
                 'legend'      => array(
                     'title' => $this->l('Default concept'),
-                    'icon'  => 'icon-files-o',
+                    'icon'  => 'icon-pencil-square',
                 ),
                 'description' => $this->l('These are the default concept settings'),
                 'input'       => array(
@@ -2134,7 +2317,7 @@ class MyParcel extends Module
                                 ),
                                 array(
                                     'id'   => static::TYPE_MAILBOX_PACKAGE,
-                                    'name' => $this->l('Brievenbuspakje'),
+                                    'name' => $this->l('Mailbox package'),
                                 ),
                                 array(
                                     'id'   => static::TYPE_UNSTAMPED,
@@ -2269,7 +2452,29 @@ class MyParcel extends Module
                         'size'     => 10,
                         'prefix'   => $currency->sign,
                         'class'    => 'fixed-width-sm',
-                        'currency' => (version_compare(_PS_VERSION_, '1.6', '<')) ? false : true,
+                        'currency' => version_compare(_PS_VERSION_, '1.6', '>='),
+                    ),
+                    array(
+                        'type'     => 'br',
+                        'name'     => '',
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Monday delivery'),
+                        'name'    => static::MONDAY_DELIVERY_SUPPORTED,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
                     ),
                 ),
                 'submit'      => array(
@@ -2285,6 +2490,184 @@ class MyParcel extends Module
      * @return array
      *
      * @since 2.0.0
+     * @throws PrestaShopException
+     */
+    protected function getDefaultReturnConceptsForm()
+    {
+        $currency = Currency::getDefaultCurrency();
+
+        return array(
+            'form' => array(
+                'legend'      => array(
+                    'title' => $this->l('Default return concept'),
+                    'icon'  => 'icon-pencil-square',
+                ),
+                'description' => $this->l('These are the default return concept settings'),
+                'input'  => array(
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Always prompt for the return settings'),
+                        'name'    => static::ASK_RETURN_SELECTION,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type' => 'br',
+                        'name' => '',
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Extra large parcel'),
+                        'name'    => static::DEFAULT_RETURN_CONCEPT_LARGE_PACKAGE,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Home delivery only'),
+                        'name'    => static::DEFAULT_RETURN_CONCEPT_HOME_DELIVERY_ONLY,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Signature'),
+                        'name'    => static::DEFAULT_RETURN_CONCEPT_SIGNED,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Return when not home'),
+                        'name'    => static::DEFAULT_RETURN_CONCEPT_RETURN,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->l('Insured'),
+                        'name'    => static::DEFAULT_RETURN_CONCEPT_INSURED,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'select',
+                        'label'   => $this->l('Amount'),
+                        'name'    => static::DEFAULT_RETURN_CONCEPT_INSURED_TYPE,
+                        'options' => array(
+                            'query' => array(
+                                array(
+                                    'id'   => static::INSURED_TYPE_50,
+                                    'name' => $this->l('€50'),
+                                ),
+                                array(
+                                    'id'   => static::INSURED_TYPE_250,
+                                    'name' => $this->l('€250'),
+                                ),
+                                array(
+                                    'id'   => static::INSURED_TYPE_500,
+                                    'name' => $this->l('€500'),
+                                ),
+                                array(
+                                    'id'   => static::INSURED_TYPE_500_PLUS,
+                                    'name' => $this->l('More than €500'),
+                                ),
+                            ),
+                            'id'    => 'id',
+                            'name'  => 'name',
+                        ),
+                    ),
+                    array(
+                        'type'     => 'text',
+                        'label'    => $this->l('Custom value (more than €500)'),
+                        'name'     => static::DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT,
+                        'size'     => 10,
+                        'prefix'   => $currency->sign,
+                        'class'    => 'fixed-width-sm',
+                        'currency' => version_compare(_PS_VERSION_, '1.6', '>='),
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Create the structure of the config form
+     *
+     * @return array
+     *
+     * @throws PrestaShopException
+     * @throws SmartyException
+     * @since 2.0.0
      */
     protected function getDefaultSettingsForm()
     {
@@ -2292,12 +2675,14 @@ class MyParcel extends Module
             'form' => array(
                 'legend' => array(
                     'title' => $this->l('Data'),
-                    'icon'  => 'icon-filter',
+                    'icon'  => 'icon-shield',
                 ),
                 'input'  => array(
                     array(
                         'type'    => 'switch',
-                        'label'   => $this->l('Share customer\'s email address with MyParcel'),
+                        'label'   => $this->display(__FILE__, 'views/templates/admin/gdpr/badge-email.tpl')
+                            .' '
+                            .$this->l('Share customer\'s email address with MyParcel'),
                         'desc'    =>
                             $this->l('Sharing the customer\'s email address with MyParcel makes sure that')
                             .' '
@@ -2321,7 +2706,9 @@ class MyParcel extends Module
                     ),
                     array(
                         'type'    => 'switch',
-                        'label'   => $this->l('Share customer\'s phone number with MyParcel'),
+                        'label'   => $this->display(__FILE__, 'views/templates/admin/gdpr/badge-phone.tpl')
+                            .' '
+                            .$this->l('Share customer\'s phone number with MyParcel'),
                         'desc'    =>
                             $this->l('When sharing the customer\'s phone number with MyParcel the')
                             .' '
@@ -2505,7 +2892,7 @@ class MyParcel extends Module
     {
         $samedayDeliveryOption = new MyParcelCarrierDeliverySetting($idMyParcelDeliveryOption);
         if (Validate::isLoadedObject($samedayDeliveryOption)) {
-            $exceptions = json_decode($samedayDeliveryOption->cutoff_exceptions, true);
+            $exceptions = @json_decode($samedayDeliveryOption->cutoff_exceptions, true);
             if (is_array($exceptions)) {
                 $exceptionDates = array_keys($exceptions);
                 for ($i = 0; $i < count($exceptionDates); $i++) {
@@ -2517,7 +2904,7 @@ class MyParcel extends Module
                 if (empty($exceptions)) {
                     $samedayDeliveryOption->cutoff_exceptions = '{}';
                 } else {
-                    $samedayDeliveryOption->cutoff_exceptions = json_encode($exceptions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                    $samedayDeliveryOption->cutoff_exceptions = mypa_json_encode($exceptions);
                 }
             }
 
@@ -2546,7 +2933,7 @@ class MyParcel extends Module
 
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'submit'.MyParcelCarrierDeliverySetting::$definition['primary'];
-        $helper->currentIndex = $this->baseUrl.'&menu='.static::MENU_DEFAULT_DELIVERY_OPTIONS;
+        $helper->currentIndex = $this->baseUrlWithoutToken.'&menu='.static::MENU_DEFAULT_DELIVERY_OPTIONS;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
         $helper->tpl_vars = array(
@@ -2575,6 +2962,13 @@ class MyParcel extends Module
     {
         $mcds = new MyParcelCarrierDeliverySetting($idMyParcelCarrierDeliverySetting);
         $mcds->{MyParcelCarrierDeliverySetting::$definition['primary']} = $mcds->id;
+
+        $mcds->{MyParcelCarrierDeliverySetting::MORNING_FEE} = str_replace('.', ',', $mcds->{MyParcelCarrierDeliverySetting::MORNING_FEE});
+        $mcds->{MyParcelCarrierDeliverySetting::EVENING_FEE} = str_replace('.', ',', $mcds->{MyParcelCarrierDeliverySetting::EVENING_FEE});
+        $mcds->{MyParcelCarrierDeliverySetting::MORNING_PICKUP_FEE} = str_replace('.', ',', $mcds->{MyParcelCarrierDeliverySetting::MORNING_PICKUP_FEE});
+        $mcds->{MyParcelCarrierDeliverySetting::RECIPIENT_ONLY_FEE} = str_replace('.', ',', $mcds->{MyParcelCarrierDeliverySetting::RECIPIENT_ONLY_FEE});
+        $mcds->{MyParcelCarrierDeliverySetting::SIGNED_FEE} = str_replace('.', ',', $mcds->{MyParcelCarrierDeliverySetting::SIGNED_FEE});
+        $mcds->{MyParcelCarrierDeliverySetting::SIGNED_RECIPIENT_ONLY_FEE} = str_replace('.', ',', $mcds->{MyParcelCarrierDeliverySetting::SIGNED_RECIPIENT_ONLY_FEE});
 
         return (array) $mcds;
     }
@@ -2618,11 +3012,15 @@ class MyParcel extends Module
         }
 
         $currency = Currency::getDefaultCurrency();
+        $carrier = Carrier::getCarrierByReference(MyParcelCarrierDeliverySetting::getCarrierReferenceById(Tools::getValue(MyParcelCarrierDeliverySetting::$definition['primary'])));
+        if (!Validate::isLoadedObject($carrier)) {
+            return array('form' => array());
+        }
 
         return array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('Delivery options'),
+                    'title' => $this->l('Delivery options')." <div class=\"badge badge-info\">{$carrier->name}</div>",
                     'icon'  => 'icon-truck',
                 ),
                 'input'  => array(
@@ -2857,9 +3255,19 @@ class MyParcel extends Module
                         'required' => true,
                     ),
                 ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
+                'buttons' => array(
+                    'back'   => array(
+                        'title' => $this->l('Back'),
+                        'href'  => "{$this->baseUrl}&menu=".static::MENU_DEFAULT_DELIVERY_OPTIONS,
+                        'icon'  => 'process-icon-back',
+                    ),
+                    'submit' => array(
+                        'title' => $this->l('Save'),
+                        'class' => 'btn btn-default  pull-right',
+                        'type'  => 'submit',
+                        'icon'  => 'process-icon-save',
+                    ),
+                )
             ),
         );
     }
@@ -3105,9 +3513,13 @@ class MyParcel extends Module
     {
         $fieldsList = array(
             bqSQL(MyParcelCarrierDeliverySetting::$definition['primary']) => array('title' => $this->l('ID')),
-            'name'                                                        => array('title' => $this->l('Name')),
+            'name'                                                        => array(
+                'title'           => $this->l('Name'),
+                'callback_object' => 'MyParcelTools',
+                'callback'        => 'printCarrierName',
+            ),
             MyParcelCarrierDeliverySetting::MAILBOX_PACKAGE               => array(
-                'title'  => $this->l('Brievenbuspakje'),
+                'title'  => $this->l('Mailbox package'),
                 'type'   => 'bool',
                 'active' => MyParcelCarrierDeliverySetting::MAILBOX_PACKAGE,
                 'ajax'   => false,
@@ -3147,10 +3559,10 @@ class MyParcel extends Module
         $helper->show_toolbar = false;
         $helper->module = $this;
         $helper->identifier = bqSQL(MyParcelCarrierDeliverySetting::$definition['primary']);
-        $helper->title = $this->l('Cutoff times');
+        $helper->title = "<i class='icon icon-truck'></i> {$this->l('Delivery options')}";
         $helper->table = MyParcelCarrierDeliverySetting::$definition['table'];
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = $this->baseUrl.'&menu='.static::MENU_DEFAULT_DELIVERY_OPTIONS;
+        $helper->currentIndex = $this->baseUrlWithoutToken.'&menu='.static::MENU_DEFAULT_DELIVERY_OPTIONS;
         $helper->colorOnBackground = true;
         $helper->no_link = true;
         $list = $this->getDeliveryOptionsList($helper);
@@ -3192,7 +3604,7 @@ class MyParcel extends Module
         $skipList = array();
 
         foreach ($list as &$samedaySetting) {
-            $cutoffExceptions = json_decode(
+            $cutoffExceptions = @json_decode(
                 $samedaySetting[MyParcelCarrierDeliverySetting::CUTOFF_EXCEPTIONS],
                 true
             );
@@ -3239,7 +3651,7 @@ class MyParcel extends Module
             }
 
             $samedaySetting['cutoff_times'] = $cutoffTimes;
-            if ($samedaySetting['external_module_name'] && $samedaySetting['external_module_name'] != $this->name) {
+            if ($samedaySetting['external_module_name'] && $samedaySetting['external_module_name'] !== $this->name) {
                 $samedaySetting['color'] = '#E08F95';
                 $samedaySetting[MyParcelCarrierDeliverySetting::PICKUP] = null;
                 $samedaySetting[MyParcelCarrierDeliverySetting::DELIVERY] = null;
@@ -3319,8 +3731,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/checkout-e158425a37f486d2.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/app/dist/paperselector-e158425a37f486d2.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/checkout-378e4d1cf8ab3806.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/paperselector-378e4d1cf8ab3806.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -3341,26 +3753,37 @@ class MyParcel extends Module
      */
     protected function getMainFormValues()
     {
-        return array(
-            static::API_KEY               => Configuration::get(static::API_KEY),
-            static::CHECKOUT_FG_COLOR1    => Configuration::get(static::CHECKOUT_FG_COLOR1) ?: '#FFFFFF',
-            static::CHECKOUT_FG_COLOR2    => Configuration::get(static::CHECKOUT_FG_COLOR2 ?: '#000000'),
-            static::CHECKOUT_BG_COLOR1    => Configuration::get(static::CHECKOUT_BG_COLOR1 ?: '#FBFBFB'),
-            static::CHECKOUT_BG_COLOR2    => Configuration::get(static::CHECKOUT_BG_COLOR2) ?: '#01BBC5',
-            static::CHECKOUT_BG_COLOR3    => Configuration::get(static::CHECKOUT_BG_COLOR3) ?: '#75D3D8',
-            static::CHECKOUT_HL_COLOR     => Configuration::get(static::CHECKOUT_HL_COLOR) ?: '#FF8C00',
-            static::CHECKOUT_FONT         => Configuration::get(static::CHECKOUT_FONT) ?: 'Exo',
-            static::CHECKOUT_FONT_SIZE    => Configuration::get(static::CHECKOUT_FONT_SIZE) ?: 2,
-            static::UPDATE_ORDER_STATUSES => Configuration::get(static::UPDATE_ORDER_STATUSES),
-            static::LOG_API               => Configuration::get(static::LOG_API),
-            static::PRINTED_STATUS        => Configuration::get(static::PRINTED_STATUS),
-            static::SHIPPED_STATUS        => Configuration::get(static::SHIPPED_STATUS),
-            static::RECEIVED_STATUS       => Configuration::get(static::RECEIVED_STATUS),
-            static::NOTIFICATIONS         => Configuration::get(static::NOTIFICATIONS),
-            static::NOTIFICATION_MOMENT   => Configuration::get(static::NOTIFICATION_MOMENT),
-            static::LABEL_DESCRIPTION     => Configuration::get(static::LABEL_DESCRIPTION),
-            static::PAPER_SELECTION       => Configuration::get(static::PAPER_SELECTION),
+        $values = array(
+            static::API_KEY                 => Configuration::get(static::API_KEY),
+            static::CHECKOUT_FG_COLOR1      => Configuration::get(static::CHECKOUT_FG_COLOR1) ?: '#FFFFFF',
+            static::CHECKOUT_FG_COLOR2      => Configuration::get(static::CHECKOUT_FG_COLOR2 ?: '#000000'),
+            static::CHECKOUT_FG_COLOR3      => Configuration::get(static::CHECKOUT_FG_COLOR3 ?: '#000000'),
+            static::CHECKOUT_BG_COLOR1      => Configuration::get(static::CHECKOUT_BG_COLOR1 ?: '#FBFBFB'),
+            static::CHECKOUT_BG_COLOR2      => Configuration::get(static::CHECKOUT_BG_COLOR2) ?: '#01BBC5',
+            static::CHECKOUT_BG_COLOR3      => Configuration::get(static::CHECKOUT_BG_COLOR3) ?: '#75D3D8',
+            static::CHECKOUT_HL_COLOR       => Configuration::get(static::CHECKOUT_HL_COLOR) ?: '#FF8C00',
+            static::CHECKOUT_INACTIVE_COLOR => Configuration::get(static::CHECKOUT_INACTIVE_COLOR) ?: '#848484',
+            static::CHECKOUT_FONT           => Configuration::get(static::CHECKOUT_FONT) ?: 'Exo',
+            static::CHECKOUT_FONT_SIZE      => Configuration::get(static::CHECKOUT_FONT_SIZE) ?: 2,
+            static::LOG_API                 => Configuration::get(static::LOG_API),
+            static::PRINTED_STATUS          => Configuration::get(static::PRINTED_STATUS),
+            static::SHIPPED_STATUS          => Configuration::get(static::SHIPPED_STATUS),
+            static::RECEIVED_STATUS         => Configuration::get(static::RECEIVED_STATUS),
+            static::NOTIFICATIONS           => Configuration::get(static::NOTIFICATIONS),
+            static::NOTIFICATION_MOMENT     => Configuration::get(static::NOTIFICATION_MOMENT),
+            static::LABEL_DESCRIPTION       => Configuration::get(static::LABEL_DESCRIPTION),
+            static::PAPER_SELECTION         => Configuration::get(static::PAPER_SELECTION),
+            static::ASK_PAPER_SELECTION     => Configuration::get(static::ASK_PAPER_SELECTION),
+            static::DEV_MODE_RESET_TOUR     => null,
+            static::DEV_MODE_SET_VERSION    => null,
+            static::DEV_MODE_ASYNC          => Configuration::get(static::DEV_MODE_ASYNC),
         );
+
+        foreach (static::getIgnoredStatuses() as $conf) {
+            $values[static::IGNORE_ORDER_STATUSES.'_'.(int) $conf] = true;
+        }
+
+        return $values;
     }
 
     /**
@@ -3373,17 +3796,19 @@ class MyParcel extends Module
         return array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('MyParcel API'),
-                    'icon'  => 'icon-server',
+                    'title' => '<img width="128" height="128" style="width: 16px; height: 16px" src="'.Media::getMediaPath($this->_path.'views/img/myparcelnl-grayscale.png').'"> '.$this->l('MyParcel API'),
+                ),
+                'description' => MyParcelTools::ppTags(
+                    $this->l('Please enter your API key. You can find this on the general settings page of the MyParcel [1]back office[/1].'),
+                    array('<a href="https://backoffice.myparcel.nl/settings" target="_blank" rel="noopener noreferrer">')
                 ),
                 'input'  => array(
                     array(
                         'type'      => 'text',
                         'label'     => $this->l('MyParcel API Key'),
                         'name'      => static::API_KEY,
-                        'size'      => 50,
-                        'maxlength' => 50,
                         'required'  => true,
+                        'prefix'    => '<i class="icon icon-key"></i>',
                     ),
                 ),
                 'cancel' => array(
@@ -3400,9 +3825,10 @@ class MyParcel extends Module
      * Get the notification form
      *
      * @return array Form
+     * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws Adapter_Exception
+     * @throws SmartyException
      */
     protected function getNotificationForm()
     {
@@ -3418,13 +3844,7 @@ class MyParcel extends Module
                 'name' => $this->l('Afgeleverd'),
             );
         }
-        $orderStatuses = array(
-            array(
-                'name'           => $this->l('Disable this status'),
-                'id_order_state' => '0',
-            ),
-        );
-        $orderStatuses = array_merge($orderStatuses, OrderState::getOrderStates($this->context->language->id));
+        $orderStatuses = OrderState::getOrderStates($this->context->language->id);
 
         for ($i = 0; $i < count($orderStatuses); $i++) {
             $orderStatuses[$i]['name'] = $orderStatuses[$i]['id_order_state'].' - '.$orderStatuses[$i]['name'];
@@ -3436,12 +3856,6 @@ class MyParcel extends Module
             'shippedStatusName'   => $shippedStatus->name,
             'deliveredStatusName' => $deliveredStatus->name,
         ));
-        try {
-            $orderStatusDescription = $this->display(__FILE__, 'views/templates/hook/orderstatusinfo.tpl');
-        } catch (Exception $e) {
-            $orderStatusDescription = '';
-            Logger::addLog("MyParcel module error: {$e->getMessage()}");
-        }
 
         return array(
             'form' => array(
@@ -3451,30 +3865,12 @@ class MyParcel extends Module
                 ),
                 'input'  => array(
                     array(
-                        'type'    => 'switch',
-                        'label'   => $this->l('Automate order statuses'),
-                        'desc'    => $orderStatusDescription,
-                        'name'    => static::UPDATE_ORDER_STATUSES,
-                        'is_bool' => true,
-                        'values'  => array(
-                            array(
-                                'id'    => 'active_on',
-                                'value' => true,
-                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
-                            ),
-                            array(
-                                'id'    => 'active_off',
-                                'value' => false,
-                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
-                            ),
-                        ),
-                    ),
-                    array(
                         'type'     => 'select',
                         'label'    => $this->l('Printed status'),
                         'desc'     => $this->l('Apply this status when the label has been printed'),
                         'name'     => static::PRINTED_STATUS,
                         'options'  => array(
+                            'default' => array('value' => '0', 'label' => "0 - {$this->l('Disable this status')}"),
                             'query'   => $orderStatuses,
                             'id'      => 'id_order_state',
                             'name'    => 'name',
@@ -3488,6 +3884,7 @@ class MyParcel extends Module
                         'desc'     => $this->l('Apply this status when the order has been received by PostNL'),
                         'name'     => static::SHIPPED_STATUS,
                         'options'  => array(
+                            'default' => array('value' => '0', 'label' => "0 - {$this->l('Disable this status')}"),
                             'query'   => $orderStatuses,
                             'id'      => 'id_order_state',
                             'name'    => 'name',
@@ -3501,6 +3898,7 @@ class MyParcel extends Module
                         'desc'     => $this->l('Apply this status when the order has been received by your customer'),
                         'name'     => static::RECEIVED_STATUS,
                         'options'  => array(
+                            'default' => array('value' => '0', 'label' => "0 - {$this->l('Disable this status')}"),
                             'query' => $orderStatuses,
                             'id'    => 'id_order_state',
                             'name'  => 'name',
@@ -3508,12 +3906,33 @@ class MyParcel extends Module
                         'class'    => 'fixed-width-xxl',
                     ),
                     array(
-                        'type'    => 'switch',
-                        'label'   => sprintf(
-                            $this->l('Send notification emails via %s'),
-                            defined('_TB_VERSION_') ? 'thirty bees' : 'PrestaShop'
+                        'type'     => 'checkbox',
+                        'label'    => $this->l('Ignored order statuses'),
+                        'desc'     => $this->l('Once an order hits one of the following statuses, the MyParcel module will stop updating the order for as long as it has the specific status. This can be useful for e.g. backorders.'),
+                        'name'     => static::IGNORE_ORDER_STATUSES,
+                        'multiple' => true,
+                        'values'   => array(
+                            'query' => $orderStatuses,
+                            'id'    => 'id_order_state',
+                            'name'  => 'name',
                         ),
+                        'expand'   => (count($orderStatuses) > 20) ? array(
+                            'print_total' => count($orderStatuses),
+                            'default'     => 'show',
+                            'show'        => array('text' => $this->l('Show'), 'icon' => 'plus-sign-alt'),
+                            'hide'        => array('text' => $this->l('Hide'), 'icon' => 'minus-sign-alt'),
+                        ) : null,
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'label'   => $this->display(__FILE__, 'views/templates/admin/gdpr/badge-notifications.tpl')
+                            .' '
+                            .sprintf(
+                                $this->l('Send notification emails via %s'),
+                                defined('_TB_VERSION_') ? 'thirty bees' : 'PrestaShop'
+                            ),
                         'name'    => static::NOTIFICATIONS,
+                        'desc'    => $this->display(__FILE__, 'views/templates/admin/notificationdesc.tpl'),
                         'is_bool' => true,
                         'values'  => array(
                             array(
@@ -3564,14 +3983,16 @@ class MyParcel extends Module
      * Get the checkout form
      *
      * @return array Form
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function getCheckoutForm()
     {
         return array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('Checkout'),
-                    'icon'  => 'icon-cogs',
+                    'title' => $this->l('Checkout design'),
+                    'icon'  => 'icon-paint-brush',
                 ),
                 'input'  => array(
                     array(
@@ -3586,6 +4007,14 @@ class MyParcel extends Module
                         'type'     => 'color',
                         'label'    => $this->l('Body text color'),
                         'name'     => static::CHECKOUT_FG_COLOR2,
+                        'lang'     => false,
+                        'data-hex' => true,
+                        'class'    => 'mColorPicker',
+                    ),
+                    array(
+                        'type'     => 'color',
+                        'label'    => $this->l('Title color'),
+                        'name'     => static::CHECKOUT_FG_COLOR3,
                         'lang'     => false,
                         'data-hex' => true,
                         'class'    => 'mColorPicker',
@@ -3623,8 +4052,16 @@ class MyParcel extends Module
                         'class'    => 'mColorPicker',
                     ),
                     array(
+                        'type'     => 'color',
+                        'label'    => $this->l('Inactive color'),
+                        'name'     => static::CHECKOUT_INACTIVE_COLOR,
+                        'lang'     => false,
+                        'data-hex' => true,
+                        'class'    => 'mColorPicker',
+                    ),
+                    array(
                         'type'  => 'fontselect',
-                        'label' => $this->l('Font family'),
+                        'label' => "{$this->display(__FILE__, 'views/templates/admin/gdpr/badge-fonts.tpl')} {$this->l('Font family')}",
                         'name'  => static::CHECKOUT_FONT,
                     ),
                     array(
@@ -3684,35 +4121,10 @@ class MyParcel extends Module
                         'name' => static::PAPER_SELECTION,
                         'type' => 'paperselector',
                     ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-    }
-
-    /**
-     * Get the advanced form
-     *
-     * @return array Form
-     */
-    protected function getAdvancedForm()
-    {
-        return array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('Advanced'),
-                    'icon'  => 'icon-cogs',
-                ),
-                'input'  => array(
                     array(
                         'type'    => 'switch',
-                        'label'   => $this->l('API logger'),
-                        'desc'    => $this->l('By enabling this option, API calls are being logged.')
-                            .' '
-                            .$this->l('They can be found on the page `Advanced Parameters > Logs`.'),
-                        'name'    => static::LOG_API,
+                        'label'   => $this->l('Always prompt for the paper size'),
+                        'name'    => static::ASK_PAPER_SELECTION,
                         'is_bool' => true,
                         'values'  => array(
                             array(
@@ -3736,6 +4148,108 @@ class MyParcel extends Module
     }
 
     /**
+     * Get the advanced form
+     *
+     * @return array Form
+     * @throws PrestaShopException
+     * @throws SmartyException
+     */
+    protected function getAdvancedForm()
+    {
+        return array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Advanced'),
+                    'icon'  => 'icon-cogs',
+                ),
+                'input'  => array(
+                    array(
+                        'type'    => 'switch',
+                        'label'   => "{$this->display(__FILE__, 'views/templates/admin/gdpr/badge-logging.tpl')} {$this->l('API logger')}",
+                        'desc'    => $this->l('By enabling this option, API calls are being logged.')
+                            .' '
+                            .sprintf($this->l('They can be found on the page `%s > %s`.'), MyParcelTools::getTabName('AdminTools'), MyParcelTools::getTabName('AdminLogs')),
+                        'name'    => static::LOG_API,
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'name'    => static::DEV_MODE_RESET_TOUR,
+                        'label'   => $this->l('Reset tour'),
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                        'hidden'   => true,
+                    ),
+                    array(
+                        'type'     => 'text',
+                        'label'    => $this->l('Force module version'),
+                        'name'     => static::DEV_MODE_SET_VERSION,
+                        'size'     => 50,
+                        'hidden'   => true,
+                        'class'    => 'myparcel-dev-always-hidden fixed-width-xxl',
+                    ),
+                    array(
+                        'type'    => 'switch',
+                        'name'    => static::DEV_MODE_ASYNC,
+                        'label'   => $this->l('Async mode (experimental)'),
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                        'hidden'   => true,
+                    ),
+                ),
+                'buttons' => array(
+                    'submit' => array(
+                        'title' => $this->l('Save'),
+                        'icon'  => 'process-icon-save',
+                        'class' => 'btn btn-default pull-right',
+                        'type'  => 'submit',
+                    ),
+                    'dev_mode' => array(
+                        'id'    => 'myparcel-dev-btn',
+                        'title' => 'Dev',
+                        'icon'  => 'process-icon-cogs',
+                        'class' => 'btn btn-default myparcel-dev-hidden',
+                    ),
+                )
+            ),
+        );
+    }
+
+    /**
      * Display before carrier
      *
      * @return string
@@ -3748,6 +4262,7 @@ class MyParcel extends Module
      */
     public function hookDisplayBeforeCarrier()
     {
+        /** @var array $smartyVars */
         $smartyVars = $this->context->smarty->getTemplateVars();
         if (!isset($smartyVars['widgetHook'])) {
             $this->context->smarty->assign('widgetHook', 'beforeCarrier');
@@ -3788,7 +4303,7 @@ class MyParcel extends Module
         }
 
         $address = new Address((int) $cart->id_address_delivery);
-        if (!preg_match(MyParcel::SPLIT_STREET_REGEX, MyParcelTools::getAddressLine($address))) {
+        if (!preg_match(static::SPLIT_STREET_REGEX, MyParcelTools::getAddressLine($address))) {
             // No house number
             if (Configuration::get(static::LOG_API)) {
                 Logger::addLog("{$this->displayName}: No housenumber for Cart {$cart->id}");
@@ -3810,6 +4325,7 @@ class MyParcel extends Module
         if (!Validate::isLoadedObject($mcds) || $carrier->external_module_name !== $this->name) {
             return '';
         }
+
 
         if ($mcds->delivery || $mcds->pickup) {
             return $this->display(__FILE__, 'views/templates/hook/beforecarrier.tpl');
@@ -3866,13 +4382,13 @@ class MyParcel extends Module
     public function hookAdminOrder($params)
     {
         $countries = array();
-        $supportedCountries = static::getSupportedCountries();
+        $supportedCountries = MyParcelTools::getSupportedCountries();
         if (isset($supportedCountries['data']['countries'][0])) {
             $euCountries = array_map(function ($item) {
                 $values = array_values($item);
 
                 return Tools::strtoupper($values[0]);
-            }, static::getEUCountries());
+            }, MyParcelTools::getEUCountries());
             foreach (array_keys($supportedCountries['data']['countries'][0]) as $iso) {
                 if (Tools::strtoupper($iso) === 'NL') {
                     continue;
@@ -3904,20 +4420,25 @@ class MyParcel extends Module
 
         $this->context->smarty->assign(
             array(
-                'idOrder'             => (int) $params['id_order'],
-                'concept'             => MyParcelDeliveryOption::getByOrder((int) $params['id_order']),
-                'preAlerted'          =>
-                    json_encode(
-                        MyParcelOrder::getByOrderIds(array((int) $params['id_order'])),
-                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                    ),
-                'myparcelProcessUrl'  => $this->moduleUrlWithoutToken.'&token='
-                    .Tools::getAdminTokenLite('AdminModules').'&ajax=1',
-                'myparcel_module_url' => __PS_BASE_URI__."modules/{$this->name}/",
-                'jsCountries'         => $countries,
-                'invoiceSuggestion'   => MyParcelTools::getInvoiceSuggestion($order),
-                'weightSuggestion'    => MyParcelTools::getWeightSuggestion($order),
-                'papersize'           => json_decode(Configuration::get(MyParcel::PAPER_SELECTION)),
+                'mpIdOrder'               => (int) $params['id_order'],
+                'mpConcept'               => MyParcelDeliveryOption::getByOrder((int) $params['id_order']),
+                'mpPreAlerted'            => mypa_json_encode(MyParcelOrder::getByOrderIds(array((int) $params['id_order']))),
+                'mpProcessUrl'            => $this->baseUrlWithoutToken.'&token='.Tools::getAdminTokenLite('AdminModules').'&ajax=1',
+                'mpModuleDir'             => __PS_BASE_URI__."modules/{$this->name}/",
+                'mpJsCountries'           => $countries,
+                'mpInvoiceSuggestion'     => MyParcelTools::getInvoiceSuggestion($order),
+                'mpWeightSuggestion'      => MyParcelTools::getWeightSuggestion($order),
+                'mpPaperSize'             => @json_decode(Configuration::get(static::PAPER_SELECTION)),
+                'mpAskPaperSize'          => (bool) Configuration::get(static::ASK_PAPER_SELECTION),
+                'mpAsync'                 => (bool) Configuration::get(static::DEV_MODE_ASYNC),
+                'mpAskReturnConfig'       => (bool) Configuration::get(static::ASK_RETURN_SELECTION),
+                'mpReturnInsuranceAmount' => MyParcelTools::getInsuranceAmount(true),
+                'mpLogApi'                => (bool) Configuration::get(static::LOG_API),
+                'mpRecipientOnly'         => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_HOME_DELIVERY_ONLY),
+                'mpSignature'             => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_SIGNED),
+                'mpExtraLarge'            => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_LARGE_PACKAGE),
+                'mpReturnUndeliverable'   => (bool) Configuration::get(static::DEFAULT_RETURN_CONCEPT_RETURN),
+                'mpCurrency'              => Context::getContext()->currency,
             )
         );
 
@@ -3948,8 +4469,7 @@ class MyParcel extends Module
         $country = new Country($address->id_country);
         $customer = new Customer($order->id_customer);
 
-        $address->email = $customer->email;
-        $deliveryOption = MyParcelDeliveryOption::getRawByCartId($cart->id);
+        $deliveryOption = mypa_dot(MyParcelDeliveryOption::getRawByCartId($cart->id));
         $mpcs = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
         $mailboxPackage = false;
         if (empty($deliveryOption)) {
@@ -3961,11 +4481,8 @@ class MyParcel extends Module
         // Check if the chosen carrier supports the MyParcel pickup or delivery options
         if (!$mpcs
             || !Validate::isLoadedObject($mpcs)
-            || !isset($deliveryOption->type)
-            || !$mpcs->{$deliveryOption->type}
-            || !in_array($deliveryOption->type, array('delivery', 'pickup'))
             || !in_array(Tools::strtoupper($country->iso_code), array('NL', 'BE'))
-            ) {
+        ) {
             MyParcelDeliveryOption::removeDeliveryOption($cart->id);
 
             return;
@@ -3974,38 +4491,42 @@ class MyParcel extends Module
         $concept = MyParcelDeliveryOption::createConcept($order, $deliveryOption, $address, $mailboxPackage);
 
         try {
-            if ($deliveryOption->type === 'pickup' && Configuration::get(MyParcel::USE_PICKUP_ADDRESS)) {
-                $newAddress = MyParcelTools::getCustomerAddress($customer->id, $deliveryOption->data->location_code);
+            // Convert the pickup address to a PrestaShop address when enabled
+            if (in_array($deliveryOption->get('data.time.0.type', static::DELIVERY_OPTION_DEFAULT), array(4, 5))
+                && Configuration::get(static::USE_PICKUP_ADDRESS)
+            ) {
+                $newAddress = MyParcelTools::getCustomerAddress($customer->id, $deliveryOption->get('data.location_code'));
                 if (!Validate::isLoadedObject($newAddress)) {
                     $newAddress->id_customer = $customer->id;
-                    $newAddress->alias = "myparcel-{$deliveryOption->data->location_code}";
-                    $newAddress->company = $deliveryOption->data->location;
+                    $newAddress->alias = "myparcel-{$deliveryOption->get('data.location_code')}";
+                    $newAddress->company = $deliveryOption->get('data.location');
                     $newAddress->firstname = $address->firstname;
                     $newAddress->lastname = $address->lastname;
-                    $newAddress->postcode = $deliveryOption->data->postal_code;
-                    $newAddress->city = $deliveryOption->data->city;
+                    $newAddress->postcode = $deliveryOption->get('data.postal_code');
+                    $newAddress->city = $deliveryOption->get('data.city');
                     $newAddress->id_country = $address->id_country;
-                    $newAddress->phone = $deliveryOption->data->phone_number;
-                    list (, $housenumberField, $extensionField) = $addressFields =
-                        MyParcelTools::getAddressLineFields($newAddress->id_country);
-                    $addressLine = "{$deliveryOption->data->street} {$deliveryOption->data->number}";
+                    $newAddress->phone = $deliveryOption->get('data.phone_number');
+
+                    // Figure out which address fields are active and parse the MyParcel formatted address
+                    list (, $housenumberField, $extensionField) = $addressFields = MyParcelTools::getAddressLineFields($newAddress->id_country);
+                    $addressLine = "{$deliveryOption->get('data.street')} {$deliveryOption->get('data.number')}";
                     $addressFields = array_filter($addressFields, function ($item) {
                         return (bool) $item;
                     });
+
+                    // Convert to a PrestaShop address
                     switch (array_sum($addressFields)) {
                         case 2:
-                            if (preg_match(MyParcel::SPLIT_STREET_REGEX, $addressLine, $m)) {
-                                $newAddress->address1 = $deliveryOption->data->street;
-                                $newAddress->{$housenumberField} = isset($m['street_suffix'])
-                                    ? $m['street_suffix']
-                                    : '';
+                            if (preg_match(static::SPLIT_STREET_REGEX, $addressLine, $m)) {
+                                $newAddress->address1 = $deliveryOption->get('data.street');
+                                $newAddress->{$housenumberField} = isset($m['street_suffix']) ? $m['street_suffix'] : '';
                             } else {
                                 $newAddress->address1 = $addressLine;
                             }
                             break;
                         case 3:
-                            if (preg_match(MyParcel::SPLIT_STREET_REGEX, $addressLine, $m)) {
-                                $newAddress->address1 = $deliveryOption->data->street;
+                            if (preg_match(static::SPLIT_STREET_REGEX, $addressLine, $m)) {
+                                $newAddress->address1 = $deliveryOption->get('data.street');
                                 $newAddress->{$housenumberField} = isset($m['number']) ? $m['number'] : '';
                                 $newAddress->{$extensionField} = isset($m['number_suffix']) ? $m['number_suffix'] : '';
                             } else {
@@ -4027,99 +4548,260 @@ class MyParcel extends Module
             Logger::addLog("MyParcel module error while saving pickup address: {$e->getMessage()}");
         }
 
-        if (isset($deliveryOption->data)) {
+        if ($deliveryOption->has('data')) {
             $deliveryOption = array(
-                'data'         => $deliveryOption->data,
-                'type'         => (isset($deliveryOption->type) ? (string) $deliveryOption->type : 'delivery'),
-                'extraOptions' => (isset($deliveryOption->extraOptions) ? $deliveryOption->extraOptions : array()),
+                'data'         => $deliveryOption->get('data'),
+                'extraOptions' => $deliveryOption->get('extraOptions', array()),
                 'concept'      => $concept,
+                'idOrder'      => (int) $order->id,
             );
         } else {
             $deliveryOption = array(
+                'idOrder' => (int) $order->id,
                 'concept' => $concept,
             );
         }
-        MyParcelDeliveryOption::saveRawDeliveryOption(
-            json_encode($deliveryOption, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-            $cart->id
-        );
+        MyParcelDeliveryOption::saveRawDeliveryOption(mypa_json_encode($deliveryOption), $cart->id);
     }
 
     /**
      * Edit order grid display
      *
      * @param array $params
+     *
+     * @since 2.1.0
+     *
+     * @throws PrestaShopException
      */
     public function hookActionAdminOrdersListingFieldsModifier($params)
     {
-        if (isset($params['select'])) {
-            $params['select'] .= ",\n\t\tmpdo.`myparcel_delivery_option`, IFNULL(mpdo.`date_delivery`, '1970-01-01 00:".
-                "00:00') as `myparcel_date_delivery`, mpdo.`pickup`, UPPER(country.`iso_code`) AS `myparcel_country_is".
-                "o`, 1 as `myparcel_void_1`, 1 as `myparcel_void_2`";
-        }
-        if (isset($params['join'])) {
-            $params['join'] .= "\n\t\tLEFT JOIN `"._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])."` ".
-                "mpdo ON (mpdo.`id_cart` = a.`id_cart`)";
-        }
-        if (isset($params['fields'])) {
-            $supportedCarrierModules = array_filter(Hook::getHookModuleExecList(Tools::substr(lcfirst(__FUNCTION__), 4, Tools::strlen(__FUNCTION__))), function ($item) {
-                $module = Module::getInstanceByName($item['module']);
-                if (!Validate::isLoadedObject($module)) {
-                    return false;
+        if (!Tools::isSubmit('exportorder') && Configuration::get(static::API_KEY)) {
+            if (isset($params['select'])) {
+                $params['select'] .= ",\n\t\tmpdo.`myparcel_delivery_option`, IFNULL(mpdo.`date_delivery`, '1970-01-01 00:".
+                    "00:00') as `myparcel_date_delivery`, mpdo.`pickup` AS `myparcel_pickup`, UPPER(country.`iso_code`) AS `myparcel_country_is".
+                    "o`, 1 as `myparcel_void_1`, 1 as `myparcel_void_2`";
+                if (!isset($params['join'])) {
+                    $params['join'] = '';
                 }
-                
-                return in_array($item['module'], ['myparcel', 'myparcelbpost', 'postnl'])
-                    && version_compare($module->version, '2.2.0', '>=');
-            });
-            if (!empty($supportedCarrierModules) && end($supportedCarrierModules)['module'] !== $this->name) {
-                return;
+                $params['join'] .= "\n\t\tLEFT JOIN `"._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])."` ".
+                    "mpdo ON (mpdo.`id_cart` = a.`id_cart`)";
             }
-            $carrierNames = [];
-            foreach ($supportedCarrierModules as $supportedCarrierModule) {
-                $name = '';
-                switch ($supportedCarrierModule['module']) {
-                    case 'myparcel':
-                        $name = 'MyParcel';
-                        break;
-                    case 'myparcelbpost':
-                        $name = 'bpost';
-                        break;
-                    case 'postnl':
-                        $name = 'PostNL';
-                        break;
+            if (isset($params['fields'])) {
+                $supportedCarrierModules = array_filter(Hook::getHookModuleExecList(Tools::substr(lcfirst(__FUNCTION__), 4, Tools::strlen(__FUNCTION__))), function ($item) {
+                    $module = Module::getInstanceByName($item['module']);
+                    if (!Validate::isLoadedObject($module)) {
+                        return false;
+                    }
+
+                    return in_array($item['module'], array('myparcel', 'myparcelbpost', 'postnl'))
+                        && version_compare($module->version, '2.2.0', '>=');
+                });
+                $lastSupportedCarrierModule = end($supportedCarrierModules);
+                reset($supportedCarrierModules); // Reset array pointer
+                if (!empty($supportedCarrierModules) && $lastSupportedCarrierModule['module'] !== $this->name) {
+                    return;
                 }
-                if ($name) {
-                    $carrierNames[$supportedCarrierModule['module']] = $name;
+                $carrierNames = array();
+                foreach ($supportedCarrierModules as $supportedCarrierModule) {
+                    $name = '';
+                    switch ($supportedCarrierModule['module']) {
+                        case 'myparcel':
+                            $name = 'MyParcel';
+                            break;
+                        case 'myparcelbpost':
+                            $name = 'bpost';
+                            break;
+                        case 'postnl':
+                            $name = 'PostNL';
+                            break;
+                    }
+                    if ($name) {
+                        $carrierNames[$supportedCarrierModule['module']] = $name;
+                    }
                 }
+
+                $params['fields']['myparcel_date_delivery'] = array(
+                    'title'           => $this->l('Preferred delivery date'),
+                    'class'           => 'fixed-width-lg',
+                    'callback'        => 'printOrderGridPreference',
+                    'callback_object' => 'MyParcelTools',
+                    'filter_key'      => 'mpdo!date_delivery',
+                    'type'            => 'date',
+                );
+                $params['fields']['myparcel_void_1'] = array(
+                    'title'           => implode(' / ', array_values($carrierNames)),
+                    'class'           => 'fixed-width-lg',
+                    'callback'        => 'printMyParcelTrackTrace',
+                    'callback_object' => 'MyParcelTools',
+                    'search'          => false,
+                    'orderby'         => false,
+                    'remove_onclick'  => true,
+                );
+                $params['fields']['myparcel_void_2'] = array(
+                    'title'           => '',
+                    'class'           => 'text-nowrap',
+                    'callback'        => 'printMyParcelIcon',
+                    'callback_object' => 'MyParcelTools',
+                    'search'          => false,
+                    'orderby'         => false,
+                    'remove_onclick'  => true,
+                );
+            }
+        }
+    }
+
+    /**
+     * Admin logs display
+     *
+     * @param array $params
+     *
+     * @since 2.2.0
+     */
+    public function hookActionAdminLogsListingFieldsModifier($params)
+    {
+        if (isset($params['fields'])) {
+            $params['fields']['message'] = array(
+                'title'           => $this->l('Message'),
+                'callback'        => 'printLogMessage',
+                'callback_object' => 'MyParcelTools',
+            );
+        }
+    }
+
+    /**
+     * Delete log files for the Customer
+     *
+     * @param array $email
+     *
+     * @return string
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
+     * @since 2.2.0
+     * @throws Adapter_Exception
+     */
+    public function hookActionDeleteGDPRCustomer($email)
+    {
+        if (empty($email['id_customer'])) {
+            $customer = new Customer();
+            $customer->getByEmail($email['email']);
+            if (!Validate::isLoadedObject($customer)) {
+                return json_encode($this->l('MyParcel: Unable to delete customer using email.'));
+            }
+        } else {
+            $customer = new Customer($email['id_customer']);
+        }
+
+        $success = true;
+
+        $success &= Db::getInstance()->delete('log', '`object_type` = \'Customer\' AND `object_id` = '.(int) $customer->id);
+
+        $sql = new DbQuery();
+        $sql->select('mdo.`id_myparcel_delivery_option`');
+        $sql->from(bqSQL(Cart::$definition['table']), 'ca');
+        $sql->innerJoin(bqSQL(Customer::$definition['table']), 'cu', 'ca.`id_customer` = cu.`id_customer`');
+        $sql->innerJoin(bqSQL(MyParcelDeliveryOption::$definition['table']), 'mdo', 'mdo.`id_cart` = ca.`id_cart`');
+        $sql->where('cu.`email` = \''.pSQL($customer->email).'\'');
+
+        $idOptions = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        if (is_array($idOptions)) {
+            $idOptions = array_column($idOptions, 'id_myparcel_delivery_option');
+            foreach ($idOptions as $idOption) {
+                $deliveryOption = new MyParcelDeliveryOption($idOption);
+                $concept = mypa_dot(@json_decode($deliveryOption->myparcel_delivery_option, true));
+                $concept->set('concept.recipient.person', '');
+                $concept->set('concept.recipient.street', '');
+                $concept->set('concept.recipient.street_additional_info', '');
+                $concept->set('concept.recipient.number', '');
+                $concept->set('concept.recipient.number_suffix', '');
+                $concept->set('concept.recipient.postal_code', '');
+                $concept->set('concept.recipient.city', '');
+                $concept->set('concept.recipient.region', '');
+                $concept->set('concept.recipient.phone', '');
+                $concept->set('concept.recipient.email', '');
+                $concept->set('extraOptions.gdpr', true);
+                $concept->delete('pickup');
+                $deliveryOption->myparcel_delivery_option = mypa_json_encode($concept);
+                try {
+                    $deliveryOption->save();
+                } catch (PrestaShopException $e) {
+                    Logger::addLog("MyParcel GDPR error: {$e->getMessage()}");
+                }
+            }
+        }
+
+        $sql = new DbQuery();
+        $sql->select('`id_order`');
+        $sql->from(bqSQL(Order::$definition['table']), 'o');
+        $sql->innerJoin(bqSQL(Customer::$definition['table']), 'cu', 'o.`id_customer` = cu.`id_customer`');
+        $sql->where('cu.`email` = \''.pSQL($customer->email).'\'');
+        $idOrders = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        if (is_array($idOrders)) {
+            $idOrders = array_column($idOrders, 'id_order');
+            if (!empty($idOrders)) {
+                Db::getInstance()->update(
+                    bqSQL(MyParcelOrder::$definition['table']),
+                    array(
+                        'shipment' => '',
+                    ),
+                    '`id_order` IN ('.implode(',', array_map('intval', $idOrders)).')'
+                );
             }
 
-            $params['fields']['myparcel_date_delivery'] = array(
-                'title'           => $this->l('Preferred delivery date'),
-                'class'           => 'fixed-width-lg',
-                'callback'        => 'printOrderGridPreference',
-                'callback_object' => 'MyParcelTools',
-                'filter_key'      => 'mpdo!date_delivery',
-                'type'            => 'date',
-            );
-            $params['fields']['myparcel_void_1'] = array(
-                'title'           => implode(' / ', array_values($carrierNames)),
-                'class'           => 'fixed-width-lg',
-                'callback'        => 'printMyParcelTrackTrace',
-                'callback_object' => 'MyParcelTools',
-                'search'          => false,
-                'orderby'         => false,
-                'remove_onclick'  => true,
-            );
-            $params['fields']['myparcel_void_2'] = array(
-                'title'           => '',
-                'class'           => 'text-nowrap',
-                'callback'        => 'printMyParcelIcon',
-                'callback_object' => 'MyParcelTools',
-                'search'          => false,
-                'orderby'         => false,
-                'remove_onclick'  => true,
+        }
+
+        if ($success) {
+            return json_encode(true);
+        }
+
+        return json_encode($this->l('MyParcel: Unable to delete customer using email.'));
+    }
+
+    /**
+     * @param array $email
+     *
+     * @return null|string|string[]
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
+     * @since 2.2.0
+     */
+    public function hookActionExportGDPRData($email)
+    {
+        if (empty($email['id_customer'])) {
+            $customer = new Customer();
+            $customer->getByEmail($email['email']);
+            if (!Validate::isLoadedObject($customer)) {
+                return mypa_json_encode($this->l('No information found for this customer'));
+            }
+        } else {
+            $customer = new Customer($email['id_customer']);
+        }
+        /** @var Customer $customer */
+        $orderSql = new DbQuery();
+        $orderSql->select('o.`reference`, mdo.`date_delivery`, mdo.`pickup`, mdo.`myparcel_delivery_option`');
+        $orderSql->from(bqSQL(Cart::$definition['table']), 'ca');
+        $orderSql->innerJoin(bqSQL(MyParcelDeliveryOption::$definition['table']), 'mdo', 'mdo.`id_cart` = ca.`id_cart`');
+        $orderSql->innerJoin(bqSQL(Order::$definition['table']), 'o', 'o.`id_cart` = ca.`id_cart`');
+        $orderSql->where('o.`id_customer` = '.(int) $customer->id);
+        $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($orderSql);
+        if (!is_array($results) || empty($results)) {
+            return mypa_json_encode($this->l('No information found for this customer'));
+        }
+
+        foreach ($results as &$result) {
+            $deliveryOption = mypa_dot(@json_decode($result['myparcel_delivery_option'], true));
+            $result = array(
+                'order'                    => $result['reference'],
+                'date_delivery'            => $result['date_delivery'],
+                'pickup'                   => $result['pickup'],
+                'recipient_only_preferred' => ($deliveryOption->get('extraOptions.recipientOnly') ? 'true' : 'false'),
+                'signature_preferred'      => ($deliveryOption->get('extraOptions.signed') ? 'true' : 'false'),
             );
         }
+
+        return json_encode($results);
     }
 
     /**
@@ -4149,11 +4831,11 @@ class MyParcel extends Module
      */
     public function getColumns()
     {
-        return [
-            'delivery_date' => ['MyParcelTools', 'printOrderGridPreference'],
-            'status'        => ['MyParcelTools', 'printMyParcelTrackTrace'],
-            'concept'       => ['MyParcelTools', 'printMyParcelIcon'],
-        ];
+        return array(
+            'delivery_date' => array('MyParcelTools', 'printOrderGridPreference'),
+            'status'        => array('MyParcelTools', 'printMyParcelTrackTrace'),
+            'concept'       => array('MyParcelTools', 'printMyParcelIcon'),
+        );
     }
 
     /**
@@ -4201,7 +4883,7 @@ class MyParcel extends Module
 
         // Detect carrier settings
         $carrier = new Carrier((int) $this->id_carrier);
-        $deliveryOption = MyParcelDeliveryOption::getRawByCartId($cart->id, false);
+        $deliveryOption = mypa_dot(@json_decode(mypa_json_encode(MyParcelDeliveryOption::getRawByCartId($cart->id, false)), true));
         $deliverySetting = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
         if (!Validate::isLoadedObject($deliverySetting)) {
             // External module name has been set to `myparcel`, but not a single delivery setting is available
@@ -4228,37 +4910,33 @@ class MyParcel extends Module
 
         $extraCosts = 0;
         // Just a check to see if we actually have a delivery option available
-        if (isset($deliveryOption->extraOptions)) {
-            $selectedOptions = $deliveryOption->extraOptions;
-            if (in_array($countryIso, array('NL', 'BE'))
-                && isset($deliveryOption->type)
-            ) {
-                if ($deliveryOption->type === 'delivery') {
-                    if ($selectedOptions->signed
-                        && $selectedOptions->recipientOnly
-                        && !in_array($deliveryOption->data->time[0]->type, array('1', '3'))) {
+        if (!$deliveryOption->isEmpty('extraOptions')) {
+            $selectedOptions = mypa_dot($deliveryOption->get('extraOptions'));
+            if (in_array($countryIso, array('NL', 'BE'))) {
+                if (in_array($deliveryOption->get('data.time.0.type', static::DELIVERY_OPTION_DEFAULT), array(1, 2, 3))) {
+                    if ($selectedOptions->get('signed')
+                        && $selectedOptions->get('recipientOnly')
+                        && !in_array($deliveryOption->get('data.time.0.type', static::DELIVERY_OPTION_DEFAULT), array(1, 3))) {
                         $extraCosts += (float) $deliverySetting->signed_recipient_only_fee_tax_incl;
-                    } elseif (in_array($deliveryOption->data->time[0]->type, array('1', '3'))) {
-                        if ($deliveryOption->data->time[0]->type == 1) {
+                    } elseif (in_array($deliveryOption->get('data.time.0.type', static::DELIVERY_OPTION_DEFAULT), array(1, 3))) {
+                        if ($deliveryOption->get('data.time.0.type', static::DELIVERY_OPTION_DEFAULT) == 1) {
                             $extraCosts += (float) $deliverySetting->morning_fee_tax_incl;
                         } else {
                             $extraCosts += (float) $deliverySetting->evening_fee_tax_incl;
                         }
 
-                        if ($selectedOptions->signed) {
+                        if ($selectedOptions->get('signed')) {
                             $extraCosts += (float) $deliverySetting->signed_fee_tax_incl;
                         }
                     } else {
-                        if ($selectedOptions->signed) {
+                        if ($selectedOptions->get('signed')) {
                             $extraCosts += (float) $deliverySetting->signed_fee_tax_incl;
                         }
-                        if ($selectedOptions->recipientOnly) {
+                        if ($selectedOptions->get('recipientOnly')) {
                             $extraCosts += (float) $deliverySetting->recipient_only_fee_tax_incl;
                         }
                     }
-                } elseif ($deliveryOption->type === 'pickup'
-                    && isset($deliveryOption->data->price_comment)
-                    && $deliveryOption->data->price_comment === 'retailexpress') {
+                } elseif ($deliveryOption->get('data.time.0.type', static::DELIVERY_OPTION_DEFAULT) == 5) {
                     $extraCosts = (float) $deliverySetting->morning_pickup_fee_tax_incl;
                 }
             }
@@ -4295,21 +4973,16 @@ class MyParcel extends Module
      * @return int Amount of boxes, 0 if it doesn't fit
      *
      * @since 2.0.0
+     * @throws PrestaShopException
      */
     protected function howManyMailboxPackages($products, $multiple = false)
     {
         // Init calculator
         $packer = new \MyParcelModule\BoxPacker\Packer();
-        try {
-            $unitConfig = Configuration::getMultiple(
-                array(
-                    'PS_WEIGHT_UNIT',
-                    'PS_DIMENSION_UNIT',
-                )
-            );
-        } catch (PrestaShopException $e) {
-            return 0;
-        }
+        $unitConfig = array(
+            'PS_WEIGHT_UNIT'    => Configuration::get('PS_WEIGHT_UNIT'),
+            'PS_DIMENSION_UNIT' => Configuration::get('PS_DIMENSION_UNIT'),
+        );
         if (in_array(Tools::strtolower($unitConfig['PS_WEIGHT_UNIT']), array('kg', 'kilo', 'kilogram'))) {
             $maxWeight = 2;
         } elseif (in_array(Tools::strtolower($unitConfig['PS_WEIGHT_UNIT']), array('g', 'gram', 'gramme'))) {
@@ -4317,11 +4990,11 @@ class MyParcel extends Module
         } else {
             return false;
         }
-        if (Tools::strtolower($unitConfig['PS_DIMENSION_UNIT']) == 'cm') {
+        if (Tools::strtolower($unitConfig['PS_DIMENSION_UNIT']) === 'cm') {
             $maxWidth = 38;
             $maxHeight = 3.2;
             $maxDepth = 26.5;
-        } elseif (Tools::strtolower($unitConfig['PS_DIMENSION_UNIT']) == 'mm') {
+        } elseif (Tools::strtolower($unitConfig['PS_DIMENSION_UNIT']) === 'mm') {
             $maxWidth = 380;
             $maxHeight = 32;
             $maxDepth = 265;
@@ -4436,7 +5109,7 @@ class MyParcel extends Module
             $products = $productList;
         }
 
-        if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_invoice') {
+        if (Configuration::get('PS_TAX_ADDRESS_TYPE') === 'id_address_invoice') {
             $addressId = (int) $cart->id_address_invoice;
         } elseif (is_array($productList) && count($productList)) {
             $prod = array_values($productList);
@@ -4622,18 +5295,12 @@ class MyParcel extends Module
             }
         }
 
-        try {
-            $configuration = Configuration::getMultiple(
-                array(
-                    'PS_SHIPPING_FREE_PRICE',
-                    'PS_SHIPPING_HANDLING',
-                    'PS_SHIPPING_METHOD',
-                    'PS_SHIPPING_FREE_WEIGHT',
-                )
-            );
-        } catch (PrestaShopException $e) {
-            return false;
-        }
+        $configuration = array(
+            'PS_SHIPPING_FREE_PRICE'  => Configuration::get('PS_SHIPPING_FREE_PRICE'),
+            'PS_SHIPPING_HANDLING'    => Configuration::get('PS_SHIPPING_HANDLING'),
+            'PS_SHIPPING_METHOD'      => Configuration::get('PS_SHIPPING_METHOD'),
+            'PS_SHIPPING_FREE_WEIGHT' => Configuration::get('PS_SHIPPING_FREE_WEIGHT'),
+        );
 
         // Free fees
         $freeFeesPrice = 0;
@@ -4760,7 +5427,7 @@ class MyParcel extends Module
 
         $mdo = MyParcelDeliveryOption::getRawByCartId($cart->id);
 
-        if (isset($mdo->type) && $mdo->type == 'timeframe') {
+        if (isset($mdo->type) && $mdo->type === 'timeframe') {
             if (isset($mdo->data->time->price_comment)) {
                 switch ($mdo->data->time->price_comment) {
                     case 'morning':
@@ -4814,6 +5481,50 @@ class MyParcel extends Module
     }
 
     /**
+     * Get paid order statuses
+     *
+     * @return int[]
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function getIgnoredStatuses()
+    {
+        $statuses = Configuration::get(static::IGNORE_ORDER_STATUSES);
+        if ($statuses === false) {
+            return array();
+        } else {
+            $statuses = @json_decode($statuses);
+            if (!is_array($statuses)) {
+                return array();
+            }
+        }
+
+        return array_map('intval', $statuses);
+    }
+
+    /**
+     * Get all status values from the form.
+     *
+     * @param $key string The key that is used in the HelperForm
+     *
+     * @return array Array with statuses
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    protected function getStatusesValue($key)
+    {
+        $statesEnabled = array();
+        foreach (OrderState::getOrderStates($this->context->language->id) as $state) {
+            if (Tools::isSubmit($key.'_'.$state['id_order_state'])) {
+                $statesEnabled[] = $state['id_order_state'];
+            }
+        }
+
+        return $statesEnabled;
+    }
+
+    /**
      * Detect whether the order has a shipping number.
      *
      * @param $order Order The order to check
@@ -4821,6 +5532,7 @@ class MyParcel extends Module
      * @return bool True if the order has a shipping number
      *
      * @since 2.0.0
+     *        
      * @throws PrestaShopException
      * @throws Adapter_Exception
      */
@@ -4935,6 +5647,7 @@ class MyParcel extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *                            
      * @since 2.0.0
      */
     protected function addGroups($carrier)
@@ -4955,8 +5668,9 @@ class MyParcel extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @since 2.0.0
      * @throws Adapter_Exception
+     *
+     * @since 2.0.0
      */
     protected function addPriceRange($carrier)
     {
@@ -4976,6 +5690,7 @@ class MyParcel extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *                            
      * @since 2.0.0
      */
     protected function addZones($carrier)
@@ -4996,6 +5711,7 @@ class MyParcel extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *                            
      * @since 2.0.9
      */
     protected function basicCheck()
@@ -5019,6 +5735,8 @@ class MyParcel extends Module
      *
      * @return string
      * @throws PrestaShopException
+     *
+     * @since 2.2.0
      */
     protected function getModuleVersion($moduleCode)
     {
@@ -5028,5 +5746,99 @@ class MyParcel extends Module
         $sql->where('`name` = \''.pSQL($moduleCode).'\'');
 
         return (string) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+    }
+
+    /**
+     * @return bool
+     *             
+     * @throws PrestaShopException
+     *
+     * @since 2.2.0
+     */
+    protected function shouldShowTour()
+    {
+        $tourStep = (int) Configuration::get(static::TOUR_CURRENT_STEP, null, 0, 0);
+        if ($tourStep >= 99) {
+            return false;
+        }
+        if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
+            // Older PrestaShop configuration forms are too borked to guide users properly
+            Configuration::updateValue(static::TOUR_CURRENT_STEP, 99, false, 0, 0);
+            return false;
+        }
+
+        if (empty($this->context->employee)) {
+            return false;
+        }
+        
+        if (!in_array(
+            Tools::getValue('controller'),
+            array(
+                'AdminModules',
+                'AdminOrders',
+                'AdminCarrierWizard',
+                'AdminCarriers',
+            )
+        )) {
+            return false;
+        }
+
+        if (Tools::getValue('controller') === 'AdminModules' && Tools::getValue('configure') !== $this->name) {
+            // Only show for the MyParcel module
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Should the resume tour message be shown?
+     *
+     * @return bool
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
+     * @since 2.2.0
+     */
+    protected function shouldResumeTour()
+    {
+        $tourStep = (int) Configuration::get(static::TOUR_CURRENT_STEP, false, 0, 0);
+        switch ($tourStep) {
+            case static::TOUR_STEP_MAIN:
+            case static::TOUR_STEP_DESIGN:
+                $canContinue = $this->context->controller instanceof AdminModulesController
+                    && Tools::getValue('configure') === $this->name
+                    && (int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS;
+                break;
+            case static::TOUR_STEP_DELIVERY_OPTIONS:
+                $canContinue = $this->context->controller instanceof AdminModulesController
+                    && Tools::getValue('configure') === $this->name
+                    && (int) Tools::getValue('menu') === static::MENU_DEFAULT_DELIVERY_OPTIONS
+                    && Tools::isSubmit('update'.MyParcelCarrierDeliverySetting::$definition['table']);
+                break;
+            case static::TOUR_STEP_LABELS_NOTIFICATIONS:
+                $canContinue = $this->context->controller instanceof AdminModulesController
+                    && Tools::getValue('configure') === $this->name
+                    && (int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS;
+                break;
+            case static::TOUR_STEP_CARRIER_CONFIG:
+                $canContinue = $this->context->controller instanceof AdminCarrierWizardController
+                    && (int) Tools::getValue('id_carrier') === (int) Carrier::getCarrierByReference(Configuration::get(static::POSTNL_DEFAULT_CARRIER))->id;
+                break;
+            case static::TOUR_STEP_START_SHIPPING:
+                $canContinue = $this->context->controller instanceof AdminOrdersController
+                    && !Tools::isSubmit('id_order');
+                break;
+            case 0:
+                $canContinue = true;
+                break;
+            case 99:
+            default:
+                $canContinue = false;
+                break;
+        }
+
+        return !$canContinue;
     }
 }

@@ -16,7 +16,7 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <!doctype html>
-<html lang="{$language_code|escape:'html':'UTF-8' nofilter}">
+<html lang="{$language_code|escape:'html' nofilter}">
 <head>
   <style>
     #myparcelapp {
@@ -30,17 +30,17 @@
   <div id="myparcelapp" class="myparcelcheckout"></div>
   <script type="text/javascript">
     {if $smarty.const._TB_VERSION_}
-    window.currencyModes = {Currency::getModes()|json_encode};
+    window.currencyModes = {mypa_json_encode(Currency::getModes())};
     {/if}
     window.priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval nofilter};
-    window.currency_iso_code = '{Context::getContext()->currency->iso_code|escape:'htmlall':'UTF-8'}';
-    window.currencySign = '{Context::getContext()->currency->sign|escape:'javascript':'UTF-8'}';
+    window.currency_iso_code = '{Context::getContext()->currency->iso_code|escape:'htmlall'}';
+    window.currencySign = '{Context::getContext()->currency->sign|escape:'javascript'}';
     window.currencyFormat = {Context::getContext()->currency->format|intval} || 3;
     window.currencyBlank = {Context::getContext()->currency->blank|intval};
   </script>
   <script type="text/javascript"></script>
-  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall':'UTF-8' nofilter}js/jquery/jquery-1.11.0.min.js"></script>
-  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall':'UTF-8' nofilter}js/tools.js"></script>
+  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall' nofilter}js/jquery/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall' nofilter}js/tools.js"></script>
   <script type="text/javascript">
     (function () {
       window.MyParcelModule = window.MyParcelModule || {ldelim}{rdelim};
@@ -48,30 +48,35 @@
       window.MyParcelModule.misc.errorCodes = {
         '3212': '{l s='Unknown address' mod='myparcel' js=1}'
       };
+      window.MyParcelModule.debug = {if $mpLogApi}true{else}false{/if};
+      window.MyParcelModule.async = {if $mpAsync}true{else}false{/if};
+      window.MyParcelModule.misc.mondayDelivery = {if Configuration::get(MyParcel::MONDAY_DELIVERY_SUPPORTED)}true{else}false{/if};
 
       function initMyParcelCheckout() {
         if (typeof window.MyParcelModule === 'undefined'
-          || typeof window.MyParcelModule.checkout === 'undefined') {
+          || typeof window.MyParcelModule.checkout === 'undefined'
+          || typeof window.MyParcelModule.checkout.default === 'undefined'
+        ) {
           setTimeout(initMyParcelCheckout, 100);
 
           return;
         }
 
-        window.checkout = new MyParcelModule.checkout({
+        window.checkout = new window.MyParcelModule.checkout.default({
           target: 'myparcelapp',
           form: null,
           iframe: true,
           refresh: false,
           selected: null,
-          street: '{$streetName|escape:'javascript':'UTF-8' nofilter}',
-          houseNumber: '{$houseNumber|escape:'javascript':'UTF-8' nofilter}',
-          postalCode: '{$postcode|escape:'javascript':'UTF-8' nofilter}',
+          street: '{$streetName|escape:'javascript' nofilter}',
+          houseNumber: '{$houseNumber|escape:'javascript' nofilter}',
+          postalCode: '{$postcode|escape:'javascript' nofilter}',
           deliveryDaysWindow: {$deliveryDaysWindow|intval nofilter},
           dropoffDelay: {$dropoffDelay|intval nofilter},
-          dropoffDays: '{$dropoffDays|escape:'javascript':'UTF-8' nofilter}',
-          cutoffTime: '{if $cutoffTime}{$cutoffTime|escape:'javascript':'UTF-8' nofilter}:00{else}15:30:00{/if}',
-          cacheKey: '{$cacheKey|escape:'htmlall':'UTF-8'}',
-          cc: '{$countryIso|escape:'javascript':'UTF-8' nofilter}',
+          dropoffDays: '{$dropoffDays|escape:'javascript' nofilter}',
+          cutoffTime: '{if $cutoffTime}{$cutoffTime|escape:'javascript' nofilter}:00{else}15:30:00{/if}',
+          cacheKey: '{$cacheKey|escape:'htmlall'}',
+          cc: '{$countryIso|escape:'javascript' nofilter}',
           signedPreferred: {if $signedPreferred}true{else}false{/if},
           recipientOnlyPreferred: {if $recipientOnlyPreferred}true{else}false{/if},
           methodsAvailable: {
@@ -85,13 +90,15 @@
             signedRecipientOnly: {if $signedRecipientOnly}true{else}false{/if}
           },
           customStyle: {
-            foreground1Color: '{$foreground1color|escape:'javascript':'UTF-8' nofilter}',
-            foreground2Color: '{$foreground2color|escape:'javascript':'UTF-8' nofilter}',
-            background1Color: '{$background1color|escape:'javascript':'UTF-8' nofilter}',
-            background2Color: '{$background2color|escape:'javascript':'UTF-8' nofilter}',
-            background3Color: '{$background3color|escape:'javascript':'UTF-8' nofilter}',
-            highlightColor: '{$highlightcolor|escape:'javascript':'UTF-8' nofilter}',
-            fontFamily: '{$fontFamily|escape:'javascript':'UTF-8' nofilter}',
+            foreground1Color: '{$foreground1color|escape:'javascript' nofilter}',
+            foreground2Color: '{$foreground2color|escape:'javascript' nofilter}',
+            foreground3Color: '{$foreground3color|escape:'javascript' nofilter}',
+            background1Color: '{$background1color|escape:'javascript' nofilter}',
+            background2Color: '{$background2color|escape:'javascript' nofilter}',
+            background3Color: '{$background3color|escape:'javascript' nofilter}',
+            highlightColor: '{$highlightcolor|escape:'javascript' nofilter}',
+            inactiveColor: '{$inactivecolor|escape:'javascript' nofilter}',
+            fontFamily: '{$fontFamily|escape:'javascript' nofilter}',
             fontSize: {$fontSize|intval} ? {$fontSize|intval} : 2
           },
           price: {
@@ -104,17 +111,23 @@
             pickup: 0,
             expressPickup: {$morningPickupFeeTaxIncl|floatval nofilter}
           },
-          baseUrl: '{$myparcel_ajax_checkout_link|escape:'javascript':'UTF-8' nofilter}',
+          baseUrl: '{$myparcel_ajax_checkout_link|escape:'javascript' nofilter}',
           locale: 'nl-NL',
-          currency: '{$currencyIso|escape:'javascript':'UTF-8' nofilter}'
+          currency: '{$currencyIso|escape:'javascript' nofilter}'
         },
           {include file="./translations.tpl"}
         );
+
+        top.postMessage(JSON.stringify({
+          messageOrigin: 'myparcelcheckout',
+          subject: 'height',
+          height: 300,
+        }), '*');
       }
 
       initMyParcelCheckout();
     })();
   </script>
-  <script type="text/javascript" src="{$checkoutJs|escape:'htmlall':'UTF-8' nofilter}"></script>
+  <script type="text/javascript" src="{$mypaCheckoutJs|escape:'htmlall' nofilter}"></script>
 </body>
 </html>

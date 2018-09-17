@@ -12,8 +12,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../../myparcel.php';
-
 /**
  * List of items to be packed, ordered by volume
  * @author Doug Wright

@@ -54,11 +54,12 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
      * @since 2.0.0
      * @throws PrestaShopException
      * @throws Adapter_Exception
+     * @throws SmartyException
      */
     public function initContent()
     {
         if (!Configuration::get(MyParcel::API_KEY)) {
-            die(json_encode(
+            die(mypa_json_encode(
                 array(
                     'data' => array(
                         'message' => 'Module has not been configured',
@@ -67,7 +68,7 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
             ));
         }
         if (!Module::isEnabled('myparcel')) {
-            die(json_encode(
+            die(mypa_json_encode(
                 array(
                     'data' => array(
                         'message' => 'Module is not enabled',
@@ -76,49 +77,50 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
             ));
         }
         // @codingStandardsIgnoreStart
-        $content = json_decode(file_get_contents('php://input'), true);
+        $content = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
         if (isset($content['ajax']) && $content['ajax']) {
             $this->displayAjax();
         }
+
+        exit;
     }
 
     /**
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws SmartyException
      */
     public function displayAjax()
     {
         header('Content-Type: application/json');
 
         // @codingStandardsIgnoreStart
-        $content = json_decode(file_get_contents('php://input'), true);
+        $content = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
         if (!empty($content['updateOption'])) {
             $context = Context::getContext();
             $cart = $context->cart;
             if (!Validate::isLoadedObject($cart)) {
                 die(
-                    json_encode(
+                    mypa_json_encode(
                         array(
                             'success' => false,
                             'status'  => static::ERR_NO_CART,
                             'message' => $this->module->l('Cart not found', 'deliveryoptions'),
-                        ),
-                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                        )
                     )
                 );
             }
             if (empty($context->customer)) {
                 die(
-                    json_encode(
+                    mypa_json_encode(
                         array(
                             'success' => false,
                             'status'  => static::ERR_NOT_LOGGED_IN,
                             'message' => $this->module->l('Customer not logged in', 'deliveryoptions'),
-                        ),
-                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                        )
                     )
                 );
             }
@@ -130,24 +132,14 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
                 if (!Validate::isLoadedObject($deliveryOptionObject)) {
                     $option = new MyParcelDeliveryOption();
                     $option->id_cart = $cart->id;
-                    $option->myparcel_delivery_option = json_encode(
-                        $deliveryOption,
-                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                    );
-
+                    $option->myparcel_delivery_option = mypa_json_encode($deliveryOption);
                     $option->add();
                 } else {
                     Db::getInstance()->execute(
                         'INSERT INTO `'._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])
                         .'` (`id_myparcel_delivery_option`, `myparcel_delivery_option`)
-                     VALUES ('.(int) $deliveryOptionObject->id.', \''.json_encode(
-                         $deliveryOption, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                        ).'\')
-                         ON DUPLICATE KEY UPDATE `myparcel_delivery_option` = \''.json_encode(
-                             $deliveryOption,
-                             JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                        )
-                        .'\''
+                     VALUES ('.(int) $deliveryOptionObject->id.', \''.pSQL(mypa_json_encode($deliveryOption)).'\')
+                         ON DUPLICATE KEY UPDATE `myparcel_delivery_option` = \''.pSQL(mypa_json_encode($deliveryOption)).'\''
                     );
                 }
 
@@ -164,7 +156,6 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
                             : $this->getDeliveryOptionList()
                         ),
                         'HOOK_BEFORECARRIER' => Hook::exec('displayBeforeCarrier', array('carriers' => $carriers)),
-                        'shouldRefresh'      => true,
                     ),
                     (version_compare(_PS_VERSION_, '1.7.0.0', '<')
                         ? $this->getFormattedSummaryDetail()
@@ -172,11 +163,11 @@ class MyParcelDeliveryoptionsModuleFrontController extends ModuleFrontController
                     )
                 );
                 Cart::addExtraCarriers($return);
-                die(json_encode($return, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                die(mypa_json_encode($return));
             }
 
             die(
-                json_encode(
+                mypa_json_encode(
                     array(
                         'success' => false,
                         'status'  => static::ERR_DELIVERY_OPTION_NOT_FOUND,

@@ -21,8 +21,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../myparcel.php';
-
 use MyParcelModule\BoxPacker\Item;
 
 /**

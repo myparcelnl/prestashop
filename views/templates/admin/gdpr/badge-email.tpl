@@ -15,4 +15,17 @@
  * @copyright  2010-2018 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-{l s='By enabling this option, the statuses "%s" and "%s" will automatically be set after exporting an order.' mod='myparcel' sprintf=[$shippedStatusName, $deliveredStatusName]}
+{assign var='gdprType' value='email'}
+<div class="badge badge-info" data-toggle="tooltip" data-html="true" title="{include file="./tooltip-data-sharing.tpl"|escape:'html'}">{l s='GDPR' mod='myparcel'}</div>
+<script type="text/javascript">
+  (function () {
+    function init() {
+      if (typeof $ === 'undefined') {
+        setTimeout(init, 100);
+        return;
+      }
+      $('[data-toggle="tooltip"]').tooltip();
+    }
+    init();
+  }());
+</script>

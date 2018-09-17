@@ -17,7 +17,7 @@
 *}
 <iframe name="myparcelcheckoutframe"
         id="myparcelcheckoutframe"
-        src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), Tools::usingSecureMode())|escape:'htmlall':'UTF-8'}"
+        src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), Tools::usingSecureMode())|escape:'htmlall'}"
         width="100%"
         height="0"
         frameBorder="0">
@@ -25,12 +25,14 @@
 <div id="myparcel"></div>
 <script type="text/javascript">
   (function () {
+    var cachedPrice = false;
+
     window.mypaNotified = window.mypaNotified || false;
 
     if (typeof document.createElement('_').classList === 'undefined') {
       Object.defineProperty(Element.prototype, 'classList', {
         get: function() {
-          var self = this, bValue = self.className.split(" ")
+          var self = this, bValue = self.className.split(" ");
 
           bValue.add = function (){
             var b;
@@ -38,7 +40,7 @@
               b = true;
               for (var j = 0; j<bValue.length;j++)
                 if (bValue[j] == arguments[i]){
-                  b = false
+                  b = false;
                   break
                 }
               if(b)
@@ -46,7 +48,7 @@
             }
           };
           bValue.remove = function(){
-            self.className = ""
+            self.className = "";
             for(i in arguments)
               for (var j = 0; j<bValue.length;j++)
                 if(bValue[j] != arguments[i])
@@ -55,16 +57,16 @@
           bValue.toggle = function(x){
             var b;
             if(x){
-              self.className = ""
+              self.className = "";
               b = false;
               for (var j = 0; j<bValue.length;j++)
                 if(bValue[j] != x){
                   self.className += (self.className?" " :"")+bValue[j]
                   b = false
-                } else b = true
+                } else b = true;
               if(!b)
                 self.className += (self.className?" ":"")+x
-            } else throw new TypeError("Failed to execute 'toggle': 1 argument required")
+            } else throw new TypeError("Failed to execute 'toggle': 1 argument required");
             return !b;
           };
 
@@ -100,6 +102,7 @@
 
     documentReady(function () {
       var xhr = null;
+      var zelargXhr = null;
 
       window.addEventListener('message', function (event) {
         if (!event.data) {
@@ -117,6 +120,11 @@
           && data.subject === 'height'
         ) {
           document.getElementById('myparcelcheckoutframe').height = parseInt(data.height, 10);
+          {if Module::isEnabled('onepagecheckoutps')}
+          var psCheckoutElem = document.getElementById('onepagecheckoutps_step_two_container');
+          psCheckoutElem.style.height = '0'; // Always reset so we can measure the actual scrollHeight
+          psCheckoutElem.style.height = psCheckoutElem.scrollHeight + 'px';
+          {/if}
         }
       });
 
@@ -128,13 +136,14 @@
         try {
           var data = JSON.parse(event.data);
         } catch (e) {
+          return;
         }
 
         if (data
           && data.messageOrigin === 'myparcelcheckout'
           && data.subject === 'selection_changed'
         ) {
-          if (xhr) {
+          if (xhr && typeof xhr.abort === 'function') {
             xhr.abort();
           }
 
@@ -155,10 +164,20 @@
             }
           }
 
+          {if Module::isEnabled('onepagecheckout')}
+          // Grab the delivery options HTML and inject
+          var deliveryOptions = document.getElementById('carrierTable');
+          if (deliveryOptions) {
+            deliveryOptions.style.opacity = 0.4;
+            deliveryOptions.style.pointerEvents = 'none';
+          }
+          {/if}
+
+          // Generic
           xhr = new XMLHttpRequest();
           xhr.open(
             'POST',
-            '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript':'UTF-8'}',
+            '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript'}',
             true
           );
 
@@ -176,6 +195,65 @@
                 if (data.carrier_data) {
                   window.mypaNotified = getIdCarrier() || true;
 
+                  {if Module::isEnabled('onepagecheckout')}
+                  if (zelargXhr && typeof zelargXhr.abort === 'function') {
+                    zelargXhr.abort();
+                  }
+                  // Zelarg OPC
+                  zelargXhr = new XMLHttpRequest();
+                  zelargXhr.open('POST', window.orderOpcUrl, true);
+
+                  zelargXhr.onreadystatechange = function () {
+                    if (zelargXhr.readyState === 4) {
+                      if (zelargXhr.status >= 200 && zelargXhr.status < 400) {
+                        // Success!
+                        var data = zelargXhr.responseText;
+                        try {
+                          data = JSON.parse(data);
+                        } catch (e) {
+                          return;
+                        }
+
+                        if (data.carrier_block) {
+                          window.mypaNotified = getIdCarrier() || true;
+
+                          var carrierHTML = document.createElement('div');
+                          carrierHTML.innerHTML = data.carrier_block;
+                          carrierHTML = carrierHTML.querySelector('#carrierTable');
+
+                          if (deliveryOptions) {
+                            deliveryOptions.innerHTML = carrierHTML.innerHTML;
+                            deliveryOptions.style.opacity = 1.0;
+                            deliveryOptions.style.pointerEvents = 'inherit';
+                            if (typeof $ !== 'undefined' && $.support && $.support.placeholder) {
+                              $('#order_msg_placeholder_fallback').hide();
+                            }
+                            if (typeof window.bindInputs === 'function') {
+                              window.bindInputs();
+                            }
+                          }
+                        }
+                      } else {
+                        zelargXhr = null;
+                      }
+                    }
+                  };
+
+                  zelargXhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                  zelargXhr.send('ajax=true&method=getCarrierList&token=' + static_token);
+                  {elseif Module::isEnabled('onepagecheckoutps')}
+                  if (data.summary.total_shipping === cachedPrice) {
+                    return;
+                  }
+                  cachedPrice = data.summary.total_shipping;
+                  if (typeof Carrier === 'object' && typeof Carrier.update === 'function') {
+                    Carrier.update();
+                  }
+                  {else}
+                  if (data.summary.total_shipping === cachedPrice) {
+                    return;
+                  }
+                  cachedPrice = data.summary.total_shipping;
                   var carrierHTML = document.createElement('div');
                   carrierHTML.innerHTML = data.carrier_data.carrier_block;
                   carrierHTML = carrierHTML.querySelector('.delivery_options');
@@ -188,17 +266,20 @@
                   // Grab the delivery options HTML and inject
                   carrierHTML.appendChild(removeMe);
                   var deliveryOptions = document.querySelector('.delivery_options');
-                  deliveryOptions.innerHTML = carrierHTML.innerHTML;
-                  if (typeof window.updateCartSummary === 'function') {
-                    window.updateCartSummary(data.summary);
-                  }
-                  if (typeof window.bindUniform === 'function') {
-                    window.bindUniform();
-                  }
-                  if (typeof window.bindInputs === 'function') {
-                    window.bindInputs();
+                  if (deliveryOptions) {
+                    deliveryOptions.innerHTML = carrierHTML.innerHTML;
+                    if (typeof window.updateCartSummary === 'function') {
+                      window.updateCartSummary(data.summary);
+                    }
+                    if (typeof window.bindUniform === 'function') {
+                      window.bindUniform();
+                    }
+                    if (typeof window.bindInputs === 'function') {
+                      window.bindInputs();
+                    }
                   }
                   removeMe.parentNode.removeChild(removeMe);
+                  {/if}
                 }
               } else {
                 xhr = null;

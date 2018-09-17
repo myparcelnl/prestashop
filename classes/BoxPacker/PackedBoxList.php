@@ -12,8 +12,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../../myparcel.php';
-
 /**
  * List of possible packed box choices, ordered by utilisation (item count, volume)
  * @author Doug Wright

@@ -55,6 +55,29 @@ td.ui-state-warning {
     background-color: white !important;
 }
 
+.myparcel-external:after {
+    content: "\f08e";
+    font-family: FontAwesome, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    text-decoration: none;
+    padding-left: 3px;
+}
+
+.myparcel-dev-hidden {
+    opacity: 0;
+}
+
+.myparcel-dev-always-hidden {
+    display: none!important;
+    visibility: hidden!important;
+}
+
+.myparcel-dev-hidden:hover {
+    opacity: 1;
+}
+
 td.sameday-cutoff-labels {
     line-height: 2em !important;
 }

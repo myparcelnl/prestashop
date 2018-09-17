@@ -16,21 +16,21 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <!doctype html>
-<html lang="{$language_code|escape:'html':'UTF-8' nofilter}">
+<html lang="{$language_code|escape:'html' nofilter}">
 <body>
   <div id="myparcelapp" class="myparcelcheckout"></div>
   <script type="text/javascript">
     {if $smarty.const._TB_VERSION_}
-    window.currencyModes = {Currency::getModes()|json_encode};
+    window.currencyModes = {mypa_json_encode(Currency::getModes())};
     {/if}
     window.priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval nofilter};
-    window.currency_iso_code = '{Context::getContext()->currency->iso_code|escape:'htmlall':'UTF-8'}';
-    window.currencySign = '{Context::getContext()->currency->sign|escape:'javascript':'UTF-8'}';
+    window.currency_iso_code = '{Context::getContext()->currency->iso_code|escape:'htmlall'}';
+    window.currencySign = '{Context::getContext()->currency->sign|escape:'javascript'}';
     window.currencyFormat = {Context::getContext()->currency->format|intval};
     window.currencyBlank = {Context::getContext()->currency->blank|intval};
   </script>
-  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall':'UTF-8' nofilter}js/jquery/jquery-1.11.0.min.js"></script>
-  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall':'UTF-8' nofilter}js/tools.js"></script>
+  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall' nofilter}js/jquery/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall' nofilter}js/tools.js"></script>
   <script type="text/javascript">
     (function () {
       window.addEventListener('message', function (event) {
@@ -49,7 +49,7 @@
             && typeof data === 'object'
             && data.subject === 'sendStyle'
           ) {
-            window.checkout.setStyle(data.style);
+            window.checkout.constructor.setStyle(data.style);
 
             var newEvent = {
               subject: 'receivedStyle',
@@ -62,19 +62,22 @@
 
       window.MyParcelModule = window.MyParcelModule || {ldelim}{rdelim};
       window.MyParcelModule.misc = window.MyParcelModule.misc || {ldelim}{rdelim};
+      window.MyParcelModule.misc.mondayDelivery = true;
       window.MyParcelModule.misc.errorCodes = {
         '3212': '{l s='Unknown address' mod='myparcel' js=1}'
       };
 
       function initMyParcelCheckout() {
         if (typeof window.MyParcelModule === 'undefined'
-          || typeof window.MyParcelModule.checkout === 'undefined') {
+          || typeof window.MyParcelModule.checkout === 'undefined'
+          || typeof window.MyParcelModule.checkout.default === 'undefined'
+        ) {
           setTimeout(initMyParcelCheckout, 100);
 
           return;
         }
 
-        window.checkout = new MyParcelModule.checkout({
+        window.checkout = new window.MyParcelModule.checkout.default({
           data: {include file="./example.json"},
           target: 'myparcelapp',
           form: null,
@@ -100,13 +103,15 @@
             signedRecipientOnly: true
           },
           customStyle: {
-            foreground1Color: '',
-            foreground2Color: '',
-            background1Color: '',
-            background2Color: '',
-            background3Color: '',
-            highlightColor: '',
-            fontFamily: '{Configuration::get(MyParcel::CHECKOUT_FONT)|escape:'javascript':'UTF-8'}',
+            foreground1Color: '{$foreground1Color|escape:'javascript'}',
+            foreground2Color: '{$foreground2Color|escape:'javascript'}',
+            foreground3Color: '{$foreground3Color|escape:'javascript'}',
+            background1Color: '{$background1Color|escape:'javascript'}',
+            background2Color: '{$background2Color|escape:'javascript'}',
+            background3Color: '{$background3Color|escape:'javascript'}',
+            highlightColor: '{$highlightColor|escape:'javascript'}',
+            inactiveColor: '{$inactiveColor|escape:'javascript'}',
+            fontFamily: '{$fontFamily|escape:'javascript'}',
             fontSize: 2,
           },
           price: {
@@ -132,6 +137,6 @@
       initMyParcelCheckout();
     })();
   </script>
-  <script type="text/javascript" src="{$checkoutJs|escape:'htmlall':'UTF-8' nofilter}"></script>
+  <script type="text/javascript" src="{$mypaCheckoutJs|escape:'htmlall' nofilter}"></script>
 </body>
 </html>

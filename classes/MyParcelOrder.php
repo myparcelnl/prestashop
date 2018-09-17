@@ -21,8 +21,6 @@ if (!defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__).'/../myparcel.php';
-
 /**
  * Class MyParcelOrder
  */
@@ -44,7 +42,7 @@ class MyParcelOrder extends MyParcelObjectModel
                 'db_type'  => 'INT(11) UNSIGNED',
             ),
             'id_shipment'   => array(
-                'type'     => self::TYPE_STRING,
+                'type'     => self::TYPE_INT,
                 'validate' => 'isInt',
                 'required' => true,
                 'db_type'  => 'BIGINT(20)',
@@ -65,15 +63,15 @@ class MyParcelOrder extends MyParcelObjectModel
             'postcode'      => array(
                 'type'     => self::TYPE_STRING,
                 'validate' => 'isString',
-                'required' => true,
+                'required' => false,
                 'db_type'  => 'VARCHAR(32)',
             ),
             'postnl_status' => array(
-                'type'     => self::TYPE_STRING,
-                'validate' => 'isString',
+                'type'     => self::TYPE_INT,
+                'validate' => 'isUnsignedInt',
                 'required' => false,
                 'default'  => '1',
-                'db_type'  => 'VARCHAR(255)',
+                'db_type'  => 'VARCHAR(255)', // TODO: convert to INT(11) UNSIGNED IN 2.3.x, okay for now
             ),
             'date_upd'      => array(
                 'type'     => self::TYPE_DATE,
@@ -113,7 +111,7 @@ class MyParcelOrder extends MyParcelObjectModel
     public $tracktrace;
     /** @var string $postcode */
     public $postcode;
-    /** @var string $postnl_status */
+    /** @var int $postnl_status */
     public $postnl_status;
     /** @var string $date_upd */
     public $date_upd;
@@ -124,33 +122,6 @@ class MyParcelOrder extends MyParcelObjectModel
     /** @var int $type */
     public $type;
     // @codingStandardsIgnoreEnd
-
-    /**
-     * Get Delivery Option info by Cart
-     *
-     * @param int $idOrder
-     *
-     * @return string Delivery from DB
-     */
-    public static function getByOrder($idOrder)
-    {
-        $sql = new DbQuery();
-        $sql->select('mo.*');
-        $sql->from(bqSQL(static::$definition['table']));
-        $sql->where('`id_order` = '.(int) $idOrder);
-
-        try {
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
-        } catch (PrestaShopException $e) {
-            $result = false;
-        }
-
-        if ($result) {
-            return json_decode($result, true);
-        }
-
-        return false;
-    }
 
     /**
      * Get MyParcelOrders by Order IDs
@@ -176,15 +147,29 @@ class MyParcelOrder extends MyParcelObjectModel
 
         try {
             $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+            foreach ($results as &$result) {
+                $result['id_shipment'] = (int) $result['id_shipment'];
+                $result['postnl_status'] = (int) $result['postnl_status'];
+                $result['postnl_final'] = (bool) $result['postnl_final'];
+                $result['retour'] = (bool) $result['retour'];
+                $result['type'] = (int) $result['type'];
+                $result['id_order'] = (int) $result['id_order'];
+                $result[static::$definition['primary']] = (int) $result[static::$definition['primary']];
+            }
         } catch (PrestaShopException $e) {
             $results = array();
         }
 
+        $newResults = array();
         foreach ($results as &$result) {
-            $result['shipment'] = json_decode($result['shipment']);
+            $result['shipment'] = @json_decode($result['shipment']);
+            if (!isset($newResults[$result['id_order']])) {
+                $newResults[$result['id_order']] = array();
+            }
+            $newResults[$result['id_order']][$result['id_shipment']] = $result;
         }
 
-        return (array) $results;
+        return $newResults;
     }
 
     /**
@@ -194,6 +179,9 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @return bool|MyParcelOrder
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     public static function getByShipmentId($idShipment)
@@ -205,12 +193,19 @@ class MyParcelOrder extends MyParcelObjectModel
 
         try {
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+            $result['id_shipment'] = (int) $result['id_shipment'];
+            $result['postnl_status'] = (int) $result['postnl_status'];
+            $result['postnl_final'] = (bool) $result['postnl_final'];
+            $result['retour'] = (bool) $result['retour'];
+            $result['type'] = (int) $result['type'];
+            $result['id_order'] = (int) $result['id_order'];
+            $result[static::$definition['primary']] = (int) $result[static::$definition['primary']];
         } catch (PrestaShopException $e) {
             $result = false;
         }
 
         if ($result) {
-            $mpo = new MyParcelOrder();
+            $mpo = new static();
             $mpo->hydrate($result);
 
             return $mpo;
@@ -227,6 +222,7 @@ class MyParcelOrder extends MyParcelObjectModel
      * @return bool|Order
      *
      * @since 2.0.5
+     * @throws PrestaShopException
      */
     public static function getOrderByShipmentId($idShipment)
     {
@@ -258,7 +254,11 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @return bool
      *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
+     * @throws ErrorException
      */
     public static function updateStatus($idShipment, $barcode, $statusCode, $date = null)
     {
@@ -266,7 +266,7 @@ class MyParcelOrder extends MyParcelObjectModel
             $date = date('Y-m-d H:i:s');
         }
 
-        $order = MyParcelOrder::getOrderByShipmentId($idShipment);
+        $order = static::getOrderByShipmentId($idShipment);
         if (Validate::isLoadedObject($order)) {
             if (!$order->shipping_number) {
                 // Checking a legacy field is allowed in this case
@@ -275,18 +275,14 @@ class MyParcelOrder extends MyParcelObjectModel
         }
 
         try {
-            if (Configuration::get(MyParcel::UPDATE_ORDER_STATUSES)) {
-                if (Configuration::get(MyParcel::PRINTED_STATUS) && $statusCode >= 2) {
-                    MyParcelOrderHistory::setPrinted($idShipment);
-                }
-                if (Configuration::get(MyParcel::SHIPPED_STATUS) && $statusCode >= 3) {
-                    MyParcelOrderHistory::setShipped($idShipment);
-                }
-                if ($statusCode >= 7 && $statusCode <= 11
-                    && Configuration::get(MyParcel::RECEIVED_STATUS)
-                ) {
-                    MyParcelOrderHistory::setReceived($idShipment);
-                }
+            if ($statusCode >= 2) {
+                MyParcelOrderHistory::setPrinted($idShipment);
+            }
+            if ($statusCode >= 3) {
+                MyParcelOrderHistory::setShipped($idShipment);
+            }
+            if ($statusCode >= 7 && $statusCode <= 11) {
+                MyParcelOrderHistory::setReceived($idShipment);
             }
         } catch (PrestaShopException $e) {
             Logger::addLog("Myparcel module error: {$e->getMessage()}");
@@ -315,16 +311,13 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @return bool
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     public function add($autoDate = true, $nullValues = false)
     {
-        try {
-            $success = (bool) parent::add($autoDate, $nullValues);
-        } catch (PrestaShopException $e) {
-            $success = false;
-        }
-
+        $success = (bool) parent::add($autoDate, $nullValues);
         $success &= MyParcelOrderHistory::log($this->id_shipment, $this->postnl_status, $this->date_upd);
 
         return $success;
@@ -335,21 +328,19 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @return bool
      *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @since 2.0.0
      */
     public function printed()
     {
-        try {
-            return Db::getInstance()->update(
-                bqSQL(static::$definition['table']),
-                array(
-                    'postnl_status' => 2, // Registered
-                ),
-                '`id_shipment` = '.(int) $this->id_shipment.' AND `postnl_status` = 1'
-            );
-        } catch (PrestaShopException $e) {
-            return false;
-        }
+        return Db::getInstance()->update(
+            bqSQL(static::$definition['table']),
+            array(
+                'postnl_status' => 2, // Registered
+            ),
+            '`id_shipment` = '.(int) $this->id_shipment.' AND `postnl_status` = 1'
+        );
     }
 
     /**
@@ -358,6 +349,8 @@ class MyParcelOrder extends MyParcelObjectModel
      * @param int $idShipment
      *
      * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function deleteShipment($idShipment)
     {
@@ -380,6 +373,9 @@ class MyParcelOrder extends MyParcelObjectModel
      * @param string    $tracktrace Track and trace code
      *
      * @return string Error message
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function updateOrderTrackingNumber($idOrder, $tracktrace)
     {
@@ -419,5 +415,31 @@ class MyParcelOrder extends MyParcelObjectModel
         }
 
         return false;
+    }
+
+    /**
+     * @param string $idShipment
+     *
+     * @return array
+     *
+     * @throws Adapter_Exception
+     * @throws ErrorException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function getTracktraceOnline($idShipment)
+    {
+        $client = new \MyParcelModule\Curl\Curl();
+        $client->setDefaultJsonDecoder(true);
+        $shipment = static::getByShipmentId($idShipment);
+        $concept = mypa_dot(@json_decode($shipment->shipment, true));
+        $countryCode = strtoupper($concept->get('recipient.cc'));
+        $postcode = strtoupper(str_replace(' ', '', strtoupper($concept->get('recipient.postal_code'))));
+        $tracktrace = $shipment->tracktrace;
+        if (!$countryCode || !$postcode || !$tracktrace) {
+            return array();
+        }
+
+        return $client->get("https://www.internationalparceltracking.com/api/shipment?barcode={$tracktrace}&country={$countryCode}&language=en&postalCode={$postcode}");
     }
 }

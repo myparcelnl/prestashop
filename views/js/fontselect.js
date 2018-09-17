@@ -5,7 +5,6 @@
  * MIT Licensed
  * @version 0.1
  */
-
 (function () {
   function addEventListener(el, eventName, handler) {
     if (el.addEventListener) {
@@ -243,6 +242,7 @@
     'Cormorant Unicase',
     'Cormorant Upright',
     'Courgette',
+    'Courier New',
     'Cousine',
     'Coustard',
     'Covered By Your Grace',
@@ -843,6 +843,7 @@
     'Varela',
     'Varela Round',
     'Vast Shadow',
+    'Verdana',
     'Vesper Libre',
     'Vibur',
     'Vidaloka',
@@ -931,9 +932,7 @@
       return;
     }
 
-    if (typeof ev !== 'undefined') {
-      ev.preventDefault();
-    }
+    ev.preventDefault();
 
     if (this.active) {
       this.element.classList.remove('font-select-active');
@@ -1086,7 +1085,7 @@
   };
 
   Fontselect.prototype.addFontLink = function (font) {
-    if (['Arial', 'Comic Sans MS', 'Helvetica', 'Times New Roman'].indexOf(font) > -1) {
+    if (['Arial', 'Comic Sans MS', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana'].indexOf(font) > -1) {
       return;
     }
 
@@ -1095,7 +1094,16 @@
     if (document.querySelector("link[href*='" + font + "']") == null) {
       var links = Array.prototype.slice.call(document.querySelectorAll('link'));
       var lastLink = links[links.length - 1];
-      lastLink.insertAdjacentHTML('afterend', '<link href="' + link + '" rel="stylesheet" type="text/css">');
+      var stylesheet = document.createElement('LINK');
+      stylesheet.href = link;
+      stylesheet.rel = 'stylesheet';
+      stylesheet.type = 'text/css';
+      // temporarily set media to something inapplicable to ensure it'll fetch without blocking render
+      stylesheet.media = 'only x';
+      // set the media back when the stylesheet loads
+      stylesheet.onload = function() { stylesheet.media = 'all' };
+      document.getElementsByTagName('head')[0].appendChild(stylesheet);
+      lastLink.insertAdjacentHTML('afterend', stylesheet.outerHTML);
     }
   };
 

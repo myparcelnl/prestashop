@@ -36,12 +36,24 @@
           $('#MYPARCEL_DEFCON_I_TYPE').parent().parent().hide();
           $('#MYPARCEL_DEFCON_I_AMOUNT').parent().parent().parent().hide();
         }
+
+        if ($('#MYPARCEL_RETDEFCON_I_on').is(':checked')) {
+          $('#MYPARCEL_RETDEFCON_I_TYPE').parent().parent().show();
+          if ($('#MYPARCEL_RETDEFCON_I_TYPE').val() == 4) {
+            $('#MYPARCEL_RETDEFCON_I_AMOUNT').parent().parent().parent().show();
+          } else {
+            $('#MYPARCEL_RETDEFCON_I_AMOUNT').parent().parent().parent().hide();
+          }
+        } else {
+          $('#MYPARCEL_RETDEFCON_I_TYPE').parent().parent().hide();
+          $('#MYPARCEL_RETDEFCON_I_AMOUNT').parent().parent().parent().hide();
+        }
       }
 
       $(document).ready(function () {
         checkInsured();
-        $('#MYPARCEL_DEFCON_I_on, #MYPARCEL_DEFCON_I_off').change(checkInsured);
-        $('#MYPARCEL_DEFCON_I_TYPE').change(checkInsured);
+        $('#MYPARCEL_DEFCON_I_on, #MYPARCEL_DEFCON_I_off, #MYPARCEL_DEFCON_I_TYPE').change(checkInsured);
+        $('#MYPARCEL_RETDEFCON_I_on, #MYPARCEL_RETDEFCON_I_off, #MYPARCEL_RETDEFCON_I_TYPE').change(checkInsured);
       });
     }
 
