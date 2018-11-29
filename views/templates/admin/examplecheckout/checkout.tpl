@@ -69,15 +69,15 @@
 
       function initMyParcelCheckout() {
         if (typeof window.MyParcelModule === 'undefined'
-          || typeof window.MyParcelModule.checkout === 'undefined'
-          || typeof window.MyParcelModule.checkout.default === 'undefined'
+          || typeof window.MyParcelModule.front === 'undefined'
+          || typeof window.MyParcelModule.front.checkout === 'undefined'
         ) {
           setTimeout(initMyParcelCheckout, 100);
 
           return;
         }
 
-        window.checkout = new window.MyParcelModule.checkout.default({
+        window.checkout = new window.MyParcelModule.front.checkout({
           data: {include file="./example.json"},
           target: 'myparcelapp',
           form: null,

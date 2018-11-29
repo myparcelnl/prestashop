@@ -101,28 +101,30 @@
     },
     {
         "name": "php-curl-class\/php-curl-class",
-        "version": "8.0.3",
-        "version_normalized": "8.0.3.0",
+        "version": "8.3.2",
+        "version_normalized": "8.3.2.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/php-curl-class\/php-curl-class.git",
-            "reference": "4b19e0fa0278b45452164d3043057cccb4f750db"
+            "reference": "3193b41dcd19025ad579ea26eb48774421d84708"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/php-curl-class\/php-curl-class\/zipball\/4b19e0fa0278b45452164d3043057cccb4f750db",
-            "reference": "4b19e0fa0278b45452164d3043057cccb4f750db",
+            "url": "https:\/\/api.github.com\/repos\/php-curl-class\/php-curl-class\/zipball\/3193b41dcd19025ad579ea26eb48774421d84708",
+            "reference": "3193b41dcd19025ad579ea26eb48774421d84708",
             "shasum": ""
         },
         "require": {
             "ext-curl": "*",
+            "ext-mbstring": "*",
             "php": ">=5.3"
         },
         "require-dev": {
+            "ext-gd": "*",
             "phpunit\/phpunit": "*",
             "squizlabs\/php_codesniffer": "*"
         },
-        "time": "2018-04-21T08:28:43+00:00",
+        "time": "2018-09-09T07:05:39+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -142,45 +144,112 @@
         "description": "PHP Curl Class makes it easy to send HTTP requests and integrate with web APIs.",
         "homepage": "https:\/\/github.com\/php-curl-class\/php-curl-class",
         "keywords": [
+            "API-Client",
             "api",
             "class",
             "client",
             "curl",
             "framework",
             "http",
-            "http client",
+            "http-client",
+            "http-proxy",
             "json",
             "php",
+            "php-curl",
+            "php-curl-library",
+            "proxy",
             "requests",
-            "rest",
             "restful",
-            "web service",
+            "web-scraper",
+            "web-scraping ",
+            "web-service",
             "xml"
         ]
     },
     {
-        "name": "symfony\/polyfill-php54",
-        "version": "v1.8.0",
-        "version_normalized": "1.8.0.0",
+        "name": "symfony\/polyfill-mbstring",
+        "version": "v1.9.0",
+        "version_normalized": "1.9.0.0",
         "source": {
             "type": "git",
-            "url": "https:\/\/github.com\/symfony\/polyfill-php54.git",
-            "reference": "6c3a2b84c6025e4ea3f6a19feac35408c64b22e1"
+            "url": "https:\/\/github.com\/symfony\/polyfill-mbstring.git",
+            "reference": "d0cd638f4634c16d8df4508e847f14e9e43168b8"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php54\/zipball\/6c3a2b84c6025e4ea3f6a19feac35408c64b22e1",
-            "reference": "6c3a2b84c6025e4ea3f6a19feac35408c64b22e1",
+            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-mbstring\/zipball\/d0cd638f4634c16d8df4508e847f14e9e43168b8",
+            "reference": "d0cd638f4634c16d8df4508e847f14e9e43168b8",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2018-04-26T10:06:28+00:00",
+        "suggest": {
+            "ext-mbstring": "For best performance"
+        },
+        "time": "2018-08-06T14:22:27+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.8-dev"
+                "dev-master": "1.9-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "MyParcelModule\\Symfony\\Polyfill\\Mbstring\\": ""
+            },
+            "files": [
+                "bootstrap.php"
+            ]
+        },
+        "notification-url": "https:\/\/packagist.org\/downloads\/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Nicolas Grekas",
+                "email": "p@tchwork.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https:\/\/symfony.com\/contributors"
+            }
+        ],
+        "description": "Symfony polyfill for the Mbstring extension",
+        "homepage": "https:\/\/symfony.com",
+        "keywords": [
+            "compatibility",
+            "mbstring",
+            "polyfill",
+            "portable",
+            "shim"
+        ]
+    },
+    {
+        "name": "symfony\/polyfill-php54",
+        "version": "v1.9.0",
+        "version_normalized": "1.9.0.0",
+        "source": {
+            "type": "git",
+            "url": "https:\/\/github.com\/symfony\/polyfill-php54.git",
+            "reference": "412977e090c6a8472dc39d50d1beb7d59495a965"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php54\/zipball\/412977e090c6a8472dc39d50d1beb7d59495a965",
+            "reference": "412977e090c6a8472dc39d50d1beb7d59495a965",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2018-08-06T14:22:27+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.9-dev"
             }
         },
         "installation-source": "dist",
@@ -220,28 +289,28 @@
     },
     {
         "name": "symfony\/polyfill-php55",
-        "version": "v1.8.0",
-        "version_normalized": "1.8.0.0",
+        "version": "v1.9.0",
+        "version_normalized": "1.9.0.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/symfony\/polyfill-php55.git",
-            "reference": "a39456128377a85f2c5707fcae458678560cba46"
+            "reference": "578b8528da843de0fc65ec395900fa3181f2ead7"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php55\/zipball\/a39456128377a85f2c5707fcae458678560cba46",
-            "reference": "a39456128377a85f2c5707fcae458678560cba46",
+            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php55\/zipball\/578b8528da843de0fc65ec395900fa3181f2ead7",
+            "reference": "578b8528da843de0fc65ec395900fa3181f2ead7",
             "shasum": ""
         },
         "require": {
             "ircmaxell\/password-compat": "~1.0",
             "php": ">=5.3.3"
         },
-        "time": "2018-04-26T10:06:28+00:00",
+        "time": "2018-08-06T14:22:27+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.8-dev"
+                "dev-master": "1.9-dev"
             }
         },
         "installation-source": "dist",

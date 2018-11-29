@@ -402,7 +402,8 @@ class MyParcelTools
     public static function getAddressLine(Address $address)
     {
         $addressLine = '';
-        foreach (static::getAddressLineFields($address->id_country) as $field) {
+        $fields = static::getAddressLineFields($address->id_country);
+        foreach ($fields as $field) {
             if ($field && !empty($address->{$field})) {
                 $addressLine .= ' '.$address->{$field};
             }

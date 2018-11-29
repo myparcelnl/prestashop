@@ -45,7 +45,7 @@ class MyParcelDemo
         $smarty = Context::getContext()->smarty;
         $smarty->assign(array(
             'language_code'          => Tools::strtolower(Context::getContext()->language->language_code),
-            'mypaCheckoutJs'         => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/checkout-378e4d1cf8ab3806.bundle.min.js'),
+            'mypaCheckoutJs'         => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-8b209a38521d2000.bundle.min.js'),
             'base_dir_ssl'           => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').Tools::getShopDomainSsl().__PS_BASE_URI__,
             'signedPreferred'        => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
             'recipientOnlyPreferred' => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),

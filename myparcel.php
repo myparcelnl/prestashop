@@ -110,6 +110,7 @@ class MyParcel extends Module
     const DEV_MODE_CHECK_WEBHOOKS = 'MYPARCEL_CHECK_WEBHOOKS';
     const DEV_MODE_REMOVE_WEBHOOK = 'MYPARCEL_REMOVE_WEBHOOK';
     const DEV_MODE_ASYNC = 'MYPARCEL_ASYNC';
+    const DEV_MODE_HIDE_PREFERRED = 'MYPARCEL_HIDE_PREFERRED';
 
     const API_TIMEOUT = 20;
     const CONNECTION_ATTEMPTS = 5;
@@ -197,7 +198,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.2.0';
+        $this->version = '2.2.1';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -941,7 +942,7 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/dist/ordergrid-378e4d1cf8ab3806.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/dist/back-8b209a38521d2000.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
         } elseif (Tools::getValue('controller') === 'AdminModules'
             && Tools::getValue('configure') === $this->name
@@ -1503,7 +1504,6 @@ class MyParcel extends Module
             unset($requestBody['controllerUri']);
         }
 
-        $request = @json_decode(file_get_contents('php://input'), true);
         $positions = implode(';', array(1, 2, 3, 4));
         $pageSize = 'A4';
         if (isset($request['paperSize'])) {
@@ -2195,6 +2195,7 @@ class MyParcel extends Module
             );
             Configuration::updateValue(static::LOG_API, (bool) Tools::getValue(static::LOG_API));
             Configuration::updateValue(static::DEV_MODE_ASYNC, (bool) Tools::getValue(static::DEV_MODE_ASYNC));
+            Configuration::updateValue(static::DEV_MODE_HIDE_PREFERRED, (bool) Tools::getValue(static::DEV_MODE_HIDE_PREFERRED));
             Configuration::updateValue(static::PRINTED_STATUS, (int) Tools::getValue(static::PRINTED_STATUS));
             Configuration::updateValue(static::SHIPPED_STATUS, (int) Tools::getValue(static::SHIPPED_STATUS));
             Configuration::updateValue(static::RECEIVED_STATUS, (int) Tools::getValue(static::RECEIVED_STATUS));
@@ -3731,8 +3732,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/dist/checkout-378e4d1cf8ab3806.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/dist/paperselector-378e4d1cf8ab3806.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/front-8b209a38521d2000.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/back-8b209a38521d2000.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -3777,6 +3778,7 @@ class MyParcel extends Module
             static::DEV_MODE_RESET_TOUR     => null,
             static::DEV_MODE_SET_VERSION    => null,
             static::DEV_MODE_ASYNC          => Configuration::get(static::DEV_MODE_ASYNC),
+            static::DEV_MODE_HIDE_PREFERRED => Configuration::get(static::DEV_MODE_HIDE_PREFERRED),
         );
 
         foreach (static::getIgnoredStatuses() as $conf) {
@@ -4230,6 +4232,25 @@ class MyParcel extends Module
                         ),
                         'hidden'   => true,
                     ),
+                    array(
+                        'type'    => 'switch',
+                        'name'    => static::DEV_MODE_HIDE_PREFERRED,
+                        'label'   => $this->l('Hide column with preferred delivery dates'),
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                        'hidden'   => true,
+                    ),
                 ),
                 'buttons' => array(
                     'submit' => array(
@@ -4244,7 +4265,7 @@ class MyParcel extends Module
                         'icon'  => 'process-icon-cogs',
                         'class' => 'btn btn-default myparcel-dev-hidden',
                     ),
-                )
+                ),
             ),
         );
     }
@@ -4620,14 +4641,16 @@ class MyParcel extends Module
                     }
                 }
 
-                $params['fields']['myparcel_date_delivery'] = array(
-                    'title'           => $this->l('Preferred delivery date'),
-                    'class'           => 'fixed-width-lg',
-                    'callback'        => 'printOrderGridPreference',
-                    'callback_object' => 'MyParcelTools',
-                    'filter_key'      => 'mpdo!date_delivery',
-                    'type'            => 'date',
-                );
+                if (!Configuration::get(static::DEV_MODE_HIDE_PREFERRED)) {
+                    $params['fields']['myparcel_date_delivery'] = array(
+                        'title'           => $this->l('Preferred delivery date'),
+                        'class'           => 'fixed-width-lg',
+                        'callback'        => 'printOrderGridPreference',
+                        'callback_object' => 'MyParcelTools',
+                        'filter_key'      => 'mpdo!date_delivery',
+                        'type'            => 'date',
+                    );
+                }
                 $params['fields']['myparcel_void_1'] = array(
                     'title'           => implode(' / ', array_values($carrierNames)),
                     'class'           => 'fixed-width-lg',

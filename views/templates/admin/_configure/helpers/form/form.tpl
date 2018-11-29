@@ -394,8 +394,8 @@
 
         function paperSelector() {
           if (typeof window.MyParcelModule === 'undefined'
-            || typeof window.MyParcelModule.paperselector === 'undefined'
-            || typeof window.MyParcelModule.paperselector.default === 'undefined'
+            || typeof window.MyParcelModule.back === 'undefined'
+            || typeof window.MyParcelModule.back.paperselector === 'undefined'
           ) {
             setTimeout(paperSelector, 100);
 
@@ -425,7 +425,7 @@
             setInput();
           }
 
-          new window.MyParcelModule.paperselector.default({
+          new window.MyParcelModule.back.paperselector({
             selected: selection,
             onChangeSize: changeSize,
             onChangeLabels: changeLabels,
@@ -539,7 +539,6 @@
         }
 
         function {$input.name|escape:'javascript'}dateSelect(date) {
-          console.log(date);
           if (moment().format('YYYY-MM-DD') > moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')) {
             $('#{$input.name|escape:'html'}_datepanel').find('.panel-body').hide();
             $('#{$input.name|escape:'html'}_datepanel').find('.date-warning').show();

@@ -19,8 +19,8 @@
   (function () {
     function initMyParcelExport() {
       if (typeof window.MyParcelModule === 'undefined'
-        || typeof window.MyParcelModule.ordergrid === 'undefined'
-        || typeof window.MyParcelModule.ordergrid.default === 'undefined'
+        || typeof window.MyParcelModule.back === 'undefined'
+        || typeof window.MyParcelModule.back.ordergrid === 'undefined'
       ) {
         setTimeout(initMyParcelExport, 10);
 
@@ -59,7 +59,7 @@
           blank: '{$mpCurrency->blank|escape:'javascript':'UTF-8'}',
           format: '{$mpCurrency->format|escape:'javascript':'UTF-8'}',
           sign: '{$mpCurrency->sign|escape:'javascript':'UTF-8'}',
-          iso: '{$mpCurrency->iso_code|escape:'javascript':'UTF-8'}'
+          iso_code: '{$mpCurrency->iso_code|escape:'javascript':'UTF-8'}'
         };
 
         if (!window.MyParcelModule.paperSize) {
@@ -74,7 +74,7 @@
           };
         }
 
-        new window.MyParcelModule.ordergrid.default(
+        new window.MyParcelModule.back.ordergrid(
           {include file="../translations.tpl"},
           {
             insurance: {$mpReturnInsuranceAmount|intval},

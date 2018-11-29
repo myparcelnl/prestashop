@@ -6,7 +6,7 @@ use MyParcelModule\Curl\ArrayUtil;
 use MyParcelModule\Curl\Decoder;
 class Curl
 {
-    const VERSION = '8.0.3';
+    const VERSION = '8.3.2';
     const DEFAULT_TIMEOUT = 30;
     public $curl;
     public $id = null;
@@ -34,7 +34,7 @@ class Curl
     public $fileHandle = null;
     public $attempts = 0;
     public $retries = 0;
-    public $isChildOfMultiCurl = false;
+    public $childOfMultiCurl = false;
     public $remainingRetries = 0;
     public $retryDecider = null;
     public $jsonDecoder = null;
@@ -44,7 +44,8 @@ class Curl
     private $options = array();
     private $jsonDecoderArgs = array();
     private $jsonPattern = '/^(?:application|text)\\/(?:[a-z]+(?:[\\.-][0-9a-z]+){0,}[\\+\\.]|x-)?json(?:-[a-z]+)?/i';
-    private $xmlPattern = '~^(?:text/|application/(?:atom\\+|rss\\+)?)xml~i';
+    private $xmlDecoderArgs = array();
+    private $xmlPattern = '~^(?:text/|application/(?:atom\\+|rss\\+|soap\\+)?)xml~i';
     private $defaultDecoder = null;
     public static $RFC2616 = array(
         // RFC 2616: "any CHAR except CTLs or separators".
@@ -248,19 +249,7 @@ class Curl
             throw new \ErrorException('cURL library is not loaded');
         }
         $this->curl = curl_init();
-        $this->id = uniqid('', true);
-        $this->setDefaultUserAgent();
-        $this->setDefaultTimeout();
-        $this->setOpt(CURLINFO_HEADER_OUT, true);
-        // Create a placeholder to temporarily store the header callback data.
-        $header_callback_data = new \stdClass();
-        $header_callback_data->rawResponseHeaders = '';
-        $header_callback_data->responseCookies = array();
-        $this->headerCallbackData = $header_callback_data;
-        $this->setOpt(CURLOPT_HEADERFUNCTION, $this->createHeaderCallback($header_callback_data));
-        $this->setOpt(CURLOPT_RETURNTRANSFER, true);
-        $this->headers = new \MyParcelModule\Curl\CaseInsensitiveArray();
-        $this->setUrl($base_url);
+        $this->initialize($base_url);
     }
     /**
      * Before Send
@@ -279,41 +268,37 @@ class Curl
      * @param  $data
      *
      * @return array|string
+     * @throws \ErrorException
      */
     public function buildPostData($data)
     {
         $binary_data = false;
-        if (is_array($data)) {
-            // Return JSON-encoded string when the request's content-type is JSON.
-            if (isset($this->headers['Content-Type']) && preg_match($this->jsonPattern, $this->headers['Content-Type'])) {
-                $json_str = json_encode($data);
-                if (!($json_str === false)) {
-                    $data = $json_str;
-                }
-            } else {
-                // Manually build a single-dimensional array from a multi-dimensional array as using curl_setopt($ch,
-                // CURLOPT_POSTFIELDS, $data) doesn't correctly handle multi-dimensional arrays when files are
-                // referenced.
-                if (\MyParcelModule\Curl\ArrayUtil::is_array_multidim($data)) {
-                    $data = \MyParcelModule\Curl\ArrayUtil::array_flatten_multidim($data);
-                }
-                // Modify array values to ensure any referenced files are properly handled depending on the support of
-                // the @filename API or CURLFile usage. This also fixes the warning "curl_setopt(): The usage of the
-                // @filename API for file uploading is deprecated. Please use the CURLFile class instead". Ignore
-                // non-file values prefixed with the @ character.
-                foreach ($data as $key => $value) {
-                    if (is_string($value) && strpos($value, '@') === 0 && is_file(substr($value, 1))) {
-                        $binary_data = true;
-                        if (class_exists('CURLFile')) {
-                            $data[$key] = new \CURLFile(substr($value, 1));
-                        }
-                    } elseif ($value instanceof \CURLFile) {
-                        $binary_data = true;
+        // Return JSON-encoded string when the request's content-type is JSON and the data is serializable.
+        if (isset($this->headers['Content-Type']) && preg_match($this->jsonPattern, $this->headers['Content-Type']) && (is_array($data) || is_object($data) && interface_exists('JsonSerializable', false) && $data instanceof \JsonSerializable)) {
+            $data = \MyParcelModule\Curl\Encoder::encodeJson($data);
+        } elseif (is_array($data)) {
+            // Manually build a single-dimensional array from a multi-dimensional array as using curl_setopt($ch,
+            // CURLOPT_POSTFIELDS, $data) doesn't correctly handle multi-dimensional arrays when files are
+            // referenced.
+            if (\MyParcelModule\Curl\ArrayUtil::is_array_multidim($data)) {
+                $data = \MyParcelModule\Curl\ArrayUtil::array_flatten_multidim($data);
+            }
+            // Modify array values to ensure any referenced files are properly handled depending on the support of
+            // the @filename API or CURLFile usage. This also fixes the warning "curl_setopt(): The usage of the
+            // @filename API for file uploading is deprecated. Please use the CURLFile class instead". Ignore
+            // non-file values prefixed with the @ character.
+            foreach ($data as $key => $value) {
+                if (is_string($value) && strpos($value, '@') === 0 && is_file(substr($value, 1))) {
+                    $binary_data = true;
+                    if (class_exists('CURLFile')) {
+                        $data[$key] = new \CURLFile(substr($value, 1));
                     }
+                } elseif ($value instanceof \CURLFile) {
+                    $binary_data = true;
                 }
             }
         }
-        if (!$binary_data && (is_array($data) || is_object($data))) {
+        if (!$binary_data && (is_array($data) || is_object($data)) && (!isset($this->headers['Content-Type']) || !preg_match('/^multipart\\/form-data/', $this->headers['Content-Type']))) {
             $data = http_build_query($data, '', '&');
         }
         return $data;
@@ -346,6 +331,7 @@ class Curl
         $this->jsonDecoder = null;
         $this->jsonDecoderArgs = null;
         $this->xmlDecoder = null;
+        $this->xmlDecoderArgs = null;
         $this->defaultDecoder = null;
     }
     /**
@@ -475,8 +461,8 @@ class Curl
         // Transfer the header callback data and release the temporary store to avoid memory leak.
         $this->rawResponseHeaders = $this->headerCallbackData->rawResponseHeaders;
         $this->responseCookies = $this->headerCallbackData->responseCookies;
-        $this->headerCallbackData->rawResponseHeaders = null;
-        $this->headerCallbackData->responseCookies = null;
+        $this->headerCallbackData->rawResponseHeaders = '';
+        $this->headerCallbackData->responseCookies = array();
         // Include additional error code information in error message when possible.
         if ($this->curlError && function_exists('curl_strerror')) {
             $this->curlErrorMessage = curl_strerror($this->curlErrorCode) . (empty($this->curlErrorMessage) ? '' : ': ' . $this->curlErrorMessage);
@@ -507,7 +493,7 @@ class Curl
         // Reset nobody setting possibly set from a HEAD request.
         $this->setOpt(CURLOPT_NOBODY, false);
         // Allow multicurl to attempt retry as needed.
-        if ($this->isChildOfMultiCurl) {
+        if ($this->isChildOfMultiCurl()) {
             return;
         }
         if ($this->attemptRetry()) {
@@ -665,7 +651,7 @@ class Curl
      * [2] https://github.com/php/php-src/pull/531
      * [3] http://php.net/ChangeLog-5.php#5.5.11
      */
-    public function post($url, $data = array(), $follow_303_with_post = false)
+    public function post($url, $data = '', $follow_303_with_post = false)
     {
         if (is_array($url)) {
             $follow_303_with_post = (bool) $data;
@@ -818,17 +804,6 @@ class Curl
         return isset($this->responseCookies[$key]) ? $this->responseCookies[$key] : null;
     }
     /**
-     * Get Response Cookies
-     *
-     * @access public
-     *
-     * @return array
-     */
-    public function getResponseCookies()
-    {
-        return $this->responseCookies;
-    }
-    /**
      * Set Max Filesize
      *
      * @access public
@@ -924,10 +899,15 @@ class Curl
      * Set Default XML Decoder
      *
      * @access public
+     * @param  $class_name
+     * @param  $options
+     * @param  $ns
+     * @param  $is_prefix
      */
     public function setDefaultXmlDecoder()
     {
         $this->xmlDecoder = '\\MyParcelModule\\Curl\\Decoder::decodeXml';
+        $this->xmlDecoderArgs = func_get_args();
     }
     /**
      * Set Default Decoder
@@ -1016,10 +996,7 @@ class Curl
      */
     public function setJsonDecoder($mixed)
     {
-        if ($mixed === false) {
-            $this->jsonDecoder = false;
-            $this->jsonDecoderArgs = array();
-        } elseif (is_callable($mixed)) {
+        if ($mixed === false || is_callable($mixed)) {
             $this->jsonDecoder = $mixed;
             $this->jsonDecoderArgs = array();
         }
@@ -1032,10 +1009,9 @@ class Curl
      */
     public function setXmlDecoder($mixed)
     {
-        if ($mixed === false) {
-            $this->xmlDecoder = false;
-        } elseif (is_callable($mixed)) {
+        if ($mixed === false || is_callable($mixed)) {
             $this->xmlDecoder = $mixed;
+            $this->xmlDecoderArgs = array();
         }
     }
     /**
@@ -1077,6 +1053,74 @@ class Curl
             }
         }
         return true;
+    }
+    /**
+     * Set Proxy
+     *
+     * Set an HTTP proxy to tunnel requests through.
+     *
+     * @access public
+     * @param  $proxy - The HTTP proxy to tunnel requests through. May include port number.
+     * @param  $port - The port number of the proxy to connect to. This port number can also be set in $proxy.
+     * @param  $username - The username to use for the connection to the proxy.
+     * @param  $password - The password to use for the connection to the proxy.
+     */
+    public function setProxy($proxy, $port = null, $username = null, $password = null)
+    {
+        $this->setOpt(CURLOPT_PROXY, $proxy);
+        if ($port !== null) {
+            $this->setOpt(CURLOPT_PROXYPORT, $port);
+        }
+        if ($username !== null && $password !== null) {
+            $this->setOpt(CURLOPT_PROXYUSERPWD, $username . ':' . $password);
+        }
+    }
+    /**
+     * Set Proxy Auth
+     *
+     * Set the HTTP authentication method(s) to use for the proxy connection.
+     *
+     * @access public
+     * @param  $auth
+     */
+    public function setProxyAuth($auth)
+    {
+        $this - setOpt(CURLOPT_PROXYAUTH, $auth);
+    }
+    /**
+     * Set Proxy Type
+     *
+     * Set the proxy protocol type.
+     *
+     * @access public
+     * @param  $type
+     */
+    public function setProxyType($type)
+    {
+        $this->setOpt(CURLOPT_PROXYTYPE, $type);
+    }
+    /**
+     * Set Proxy Tunnel
+     *
+     * Set the proxy to tunnel through HTTP proxy.
+     *
+     * @access public
+     * @param  $tunnel boolean
+     */
+    public function setProxyTunnel($tunnel = true)
+    {
+        $this->setOpt(CURLOPT_HTTPPROXYTUNNEL, $tunnel);
+    }
+    /**
+     * Unset Proxy
+     *
+     * Disable use of the proxy.
+     *
+     * @access public
+     */
+    public function unsetProxy()
+    {
+        $this->setOpt(CURLOPT_PROXY, null);
     }
     /**
      * Set Referer
@@ -1234,6 +1278,144 @@ class Curl
         $this->setOpt(CURLOPT_STDERR, $output);
     }
     /**
+     * Reset
+     *
+     * @access public
+     */
+    public function reset()
+    {
+        if (function_exists('curl_reset') && is_resource($this->curl)) {
+            curl_reset($this->curl);
+        } else {
+            $this->curl = curl_init();
+        }
+        $this->initialize();
+    }
+    public function getCurl()
+    {
+        return $this->curl;
+    }
+    public function getId()
+    {
+        return $this->id;
+    }
+    public function isError()
+    {
+        return $this->error;
+    }
+    public function getErrorCode()
+    {
+        return $this->errorCode;
+    }
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+    public function isCurlError()
+    {
+        return $this->curlError;
+    }
+    public function getCurlErrorCode()
+    {
+        return $this->curlErrorCode;
+    }
+    public function getCurlErrorMessage()
+    {
+        return $this->curlErrorMessage;
+    }
+    public function isHttpError()
+    {
+        return $this->httpError;
+    }
+    public function getHttpStatusCode()
+    {
+        return $this->httpStatusCode;
+    }
+    public function getHttpErrorMessage()
+    {
+        return $this->httpErrorMessage;
+    }
+    public function getUrl()
+    {
+        return $this->url;
+    }
+    public function getRequestHeaders()
+    {
+        return $this->requestHeaders;
+    }
+    public function getResponseHeaders()
+    {
+        return $this->responseHeaders;
+    }
+    public function getRawResponseHeaders()
+    {
+        return $this->rawResponseHeaders;
+    }
+    public function getResponseCookies()
+    {
+        return $this->responseCookies;
+    }
+    public function getResponse()
+    {
+        return $this->response;
+    }
+    public function getRawResponse()
+    {
+        return $this->rawResponse;
+    }
+    public function getBeforeSendCallback()
+    {
+        return $this->beforeSendCallback;
+    }
+    public function getDownloadCompleteCallback()
+    {
+        return $this->downloadCompleteCallback;
+    }
+    public function getSuccessCallback()
+    {
+        return $this->successCallback;
+    }
+    public function getErrorCallback()
+    {
+        return $this->errorCallback;
+    }
+    public function getCompleteCallback()
+    {
+        return $this->completeCallback;
+    }
+    public function getFileHandle()
+    {
+        return $this->fileHandle;
+    }
+    public function getAttempts()
+    {
+        return $this->attempts;
+    }
+    public function getRetries()
+    {
+        return $this->retries;
+    }
+    public function isChildOfMultiCurl()
+    {
+        return $this->childOfMultiCurl;
+    }
+    public function getRemainingRetries()
+    {
+        return $this->remainingRetries;
+    }
+    public function getRetryDecider()
+    {
+        return $this->retryDecider;
+    }
+    public function getJsonDecoder()
+    {
+        return $this->jsonDecoder;
+    }
+    public function getXmlDecoder()
+    {
+        return $this->xmlDecoder;
+    }
+    /**
      * Destruct
      *
      * @access public
@@ -1320,24 +1502,6 @@ class Curl
             }
         }
         return $url . $query_string;
-    }
-    /**
-     * Create Header Callback
-     *
-     * @access private
-     * @param  $header_callback_data
-     *
-     * @return callable
-     */
-    private function createHeaderCallback($header_callback_data)
-    {
-        return function ($ch, $header) use($header_callback_data) {
-            if (preg_match('/^Set-Cookie:\\s*([^=]+)=([^;]+)/mi', $header, $cookie) === 1) {
-                $header_callback_data->responseCookies[$cookie[1]] = trim($cookie[2], " \n\r\t\0\v");
-            }
-            $header_callback_data->rawResponseHeaders .= $header;
-            return strlen($header);
-        };
     }
     /**
      * Download Complete
@@ -1444,7 +1608,9 @@ class Curl
                 }
             } elseif (preg_match($this->xmlPattern, $response_headers['Content-Type'])) {
                 if ($this->xmlDecoder) {
-                    $response = call_user_func($this->xmlDecoder, $response);
+                    $args = $this->xmlDecoderArgs;
+                    array_unshift($args, $response);
+                    $response = call_user_func_array($this->xmlDecoder, $args);
                 }
             } else {
                 if ($this->defaultDecoder) {
@@ -1507,4 +1673,47 @@ class Curl
         }
         $this->cookies[implode('', $name_chars)] = implode('', $value_chars);
     }
+    /**
+     * Initialize
+     *
+     * @access private
+     * @param  $base_url
+     */
+    private function initialize($base_url = null)
+    {
+        $this->id = uniqid('', true);
+        $this->setDefaultUserAgent();
+        $this->setDefaultTimeout();
+        $this->setOpt(CURLINFO_HEADER_OUT, true);
+        // Create a placeholder to temporarily store the header callback data.
+        $header_callback_data = new \stdClass();
+        $header_callback_data->rawResponseHeaders = '';
+        $header_callback_data->responseCookies = array();
+        $this->headerCallbackData = $header_callback_data;
+        $this->setOpt(CURLOPT_HEADERFUNCTION, createHeaderCallback($header_callback_data));
+        $this->setOpt(CURLOPT_RETURNTRANSFER, true);
+        $this->headers = new \MyParcelModule\Curl\CaseInsensitiveArray();
+        $this->setUrl($base_url);
+    }
+}
+/**
+ * Create Header Callback
+ *
+ * Gather headers and parse cookies as response headers are received. Keep this function separate from the class so that
+ * unset($curl) automatically calls __destruct() as expected. Otherwise, manually calling $curl->close() will be
+ * necessary to prevent a memory leak.
+ *
+ * @param  $header_callback_data
+ *
+ * @return callable
+ */
+function createHeaderCallback($header_callback_data)
+{
+    return function ($ch, $header) use($header_callback_data) {
+        if (preg_match('/^Set-Cookie:\\s*([^=]+)=([^;]+)/mi', $header, $cookie) === 1) {
+            $header_callback_data->responseCookies[$cookie[1]] = trim($cookie[2], " \n\r\t\0\v");
+        }
+        $header_callback_data->rawResponseHeaders .= $header;
+        return strlen($header);
+    };
 }

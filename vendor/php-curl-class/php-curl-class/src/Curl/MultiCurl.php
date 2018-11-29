@@ -191,7 +191,7 @@ class MultiCurl
      *
      * @return object
      */
-    public function addPost($url, $data = array(), $follow_303_with_post = false)
+    public function addPost($url, $data = '', $follow_303_with_post = false)
     {
         if (is_array($url)) {
             $follow_303_with_post = (bool) $data;
@@ -734,7 +734,7 @@ class MultiCurl
     {
         // Use sequential ids to allow for ordered post processing.
         $curl->id = $this->nextCurlId++;
-        $curl->isChildOfMultiCurl = true;
+        $curl->childOfMultiCurl = true;
         $this->curls[$curl->id] = $curl;
         $curl->setHeaders($this->headers);
     }

@@ -1377,10 +1377,9 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             if (preg_match('/^(\d+)(.*?$)/', trim($concept->get('recipient.number')), $m)) {
                 if (count($m) > 1) {
                     $concept->set('recipient.number', $m[1]);
-                    if (isset($m[2]) && is_bool($m[2])) {
-                        $concept->set('recipient.number_suffix', $m[2]);
-                    } else {
-                        $concept->delete('recipient.number_suffix');
+                    $numberSuffix = is_bool($m[2]) ? $m[2] : Tools::substr(trim($m[2]), 0, 4);
+                    if (isset($m[2]) && !is_bool($numberSuffix) && !empty($numberSuffix)) {
+                        $concept->set('recipient.number_suffix', $numberSuffix);
                     }
                 }
             }

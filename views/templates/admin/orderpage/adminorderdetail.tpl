@@ -16,14 +16,14 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div id="myparcel-export-panel"></div>
-<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/orderpage-378e4d1cf8ab3806.bundle.min.js"></script>
+<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/back-8b209a38521d2000.bundle.min.js"></script>
 <script type="text/javascript">
   (function () {
     function initAdminOrderDetail() {
       if (typeof $ === 'undefined'
           || typeof MyParcelModule === 'undefined'
-          || typeof MyParcelModule.orderpage === 'undefined'
-          || typeof MyParcelModule.orderpage.default === 'undefined'
+          || typeof MyParcelModule.back === 'undefined'
+          || typeof MyParcelModule.back.orderpage === 'undefined'
       ) {
         setTimeout(initAdminOrderDetail, 10);
 
@@ -49,10 +49,10 @@
         blank: '{$mpCurrency->blank|escape:'javascript':'UTF-8'}',
         format: '{$mpCurrency->format|escape:'javascript':'UTF-8'}',
         sign: '{$mpCurrency->sign|escape:'javascript':'UTF-8'}',
-        iso: '{$mpCurrency->iso_code|escape:'javascript':'UTF-8'}'
+        iso_code: '{$mpCurrency->iso_code|escape:'javascript':'UTF-8'}'
       };
 
-      new window.MyParcelModule.orderpage.default(
+      new window.MyParcelModule.back.orderpage(
         {$mpIdOrder|intval nofilter},
         JSON.parse('{$mpConcept|escape:'javascript' nofilter}'),
         JSON.parse('{$mpPreAlerted|escape:'javascript' nofilter}'),
