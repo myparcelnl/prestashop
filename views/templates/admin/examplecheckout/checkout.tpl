@@ -1,5 +1,5 @@
 {*
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,11 +12,14 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <!doctype html>
 <html lang="{$language_code|escape:'html' nofilter}">
+<head>
+  <meta charset="UTF-8">
+</head>
 <body>
   <div id="myparcelapp" class="myparcelcheckout"></div>
   <script type="text/javascript">

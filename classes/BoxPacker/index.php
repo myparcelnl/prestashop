@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  *  NOTICE OF LICENSE
  *
@@ -14,7 +14,7 @@
  *
  *  @author     DM Productions B.V. <info@dmp.nl>
  *  @author     Michael Dekker <info@mijnpresta.nl>
- *  @copyright  2010-2018 DM Productions B.V.
+ *  @copyright  2010-2019 DM Productions B.V.
  *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 

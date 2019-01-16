@@ -1,5 +1,5 @@
 {*
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,11 +12,11 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div id="myparcel-export-panel"></div>
-<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/back-8b209a38521d2000.bundle.min.js"></script>
+<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/back-2411272a95c2d98f.bundle.min.js"></script>
 <script type="text/javascript">
   (function () {
     function initAdminOrderDetail() {
@@ -42,7 +42,6 @@
         window.MyParcelModule.paperSize = false;
       }
       window.MyParcelModule.askPaperSize = {if $mpAskPaperSize}true{else}false{/if};
-      window.MyParcelModule.async = {if $mpAsync}true{else}false{/if};
       window.MyParcelModule.askReturnConfig = {if $mpAskReturnConfig}true{else}false{/if};
       window.MyParcelModule.debug = {if $mpLogApi}true{else}false{/if};
       window.MyParcelModule.currency = {

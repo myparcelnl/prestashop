@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -143,7 +143,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         // Calculate the conversion to make before displaying prices
         // It is comprised of taxes and currency conversions
         /** @var Currency $defaultCurrency */
-        $defaultCurrency = Currency::getCurrencyInstance(Configuration::get(' PS_CURRENCY_DEFAULT'));
+        $defaultCurrency = Currency::getCurrencyInstance(Configuration::get('PS_CURRENCY_DEFAULT'));
         /** @var Currency $currentCurrency */
         $currentCurrency = $this->context->currency;
         $conversion = $defaultCurrency->conversion_rate * $currentCurrency->conversion_rate;
@@ -201,7 +201,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                     : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
                 'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
-                'mypaCheckoutJs'                => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-8b209a38521d2000.bundle.min.js'),
+                'mypaCheckoutJs'                => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-2411272a95c2d98f.bundle.min.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
@@ -235,7 +235,6 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                     array(),
                     Tools::usingSecureMode()
                 ),
-                'mpAsync'                       => (bool) Configuration::get(MyParcel::DEV_MODE_ASYNC),
                 'mpLogApi'                      => (bool) Configuration::get(MyParcel::LOG_API),
         );
         $cacheKey = md5(
@@ -455,8 +454,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      */
     protected function hideMe()
     {
-        header('Content-Type: text/html');
-        ob_clean();
+        header('Content-Type: text/html;charset=utf-8');
         echo Context::getContext()->smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/front/removeiframe.tpl');
         exit;
     }

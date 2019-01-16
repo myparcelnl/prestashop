@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -40,12 +40,12 @@ class MyParcelDemo
      */
     public static function renderDemo()
     {
-        header('Content-Type: text/html');
+        header('Content-Type: text/html;charset=utf-8');
 
         $smarty = Context::getContext()->smarty;
         $smarty->assign(array(
             'language_code'          => Tools::strtolower(Context::getContext()->language->language_code),
-            'mypaCheckoutJs'         => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-8b209a38521d2000.bundle.min.js'),
+            'mypaCheckoutJs'         => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-2411272a95c2d98f.bundle.min.js'),
             'base_dir_ssl'           => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').Tools::getShopDomainSsl().__PS_BASE_URI__,
             'signedPreferred'        => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
             'recipientOnlyPreferred' => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
@@ -59,7 +59,6 @@ class MyParcelDemo
             'inactivecolor'          => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
             'fontfamily'             => Configuration::get(MyParcel::CHECKOUT_FONT),
         ));
-        ob_clean();
         echo $smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/admin/examplecheckout/checkout.tpl');
         exit;
     }

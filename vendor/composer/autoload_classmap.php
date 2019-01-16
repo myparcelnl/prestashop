@@ -7,9 +7,10 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'CallbackFilterIterator' => $vendorDir . '/symfony/polyfill-php54/Resources/stubs/CallbackFilterIterator.php',
-    'ComposerAutoloaderInitc8b85057d4faeb2eab515384c5309f65' => $vendorDir . '/composer/autoload_real.php',
+    'ComposerAutoloaderInitcf368d5f53a97611889a28c6569c976b' => $vendorDir . '/composer/autoload_real.php',
     'MyParcelBrievenbuspakjeItem' => $baseDir . '/classes/MyParcelBrievenbuspakjeItem.php',
     'MyParcelCarrierDeliverySetting' => $baseDir . '/classes/MyParcelCarrierDeliverySetting.php',
+    'MyParcelDataColumn' => $baseDir . '/classes/MyParcelDataColumn.php',
     'MyParcelDeliveryOption' => $baseDir . '/classes/MyParcelDeliveryOption.php',
     'MyParcelDemo' => $baseDir . '/classes/MyParcelDemo.php',
     'MyParcelMailboxPackage' => $baseDir . '/classes/MyParcelMailboxPackage.php',
@@ -23,7 +24,7 @@ return array(
     'MyParcelModule\\BoxPacker\\VolumePacker' => $baseDir . '/classes/BoxPacker/VolumePacker.php',
     'MyParcelModule\\BoxPacker\\WeightRedistributor' => $baseDir . '/classes/BoxPacker/WeightRedistributor.php',
     'MyParcelModule\\Composer\\Autoload\\ClassLoader' => $vendorDir . '/composer/ClassLoader.php',
-    'MyParcelModule\\Composer\\Autoload\\ComposerStaticInitc8b85057d4faeb2eab515384c5309f65' => $vendorDir . '/composer/autoload_static.php',
+    'MyParcelModule\\Composer\\Autoload\\ComposerStaticInitcf368d5f53a97611889a28c6569c976b' => $vendorDir . '/composer/autoload_static.php',
     'MyParcelModule\\Curl\\ArrayUtil' => $vendorDir . '/php-curl-class/php-curl-class/src/Curl/ArrayUtil.php',
     'MyParcelModule\\Curl\\CaseInsensitiveArray' => $vendorDir . '/php-curl-class/php-curl-class/src/Curl/CaseInsensitiveArray.php',
     'MyParcelModule\\Curl\\Curl' => $vendorDir . '/php-curl-class/php-curl-class/src/Curl/Curl.php',

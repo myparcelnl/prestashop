@@ -122,14 +122,14 @@ final class Mbstring
     public static function mb_decode_numericentity($s, $convmap, $encoding = null)
     {
         if (null !== $s && !\is_scalar($s) && !(\is_object($s) && \method_exists($s, '__toString'))) {
-            trigger_error('mb_decode_numericentity() expects parameter 1 to be string, ' . gettype($s) . ' given', E_USER_WARNING);
+            trigger_error('mb_decode_numericentity() expects parameter 1 to be string, ' . \gettype($s) . ' given', E_USER_WARNING);
             return null;
         }
         if (!\is_array($convmap) || !$convmap) {
             return false;
         }
         if (null !== $encoding && !\is_scalar($encoding)) {
-            trigger_error('mb_decode_numericentity() expects parameter 3 to be string, ' . gettype($s) . ' given', E_USER_WARNING);
+            trigger_error('mb_decode_numericentity() expects parameter 3 to be string, ' . \gettype($s) . ' given', E_USER_WARNING);
             return '';
             // Instead of null (cf. mb_encode_numericentity).
         }
@@ -169,19 +169,19 @@ final class Mbstring
     public static function mb_encode_numericentity($s, $convmap, $encoding = null, $is_hex = false)
     {
         if (null !== $s && !\is_scalar($s) && !(\is_object($s) && \method_exists($s, '__toString'))) {
-            trigger_error('mb_encode_numericentity() expects parameter 1 to be string, ' . gettype($s) . ' given', E_USER_WARNING);
+            trigger_error('mb_encode_numericentity() expects parameter 1 to be string, ' . \gettype($s) . ' given', E_USER_WARNING);
             return null;
         }
         if (!\is_array($convmap) || !$convmap) {
             return false;
         }
         if (null !== $encoding && !\is_scalar($encoding)) {
-            trigger_error('mb_encode_numericentity() expects parameter 3 to be string, ' . gettype($s) . ' given', E_USER_WARNING);
+            trigger_error('mb_encode_numericentity() expects parameter 3 to be string, ' . \gettype($s) . ' given', E_USER_WARNING);
             return null;
             // Instead of '' (cf. mb_decode_numericentity).
         }
         if (null !== $is_hex && !\is_scalar($is_hex)) {
-            trigger_error('mb_encode_numericentity() expects parameter 4 to be boolean, ' . gettype($s) . ' given', E_USER_WARNING);
+            trigger_error('mb_encode_numericentity() expects parameter 4 to be boolean, ' . \gettype($s) . ' given', E_USER_WARNING);
             return null;
         }
         $s = (string) $s;
@@ -381,6 +381,8 @@ final class Mbstring
                     if (strncmp($enc, 'ISO-8859-', 9)) {
                         return false;
                     }
+                    // no break
+                // no break
                 case 'ASCII':
                 case 'UTF8':
                 case 'UTF-8':
@@ -566,6 +568,9 @@ final class Mbstring
     {
         if ('UTF-8' !== ($encoding = self::getEncoding($encoding))) {
             $s = mb_convert_encoding($s, 'UTF-8', $encoding);
+        }
+        if (1 === \strlen($s)) {
+            return \ord($s);
         }
         $code = ($s = unpack('C*', substr($s, 0, 4))) ? $s[1] : 0;
         if (0xf0 <= $code) {

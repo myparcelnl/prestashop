@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -58,7 +58,6 @@ function upgrade_module_2_2_0($module)
     Configuration::updateValue('MYPARCEL_ASK_PAPER_SELECT', true);
     Configuration::updateValue('MYPARCEL_ASK_RETURN_SELECT', true);
     Configuration::updateValue('MYPARCEL_MON_DEL', true);
-    $module->registerHook('displayBackOfficeFooter');
     $module->registerHook('actionAdminLogsListingFieldsModifier');
     $module->registerHook('registerGDPRConsent');
     $module->registerHook('actionDeleteGDPRCustomer');

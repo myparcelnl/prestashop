@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -84,7 +84,7 @@ class MyParcel extends Module
     const DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT = 'MYPARCEL_RETDEFCON_I_AMOUNT';
     const MONDAY_DELIVERY_SUPPORTED = 'MYPARCEL_MON_DEL';
 
-    const INSURED_TYPE_50 = 1;
+    const INSURED_TYPE_100 = 1;
     const INSURED_TYPE_250 = 2;
     const INSURED_TYPE_500 = 3;
     const INSURED_TYPE_500_PLUS = 4;
@@ -109,7 +109,6 @@ class MyParcel extends Module
     const DEV_MODE_RESET_TOUR = 'MYPARCEL_RESET_TOUR';
     const DEV_MODE_CHECK_WEBHOOKS = 'MYPARCEL_CHECK_WEBHOOKS';
     const DEV_MODE_REMOVE_WEBHOOK = 'MYPARCEL_REMOVE_WEBHOOK';
-    const DEV_MODE_ASYNC = 'MYPARCEL_ASYNC';
     const DEV_MODE_HIDE_PREFERRED = 'MYPARCEL_HIDE_PREFERRED';
 
     const API_TIMEOUT = 20;
@@ -168,12 +167,13 @@ class MyParcel extends Module
         'displayCarrierList',
         'displayHeader',
         'displayBackOfficeHeader',
-        'displayBackOfficeFooter',
         'adminOrder',
         'orderDetail',
         'actionValidateOrder',
         'actionAdminOrdersListingFieldsModifier',
         'actionAdminLogsListingFieldsModifier',
+        'actionLogsGridDefinitionModifier',
+        'actionlogsGridPresenterModifier',
         'registerGDPRConsent',
         'actionDeleteGDPRCustomer',
         'actionExportGDPRData',
@@ -198,7 +198,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.2.1';
+        $this->version = '2.2.2';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -286,7 +286,7 @@ class MyParcel extends Module
             }
 
             if (!$found) {
-                $curl->setHeader('Content-Type', 'application/json;charset=UTF-8');
+                $curl->setHeader('Content-Type', 'application/json;charset=utf-8');
                 $response = $curl->post('https://api.myparcel.nl/webhook_subscriptions', mypa_json_encode(array(
                     'data' => array(
                         'webhook_subscriptions' => array(
@@ -927,7 +927,6 @@ class MyParcel extends Module
                     'mpJsCountries'           => $countries,
                     'mpPaperSize'             => @json_decode(Configuration::get(static::PAPER_SELECTION)),
                     'mpAskPaperSize'          => (bool) Configuration::get(static::ASK_PAPER_SELECTION),
-                    'mpAsync'                 => (bool) Configuration::get(static::DEV_MODE_ASYNC),
                     'mpAskReturnConfig'       => (bool) Configuration::get(static::ASK_RETURN_SELECTION),
                     'mpCheckWebhooks'         => (time() > ($lastWebhookCheck + static::WEBHOOK_CHECK_INTERVAL)) || empty($webHookId),
                     'mpReturnInsuranceAmount' => MyParcelTools::getInsuranceAmount(true),
@@ -942,7 +941,7 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/dist/back-8b209a38521d2000.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/dist/back-2411272a95c2d98f.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
         } elseif (Tools::getValue('controller') === 'AdminModules'
             && Tools::getValue('configure') === $this->name
@@ -959,76 +958,64 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/hook/initdeliverysettings.tpl');
         }
 
+        if ($this->shouldShowTour()) {
+            $tourElement = false;
+            $submitForm = false;
+            $extraSubmits = array();
+            switch ((int) Configuration::get(static::TOUR_CURRENT_STEP, null, 0, 0)) {
+                case static::TOUR_STEP_MAIN:
+                    if ((int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS) {
+                        $tourElement = '#fieldset_0';
+                        $submitForm = '#configuration_form';
+                        $extraSubmits = array(
+                            'configuration_form_submit_btn' => 1,
+                        );
+                    }
+                    break;
+                case static::TOUR_STEP_DELIVERY_OPTIONS:
+                    $tourElement = '#module_form .panel';
+                    $submitForm = '#module_form';
+                    $extraSubmits = array(
+                        'module_form_submit_btn' => 1,
+                    );
+                    break;
+                case static::TOUR_STEP_DESIGN:
+                    $tourElement = '#fieldset_1_1';
+                    $submitForm = '#configuration_form';
+                    $extraSubmits = array(
+                        'configuration_form_submit_btn' => 1,
+                    );
+                    break;
+                case static::TOUR_STEP_LABELS_NOTIFICATIONS:
+                    if ((int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS) {
+                        $tourElement = '#fieldset_2_2, #fieldset_3_3';
+                        $submitForm = '#configuration_form';
+                        $extraSubmits = array(
+                            'configuration_form_submit_btn' => 1,
+                        );
+                    }
+                    break;
+                case static::TOUR_STEP_CARRIER_CONFIG:
+                    break;
+                case static::TOUR_STEP_START_SHIPPING:
+                    break;
+            }
+
+            $this->context->smarty->assign(array(
+                'link'         => $this->context->link,
+                'moduleCode'   => $this->name,
+                'moduleTab'    => $this->tab,
+                'moduleUrl'    => $this->baseUrl,
+                'shouldResume' => $this->shouldResumeTour(),
+                'tourElement'  => $tourElement,
+                'submitForm'   => $submitForm,
+                'extraSubmits' => $extraSubmits,
+            ));
+
+            $html .= $this->display(__FILE__, 'views/templates/admin/tour/backoffice_top.tpl');
+        }
+
         return $html;
-    }
-
-    /**
-     * Back office top banner
-     *
-     * @return string
-     * @throws PrestaShopException
-     * @throws SmartyException
-     */
-    public function hookDisplayBackOfficeFooter()
-    {
-        if (!$this->shouldShowTour()) {
-            return '';
-        }
-
-        $tourElement = false;
-        $submitForm = false;
-        $extraSubmits = array();
-        switch ((int) Configuration::get(static::TOUR_CURRENT_STEP, null, 0, 0)) {
-            case static::TOUR_STEP_MAIN:
-                if ((int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS) {
-                    $tourElement = '#fieldset_0';
-                    $submitForm = '#configuration_form';
-                    $extraSubmits = array(
-                        'configuration_form_submit_btn' => 1,
-                    );
-                }
-                break;
-            case static::TOUR_STEP_DELIVERY_OPTIONS:
-                $tourElement = '#module_form .panel';
-                $submitForm = '#module_form';
-                $extraSubmits = array(
-                    'module_form_submit_btn' => 1,
-                );
-                break;
-            case static::TOUR_STEP_DESIGN:
-                $tourElement = '#fieldset_1_1';
-                $submitForm = '#configuration_form';
-                $extraSubmits = array(
-                    'configuration_form_submit_btn' => 1,
-                );
-                break;
-            case static::TOUR_STEP_LABELS_NOTIFICATIONS:
-                if ((int) Tools::getValue('menu') === static::MENU_MAIN_SETTINGS) {
-                    $tourElement = '#fieldset_2_2, #fieldset_3_3';
-                    $submitForm = '#configuration_form';
-                    $extraSubmits = array(
-                        'configuration_form_submit_btn' => 1,
-                    );
-                }
-                break;
-            case static::TOUR_STEP_CARRIER_CONFIG:
-                break;
-            case static::TOUR_STEP_START_SHIPPING:
-                break;
-        }
-
-        $this->context->smarty->assign(array(
-            'link'             => $this->context->link,
-            'moduleCode'       => $this->name,
-            'moduleTab'        => $this->tab,
-            'moduleUrl'        => $this->baseUrl,
-            'shouldResume'     => $this->shouldResumeTour(),
-            'tourElement'      => $tourElement,
-            'submitForm'       => $submitForm,
-            'extraSubmits'     => $extraSubmits,
-        ));
-
-        return $this->display(__FILE__, 'views/templates/admin/tour/backoffice_top.tpl');
     }
 
     /**
@@ -1044,7 +1031,7 @@ class MyParcel extends Module
             $success &= Configuration::updateValue(static::TOUR_CURRENT_STEP, $tourStep, false, 0, 0);
         }
 
-        header('Content-Type: application/json;charset=UTF-8');
+        header('Content-Type: application/json;charset=utf-8');
         die(mypa_json_encode(array(
             'success' => $success,
         )));
@@ -1196,7 +1183,7 @@ class MyParcel extends Module
     public function ajaxProcessOrderInfo()
     {
         if (!$this->active) {
-            header('Content-Type: text/plain');
+            header('Content-Type: text/plain;charset=utf-8');
             if (function_exists('http_response_code')) {
                 http_response_code(404);
             } else {
@@ -1206,7 +1193,7 @@ class MyParcel extends Module
             die('MyParcel module has been disabled');
         }
 
-        header('Content-Type: application/json');
+        header('Content-Type: application/json;charset=utf-8');
         // @codingStandardsIgnoreStart
         $payload = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
@@ -1640,7 +1627,7 @@ class MyParcel extends Module
         $data = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
 
-        header('Content-Type: application/json');
+        header('Content-Type: application/json;charset=utf-8');
         if (isset($data['data']['concept'])) {
             die(
                 mypa_json_encode(
@@ -1674,7 +1661,7 @@ class MyParcel extends Module
         $data = @json_decode(file_get_contents('php://input'), true);
         // @codingStandardsIgnoreEnd
 
-        header('Content-Type: application/json');
+        header('Content-Type: application/json;charset=utf-8');
         if (!empty($data['idOrder']) && !empty($data['data'])) {
             die(mypa_json_encode(
                 array(
@@ -2194,7 +2181,6 @@ class MyParcel extends Module
                 (int) Tools::getValue(static::CHECKOUT_FONT_SIZE) ?: 14
             );
             Configuration::updateValue(static::LOG_API, (bool) Tools::getValue(static::LOG_API));
-            Configuration::updateValue(static::DEV_MODE_ASYNC, (bool) Tools::getValue(static::DEV_MODE_ASYNC));
             Configuration::updateValue(static::DEV_MODE_HIDE_PREFERRED, (bool) Tools::getValue(static::DEV_MODE_HIDE_PREFERRED));
             Configuration::updateValue(static::PRINTED_STATUS, (int) Tools::getValue(static::PRINTED_STATUS));
             Configuration::updateValue(static::SHIPPED_STATUS, (int) Tools::getValue(static::SHIPPED_STATUS));
@@ -2426,8 +2412,8 @@ class MyParcel extends Module
                         'options' => array(
                             'query' => array(
                                 array(
-                                    'id'   => static::INSURED_TYPE_50,
-                                    'name' => $this->l('€50'),
+                                    'id'   => static::INSURED_TYPE_100,
+                                    'name' => $this->l('€100'),
                                 ),
                                 array(
                                     'id'   => static::INSURED_TYPE_250,
@@ -2624,8 +2610,8 @@ class MyParcel extends Module
                         'options' => array(
                             'query' => array(
                                 array(
-                                    'id'   => static::INSURED_TYPE_50,
-                                    'name' => $this->l('€50'),
+                                    'id'   => static::INSURED_TYPE_100,
+                                    'name' => $this->l('€100'),
                                 ),
                                 array(
                                     'id'   => static::INSURED_TYPE_250,
@@ -3732,8 +3718,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/dist/front-8b209a38521d2000.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/dist/back-8b209a38521d2000.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/front-2411272a95c2d98f.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/back-2411272a95c2d98f.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -3777,7 +3763,6 @@ class MyParcel extends Module
             static::ASK_PAPER_SELECTION     => Configuration::get(static::ASK_PAPER_SELECTION),
             static::DEV_MODE_RESET_TOUR     => null,
             static::DEV_MODE_SET_VERSION    => null,
-            static::DEV_MODE_ASYNC          => Configuration::get(static::DEV_MODE_ASYNC),
             static::DEV_MODE_HIDE_PREFERRED => Configuration::get(static::DEV_MODE_HIDE_PREFERRED),
         );
 
@@ -4215,25 +4200,6 @@ class MyParcel extends Module
                     ),
                     array(
                         'type'    => 'switch',
-                        'name'    => static::DEV_MODE_ASYNC,
-                        'label'   => $this->l('Async mode (experimental)'),
-                        'is_bool' => true,
-                        'values'  => array(
-                            array(
-                                'id'    => 'active_on',
-                                'value' => true,
-                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
-                            ),
-                            array(
-                                'id'    => 'active_off',
-                                'value' => false,
-                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
-                            ),
-                        ),
-                        'hidden'   => true,
-                    ),
-                    array(
-                        'type'    => 'switch',
                         'name'    => static::DEV_MODE_HIDE_PREFERRED,
                         'label'   => $this->l('Hide column with preferred delivery dates'),
                         'is_bool' => true,
@@ -4451,7 +4417,6 @@ class MyParcel extends Module
                 'mpWeightSuggestion'      => MyParcelTools::getWeightSuggestion($order),
                 'mpPaperSize'             => @json_decode(Configuration::get(static::PAPER_SELECTION)),
                 'mpAskPaperSize'          => (bool) Configuration::get(static::ASK_PAPER_SELECTION),
-                'mpAsync'                 => (bool) Configuration::get(static::DEV_MODE_ASYNC),
                 'mpAskReturnConfig'       => (bool) Configuration::get(static::ASK_RETURN_SELECTION),
                 'mpReturnInsuranceAmount' => MyParcelTools::getInsuranceAmount(true),
                 'mpLogApi'                => (bool) Configuration::get(static::LOG_API),
@@ -4689,6 +4654,55 @@ class MyParcel extends Module
                 'callback_object' => 'MyParcelTools',
             );
         }
+    }
+
+    /**
+     * Decode the base64 log messages on the AdminLogs page
+     *
+     * @param array $params
+     *
+     * @since 2.3.0
+     */
+    public function hookActionLogsGridPresenterModifier($params)
+    {
+        $all = $params['presented_grid']['data']['records']->all();
+        foreach ($all as &$item) {
+            if (base64_encode(base64_decode($item['message'])) !== $item['message']
+                || mb_strlen($item['message']) < 8
+            ) {
+                $item['base64'] = false;
+                continue;
+            }
+
+            $item['message'] = base64_decode($item['message']);
+            $item['base64'] = true;
+        }
+        $params['presented_grid']['data']['records'] = new \PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection($all);
+    }
+
+    /**
+     * Update the AdminLogs page listing
+     *
+     * @param array $params
+     *
+     * @since 2.3.0
+     */
+    public function hookActionLogsGridDefinitionModifier($params)
+    {
+        /** @var \PrestaShop\PrestaShop\Core\Grid\Definition\GridDefinition $def */
+        $def = $params['definition'];
+        $columns = $def->getColumns();
+
+        $oldColumn = current(array_filter($columns->toArray(), function ($elem) {
+            return $elem['id'] === 'message';
+        }));
+
+        $newColumn = new MyParcelDataColumn($oldColumn['id']);
+        $newColumn->setName($oldColumn['name']);
+        $newColumn->setOptions($oldColumn['options']);
+
+        $columns->remove('message');
+        $columns->addAfter('severity', $newColumn);
     }
 
     /**
@@ -4967,7 +4981,7 @@ class MyParcel extends Module
         // Calculate the conversion to make before displaying prices
         // It is comprised of taxes and currency conversions
         /** @var Currency $defaultCurrency */
-        $defaultCurrency = Currency::getCurrencyInstance(Configuration::get(' PS_CURRENCY_DEFAULT'));
+        $defaultCurrency = Currency::getCurrencyInstance(Configuration::get('PS_CURRENCY_DEFAULT'));
         /** @var Currency $currentCurrency */
         $currentCurrency = $this->context->currency;
         $conversion = $defaultCurrency->conversion_rate * $currentCurrency->conversion_rate;
@@ -5450,9 +5464,9 @@ class MyParcel extends Module
 
         $mdo = MyParcelDeliveryOption::getRawByCartId($cart->id);
 
-        if (isset($mdo->type) && $mdo->type === 'timeframe') {
-            if (isset($mdo->data->time->price_comment)) {
-                switch ($mdo->data->time->price_comment) {
+        if (isset($mdo['type']) && $mdo['type'] === 'timeframe') {
+            if (isset($mdo['data']['time']['price_comment'])) {
+                switch ($mdo['data']['time']['price_comment']) {
                     case 'morning':
                         return 4;
                     case 'night':
@@ -5784,7 +5798,9 @@ class MyParcel extends Module
         if ($tourStep >= 99) {
             return false;
         }
-        if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
+        if (version_compare(_PS_VERSION_, '1.6.1.0', '<')
+            || version_compare(_PS_VERSION_, '1.7.4.0', '>=')
+        ) {
             // Older PrestaShop configuration forms are too borked to guide users properly
             Configuration::updateValue(static::TOUR_CURRENT_STEP, 99, false, 0, 0);
             return false;

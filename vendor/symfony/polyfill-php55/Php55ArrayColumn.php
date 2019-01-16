@@ -34,11 +34,11 @@ final class Php55ArrayColumn
         foreach ($input as $row) {
             $key = $value = null;
             $keySet = $valueSet = false;
-            if ($indexKey !== null && array_key_exists($indexKey, $row)) {
+            if (null !== $indexKey && array_key_exists($indexKey, $row)) {
                 $keySet = true;
                 $key = (string) $row[$indexKey];
             }
-            if ($columnKey === null) {
+            if (null === $columnKey) {
                 $valueSet = true;
                 $value = $row;
             } elseif (\is_array($row) && \array_key_exists($columnKey, $row)) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -132,9 +132,6 @@ class MyParcelHttpClient extends Curl
     public function execDone()
     {
         parent::execDone();
-        header('Content-Type: text/plain');
-        ob_clean();
-
         if (Configuration::get(MyParcel::LOG_API)) {
             if (Validate::isLoadedObject(Context::getContext()->customer)) {
                 $subject = 'Customer';
@@ -160,20 +157,26 @@ class MyParcelHttpClient extends Curl
             $rawRequest[] = '';
             $rawRequest[] = '';
 
-            Logger::addLog(
-                base64_encode(implode("\n", $rawRequest).$this->requestBody),
-                1,
-                null,
-                $subject,
-                $id
-            );
-            Logger::addLog(
-                base64_encode($this->rawResponseHeaders.$this->rawResponse),
-                1,
-                null,
-                $subject,
-                $id
-            );
+            $requestLog = base64_encode(implode("\n", $rawRequest).$this->requestBody);
+            if (\Tools::strlen($requestLog)) {
+                Logger::addLog(
+                    $requestLog,
+                    1,
+                    null,
+                    $subject,
+                    $id
+                );
+            }
+            $responseLog = base64_encode($this->rawResponseHeaders.$this->rawResponse);
+            if (\Tools::strlen($responseLog)) {
+                Logger::addLog(
+                    $responseLog,
+                    1,
+                    null,
+                    $subject,
+                    $id
+                );
+            }
         }
 
         // Reset headers

@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
@@ -14,5 +15,22 @@
  * @author     Michael Dekker <info@mijnpresta.nl>
  * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*}
-{l s='You can configure notifications sent via MyParcel on [1]this page[/1].' tags=['<a href="https://backoffice.myparcel.nl/ttsettingstable" rel="noopener noreferrer" target="_blank">', '</a>'] mod='myparcel'}
+ */
+
+if (!defined('_PS_VERSION_' && !defined('_TB_VERSION_'))) {
+    return;
+}
+
+function upgrade_module_2_2_2($module)
+{
+    /** @var MyParcel $module */
+    $newHooks = array(
+        'actionLogsGridDefinitionModifier',
+        'actionLogsGridPresenterModifier',
+    );
+    foreach ($newHooks as $oldName => $newHook) {
+        $module->registerHook($newHook);
+    }
+
+    return true;
+}

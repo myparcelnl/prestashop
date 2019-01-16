@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -464,8 +464,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         $countryIso = Tools::strtolower(Country::getIsoById($address->id_country));
         if ($countryIso === 'nl' && $configuration[MyParcel::DEFAULT_CONCEPT_INSURED]) {
             switch ($configuration[MyParcel::DEFAULT_CONCEPT_INSURED_TYPE]) {
-                case MyParcel::INSURED_TYPE_50:
-                    $insuranceAmount = 5000;
+                case MyParcel::INSURED_TYPE_100:
+                    $insuranceAmount = 10000;
                     break;
                 case MyParcel::INSURED_TYPE_250:
                     $insuranceAmount = 25000;
@@ -628,8 +628,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
 
         if ($configuration[MyParcel::DEFAULT_CONCEPT_INSURED]) {
             switch ($configuration[MyParcel::DEFAULT_CONCEPT_INSURED_TYPE]) {
-                case MyParcel::INSURED_TYPE_50:
-                    $insuranceAmount = 5000;
+                case MyParcel::INSURED_TYPE_100:
+                    $insuranceAmount = 10000;
                     break;
                 case MyParcel::INSURED_TYPE_250:
                     $insuranceAmount = 25000;
@@ -731,8 +731,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         $countryIso = Tools::strtoupper(Country::getIsoById($address->id_country));
         if ($countryIso === 'NL' && Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED)) {
             switch (Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED_TYPE)) {
-                case MyParcel::INSURED_TYPE_50:
-                    $insuranceAmount = 5000;
+                case MyParcel::INSURED_TYPE_100:
+                    $insuranceAmount = 10000;
                     break;
                 case MyParcel::INSURED_TYPE_250:
                     $insuranceAmount = 25000;

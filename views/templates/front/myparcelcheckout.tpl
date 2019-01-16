@@ -1,5 +1,5 @@
 {*
- * 2017-2018 DM Productions B.V.
+ * 2017-2019 DM Productions B.V.
  *
  * NOTICE OF LICENSE
  *
@@ -12,7 +12,7 @@
  * to info@dmp.nl so we can send you a copy immediately.
  *
  * @author     Michael Dekker <info@mijnpresta.nl>
- * @copyright  2010-2018 DM Productions B.V.
+ * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <!doctype html>
@@ -49,7 +49,6 @@
         '3212': '{l s='Unknown address' mod='myparcel' js=1}'
       };
       window.MyParcelModule.debug = {if $mpLogApi}true{else}false{/if};
-      window.MyParcelModule.async = {if $mpAsync}true{else}false{/if};
       window.MyParcelModule.misc.mondayDelivery = {if Configuration::get(MyParcel::MONDAY_DELIVERY_SUPPORTED)}true{else}false{/if};
 
       function initMyParcelCheckout() {
