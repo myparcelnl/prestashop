@@ -6,7 +6,7 @@ use MyParcelModule\Curl\ArrayUtil;
 use MyParcelModule\Curl\Decoder;
 class Curl
 {
-    const VERSION = '8.3.3';
+    const VERSION = '8.5.0';
     const DEFAULT_TIMEOUT = 30;
     public $curl;
     public $id = null;
@@ -375,7 +375,16 @@ class Curl
         }
         $this->setUrl($url, $query_parameters);
         $this->setOpt(CURLOPT_CUSTOMREQUEST, 'DELETE');
-        $this->setOpt(CURLOPT_POSTFIELDS, $this->buildPostData($data));
+        // Avoid including a content-length header in DELETE requests unless there is a message body. The following
+        // would include "Content-Length: 0" in the request header:
+        //   curl_setopt($ch, CURLOPT_POSTFIELDS, array());
+        // RFC 2616 4.3 Message Body:
+        //   The presence of a message-body in a request is signaled by the
+        //   inclusion of a Content-Length or Transfer-Encoding header field in
+        //   the request's message-headers.
+        if (!empty($data)) {
+            $this->setOpt(CURLOPT_POSTFIELDS, $this->buildPostData($data));
+        }
         return $this->exec();
     }
     /**

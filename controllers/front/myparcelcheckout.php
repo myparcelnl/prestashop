@@ -201,7 +201,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                     : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
                 'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
                 'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
-                'mypaCheckoutJs'                => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-2411272a95c2d98f.bundle.min.js'),
+                'mypaCheckoutJs'                => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-8d6122b2c2e093e8.bundle.min.js'),
                 'link'                          => $context->link,
                 'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
                 'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),

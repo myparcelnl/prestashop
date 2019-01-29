@@ -12,5 +12,4 @@ return array(
     '3e2471375464aac821502deb0ac64275' => $vendorDir . '/symfony/polyfill-php54/bootstrap.php',
     'edc6464955a37aa4d5fbf39d40fb6ee7' => $vendorDir . '/symfony/polyfill-php55/bootstrap.php',
     '5a30d5fecde1fe9d975fb4ca93d2386f' => $baseDir . '/classes/helpers.php',
-    '680e970d330d666da38e2fc586c692c4' => $baseDir . '/classes/MyParcelDataColumn.php',
 );

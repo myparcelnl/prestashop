@@ -16,7 +16,7 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div id="myparcel-export-panel"></div>
-<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/back-2411272a95c2d98f.bundle.min.js"></script>
+<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/back-8d6122b2c2e093e8.bundle.min.js"></script>
 <script type="text/javascript">
   (function () {
     function initAdminOrderDetail() {

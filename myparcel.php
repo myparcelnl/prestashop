@@ -172,8 +172,6 @@ class MyParcel extends Module
         'actionValidateOrder',
         'actionAdminOrdersListingFieldsModifier',
         'actionAdminLogsListingFieldsModifier',
-        'actionLogsGridDefinitionModifier',
-        'actionlogsGridPresenterModifier',
         'registerGDPRConsent',
         'actionDeleteGDPRCustomer',
         'actionExportGDPRData',
@@ -198,7 +196,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.2.2';
+        $this->version = '2.2.3';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -941,7 +939,7 @@ class MyParcel extends Module
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
 
             $this->context->controller->addJquery();
-            $this->context->controller->addJS($this->_path.'views/js/dist/back-2411272a95c2d98f.bundle.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/dist/back-8d6122b2c2e093e8.bundle.min.js');
             $this->context->controller->addCSS($this->_path.'views/css/forms.css');
         } elseif (Tools::getValue('controller') === 'AdminModules'
             && Tools::getValue('configure') === $this->name
@@ -3718,8 +3716,8 @@ class MyParcel extends Module
         );
         $helper->fields_value = $this->getMainFormValues();
 
-        $this->context->controller->addJS($this->_path.'views/js/dist/front-2411272a95c2d98f.bundle.min.js');
-        $this->context->controller->addJS($this->_path.'views/js/dist/back-2411272a95c2d98f.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/front-8d6122b2c2e093e8.bundle.min.js');
+        $this->context->controller->addJS($this->_path.'views/js/dist/back-8d6122b2c2e093e8.bundle.min.js');
 
         return $helper->generateForm(array(
             $this->getApiForm(),
@@ -4654,55 +4652,6 @@ class MyParcel extends Module
                 'callback_object' => 'MyParcelTools',
             );
         }
-    }
-
-    /**
-     * Decode the base64 log messages on the AdminLogs page
-     *
-     * @param array $params
-     *
-     * @since 2.3.0
-     */
-    public function hookActionLogsGridPresenterModifier($params)
-    {
-        $all = $params['presented_grid']['data']['records']->all();
-        foreach ($all as &$item) {
-            if (base64_encode(base64_decode($item['message'])) !== $item['message']
-                || mb_strlen($item['message']) < 8
-            ) {
-                $item['base64'] = false;
-                continue;
-            }
-
-            $item['message'] = base64_decode($item['message']);
-            $item['base64'] = true;
-        }
-        $params['presented_grid']['data']['records'] = new \PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection($all);
-    }
-
-    /**
-     * Update the AdminLogs page listing
-     *
-     * @param array $params
-     *
-     * @since 2.3.0
-     */
-    public function hookActionLogsGridDefinitionModifier($params)
-    {
-        /** @var \PrestaShop\PrestaShop\Core\Grid\Definition\GridDefinition $def */
-        $def = $params['definition'];
-        $columns = $def->getColumns();
-
-        $oldColumn = current(array_filter($columns->toArray(), function ($elem) {
-            return $elem['id'] === 'message';
-        }));
-
-        $newColumn = new MyParcelDataColumn($oldColumn['id']);
-        $newColumn->setName($oldColumn['name']);
-        $newColumn->setOptions($oldColumn['options']);
-
-        $columns->remove('message');
-        $columns->addAfter('severity', $newColumn);
     }
 
     /**
