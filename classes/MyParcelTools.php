@@ -569,7 +569,7 @@ class MyParcelTools
                                 'GB' =>
                                     array(
                                         'label'  => 'Verenigd Koninkrijk',
-                                        'region' => 'EU',
+                                        'region' => 'CD',
                                     ),
                                 'GR' =>
                                     array(
@@ -1681,7 +1681,6 @@ class MyParcelTools
             array('alpha2Code' => 'SI',),
             array('alpha2Code' => 'ES',),
             array('alpha2Code' => 'SE',),
-            array('alpha2Code' => 'GB',),
         );
     }
 

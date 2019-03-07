@@ -196,7 +196,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.2.3';
+        $this->version = '2.2.4';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -856,7 +856,7 @@ class MyParcel extends Module
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws SmartyException
-     *                        
+     *
      * @since 1.0.0
      */
     public function hookDisplayBackOfficeHeader()
@@ -1034,7 +1034,7 @@ class MyParcel extends Module
             'success' => $success,
         )));
     }
-    
+
     /**
      * Configuration Page: get content of the form
      *
@@ -1341,7 +1341,7 @@ class MyParcel extends Module
             $newShipment['shipment'] = $shipment;
             $response->set("data.shipments.{$index}", $newShipment);
         }
-            
+
         // finally, output the content
         header('Content-Type: application/json; charset=utf-8');
         die(mypa_json_encode($response->jsonSerialize()));
@@ -1443,7 +1443,7 @@ class MyParcel extends Module
                 'shipments' => $shipments,
             ),
         )));
-        
+
         if ($response) {
             $labelData = $this->processNewLabels($response, $idOrders, mypa_dot($request)->get('moduleData.shipments'));
             if (empty($labelData)) {
@@ -1743,7 +1743,7 @@ class MyParcel extends Module
         if (Tools::isSubmit('tour_step')) {
             $this->postProcessTour();
         }
-        
+
         switch (Tools::getValue('menu')) {
             case static::MENU_DEFAULT_SETTINGS:
                 $this->postProcessDefaultSettingsPage();
@@ -5518,7 +5518,7 @@ class MyParcel extends Module
      * @return bool True if the order has a shipping number
      *
      * @since 2.0.0
-     *        
+     *
      * @throws PrestaShopException
      * @throws Adapter_Exception
      */
@@ -5633,7 +5633,7 @@ class MyParcel extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     *                            
+     *
      * @since 2.0.0
      */
     protected function addGroups($carrier)
@@ -5676,7 +5676,7 @@ class MyParcel extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     *                            
+     *
      * @since 2.0.0
      */
     protected function addZones($carrier)
@@ -5697,7 +5697,7 @@ class MyParcel extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     *                            
+     *
      * @since 2.0.9
      */
     protected function basicCheck()
@@ -5736,7 +5736,7 @@ class MyParcel extends Module
 
     /**
      * @return bool
-     *             
+     *
      * @throws PrestaShopException
      *
      * @since 2.2.0
@@ -5758,7 +5758,7 @@ class MyParcel extends Module
         if (empty($this->context->employee)) {
             return false;
         }
-        
+
         if (!in_array(
             Tools::getValue('controller'),
             array(
