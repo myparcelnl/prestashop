@@ -21,6 +21,11 @@ if (!defined('_PS_VERSION_') && !defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @param MyParcel $module
+ *
+ * @return bool
+ */
 function upgrade_module_1_2($module)
 {
     /** @var MyParcel $module */

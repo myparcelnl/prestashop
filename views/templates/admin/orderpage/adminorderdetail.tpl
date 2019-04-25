@@ -15,55 +15,153 @@
  * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<div id="myparcel-export-panel"></div>
-<script type="text/javascript" src="{$mpModuleDir|escape:'htmlall' nofilter}views/js/dist/back-8d6122b2c2e093e8.bundle.min.js"></script>
+<div id="myparcel-export-panel" style="{if version_compare($smarty.const._PS_VERSION_, '1.6.0.0', '<')}margin-top: 10px{/if}"></div>
+{include file="../../hook/load_webpack_chunks.tpl"}
 <script type="text/javascript">
   (function () {
     function initAdminOrderDetail() {
       if (typeof $ === 'undefined'
           || typeof MyParcelModule === 'undefined'
-          || typeof MyParcelModule.back === 'undefined'
-          || typeof MyParcelModule.back.orderpage === 'undefined'
+          || typeof MyParcelModule.app === 'undefined'
+          || typeof MyParcelModule.app.default === 'undefined'
+          || typeof MyParcelModule.app.default.orderPage === 'undefined'
       ) {
         setTimeout(initAdminOrderDetail, 10);
 
         return;
       }
 
-      window.MyParcelModule.misc = window.MyParcelModule.misc || {ldelim}{rdelim};
-      window.MyParcelModule.misc.process_url = '{$mpProcessUrl|escape:'javascript' nofilter}';
-      window.MyParcelModule.misc.module_url = '{$mpModuleDir|escape:'javascript' nofilter}';
-      window.MyParcelModule.misc.countries = {mypa_json_encode($mpJsCountries)};
-      window.MyParcelModule.invoiceSuggestion = '{$mpInvoiceSuggestion|escape:'javascript':'UTF-8'}';
-      window.MyParcelModule.weightSuggestion = {$mpWeightSuggestion|intval};
-      try {
-        window.MyParcelModule.paperSize = {mypa_json_encode($mpPaperSize)};
-      } catch (e) {
-        window.MyParcelModule.paperSize = false;
-      }
-      window.MyParcelModule.askPaperSize = {if $mpAskPaperSize}true{else}false{/if};
-      window.MyParcelModule.askReturnConfig = {if $mpAskReturnConfig}true{else}false{/if};
-      window.MyParcelModule.debug = {if $mpLogApi}true{else}false{/if};
-      window.MyParcelModule.currency = {
-        blank: '{$mpCurrency->blank|escape:'javascript':'UTF-8'}',
-        format: '{$mpCurrency->format|escape:'javascript':'UTF-8'}',
-        sign: '{$mpCurrency->sign|escape:'javascript':'UTF-8'}',
-        iso_code: '{$mpCurrency->iso_code|escape:'javascript':'UTF-8'}'
-      };
-
-      new window.MyParcelModule.back.orderpage(
-        {$mpIdOrder|intval nofilter},
-        JSON.parse('{$mpConcept|escape:'javascript' nofilter}'),
-        JSON.parse('{$mpPreAlerted|escape:'javascript' nofilter}'),
-        {include file="../translations.tpl"},
-        {
-          insurance: {$mpReturnInsuranceAmount|intval},
-          recipientOnly: {if $mpRecipientOnly}true{else}false{/if},
-          signature: {if $mpSignature}true{else}false{/if},
-          extraLarge: {if $mpExtraLarge}true{else}false{/if},
-          returnUndeliverable: {if $mpReturnUndeliverable}true{else}false{/if},
-        }
-      );
+      window.MyParcelModule.app.default.orderPage().then(function (fn) {
+        new fn.default(
+          JSON.parse('{$mpPreAlerted|escape:'javascript' nofilter}'),
+          JSON.parse('{$mpConcept|escape:'javascript' nofilter}'),
+          {
+            defaultReturnConfig: {
+              insurance: {$mpReturnInsuranceAmount|intval},
+              onlyRecipient: {if $mpOnlyRecipient}true{else}false{/if},
+              signature: {if $mpSignature}true{else}false{/if},
+              largeFormat: {if $mpExtraLarge}true{else}false{/if},
+              returnUndeliverable: {if $mpReturnUndeliverable}true{else}false{/if},
+            },
+            returnCountries: ['NL', 'BE', 'DE', 'GB', 'UK', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LU', 'AT', 'SI', 'SK', 'ES', 'CZ'],
+            defaultPaperFormat: {mypa_json_encode(MyParcel::getPaperFormat())},
+            numberFormat: '{MyParcel::getNumberFormat()|escape:'javascript':'UTF-8'}',
+            currencyFormat: '{MyParcel::getCurrencyFormat()|escape:'javascript':'UTF-8'}',
+            urls: {
+              assets: '{$mpModuleDir|escape:'javascript':'UTF-8'}',
+              createLabel: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'createLabel'])|escape:'javascript':'UTF-8'}',
+              createRelatedReturnLabel: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'createRelatedReturnLabel'])|escape:'javascript':'UTF-8'}',
+              saveConceptData: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'saveConceptData'])|escape:'javascript':'UTF-8'}',
+              orderInfo: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'orderInfo'])|escape:'javascript':'UTF-8':'UTF-8'}',
+              refreshLabel: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'getShipment'])|escape:'javascript':'UTF-8'}',
+              trackTrace: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'getShipmentHistory'])|escape:'javascript':'UTF-8'}',
+              printLabel: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'printLabel'])|escape:'javascript':'UTF-8'}',
+              deleteShipment: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'deleteShipment'])|escape:'javascript':'UTF-8'}',
+              deliveryOptions: '{MyParcel::appendQueryToUrl($mpProcessUrl, ['action' => 'deliveryOptions'])|escape:'javascript':'UTF-8'}',
+              goodsNomenclatureInstall: '{$mpGoodsNomenclatureInstallUrl|escape:'javascript':'UTF-8'}',
+              goodsNomenclatureSearch: '{$mpGoodsNomenclatureSearchUrl|escape:'javascript':'UTF-8'}',
+              goodsNomenclatureBrowse: '{$mpGoodsNomenclatureBrowseUrl|escape:'javascript':'UTF-8'}',
+              goodsNomenclatureNavigate: '{$mpGoodsNomenclatureNavigateUrl|escape:'javascript':'UTF-8'}',
+            },
+            askPaperFormat: {if $mpAskPaperSize}true{else}false{/if},
+            askReturnConfig: {if $mpAskReturnConfig}true{else}false{/if},
+            carrierId: 1,
+            carrierCode: 'myparcelnl_postnl',
+            theme: '{MyParcel::getThemeVersion()|escape:'javascript':'UTF-8'}',
+            goodsNomenclatureInstallStep: {if MyParcelGoodsNomenclature::isInstalled()}0{else}1{/if},
+          },
+          {include file="../translations.tpl"},
+          {mypa_json_encode($mpJsCountries)},
+          {
+            onlyRecipient: {
+              currency: 'EUR',
+              amount: 30,
+            },
+            signature: {
+              currency: 'EUR',
+              amount: 38,
+            },
+            largeFormat: {
+              NL: {
+                currency: 'EUR',
+                amount: 295,
+              },
+              DE: {
+                currency: 'EUR',
+                amount: 295,
+              },
+              BE: {
+                currency: 'EUR',
+                amount: 295,
+              },
+              UK: {
+                currency: 'EUR',
+                amount: 295,
+              },
+              GB: {
+                currency: 'EUR',
+                amount: 295,
+              },
+              FR: {
+                currency: 'EUR',
+                amount: 295,
+              },
+              ES: {
+                currency: 'EUR',
+                amount: 295,
+              },
+            },
+            onlyRecipientSignature: {
+              currency: 'EUR',
+              amount: 47,
+            },
+            digitalStamp: {
+              '0': {
+                currency: 'EUR',
+                amount: 83,
+              },
+              '20': {
+                currency: 'EUR',
+                amount: 166,
+              },
+              '50': {
+                currency: 'EUR',
+                amount: 249,
+              },
+              '100': {
+                currency: 'EUR',
+                amount: 332,
+              },
+              '350': {
+                currency: 'EUR',
+                amount: 415,
+              },
+            },
+            insurance: {
+              '100': {
+                currency: 'EUR',
+                amount: 60,
+              },
+              '250': {
+                currency: 'EUR',
+                amount: 100,
+              },
+              '500': {
+                currency: 'EUR',
+                amount: 165,
+              },
+              'm500': {
+                currency: 'EUR',
+                amount: 165,
+              },
+            },
+            ageCheck: {
+              currency: 'EUR',
+              amount: 150
+            },
+          }
+        );
+      });
     }
 
     initAdminOrderDetail();

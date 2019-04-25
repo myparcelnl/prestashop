@@ -65,6 +65,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
     const DELIVERY = 'delivery';
     const PICKUP = 'pickup';
     const MAILBOX_PACKAGE = 'mailbox_package';
+    const DIGITAL_STAMP = 'digital_stamp';
 
     const DEFAULT_CUTOFF = '15:30';
 
@@ -98,6 +99,13 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
                 'db_type'  => 'TINYINT(1) UNSIGNED',
             ),
             'mailbox_package'                    => array(
+                'type'     => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => true,
+                'default'  => '0',
+                'db_type'  => 'TINYINT(1) UNSIGNED',
+            ),
+            'digital_stamp'                      => array(
                 'type'     => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true,
@@ -331,6 +339,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
     public $pickup;
     /** @var bool $mailbox_package */
     public $mailbox_package;
+    /** @var bool $digital_stamp */
+    public $digital_stamp;
     /** @var bool $monday_enabled */
     public $monday_enabled;
     /** @var string $monday_cutoff */
@@ -484,13 +494,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
         $sql->from(bqSQL(MyParcelCarrierDeliverySetting::$definition['table']), 'pcds');
         $sql->where('pcds.`id_reference` = '.(int) $idReference);
 
-        try {
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-        } catch (PrestaShopException $e) {
-            Logger::addLog("MyParcel module error: {$e->getMessage()}");
-
-            return false;
-        }
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
         if (empty($result)) {
             return false;
         }
@@ -523,13 +527,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
         $sql->from(bqSQL(static::$definition['table']), 'pcds');
         $sql->where('pcds.`'.bqSQL(static::$definition['primary']).'` = '.(int) $idMyParcelCarrierDeliverySetting);
 
-        try {
-            return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
-        } catch (PrestaShopException $e) {
-            Logger::addLog("MyParcel module error: {$e->getMessage()}");
-
-            return 0;
-        }
+        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
     }
 
     /**
@@ -552,6 +550,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
 
         if ($mpcds->delivery) {
             $mpcds->mailbox_package = false;
+            $mpcds->digital_stamp = false;
         }
 
         MyParcel::processCarrierDeliverySettingsRestrictions($mpcds);
@@ -574,41 +573,35 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      */
     public function save($nullValues = false, $autoDate = true)
     {
-        try {
-            // Need to be associated with an active carrier
-            $carrier = Carrier::getCarrierByReference($this->id_reference);
-            if (!Validate::isLoadedObject($carrier)) {
-                return false;
-            }
-            // Cannot associate with this carrier if it is already managage by another module
-            if ($carrier->external_module_name && $carrier->external_module_name !== 'myparcel') {
-                return false;
-            }
-            // No delivery options for this carrier => release carrier
-            if (!$this->pickup && !$this->delivery && !$this->mailbox_package) {
-                static::associateCarrierToModule($this->id_reference, false);
-            } else {
-                static::associateCarrierToModule($this->id_reference);
-                if ($this->mailbox_package) {
-                    Db::getInstance()->update(
-                        'carrier',
-                        array(
-                            'max_width'  => 0,
-                            'max_height' => 0,
-                            'max_depth'  => 0,
-                            'max_weight' => 0,
-                        ),
-                        '`id_reference` = '.(int) $this->id_reference.' AND `deleted` = 0'
-                    );
-                }
-            }
-
-            return parent::save($nullValues, $autoDate);
-        } catch (PrestaShopException $e) {
-            Logger::addLog("MyParcel module error: {$e->getMessage()}");
-
+        // Need to be associated with an active carrier
+        $carrier = Carrier::getCarrierByReference($this->id_reference);
+        if (!Validate::isLoadedObject($carrier)) {
             return false;
         }
+        // Cannot associate with this carrier if it is already managage by another module
+        if ($carrier->external_module_name && $carrier->external_module_name !== 'myparcel') {
+            return false;
+        }
+        // No delivery options for this carrier => release carrier
+        if (!$this->pickup && !$this->delivery && !$this->mailbox_package && !$this->digital_stamp) {
+            static::associateCarrierToModule($this->id_reference, false);
+        } else {
+            static::associateCarrierToModule($this->id_reference);
+            if ($this->mailbox_package || $this->digital_stamp) {
+                Db::getInstance()->update(
+                    'carrier',
+                    array(
+                        'max_width'  => 0,
+                        'max_height' => 0,
+                        'max_depth'  => 0,
+                        'max_weight' => 0,
+                    ),
+                    '`id_reference` = '.(int) $this->id_reference.' AND `deleted` = 0'
+                );
+            }
+        }
+
+        return parent::save($nullValues, $autoDate);
     }
 
     /**
@@ -626,33 +619,27 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      */
     public static function associateCarrierToModule($idReference, $associate = true)
     {
-        try {
-            if ($associate) {
-                return Db::getInstance()->update(
-                    'carrier',
-                    array(
-                        'external_module_name' => 'myparcel',
-                        'shipping_external'    => 1,
-                        'is_module'            => 1,
-                        'need_range'           => 1,
-                    ),
-                    '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
-                );
-            } else {
-                return Db::getInstance()->update(
-                    'carrier',
-                    array(
-                        'external_module_name' => '',
-                        'shipping_external'    => 0,
-                        'is_module'            => 0,
-                    ),
-                    '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
-                );
-            }
-        } catch (PrestaShopException $e) {
-            Logger::addLog("MyParcel module error: {$e->getMessage()}");
-
-            return false;
+        if ($associate) {
+            return Db::getInstance()->update(
+                'carrier',
+                array(
+                    'external_module_name' => 'myparcel',
+                    'shipping_external'    => 1,
+                    'is_module'            => 1,
+                    'need_range'           => 1,
+                ),
+                '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
+            );
+        } else {
+            return Db::getInstance()->update(
+                'carrier',
+                array(
+                    'external_module_name' => '',
+                    'shipping_external'    => 0,
+                    'is_module'            => 0,
+                ),
+                '`id_reference` = '.(int) $idReference.' AND `deleted` = 0'
+            );
         }
     }
 
@@ -676,6 +663,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
 
         if ($mpcds->pickup) {
             $mpcds->mailbox_package = false;
+            $mpcds->digital_stamp = false;
         }
 
         MyParcel::processCarrierDeliverySettingsRestrictions($mpcds);
@@ -700,6 +688,39 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
     {
         $mpcds = new self($idMyParcelCarrierDeliverySetting);
         $mpcds->mailbox_package = !$mpcds->mailbox_package;
+        if ($mpcds->mailbox_package) {
+            $mpcds->digital_stamp = false;
+            $mpcds->pickup = false;
+            $mpcds->delivery = false;
+        }
+
+        MyParcel::processCarrierDeliverySettingsRestrictions($mpcds);
+
+        return $mpcds->save();
+    }
+
+    /**
+     * Toggle mailbox pacckage status
+     *
+     * @param int $idMyParcelCarrierDeliverySetting
+     *
+     * @return bool Indicates whether the digital stamp status has been successfully toggled
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
+     * @since 2.3.0
+     */
+    public static function toggleDigitalStamp($idMyParcelCarrierDeliverySetting)
+    {
+        $mpcds = new self($idMyParcelCarrierDeliverySetting);
+        $mpcds->digital_stamp = !$mpcds->digital_stamp;
+        if ($mpcds->digital_stamp) {
+            $mpcds->mailbox_package = false;
+            $mpcds->pickup = false;
+            $mpcds->delivery = false;
+        }
 
         MyParcel::processCarrierDeliverySettingsRestrictions($mpcds);
 
@@ -713,6 +734,8 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      * @param int    $method   Method
      *
      * @return array Array with cut off times
+     *
+     * @throws Exception
      *
      * @since 2.0.0
      */
@@ -786,8 +809,10 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
      *
      * @return array Array with cut off times
      *
-     * @since 2.0.0
+     * @throws Exception
+     *
      * @since 2.2.0 Returned array key is now `Y-m-d` date
+     * @since 2.0.0
      */
     public function getDropoffDays($dateFrom, $days = 7)
     {

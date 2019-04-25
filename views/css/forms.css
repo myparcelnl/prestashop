@@ -1,95 +1,95 @@
 td.ui-state-danger {
-    background-color: #E08F95;
+  background-color: #E08F95;
 }
 
 td.ui-state-warning {
-    background-color: #fbbb22;
+  background-color: #fbbb22;
 }
 
 .ui-datepicker:before, .ui-datepicker:after {
-    display: none!important;
+  display: none !important;
 }
 
 .myparcel-label-warning {
-    background-color: #fbbb22 !important;
+  background-color: #fbbb22 !important;
 }
 
 .myparcel-label-success {
-    background-color: #72C279 !important;
+  background-color: #72C279 !important;
 }
 
 .myparcel-label-info {
-    background-color: #00aff0 !important;
+  background-color: #00aff0 !important;
 }
 
 .myparcel-label-danger {
-    background-color: #E08F95 !important;
+  background-color: #E08F95 !important;
 }
 
 .myparcel-label-inverse {
-    background-color: #333333 !important;
+  background-color: #333333 !important;
 }
 
 .myparcel-badge-warning {
-    color: #fbbb22 !important;
-    background-color: white !important;
+  color:            #fbbb22 !important;
+  background-color: white !important;
 }
 
 .myparcel-badge-success {
-    color: #72C279 !important;
-    background-color: white !important;
+  color:            #72C279 !important;
+  background-color: white !important;
 }
 
 .myparcel-badge-info {
-    color: #00aff0 !important;
-    background-color: white !important;
+  color:            #00aff0 !important;
+  background-color: white !important;
 }
 
 .myparcel-badge-danger {
-    color: #E08F95 !important;
-    background-color: white !important;
+  color:            #E08F95 !important;
+  background-color: white !important;
 }
 
 .myparcel-badge-inverse {
-    color: #333333 !important;
-    background-color: white !important;
+  color:            #333333 !important;
+  background-color: white !important;
 }
 
 .myparcel-external:after {
-    content: "\f08e";
-    font-family: FontAwesome, sans-serif;
-    font-weight: normal;
-    font-style: normal;
-    display: inline-block;
-    text-decoration: none;
-    padding-left: 3px;
+  content:         "\f08e";
+  font-family:     FontAwesome, sans-serif;
+  font-weight:     normal;
+  font-style:      normal;
+  display:         inline-block;
+  text-decoration: none;
+  padding-left:    3px;
 }
 
 .myparcel-dev-hidden {
-    opacity: 0;
+  opacity: 0;
 }
 
 .myparcel-dev-always-hidden {
-    display: none!important;
-    visibility: hidden!important;
+  display:    none !important;
+  visibility: hidden !important;
 }
 
 .myparcel-dev-hidden:hover {
-    opacity: 1;
+  opacity: 1;
 }
 
 td.sameday-cutoff-labels {
-    line-height: 2em !important;
+  line-height: 2em !important;
 }
 
 td.sameday-cutoff-labels * {
-    font-weight: 700 !important;
+  font-weight: 700 !important;
 }
 
 .swal-overlay {
-    display: none;
+  display: none;
 }
 
 .swal-overlay--show-modal {
-    display: inline-block;
+  display: inline-block;
 }

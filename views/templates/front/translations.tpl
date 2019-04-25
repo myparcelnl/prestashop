@@ -18,9 +18,9 @@
 {
   morning: '{l s='Morning' mod='myparcel' js=1}',
   standard: '{l s='Standard' mod='myparcel' js=1}',
-  night: '{l s='Evening' mod='myparcel' js=1}',
-  signed: '{l s='Signature required' mod='myparcel' js=1}',
-  recipientOnly: '{l s='Recipient only' mod='myparcel' js=1}',
+  evening: '{l s='Evening' mod='myparcel' js=1}',
+  signature: '{l s='Signature required' mod='myparcel' js=1}',
+  onlyRecipient: '{l s='Recipient only' mod='myparcel' js=1}',
   noAddress: '{l s='No address given' mod='myparcel' js=1}',
   deliveredAtHomeOrOffice: '{l s='Delivered at home or at the office' mod='myparcel' js=1}',
   deliveryOptions: '{l s='Delivery options' mod='myparcel' js=1}',

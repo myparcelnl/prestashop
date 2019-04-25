@@ -21,6 +21,9 @@ if (!defined('_PS_VERSION_') && !defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @return bool
+ */
 function upgrade_module_1_3_2()
 {
     Configuration::deleteByName('MYPARCEL_USERNAME');

@@ -20,10 +20,5 @@
   {l s='If you enable this option in the MyParcel back office and start sharing the email addresses with MyParcel, your store might no longer be GDPR compliant.' mod='myparcel'}
 </p>
 <p>
-  {l s='Therefore, if you do not have this kind of data sharing specified in your terms & conditions and/or privacy policy, or if you do not wish to do so, it is generally better to enable this option so the module sends emails directly through' mod='myparcel'}
-  {if $smarty.const._TB_VERSION_}
-    thirty bees.
-  {else}
-    PrestaShop.
-  {/if}
+  {l s='Therefore, if you do not have this kind of data sharing specified in your terms & conditions and/or privacy policy, or if you do not wish to do so, it is generally better to enable this option so the module sends emails directly through' mod='myparcel'} PrestaShop.
 </p>

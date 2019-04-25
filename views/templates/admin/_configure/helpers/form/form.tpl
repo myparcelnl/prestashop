@@ -214,7 +214,40 @@
       {/if}
     {/if}
   {elseif $input.type == 'switch'}
-    <span class="switch prestashop-switch fixed-width-lg{if !empty($input.hidden)} myparcel-dev-always-hidden{/if}">
+    {if version_compare($smarty.const._PS_VERSION_, '1.6.0.0', '<')}
+      {foreach $input.values as $value}
+        <input
+          class="{if !empty($input.hidden)} myparcel-dev-always-hidden{/if}"
+          type="radio"
+          name="{$input.name|escape:'htmlall':'UTF-8'}"
+          id="{$input.name|escape:'htmlall':'UTF-8'}_{$value.id|escape:'htmlall':'UTF-8'}"
+          value="{$value.value|escape:'htmlall':'UTF-8'}"
+          {if $fields_value[$input.name] == $value.value}checked="checked"{/if}
+          {if isset($input.disabled) && $input.disabled}disabled="disabled"{/if}
+        >
+        <label class="t {if !empty($input.hidden)} myparcel-dev-always-hidden{/if}" for="{$input.name|escape:'htmlall':'UTF-8'}_{$value.id|escape:'htmlall':'UTF-8'}">
+          {if isset($input.is_bool) && $input.is_bool == true}
+            {if $value.value == 1}
+              <img
+                src="../img/admin/enabled.gif"
+                alt="{$value.label|escape:'htmlall':'UTF-8'}"
+                title="{$value.label|escape:'htmlall':'UTF-8'}" />
+            {else}
+              <img
+                src="../img/admin/disabled.gif"
+                alt="{$value.label|escape:'htmlall':'UTF-8'}"
+                title="{$value.label|escape:'htmlall':'UTF-8'}"
+              />
+            {/if}
+          {else}
+            {$value.label|escape:'htmlall':'UTF-8'}
+          {/if}
+        </label>
+        {if isset($input.br) && $input.br}<br />{/if}
+        {if isset($value.p) && $value.p}<p>{$value.p|escape:'htmlall':'UTF-8'}</p>{/if}
+      {/foreach}
+    {else}
+      <span class="switch prestashop-switch fixed-width-lg{if !empty($input.hidden)} myparcel-dev-always-hidden{/if}">
       {foreach $input.values as $value}
         <input type="radio" name="{$input.name}"{if $value.value == 1} id="{$input.name}_on"{else} id="{$input.name}_off"{/if} value="{$value.value}"{if $fields_value[$input.name] == $value.value} checked="checked"{/if}{if isset($input.disabled) && $input.disabled} disabled="disabled"{/if}/>
       {strip}
@@ -229,54 +262,47 @@
       {/foreach}
       <a class="slide-button btn"></a>
     </span>
+    {/if}
   {elseif $input.type == 'fontselect'}
     <div class="form-group">
-      <label id="label-{$input.name|escape:'html'}"
-             for="{$input.label|escape:'html'}"
+      <label id="label-{$input.name|escape:'html':'UTF-8'}"
+             for="{$input.label|escape:'html':'UTF-8'}"
              class="control-label fixed-width-xxl"
              style="margin-left: 5px"
       >
-        <select id="{$input.name|escape:'html'}"
-                name="{$input.name|escape:'html'}"
-        >
-          <option value="{$fields_value[$input.name]|escape:'javascript'}"
-                  label="{$fields_value[$input.name]|escape:'javascript'}"
-                  selected="selected"
-          >
-            {$fields_value[$input.name]|escape:'javascript'}
-          </option>
-        </select>
+
       </label>
+      <div class="col-lg-9">
+        <input type="hidden" id="{$input.name|escape:'html':'UTF-8'}" name="{$input.name|escape:'html':'UTF-8'}" value="{$fields_value[$input.name]|escape:'html':'UTF-8'}">
+        <div id="{$input.name|escape:'html':'UTF-8'}_fontselect"></div>
+      </div>
     </div>
     <script type="text/javascript">
-      (function () {
-        function ready(fn) {
-          if (document.readyState !== 'loading'){
-            fn();
-          } else if (document.addEventListener) {
-            document.addEventListener('DOMContentLoaded', fn);
-          } else {
-            document.attachEvent('onreadystatechange', function() {
-              if (document.readyState !== 'loading')
-                fn();
-            });
-          }
+      (function initFontselect() {
+        if (typeof window.MyParcelModule === 'undefined'
+          || typeof window.MyParcelModule.app === 'undefined'
+          || typeof window.MyParcelModule.app.default === 'undefined'
+          || typeof window.MyParcelModule.app.default.fontSelect === 'undefined'
+        ) {
+          setTimeout(initFontselect, 100);
+
+          return;
         }
 
-        function initFontselect() {
-          if (typeof window.Fontselect === 'undefined') {
-            setTimeout(initFontselect, 100);
-
-            return;
-          }
-
-          window.myparcelFontselect = window.stripeFontselect || { };
-          window.myparcelFontselect.checkout = new window.Fontselect('{$input.name|escape:'html'}', {
-            {if isset($fields_value[$input.name])}placeholder: '{$fields_value[$input.name]|escape:'javascript'}',{/if}
-          });
-        }
-
-        ready(initFontselect);
+        window.MyParcelModule.app.default.fontSelect().then(function (fn) {
+          fn.default(
+            '{$input.name|escape:'javascript':'UTF-8'}_fontselect',
+            '{MyParcel::getThemeVersion()|escape:'javascript':'UTF-8'}',
+            '{$fields_value[$input.name]|escape:'javascript':'UTF-8'}',
+            function (newFont) {
+              var elem = document.getElementById('{$input.name|escape:'javascript':'UTF-8'}');
+              if (elem == null) {
+                return;
+              }
+              elem.value = newFont;
+            }
+          );
+        });
       }());
     </script>
   {elseif $input.type == 'checkout'}
@@ -286,8 +312,9 @@
       <iframe id="checkoutexample"
               style="border: 1px solid #C7D6DB; border-radius: 3px; padding: 0"
               class="col-xs-12 col-sm-12 col-md-9"
-              height="620"
               src="{$smarty.server.REQUEST_URI|escape:'html'}&demo=1"
+              height="594"
+              {if version_compare($smarty.const._PS_VERSION_, '1.6.0.0', '<')}width="800"{/if}
               frameborder="0"
       ></iframe>
       <script type="text/javascript">
@@ -295,7 +322,7 @@
           var currentStyle = null;
 
           function ready(fn) {
-            if (document.readyState !== 'loading'){
+            if (document.readyState !== 'loading') {
               fn();
             } else if (document.addEventListener) {
               window.addEventListener('DOMContentLoaded', fn);
@@ -320,7 +347,7 @@
               highlightColor: document.querySelector('[name={MyParcel::CHECKOUT_HL_COLOR|escape:'htmlall'}]').value,
               inactiveColor: document.querySelector('[name={MyParcel::CHECKOUT_INACTIVE_COLOR|escape:'htmlall'}]').value,
               fontFamily: document.querySelector('[name={MyParcel::CHECKOUT_FONT|escape:'htmlall'}]').value,
-              fontSize: document.querySelector('[name={MyParcel::CHECKOUT_FONT_SIZE|escape:'htmlall'}]').value,
+              fontSize: parseInt(document.querySelector('[name={MyParcel::CHECKOUT_FONT_SIZE|escape:'htmlall'}]').value, 10),
             };
 
             if (JSON.stringify(currentStyle) === JSON.stringify(style)) {
@@ -371,15 +398,6 @@
   {elseif $input.type == 'paperselector'}
     <input type="hidden" name="{$input.name|escape:'htmlall'}" value="{if isset($fields_value[$input.name])}{$fields_value[$input.name]|escape:'htmlall'}{/if}">
     <div id="paper-selector"></div>
-    <style>
-      .print-overlay .paper {
-        float: left!important;
-        padding-left: 8px!important;
-      }
-      .print-overlay i {
-        left: 36px!important;
-      }
-    </style>
     <script type="text/javascript">
       (function () {
         var selection = {
@@ -389,13 +407,14 @@
             2: true,
             3: true,
             4: true,
-          }
+          },
         };
 
-        function paperSelector() {
+        (function paperSelector() {
           if (typeof window.MyParcelModule === 'undefined'
-            || typeof window.MyParcelModule.back === 'undefined'
-            || typeof window.MyParcelModule.back.paperselector === 'undefined'
+            || typeof window.MyParcelModule.app === 'undefined'
+            || typeof window.MyParcelModule.app.default === 'undefined'
+            || typeof window.MyParcelModule.app.default.paperSelector === 'undefined'
           ) {
             setTimeout(paperSelector, 100);
 
@@ -425,18 +444,18 @@
             setInput();
           }
 
-          new window.MyParcelModule.back.paperselector({
-            selected: selection,
-            onChangeSize: changeSize,
-            onChangeLabels: changeLabels,
-          }, {include file="../../../translations.tpl"});
-        }
-
-        paperSelector();
+          window.MyParcelModule.app.default.paperSelector().then(function (fn) {
+            new fn.default({
+              selected: selection,
+              onChangeSize: changeSize,
+              onChangeLabels: changeLabels,
+            }, {include file="../../../translations.tpl"});
+          });
+        }());
       }());
     </script>
   {elseif $input.type == 'time'}
-    <div class="row">
+    <div {if version_compare($smarty.const._PS_VERSION_, '1.6.0.0', '>=')}class="row"{/if}>
       <div class="input-group col-lg-2 col-md-3 col-sm-4">
         <input type="text"
                id="{$input.name|escape:'html'}"
@@ -456,20 +475,18 @@
       (function () {
         function initTimepicker() {
           if (typeof $ === 'undefined') {
-            setTimeout(initTimePicker, 100);
-
-            return;
+            return setTimeout(initTimePicker, 100);
           }
+
+          $(document).ready(function () {ldelim}
+            $('#{$input.name|escape:'html'}').timepicker({
+              timeOnly: true,
+              timeFormat: 'hh:mm'
+              });
+          });
         }
 
-        $(document).ready(function () {ldelim}
-          $('#{$input.name|escape:'html'}').timepicker({ldelim}
-            timeOnly: true,
-            timeFormat: 'hh:mm'
-            {rdelim});
-          {rdelim});
-
-        initTimepicker();
+        {if version_compare($smarty.const._PS_VERSION_, '1.6.0.0', '>=')}initTimepicker();{/if}
       }());
     </script>
   {elseif $input.type == 'cutoffexceptions'}
@@ -654,6 +671,113 @@
             day = current_date.getDate() < 10 ? '0' + current_date.getDate() : current_date.getDate(),
             new_current_date = day + '-' + month + '-' + yr;
           {$input.name|escape:'javascript'}dateSelect(new_current_date);
+        });
+      }());
+    </script>
+  {elseif $input.type === 'myparcel-product-settings'}
+    <div id="myparcel-default-product-settings">
+      <style type="text/css" scoped>
+        @keyframes animation-14kwaps {
+          0%, 80%, 100% {
+            -webkit-transform: scale(0);
+            -ms-transform: scale(0);
+            transform: scale(0);
+          }
+          40% {
+            -webkit-transform: scale(1.0);
+            -ms-transform: scale(1.0);
+            transform: scale(1.0);
+          }
+        }
+
+        .spinner-div {
+          margin: 20px auto;
+        }
+
+        .spinner-div div {
+          width: 18px;
+          height: 18px;
+          border-radius: 100%;
+          display: inline-block;
+          -webkit-animation: animation-14kwaps 1.4s infinite ease-in-out both;
+          animation: animation-14kwaps 1.4s infinite ease-in-out both;
+        }
+
+        .spinner-div .bounce1 {
+          -webkit-animation-delay: 0s;
+          animation-delay: 0s;
+          background-color: #555;
+          margin: 0 2px;
+        }
+        .spinner-div .bounce2 {
+          -webkit-animation-delay: -0.16s;
+          animation-delay: -0.16s;
+          background-color: #555;
+          margin: 0 2px;
+        }
+        .spinner-div .bounce3 {
+          -webkit-animation-delay: -0.32s;
+          animation-delay: -0.32s;
+          background-color: #555;
+          margin: 0 2px;
+        }
+      </style>
+      <div class="spinner-div">
+        <div class="bounce3"></div>
+        <div class="bounce2"></div>
+        <div class="bounce1"></div>
+      </div>
+    </div>
+    {include file="../../../../hook/load_webpack_chunks.tpl"}
+    <script type="text/javascript">
+      (function initMyParcelDefaultCustomsInfo() {
+        if (typeof window.MyParcelModule === 'undefined'
+          || typeof window.MyParcelModule.app === 'undefined'
+          || typeof window.MyParcelModule.app.default === 'undefined'
+          || typeof window.MyParcelModule.app.default.productCustomsInfoLegacy === 'undefined'
+        ) {
+          return setTimeout(initMyParcelDefaultCustomsInfo, 10);
+        }
+
+        function documentReady(fn) {
+          if (document.readyState !== 'loading') {
+            fn();
+          } else if (document.addEventListener) {
+            document.addEventListener('DOMContentLoaded', fn);
+          } else {
+            document.attachEvent('onreadystatechange', function() {
+              if (document.readyState !== 'loading')
+                fn('myparcel-default-product-settings');
+            });
+          }
+        }
+
+        documentReady(function () {
+          window.MyParcelModule.app.default.productCustomsInfoLegacy().then(function (fn) {
+            fn.default(
+              {
+                idProduct: 62,
+                prefix: 'myparcel',
+                installationStep: {if MyParcelGoodsNomenclature::isInstalled()}0{else}1{/if},
+                urls: {
+                  assets: '{$mpAssetsUrl|escape:'javascript':'UTF-8'}',
+                  goodsNomenclatureInstall: '{$mpGoodsNomenclatureInstallUrl|escape:'javascript':'UTF-8'}',
+                  goodsNomenclatureSearch: '{$mpGoodsNomenclatureSearchUrl|escape:'javascript':'UTF-8'}',
+                  goodsNomenclatureBrowse: '{$mpGoodsNomenclatureBrowseUrl|escape:'javascript':'UTF-8'}',
+                  goodsNomenclatureNavigate: '{$mpGoodsNomenclatureNavigateUrl|escape:'javascript':'UTF-8'}',
+                },
+                theme: {
+                  theme: '{MyParcel::getThemeVersion()|escape:'javascript':'UTF-8'}',
+                },
+                defaults: {mypa_json_encode($mpProductSettings)},
+                translations: {include file="../../../translations.tpl"},
+                countries: {mypa_json_encode($mpJsCountries)},
+              },
+              '{$smarty.const._PS_VERSION_|escape:'javascript':'UTF-8'}',
+              'product',
+              'myparcel-default-product-settings',
+            );
+          });
         });
       }());
     </script>

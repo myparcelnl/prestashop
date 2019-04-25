@@ -24,9 +24,9 @@ if (!defined('_PS_VERSION_')) {
 use MyParcelModule\BoxPacker\Item;
 
 /**
- * Class MyParcelBrievenbuspakjeItem
+ * Class MyParcelMailboxPackageItem
  */
-class MyParcelBrievenbuspakjeItem implements Item
+class MyParcelMailboxPackageItem implements Item
 {
     /** @var string $description */
     protected $description;

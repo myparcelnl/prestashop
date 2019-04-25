@@ -21,7 +21,7 @@
   {else}
     {assign var='gdprEntity' value={l s='phone number' mod='myparcel'}}
   {/if}
-  {l s='Sharing your customer\'s %s is not required for a successful delivery.' mod='myparcel' sprintf=[$gdprEntity]}
+  {l s='Sharing your customer`s %s is not required for a successful delivery.' mod='myparcel' sprintf=[$gdprEntity]}
   {l s='If you enable this option, your store might no longer be GDPR compliant.' mod='myparcel'}
 </p>
 <p>

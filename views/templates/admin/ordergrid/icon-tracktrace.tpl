@@ -15,4 +15,4 @@
  * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<myparcel-tracktrace data-id-order="{$tr['id_order']|intval}"></myparcel-tracktrace>
+<myparcel-tracktrace id="myparcel-tracktrace-{$tr['id_order']|intval}" data-id-order="{$tr['id_order']|intval}"></myparcel-tracktrace>

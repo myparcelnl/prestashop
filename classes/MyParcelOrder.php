@@ -17,6 +17,10 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use MyParcelModule\Curl\Curl;
+use MyParcelModule\Firstred\Dot;
+use MyParcelModule\MyParcelHttpClient;
+
 if (!defined('_PS_VERSION_')) {
     return;
 }
@@ -71,7 +75,7 @@ class MyParcelOrder extends MyParcelObjectModel
                 'validate' => 'isUnsignedInt',
                 'required' => false,
                 'default'  => '1',
-                'db_type'  => 'VARCHAR(255)', // TODO: convert to INT(11) UNSIGNED IN 2.3.x, okay for now
+                'db_type'  => 'VARCHAR(255)',
             ),
             'date_upd'      => array(
                 'type'     => self::TYPE_DATE,
@@ -128,17 +132,20 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @param array $idOrders
      *
-     * @return array
+     * @return stdClass
+     *
+     * @since 2.0.0
      */
     public static function getByOrderIds($idOrders)
     {
         if (empty($idOrders)) {
-            return array();
+            return (object) array();
         }
 
         foreach ($idOrders as &$idOrder) {
             $idOrder = (int) $idOrder;
         }
+        unset($idOrder);
 
         $sql = new DbQuery();
         $sql->select('mo.*');
@@ -168,8 +175,13 @@ class MyParcelOrder extends MyParcelObjectModel
             }
             $newResults[$result['id_order']][$result['id_shipment']] = $result;
         }
+        foreach ($idOrders as $idOrder) {
+            if (!isset($newResults[$idOrder])) {
+                $newResults[$idOrder] = (object) array();
+            }
+        }
 
-        return $newResults;
+        return (object) $newResults;
     }
 
     /**
@@ -182,6 +194,7 @@ class MyParcelOrder extends MyParcelObjectModel
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public static function getByShipmentId($idShipment)
@@ -257,8 +270,9 @@ class MyParcelOrder extends MyParcelObjectModel
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @since 2.0.0
      * @throws ErrorException
+     *
+     * @since 2.0.0
      */
     public static function updateStatus($idShipment, $barcode, $statusCode, $date = null)
     {
@@ -275,14 +289,22 @@ class MyParcelOrder extends MyParcelObjectModel
         }
 
         try {
-            if ($statusCode >= 2) {
-                MyParcelOrderHistory::setPrinted($idShipment);
-            }
-            if ($statusCode >= 3) {
-                MyParcelOrderHistory::setShipped($idShipment);
-            }
-            if ($statusCode >= 7 && $statusCode <= 11) {
-                MyParcelOrderHistory::setReceived($idShipment);
+            if ($statusCode === 14) {
+                if (Configuration::get(MyParcel::DIGITAL_STAMP_USE_SHIPPED_STATUS)) {
+                    MyParcelOrderHistory::setShipped($idShipment, false);
+                } else {
+                    MyParcelOrderHistory::setPrinted($idShipment, false);
+                }
+            } else {
+                if ($statusCode >= 2) {
+                    MyParcelOrderHistory::setPrinted($idShipment);
+                }
+                if ($statusCode >= 3) {
+                    MyParcelOrderHistory::setShipped($idShipment);
+                }
+                if ($statusCode >= 7 && $statusCode <= 11) {
+                    MyParcelOrderHistory::setReceived($idShipment);
+                }
             }
         } catch (PrestaShopException $e) {
             Logger::addLog("Myparcel module error: {$e->getMessage()}");
@@ -313,6 +335,7 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public function add($autoDate = true, $nullValues = false)
@@ -330,6 +353,7 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     public function printed()
@@ -351,6 +375,8 @@ class MyParcelOrder extends MyParcelObjectModel
      * @return bool
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *
+     * @since 2.1.0
      */
     public static function deleteShipment($idShipment)
     {
@@ -389,7 +415,10 @@ class MyParcelOrder extends MyParcelObjectModel
             return false;
         }
         try {
-            $orderCarrier = new OrderCarrier($order->getIdOrderCarrier());
+            $orderCarrier = new OrderCarrier((int) Db::getInstance()->getValue('
+				SELECT `id_order_carrier`
+				FROM `'._DB_PREFIX_.'order_carrier`
+				WHERE `id_order` = '.(int) $order->id));
         } catch (PrestaShopException $e) {
             Logger::addLog("MyParcel module error: {$e->getMessage()}");
 
@@ -418,18 +447,22 @@ class MyParcelOrder extends MyParcelObjectModel
     }
 
     /**
+     * Get the track trace info, e.g. for sending mails
+     *
      * @param string $idShipment
      *
-     * @return array
+     * @return Dot
+     *
+     * @since 2.3.0
      *
      * @throws Adapter_Exception
      * @throws ErrorException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    public static function getTracktraceOnline($idShipment)
+    public static function getTrackTraceOnline($idShipment)
     {
-        $client = new \MyParcelModule\Curl\Curl();
+        $client = new MyParcelHttpClient();
         $client->setDefaultJsonDecoder(true);
         $shipment = static::getByShipmentId($idShipment);
         $concept = mypa_dot(@json_decode($shipment->shipment, true));
@@ -437,9 +470,12 @@ class MyParcelOrder extends MyParcelObjectModel
         $postcode = strtoupper(str_replace(' ', '', strtoupper($concept->get('recipient.postal_code'))));
         $tracktrace = $shipment->tracktrace;
         if (!$countryCode || !$postcode || !$tracktrace) {
-            return array();
+            return new Dot();
         }
 
-        return $client->get("https://www.internationalparceltracking.com/api/shipment?barcode={$tracktrace}&country={$countryCode}&language=en&postalCode={$postcode}");
+        $response = mypa_dot($client->get("https://api.myparcel.nl/tracktraces/{$idShipment}?extra_info=delivery_moment"));
+        $response->set('barcode', $shipment->tracktrace);
+
+        return $response;
     }
 }

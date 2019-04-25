@@ -6,9 +6,11 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'MyParcelModule\\Symfony\\Polyfill\\Php55\\' => array($vendorDir . '/symfony/polyfill-php55'),
-    'MyParcelModule\\Symfony\\Polyfill\\Php54\\' => array($vendorDir . '/symfony/polyfill-php54'),
-    'MyParcelModule\\Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
-    'MyParcelModule\\Firstred\\' => array($vendorDir . '/firstred/php-dot-notation/src'),
+    'MyParcelModule\\MyParcelNL\\Sdk\\src\\' => array($vendorDir . '/firstred/myparcelnl-sdk/src'),
+    'MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php55\\' => array($vendorDir . '/symfony/polyfill-php55'),
+    'MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php54\\' => array($vendorDir . '/symfony/polyfill-php54'),
+    'MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
+    'MyParcelModule\\MyParcelModule\\MyParcelModule\\Firstred\\' => array($vendorDir . '/firstred/php-dot-notation/src'),
+    'MyParcelModule\\MyParcelModule\\MyParcelModule\\Composer\\CaBundle\\' => array($vendorDir . '/composer/ca-bundle/src'),
     'MyParcelModule\\Curl\\' => array($vendorDir . '/php-curl-class/php-curl-class/src/Curl'),
 );

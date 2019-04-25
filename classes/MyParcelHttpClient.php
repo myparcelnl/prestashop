@@ -25,10 +25,11 @@ use Context;
 use ErrorException;
 use Logger;
 use MyParcel;
-use MyParcelModule\Curl\CaseInsensitiveArray;
-use MyParcelModule\Curl\Curl;
+use MyParcelModule\Composer\CaBundle\CaBundle;
 use PrestaShopException;
 use Validate;
+use MyParcelModule\Curl\CaseInsensitiveArray;
+use MyParcelModule\Curl\Curl;
 
 if (!defined('_PS_VERSION_')) {
     return;
@@ -51,24 +52,22 @@ class MyParcelHttpClient extends Curl
     public $remainingRetries = MyParcel::CONNECTION_ATTEMPTS;
 
     /**
-     * @return Curl
+     * MyParcelHttpClient constructor.
+     *
+     * @param string|null $base_url
      *
      * @throws ErrorException
      * @throws PrestaShopException
      */
-    public static function getInstance()
+    public function __construct($base_url = null)
     {
-        if (!static::$myparcelClient) {
-            $curl = new static();
-            $curl->retryDecider = $curl->getRetryDecider();
-            $curl->setConnectTimeout(MyParcel::API_TIMEOUT);
-            $curl->setTimeout(MyParcel::API_TIMEOUT);
-            $curl->setDefaultHeaders();
-            $curl->setDefaultJsonDecoder(true);
-            static::$myparcelClient = $curl;
-        }
-
-        return static::$myparcelClient;
+        parent::__construct($base_url);
+        $this->retryDecider = $this->getRetryDecider();
+        $this->setConnectTimeout(MyParcel::API_TIMEOUT);
+        $this->setTimeout(MyParcel::API_TIMEOUT);
+        $this->setDefaultHeaders();
+        $this->setDefaultJsonDecoder(true);
+        $this->setOpt(CURLOPT_CAINFO, CaBundle::getBundledCaBundlePath());
     }
 
     /**

@@ -15,8 +15,8 @@
  * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<myparcel-icon data-id-order="{$tr['id_order']|intval}" style="display: inline-block">
-  <div style="float: left;">
+<myparcel-concept id="myparcel-concept-{$tr['id_order']|intval}" data-id-order="{$tr['id_order']|intval}" style="display: inline-block">
+  <div id="myparcel-concept-clearme-{$tr['id_order']|intval}" style="float: left;">
     <span class="btn-group-action">
       <span class="btn-group">
         <button type="button" class="btn btn-default" disabled="disabled">
@@ -25,4 +25,4 @@
       </span>
     </span>
   </div>
-</myparcel-icon>
+</myparcel-concept>

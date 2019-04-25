@@ -1,16 +1,16 @@
 #myparcel-export-panel .form-group.has-error > input,
 [id^=concept-popover-] .form-group.has-error > input,
 [id^=concept-modal-] .form-group.has-error > input {
-    border: 2px solid #ff5555;
+  border: 2px solid #ff5555;
 }
 
 .bootstrap .dropdown-menu > li.mypa-menu-item.disabled a:hover > i {
-    color: #999;
+  color: #999;
 }
 
 @media (min-width: 768px) {
-    .table-responsive.mypa-table-responsive {
-        overflow: visible !important;
-    }
+  .table-responsive.mypa-table-responsive {
+    overflow: visible !important;
+  }
 }
 

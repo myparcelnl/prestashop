@@ -35,7 +35,7 @@
   {elseif $current_step == 2}
     {l s='On this page you can set the preferred delivery options. These will be displayed on the checkout page, which is where the customer can pick the preferred delivery method.[1]The settings will be tied to a carrier, so it is possible to add multiple carriers with different settings.[1]Most of the domestic shipment options are available for shipments to Belgium as well.' tags=['<br>'] mod='myparcel'}
   {elseif $current_step == 3}
-    {l s='The checkout can be fully adjusted to your likings on this page. The panel below allows you to change the colors and font. The changes are shown in realtime, so you immediately get to see the end result in the preview box.[1]As soon as you\'re ready, you can save the settings. Not quite what you had in mind? Click the reset button to revert to factory settings.' mod='myparcel' tags=['<br>']}
+    {l s='The checkout can be fully adjusted to your likings on this page. The panel below allows you to change the colors and font. The changes are shown in realtime, so you immediately get to see the end result in the preview box.[1]As soon as you`re ready, you can save the settings. Not quite what you had in mind? Click the reset button to revert to factory settings.' mod='myparcel' tags=['<br>']}
   {elseif $current_step == 4}
     {l s='At the bottom of this page you will find the possibility to change default label descriptions. It is possible to further personalize a label by uploading your logo. This can be done with the MyParcel back ofice.[1]Beneath this setting you can adjust the paper format and persist your choice by unticking the option "Always prompt for the paper size."[1]Order statuses can be automated on this page as well. Choose one or more of the available automation statuses and they will be applied instantly. If you have several statuses that may never change, pick them from the list just underneath. The module will skip updating the order as soon as they have one of the chosen blacklisted order statuses.' mod='myparcel' tags=['<br>'] sprintf=['PrestaShop']}
   {elseif $current_step == 5}
@@ -48,9 +48,9 @@
   {if $shouldResume}
     {l s='Resume' sprintf=[$employee->firstname] tags=['<br>'] mod='myparcel'}
   {elseif $current_step == 0}
-    {l s='Let\'s start!' mod='myparcel'}
+    {l s='Let`s start!' mod='myparcel'}
   {elseif $current_step == 6}
-    {l s='Let\'s begin sending!' mod='myparcel'}
+    {l s='Let`s begin sending!' mod='myparcel'}
   {else}
     {l s='Next step' mod='myparcel'}
   {/if}
@@ -75,7 +75,7 @@
   {/if}
 {/capture}
 
-<div id="myparcel-onboarding" >
+<div id="myparcel-onboarding">
   <div class="alert alert-onboarding">
     <img id="myparcel-onboarding-logo" src="{$module_dir|escape:'htmlall'}views/img/myparcelnl.png" width="250" height="250">
     <div id="myparcel-onboarding-starter">
@@ -194,9 +194,12 @@
     };
   }
 
-  (function () {
-    var onboardingDiv = document.getElementById('myparcel-onboarding');
+  (function initMyParcelOnboarding() {
     var content = document.getElementById('content');
+    if (content == null) {
+      return setTimeout(initMyParcelOnboarding, 100);
+    }
+    var onboardingDiv = document.getElementById('myparcel-onboarding');
     var outlineElements = [onboardingDiv];
 
     function ajaxEndTour(callback) {

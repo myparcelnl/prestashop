@@ -202,7 +202,7 @@
                     for (var key in data.carrier_data) {
                       try {
                         var carrier = data.carrier_data[key];
-                        document.querySelector('label[for=delivery_option_' + carrier.id +'] span.carrier-price').innerHTML = carrier.price;
+                        document.querySelector('label[for=delivery_option_' + carrier.id +'] span.carrier-pricing').innerHTML = carrier.pricing;
                       } catch (e) {
                       }
                     }

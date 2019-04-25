@@ -21,6 +21,10 @@ if (!defined('_PS_VERSION_') && !defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @return bool
+ * @throws PrestaShopDatabaseException
+ */
 function upgrade_module_2_0_5()
 {
     /** @var MyParcel $module */

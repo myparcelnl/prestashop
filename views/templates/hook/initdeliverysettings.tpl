@@ -43,7 +43,7 @@
     {/literal}
   </script>
 {/if}
-{if $smarty.const._PS_VERSION_|@addcslashes:'\'' < '1.6.0.9'}
+{if version_compare($smarty.const._PS_VERSION_, '1.6.0.9', '<')}
   <script type="text/javascript">
     {literal}
     $(document).ready(function () {

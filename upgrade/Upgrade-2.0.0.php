@@ -21,6 +21,12 @@ if (!defined('_PS_VERSION_') && !defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @param MyParcel $module
+ *
+ * @return bool
+ * @throws PrestaShopException
+ */
 function upgrade_module_2_0_0($module)
 {
     /** @var MyParcel $module */
@@ -158,7 +164,7 @@ function upgrade_module_2_0_0($module)
   PRIMARY KEY (`id_myparcel_order_history`)
 )';
     $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'myparcel_carrier_delivery_setting` (
-	`id_myparcel_carrier_delivery_setting` INT(11) UNSIGNED                  NOT NULL AUTO_INCREMENT,
+  `id_myparcel_carrier_delivery_setting` INT(11) UNSIGNED                  NOT NULL AUTO_INCREMENT,
   `id_reference`                           INT DEFAULT \'0\'                 NOT NULL,
   `delivery`                               TINYINT(1) DEFAULT \'0\'          NOT NULL,
   `pickup`                                 TINYINT(1) DEFAULT \'0\'          NOT NULL,

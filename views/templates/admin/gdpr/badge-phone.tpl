@@ -15,17 +15,21 @@
  * @copyright  2010-2019 DM Productions B.V.
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-{assign var='gdprType' value='phone'}
-<div class="badge badge-info" data-toggle="tooltip" data-html="true" title="{include file="./tooltip-data-sharing.tpl"|escape:'html'}">{l s='GDPR' mod='myparcel'}</div>
-<script type="text/javascript">
-  (function () {
-    function init() {
-      if (typeof $ === 'undefined') {
-        setTimeout(init, 100);
-        return;
+{if version_compare($smarty.const._PS_VERSION_, '1.6.0.0', '>=')}
+  {assign var='gdprType' value='phone'}
+  <div class="badge badge-info" data-toggle="tooltip" data-html="true" title="{include file="./tooltip-data-sharing.tpl"|escape:'html'}">{l s='GDPR' mod='myparcel'}</div>
+  <script type="text/javascript">
+    (function () {
+      function init() {
+        if (typeof $ === 'undefined') {
+          setTimeout(init, 100);
+          return;
+        }
+        if (typeof $.fn.tooltip === 'function') {
+          $('[data-toggle="tooltip"]').tooltip();
+        }
       }
-      $('[data-toggle="tooltip"]').tooltip();
-    }
-    init();
-  }());
-</script>
+      init();
+    }());
+  </script>
+{/if}

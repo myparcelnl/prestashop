@@ -17,10 +17,16 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_' && !defined('_TB_VERSION_'))) {
+if (!defined('_PS_VERSION_')) {
     return;
 }
 
+/**
+ * @param MyParcel $module
+ *
+ * @return bool
+ * @throws PrestaShopDatabaseException
+ */
 function upgrade_module_2_1_0($module)
 {
     $sql = array();

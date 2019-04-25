@@ -20,20 +20,8 @@
 <head>
   <meta charset="UTF-8">
 </head>
-<body>
+<body style="overflow-x: hidden; overflow-y: auto; margin: 8px">
   <div id="myparcelapp" class="myparcelcheckout"></div>
-  <script type="text/javascript">
-    {if $smarty.const._TB_VERSION_}
-    window.currencyModes = {mypa_json_encode(Currency::getModes())};
-    {/if}
-    window.priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval nofilter};
-    window.currency_iso_code = '{Context::getContext()->currency->iso_code|escape:'htmlall'}';
-    window.currencySign = '{Context::getContext()->currency->sign|escape:'javascript'}';
-    window.currencyFormat = {Context::getContext()->currency->format|intval};
-    window.currencyBlank = {Context::getContext()->currency->blank|intval};
-  </script>
-  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall' nofilter}js/jquery/jquery-1.11.0.min.js"></script>
-  <script type="text/javascript" src="{$base_dir_ssl|escape:'htmlall' nofilter}js/tools.js"></script>
   <script type="text/javascript">
     (function () {
       window.addEventListener('message', function (event) {
@@ -52,7 +40,7 @@
             && typeof data === 'object'
             && data.subject === 'sendStyle'
           ) {
-            window.checkout.constructor.setStyle(data.style);
+            window.checkout.setStyle(data.style);
 
             var newEvent = {
               subject: 'receivedStyle',
@@ -63,83 +51,84 @@
         }
       });
 
-      window.MyParcelModule = window.MyParcelModule || {ldelim}{rdelim};
-      window.MyParcelModule.misc = window.MyParcelModule.misc || {ldelim}{rdelim};
-      window.MyParcelModule.misc.mondayDelivery = true;
-      window.MyParcelModule.misc.errorCodes = {
-        '3212': '{l s='Unknown address' mod='myparcel' js=1}'
-      };
-
-      function initMyParcelCheckout() {
+      (function initMyParcelCheckout() {
         if (typeof window.MyParcelModule === 'undefined'
-          || typeof window.MyParcelModule.front === 'undefined'
-          || typeof window.MyParcelModule.front.checkout === 'undefined'
+          || typeof window.MyParcelModule.app === 'undefined'
+          || typeof window.MyParcelModule.app.default === 'undefined'
+          || typeof window.MyParcelModule.app.default.checkout === 'undefined'
         ) {
           setTimeout(initMyParcelCheckout, 100);
 
           return;
         }
 
-        window.checkout = new window.MyParcelModule.front.checkout({
-          data: {include file="./example.json"},
-          target: 'myparcelapp',
-          form: null,
-          iframe: true,
-          refresh: false,
-          selected: null,
-          street: 'Siriusdreef',
-          houseNumber: '66',
-          postalCode: '2132WT',
-          deliveryDaysWindow: 12,
-          dropoffDelay: 0,
-          dropoffDays: '1,2,3,4,5',
-          cutoffTime: '15:30:00',
-          cc: 'NL',
-          methodsAvailable: {
-            timeframes: true,
-            pickup: true,
-            expressPickup: true,
-            morning: true,
-            night: true,
-            signed: true,
-            recipientOnly: true,
-            signedRecipientOnly: true
-          },
-          customStyle: {
-            foreground1Color: '{$foreground1Color|escape:'javascript'}',
-            foreground2Color: '{$foreground2Color|escape:'javascript'}',
-            foreground3Color: '{$foreground3Color|escape:'javascript'}',
-            background1Color: '{$background1Color|escape:'javascript'}',
-            background2Color: '{$background2Color|escape:'javascript'}',
-            background3Color: '{$background3Color|escape:'javascript'}',
-            highlightColor: '{$highlightColor|escape:'javascript'}',
-            inactiveColor: '{$inactiveColor|escape:'javascript'}',
-            fontFamily: '{$fontFamily|escape:'javascript'}',
-            fontSize: 2,
-          },
-          price: {
-            morning: 2,
-            standard: 0,
-            night: 2,
-            signed: 2,
-            recipientOnly: 2,
-            signedRecipientOnly: 2,
-            pickup: 0,
-            expressPickup: 0
-          },
-          signedPreferred: {if $signedPreferred}true{else}false{/if},
-          recipientOnlyPreferred: {if $recipientOnlyPreferred}true{else}false{/if},
-          baseUrl: '',
-          locale: 'nl-NL',
-          currency: 'EUR'
-        },
-          {include file="../../front/translations.tpl"}
-        );
-      }
-
-      initMyParcelCheckout();
+        window.MyParcelModule.app.default.checkout().then(function (fn) {
+          window.checkout = new fn.default(
+            {
+              data: {include file="./example.json"},
+              target: 'myparcelapp',
+              form: null,
+              iframe: true,
+              refresh: false,
+              selected: null,
+              street: 'Siriusdreef',
+              houseNumber: '66',
+              postalCode: '2132WT',
+              deliveryDaysWindow: 12,
+              dropOffDelay: 0,
+              dropOffDays: '1,2,3,4,5',
+              cutoffTime: '15:30:00',
+              cc: 'NL',
+              capabilities: {
+                delivery: true,
+                pickup: true,
+                pickupExpress: true,
+                deliveryMorning: true,
+                deliveryEvening: true,
+                signature: true,
+                onlyRecipient: true,
+                signatureOnlyRecipient: true,
+                deliveryMonday: true,
+              },
+              pricing: {
+                delivery: 0,
+                deliveryMorning: 2,
+                deliveryEvening: 2,
+                signature: 2,
+                onlyRecipient: 2,
+                signatureOnlyRecipient: 2,
+                pickup: 0,
+                pickupExpress: 0
+              },
+              signaturePreferred: {if $signaturePreferred}true{else}false{/if},
+              onlyRecipientPreferred: {if $onlyRecipientPreferred}true{else}false{/if},
+              currencyFormat: '{MyParcel::getCurrencyFormat()|escape:'javascript':'UTF-8'}',
+              numberFormat: '{MyParcel::getNumberFormat()|escape:'javascript':'UTF-8'}',
+              urls: {
+                deliveryOptions: '',
+                updateSelection: ''
+              },
+              carrierId: 1,
+              carrierCode: 'myparcelnl_postnl'
+            },
+            {include file="../../front/translations.tpl"},
+            {
+              foreground1Color: '{$foreground1Color|escape:'javascript'}' || '#FFFFFF',
+              foreground2Color: '{$foreground2Color|escape:'javascript'}' || '#000000',
+              foreground3Color: '{$foreground3Color|escape:'javascript'}' || '#000000',
+              background1Color: '{$background1Color|escape:'javascript'}' || '#FBFBFB',
+              background2Color: '{$background2Color|escape:'javascript'}' || '#01BBC5',
+              background3Color: '{$background3Color|escape:'javascript'}' || '#75D3D8',
+              highlightColor: '{$highlightColor|escape:'javascript'}' || '#FF8C00',
+              inactiveColor: '{$inactiveColor|escape:'javascript'}' || '#848484',
+              fontFamily: '{$fontFamily|escape:'javascript'}' || 'Exo',
+              fontSize: 2,
+            }
+          );
+        });
+      }());
     })();
   </script>
-  <script type="text/javascript" src="{$mypaCheckoutJs|escape:'htmlall' nofilter}"></script>
+  {include file="../../hook/load_webpack_chunks.tpl"}
 </body>
 </html>

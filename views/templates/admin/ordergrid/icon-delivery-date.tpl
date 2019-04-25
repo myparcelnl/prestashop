@@ -32,7 +32,9 @@
               setTimeout(init, 100);
               return;
             }
-            $('.pickup-tooltip-{$tr['id_order']|intval}').tooltip();
+            if (typeof $.fn.tooltip === 'function') {
+              $('.pickup-tooltip-{$tr['id_order']|intval}').tooltip();
+            }
           }
           init();
         }());

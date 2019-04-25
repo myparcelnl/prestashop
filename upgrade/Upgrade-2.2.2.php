@@ -17,10 +17,17 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_' && !defined('_TB_VERSION_'))) {
+if (!defined('_PS_VERSION_')) {
     return;
 }
 
+/**
+ * @param MyParcel $module
+ *
+ * @return bool
+ * @throws PrestaShopDatabaseException
+ * @throws PrestaShopException
+ */
 function upgrade_module_2_2_2($module)
 {
     /** @var MyParcel $module */
@@ -28,7 +35,7 @@ function upgrade_module_2_2_2($module)
         'actionLogsGridDefinitionModifier',
         'actionLogsGridPresenterModifier',
     );
-    foreach ($newHooks as $oldName => $newHook) {
+    foreach ($newHooks as $newHook) {
         $module->registerHook($newHook);
     }
 

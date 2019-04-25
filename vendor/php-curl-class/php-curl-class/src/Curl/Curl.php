@@ -6,7 +6,7 @@ use MyParcelModule\Curl\ArrayUtil;
 use MyParcelModule\Curl\Decoder;
 class Curl
 {
-    const VERSION = '8.5.0';
+    const VERSION = '8.5.1';
     const DEFAULT_TIMEOUT = 30;
     public $curl;
     public $id = null;
@@ -1097,7 +1097,7 @@ class Curl
      */
     public function setProxyAuth($auth)
     {
-        $this - setOpt(CURLOPT_PROXYAUTH, $auth);
+        $this->setOpt(CURLOPT_PROXYAUTH, $auth);
     }
     /**
      * Set Proxy Type

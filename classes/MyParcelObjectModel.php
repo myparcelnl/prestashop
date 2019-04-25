@@ -30,12 +30,13 @@ class MyParcelObjectModel extends ObjectModel
      *  Create the database table with its columns. Similar to the createColumn() method.
      *
      * @param string|null $className Class name
+     * @param string      $engine
      *
      * @return bool Indicates whether the database was successfully added
      * @throws PrestaShopException
      * @throws ReflectionException
      */
-    public static function createDatabase($className = null)
+    public static function createDatabase($className = null, $engine = _MYSQL_ENGINE_)
     {
         $success = true;
 
@@ -60,7 +61,7 @@ class MyParcelObjectModel extends ObjectModel
             $sql .= ',';
         }
         $sql = trim($sql, ',');
-        $sql .= ') ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
+        $sql .= ') ENGINE='.pSQL($engine).' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
 
         try {
             $success &= \Db::getInstance()->execute($sql);
@@ -98,7 +99,7 @@ class MyParcelObjectModel extends ObjectModel
             $sql .= 'PRIMARY KEY (`'.bqSQL($definition['primary']).'`, `id_lang`)';
 
 
-            $sql .= ') ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
+            $sql .= ') ENGINE='.pSQL($engine).' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
 
             try {
                 $success &= \Db::getInstance()->execute($sql);
@@ -133,7 +134,7 @@ class MyParcelObjectModel extends ObjectModel
             // Primary key
             $sql .= 'PRIMARY KEY (`'.bqSQL($definition['primary']).'`, `id_shop`)';
 
-            $sql .= ') ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
+            $sql .= ') ENGINE='.pSQL($engine).' DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci';
 
             try {
                 $success &= \Db::getInstance()->execute($sql);

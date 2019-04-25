@@ -83,13 +83,14 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
 
         $address = new Address((int) $cart->id_address_delivery);
 
-        if (!preg_match(MyParcel::SPLIT_STREET_REGEX, MyParcelTools::getAddressLine($address), $m)) {
+        $m = MyParcelTools::getParsedAddress($address);
+        if (!isset($m['number'])) {
             // No house number
             $this->hideMe();
         }
 
         $streetName = isset($m['street']) ? $m['street'] : '';
-        $houseNumber = isset($m['street_suffix']) ? $m['street_suffix'] : '';
+        $houseNumber = isset($m['number']) ? $m['number'] : '';
 
         // id_carrier is not defined in database before choosing a carrier,
         // set it to a default one to match a potential cart _rule
@@ -135,8 +136,8 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             $cutoffTime = MyParcelCarrierDeliverySetting::DEFAULT_CUTOFF;
         }
 
-        $countryIso = Tools::strtolower(Country::getIsoById($address->id_country));
-        if (!in_array($countryIso, array('nl', 'be'))) {
+        $countryIso = Tools::strtoupper(Country::getIsoById($address->id_country));
+        if (!in_array($countryIso, array('NL', 'BE'))) {
             $this->hideMe();
         }
 
@@ -164,78 +165,82 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         }
 
         $smartyVars = array(
-                'base_dir_ssl'                  => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
-                    .Tools::getShopDomainSsl().__PS_BASE_URI__,
-                'streetName'                    => $streetName,
-                'houseNumber'                   => $houseNumber,
-                'postcode'                      => $address->postcode,
-                'langIso'                       => Tools::strtolower(Context::getContext()->language->iso_code),
-                'language_code'                 => Context::getContext()->language->language_code,
-                'currencyIso'                   => Tools::strtolower(Context::getContext()->currency->iso_code),
-                'countryIso'                    => $countryIso,
-                'express'                       => (bool) $this->myParcelCarrierDeliverySetting->morning_pickup,
-                'delivery'                      => (bool) $this->useTimeframes(),
-                'pickup'                        => (bool) $this->myParcelCarrierDeliverySetting->pickup,
-                'morning'                       => (bool) $this->myParcelCarrierDeliverySetting->morning,
-                'morningFeeTaxIncl'             => ($carrier->is_free)
-                    ? 0
-                    : (float) $this->myParcelCarrierDeliverySetting->morning_fee_tax_incl * $conversion,
-                'morningPickupFeeTaxIncl'       => ($carrier->is_free)
-                    ? 0
-                    : (float) $this->myParcelCarrierDeliverySetting->morning_pickup_fee_tax_incl * $conversion,
-                'night'                         => (bool) $this->myParcelCarrierDeliverySetting->evening,
-                'nightFeeTaxIncl'               => ($carrier->is_free)
-                    ? 0
-                    : (float) $this->myParcelCarrierDeliverySetting->evening_fee_tax_incl * $conversion,
-                'signed'                        => (bool) $this->myParcelCarrierDeliverySetting->signed,
-                'signedFeeTaxIncl'              => ($carrier->is_free)
-                    ? 0
-                    : (float) $this->myParcelCarrierDeliverySetting->signed_fee_tax_incl * $conversion,
-                'recipientOnly'                 => (bool) $this->myParcelCarrierDeliverySetting->recipient_only,
-                'recipientOnlyFeeTaxIncl'       => ($carrier->is_free)
-                    ? 0
-                    : (float) $this->myParcelCarrierDeliverySetting->recipient_only_fee_tax_incl * $conversion,
-                'signedRecipientOnly'           => (bool) $this->myParcelCarrierDeliverySetting->signed_recipient_only,
-                'signedRecipientOnlyFeeTaxIncl' => ($carrier->is_free)
-                    ? 0
-                    : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
-                'fontFamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
-                'fontSize'                      => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
-                'mypaCheckoutJs'                => Media::getJSPath(_PS_MODULE_DIR_.'myparcel/views/js/dist/front-8d6122b2c2e093e8.bundle.min.js'),
-                'link'                          => $context->link,
-                'foreground1color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
-                'foreground2color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
-                'foreground3color'              => Configuration::get(MyParcel::CHECKOUT_FG_COLOR3),
-                'background1color'              => Configuration::get(MyParcel::CHECKOUT_BG_COLOR1),
-                'background2color'              => Configuration::get(MyParcel::CHECKOUT_BG_COLOR2),
-                'background3color'              => Configuration::get(MyParcel::CHECKOUT_BG_COLOR3),
-                'highlightcolor'                => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
-                'inactivecolor'                 => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
-                'fontfamily'                    => Configuration::get(MyParcel::CHECKOUT_FONT),
-                'deliveryDaysWindow'            => (int) $this->getActualDeliveryDaysWindow($this->myParcelCarrierDeliverySetting->timeframe_days, $this->myParcelCarrierDeliverySetting->dropoff_delay),
-                'dropoffDelay'                  => (int) $this->getActualDropOffDelay($this->myParcelCarrierDeliverySetting->dropoff_delay),
-                'dropoffDays'                   => implode(
-                    ';',
-                    $this->getDropOffDays()
-                ),
-                'cutoffTime'                    => $cutoffTime,
-                'signedPreferred'               =>
-                    (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
-                'recipientOnlyPreferred'        =>
-                    (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
-                'myparcel_ajax_checkout_link'   => $this->context->link->getModuleLink(
-                    'myparcel',
-                    'myparcelcheckout',
-                    array('ajax' => true),
-                    Tools::usingSecureMode()
-                ),
-                'myparcel_deliveryoptions_link' => $this->context->link->getModuleLink(
-                    'myparcel',
-                    'deliveryoptions',
-                    array(),
-                    Tools::usingSecureMode()
-                ),
-                'mpLogApi'                      => (bool) Configuration::get(MyParcel::LOG_API),
+            'base_dir_ssl'                     => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
+                .Tools::getShopDomainSsl().__PS_BASE_URI__,
+            'streetName'                       => $streetName,
+            'houseNumber'                      => $houseNumber,
+            'postcode'                         => $address->postcode,
+            'langIso'                          => Tools::strtolower(Context::getContext()->language->iso_code),
+            'language_code'                    => Context::getContext()->language->language_code,
+            'currencyIso'                      => Tools::strtolower(Context::getContext()->currency->iso_code),
+            'countryIso'                       => $countryIso,
+            'express'                          => (bool) $this->myParcelCarrierDeliverySetting->morning_pickup,
+            'delivery'                         => (bool) $this->useTimeframes(),
+            'pickup'                           => (bool) $this->myParcelCarrierDeliverySetting->pickup,
+            'morning'                          => (bool) $this->myParcelCarrierDeliverySetting->morning,
+            'morningFeeTaxIncl'                => $carrier->is_free
+                ? 0
+                : (float) $this->myParcelCarrierDeliverySetting->morning_fee_tax_incl * $conversion,
+            'morningPickupFeeTaxIncl'          => $carrier->is_free
+                ? 0
+                : (float) $this->myParcelCarrierDeliverySetting->morning_pickup_fee_tax_incl * $conversion,
+            'evening'                          => (bool) $this->myParcelCarrierDeliverySetting->evening,
+            'eveningFeeTaxIncl'                => $carrier->is_free
+                ? 0
+                : (float) $this->myParcelCarrierDeliverySetting->evening_fee_tax_incl * $conversion,
+            'signature'                        => (bool) $this->myParcelCarrierDeliverySetting->signed,
+            'signatureFeeTaxIncl'              => $carrier->is_free
+                ? 0
+                : (float) $this->myParcelCarrierDeliverySetting->signed_fee_tax_incl * $conversion,
+            'onlyRecipient'                    => (bool) $this->myParcelCarrierDeliverySetting->recipient_only,
+            'onlyRecipientFeeTaxIncl'          => $carrier->is_free
+                ? 0
+                : (float) $this->myParcelCarrierDeliverySetting->recipient_only_fee_tax_incl * $conversion,
+            'signatureOnlyRecipient'           => (bool) $this->myParcelCarrierDeliverySetting->signed_recipient_only,
+            'signatureOnlyRecipientFeeTaxIncl' => 12, //$carrier->is_free
+            //? 0
+            //: (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
+            'cooledDelivery'                   => (bool) MyParcelProductSetting::cartHasCooledDelivery($cart),
+            'ageCheck'                         => (bool) MyParcelProductSetting::cartHasAgeCheck($cart),
+            'fontFamily'                       => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
+            'fontSize'                         => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
+            'link'                             => $context->link,
+            'foreground1Color'                 => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
+            'foreground2Color'                 => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
+            'foreground3Color'                 => Configuration::get(MyParcel::CHECKOUT_FG_COLOR3),
+            'background1Color'                 => Configuration::get(MyParcel::CHECKOUT_BG_COLOR1),
+            'background2Color'                 => Configuration::get(MyParcel::CHECKOUT_BG_COLOR2),
+            'background3Color'                 => Configuration::get(MyParcel::CHECKOUT_BG_COLOR3),
+            'highlightcolor'                   => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
+            'inactivecolor'                    => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
+            'fontfamily'                       => Configuration::get(MyParcel::CHECKOUT_FONT),
+            'deliveryDaysWindow'               => $this->context->cart->checkQuantities() ? (int) $this->getActualDeliveryDaysWindow(
+                $this->myParcelCarrierDeliverySetting->timeframe_days,
+                $this->myParcelCarrierDeliverySetting->dropoff_delay
+            ) : 0,
+            'dropOffDelay'                     => (int) $this->getActualDropOffDelay($this->myParcelCarrierDeliverySetting->dropoff_delay),
+            'dropOffDays'                      => implode(
+                ';',
+                $this->getDropOffDays()
+            ),
+            'cutoffTime'                       => $cutoffTime,
+            'signaturePreferred'               =>
+                (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
+            'onlyRecipientPreferred'           =>
+                (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
+            'myparcel_ajax_checkout_link'      => $this->context->link->getModuleLink(
+                'myparcel',
+                'myparcelcheckout',
+                array('ajax' => true),
+                Tools::usingSecureMode()
+            ),
+            'myparcel_deliveryoptions_link'    => $this->context->link->getModuleLink(
+                'myparcel',
+                'deliveryoptions',
+                array(),
+                Tools::usingSecureMode()
+            ),
+            'mpLogApi'                         => (bool) Configuration::get(MyParcel::LOG_API),
         );
         $cacheKey = md5(
             mypa_json_encode($smartyVars)
@@ -256,20 +261,17 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
     }
 
     /**
-     * Use timeframes
+     * Use delivery
      *
      * @return bool
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *
      * @since 2.0.0
      */
     protected function useTimeframes()
     {
-        if (!$this->context->cart->checkQuantities()) {
-            return false;
-        }
-
         if (!$this->myParcelCarrierDeliverySetting->delivery) {
             return false;
         }
@@ -337,7 +339,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             $query[$param] = $value;
         }
 
-        $curl = \MyParcelModule\MyParcelHttpClient::getInstance();
+        $curl = new \MyParcelModule\MyParcelHttpClient();
         $url = static::BASE_URI.'?'.http_build_query($query);
         $response = $curl->get($url);
         if (!$response) {
@@ -347,10 +349,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         }
 
         header('Content-Type: application/json;charset=utf-8');
-        die(mypa_json_encode(array(
-            'success'  => true,
-            'response' => $response,
-        )));
+        die(mypa_json_encode($response));
     }
 
     /**

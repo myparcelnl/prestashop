@@ -24,7 +24,7 @@ if (!defined('_PS_VERSION_')) {
 use MyParcelModule\BoxPacker\Box;
 
 /**
- * Class MyParcelBrievenbuspakjeBox
+ * Class MyParcelMailboxPackage
  *
  * @package DVDoug\BoxPacker
  */

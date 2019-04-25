@@ -1,211 +1,211 @@
 ﻿#myparcel-onboarding-logo {
-    float: left;
-    margin-left: -144px;
-    margin-top: -20px;
-    height: 100px;
-    width: 100px;
+  float:       left;
+  margin-left: -144px;
+  margin-top:  -44px;
+  height:      100px;
+  width:       100px;
 }
 
 #myparcel-onboarding .alert.alert-onboarding {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius:    0;
+  border-radius:         0;
 }
 
-.alert-onboarding::before {
-    content: "" !important;
+#myparcel-onboarding .alert.alert-onboarding::before {
+  content: "" !important;
 }
 
-.step-in-progress {
-    animation: none !important
+#myparcel-onboarding .step-in-progress {
+  animation: none !important
 }
 
-.onboarding-action-container .quick-start-button {
-    margin-left: 1em
+#myparcel-onboarding .onboarding-action-container .quick-start-button {
+  margin-left: 1em
 }
 
 #myparcel-onboarding * {
-    box-sizing: border-box !important
+  box-sizing: border-box !important
 }
 
 #myparcel-onboarding-starter a:not([href]) {
-    pointer-events: none;
-    cursor: not-allowed;
+  pointer-events: none;
+  cursor:         not-allowed;
 }
 
 #myparcel-onboarding.minimized .overlay {
-    display: none
+  display: none
 }
 
 #myparcel-onboarding.minimized .onboarding-steps {
-    top: -560px
+  top: -560px
 }
 
 #myparcel-onboarding .overlay {
-    display: block;
-    width: 100%;
-    height: 100%;
-    z-index: 7000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.5)
+  display:    block;
+  width:      100%;
+  height:     100%;
+  z-index:    7000;
+  position:   fixed;
+  top:        0;
+  left:       0;
+  background: rgba(0, 0, 0, 0.5)
 }
 
 #myparcel-onboarding .panel {
-    position: absolute;
-    top: -5px;
-    left: 0;
-    right: 0;
-    width: 800px;
-    height: 540px;
-    margin: 0 auto;
-    z-index: 8000;
-    border: none;
-    -moz-box-shadow: 0 0 16px #000;
-    -webkit-box-shadow: 0 0 16px #000;
-    box-shadow: 0 0 16px #000
+  position:           absolute;
+  top:                -5px;
+  left:               0;
+  right:              0;
+  width:              800px;
+  height:             540px;
+  margin:             0 auto;
+  z-index:            8000;
+  border:             none;
+  -moz-box-shadow:    0 0 16px #000;
+  -webkit-box-shadow: 0 0 16px #000;
+  box-shadow:         0 0 16px #000
 }
 
 #myparcel-onboarding .panel.final {
-    height: 350px
+  height: 350px
 }
 
 #myparcel-onboarding .panel .onboarding-intro {
-    border-bottom: solid 1px #E4E5E7;
-    height: 70px
+  border-bottom: solid 1px #E4E5E7;
+  height:        70px
 }
 
 #myparcel-onboarding .panel .onboarding-intro h3 {
-    font-family: "Open Sans";
-    font-weight: 300;
-    font-size: 28px;
-    line-height: 50px
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  font-size:   28px;
+  line-height: 50px
 }
 
 #myparcel-onboarding .panel .steps-list-container {
-    float: left;
-    width: 535px;
-    height: 450px;
-    padding: 30px 20px 0;
-    border-right: solid 1px #E4E5E7
+  float:        left;
+  width:        535px;
+  height:       450px;
+  padding:      30px 20px 0;
+  border-right: solid 1px #E4E5E7
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: onboardingSteps
+  margin:        0;
+  padding:       0;
+  list-style:    none;
+  counter-reset: onboardingSteps
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li {
-    counter-increment: onboardingSteps;
-    content: counter(onboardingSteps);
-    position: relative;
-    font-size: 18px;
-    margin-bottom: 30px;
-    padding-left: 55px
+  counter-increment: onboardingSteps;
+  content:           counter(onboardingSteps);
+  position:          relative;
+  font-size:         18px;
+  margin-bottom:     30px;
+  padding-left:      55px
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li .title {
-    display: block
+  display: block
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li .desc {
-    display: block;
-    font-size: 13px
+  display:   block;
+  font-size: 13px
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li:before {
-    display: block;
-    width: 40px;
-    height: 40px;
-    position: absolute;
-    left: 6px;
-    top: 0;
-    border: 1px solid #97A9B0;
-    content: counter(onboardingSteps);
-    text-align: center;
-    font-size: 22px;
-    line-height: 38px;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
-    border-radius: 50%
+  display:               block;
+  width:                 40px;
+  height:                40px;
+  position:              absolute;
+  left:                  6px;
+  top:                   0;
+  border:                1px solid #97A9B0;
+  content:               counter(onboardingSteps);
+  text-align:            center;
+  font-size:             22px;
+  line-height:           38px;
+  -moz-border-radius:    50%;
+  -webkit-border-radius: 50%;
+  border-radius:         50%
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li.checked .title {
-    color: #aaa
+  color: #aaa
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li.checked:before {
-    display: block;
-    width: 40px;
-    height: 40px;
-    position: absolute;
-    left: 6px;
-    top: 0;
-    border: none;
-    color: #fff;
-    font-family: FontAwesome;
-    line-height: 40px;
-    content: "";
-    background-color: #8BC954
+  display:          block;
+  width:            40px;
+  height:           40px;
+  position:         absolute;
+  left:             6px;
+  top:              0;
+  border:           none;
+  color:            #fff;
+  font-family:      FontAwesome, sans-serif;
+  line-height:      40px;
+  content:          "";
+  background-color: #8BC954
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li.active .title {
-    font-size: 24px;
-    margin-bottom: 8px
+  font-size:     24px;
+  margin-bottom: 8px
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li.inactive .title {
-    color: #ccc;
-    line-height: 40px
+  color:       #ccc;
+  line-height: 40px
 }
 
 #myparcel-onboarding .panel .steps-list-container .steps-list li.inactive:before {
-    color: #ccc;
-    border-color: #ccc
+  color:        #ccc;
+  border-color: #ccc
 }
 
 #myparcel-onboarding .panel .steps-list-container .step-launch {
-    padding: 0 80px;
-    margin-top: 50px
+  padding:    0 80px;
+  margin-top: 50px
 }
 
 #myparcel-onboarding .panel .steps-animation-container {
-    float: right;
-    width: 265px;
-    height: 386px;
-    border-bottom: solid 1px #E4E5E7
+  float:         right;
+  width:         265px;
+  height:        386px;
+  border-bottom: solid 1px #E4E5E7
 }
 
 #myparcel-onboarding .panel .steps-animation-container .step-before-launch {
-    line-height: 65px
+  line-height: 65px
 }
 
 #myparcel-onboarding .panel .final-container {
-    float: left;
-    width: 800px;
-    padding: 30px 20px 0
+  float:   left;
+  width:   800px;
+  padding: 30px 20px 0
 }
 
 #myparcel-onboarding .panel .final-container .title {
-    display: block
+  display: block
 }
 
 #myparcel-onboarding .close-button {
-    position: absolute;
-    top: 30px;
-    right: 20px;
-    color: #ccc
+  position: absolute;
+  top:      30px;
+  right:    20px;
+  color:    #ccc
 }
 
 #myparcel-onboarding .close-button i {
-    font-size: 28px
+  font-size: 28px
 }
 
 #myparcel-onboarding .skip {
-    position: relative;
-    top: -20px;
-    left: 10px
+  position: relative;
+  top:      -20px;
+  left:     10px
 }
