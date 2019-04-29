@@ -20,12 +20,16 @@
         src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), Tools::usingSecureMode())|escape:'htmlall'}"
         width="100%"
         height="0"
-        frameBorder="0">
+        frameBorder="0"
+        style="display: none; border: none"
+>
 </iframe>
 <div id="myparcel"></div>
 <script type="text/javascript">
   (function () {
     var cachedPrice = false;
+    var xhr = null;
+    var zelargXhr = null;
 
     window.mypaNotified = window.mypaNotified || false;
 
@@ -100,200 +104,210 @@
       }
     }
 
-    documentReady(function () {
-      var xhr = null;
-      var zelargXhr = null;
+    window.myParcelCheckoutHeightWatcher = window.myParcelCheckoutHeightWatcher || function (event) {
+      if (!event.data) {
+        return;
+      }
 
-      window.addEventListener('message', function (event) {
-        if (!event.data) {
+      try {
+        var data = JSON.parse(event.data);
+      } catch (e) {
+        return;
+      }
+
+      if (data
+        && data.messageOrigin === 'myparcelcheckout'
+        && data.subject === 'height'
+      ) {
+        var newHeight = parseInt(data.height, 10);
+        var checkoutIframe = document.getElementById('myparcelcheckoutframe');
+        if (checkoutIframe == null) {
           return;
         }
-
-        try {
-          var data = JSON.parse(event.data);
-        } catch (e) {
-          return;
-        }
-
-        if (data
-          && data.messageOrigin === 'myparcelcheckout'
-          && data.subject === 'height'
-        ) {
-          document.getElementById('myparcelcheckoutframe').height = parseInt(data.height, 10);
+        if (newHeight < 0) {
+          checkoutIframe.style.display = 'none';
+        } else {
+          checkoutIframe.style.display = 'block';
+          checkoutIframe.height = newHeight;
           {if Module::isEnabled('onepagecheckoutps')}
           var psCheckoutElem = document.getElementById('onepagecheckoutps_step_two_container');
           psCheckoutElem.style.height = '0'; // Always reset so we can measure the actual scrollHeight
           psCheckoutElem.style.height = psCheckoutElem.scrollHeight + 'px';
           {/if}
         }
-      });
+      }
+    };
 
-      window.addEventListener('message', function (event) {
-        if (!event.data) {
-          return;
+    window.myParcelCheckoutSelectionChanged = window.myParcelCheckoutSelectionChanged || function (event) {
+      if (!event.data) {
+        return;
+      }
+
+      try {
+        var data = JSON.parse(event.data);
+      } catch (e) {
+        return;
+      }
+
+      if (data
+        && data.messageOrigin === 'myparcelcheckout'
+        && data.subject === 'selection_changed'
+      ) {
+        if (xhr && typeof xhr.abort === 'function') {
+          xhr.abort();
         }
 
-        try {
-          var data = JSON.parse(event.data);
-        } catch (e) {
-          return;
+        var selection = data.selection;
+
+        /*
+         *  If the `dontNotify` flag is set, first check if the server still needs the first notification
+         *  for the selected delivery option
+         */
+        if (data.dontNotify) {
+          if (window.mypaNotified && typeof window.mypaNotified === 'boolean') {
+            return;
+          }
+
+          var idCarrier = getIdCarrier();
+          if (idCarrier && window.mypaNotified === idCarrier) {
+            return;
+          }
         }
 
-        if (data
-          && data.messageOrigin === 'myparcelcheckout'
-          && data.subject === 'selection_changed'
-        ) {
-          if (xhr && typeof xhr.abort === 'function') {
-            xhr.abort();
-          }
+        {if Module::isEnabled('onepagecheckout')}
+        // Grab the delivery options HTML and inject
+        var deliveryOptions = document.getElementById('carrierTable');
+        if (deliveryOptions) {
+          deliveryOptions.style.opacity = 0.4;
+          deliveryOptions.style.pointerEvents = 'none';
+        }
+        {/if}
 
-          var selection = data.selection;
+        // Generic
+        xhr = new XMLHttpRequest();
+        xhr.open(
+          'POST',
+          '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript'}',
+          true
+        );
 
-          /*
-           *  If the `dontNotify` flag is set, first check if the server still needs the first notification
-           *  for the selected delivery option
-           */
-          if (data.dontNotify) {
-            if (window.mypaNotified && typeof window.mypaNotified === 'boolean') {
-              return;
-            }
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status >= 200 && xhr.status < 400) {
+              // Success!
+              var data = xhr.responseText;
+              try {
+                data = JSON.parse(data);
+              } catch (e) {
+                return;
+              }
 
-            var idCarrier = getIdCarrier();
-            if (idCarrier && window.mypaNotified === idCarrier) {
-              return;
-            }
-          }
+              if (data.carrier_data) {
+                window.mypaNotified = getIdCarrier() || true;
 
-          {if Module::isEnabled('onepagecheckout')}
-          // Grab the delivery options HTML and inject
-          var deliveryOptions = document.getElementById('carrierTable');
-          if (deliveryOptions) {
-            deliveryOptions.style.opacity = 0.4;
-            deliveryOptions.style.pointerEvents = 'none';
-          }
-          {/if}
-
-          // Generic
-          xhr = new XMLHttpRequest();
-          xhr.open(
-            'POST',
-            '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript'}',
-            true
-          );
-
-          xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-              if (xhr.status >= 200 && xhr.status < 400) {
-                // Success!
-                var data = xhr.responseText;
-                try {
-                  data = JSON.parse(data);
-                } catch (e) {
-                  return;
+                {if Module::isEnabled('onepagecheckout')}
+                if (zelargXhr && typeof zelargXhr.abort === 'function') {
+                  zelargXhr.abort();
                 }
+                // Zelarg OPC
+                zelargXhr = new XMLHttpRequest();
+                zelargXhr.open('POST', window.orderOpcUrl, true);
 
-                if (data.carrier_data) {
-                  window.mypaNotified = getIdCarrier() || true;
+                zelargXhr.onreadystatechange = function () {
+                  if (zelargXhr.readyState === 4) {
+                    if (zelargXhr.status >= 200 && zelargXhr.status < 400) {
+                      // Success!
+                      var data = zelargXhr.responseText;
+                      try {
+                        data = JSON.parse(data);
+                      } catch (e) {
+                        return;
+                      }
 
-                  {if Module::isEnabled('onepagecheckout')}
-                  if (zelargXhr && typeof zelargXhr.abort === 'function') {
-                    zelargXhr.abort();
-                  }
-                  // Zelarg OPC
-                  zelargXhr = new XMLHttpRequest();
-                  zelargXhr.open('POST', window.orderOpcUrl, true);
+                      if (data.carrier_block) {
+                        window.mypaNotified = getIdCarrier() || true;
 
-                  zelargXhr.onreadystatechange = function () {
-                    if (zelargXhr.readyState === 4) {
-                      if (zelargXhr.status >= 200 && zelargXhr.status < 400) {
-                        // Success!
-                        var data = zelargXhr.responseText;
-                        try {
-                          data = JSON.parse(data);
-                        } catch (e) {
-                          return;
-                        }
+                        var carrierHTML = document.createElement('div');
+                        carrierHTML.innerHTML = data.carrier_block;
+                        carrierHTML = carrierHTML.querySelector('#carrierTable');
 
-                        if (data.carrier_block) {
-                          window.mypaNotified = getIdCarrier() || true;
-
-                          var carrierHTML = document.createElement('div');
-                          carrierHTML.innerHTML = data.carrier_block;
-                          carrierHTML = carrierHTML.querySelector('#carrierTable');
-
-                          if (deliveryOptions) {
-                            deliveryOptions.innerHTML = carrierHTML.innerHTML;
-                            deliveryOptions.style.opacity = 1.0;
-                            deliveryOptions.style.pointerEvents = 'inherit';
-                            if (typeof $ !== 'undefined' && $.support && $.support.placeholder) {
-                              $('#order_msg_placeholder_fallback').hide();
-                            }
-                            if (typeof window.bindInputs === 'function') {
-                              window.bindInputs();
-                            }
+                        if (deliveryOptions) {
+                          deliveryOptions.innerHTML = carrierHTML.innerHTML;
+                          deliveryOptions.style.opacity = 1.0;
+                          deliveryOptions.style.pointerEvents = 'inherit';
+                          if (typeof $ !== 'undefined' && $.support && $.support.placeholder) {
+                            $('#order_msg_placeholder_fallback').hide();
+                          }
+                          if (typeof window.bindInputs === 'function') {
+                            window.bindInputs();
                           }
                         }
-                      } else {
-                        zelargXhr = null;
                       }
+                    } else {
+                      zelargXhr = null;
                     }
-                  };
+                  }
+                };
 
-                  zelargXhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-                  zelargXhr.send('ajax=true&method=getCarrierList&token=' + static_token);
-                  {elseif Module::isEnabled('onepagecheckoutps')}
-                  if (data.summary.total_shipping === cachedPrice) {
-                    return;
-                  }
-                  cachedPrice = data.summary.total_shipping;
-                  if (typeof Carrier === 'object' && typeof Carrier.update === 'function') {
-                    Carrier.update();
-                  }
-                  {else}
-                  if (data.summary.total_shipping === cachedPrice) {
-                    return;
-                  }
-                  cachedPrice = data.summary.total_shipping;
-                  var carrierHTML = document.createElement('div');
-                  carrierHTML.innerHTML = data.carrier_data.carrier_block;
-                  carrierHTML = carrierHTML.querySelector('.delivery_options');
-
-                  // Prevent the page from refreshing when the cart rules haven't been initialized on time
-                  var removeMe = document.createElement('div');
-                  removeMe.id = 'myparcel-remove-me';
-                  removeMe.classList.add('cart_discount');
-
-                  // Grab the delivery options HTML and inject
-                  carrierHTML.appendChild(removeMe);
-                  var deliveryOptions = document.querySelector('.delivery_options');
-                  if (deliveryOptions) {
-                    deliveryOptions.innerHTML = carrierHTML.innerHTML;
-                    if (typeof window.updateCartSummary === 'function') {
-                      window.updateCartSummary(data.summary);
-                    }
-                    if (typeof window.bindUniform === 'function') {
-                      window.bindUniform();
-                    }
-                    if (typeof window.bindInputs === 'function') {
-                      window.bindInputs();
-                    }
-                  }
-                  removeMe.parentNode.removeChild(removeMe);
-                  {/if}
+                zelargXhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                zelargXhr.send('ajax=true&method=getCarrierList&token=' + static_token);
+                {elseif Module::isEnabled('onepagecheckoutps')}
+                if (data.summary.total_shipping === cachedPrice) {
+                  return;
                 }
-              } else {
-                xhr = null;
-              }
-            }
-          };
+                cachedPrice = data.summary.total_shipping;
+                if (typeof Carrier === 'object' && typeof Carrier.update === 'function') {
+                  Carrier.update();
+                }
+                {else}
+                if (data.summary.total_shipping === cachedPrice) {
+                  return;
+                }
+                cachedPrice = data.summary.total_shipping;
+                var carrierHTML = document.createElement('div');
+                carrierHTML.innerHTML = data.carrier_data.carrier_block;
+                carrierHTML = carrierHTML.querySelector('.delivery_options');
 
-          xhr.send(JSON.stringify({
-            ajax: true,
-            updateOption: true,
-            deliveryOption: selection,
-          }));
-        }
-      });
+                // Prevent the page from refreshing when the cart rules haven't been initialized on time
+                var removeMe = document.createElement('div');
+                removeMe.id = 'myparcel-remove-me';
+                removeMe.classList.add('cart_discount');
+
+                // Grab the delivery options HTML and inject
+                carrierHTML.appendChild(removeMe);
+                var deliveryOptions = document.querySelector('.delivery_options');
+                if (deliveryOptions) {
+                  deliveryOptions.innerHTML = carrierHTML.innerHTML;
+                  if (typeof window.updateCartSummary === 'function') {
+                    window.updateCartSummary(data.summary);
+                  }
+                  if (typeof window.bindUniform === 'function') {
+                    window.bindUniform();
+                  }
+                  if (typeof window.bindInputs === 'function') {
+                    window.bindInputs();
+                  }
+                }
+                removeMe.parentNode.removeChild(removeMe);
+                {/if}
+              }
+            } else {
+              xhr = null;
+            }
+          }
+        };
+
+        xhr.send(JSON.stringify({
+          ajax: true,
+          updateOption: true,
+          deliveryOption: selection,
+        }));
+      }
+    };
+
+    documentReady(function () {
+      window.addEventListener('message', window.myParcelCheckoutHeightWatcher);
+      window.addEventListener('message', window.myParcelCheckoutSelectionChanged);
     });
   }());
 </script>

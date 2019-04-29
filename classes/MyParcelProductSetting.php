@@ -118,6 +118,9 @@ class MyParcelProductSetting extends MyParcelObjectModel
             $idProduct = $product;
         }
         $option->id_product = (int) $idProduct;
+        $option->status = (int) static::findNumericStatus(Configuration::get(MyParcel::DEFAULT_CONCEPT_CUSTOMS_STATUS));
+        $option->classification = (string) Configuration::get(MyParcel::DEFAULT_CONCEPT_CLASSIFICATION);
+        $option->country = (string) Configuration::get(MyParcel::DEFAULT_CONCEPT_COUNTRY_OF_ORIGIN);
 
         $sql = new DbQuery();
         $sql->select('*');
@@ -127,22 +130,7 @@ class MyParcelProductSetting extends MyParcelObjectModel
         if (empty($result)) {
             return $option;
         }
-
         $option->hydrate($result);
-        // PrestaShop bug
-        $option->status = (int) $option->status;
-        if ($option->status !== static::CUSTOMS_ENABLE) {
-            $defaultStatus = Configuration::get(MyParcel::DEFAULT_CONCEPT_CUSTOMS_STATUS);
-            if ($defaultStatus === static::CUSTOMS_ENABLE_STRING) {
-                $option->status = static::CUSTOMS_ENABLE;
-                if (!$option->classification) {
-                    $option->classification = (string) Configuration::get(MyParcel::DEFAULT_CONCEPT_CLASSIFICATION);
-                }
-                if (!$option->country) {
-                    $option->country = (string) Configuration::get(MyParcel::DEFAULT_CONCEPT_COUNTRY_OF_ORIGIN);
-                }
-            }
-        }
 
         $option->age_check = (bool) $option->age_check;
         $option->cooled_delivery = (bool) $option->cooled_delivery;
@@ -373,8 +361,9 @@ class MyParcelProductSetting extends MyParcelObjectModel
      * @return int
      *
      * @since 2.3.0
+     * @since 2.3.1 public
      */
-    protected static function findNumericStatus($status)
+    public static function findNumericStatus($status)
     {
         if (is_string($status)) {
             switch ($status) {
@@ -396,15 +385,50 @@ class MyParcelProductSetting extends MyParcelObjectModel
     }
 
     /**
-     * @param Cart $cart
+     * Find numeric status enum
      *
-     * @return bool
+     * @param int|string $status
      *
-     * @throws PrestaShopException
+     * @return int
      *
      * @since 2.3.0
      */
-    public static function cartHasAgeCheck(Cart $cart)
+    public static function findStringStatus($status)
+    {
+        if (is_string($status)) {
+            if (in_array($status, array(static::CUSTOMS_ENABLE_STRING, static::CUSTOMS_ENABLE_STRING, static::CUSTOMS_ENABLE_STRING))) {
+                return $status;
+            }
+
+            return static::CUSTOMS_DISABLE_STRING;
+        } elseif (is_numeric($status)) {
+            switch((int) $status) {
+                case static::CUSTOMS_ENABLE:
+                    return static::CUSTOMS_ENABLE_STRING;
+                case static::CUSTOMS_SKIP:
+                    return static::CUSTOMS_SKIP_STRING;
+                default:
+                    return static::CUSTOMS_DISABLE_STRING;
+            }
+        }
+
+        return static::CUSTOMS_DISABLE_STRING;
+    }
+
+    /**
+     * Check if a cart requires a specific product setting
+     *
+     * @param Cart   $cart
+     * @param string $check
+     *
+     * @return bool
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     *
+     * @since 2.3.1
+     */
+    protected static function cartHasProductSetting(Cart $cart, $check = 'age_check')
     {
         $products = $cart->getProducts();
         $ids = array_map(function ($product) {
@@ -412,17 +436,22 @@ class MyParcelProductSetting extends MyParcelObjectModel
         }, $products);
 
         $sql = new DbQuery();
-        $sql->select('`id_product`');
+        $sql->select('`id_product`, `'.bqSQL($check).'`');
         $sql->from(bqSQL(static::$definition['table']));
-        $sql->where('`age_check` = 1');
         $sql->where('`id_product` IN ('.implode(',', array_map('intval', $ids)).')');
-
-        $hasAgeCheck = (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
-        if ($hasAgeCheck) {
-            return true;
+        $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        if (!is_array($results)) {
+            return (bool) Configuration::get(constant('MyParcel::DEFAULT_CONCEPT_'.Tools::strtoupper($check)));
         }
-        if (Configuration::get(MyParcel::DEFAULT_CONCEPT_AGE_CHECK)) {
-            return true;
+
+        $checkResults = array_map('boolval', array_column($results, $check));
+        foreach ($checkResults as $ageCheck) {
+            if ($ageCheck) {
+                return true;
+            }
+        }
+        if (count($checkResults) !== count($products)) {
+            return (bool) Configuration::get(constant('MyParcel::DEFAULT_CONCEPT_'.Tools::strtoupper($check)));
         }
 
         return false;
@@ -437,27 +466,22 @@ class MyParcelProductSetting extends MyParcelObjectModel
      *
      * @since 2.3.0
      */
+    public static function cartHasAgeCheck(Cart $cart)
+    {
+        return static::cartHasProductSetting($cart, 'age_check');
+    }
+
+    /**
+     * @param Cart $cart
+     *
+     * @return bool
+     *
+     * @throws PrestaShopException
+     *
+     * @since 2.3.0
+     */
     public static function cartHasCooledDelivery(Cart $cart)
     {
-        $products = $cart->getProducts();
-        $ids = array_map(function ($product) {
-            return (int) $product['id_product'];
-        }, $products);
-
-        $sql = new DbQuery();
-        $sql->select('`id_product`');
-        $sql->from(bqSQL(static::$definition['table']));
-        $sql->where('`cooled_delivery` = 1');
-        $sql->where('`id_product` IN ('.implode(',', array_map('intval', $ids)).')');
-
-        $hasCooledDelivery = (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
-        if ($hasCooledDelivery) {
-            return true;
-        }
-        if (Configuration::get(MyParcel::DEFAULT_CONCEPT_COOLED_DELIVERY)) {
-            return true;
-        }
-
-        return false;
+        return static::cartHasProductSetting($cart, 'cooled_delivery');
     }
 }

@@ -351,7 +351,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                     'large_format'           => (boolean) $fromDb->get('concept.options.large_format', $fromDb->get('concept.large_format', false)),
                     'signature'              => (boolean) $fromDb->get('concept.options.signature', $fromDb->get('concept.signature', 0)),
                     'return'                 => (boolean) $fromDb->get('concept.options.return', $fromDb->get('concept.return', false)),
-                    'insurance'              => (int) MyParcel::findValidInsuranceAmount($fromDb->get('concept.options.insurance.amount', $fromDb->get('concept.insurance', 0))),
+                    'insurance'              => (int) MyParcel::findValidInsuranceAmount($fromDb->get('concept.options.insurance.amount', $fromDb->get('concept.insurance', 0) / 100)) * 100,
                     'cooled_delivery'        => (boolean) $fromDb->get('concept.cooled_delivery', false),
                     'age_check'              => (boolean) $fromDb->get('concept.age_check', false),
                     'delivery_date'          => (string) $fromDb->get('concept.options_delivery_date', $fromDb->get('concept.delivery_date')),
@@ -450,15 +450,6 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = false;
                 $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = false;
             }
-            if (in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_RETAIL, MyParcelConsignmentRepository::DELIVERY_TYPE_RETAIL_EXPRESS))) {
-                $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = true;
-                $configuration[MyParcel::DEFAULT_CONCEPT_RETURN] = false;
-            } elseif (in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_MORNING, MyParcelConsignmentRepository::DELIVERY_TYPE_NIGHT))) {
-                $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = true;
-                if (MyParcelProductSetting::cartHasCooledDelivery($cart)) {
-                    $configuration[MyParcel::DEFAULT_CONCEPT_COOLED_DELIVERY] = true;
-                }
-            }
             if ($configuration[MyParcel::DEFAULT_CONCEPT_AGE_CHECK]
                 && !$configuration[MyParcel::DEFAULT_CONCEPT_COOLED_DELIVERY]
                 && !in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_MORNING, MyParcelConsignmentRepository::DELIVERY_TYPE_NIGHT))
@@ -467,6 +458,16 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = true;
             } else {
                 $configuration[MyParcel::DEFAULT_CONCEPT_AGE_CHECK] = false;
+            }
+            if (in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_RETAIL, MyParcelConsignmentRepository::DELIVERY_TYPE_RETAIL_EXPRESS))) {
+                $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = true;
+                $configuration[MyParcel::DEFAULT_CONCEPT_RETURN] = false;
+            } elseif (in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_MORNING, MyParcelConsignmentRepository::DELIVERY_TYPE_NIGHT))) {
+                $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = true;
+                $configuration[MyParcel::DEFAULT_CONCEPT_AGE_CHECK] = false;
+                if (MyParcelProductSetting::cartHasCooledDelivery($cart)) {
+                    $configuration[MyParcel::DEFAULT_CONCEPT_COOLED_DELIVERY] = true;
+                }
             }
 
             if (is_null($mailboxPackage)) {
@@ -529,18 +530,12 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         }
 
         if ($deliveryOption instanceof Dot) {
-            if ($deliveryOption->get('extraOptions.onlyRecipient')
-                || in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_MORNING, MyParcelConsignmentRepository::DELIVERY_TYPE_NIGHT))
-            ) {
-                $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY] = true;
-            }
-            if ($deliveryOption->get('extraOptions.onlyRecipient')) {
-                $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = (bool) $deliveryOption->get('extraOptions.signed', false);
+            if ($deliveryOption->get('extraOptions.signature')) {
+                $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = (bool) $deliveryOption->get('extraOptions.signature', false);
             }
             if ($deliveryType = $deliveryOption->get('concept.options.delivery_type')) {
                 $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcelConsignmentRepository::PACKAGE_TYPE_NORMAL;
             }
-
             if ($deliveryOption->get('extraOptions.onlyRecipient')
                 || in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_MORNING, MyParcelConsignmentRepository::DELIVERY_TYPE_NIGHT))
             ) {
@@ -575,7 +570,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             'package_type'           => (int) $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] ?: MyParcelConsignmentRepository::PACKAGE_TYPE_NORMAL,
             'only_recipient'         => (bool) $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY],
             'signature'              => (bool) $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED],
-            'insurance'              => (bool) $insuranceAmount,
+            'insurance'              => (int) $insuranceAmount,
             'large_format'           => (bool) $configuration[MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE],
             'age_check'              => (bool) $configuration[MyParcel::DEFAULT_CONCEPT_AGE_CHECK],
             'cooled_delivery'        => (bool) $configuration[MyParcel::DEFAULT_CONCEPT_COOLED_DELIVERY],

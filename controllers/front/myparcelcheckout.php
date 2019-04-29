@@ -163,6 +163,8 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 $conversion *= (1 + ($carrier->getTaxesRate($address) / 100));
             }
         }
+        $hasAgeCheck = (bool) MyParcelProductSetting::cartHasAgeCheck($cart);
+        $hasCooledDelivery = (bool) MyParcelProductSetting::cartHasCooledDelivery($cart);
 
         $smartyVars = array(
             'base_dir_ssl'                     => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
@@ -197,11 +199,11 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 ? 0
                 : (float) $this->myParcelCarrierDeliverySetting->recipient_only_fee_tax_incl * $conversion,
             'signatureOnlyRecipient'           => (bool) $this->myParcelCarrierDeliverySetting->signed_recipient_only,
-            'signatureOnlyRecipientFeeTaxIncl' => 12, //$carrier->is_free
-            //? 0
-            //: (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
-            'cooledDelivery'                   => (bool) MyParcelProductSetting::cartHasCooledDelivery($cart),
-            'ageCheck'                         => (bool) MyParcelProductSetting::cartHasAgeCheck($cart),
+            'signatureOnlyRecipientFeeTaxIncl' => $carrier->is_free
+            ? 0
+            : (float) $this->myParcelCarrierDeliverySetting->signed_recipient_only_fee_tax_incl * $conversion,
+            'cooledDelivery'                   => (bool) $hasCooledDelivery,
+            'ageCheck'                         => (bool) $hasAgeCheck && !$hasCooledDelivery,
             'fontFamily'                       => Configuration::get(MyParcel::CHECKOUT_FONT) ?: 'Exo',
             'fontSize'                         => (int) Configuration::get(MyParcel::CHECKOUT_FONT_SIZE),
             'link'                             => $context->link,

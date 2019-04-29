@@ -132,7 +132,7 @@
             defaults: {
               classification: '{$mpProductSettings->classification|escape:'javascript':'UTF-8'}',
               country: '{$mpProductSettings->country|escape:'javascript':'UTF-8'}',
-              status: '{if $mpProductSettings->status === MyParcelProductSetting::CUSTOMS_ENABLE}enable{elseif $mpProductSettings->status === MyParcelProductSetting::CUSTOMS_SKIP}skip{else}disable{/if}',
+              status: '{MyParcelProductSetting::findStringStatus($mpProductSettings->status)|escape:'javascript':'UTF-8'}',
               ageCheck: {if $mpProductSettings->age_check}true{else}false{/if},
               cooledDelivery: {if $mpProductSettings->cooled_delivery}true{else}false{/if},
             },

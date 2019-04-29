@@ -190,7 +190,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.3.0';
+        $this->version = '2.3.1';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -2109,14 +2109,17 @@ class MyParcel extends Module
         foreach (array_keys($this->getDefaultSettingsFormValues()) as $key) {
             if (Tools::isSubmit($key)) {
                 $submitted = true;
-                switch ($key) {
+                switch ($key) {case static::DEFAULT_CONCEPT_INSURED_AMOUNT:
+                    if ((int) Tools::getValue(static::DEFAULT_CONCEPT_INSURED_TYPE) === static::INSURED_TYPE_500_PLUS) {
+                        $correctedAmount = max(1000, static::findValidInsuranceAmount((int) Tools::getValue($key)));
+                        Configuration::updateValue($key, $correctedAmount * 100);
+                    }
+                    break;
                     case static::DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT:
-                    case static::DEFAULT_CONCEPT_INSURED_AMOUNT:
-                        $value = (int) Tools::getValue($key);
-                        if ($value < 500) {
-                            $value = 500;
+                        if ((int) Tools::getValue(static::DEFAULT_RETURN_CONCEPT_INSURED_TYPE) === static::INSURED_TYPE_500_PLUS) {
+                            $correctedAmount = max(static::findValidInsuranceAmount((int) Tools::getValue($key)), 1000);
+                            Configuration::updateValue($key, $correctedAmount * 100);
                         }
-                        Configuration::updateValue($key, $value * 100);
                         break;
                     default:
                         Configuration::updateValue($key, Tools::getValue($key));
@@ -2159,7 +2162,6 @@ class MyParcel extends Module
 
             static::DEFAULT_CONCEPT_PARCEL_TYPE        => Configuration::get(static::DEFAULT_CONCEPT_PARCEL_TYPE),
             static::DEFAULT_CONCEPT_LARGE_PACKAGE      => Configuration::get(static::DEFAULT_CONCEPT_LARGE_PACKAGE),
-            static::DEFAULT_CONCEPT_AGE_CHECK          => Configuration::get(static::DEFAULT_CONCEPT_AGE_CHECK),
             static::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY => Configuration::get(static::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
             static::DEFAULT_CONCEPT_SIGNED             => Configuration::get(static::DEFAULT_CONCEPT_SIGNED),
             static::DEFAULT_CONCEPT_RETURN             => Configuration::get(static::DEFAULT_CONCEPT_RETURN),
@@ -2665,24 +2667,6 @@ class MyParcel extends Module
                         'type'    => 'switch',
                         'label'   => $this->l('Extra large parcel'),
                         'name'    => static::DEFAULT_CONCEPT_LARGE_PACKAGE,
-                        'is_bool' => true,
-                        'values'  => array(
-                            array(
-                                'id'    => 'active_on',
-                                'value' => true,
-                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
-                            ),
-                            array(
-                                'id'    => 'active_off',
-                                'value' => false,
-                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
-                            ),
-                        ),
-                    ),
-                    array(
-                        'type'    => 'switch',
-                        'label'   => $this->l('Age check 18+'),
-                        'name'    => static::DEFAULT_CONCEPT_AGE_CHECK,
                         'is_bool' => true,
                         'values'  => array(
                             array(
@@ -5487,7 +5471,7 @@ class MyParcel extends Module
 
         if ($deliverySetting->mailbox_package || $deliverySetting->digital_stamp) {
             // Disable if not delivering to the Netherlands
-            if ($countryIso !== 'NL') {
+            if ($countryIso !== 'NL' || MyParcelProductSetting::cartHasCooledDelivery($cart) || MyParcelProductSetting::cartHasAgeCheck($cart)) {
                 return false;
             }
 
@@ -5558,7 +5542,7 @@ class MyParcel extends Module
             false
         );
 
-        return $extraCosts * $conversion * $taxRate + $shippingCost;
+        return ($extraCosts * $conversion * $taxRate) + $shippingCost;
     }
 
     /**
