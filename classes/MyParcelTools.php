@@ -462,9 +462,9 @@ class MyParcelTools
             }
 
             return array(
-                'street'        => $matches['street'],
-                'number'        => $matches['number'],
-                'number_suffix' => isset($matches['number_suffix']) ? $matches['number_suffix'] : '',
+                'street'        => !empty($matches['street']) ? $matches['street'] : $addressLine,
+                'number'        => !empty($matches['street']) && isset($matches['number']) ? $matches['number'] : '',
+                'number_suffix' => Tools::substr(!empty($matches['street']) && isset($matches['number_suffix']) ? $matches['number_suffix'] : '', 0, 6),
             );
         } else {
             $results = array();

@@ -190,7 +190,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.3.1';
+        $this->version = '2.3.2';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -251,10 +251,10 @@ class MyParcel extends Module
     {
         $lastCheck = (int) Configuration::get(static::WEBHOOK_LAST_CHECK);
         $webHookId = trim(Configuration::get(static::WEBHOOK_ID));
-        $curl = new \MyParcelModule\MyParcelHttpClient();
 
         if ((time() > ($lastCheck + static::WEBHOOK_CHECK_INTERVAL)) || empty($webHookId)) {
             // Time to update webhooks
+            $curl = new \MyParcelModule\MyParcelHttpClient();
             $curl->setHeader('Accept', 'application/json');
             $response = $curl->get("https://api.myparcel.nl/webhook_subscriptions/$webHookId");
 
@@ -283,6 +283,7 @@ class MyParcel extends Module
             }
 
             if (!$found) {
+                $curl = new \MyParcelModule\MyParcelHttpClient();
                 $curl->setHeader('Content-Type', 'application/json;charset=utf-8');
                 $response = $curl->post('https://api.myparcel.nl/webhook_subscriptions', mypa_json_encode(array(
                     'data' => array(
@@ -2109,12 +2110,13 @@ class MyParcel extends Module
         foreach (array_keys($this->getDefaultSettingsFormValues()) as $key) {
             if (Tools::isSubmit($key)) {
                 $submitted = true;
-                switch ($key) {case static::DEFAULT_CONCEPT_INSURED_AMOUNT:
-                    if ((int) Tools::getValue(static::DEFAULT_CONCEPT_INSURED_TYPE) === static::INSURED_TYPE_500_PLUS) {
-                        $correctedAmount = max(1000, static::findValidInsuranceAmount((int) Tools::getValue($key)));
-                        Configuration::updateValue($key, $correctedAmount * 100);
-                    }
-                    break;
+                switch ($key) {
+                    case static::DEFAULT_CONCEPT_INSURED_AMOUNT:
+                        if ((int) Tools::getValue(static::DEFAULT_CONCEPT_INSURED_TYPE) === static::INSURED_TYPE_500_PLUS) {
+                            $correctedAmount = max(1000, static::findValidInsuranceAmount((int) Tools::getValue($key)));
+                            Configuration::updateValue($key, $correctedAmount * 100);
+                        }
+                        break;
                     case static::DEFAULT_RETURN_CONCEPT_INSURED_AMOUNT:
                         if ((int) Tools::getValue(static::DEFAULT_RETURN_CONCEPT_INSURED_TYPE) === static::INSURED_TYPE_500_PLUS) {
                             $correctedAmount = max(static::findValidInsuranceAmount((int) Tools::getValue($key)), 1000);
@@ -4831,7 +4833,13 @@ class MyParcel extends Module
         }
 
         $address = new Address((int) $cart->id_address_delivery);
-        if (!preg_match(MyParcelModule\MyParcelNL\Sdk\src\Model\Repository\MyParcelConsignmentRepository::SPLIT_STREET_REGEX, MyParcelTools::getAddressLine($address))) {
+        $countryIso = Tools::strtoupper(Country::getIsoById($address->id_country));
+        if (!in_array($countryIso, array('NL', 'BE'))) {
+            return '';
+        }
+
+        $matches = MyParcelTools::getParsedAddress(new Address((int) $cart->id_address_delivery));
+        if (!$matches['number']) {
             // No house number
             if (Configuration::get(static::LOG_API)) {
                 Logger::addLog("{$this->displayName}: No house number for Cart {$cart->id}");
@@ -4909,16 +4917,20 @@ class MyParcel extends Module
      */
     public function hookAdminOrder($params)
     {
-        $order = new Order($params['id_order']);
+        $idOrder = (int) $params['id_order'];
+        if (!$idOrder) {
+            $idOrder = (int) Tools::getValue('id_order');
+        }
+        $order = new Order($idOrder);
         if (!Validate::isLoadedObject($order)) {
             return '';
         }
 
         $this->context->smarty->assign(
             array(
-                'mpIdOrder'                      => (int) $params['id_order'],
-                'mpConcept'                      => mypa_json_encode(MyParcelDeliveryOption::getByOrderId((int) $params['id_order'])),
-                'mpPreAlerted'                   => mypa_json_encode(MyParcelOrder::getByOrderIds(array((int) $params['id_order']))),
+                'mpIdOrder'                      => (int) $idOrder,
+                'mpConcept'                      => mypa_json_encode(MyParcelDeliveryOption::getByOrderId((int) $idOrder)),
+                'mpPreAlerted'                   => mypa_json_encode(MyParcelOrder::getByOrderIds(array((int) $idOrder))),
                 'mpProcessUrl'                   => static::appendQueryToUrl($this->baseUrl, array('ajax' => '1')),
                 'mpModuleDir'                    => __PS_BASE_URI__."modules/{$this->name}/",
                 'mpJsCountries'                  => static::getCountries(),
@@ -6814,7 +6826,12 @@ class MyParcel extends Module
         $url = mypa_parse_url($urlString);
         $url['query'] = isset($url['query']) ? $url['query'] : '';
         parse_str($url['query'], $oldQuery);
-        $url['query'] = http_build_query($oldQuery + $query, PHP_QUERY_RFC1738);
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            $url['query'] = http_build_query($oldQuery + $query, PHP_QUERY_RFC1738);
+        } else {
+            $url['query'] = http_build_query($oldQuery + $query);
+        }
+
 
         return mypa_stringify_url($url);
     }
@@ -6837,7 +6854,12 @@ class MyParcel extends Module
         $url = mypa_parse_url($this->context->link->getAdminLink($controller, $withToken));
         $url['query'] = isset($url['query']) ? $url['query'] : '';
         parse_str($url['query'], $query);
-        $url['query'] = http_build_query($query + $params, PHP_QUERY_RFC1738);
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            $url['query'] = http_build_query($query + $params, PHP_QUERY_RFC1738);
+        } else {
+            $url['query'] = http_build_query($query + $params);
+        }
+
 
         return mypa_stringify_url($url);
     }
@@ -6881,13 +6903,16 @@ class MyParcel extends Module
             )));
         }
         if (version_compare(
-            Tools::substr($latestVersion['version'], 1, Tools::strlen($latestVersion['version']) - 1),
+            Tools::substr($latestVersion, 1, Tools::strlen($latestVersion) - 1),
             $this->version,
             '>'
         )) {
             // Then update
+            $success = $this->downloadModuleFromLocation($this->name, "https://github.com/myparcelnl/prestashop/releases/download/v{$latestVersion}/myparcel-v{$latestVersion}.zip");
+            $message = isset($this->context->controller->errors[0]) ? $this->context->controller->errors[0] : '';
             die(json_encode(array(
-                'success' => $this->downloadModuleFromLocation($this->name, "https://github.com/myparcelnl/prestashop/releases/download/{$latestVersion}/myparcel-v{$latestVersion}.zip"),
+                'success' => $success,
+                'message' => $message,
             )));
         } else {
             die(json_encode(array(
@@ -6969,6 +6994,10 @@ class MyParcel extends Module
             $curl->setOpt(CURLOPT_ENCODING, '');
             $curl->setOpt(CURLOPT_FOLLOWLOCATION, 1);
             if (!$curl->download($location, _PS_MODULE_DIR_.'myparcel-update.zip')) {
+                if (!empty($curl->errorMessage)) {
+                    @$errorMessage = (string) $curl->errorMessage;
+                    $this->context->controller->errors[] = "Download error: $errorMessage";
+                }
                 return false;
             }
         }
@@ -7134,7 +7163,7 @@ class MyParcel extends Module
     protected static function checkForUpdates()
     {
         $curl = new \MyParcelModule\MyParcelHttpClient();
-        $updateXml =  $curl->get('https://github.com/myparcelnl/prestashop/releases.atom');
+        $updateXml = $curl->get('https://github.com/myparcelnl/prestashop/releases.atom');
         if ($updateXml instanceof SimpleXMLElement) {
             try {
                 /** @var SimpleXMLElement $updateXml */

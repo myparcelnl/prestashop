@@ -69,7 +69,6 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
 
         if (Tools::isSubmit('ajax')) {
             $this->getDeliveryOptions();
-
             return;
         }
 
@@ -84,13 +83,13 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
         $address = new Address((int) $cart->id_address_delivery);
 
         $m = MyParcelTools::getParsedAddress($address);
-        if (!isset($m['number'])) {
+        if (!$m['number']) {
             // No house number
             $this->hideMe();
         }
 
-        $streetName = isset($m['street']) ? $m['street'] : '';
-        $houseNumber = isset($m['number']) ? $m['number'] : '';
+        $streetName = $m['street'];
+        $houseNumber = $m['number'];
 
         // id_carrier is not defined in database before choosing a carrier,
         // set it to a default one to match a potential cart _rule

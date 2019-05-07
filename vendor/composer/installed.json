@@ -34,7 +34,7 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "MyParcelModule\\MyParcelModule\\MyParcelModule\\Composer\\CaBundle\\": "src"
+                "MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Composer\\CaBundle\\": "src"
             }
         },
         "notification-url": "https:\/\/packagist.org\/downloads\/",
@@ -59,17 +59,17 @@
     },
     {
         "name": "firstred\/myparcelnl-sdk",
-        "version": "v1.5.1-beta.11",
-        "version_normalized": "1.5.1.0-beta11",
+        "version": "v1.5.1",
+        "version_normalized": "1.5.1.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/firstred\/myparcelnl-sdk.git",
-            "reference": "334f481d0c28c0462569785cae2cf3e8c066f221"
+            "reference": "549a3d2227932c2a7ecc7af7e3efb422ca6f06f7"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/firstred\/myparcelnl-sdk\/zipball\/334f481d0c28c0462569785cae2cf3e8c066f221",
-            "reference": "334f481d0c28c0462569785cae2cf3e8c066f221",
+            "url": "https:\/\/api.github.com\/repos\/firstred\/myparcelnl-sdk\/zipball\/549a3d2227932c2a7ecc7af7e3efb422ca6f06f7",
+            "reference": "549a3d2227932c2a7ecc7af7e3efb422ca6f06f7",
             "shasum": ""
         },
         "require": {
@@ -81,7 +81,7 @@
         "require-dev": {
             "phpunit\/phpunit": "^4.8.36 || ^5.7.27"
         },
-        "time": "2019-04-18T09:58:07+00:00",
+        "time": "2019-05-02T21:31:59+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -146,7 +146,7 @@
                 "src\/helpers.php"
             ],
             "psr-4": {
-                "MyParcelModule\\MyParcelModule\\MyParcelModule\\Firstred\\": "src"
+                "MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Firstred\\": "src"
             }
         },
         "notification-url": "https:\/\/packagist.org\/downloads\/",
@@ -246,7 +246,7 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "MyParcelModule\\Curl\\": "src\/Curl\/"
+                "MyParcelModule\\MyParcelModule\\Curl\\": "src\/Curl\/"
             }
         },
         "notification-url": "https:\/\/packagist.org\/downloads\/",
@@ -314,7 +314,7 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Mbstring\\": ""
+                "MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Mbstring\\": ""
             },
             "files": [
                 "bootstrap.php"
@@ -372,7 +372,7 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php54\\": ""
+                "MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php54\\": ""
             },
             "files": [
                 "bootstrap.php"
@@ -433,7 +433,7 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php55\\": ""
+                "MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php55\\": ""
             },
             "files": [
                 "bootstrap.php"

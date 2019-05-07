@@ -296,6 +296,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         $deliveryOptions = array();
         foreach ($results as $result) {
             $fromDb = mypa_dot(@json_decode($result[static::$definition['table']], true));
+            $idOrder = (int) $result['id_order'];
+            $order = new Order($idOrder);
             $cc = Tools::strtoupper($fromDb->get('concept.recipient.cc', $fromDb->get('concept.cc')));
             $address = array(
                 'street'        => trim($fromDb->get('concept.recipient.street', $fromDb->get('concept.street', ''))),
@@ -303,21 +305,20 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
                 'number_suffix' => trim($fromDb->get('concept.recipient.number_suffix', $fromDb->get('concept.number_suffix', ''))),
             );
             if ($cc === 'NL' && !is_numeric($address['number'])) {
-                preg_match(MyParcelConsignmentRepository::SPLIT_STREET_REGEX, "{$address['street']} {$address['number']}{$address['number_suffix']}", $matches);
+                preg_match(MyParcelConsignmentRepository::SPLIT_STREET_REGEX, "{$address['street']} {$address['number']} {$address['number_suffix']}", $matches);
                 $address = array(
                     'street'        => isset($matches['street']) ? $matches['street'] : '',
                     'number'        => isset($matches['number']) ? $matches['number'] : '',
                     'number_suffix' => isset($matches['number_suffix']) ? $matches['number_suffix'] : '',
                 );
-            } elseif ($cc !== 'NL' && $address['number'] || $address['number_suffix']) {
+            } elseif ($cc !== 'NL' && ($address['number'] || $address['number_suffix'])) {
                 $address = array(
-                    'street'        => "{$address['street']} {$address['number']}{$address['number_suffix']}",
+                    'street'        => "{$address['street']} {$address['number']} {$address['number_suffix']}",
                     'number'        => '',
                     'number_suffix' => '',
                 );
             }
             static::checkSpecialDeliveryOption($fromDb);
-            $order = new Order($fromDb->get('idOrder'));
             $formattedInvoiceNumber = '';
             if (Validate::isLoadedObject($order)) {
                 $orderInvoice = $order->getInvoicesCollection();
@@ -329,7 +330,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             }
 
             $deliveryOption = array(
-                'idOrder'        => $fromDb->get('idOrder'),
+                'idOrder'        => (int) $idOrder,
                 'editingAddress' => false,
                 'editingCustoms' => false,
                 'concept'        => array(
@@ -377,8 +378,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             if ($fromDb->has('previous')) {
                 $deliveryOption['previous'] = $fromDb->get('previous');
             }
-            $deliveryOptions[(int) $result['id_order']] = $deliveryOption;
-            if (($key = array_search((int) $result['id_order'], $range)) !== false) {
+            $deliveryOptions[(int) $idOrder] = $deliveryOption;
+            if (($key = array_search((int) $idOrder, $range)) !== false) {
                 unset($range[$key]);
             }
         }
@@ -418,10 +419,11 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         if (!$address) {
             $address = new Address($order->id_address_delivery);
         }
-        $cart = new Cart((int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-			SELECT `id_cart`
-			FROM `'._DB_PREFIX_.'orders`
-			WHERE `id_order` = '.(int) $order->id));
+        $sql = new DbQuery();
+        $sql->select('`id_cart`');
+        $sql->from(bqSQL(Order::$definition['table']));
+        $sql->where('`id_order` = '.(int) $order->id);
+        $cart = new Cart((int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql));
         $countryIso = Tools::strtoupper(Country::getIsoById($address->id_country));
         $configuration = array(
             MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE      => in_array($countryIso, array_map(function ($country) { return $country['iso_code']; }, array_filter(MyParcel::getCountries(), function ($country) { return in_array($country['region'], array('NL', 'BE', 'EU')); }))) && in_array($countryIso, MyParcel::getLargeFormatCountries()) ? Configuration::get(MyParcel::DEFAULT_CONCEPT_LARGE_PACKAGE) : false,

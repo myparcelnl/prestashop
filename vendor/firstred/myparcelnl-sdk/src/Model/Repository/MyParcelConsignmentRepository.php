@@ -31,7 +31,7 @@ class MyParcelConsignmentRepository extends \MyParcelModule\MyParcelNL\Sdk\src\M
      * This regex goes from right to left
      * Contains php keys to store the data in an array
      */
-    const SPLIT_STREET_REGEX = '~(?P<street>.*?)\\s?(?P<number>\\d{1,4})[/\\s\\-]{0,2}(?P<number_suffix>[a-zA-Z]{1}\\d{1,3}|-\\d{1,4}|\\d{2}\\w{1,2}|[a-zA-Z]{1}[a-zA-Z\\s]{0,3})?$~';
+    const SPLIT_STREET_REGEX = '~(?P<street>.*?)\\s?(?P<number>\\d{1,4})[/\\s\\-]{0,2}(?P<number_suffix>[a-zA-Z]{1}\\d{1,3}|-\\d{1,4}|\\d{2}\\w{1,2}|[a-zA-Z]{1}[a-zA-Z\\s]*)?$~';
     const BOX_PLACEHOLDER = '{{bus}}';
     const BOX_TRANSLATION_POSSIBILITIES = 'bus, Bus, boîte, Boîte, boite, Boite, box, Box, bte, Bte, app';
     /**
