@@ -274,7 +274,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         } elseif (is_string($range)) {
             $range = array((int) $range);
         }
-        if (!is_array($range)) {
+        if (!is_array($range) || empty($range)) {
             return array();
         }
 
@@ -372,7 +372,9 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             );
             if ($fromDb->has('data')) {
                 $deliveryOption['data'] = $fromDb->get('data');
-                $deliveryOption['concept']['delivery_type'] = (int) $fromDb->get('data.time.0.type');
+                if ((int) $deliveryOption['concept']['delivery_type'] !== MyParcelConsignmentRepository::DEFAULT_DELIVERY_TYPE) {
+                    $deliveryOption['concept']['delivery_type'] = (int) $fromDb->get('data.time.0.type');
+                }
                 $deliveryOption['concept']['delivery_date'] = $fromDb->get('data.date');
             }
             if ($fromDb->has('previous')) {
@@ -419,6 +421,8 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
         if (!$address) {
             $address = new Address($order->id_address_delivery);
         }
+        $carrier = new Carrier($order->id_carrier);
+        $carrierSetting = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
         $sql = new DbQuery();
         $sql->select('`id_cart`');
         $sql->from(bqSQL(Order::$definition['table']));
@@ -435,7 +439,7 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             MyParcel::DEFAULT_CONCEPT_SIGNED             => false,
             MyParcel::DEFAULT_CONCEPT_INSURED            => false,
             MyParcel::DEFAULT_CONCEPT_INSURED_TYPE       => false,
-            MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT     => $countryIso === 'NL' ? Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT) : 0,
+            MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT     => $countryIso === 'NL' ? (int) Configuration::get(MyParcel::DEFAULT_CONCEPT_INSURED_AMOUNT) : 0,
             MyParcel::LINK_EMAIL                         => Configuration::get(MyParcel::LINK_EMAIL),
             MyParcel::LINK_PHONE                         => Configuration::get(MyParcel::LINK_PHONE),
         );
@@ -502,6 +506,15 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $street = isset($matches['street']) ? $matches['street'] : '';
             $houseNumber = isset($matches['number']) ? $matches['number'] : '';
             $houseNumberSuffix = isset($matches['number_suffix']) ? $matches['number_suffix'] : '';
+        } elseif ($countryIso === 'BE') {
+            $matches = MyParcelTools::getParsedAddress($address);
+            $boxSeparator = MyParcelTools::isWallonia($address->postcode) ? 'bte' : 'bus';
+            $street = "{$matches['street']} {$matches['number']}";
+            if ($matches['number_suffix']) {
+                $street .= " {$boxSeparator} {$matches['number_suffix']}";
+            }
+            $houseNumber = '';
+            $houseNumberSuffix = '';
         } else {
             $street = $address->address1;
             $houseNumber = '';
@@ -531,12 +544,14 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $insuranceAmount = 0;
         }
 
+        if (Validate::isLoadedObject($carrierSetting)
+            && ($carrierSetting->delivery || $carrierSetting->pickup)
+        ) {
+            $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcelConsignmentRepository::PACKAGE_TYPE_NORMAL;
+        }
         if ($deliveryOption instanceof Dot) {
             if ($deliveryOption->get('extraOptions.signature')) {
                 $configuration[MyParcel::DEFAULT_CONCEPT_SIGNED] = (bool) $deliveryOption->get('extraOptions.signature', false);
-            }
-            if ($deliveryType = $deliveryOption->get('concept.options.delivery_type')) {
-                $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] = MyParcelConsignmentRepository::PACKAGE_TYPE_NORMAL;
             }
             if ($deliveryOption->get('extraOptions.onlyRecipient')
                 || in_array($deliveryOption->get('data.time.0.type'), array(MyParcelConsignmentRepository::DELIVERY_TYPE_MORNING, MyParcelConsignmentRepository::DELIVERY_TYPE_NIGHT))
@@ -561,13 +576,13 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             'street_additional_info' => (string) MyParcelTools::getAdditionalAddressLine($address),
             'postal_code'            => (string) $address->postcode,
             'city'                   => (string) $address->city,
-            'region'                 => (string) $address->id_state ? State::getNameById($address->id_state) : '',
+            'region'                 => $address->id_state ? (string) State::getNameById($address->id_state) : '',
             'company'                => (string) $address->company,
             'person'                 => (string) $address->firstname.' '.$address->lastname,
-            'phone'                  => (string) $configuration[MyParcel::LINK_PHONE]
-                ? ($address->phone_mobile ? $address->phone_mobile : $address->phone)
+            'phone'                  => $configuration[MyParcel::LINK_PHONE]
+                ? (string) ($address->phone_mobile ? $address->phone_mobile : $address->phone)
                 : '',
-            'email'                  => (string) $configuration[MyParcel::LINK_EMAIL] ? $customer->email : '',
+            'email'                  => $configuration[MyParcel::LINK_EMAIL] ? (string) $customer->email : '',
             'delivery_type'          => (int) $deliveryOption->get('data.time.0.type', MyParcelConsignmentRepository::DEFAULT_DELIVERY_TYPE),
             'package_type'           => (int) $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] ?: MyParcelConsignmentRepository::PACKAGE_TYPE_NORMAL,
             'only_recipient'         => (bool) $configuration[MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY],
@@ -579,7 +594,9 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             'label_description'      => static::getLabelDescription($order),
             'number_of_labels'       => 1,
             'carrier'                => 1,
-            'weight'                 => MyParcelProductSetting::getTotalWeight($order->id),
+            'weight'                 => $configuration[MyParcel::DEFAULT_CONCEPT_PARCEL_TYPE] === MyParcelConsignmentRepository::PACKAGE_TYPE_DIGITAL_STAMP
+                ? static::getDigitalStampWeightForApi(MyParcelProductSetting::getTotalWeight($order->id))
+                : MyParcelProductSetting::getTotalWeight($order->id),
             'customs'                => array(
                 'contents' => 1,
                 'invoice'  => $formattedInvoiceNumber,
@@ -1114,10 +1131,11 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
 
         $consignmentCollection = new MyParcelCollection();
         foreach ($shipments as $conceptData) {
+            $order = new Order($conceptData['idOrder']);
             $conceptData = mypa_dot($conceptData);
             $consignment = new MyParcelConsignmentRepository();
             $consignment
-                ->setApiKey(Configuration::get(MyParcel::API_KEY))
+                ->setApiKey(Configuration::get(MyParcel::API_KEY, null, $order->id_shop_group, $order->id_shop))
                 ->setReferenceId("PRESTASHOP_{$shopIdentifier}_{$conceptData->get('idOrder')}")
                 ->setStreet($conceptData->get('concept.street'))
                 ->setCity($conceptData->get('concept.city'))
@@ -1280,6 +1298,30 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             array(MyParcelConsignmentRepository::DELIVERY_TYPE_MORNING, MyParcelConsignmentRepository::DELIVERY_TYPE_NIGHT)
         )) {
             $conceptData->set('cooled_delivery', 0);
+        }
+    }
+
+    /**
+     * Calculated weight in grams
+     *
+     * @param int $weight Weight in grams
+     *
+     * @return int $weight in grams
+     *
+     * @since 2.3.3
+     */
+    public static function getDigitalStampWeightForApi($weight)
+    {
+        if ($weight >= 0 && $weight <= 20) {
+            return 10;
+        } elseif ($weight > 20 && $weight <= 50) {
+            return 35;
+        } elseif ($weight > 50 && $weight <= 100) {
+            return 75;
+        } elseif ($weight > 100 && $weight <= 350) {
+            return 225;
+        } else {
+            return 1175;
         }
     }
 }

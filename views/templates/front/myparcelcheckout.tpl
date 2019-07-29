@@ -149,6 +149,7 @@
               selected: null,
               street: '{$streetName|escape:'javascript':'UTF-8' nofilter}',
               houseNumber: '{$houseNumber|escape:'javascript':'UTF-8' nofilter}',
+              houseNumberSuffix: '{$houseNumberSuffix|escape:'javascript':'UTF-8' nofilter}',
               postalCode: '{$postcode|escape:'javascript':'UTF-8' nofilter}',
               deliveryDaysWindow: {$deliveryDaysWindow|intval nofilter},
               dropOffDelay: {$dropOffDelay|intval nofilter},
@@ -169,6 +170,7 @@
                 signatureOnlyRecipient: {if $signatureOnlyRecipient}true{else}false{/if},
                 cooledDelivery: {if $cooledDelivery}true{else}false{/if},
                 ageCheck: {if $ageCheck}true{else}false{/if},
+                deliveryMonday: {if Configuration::get(MyParcel::MONDAY_DELIVERY_SUPPORTED)}true{else}false{/if},
               },
               pricing: {
                 delivery: 0,
@@ -198,10 +200,10 @@
               background1Color: '{$background1Color|escape:'javascript':'UTF-8' nofilter}',
               background2Color: '{$background2Color|escape:'javascript':'UTF-8' nofilter}',
               background3Color: '{$background3Color|escape:'javascript':'UTF-8' nofilter}',
-              highlightColor: '{$highlightcolor|escape:'javascript':'UTF-8' nofilter}',
-              inactiveColor: '{$inactivecolor|escape:'javascript':'UTF-8' nofilter}',
+              highlightColor: '{$highlightColor|escape:'javascript':'UTF-8' nofilter}',
+              inactiveColor: '{$inactiveColor|escape:'javascript':'UTF-8' nofilter}',
               fontFamily: '{$fontFamily|escape:'javascript':'UTF-8' nofilter}',
-              fontSize: {$fontSize|intval} ? {$fontSize|intval} : 2,
+              fontSize: {$fontSize|intval} || 2,
             }
           );
         });

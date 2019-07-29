@@ -105,9 +105,10 @@
       } else if (document.addEventListener) {
         document.addEventListener('DOMContentLoaded', fn);
       } else {
-        document.attachEvent('onreadystatechange', function() {
-          if (document.readyState !== 'loading')
-            fn('myparcel-default-product-settings');
+        document.attachEvent('onreadystatechange', function () {
+          if (document.readyState !== 'loading') {
+            fn();
+          }
         });
       }
     }

@@ -214,4 +214,5 @@
   cooledDelivery: '{l s='Immediate return (food)' mod='myparcel' js=1}',
   history: '{l s='History' mod='myparcel' js=1}',
   trackingHistory: '{l s='Tracking history' mod='myparcel' js=1}',
+  naInMultistoreMode: '{l s='N/A in multistore mode' mod='myparcel' js=1}',
 }

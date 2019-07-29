@@ -189,7 +189,7 @@ function upgrade_module_2_1_0($module)
 
     // Clear the Smarty cache
     if (method_exists('Tools', 'clearCache')) {
-        Tools::clearCache();
+        Tools::clearCache(Context::getContext()->smarty);
     }
 
     // Clear the OPCache

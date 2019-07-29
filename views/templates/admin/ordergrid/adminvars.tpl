@@ -29,14 +29,15 @@
       }
 
       function documentReady(fn) {
-        if (document.readyState !== 'loading'){
+        if (document.readyState !== 'loading') {
           fn();
         } else if (document.addEventListener) {
           document.addEventListener('DOMContentLoaded', fn);
         } else {
-          document.attachEvent('onreadystatechange', function() {
-            if (document.readyState !== 'loading')
+          document.attachEvent('onreadystatechange', function () {
+            if (document.readyState !== 'loading') {
               fn();
+            }
           });
         }
       }
@@ -44,6 +45,7 @@
       documentReady(function () {
         window.MyParcelModule.misc = window.MyParcelModule.misc || {ldelim}{rdelim};
         window.MyParcelModule.misc.icons = [];
+        window.MyParcelModule.misc.multi = {if $mpMultistore}true{else}false{/if};
 
         window.MyParcelModule.app.default.orderGrid().then(function (fn) {
           new fn.default(
@@ -132,19 +134,19 @@
                   currency: 'EUR',
                   amount: 83
                 },
-                '20': {
+                '21': {
                   currency: 'EUR',
                   amount: 166
                 },
-                '50': {
+                '51': {
                   currency: 'EUR',
                   amount: 249
                 },
-                '100': {
+                '101': {
                   currency: 'EUR',
                   amount: 332
                 },
-                '350': {
+                '351': {
                   currency: 'EUR',
                   amount: 415
                 }

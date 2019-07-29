@@ -49,11 +49,7 @@ function upgrade_module_1_2($module)
     }
 
     // Clear cache
-    if (version_compare(_PS_VERSION_, '1.6', '>=')) {
-        Tools::clearSmartyCache();
-    } else {
-        Tools::clearCache();
-    }
+    Tools::clearCache(Context::getContext()->smarty);
     Autoload::getInstance()->generateIndex();
     if (function_exists('opcache_reset')) {
         opcache_reset();

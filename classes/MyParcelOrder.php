@@ -134,6 +134,8 @@ class MyParcelOrder extends MyParcelObjectModel
      *
      * @return stdClass
      *
+     * @throws PrestaShopDatabaseException
+     *
      * @since 2.0.0
      */
     public static function getByOrderIds($idOrders)
@@ -152,24 +154,22 @@ class MyParcelOrder extends MyParcelObjectModel
         $sql->from(bqSQL(static::$definition['table']), 'mo');
         $sql->where('mo.`id_order` IN ('.implode(', ', $idOrders).')');
 
-        try {
-            $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-            foreach ($results as &$result) {
-                $result['id_shipment'] = (int) $result['id_shipment'];
-                $result['postnl_status'] = (int) $result['postnl_status'];
-                $result['postnl_final'] = (bool) $result['postnl_final'];
-                $result['retour'] = (bool) $result['retour'];
-                $result['type'] = (int) $result['type'];
-                $result['id_order'] = (int) $result['id_order'];
-                $result[static::$definition['primary']] = (int) $result[static::$definition['primary']];
-            }
-        } catch (PrestaShopException $e) {
+        $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        if (!is_array($results)) {
             $results = array();
         }
 
         $newResults = array();
         foreach ($results as &$result) {
+            $result['id_shipment'] = (int) $result['id_shipment'];
+            $result['postnl_status'] = (int) $result['postnl_status'];
+            $result['postnl_final'] = (bool) $result['postnl_final'];
+            $result['retour'] = (bool) $result['retour'];
+            $result['type'] = (int) $result['type'];
+            $result['id_order'] = (int) $result['id_order'];
+            $result[static::$definition['primary']] = (int) $result[static::$definition['primary']];
             $result['shipment'] = @json_decode($result['shipment']);
+
             if (!isset($newResults[$result['id_order']])) {
                 $newResults[$result['id_order']] = array();
             }
@@ -204,18 +204,17 @@ class MyParcelOrder extends MyParcelObjectModel
         $sql->from(bqSQL(static::$definition['table']), 'mpo');
         $sql->where('mpo.`id_shipment` = '.(int) $idShipment);
 
-        try {
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-            $result['id_shipment'] = (int) $result['id_shipment'];
-            $result['postnl_status'] = (int) $result['postnl_status'];
-            $result['postnl_final'] = (bool) $result['postnl_final'];
-            $result['retour'] = (bool) $result['retour'];
-            $result['type'] = (int) $result['type'];
-            $result['id_order'] = (int) $result['id_order'];
-            $result[static::$definition['primary']] = (int) $result[static::$definition['primary']];
-        } catch (PrestaShopException $e) {
-            $result = false;
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+        if (!isset($result['id_shipment'])) {
+            return false;
         }
+        $result['id_shipment'] = (int) $result['id_shipment'];
+        $result['postnl_status'] = (int) $result['postnl_status'];
+        $result['postnl_final'] = (bool) $result['postnl_final'];
+        $result['retour'] = (bool) $result['retour'];
+        $result['type'] = (int) $result['type'];
+        $result['id_order'] = (int) $result['id_order'];
+        $result[static::$definition['primary']] = (int) $result[static::$definition['primary']];
 
         if ($result) {
             $mpo = new static();
@@ -244,11 +243,7 @@ class MyParcelOrder extends MyParcelObjectModel
         $sql->from(bqSQL(static::$definition['table']), 'mpo');
         $sql->where('mpo.`id_shipment` = '.(int) $idShipment);
 
-        try {
-            $idOrder = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
-        } catch (PrestaShopException $e) {
-            $idOrder = false;
-        }
+        $idOrder = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
 
         if ($idOrder) {
             return new Order($idOrder);
@@ -288,43 +283,35 @@ class MyParcelOrder extends MyParcelObjectModel
             }
         }
 
-        try {
-            if ($statusCode === 14) {
-                if (Configuration::get(MyParcel::DIGITAL_STAMP_USE_SHIPPED_STATUS)) {
-                    MyParcelOrderHistory::setShipped($idShipment, false);
-                } else {
-                    MyParcelOrderHistory::setPrinted($idShipment, false);
-                }
+        if ($statusCode === 14) {
+            if (Configuration::get(MyParcel::DIGITAL_STAMP_USE_SHIPPED_STATUS)) {
+                MyParcelOrderHistory::setShipped($idShipment, false);
             } else {
-                if ($statusCode >= 2) {
-                    MyParcelOrderHistory::setPrinted($idShipment);
-                }
-                if ($statusCode >= 3) {
-                    MyParcelOrderHistory::setShipped($idShipment);
-                }
-                if ($statusCode >= 7 && $statusCode <= 11) {
-                    MyParcelOrderHistory::setReceived($idShipment);
-                }
+                MyParcelOrderHistory::setPrinted($idShipment, false);
             }
-        } catch (PrestaShopException $e) {
-            Logger::addLog("Myparcel module error: {$e->getMessage()}");
+        } else {
+            if ($statusCode >= 2) {
+                MyParcelOrderHistory::setPrinted($idShipment);
+            }
+            if ($statusCode >= 3) {
+                MyParcelOrderHistory::setShipped($idShipment);
+            }
+            if ($statusCode >= 7 && $statusCode <= 11) {
+                MyParcelOrderHistory::setReceived($idShipment);
+            }
         }
 
         MyParcelOrderHistory::log($idShipment, $statusCode, $date);
 
-        try {
-            return (bool) Db::getInstance()->update(
-                bqSQL(static::$definition['table']),
-                array(
-                    'tracktrace'    => pSQL($barcode),
-                    'postnl_status' => (int) $statusCode,
-                    'date_upd'      => pSQL($date),
-                ),
-                'id_shipment = '.(int) $idShipment
-            );
-        } catch (PrestaShopException $e) {
-            return false;
-        }
+        return (bool) Db::getInstance()->update(
+            bqSQL(static::$definition['table']),
+            array(
+                'tracktrace'    => pSQL($barcode),
+                'postnl_status' => (int) $statusCode,
+                'date_upd'      => pSQL($date),
+            ),
+            'id_shipment = '.(int) $idShipment
+        );
     }
 
     /**
@@ -380,16 +367,10 @@ class MyParcelOrder extends MyParcelObjectModel
      */
     public static function deleteShipment($idShipment)
     {
-        try {
-            return Db::getInstance()->delete(
-                bqSQL(static::$definition['table']),
-                '`id_shipment` = '.(int) $idShipment
-            );
-        } catch (PrestaShopException $e) {
-            Logger::addLog("MyParcel module error: {$e->getMessage()}");
-
-            return false;
-        }
+        return Db::getInstance()->delete(
+            bqSQL(static::$definition['table']),
+            '`id_shipment` = '.(int) $idShipment
+        );
     }
 
     /**
@@ -414,16 +395,10 @@ class MyParcelOrder extends MyParcelObjectModel
         if (!Validate::isLoadedObject($order)) {
             return false;
         }
-        try {
-            $orderCarrier = new OrderCarrier((int) Db::getInstance()->getValue('
-				SELECT `id_order_carrier`
-				FROM `'._DB_PREFIX_.'order_carrier`
-				WHERE `id_order` = '.(int) $order->id));
-        } catch (PrestaShopException $e) {
-            Logger::addLog("MyParcel module error: {$e->getMessage()}");
-
-            return false;
-        }
+        $orderCarrier = new OrderCarrier((int) Db::getInstance()->getValue('
+            SELECT `id_order_carrier`
+            FROM `'._DB_PREFIX_.'order_carrier`
+            WHERE `id_order` = '.(int) $order->id));
         if (!Validate::isTrackingNumber($tracktrace)) {
             return false;
         } else {
@@ -434,12 +409,7 @@ class MyParcelOrder extends MyParcelObjectModel
             if (Validate::isLoadedObject($orderCarrier)) {
                 // Update order_carrier
                 $orderCarrier->tracking_number = pSQL($tracktrace);
-
-                try {
-                    return $orderCarrier->update();
-                } catch (PrestaShopException $e) {
-                    return false;
-                }
+                return $orderCarrier->update();
             }
         }
 

@@ -392,6 +392,12 @@ class MyParcelTools
      */
     public static function getAddressLineFields($idCountry)
     {
+        $country = new Country($idCountry);
+        $iso = Tools::strtoupper($country->iso_code);
+        if ($line = Configuration::get(MyParcel::ADDRESS_FIELD_OVERRIDE.$iso)) {
+            return explode(' ', $line);
+        }
+
         preg_match(MyParcel::ADDRESS_FORMAT_REGEX, AddressFormat::getAddressCountryFormat($idCountry), $fields);
 
         return array_pad(array_splice($fields, 1), 3, null);
@@ -414,15 +420,23 @@ class MyParcelTools
     {
         $country = new Country($address->id_country);
         $iso = Tools::strtoupper($country->iso_code);
+        $addressLine = '';
         if ($line = Configuration::get(MyParcel::ADDRESS_FIELD_OVERRIDE.$iso)) {
-            return $line;
+            $fields = explode(' ', $line);
+        } else {
+            $fields = static::getAddressLineFields($address->id_country);
         }
 
-        $addressLine = '';
-        $fields = static::getAddressLineFields($address->id_country);
-        foreach ($fields as $field) {
-            if ($field && !empty($address->{$field})) {
-                $addressLine .= ' '.$address->{$field};
+        if (strtoupper($country->iso_code) === 'BE' && count($fields) === 3) {
+            $addressLine = "{$address->{$fields[0]}} {$address->{$fields[1]}}";
+            if ($address->{$fields[2]}) {
+                $addressLine .= " bus {$address->{$fields[2]}}";
+            }
+        } else {
+            foreach ($fields as $field) {
+                if ($field && !empty($address->{$field})) {
+                    $addressLine .= ' '.$address->{$field};
+                }
             }
         }
 
@@ -470,22 +484,19 @@ class MyParcelTools
             $results = array();
             $counts = array();
             $addressLine = static::getAddressLine($address);
-            $defaultAddressLine = "{$address->address1} {$address->address2}";
-            foreach (explode(', ', MyParcelConsignmentRepository::BOX_TRANSLATION_POSSIBILITIES) as $possibility) {
-                $regex = str_replace(MyParcelConsignmentRepository::BOX_PLACEHOLDER, $possibility, MyParcelConsignmentRepository::SPLIT_STREET_REGEX_BE);
-                foreach (array($addressLine, $defaultAddressLine) as $target) {
-                    preg_match($regex, $target, $matches);
-                    $result = array(
-                        'street'        => isset($matches['street']) ? $matches['street'] : '',
-                        'street_suffix' => isset($matches['street_suffix']) ? $matches['street_suffix'] : '',
-                        'number'        => isset($matches['number']) ? $matches['number'] : '',
-                        'box_separator' => isset($matches['box_separator']) ? $matches['box_separator'] : '',
-                        'box_number'    => isset($matches['box_number']) ? $matches['box_number'] : '',
-                    );
-                    $counts[] = array_sum(array_map(function ($item) { return !empty($item); }, array_values($result)));
-                    $results[] = $result;
-                    unset($matches);
-                }
+            $defaultAddressLine = $address->address1;
+            foreach (array($addressLine, $defaultAddressLine) as $target) {
+                preg_match(MyParcelConsignmentRepository::SPLIT_STREET_REGEX_BE, $target, $matches);
+                $result = array(
+                    'street'        => isset($matches['street']) ? $matches['street'] : '',
+                    'street_suffix' => isset($matches['street_suffix']) ? $matches['street_suffix'] : '',
+                    'number'        => isset($matches['number']) ? $matches['number'] : '',
+                    'box_separator' => isset($matches['box_separator']) ? $matches['box_separator'] : '',
+                    'box_number'    => isset($matches['box_number']) ? $matches['box_number'] : '',
+                );
+                $counts[] = array_sum(array_map(function ($item) { return !empty($item); }, array_values($result)));
+                $results[] = $result;
+                unset($matches);
             }
             $highestIndex = array_keys($counts, max($counts));
             $highestIndex = $highestIndex[0];
@@ -552,15 +563,14 @@ class MyParcelTools
      * @param Order $order
      *
      * @return string
+     *
+     * @throws PrestaShopException
      */
     public static function getInvoiceSuggestion(Order $order)
     {
-        try {
-            $invoice = $order->getInvoicesCollection()->getFirst();
-            if ($invoice instanceof OrderInvoice) {
-                return $invoice->getInvoiceNumberFormatted(Context::getContext()->language->id);
-            }
-        } catch (PrestaShopException $e) {
+        $invoice = $order->getInvoicesCollection()->getFirst();
+        if ($invoice instanceof OrderInvoice) {
+            return $invoice->getInvoiceNumberFormatted(Context::getContext()->language->id);
         }
 
         return $order->reference;
@@ -573,11 +583,7 @@ class MyParcelTools
      */
     public static function getWeightSuggestion(Order $order)
     {
-        try {
-            $weight = ceil($order->getTotalWeight()) * (MyParcel::getWeightUnit() === 'kg' ? 1000 : 1);
-        } catch (PrestaShopException $e) {
-            $weight = 1000;
-        }
+        $weight = ceil($order->getTotalWeight()) * (MyParcel::getWeightUnit() === 'kg' ? 1000 : 1);
         if ($weight < 1000) {
             $weight = 1000;
         }
@@ -637,9 +643,12 @@ class MyParcelTools
     {
         $curl = new MyParcelHttpClient();
         $countries = $curl->get(MyParcel::SUPPORTED_COUNTRIES_URL);
-        if (!$countries) {
+        if (!$countries || !isset($countries['data']['countries'][0])) {
             $countries = json_encode(MyParcelTools::getSupportedCountriesOffline(), JSON_UNESCAPED_UNICODE);
         } else {
+            if (isset($countries['data']['countries'][0]['GB']['region'])) {
+                $countries['data']['countries'][0]['UK'] = $countries['data']['countries'][0]['GB'];
+            }
             Configuration::updateValue(MyParcel::SUPPORTED_COUNTRIES, mypa_json_encode($countries));
         }
         return $countries;
@@ -789,5 +798,42 @@ class MyParcelTools
             reset($objects);
             rmdir($dir);
         }
+    }
+
+    /**
+     * Determine whether the postcode is Walloon
+     *
+     * Can be used to put the right translation of the box separator on a Belgian label
+     *
+     * @param string $postcode
+     *
+     * @return bool
+     *
+     * @see https://en.wikipedia.org/wiki/List_of_postal_codes_in_Belgium
+     */
+    public static function isWallonia($postcode)
+    {
+        $postcode = trim($postcode);
+        if ($postcode >= '1300' && $postcode <= '1499') {
+            // Walloon Brabant
+            return true;
+        } elseif ($postcode >= '4000' && $postcode <= '4999') {
+            // Liège
+            return true;
+        } elseif ($postcode >= '5000' && $postcode <= '5999') {
+            // Namur
+            return true;
+        } elseif ($postcode >= '6000' && $postcode <= '6599') {
+            // Hainaut
+            return true;
+        } elseif ($postcode >= '6600' && $postcode <= '6999') {
+            // Luxembourg
+            return true;
+        } elseif ($postcode >= '7000' && $postcode <= '7999') {
+            // Hainaut (continued)
+            return true;
+        }
+
+        return false;
     }
 }

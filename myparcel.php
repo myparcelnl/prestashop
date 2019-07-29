@@ -119,6 +119,7 @@ class MyParcel extends Module
     const DEV_MODE_CHECK_WEBHOOKS = 'MYPARCEL_CHECK_WEBHOOKS';
     const DEV_MODE_REMOVE_WEBHOOK = 'MYPARCEL_REMOVE_WEBHOOK';
     const DEV_MODE_HIDE_PREFERRED = 'MYPARCEL_HIDE_PREFERRED';
+    const DEV_MODE_SEARCH_TRACKTRACE = 'MYPARCEL_SEARCH_TRACKTRACE';
 
     const API_TIMEOUT = 20;
     const CONNECTION_ATTEMPTS = 5;
@@ -190,7 +191,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.3.2';
+        $this->version = '2.3.3';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -258,27 +259,33 @@ class MyParcel extends Module
             $curl->setHeader('Accept', 'application/json');
             $response = $curl->get("https://api.myparcel.nl/webhook_subscriptions/$webHookId");
 
-            $sslEnabled = (bool) Configuration::get('PS_SSL_ENABLED');
-            $webhookUrl = Context::getContext()->link->getModuleLink(
-                $this->name,
-                'hook',
-                array(),
-                $sslEnabled,
-                (int) Configuration::get('PS_LANG_DEFAULT')
-            );
-            $found = false;
+            $webhookUrl = rtrim((Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').Tools::getShopDomainSsl().__PS_BASE_URI__, '/')."/index.php?fc=module&module={$this->name}&controller=hook";
             $data = mypa_dot($response);
-            if (!$data->isEmpty()) {
-                if (!$data->isEmpty('data.webhook_subscriptions') && is_array($data->get('data.webhook_subscriptions'))) {
-                    foreach ($data->get('data.webhook_subscriptions') as $subscription) {
-                        if ((int) $subscription['id'] !== $webHookId) {
-                            continue;
-                        } elseif ($subscription['url'] === $webhookUrl) {
-                            $found = true;
+            $found = null;
 
-                            break;
-                        }
+            if (is_array($data->get('data.webhook_subscriptions'))) {
+                foreach ($data->get('data.webhook_subscriptions') as $subscription) {
+                    if (isset($subscription['id']) && (string) $subscription['id'] === (string) $webHookId) {
+                        $found = $subscription;
+                        break;
                     }
+                }
+            }
+
+            if (isset($found['id']) && isset($found['url'])) {
+                $localUrlParts = parse_url($webhookUrl);
+                $remoteUrlParts = parse_url($found['url']);
+
+                if (!isset($remoteUrlParts['host'])
+                    || !isset($remoteUrlParts['path'])
+                    || !isset($remoteUrlParts['query'])
+                    || $localUrlParts['host'] !== $remoteUrlParts['host']
+                    || $localUrlParts['path'] !== $remoteUrlParts['path']
+                    || $localUrlParts['query'] !== $remoteUrlParts['query']
+                ) {
+                    $curl = new \MyParcelModule\MyParcelHttpClient();
+                    $curl->delete("https://api.myparcel.nl/webhook_subscriptions/{$found['id']}");
+                    $found = null;
                 }
             }
 
@@ -556,6 +563,23 @@ class MyParcel extends Module
         $this->addCarrier('PostNL Brievenbuspakje', static::POSTNL_DEFAULT_MAILBOX_PACKAGE_CARRIER);
         $this->addCarrier('PostNL Briefpost', static::POSTNL_DEFAULT_DIGITAL_STAMP_CARRIER);
 
+        $sql = new DbQuery();
+        $sql->select('`id_reference`');
+        $sql->from(bqSQL(MyParcelCarrierDeliverySetting::$definition['table']));
+        $sql->where('`delivery` = \'1\' OR `pickup` = \'1\' OR `mailbox_package` = \'1\' OR `digital_stamp` = \'1\'');
+        $carrierReferences = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        if (is_array($carrierReferences) && count($carrierReferences) >= 1) {
+            Db::getInstance()->update(
+                bqSQL(Carrier::$definition['table']),
+                array(
+                    'is_module'            => true,
+                    'shipping_external'    => true,
+                    'external_module_name' => $this->name,
+                ),
+                '`id_reference` IN ('.implode(',', array_map('intval', array_column($carrierReferences, 'id_reference'))).')'
+            );
+        }
+
         // On 1.7 only the hook `displayBeforeCarrier` works properly
         if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
             $index = array_search('displayCarrierList', $this->hooks);
@@ -604,7 +628,7 @@ class MyParcel extends Module
         Configuration::updateValue(static::DEFAULT_CONCEPT_CUSTOMS_STATUS, MyParcelProductSetting::CUSTOMS_ENABLE_STRING);
 
         if (method_exists('Tools', 'clearCache')) {
-            Tools::clearCache();
+            Tools::clearCache(Context::getContext()->smarty);
         }
 
         return true;
@@ -634,20 +658,16 @@ class MyParcel extends Module
 
             return false;
         }
-        try {
-            if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue("
-            SELECT * 
-            FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
-            WHERE `CONSTRAINT_TYPE` = 'UNIQUE'
-                AND TABLE_NAME = '"._DB_PREFIX_.pSQL(bqSQL(MyParcelDeliveryOption::$definition['table']))."'")
-            ) {
-                Db::getInstance()->execute(
-                    'ALTER TABLE `'._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])
-                    .'` ADD CONSTRAINT `id_cart` UNIQUE (`id_cart`)'
-                );
-            }
-        } catch (Exception $e) {
-            $this->addError("MyParcel installation error: {$e->getMessage()}", false);
+        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue("
+        SELECT * 
+        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+        WHERE `CONSTRAINT_TYPE` = 'UNIQUE'
+            AND TABLE_NAME = '"._DB_PREFIX_.pSQL(bqSQL(MyParcelDeliveryOption::$definition['table']))."'")
+        ) {
+            Db::getInstance()->execute(
+                'ALTER TABLE `'._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])
+                .'` ADD CONSTRAINT `id_cart` UNIQUE (`id_cart`)'
+            );
         }
 
         return true;
@@ -727,7 +747,7 @@ class MyParcel extends Module
             Db::getInstance()->update(
                 'delivery',
                 array(
-                    'pricing' => $key == static::POSTNL_DEFAULT_CARRIER ? (4.99 / 1.21) : (3.50 / 1.21),
+                    'price' => $key == static::POSTNL_DEFAULT_CARRIER ? (4.99 / 1.21) : (3.50 / 1.21),
                 ),
                 '`id_carrier` = '.(int) $carrier->id
             );
@@ -823,6 +843,9 @@ class MyParcel extends Module
     public function uninstall()
     {
         Configuration::deleteByName(static::API_KEY);
+        Configuration::deleteByName(static::NEW_VERSION_AVAILABLE);
+        Configuration::deleteByName(static::WEBHOOK_ID);
+        Configuration::deleteByName(static::WEBHOOK_LAST_CHECK);
 
         foreach ($this->hooks as $hook) {
             $this->unregisterHook($hook);
@@ -1039,6 +1062,7 @@ class MyParcel extends Module
                             'action'      => 'NavigateGoodsNomenclature',
                         )
                     ),
+                    'mpMultistore'                   => Shop::isFeatureActive() && in_array(Shop::getContext(), array(Shop::CONTEXT_ALL, Shop::CONTEXT_GROUP)),
                 )
             );
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
@@ -1550,19 +1574,8 @@ class MyParcel extends Module
                 'success' => false,
             )));
         }
-        $query = array(
-            'carrier'         => 1,
-            'cutoff_time'     => '23:59:00',
-            'monday_delivery' => 1,
-            'dropoff_days'    => '0;1;2;3;4;5;6',
-            'cc'              => $request['cc'],
-            'postal_code'     => $request['postal_code'],
-            'number'          => $request['number'],
-        );
 
-        $curl = new \MyParcelModule\MyParcelHttpClient();
-        $url = 'https://api.myparcel.nl/delivery_options?'.http_build_query($query);
-        $response = $curl->get($url);
+        $response = static::getDeliveryOptions($request['cc'], $request['postal_code'], $request['number']);
         if (!$response) {
             die(mypa_json_encode(array(
                 'success' => false,
@@ -1585,6 +1598,11 @@ class MyParcel extends Module
         $requestBody = @json_decode(file_get_contents('php://input'), true);
         $curl = new \MyParcelModule\MyParcelHttpClient();
         $shipments = implode(';', $requestBody['moduleData']['shipments']);
+        $order = MyParcelOrder::getOrderByShipmentId($requestBody['moduleData']['shipments'][0]);
+        if (!Validate::isLoadedObject($order)) {
+            die(mypa_json_encode(array('success' => false)));
+        }
+        $curl->setHeader('Authorization', 'basic '.base64_encode(Configuration::get(MyParcel::API_KEY, null, $order->id_shop_group, $order->id_shop)));
         $responseContent = $curl->get("https://api.myparcel.nl/shipments/{$shipments}");
 
         $this->getShipmentApiInterceptor($responseContent);
@@ -1639,6 +1657,11 @@ class MyParcel extends Module
         $requestBody = @json_decode(file_get_contents('php://input'), true);
         $curl = new \MyParcelModule\MyParcelHttpClient();
         $shipments = implode(';', $requestBody['moduleData']['shipments']);
+        $order = MyParcelOrder::getOrderByShipmentId($requestBody['moduleData']['shipments'][0]);
+        if (!Validate::isLoadedObject($order)) {
+            die(mypa_json_encode(array('success' => false)));
+        }
+        $curl->setHeader('Authorization', 'basic '.base64_encode(Configuration::get(MyParcel::API_KEY, null, $order->id_shop_group, $order->id_shop)));
         $responseContent = $curl->get("https://api.myparcel.nl/tracktraces/{$shipments}");
 
         $this->getTrackTraceApiInterceptor($responseContent);
@@ -1767,9 +1790,7 @@ class MyParcel extends Module
     public function ajaxProcessCreateLabel()
     {
         header('Content-Type: application/json; charset=utf-8');
-        $curl = new \MyParcelModule\MyParcelHttpClient();
-        $curl->setHeader('Accept', 'application/json; charset=utf-8');
-        $curl->setHeader('Content-Type', 'application/vnd.shipment+json; charset=utf-8');
+        \MyParcelModule\MyParcelNL\Sdk\src\Model\MyParcelRequest::setHttpClientClass('\\MyParcelModule\\MyParcelHttpClient');
         $request = @json_decode(file_get_contents('php://input'), true);
 
         try {
@@ -1798,8 +1819,6 @@ class MyParcel extends Module
     public function ajaxProcessPrintLabel()
     {
         header('Content-Type: application/json; charset=utf-8');
-        $curl = new \MyParcelModule\MyParcelHttpClient();
-        $curl->setHeader('Accept', 'application/json; charset=utf-8');
         $requestBody = file_get_contents('php://input');
         $request = @json_decode($requestBody, true);
         if (is_array($request) && array_key_exists('idShipments', $request)) {
@@ -1810,6 +1829,16 @@ class MyParcel extends Module
                 'success' => false,
             )));
         }
+        $order = MyParcelOrder::getOrderByShipmentId($request['idShipments'][0]);
+        if (!Validate::isLoadedObject($order)) {
+            die(mypa_json_encode(array(
+                'success' => false,
+            )));
+        }
+        /** @var Order $myparcelOrder */
+        $curl = new \MyParcelModule\MyParcelHttpClient();
+        $curl->setHeader('Accept', 'application/json; charset=utf-8');
+        $curl->setHeader('Authorization', 'basic '.base64_encode(Configuration::get(static::API_KEY, null, $order->id_shop_group, $order->id_shop)));
 
         if (is_array($requestBody)) {
             unset($requestBody['controller']);
@@ -2453,6 +2482,7 @@ class MyParcel extends Module
             );
             Configuration::updateValue(static::LOG_API, (bool) Tools::getValue(static::LOG_API));
             Configuration::updateValue(static::DEV_MODE_HIDE_PREFERRED, (bool) Tools::getValue(static::DEV_MODE_HIDE_PREFERRED));
+            Configuration::updateValue(static::DEV_MODE_SEARCH_TRACKTRACE, (bool) Tools::getValue(static::DEV_MODE_SEARCH_TRACKTRACE));
             Configuration::updateValue(static::PRINTED_STATUS, (int) Tools::getValue(static::PRINTED_STATUS));
             Configuration::updateValue(static::SHIPPED_STATUS, (int) Tools::getValue(static::SHIPPED_STATUS));
             Configuration::updateValue(static::RECEIVED_STATUS, (int) Tools::getValue(static::RECEIVED_STATUS));
@@ -4262,8 +4292,8 @@ class MyParcel extends Module
             static::DEV_MODE_SET_VERSION             => null,
             static::ADDRESS_FIELD_OVERRIDE.'NL'      => Configuration::get(static::ADDRESS_FIELD_OVERRIDE.'NL'),
             static::ADDRESS_FIELD_OVERRIDE.'BE'      => Configuration::get(static::ADDRESS_FIELD_OVERRIDE.'BE'),
-            static::DEV_MODE_SET_VERSION             => null,
             static::DEV_MODE_HIDE_PREFERRED          => Configuration::get(static::DEV_MODE_HIDE_PREFERRED),
+            static::DEV_MODE_SEARCH_TRACKTRACE       => Configuration::get(static::DEV_MODE_SEARCH_TRACKTRACE),
         );
 
         foreach (static::getIgnoredStatuses() as $conf) {
@@ -4751,6 +4781,25 @@ class MyParcel extends Module
                         ),
                         'hidden'   => true,
                     ),
+                    array(
+                        'type'    => 'switch',
+                        'name'    => static::DEV_MODE_SEARCH_TRACKTRACE,
+                        'label'   => $this->l('Add a search box to the track&trace column'),
+                        'is_bool' => true,
+                        'values'  => array(
+                            array(
+                                'id'    => 'active_on',
+                                'value' => true,
+                                'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
+                            ),
+                            array(
+                                'id'    => 'active_off',
+                                'value' => false,
+                                'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
+                            ),
+                        ),
+                        'hidden'   => true,
+                    ),
                 ),
             ),
         );
@@ -5001,6 +5050,7 @@ class MyParcel extends Module
      *
      * @throws Adapter_Exception
      * @throws PrestaShopException
+     * @throws ErrorException
      * @since 2.0.0
      */
     public function hookActionValidateOrder($params)
@@ -5020,9 +5070,6 @@ class MyParcel extends Module
         $mpcs = MyParcelCarrierDeliverySetting::getByCarrierReference($carrier->id_reference);
         $mailboxPackage = MyParcelDeliveryOption::checkMailboxPackage($cart);
         $digitalStamp = MyParcelDeliveryOption::checkDigitalStamp($cart);
-        if (empty($deliveryOption) && !$mailboxPackage && !$digitalStamp) {
-            return;
-        }
 
         // Check if the chosen carrier supports the MyParcel pickup or delivery options
         if (!$mpcs
@@ -5032,6 +5079,25 @@ class MyParcel extends Module
             MyParcelDeliveryOption::removeDeliveryOption($cart->id);
 
             return;
+        }
+
+        if ($mpcs->pickup && !$mpcs->delivery && !$deliveryOption->has('data.time.0.type')) {
+            $parsedAddress = MyParcelTools::getParsedAddress($address);
+            $deliveryOptions = mypa_dot(static::getDeliveryOptions(Tools::strtoupper($country->iso_code), $address->postcode, $parsedAddress['number']));
+            if (!$deliveryOptions->has('data.pickup.0')) {
+                return;
+            }
+            $pickups = $deliveryOptions->get('data.pickup');
+            usort($pickups, function ($a, $b) {
+               return $b['distance'] < $a['distance'];
+            });
+            list($pickup) = $pickups;
+            $pickup['time'] = array_filter($pickup['time'], function ($time) {
+                return (int) $time['type'] === MyParcelModule\MyParcelNL\Sdk\src\Model\Repository\MyParcelConsignmentRepository::DELIVERY_TYPE_RETAIL;
+            });
+            $deliveryOption = mypa_dot(array());
+            $deliveryOption->set('idOrder', (int) $order->id);
+            $deliveryOption->set('data', $pickup);
         }
 
         $concept = MyParcelDeliveryOption::createConcept($order, $deliveryOption, $address, $mailboxPackage, $digitalStamp);
@@ -5052,7 +5118,7 @@ class MyParcel extends Module
                 $newAddress->phone = $deliveryOption->get('data.phone_number');
 
                 // Figure out which address fields are active and parse the MyParcel formatted address
-                list (, $housenumberField, $extensionField) = $addressFields = MyParcelTools::getAddressLineFields($newAddress->id_country);
+                list (, $numberField, $numberSuffixField) = $addressFields = MyParcelTools::getAddressLineFields($newAddress->id_country);
                 $addressLine = "{$deliveryOption->get('data.street')} {$deliveryOption->get('data.number')}";
                 $addressFields = array_filter($addressFields, function ($item) {
                     return (bool) $item;
@@ -5063,7 +5129,7 @@ class MyParcel extends Module
                     case 2:
                         if (preg_match(MyParcelModule\MyParcelNL\Sdk\src\Model\Repository\MyParcelConsignmentRepository::SPLIT_STREET_REGEX, $addressLine, $m)) {
                             $newAddress->address1 = $deliveryOption->get('data.street');
-                            $newAddress->{$housenumberField} = isset($m['street_suffix']) ? $m['street_suffix'] : '';
+                            $newAddress->{$numberField} = isset($m['street_suffix']) ? $m['street_suffix'] : '';
                         } else {
                             $newAddress->address1 = $addressLine;
                         }
@@ -5071,8 +5137,8 @@ class MyParcel extends Module
                     case 3:
                         if (preg_match(MyParcelModule\MyParcelNL\Sdk\src\Model\Repository\MyParcelConsignmentRepository::SPLIT_STREET_REGEX, $addressLine, $m)) {
                             $newAddress->address1 = $deliveryOption->get('data.street');
-                            $newAddress->{$housenumberField} = isset($m['number']) ? $m['number'] : '';
-                            $newAddress->{$extensionField} = isset($m['number_suffix']) ? $m['number_suffix'] : '';
+                            $newAddress->{$numberField} = isset($m['number']) ? $m['number'] : '';
+                            $newAddress->{$numberSuffixField} = isset($m['number_suffix']) ? $m['number_suffix'] : '';
                         } else {
                             $newAddress->address1 = $addressLine;
                         }
@@ -5118,14 +5184,15 @@ class MyParcel extends Module
     {
         if (!Tools::isSubmit('exportorder') && Configuration::get(static::API_KEY)) {
             if (isset($params['select'])) {
-                $params['select'] .= ",\n\t\tmpdo.`myparcel_delivery_option`, IFNULL(mpdo.`date_delivery`, '1970-01-01 00:".
-                    "00:00') as `myparcel_date_delivery`, mpdo.`pickup` AS `myparcel_pickup`, UPPER(country.`iso_code`) AS `myparcel_country_is".
-                    "o`, 1 as `myparcel_void_1`, 1 as `myparcel_void_2`";
+                $params['select'] .= ",\n\t\tmpdo.`myparcel_delivery_option`, IFNULL(mpdo.`date_delivery`, '1970-01-01 00:00:00') as `myparcel_date_delivery`, mpdo.`pickup` AS `myparcel_pickup`, UPPER(country.`iso_code`) AS `myparcel_country_iso`, 1 as `myparcel_void_1`, 1 as `myparcel_void_2`";
                 if (!isset($params['join'])) {
                     $params['join'] = '';
                 }
-                $params['join'] .= "\n\t\tLEFT JOIN `"._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])."` ".
-                    "mpdo ON (mpdo.`id_cart` = a.`id_cart`)";
+                $params['join'] .= "\n\t\tLEFT JOIN `"._DB_PREFIX_.bqSQL(MyParcelDeliveryOption::$definition['table'])."` mpdo ON (mpdo.`id_cart` = a.`id_cart`)";
+                if (Configuration::get(static::DEV_MODE_SEARCH_TRACKTRACE)) {
+                    $params['join'] .= "\n\t\tLEFT JOIN `"._DB_PREFIX_.bqSQL(MyParcelOrder::$definition['table'])."` mpo ON (mpo.`id_order` = a.`id_order`)";
+                    $params['group_by'] = 'GROUP BY a.`id_order`';
+                }
             }
             if (isset($params['fields'])) {
                 $supportedCarrierModules = array_filter(Hook::getHookModuleExecList(Tools::substr(lcfirst(__FUNCTION__), 4, Tools::strlen(__FUNCTION__))), function ($item) {
@@ -5176,8 +5243,9 @@ class MyParcel extends Module
                     'class'           => 'fixed-width-lg',
                     'callback'        => 'printMyParcelTrackTrace',
                     'callback_object' => 'MyParcelTools',
-                    'search'          => false,
-                    'orderby'         => false,
+                    'filter_key'      => Configuration::get(static::DEV_MODE_SEARCH_TRACKTRACE) ? 'mpo!tracktrace' : null,
+                    'search'          => Configuration::get(static::DEV_MODE_SEARCH_TRACKTRACE) ? true: false,
+                    'orderby'         => Configuration::get(static::DEV_MODE_SEARCH_TRACKTRACE) ? true: false,
                     'remove_onclick'  => true,
                 );
                 $params['fields']['myparcel_void_2'] = array(
@@ -5494,7 +5562,10 @@ class MyParcel extends Module
         }
 
         if (MyParcelProductSetting::cartHasCooledDelivery($cart)
-            && ((!$deliverySetting->morning && !$deliverySetting->evening) || $countryIso !== 'NL')
+            && ((!$deliverySetting->morning && !$deliverySetting->evening)
+                || $countryIso !== 'NL'
+                || ($deliverySetting->pickup && !$deliverySetting->delivery)
+            )
         ) {
             return false;
         }
@@ -5879,11 +5950,7 @@ class MyParcel extends Module
 
         // Select carrier tax
         if ($useTax && !Tax::excludeTaxeOption()) {
-            try {
-                $address = Address::initialize((int) $addressId);
-            } catch (PrestaShopException $e) {
-                $address = new Address();
-            }
+            $address = Address::initialize((int) $addressId);
 
             if (Configuration::get('PS_ATCP_SHIPWRAP')) {
                 $carrierTax = 0;
@@ -6049,6 +6116,7 @@ class MyParcel extends Module
      *
      * @return array|bool Carrier IDs
      *
+     * @throws PrestaShopDatabaseException
      * @since 2.0.0
      */
     protected function getCarriersByReferences($references)
@@ -6257,7 +6325,7 @@ class MyParcel extends Module
         }
 
         return Db::getInstance()->insert(
-            'carrier',
+            'carrier_group',
             array_map(function ($idGroup) use ($carrier) {
                 return array(
                     'id_carrier' => (int) $carrier->id,
@@ -6670,6 +6738,7 @@ class MyParcel extends Module
      * @return array
      *
      * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      *
      * @since 2.3.0
      */
@@ -6902,11 +6971,7 @@ class MyParcel extends Module
                 'message' => $this->l('Unable to retrieve info about the latest version'),
             )));
         }
-        if (version_compare(
-            Tools::substr($latestVersion, 1, Tools::strlen($latestVersion) - 1),
-            $this->version,
-            '>'
-        )) {
+        if (version_compare($latestVersion, $this->version, '>')) {
             // Then update
             $success = $this->downloadModuleFromLocation($this->name, "https://github.com/myparcelnl/prestashop/releases/download/v{$latestVersion}/myparcel-v{$latestVersion}.zip");
             $message = isset($this->context->controller->errors[0]) ? $this->context->controller->errors[0] : '';
@@ -7363,4 +7428,35 @@ class MyParcel extends Module
 
         return $target === 'product' ? 'ps174' : 'ps161';
     }
+
+    /**
+     * @param string $cc
+     * @param string $postcode
+     * @param string $number
+     *
+     * @return array
+     *
+     * @throws ErrorException
+     * @throws PrestaShopException
+     *
+     * @since 2.3.3
+     */
+    public static function getDeliveryOptions($cc, $postcode, $number)
+    {
+        $query = array(
+            'carrier'         => 1,
+            'cutoff_time'     => '23:59:00',
+            'monday_delivery' => 1,
+            'dropoff_days'    => '0;1;2;3;4;5;6',
+            'cc'              => $cc,
+            'postal_code'     => $postcode,
+            'number'          => $number,
+        );
+
+        $curl = new \MyParcelModule\MyParcelHttpClient();
+        $url = 'https://api.myparcel.nl/delivery_options?'.http_build_query($query);
+        return $curl->get($url);
+    }
 }
+
+MyParcelModule\MyParcelNL\Sdk\src\Model\Repository\MyParcelConsignmentRepository::$euCountries = array_values(array_map(function ($country) { return $country['iso_code']; }, array_filter(MyParcel::getCountries(), function ($country) { return in_array($country['region'], array('NL', 'BE', 'EU')); })));

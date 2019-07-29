@@ -39,23 +39,23 @@ class MyParcelOrderHistory extends MyParcelObjectModel
         'primary' => 'id_myparcel_order_history',
         'fields'  => array(
             'id_shipment'   => array(
-                'type' => self::TYPE_STRING,
+                'type'     => self::TYPE_STRING,
                 'validate' => 'isInt',
                 'required' => true,
-                'db_type' => 'BIGINT(20)'
+                'db_type'  => 'BIGINT(20)',
             ),
             'postnl_status' => array(
-                'type' => self::TYPE_STRING,
+                'type'     => self::TYPE_STRING,
                 'validate' => 'isString',
                 'required' => false,
-                'default' => '1',
-                'db_type' => 'VARCHAR(255)'
+                'default'  => '1',
+                'db_type'  => 'VARCHAR(255)',
             ),
             'date_upd'      => array(
-                'type' => self::TYPE_DATE,
+                'type'     => self::TYPE_DATE,
                 'validate' => 'isDate',
                 'required' => true,
-                'db_type' => 'DATETIME'
+                'db_type'  => 'DATETIME',
             ),
         ),
     );
@@ -127,8 +127,8 @@ class MyParcelOrderHistory extends MyParcelObjectModel
     /**
      * Set printed status
      *
-     * @param int  $idShipment
-     * @param bool $mail
+     * @param int  $idShipment Shipment ID
+     * @param bool $mail       Send mail
      *
      * @throws Adapter_Exception
      * @throws PrestaShopException
@@ -227,7 +227,6 @@ class MyParcelOrderHistory extends MyParcelObjectModel
         }
         $myParcelOrder = MyParcelOrder::getByShipmentId($idShipment);
         if (!Validate::isLoadedObject($myParcelOrder)) {
-
             return;
         }
         $shipmentHistory = MyParcelOrderHistory::getShipmentHistoryByShipmentId($idShipment);
@@ -404,7 +403,7 @@ class MyParcelOrderHistory extends MyParcelObjectModel
                     }
                     $dayTo = $deliveryRequest->get("data.opening_hours.{$day}.".($deliveryRequest->count("data.opening_hours.{$day}") - 1));
                     if (strpos($dayTo, '-') !== false) {
-                        list(,$dayTo) = array_pad(explode('-', $dayTo), 2, '');
+                        list(, $dayTo) = array_pad(explode('-', $dayTo), 2, '');
                     }
                     if ($dayFrom) {
                         $dayFull = "{$dayFrom} - {$dayTo}";
@@ -505,11 +504,12 @@ class MyParcelOrderHistory extends MyParcelObjectModel
     }
 
     /**
-     * @param int  $idShipment Shipment ID
-     * @param int  $status     Target order state
-     * @param bool $addWithEmail
+     * @param int  $idShipment   Shipment ID
+     * @param int  $status       Target order state
+     * @param bool $addWithEmail Send email as well
      *
      * @return void
+     *
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -531,17 +531,16 @@ class MyParcelOrderHistory extends MyParcelObjectModel
             return;
         }
         $shipment = mypa_dot(@json_decode($shipment->shipment, true));
-        $history = $order->getHistory(Context::getContext()->language->id);
-        $found = false;
-        foreach ($history as $item) {
-            if ((int) $item['id_order_state'] === $targetOrderState) {
-                $found = true;
-                break;
+
+        $idOrder = (int) $order->id;
+        $history = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS("SELECT `id_order_state` FROM "._DB_PREFIX_."order_history WHERE `id_order` = $idOrder");
+        if (is_array($history)) {
+            $history = array_column($history, 'id_order_state');
+            if (in_array($targetOrderState, $history)) {
+                return;
             }
         }
-        if ($found) {
-            return;
-        }
+
         $history = new OrderHistory();
         $history->id_order = (int) $order->id;
         $history->changeIdOrderState($targetOrderState, (int) $order->id, !$order->hasInvoice());

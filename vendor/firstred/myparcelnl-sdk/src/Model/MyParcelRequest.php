@@ -50,7 +50,7 @@ class MyParcelRequest
     private static $clientClass = '\\MyParcelModule\\MyParcelNL\\Sdk\\src\\Helper\\MyParcelCurl';
     public static function setHttpClientClass($client)
     {
-        if (!is_subclass_of($client, 'Curl\\Curl')) {
+        if (!is_subclass_of($client, '\\MyParcelModule\\Curl\\Curl')) {
             throw new \InvalidArgumentException('Invalid HTTP client given. It should extend \\Curl\\Curl');
         }
         static::$clientClass = $client;
@@ -179,7 +179,7 @@ class MyParcelRequest
      */
     public function getUserAgentFromComposer()
     {
-        return 'MyParcelNL-SDK/1.5.1';
+        return 'MyParcelNL-SDK/1.5.2';
     }
     /**
      * Get request url

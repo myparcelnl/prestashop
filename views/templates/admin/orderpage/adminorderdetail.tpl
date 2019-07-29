@@ -120,19 +120,19 @@
                 currency: 'EUR',
                 amount: 83,
               },
-              '20': {
+              '21': {
                 currency: 'EUR',
                 amount: 166,
               },
-              '50': {
+              '51': {
                 currency: 'EUR',
                 amount: 249,
               },
-              '100': {
+              '101': {
                 currency: 'EUR',
                 amount: 332,
               },
-              '350': {
+              '351': {
                 currency: 'EUR',
                 amount: 415,
               },

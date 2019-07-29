@@ -253,7 +253,7 @@ function upgrade_module_2_0_0($module)
     }
 
     // Clear the smarty cache hereafter
-    Tools::clearCache();
+    Tools::clearCache(Context::getContext()->smarty);
 
     foreach ($sql as $query) {
         try {

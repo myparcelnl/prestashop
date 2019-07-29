@@ -32,12 +32,10 @@ class MyParcelConsignmentRepository extends \MyParcelModule\MyParcelNL\Sdk\src\M
      * Contains php keys to store the data in an array
      */
     const SPLIT_STREET_REGEX = '~(?P<street>.*?)\\s?(?P<number>\\d{1,4})[/\\s\\-]{0,2}(?P<number_suffix>[a-zA-Z]{1}\\d{1,3}|-\\d{1,4}|\\d{2}\\w{1,2}|[a-zA-Z]{1}[a-zA-Z\\s]*)?$~';
-    const BOX_PLACEHOLDER = '{{bus}}';
-    const BOX_TRANSLATION_POSSIBILITIES = 'bus, Bus, boîte, Boîte, boite, Boite, box, Box, bte, Bte, app';
     /**
      * Regular expression used to split street name from house number.
      */
-    const SPLIT_STREET_REGEX_BE = '~(?P<street>.*?)\\s(?P<street_suffix>(?P<number>[^\\s]{1,8})\\s?(?P<box_separator>{{bus}}?)?\\s?(?P<box_number>\\d{0,8}$))$~';
+    const SPLIT_STREET_REGEX_BE = '~^(?P<street>.*?)\\s(?P<street_suffix>(?P<number>[^\\s#]{1,8})\\s*(?P<box_separator>(bus|Bus|boîte|Boîte|boite|Boite|box|Box|bte|Bte|app|App|appt|Appt|/|\\\\|#)?)?\\s*(?P<box_number>\\d{0,8}$))$~';
     /**
      * Consignment types
      */
@@ -52,6 +50,7 @@ class MyParcelConsignmentRepository extends \MyParcelModule\MyParcelNL\Sdk\src\M
     const PACKAGE_TYPE_UNSTAMPED = 3;
     const PACKAGE_TYPE_DIGITAL_STAMP = 4;
     const DEFAULT_PACKAGE_TYPE = self::PACKAGE_TYPE_NORMAL;
+    public static $euCountries = array('NL', 'BE', 'AT', 'BG', 'CZ', 'CY', 'DK', 'EE', 'FI', 'FR', 'DE', 'GB', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'UK', 'XK');
     /**
      * @var array
      */
@@ -165,7 +164,7 @@ class MyParcelConsignmentRepository extends \MyParcelModule\MyParcelNL\Sdk\src\M
      */
     public function isEuCountry()
     {
-        return in_array($this->getCountry(), array('NL', 'BE', 'AT', 'BG', 'CZ', 'CY', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'XK'));
+        return in_array($this->getCountry(), static::$euCountries);
     }
     /**
      * Encode product for the request

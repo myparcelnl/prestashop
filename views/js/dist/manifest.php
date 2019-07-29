@@ -17,4 +17,4 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-return json_decode("[{\"name\":\"app\",\"files\":[\"vendors~app-v2.3.0.min.js\",\"app-v2.3.0.min.js\"]}]", true);
+return json_decode("[{\"name\":\"app\",\"files\":[\"vendors~app-v2.3.3.min.js\",\"app-v2.3.3.min.js\"]}]", true);

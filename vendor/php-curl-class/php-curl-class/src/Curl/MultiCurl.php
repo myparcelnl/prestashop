@@ -2,6 +2,7 @@
 
 namespace MyParcelModule\Curl;
 
+use MyParcelModule\Curl\ArrayUtil;
 class MultiCurl
 {
     public $baseUrl = null;
@@ -19,6 +20,7 @@ class MultiCurl
     private $cookies = array();
     private $headers = array();
     private $options = array();
+    private $proxies = null;
     private $jsonDecoder = null;
     private $xmlDecoder = null;
     /**
@@ -524,6 +526,20 @@ class MultiCurl
         }
     }
     /**
+     * Set Proxies
+     *
+     * Set proxies to tunnel requests through. When set, a random proxy will be
+     * used for the request.
+     *
+     * @access public
+     * @param  $proxies array - A list of HTTP proxies to tunnel requests
+     *     through. May include port number.
+     */
+    public function setProxies($proxies)
+    {
+        $this->proxies = $proxies;
+    }
+    /**
      * Set Proxy Auth
      *
      * Set the HTTP authentication method(s) to use for the proxy connection.
@@ -533,7 +549,7 @@ class MultiCurl
      */
     public function setProxyAuth($auth)
     {
-        $this - setOpt(CURLOPT_PROXYAUTH, $auth);
+        $this->setOpt(CURLOPT_PROXYAUTH, $auth);
     }
     /**
      * Set Proxy Type
@@ -616,8 +632,13 @@ class MultiCurl
     /**
      * Set Retry
      *
-     * Number of retries to attempt or decider callable. Maximum number of
-     * attempts is $maximum_number_of_retries + 1.
+     * Number of retries to attempt or decider callable.
+     *
+     * When using a number of retries to attempt, the maximum number of attempts
+     * for the request is $maximum_number_of_retries + 1.
+     *
+     * When using a callable decider, the request will be retried until the
+     * function returns a value which evaluates to false.
      *
      * @access public
      * @param  $mixed
@@ -838,6 +859,12 @@ class MultiCurl
         $curl->setOpts($this->options);
         $curl->setRetry($this->retry);
         $curl->setCookies($this->cookies);
+        // Use a random proxy for the curl instance when proxies have been set
+        // and the curl instance doesn't already have a proxy set.
+        if (is_array($this->proxies) && $curl->getOpt(CURLOPT_PROXY) === null) {
+            $random_proxy = \MyParcelModule\Curl\ArrayUtil::array_random($this->proxies);
+            $curl->setProxy($random_proxy);
+        }
         $curlm_error_code = curl_multi_add_handle($this->multiCurl, $curl->curl);
         if (!($curlm_error_code === CURLM_OK)) {
             throw new \ErrorException('cURL multi add handle error: ' . curl_multi_strerror($curlm_error_code));

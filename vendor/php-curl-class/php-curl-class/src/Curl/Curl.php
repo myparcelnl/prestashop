@@ -6,7 +6,7 @@ use MyParcelModule\Curl\ArrayUtil;
 use MyParcelModule\Curl\Decoder;
 class Curl
 {
-    const VERSION = '8.5.1';
+    const VERSION = '8.6.0';
     const DEFAULT_TIMEOUT = 30;
     public $curl;
     public $id = null;
@@ -411,7 +411,7 @@ class Curl
             $download_filename = $filename . '.pccdownload';
             $mode = 'wb';
             // Attempt to resume download only when a temporary download file exists and is not empty.
-            if (file_exists($download_filename) && ($filesize = filesize($download_filename))) {
+            if (is_file($download_filename) && ($filesize = filesize($download_filename))) {
                 $mode = 'ab';
                 $first_byte_position = $filesize;
                 $range = $first_byte_position . '-';
@@ -1157,8 +1157,13 @@ class Curl
     /**
      * Set Retry
      *
-     * Number of retries to attempt or decider callable. Maximum number of
-     * attempts is $maximum_number_of_retries + 1.
+     * Number of retries to attempt or decider callable.
+     *
+     * When using a number of retries to attempt, the maximum number of attempts
+     * for the request is $maximum_number_of_retries + 1.
+     *
+     * When using a callable decider, the request will be retried until the
+     * function returns a value which evaluates to false.
      *
      * @access public
      * @param  $mixed

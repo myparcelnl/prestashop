@@ -57,9 +57,10 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @since 2.0.0
      * @throws SmartyException
-     * @throws ErrorException
+     * @throws ErrorException*@throws Exception
+     * @throws Exception
+     * @since 2.0.0
      */
     public function initContent()
     {
@@ -90,6 +91,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
 
         $streetName = $m['street'];
         $houseNumber = $m['number'];
+        $houseNumberSuffix = $m['number_suffix'];
 
         // id_carrier is not defined in database before choosing a carrier,
         // set it to a default one to match a potential cart _rule
@@ -170,6 +172,7 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
                 .Tools::getShopDomainSsl().__PS_BASE_URI__,
             'streetName'                       => $streetName,
             'houseNumber'                      => $houseNumber,
+            'houseNumberSuffix'                => $houseNumberSuffix,
             'postcode'                         => $address->postcode,
             'langIso'                          => Tools::strtolower(Context::getContext()->language->iso_code),
             'language_code'                    => Context::getContext()->language->language_code,
@@ -212,18 +215,14 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
             'background1Color'                 => Configuration::get(MyParcel::CHECKOUT_BG_COLOR1),
             'background2Color'                 => Configuration::get(MyParcel::CHECKOUT_BG_COLOR2),
             'background3Color'                 => Configuration::get(MyParcel::CHECKOUT_BG_COLOR3),
-            'highlightcolor'                   => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
-            'inactivecolor'                    => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
-            'fontfamily'                       => Configuration::get(MyParcel::CHECKOUT_FONT),
+            'highlightColor'                   => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
+            'inactiveColor'                    => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
             'deliveryDaysWindow'               => $this->context->cart->checkQuantities() ? (int) $this->getActualDeliveryDaysWindow(
                 $this->myParcelCarrierDeliverySetting->timeframe_days,
                 $this->myParcelCarrierDeliverySetting->dropoff_delay
             ) : 0,
             'dropOffDelay'                     => (int) $this->getActualDropOffDelay($this->myParcelCarrierDeliverySetting->dropoff_delay),
-            'dropOffDays'                      => implode(
-                ';',
-                $this->getDropOffDays()
-            ),
+            'dropOffDays'                      => implode(';', $this->getDropOffDays()),
             'cutoffTime'                       => $cutoffTime,
             'signaturePreferred'               =>
                 (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
@@ -360,6 +359,8 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      *
      * @return array
      *
+     * @throws Exception
+     *
      * @since 2.2.0
      */
     public function getDropOffDays($dropOffDelay = 0)
@@ -397,6 +398,8 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      *
      * @return int
      *
+     * @throws Exception
+     *
      * @since 2.2.0
      */
     public function getActualDropOffDelay($dropOffDelay = 0)
@@ -431,6 +434,8 @@ class MyParcelmyparcelcheckoutModuleFrontController extends ModuleFrontControlle
      * @param int $dropOffDelay
      *
      * @return int
+     *
+     * @throws Exception
      */
     public function getActualDeliveryDaysWindow($deliveryDaysWindow = 0, $dropOffDelay = 0)
     {

@@ -46,7 +46,7 @@ class MyParcelDemo
         $smarty->assign(array(
             'language_code'          => Tools::strtolower(Context::getContext()->language->language_code),
             'base_dir_ssl'           => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').Tools::getShopDomainSsl().__PS_BASE_URI__,
-            'signaturePreferred'        => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
+            'signaturePreferred'     => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_SIGNED),
             'onlyRecipientPreferred' => (bool) Configuration::get(MyParcel::DEFAULT_CONCEPT_HOME_DELIVERY_ONLY),
             'foreground1Color'       => Configuration::get(MyParcel::CHECKOUT_FG_COLOR1),
             'foreground2Color'       => Configuration::get(MyParcel::CHECKOUT_FG_COLOR2),
@@ -54,9 +54,9 @@ class MyParcelDemo
             'background1Color'       => Configuration::get(MyParcel::CHECKOUT_BG_COLOR1),
             'background2Color'       => Configuration::get(MyParcel::CHECKOUT_BG_COLOR2),
             'background3Color'       => Configuration::get(MyParcel::CHECKOUT_BG_COLOR3),
-            'highlightcolor'         => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
-            'inactivecolor'          => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
-            'fontfamily'             => Configuration::get(MyParcel::CHECKOUT_FONT),
+            'highlightColor'         => Configuration::get(MyParcel::CHECKOUT_HL_COLOR),
+            'inactiveColor'          => Configuration::get(MyParcel::CHECKOUT_INACTIVE_COLOR),
+            'fontFamily'             => Configuration::get(MyParcel::CHECKOUT_FONT),
         ));
         echo $smarty->fetch(_PS_MODULE_DIR_.'myparcel/views/templates/admin/examplecheckout/checkout.tpl');
         exit;

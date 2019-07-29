@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitdc13c646457032a37b8f55da615d4ddb
+class ComposerStaticInit91f10995ed8dc8ecb302e78393b09607
 {
     public static $files = array (
         'e40631d46120a9c38ea139981f8dab26' => __DIR__ . '/..' . '/ircmaxell/password-compat/lib/password.php',
@@ -19,50 +19,50 @@ class ComposerStaticInitdc13c646457032a37b8f55da615d4ddb
     public static $prefixLengthsPsr4 = array (
         'M' => 
         array (
+            'MyParcelModule\\Symfony\\Polyfill\\Php55\\' => 38,
+            'MyParcelModule\\Symfony\\Polyfill\\Php54\\' => 38,
+            'MyParcelModule\\Symfony\\Polyfill\\Mbstring\\' => 41,
             'MyParcelModule\\MyParcelNL\\Sdk\\src\\' => 34,
-            'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php55\\' => 83,
-            'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php54\\' => 83,
-            'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Mbstring\\' => 86,
-            'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Firstred\\' => 69,
-            'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Composer\\CaBundle\\' => 78,
-            'MyParcelModule\\MyParcelModule\\Curl\\' => 35,
+            'MyParcelModule\\Firstred\\' => 24,
+            'MyParcelModule\\Curl\\' => 20,
+            'MyParcelModule\\Composer\\CaBundle\\' => 33,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'MyParcelModule\\Symfony\\Polyfill\\Php55\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php55',
+        ),
+        'MyParcelModule\\Symfony\\Polyfill\\Php54\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php54',
+        ),
+        'MyParcelModule\\Symfony\\Polyfill\\Mbstring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
         'MyParcelModule\\MyParcelNL\\Sdk\\src\\' => 
         array (
             0 => __DIR__ . '/..' . '/firstred/myparcelnl-sdk/src',
         ),
-        'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php55\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php55',
-        ),
-        'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Php54\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php54',
-        ),
-        'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Symfony\\Polyfill\\Mbstring\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
-        ),
-        'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Firstred\\' => 
+        'MyParcelModule\\Firstred\\' => 
         array (
             0 => __DIR__ . '/..' . '/firstred/php-dot-notation/src',
         ),
-        'MyParcelModule\\MyParcelModule\\MyParcelModule\\MyParcelModule\\Composer\\CaBundle\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
-        ),
-        'MyParcelModule\\MyParcelModule\\Curl\\' => 
+        'MyParcelModule\\Curl\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl',
+        ),
+        'MyParcelModule\\Composer\\CaBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
         ),
     );
 
     public static $classMap = array (
         'CallbackFilterIterator' => __DIR__ . '/..' . '/symfony/polyfill-php54/Resources/stubs/CallbackFilterIterator.php',
-        'ComposerAutoloaderInitdc13c646457032a37b8f55da615d4ddb' => __DIR__ . '/..' . '/composer/autoload_real.php',
+        'ComposerAutoloaderInit91f10995ed8dc8ecb302e78393b09607' => __DIR__ . '/..' . '/composer/autoload_real.php',
         'MyParcelCarrierDeliverySetting' => __DIR__ . '/../..' . '/classes/MyParcelCarrierDeliverySetting.php',
         'MyParcelDataColumn' => __DIR__ . '/../..' . '/classes/MyParcelDataColumn.php',
         'MyParcelDeliveryOption' => __DIR__ . '/../..' . '/classes/MyParcelDeliveryOption.php',
@@ -80,7 +80,7 @@ class ComposerStaticInitdc13c646457032a37b8f55da615d4ddb
         'MyParcelModule\\BoxPacker\\VolumePacker' => __DIR__ . '/../..' . '/classes/BoxPacker/VolumePacker.php',
         'MyParcelModule\\BoxPacker\\WeightRedistributor' => __DIR__ . '/../..' . '/classes/BoxPacker/WeightRedistributor.php',
         'MyParcelModule\\Composer\\Autoload\\ClassLoader' => __DIR__ . '/..' . '/composer/ClassLoader.php',
-        'MyParcelModule\\Composer\\Autoload\\ComposerStaticInitdc13c646457032a37b8f55da615d4ddb' => __DIR__ . '/..' . '/composer/autoload_static.php',
+        'MyParcelModule\\Composer\\Autoload\\ComposerStaticInit91f10995ed8dc8ecb302e78393b09607' => __DIR__ . '/..' . '/composer/autoload_static.php',
         'MyParcelModule\\Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
         'MyParcelModule\\Curl\\ArrayUtil' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl/ArrayUtil.php',
         'MyParcelModule\\Curl\\CaseInsensitiveArray' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl/CaseInsensitiveArray.php',
@@ -118,9 +118,9 @@ class ComposerStaticInitdc13c646457032a37b8f55da615d4ddb
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitdc13c646457032a37b8f55da615d4ddb::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitdc13c646457032a37b8f55da615d4ddb::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitdc13c646457032a37b8f55da615d4ddb::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit91f10995ed8dc8ecb302e78393b09607::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit91f10995ed8dc8ecb302e78393b09607::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit91f10995ed8dc8ecb302e78393b09607::$classMap;
 
         }, null, ClassLoader::class);
     }

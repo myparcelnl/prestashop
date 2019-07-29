@@ -34,11 +34,12 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     /**
      * Initialize content and block unauthorized calls
      *
-     * @since 2.0.0
-     *
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ErrorException
+     *
+     * @since 2.0.0
      */
     public function initContent()
     {
@@ -65,11 +66,12 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
     /**
      * Process webhook
      *
-     * @since 2.0.0
-     *
      * @throws Adapter_Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ErrorException
+     *
+     * @since 2.0.0
      */
     protected function processWebhook()
     {
@@ -77,8 +79,8 @@ class MyParcelHookModuleFrontController extends ModuleFrontController
         $content = file_get_contents('php://input');
         // @codingStandardsIgnoreEnd
         if (Configuration::get(MyParcel::LOG_API)) {
-            $logContent = pSQL($content);
-            Logger::addLog("MyParcel webhook: $logContent");
+            $logContent = ($content);
+            Logger::addLog(base64_encode("MyParcel - incoming webhook\n$logContent"));
         }
 
         $data = @json_decode($content, true);

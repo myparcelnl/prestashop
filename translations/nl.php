@@ -36,7 +36,6 @@ $_MODULE['<{myparcel}prestashop>myparcel_ea3b5abcd2648b74985b1be3d162eac1'] = 'B
 $_MODULE['<{myparcel}prestashop>myparcel_9403b88aeef0df589548a59de85943bb'] = 'Digitale postzegel';
 $_MODULE['<{myparcel}prestashop>myparcel_fd2d60b7a0fb6ee17a52d12715b4967c'] = 'Ongefrankeerd';
 $_MODULE['<{myparcel}prestashop>myparcel_276e1031b0f544f7b8f54018e379ef08'] = 'Extra groot';
-$_MODULE['<{myparcel}prestashop>myparcel_2abc7448dd23236af0b5558ef8b1768e'] = 'Leeftijdscheck 18+';
 $_MODULE['<{myparcel}prestashop>myparcel_47599849e0aea698c478084552d0700d'] = 'Alleen geadresseerde';
 $_MODULE['<{myparcel}prestashop>myparcel_8c09001c99ecb6fdd8d6023fcf039054'] = 'Handtekening';
 $_MODULE['<{myparcel}prestashop>myparcel_445dd958a32149c8d8b41f0053348338'] = 'Retour afzender wanneer niet thuis';
@@ -391,6 +390,7 @@ $_MODULE['<{myparcel}prestashop>translations_bcc19b1e37c5011b3d6e2d45a1a80480'] 
 $_MODULE['<{myparcel}prestashop>translations_e573da48f22026d0da156ae208efc0b6'] = 'Direct retour (food)';
 $_MODULE['<{myparcel}prestashop>translations_16d2b386b2034b9488996466aaae0b57'] = 'Geschiedenis';
 $_MODULE['<{myparcel}prestashop>translations_f0f22a02b4a12e15cd850d64e56d3cf7'] = 'Trackinggeschiedenis';
+$_MODULE['<{myparcel}prestashop>translations_b4d5ea7ea2a20f07ced8b567ebb31045'] = 'Niet beschikbaar vanwege multistore';
 $_MODULE['<{myparcel}prestashop>form_d6f762d37d624fddba490e0c069c63d3'] = 'Preview niet beschikbaar. De module is momenteel uitgeschakeld voor de huidige winkel.';
 $_MODULE['<{myparcel}prestashop>form_6520ec2196a6f44e0944b62b79951841'] = 'Kies een datum dat in de toekomst ligt om de cut-off-tijd te kiezen';
 $_MODULE['<{myparcel}prestashop>form_ccb238a0f0edacaeaa57217da1afaaf8'] = 'Geen zending op deze dag';
