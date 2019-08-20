@@ -427,14 +427,11 @@ class MyParcelTools
             $fields = static::getAddressLineFields($address->id_country);
         }
 
-        if (strtoupper($country->iso_code) === 'BE' && count($fields) === 3) {
-            $addressLine = "{$address->{$fields[0]}} {$address->{$fields[1]}}";
-            if ($address->{$fields[2]}) {
-                $addressLine .= " bus {$address->{$fields[2]}}";
-            }
+        if (strtoupper($country->iso_code) === 'BE' && $fields[2]) {
+            $addressLine = "{$address->{$fields[0]}} {$address->{$fields[1]}} bus {$address->{$fields[2]}}";
         } else {
             foreach ($fields as $field) {
-                if ($field && !empty($address->{$field})) {
+                if ($field && $address->{$field}) {
                     $addressLine .= ' '.$address->{$field};
                 }
             }

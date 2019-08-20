@@ -191,7 +191,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.3.3';
+        $this->version = '2.3.4';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -5102,7 +5102,8 @@ class MyParcel extends Module
 
         $concept = MyParcelDeliveryOption::createConcept($order, $deliveryOption, $address, $mailboxPackage, $digitalStamp);
         // Convert the pickup address to a PrestaShop address when enabled
-        if (in_array($deliveryOption->get('data.time.0.type', MyParcelModule\MyParcelNL\Sdk\src\Model\Repository\MyParcelConsignmentRepository::DEFAULT_DELIVERY_TYPE), array(4, 5))
+        if ($mpcs->pickup
+            && in_array($deliveryOption->get('data.time.0.type', MyParcelModule\MyParcelNL\Sdk\src\Model\Repository\MyParcelConsignmentRepository::DEFAULT_DELIVERY_TYPE), array(4, 5))
             && Configuration::get(static::USE_PICKUP_ADDRESS)
         ) {
             $newAddress = MyParcelTools::getCustomerAddress($customer->id, $deliveryOption->get('data.location_code'));
@@ -5156,9 +5157,16 @@ class MyParcel extends Module
         }
 
         if ($deliveryOption->has('data')) {
-            $deliveryOption = array(
-                'data'         => $deliveryOption->get('data'),
-                'extraOptions' => $deliveryOption->get('extraOptions', array()),
+            $extraOptions = $deliveryOption->get('extraOptions', array());
+            if (($mpcs->delivery && in_array($deliveryOption->get('data.time.0.type'), array(1, 2, 3)))
+                || ($mpcs->pickup && in_array($deliveryOption->get('data.time.0.type'), array(4, 5)))
+            ) {
+                $deliveryOption = array('data' => array());
+            } else {
+                $deliveryOption = array();
+            }
+            $deliveryOption += array(
+                'extraOptions' => $extraOptions,
                 'concept'      => $concept,
                 'idOrder'      => (int) $order->id,
             );
