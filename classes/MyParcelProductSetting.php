@@ -435,11 +435,14 @@ class MyParcelProductSetting extends MyParcelObjectModel
             return (int) $product['id_product'];
         }, $products);
 
-        $sql = new DbQuery();
-        $sql->select('`id_product`, `'.bqSQL($check).'`');
-        $sql->from(bqSQL(static::$definition['table']));
-        $sql->where('`id_product` IN ('.implode(',', array_map('intval', $ids)).')');
-        $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        $results = null;
+        if (!empty($ids)) {
+            $sql = new DbQuery();
+            $sql->select('`id_product`, `'.bqSQL($check).'`');
+            $sql->from(bqSQL(static::$definition['table']));
+            $sql->where('`id_product` IN ('.implode(',', array_map('intval', $ids)).')');
+            $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        }
         if (!is_array($results)) {
             return (bool) Configuration::get(constant('MyParcel::DEFAULT_CONCEPT_'.Tools::strtoupper($check)));
         }
