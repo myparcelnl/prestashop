@@ -582,8 +582,9 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
         if ($carrier->external_module_name && $carrier->external_module_name !== 'myparcel') {
             return false;
         }
-        // No delivery options for this carrier => release carrier
-        if (!$this->pickup && !$this->delivery && !$this->mailbox_package && !$this->digital_stamp) {
+
+        // No delivery options for this carrier in all shops => release carrier
+        if (!(($this->delivery || $this->pickup || $this->mailbox_package || $this->digital_stamp) + (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT count(`id_reference`) FROM `'._DB_PREFIX_.bqSQL(static::$definition['table']).'` WHERE `'.bqSQL(static::$definition['primary']).'` != '.(int) $this->id.' AND `id_reference` = '.(int) $this->id_reference.' AND (`mailbox_package` = 1 OR `digital_stamp` = 1 OR `delivery` = 1 OR `pickup` = 1)'))) {
             static::associateCarrierToModule($this->id_reference, false);
         } else {
             static::associateCarrierToModule($this->id_reference);

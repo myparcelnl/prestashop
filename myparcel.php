@@ -191,7 +191,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.3.5';
+        $this->version = '2.3.6';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -779,7 +779,7 @@ class MyParcel extends Module
             $deliverySetting->recipient_only = false;
             $deliverySetting->signed_recipient_only = false;
             $deliverySetting->dropoff_delay = 0;
-            $deliverySetting->id_shop = $this->context->shop->id;
+            $deliverySetting->id_shop = $this->getShopId();
             $deliverySetting->morning_fee_tax_incl = 0;
             $deliverySetting->morning_pickup_fee_tax_incl = 0;
             $deliverySetting->default_fee_tax_incl = 0;
@@ -3340,7 +3340,7 @@ class MyParcel extends Module
         ) {
             $cookie = Context::getContext()->cookie->getFamily('shopContext');
 
-            return (int) Tools::substr($cookie['shopContext'], 2, count($cookie['shopContext']));
+            return (int) Tools::substr($cookie['shopContext'], 2, strlen($cookie['shopContext']));
         }
 
         return (int) Context::getContext()->shop->id;
@@ -4097,19 +4097,70 @@ class MyParcel extends Module
      *
      * @param HelperList $helper
      *
-     * @throws PrestaShopException
-     *
      * @return array
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopException
      *
      * @since 2.0.0
      */
     protected function getDeliveryOptionsList(HelperList $helper)
     {
+        // Search for missing carriers
+        $missing = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('SELECT DISTINCT(`id_reference`) FROM `ps_carrier` WHERE `deleted` = 0 AND `id_reference` NOT IN (SELECT `id_reference` FROM `ps_myparcel_carrier_delivery_setting` WHERE `id_shop` = '.(int) $this->getShopId().')');
+        if (is_array($missing)) {
+            $missing = array_column($missing, 'id_reference');
+            foreach ($missing as $item) {
+                $setting = new MyParcelCarrierDeliverySetting();
+                $setting->id_reference = (int) $item;
+                $setting->monday_cutoff = '15:30:00';
+                $setting->tuesday_cutoff = '15:30:00';
+                $setting->wednesday_cutoff = '15:30:00';
+                $setting->thursday_cutoff = '15:30:00';
+                $setting->friday_cutoff = '15:30:00';
+                $setting->saturday_cutoff = '15:30:00';
+                $setting->sunday_cutoff = '15:30:00';
+                $setting->timeframe_days = 1;
+                $setting->daytime = true;
+                $setting->morning = false;
+                $setting->morning_pickup = false;
+                $setting->evening = false;
+                $setting->signed = false;
+                $setting->recipient_only = false;
+                $setting->signed_recipient_only = false;
+                $setting->dropoff_delay = 0;
+                $setting->id_shop = $this->getShopId();
+                $setting->morning_fee_tax_incl = 0;
+                $setting->morning_pickup_fee_tax_incl = 0;
+                $setting->default_fee_tax_incl = 0;
+                $setting->evening_fee_tax_incl = 0;
+                $setting->signed_fee_tax_incl = 0;
+                $setting->recipient_only_fee_tax_incl = 0;
+                $setting->signed_recipient_only_fee_tax_incl = 0;
+                $setting->monday_enabled = false;
+                $setting->tuesday_enabled = false;
+                $setting->wednesday_enabled = false;
+                $setting->thursday_enabled = false;
+                $setting->friday_enabled = false;
+                $setting->saturday_enabled = false;
+                $setting->sunday_enabled = false;
+                $setting->pickup = false;
+                $setting->delivery = false;
+                $setting->mailbox_package = false;
+                $setting->digital_stamp = false;
+                $setting->mailbox_package = false;
+                $setting->digital_stamp = false;
+
+                $setting->add();
+            }
+        }
+
+        // Find all carrier settings for store
         $sql = new DbQuery();
         $sql->select('mcds.*, c.`name`, c.`external_module_name`');
         $sql->from(bqSQL(MyParcelCarrierDeliverySetting::$definition['table']), 'mcds');
         $sql->innerJoin('carrier', 'c', 'mcds.`id_reference` = c.`id_reference` AND c.`deleted` = 0');
-        $sql->where('mcds.`id_shop` = '.(int) $this->context->shop->id);
+        $sql->where('mcds.`id_shop` = '.(int) $this->getShopId());
 
         $list = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
         $skipList = array();
@@ -5161,7 +5212,7 @@ class MyParcel extends Module
             if (($mpcs->delivery && in_array($deliveryOption->get('data.time.0.type'), array(1, 2, 3)))
                 || ($mpcs->pickup && in_array($deliveryOption->get('data.time.0.type'), array(4, 5)))
             ) {
-                $deliveryOption = array('data' => array());
+                $deliveryOption = array('data' => $deliveryOption->get('data'));
             } else {
                 $deliveryOption = array();
             }

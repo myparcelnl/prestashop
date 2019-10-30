@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f
+class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
 {
     public static $files = array (
         'e40631d46120a9c38ea139981f8dab26' => __DIR__ . '/..' . '/ircmaxell/password-compat/lib/password.php',
@@ -62,7 +62,7 @@ class ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f
 
     public static $classMap = array (
         'CallbackFilterIterator' => __DIR__ . '/..' . '/symfony/polyfill-php54/Resources/stubs/CallbackFilterIterator.php',
-        'ComposerAutoloaderInitacd3c35c6f4bbe8d494ce6bc4b82ba4f' => __DIR__ . '/..' . '/composer/autoload_real.php',
+        'ComposerAutoloaderIniteaca8773c0003a3992f29914d31e64c7' => __DIR__ . '/..' . '/composer/autoload_real.php',
         'MyParcelCarrierDeliverySetting' => __DIR__ . '/../..' . '/classes/MyParcelCarrierDeliverySetting.php',
         'MyParcelDataColumn' => __DIR__ . '/../..' . '/classes/MyParcelDataColumn.php',
         'MyParcelDeliveryOption' => __DIR__ . '/../..' . '/classes/MyParcelDeliveryOption.php',
@@ -80,7 +80,7 @@ class ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f
         'MyParcelModule\\BoxPacker\\VolumePacker' => __DIR__ . '/../..' . '/classes/BoxPacker/VolumePacker.php',
         'MyParcelModule\\BoxPacker\\WeightRedistributor' => __DIR__ . '/../..' . '/classes/BoxPacker/WeightRedistributor.php',
         'MyParcelModule\\Composer\\Autoload\\ClassLoader' => __DIR__ . '/..' . '/composer/ClassLoader.php',
-        'MyParcelModule\\Composer\\Autoload\\ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f' => __DIR__ . '/..' . '/composer/autoload_static.php',
+        'MyParcelModule\\Composer\\Autoload\\ComposerStaticIniteaca8773c0003a3992f29914d31e64c7' => __DIR__ . '/..' . '/composer/autoload_static.php',
         'MyParcelModule\\Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
         'MyParcelModule\\Curl\\ArrayUtil' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl/ArrayUtil.php',
         'MyParcelModule\\Curl\\CaseInsensitiveArray' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl/CaseInsensitiveArray.php',
@@ -118,9 +118,9 @@ class ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitacd3c35c6f4bbe8d494ce6bc4b82ba4f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticIniteaca8773c0003a3992f29914d31e64c7::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticIniteaca8773c0003a3992f29914d31e64c7::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticIniteaca8773c0003a3992f29914d31e64c7::$classMap;
 
         }, null, ClassLoader::class);
     }

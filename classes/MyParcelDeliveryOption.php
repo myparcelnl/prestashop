@@ -299,6 +299,9 @@ class MyParcelDeliveryOption extends MyParcelObjectModel
             $idOrder = (int) $result['id_order'];
             $order = new Order($idOrder);
             $cc = Tools::strtoupper($fromDb->get('concept.recipient.cc', $fromDb->get('concept.cc')));
+            if (!$cc) {
+                continue;
+            }
             $address = array(
                 'street'        => trim($fromDb->get('concept.recipient.street', $fromDb->get('concept.street', ''))),
                 'number'        => trim($fromDb->get('concept.recipient.number', $fromDb->get('concept.number', ''))),

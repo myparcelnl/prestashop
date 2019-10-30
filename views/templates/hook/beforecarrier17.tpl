@@ -17,7 +17,7 @@
 *}
 <iframe name="myparcelcheckoutframe"
         id="myparcelcheckoutframe"
-        src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), Tools::usingSecureMode())|escape:'htmlall'}"
+        src="{$link->getModuleLink('myparcel', 'myparcelcheckout', array(), Tools::usingSecureMode())|escape:'htmlall' nofilter}"
         width="100%"
         height="0"
         frameBorder="0">
@@ -181,7 +181,7 @@
             var xhr = new XMLHttpRequest();
             xhr.open(
               'POST',
-              '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript'}',
+              '{$link->getModuleLink('myparcel', 'deliveryoptions', array(), Tools::usingSecureMode())|escape:'javascript' nofilter}',
               true
             );
 
