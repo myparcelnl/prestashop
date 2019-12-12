@@ -16,7 +16,7 @@
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 {l s='The configuration option "%s" has been set to "%s"' mod='myparcel' sprintf=[$settingKey, $settingValue]}.
-{l s='This makes it impossible to list payment methods on the checkout' mod='myparcel'}.
+{l s='This makes it impossible to list delivery options on the checkout' mod='myparcel'}.
 {l s='Please navigate to the page "%s" and choose the other option' mod='myparcel' sprintf=[$settingsPage]}.
 
 

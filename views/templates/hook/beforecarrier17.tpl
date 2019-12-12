@@ -197,12 +197,13 @@
                   }
 
                   if (data.carrier_data) {
+                    console.log(data.carrier_data);
                     window.mypaNotified = getIdCarrier() || true;
 
                     for (var key in data.carrier_data) {
                       try {
                         var carrier = data.carrier_data[key];
-                        document.querySelector('label[for=delivery_option_' + carrier.id +'] span.carrier-pricing').innerHTML = carrier.pricing;
+                        document.querySelector('label[for=delivery_option_' + carrier.id +'] span.carrier-pricing, label[for=delivery_option_' + carrier.id +'] span.carrier-price').innerHTML = carrier.pricing || carrier.price;
                       } catch (e) {
                       }
                     }

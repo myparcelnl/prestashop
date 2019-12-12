@@ -7,7 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'CallbackFilterIterator' => $vendorDir . '/symfony/polyfill-php54/Resources/stubs/CallbackFilterIterator.php',
-    'ComposerAutoloaderIniteaca8773c0003a3992f29914d31e64c7' => $vendorDir . '/composer/autoload_real.php',
+    'ComposerAutoloaderInit714abb320de207172b4ec56a63eacbf7' => $vendorDir . '/composer/autoload_real.php',
     'MyParcelCarrierDeliverySetting' => $baseDir . '/classes/MyParcelCarrierDeliverySetting.php',
     'MyParcelDataColumn' => $baseDir . '/classes/MyParcelDataColumn.php',
     'MyParcelDeliveryOption' => $baseDir . '/classes/MyParcelDeliveryOption.php',
@@ -25,7 +25,7 @@ return array(
     'MyParcelModule\\BoxPacker\\VolumePacker' => $baseDir . '/classes/BoxPacker/VolumePacker.php',
     'MyParcelModule\\BoxPacker\\WeightRedistributor' => $baseDir . '/classes/BoxPacker/WeightRedistributor.php',
     'MyParcelModule\\Composer\\Autoload\\ClassLoader' => $vendorDir . '/composer/ClassLoader.php',
-    'MyParcelModule\\Composer\\Autoload\\ComposerStaticIniteaca8773c0003a3992f29914d31e64c7' => $vendorDir . '/composer/autoload_static.php',
+    'MyParcelModule\\Composer\\Autoload\\ComposerStaticInit714abb320de207172b4ec56a63eacbf7' => $vendorDir . '/composer/autoload_static.php',
     'MyParcelModule\\Composer\\CaBundle\\CaBundle' => $vendorDir . '/composer/ca-bundle/src/CaBundle.php',
     'MyParcelModule\\Curl\\ArrayUtil' => $vendorDir . '/php-curl-class/php-curl-class/src/Curl/ArrayUtil.php',
     'MyParcelModule\\Curl\\CaseInsensitiveArray' => $vendorDir . '/php-curl-class/php-curl-class/src/Curl/CaseInsensitiveArray.php',
@@ -50,6 +50,10 @@ return array(
     'MyParcelModule\\Symfony\\Polyfill\\Php54\\Php54' => $vendorDir . '/symfony/polyfill-php54/Php54.php',
     'MyParcelModule\\Symfony\\Polyfill\\Php55\\Php55' => $vendorDir . '/symfony/polyfill-php55/Php55.php',
     'MyParcelModule\\Symfony\\Polyfill\\Php55\\Php55ArrayColumn' => $vendorDir . '/symfony/polyfill-php55/Php55ArrayColumn.php',
+    'MyParcelModule\\cweagans\\Composer\\PatchEvent' => $vendorDir . '/cweagans/composer-patches/src/PatchEvent.php',
+    'MyParcelModule\\cweagans\\Composer\\PatchEvents' => $vendorDir . '/cweagans/composer-patches/src/PatchEvents.php',
+    'MyParcelModule\\cweagans\\Composer\\Patches' => $vendorDir . '/cweagans/composer-patches/src/Patches.php',
+    'MyParcelModule\\cweagans\\Composer\\Tests\\PatchEventTest' => $vendorDir . '/cweagans/composer-patches/tests/PatchEventTest.php',
     'MyParcelObjectModel' => $baseDir . '/classes/MyParcelObjectModel.php',
     'MyParcelOrder' => $baseDir . '/classes/MyParcelOrder.php',
     'MyParcelOrderHistory' => $baseDir . '/classes/MyParcelOrderHistory.php',

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
+class ComposerStaticInit714abb320de207172b4ec56a63eacbf7
 {
     public static $files = array (
         'e40631d46120a9c38ea139981f8dab26' => __DIR__ . '/..' . '/ircmaxell/password-compat/lib/password.php',
@@ -19,6 +19,7 @@ class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
     public static $prefixLengthsPsr4 = array (
         'M' => 
         array (
+            'MyParcelModule\\cweagans\\Composer\\' => 33,
             'MyParcelModule\\Symfony\\Polyfill\\Php55\\' => 38,
             'MyParcelModule\\Symfony\\Polyfill\\Php54\\' => 38,
             'MyParcelModule\\Symfony\\Polyfill\\Mbstring\\' => 41,
@@ -30,6 +31,10 @@ class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
     );
 
     public static $prefixDirsPsr4 = array (
+        'MyParcelModule\\cweagans\\Composer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cweagans/composer-patches/src',
+        ),
         'MyParcelModule\\Symfony\\Polyfill\\Php55\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php55',
@@ -62,7 +67,7 @@ class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
 
     public static $classMap = array (
         'CallbackFilterIterator' => __DIR__ . '/..' . '/symfony/polyfill-php54/Resources/stubs/CallbackFilterIterator.php',
-        'ComposerAutoloaderIniteaca8773c0003a3992f29914d31e64c7' => __DIR__ . '/..' . '/composer/autoload_real.php',
+        'ComposerAutoloaderInit714abb320de207172b4ec56a63eacbf7' => __DIR__ . '/..' . '/composer/autoload_real.php',
         'MyParcelCarrierDeliverySetting' => __DIR__ . '/../..' . '/classes/MyParcelCarrierDeliverySetting.php',
         'MyParcelDataColumn' => __DIR__ . '/../..' . '/classes/MyParcelDataColumn.php',
         'MyParcelDeliveryOption' => __DIR__ . '/../..' . '/classes/MyParcelDeliveryOption.php',
@@ -80,7 +85,7 @@ class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
         'MyParcelModule\\BoxPacker\\VolumePacker' => __DIR__ . '/../..' . '/classes/BoxPacker/VolumePacker.php',
         'MyParcelModule\\BoxPacker\\WeightRedistributor' => __DIR__ . '/../..' . '/classes/BoxPacker/WeightRedistributor.php',
         'MyParcelModule\\Composer\\Autoload\\ClassLoader' => __DIR__ . '/..' . '/composer/ClassLoader.php',
-        'MyParcelModule\\Composer\\Autoload\\ComposerStaticIniteaca8773c0003a3992f29914d31e64c7' => __DIR__ . '/..' . '/composer/autoload_static.php',
+        'MyParcelModule\\Composer\\Autoload\\ComposerStaticInit714abb320de207172b4ec56a63eacbf7' => __DIR__ . '/..' . '/composer/autoload_static.php',
         'MyParcelModule\\Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
         'MyParcelModule\\Curl\\ArrayUtil' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl/ArrayUtil.php',
         'MyParcelModule\\Curl\\CaseInsensitiveArray' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl/CaseInsensitiveArray.php',
@@ -105,6 +110,10 @@ class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
         'MyParcelModule\\Symfony\\Polyfill\\Php54\\Php54' => __DIR__ . '/..' . '/symfony/polyfill-php54/Php54.php',
         'MyParcelModule\\Symfony\\Polyfill\\Php55\\Php55' => __DIR__ . '/..' . '/symfony/polyfill-php55/Php55.php',
         'MyParcelModule\\Symfony\\Polyfill\\Php55\\Php55ArrayColumn' => __DIR__ . '/..' . '/symfony/polyfill-php55/Php55ArrayColumn.php',
+        'MyParcelModule\\cweagans\\Composer\\PatchEvent' => __DIR__ . '/..' . '/cweagans/composer-patches/src/PatchEvent.php',
+        'MyParcelModule\\cweagans\\Composer\\PatchEvents' => __DIR__ . '/..' . '/cweagans/composer-patches/src/PatchEvents.php',
+        'MyParcelModule\\cweagans\\Composer\\Patches' => __DIR__ . '/..' . '/cweagans/composer-patches/src/Patches.php',
+        'MyParcelModule\\cweagans\\Composer\\Tests\\PatchEventTest' => __DIR__ . '/..' . '/cweagans/composer-patches/tests/PatchEventTest.php',
         'MyParcelObjectModel' => __DIR__ . '/../..' . '/classes/MyParcelObjectModel.php',
         'MyParcelOrder' => __DIR__ . '/../..' . '/classes/MyParcelOrder.php',
         'MyParcelOrderHistory' => __DIR__ . '/../..' . '/classes/MyParcelOrderHistory.php',
@@ -118,9 +127,9 @@ class ComposerStaticIniteaca8773c0003a3992f29914d31e64c7
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticIniteaca8773c0003a3992f29914d31e64c7::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticIniteaca8773c0003a3992f29914d31e64c7::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticIniteaca8773c0003a3992f29914d31e64c7::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit714abb320de207172b4ec56a63eacbf7::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit714abb320de207172b4ec56a63eacbf7::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit714abb320de207172b4ec56a63eacbf7::$classMap;
 
         }, null, ClassLoader::class);
     }

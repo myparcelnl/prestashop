@@ -1,30 +1,30 @@
 [
     {
         "name": "composer\/ca-bundle",
-        "version": "1.1.4",
-        "version_normalized": "1.1.4.0",
+        "version": "1.2.5",
+        "version_normalized": "1.2.5.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/composer\/ca-bundle.git",
-            "reference": "558f321c52faeb4828c03e7dc0cfe39a09e09a2d"
+            "reference": "62e8fc2dc550e5d6d8c9360c7721662670f58149"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/composer\/ca-bundle\/zipball\/558f321c52faeb4828c03e7dc0cfe39a09e09a2d",
-            "reference": "558f321c52faeb4828c03e7dc0cfe39a09e09a2d",
+            "url": "https:\/\/api.github.com\/repos\/composer\/ca-bundle\/zipball\/62e8fc2dc550e5d6d8c9360c7721662670f58149",
+            "reference": "62e8fc2dc550e5d6d8c9360c7721662670f58149",
             "shasum": ""
         },
         "require": {
             "ext-openssl": "*",
             "ext-pcre": "*",
-            "php": "^5.3.2 || ^7.0"
+            "php": "^5.3.2 || ^7.0 || ^8.0"
         },
         "require-dev": {
-            "phpunit\/phpunit": "^4.8.35 || ^5.7 || ^6.5",
+            "phpunit\/phpunit": "^4.8.35 || ^5.7 || 6.5 - 8",
             "psr\/log": "^1.0",
-            "symfony\/process": "^2.5 || ^3.0 || ^4.0"
+            "symfony\/process": "^2.5 || ^3.0 || ^4.0 || ^5.0"
         },
-        "time": "2019-01-28T09:30:10+00:00",
+        "time": "2019-12-11T14:44:42+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -58,18 +58,64 @@
         ]
     },
     {
-        "name": "firstred\/myparcelnl-sdk",
-        "version": "v1.5.5",
-        "version_normalized": "1.5.5.0",
+        "name": "cweagans\/composer-patches",
+        "version": "1.6.7",
+        "version_normalized": "1.6.7.0",
         "source": {
             "type": "git",
-            "url": "https:\/\/github.com\/firstred\/myparcelnl-sdk.git",
-            "reference": "b9125ca6e94e68bd8dc38605b3ec825c0c07168e"
+            "url": "https:\/\/github.com\/cweagans\/composer-patches.git",
+            "reference": "2e6f72a2ad8d59cd7e2b729f218bf42adb14f590"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/firstred\/myparcelnl-sdk\/zipball\/b9125ca6e94e68bd8dc38605b3ec825c0c07168e",
-            "reference": "b9125ca6e94e68bd8dc38605b3ec825c0c07168e",
+            "url": "https:\/\/api.github.com\/repos\/cweagans\/composer-patches\/zipball\/2e6f72a2ad8d59cd7e2b729f218bf42adb14f590",
+            "reference": "2e6f72a2ad8d59cd7e2b729f218bf42adb14f590",
+            "shasum": ""
+        },
+        "require": {
+            "composer-plugin-api": "^1.0",
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "composer\/composer": "~1.0",
+            "phpunit\/phpunit": "~4.6"
+        },
+        "time": "2019-08-29T20:11:49+00:00",
+        "type": "composer-plugin",
+        "extra": {
+            "class": "cweagans\\Composer\\Patches"
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "MyParcelModule\\cweagans\\Composer\\": "src"
+            }
+        },
+        "notification-url": "https:\/\/packagist.org\/downloads\/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Cameron Eagans",
+                "email": "me@cweagans.net"
+            }
+        ],
+        "description": "Provides a way to patch Composer packages."
+    },
+    {
+        "name": "firstred\/myparcelnl-sdk",
+        "version": "v1.5.6",
+        "version_normalized": "1.5.6.0",
+        "source": {
+            "type": "git",
+            "url": "https:\/\/github.com\/firstred\/myparcelnl-sdk.git",
+            "reference": "1cbca7537a488204267aeece60422f67e889e8ae"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https:\/\/api.github.com\/repos\/firstred\/myparcelnl-sdk\/zipball\/1cbca7537a488204267aeece60422f67e889e8ae",
+            "reference": "1cbca7537a488204267aeece60422f67e889e8ae",
             "shasum": ""
         },
         "require": {
@@ -81,7 +127,7 @@
         "require-dev": {
             "phpunit\/phpunit": "^4.8.36 || ^5.7.27"
         },
-        "time": "2019-07-27T00:13:54+00:00",
+        "time": "2019-08-22T21:20:22+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -96,21 +142,21 @@
         "authors": [
             {
                 "name": "Reindert Vetter",
-                "role": "Developer",
                 "email": "support@myparcel.nl",
-                "homepage": "https:\/\/www.myparcel.nl"
+                "homepage": "https:\/\/www.myparcel.nl",
+                "role": "Developer"
             },
             {
                 "name": "Richard Perdaan",
-                "role": "Developer",
                 "email": "support@myparcel.nl",
-                "homepage": "https:\/\/www.myparcel.nl"
+                "homepage": "https:\/\/www.myparcel.nl",
+                "role": "Developer"
             },
             {
                 "name": "Edie Lemoine",
-                "role": "Developer",
                 "email": "support@myparcel.nl",
-                "homepage": "https:\/\/www.myparcel.nl"
+                "homepage": "https:\/\/www.myparcel.nl",
+                "role": "Developer"
             }
         ],
         "description": "This package is designed to send and receive data from MyParcel by means of an API.",
@@ -216,17 +262,17 @@
     },
     {
         "name": "php-curl-class\/php-curl-class",
-        "version": "8.6.0",
-        "version_normalized": "8.6.0.0",
+        "version": "8.6.2",
+        "version_normalized": "8.6.2.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/php-curl-class\/php-curl-class.git",
-            "reference": "73bf10e2652ad2261cbab7fbf242b76f0e7ee359"
+            "reference": "54be433a7299c15b024ba808e10a96c5d5791d99"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/php-curl-class\/php-curl-class\/zipball\/73bf10e2652ad2261cbab7fbf242b76f0e7ee359",
-            "reference": "73bf10e2652ad2261cbab7fbf242b76f0e7ee359",
+            "url": "https:\/\/api.github.com\/repos\/php-curl-class\/php-curl-class\/zipball\/54be433a7299c15b024ba808e10a96c5d5791d99",
+            "reference": "54be433a7299c15b024ba808e10a96c5d5791d99",
             "shasum": ""
         },
         "require": {
@@ -241,8 +287,13 @@
         "suggest": {
             "ext-mbstring": "*"
         },
-        "time": "2019-05-12T08:22:01+00:00",
+        "time": "2019-11-17T08:37:31+00:00",
         "type": "library",
+        "extra": {
+            "patches_applied": {
+                "Fix static calls": "patches\/curl.patch"
+            }
+        },
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
@@ -285,17 +336,17 @@
     },
     {
         "name": "symfony\/polyfill-mbstring",
-        "version": "v1.11.0",
-        "version_normalized": "1.11.0.0",
+        "version": "v1.13.1",
+        "version_normalized": "1.13.1.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/symfony\/polyfill-mbstring.git",
-            "reference": "fe5e94c604826c35a32fa832f35bd036b6799609"
+            "reference": "7b4aab9743c30be783b73de055d24a39cf4b954f"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-mbstring\/zipball\/fe5e94c604826c35a32fa832f35bd036b6799609",
-            "reference": "fe5e94c604826c35a32fa832f35bd036b6799609",
+            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-mbstring\/zipball\/7b4aab9743c30be783b73de055d24a39cf4b954f",
+            "reference": "7b4aab9743c30be783b73de055d24a39cf4b954f",
             "shasum": ""
         },
         "require": {
@@ -304,11 +355,11 @@
         "suggest": {
             "ext-mbstring": "For best performance"
         },
-        "time": "2019-02-06T07:57:58+00:00",
+        "time": "2019-11-27T14:18:11+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.11-dev"
+                "dev-master": "1.13-dev"
             }
         },
         "installation-source": "dist",
@@ -346,27 +397,27 @@
     },
     {
         "name": "symfony\/polyfill-php54",
-        "version": "v1.11.0",
-        "version_normalized": "1.11.0.0",
+        "version": "v1.13.1",
+        "version_normalized": "1.13.1.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/symfony\/polyfill-php54.git",
-            "reference": "2964b17ddc32dba7bcba009d5501c84d3fba1452"
+            "reference": "dd1618047426412036e98d159940d58a81fc392c"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php54\/zipball\/2964b17ddc32dba7bcba009d5501c84d3fba1452",
-            "reference": "2964b17ddc32dba7bcba009d5501c84d3fba1452",
+            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php54\/zipball\/dd1618047426412036e98d159940d58a81fc392c",
+            "reference": "dd1618047426412036e98d159940d58a81fc392c",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2019-02-06T07:57:58+00:00",
+        "time": "2019-11-27T13:56:44+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.11-dev"
+                "dev-master": "1.13-dev"
             }
         },
         "installation-source": "dist",
@@ -406,28 +457,28 @@
     },
     {
         "name": "symfony\/polyfill-php55",
-        "version": "v1.11.0",
-        "version_normalized": "1.11.0.0",
+        "version": "v1.13.1",
+        "version_normalized": "1.13.1.0",
         "source": {
             "type": "git",
             "url": "https:\/\/github.com\/symfony\/polyfill-php55.git",
-            "reference": "96fa25cef405ea452919559a0025d5dc16e30e4c"
+            "reference": "b0d838f225725e2951af1aafc784d2e5ea7b656e"
         },
         "dist": {
             "type": "zip",
-            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php55\/zipball\/96fa25cef405ea452919559a0025d5dc16e30e4c",
-            "reference": "96fa25cef405ea452919559a0025d5dc16e30e4c",
+            "url": "https:\/\/api.github.com\/repos\/symfony\/polyfill-php55\/zipball\/b0d838f225725e2951af1aafc784d2e5ea7b656e",
+            "reference": "b0d838f225725e2951af1aafc784d2e5ea7b656e",
             "shasum": ""
         },
         "require": {
             "ircmaxell\/password-compat": "~1.0",
             "php": ">=5.3.3"
         },
-        "time": "2019-02-06T07:57:58+00:00",
+        "time": "2019-11-27T13:56:44+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.11-dev"
+                "dev-master": "1.13-dev"
             }
         },
         "installation-source": "dist",

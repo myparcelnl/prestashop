@@ -175,6 +175,7 @@ $_MODULE['<{myparcel}prestashop>myparcel_a7a12189ba211505ddff78275337d767'] = 'D
 $_MODULE['<{myparcel}prestashop>myparcel_70ae76a6401525290da1bfa939e0d773'] = 'Tour resetten';
 $_MODULE['<{myparcel}prestashop>myparcel_6b5a020779eaf5355abd615fcaad7ed2'] = 'Forceer moduleversie';
 $_MODULE['<{myparcel}prestashop>myparcel_496ca3f16a13a5f7269241b195cd62b1'] = 'Verberg kolom met gewenste levertijdstippen';
+$_MODULE['<{myparcel}prestashop>myparcel_21bc366d94588bc6d47e702f5cf67ec8'] = 'Zoekveld toevoegen aan de track&trace kolom';
 $_MODULE['<{myparcel}prestashop>myparcel_b0407576a3cf9472594aeef88ff84ac3'] = 'Gewenste leverdatum';
 $_MODULE['<{myparcel}prestashop>myparcel_4c2a8fe7eaf24721cc7a9f0175115bd4'] = 'Bericht';
 $_MODULE['<{myparcel}prestashop>myparcel_fff7990503c649d307060f39d465099e'] = 'MyParcel: niet gelukt om de klant te verwijderen d.m.v. het e-mailadres.';
@@ -464,7 +465,7 @@ $_MODULE['<{myparcel}prestashop>translations_3c9423b4ee4b09d9b90ca3f4e9f062ae'] 
 $_MODULE['<{myparcel}prestashop>translations_660f3e2c0e086590a7f4b1334b18097d'] = 'Bezig met bezorgopties ophalen';
 $_MODULE['<{myparcel}prestashop>translations_5da618e8e4b89c66fe86e32cdafde142'] = 'Vanaf';
 $_MODULE['<{myparcel}prestashop>smarty_error_9d1fbbe0d150b89f068ba72a20366659'] = 'De configuratieoptie \"%s\" is op \"%s\" gezet';
-$_MODULE['<{myparcel}prestashop>smarty_error_27dd3bb10855eb84f48efedf6924c4c1'] = 'Hierdoor is het niet mogelijk om betaalmethoden op de checkout weer te geven';
+$_MODULE['<{myparcel}prestashop>smarty_error_b3d52c45771c18280d8fdceda232fe68'] = 'Hierdoor is het niet mogelijk om bezorgopties op de checkout weer te geven';
 $_MODULE['<{myparcel}prestashop>smarty_error_4ec23c59d832a2934277a2a040918789'] = 'Navigeer naar de pagian \"%s\" en kies één van de andere opties';
 $_MODULE['<{myparcel}prestashop>smarty_warning_9d1fbbe0d150b89f068ba72a20366659'] = 'De configuratieoptie \"%s\" is op \"%s\" gezet';
 $_MODULE['<{myparcel}prestashop>smarty_warning_f787125eb30790beb34e1818b8ef12db'] = 'Het is mogelijk dat de checkout-widget niet kan worden getoond';

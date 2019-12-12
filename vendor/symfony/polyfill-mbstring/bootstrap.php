@@ -165,3 +165,9 @@ if (!\function_exists('mb_chr')) {
         return \mb_convert_encoding($s, $enc, $enc);
     }
 }
+if (!\function_exists('mb_str_split')) {
+    function mb_str_split($string, $split_length = 1, $encoding = \null)
+    {
+        return \MyParcelModule\Symfony\Polyfill\Mbstring\Mbstring::mb_str_split($string, $split_length, $encoding);
+    }
+}

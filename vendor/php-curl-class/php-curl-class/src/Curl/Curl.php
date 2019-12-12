@@ -6,7 +6,7 @@ use MyParcelModule\Curl\ArrayUtil;
 use MyParcelModule\Curl\Decoder;
 class Curl
 {
-    const VERSION = '8.6.0';
+    const VERSION = '8.6.1';
     const DEFAULT_TIMEOUT = 30;
     public $curl;
     public $id = null;
@@ -32,7 +32,7 @@ class Curl
     public $errorCallback = null;
     public $completeCallback = null;
     public $fileHandle = null;
-    private $downloadFileName = null;
+    public $downloadFileName = null;
     public $attempts = 0;
     public $retries = 0;
     public $childOfMultiCurl = false;
@@ -281,8 +281,8 @@ class Curl
             // Manually build a single-dimensional array from a multi-dimensional array as using curl_setopt($ch,
             // CURLOPT_POSTFIELDS, $data) doesn't correctly handle multi-dimensional arrays when files are
             // referenced.
-            if (\MyParcelModule\Curl\ArrayUtil::is_array_multidim($data)) {
-                $data = \MyParcelModule\Curl\ArrayUtil::array_flatten_multidim($data);
+            if (\MyParcelModule\Curl\ArrayUtil::isArrayMultidim($data)) {
+                $data = \MyParcelModule\Curl\ArrayUtil::arrayFlattenMultidim($data);
             }
             // Modify array values to ensure any referenced files are properly handled depending on the support of
             // the @filename API or CURLFile usage. This also fixes the warning "curl_setopt(): The usage of the
@@ -398,6 +398,7 @@ class Curl
      */
     public function download($url, $mixed_filename)
     {
+        // Use tmpfile() or php://temp to avoid "Too many open files" error.
         if (is_callable($mixed_filename)) {
             $this->downloadCompleteCallback = $mixed_filename;
             $this->downloadFileName = null;
@@ -409,16 +410,16 @@ class Curl
             // path. The download request will include header "Range: bytes=$filesize-" which is syntactically valid,
             // but unsatisfiable.
             $download_filename = $filename . '.pccdownload';
-            $mode = 'wb';
+            $this->downloadFileName = $download_filename;
             // Attempt to resume download only when a temporary download file exists and is not empty.
             if (is_file($download_filename) && ($filesize = filesize($download_filename))) {
-                $mode = 'ab';
                 $first_byte_position = $filesize;
                 $range = $first_byte_position . '-';
                 $this->setOpt(CURLOPT_RANGE, $range);
+                $this->fileHandle = fopen($download_filename, 'ab');
+            } else {
+                $this->fileHandle = fopen($download_filename, 'wb');
             }
-            $this->downloadFileName = $download_filename;
-            $this->fileHandle = fopen($download_filename, $mode);
             // Move the downloaded temporary file to the destination save path.
             $this->downloadCompleteCallback = function ($instance, $fh) use($download_filename, $filename) {
                 // Close the open file handle before renaming the file.
@@ -469,7 +470,7 @@ class Curl
             $this->rawResponse = curl_multi_getcontent($ch);
             $this->curlErrorMessage = curl_error($ch);
         }
-        $this->curlError = !($this->curlErrorCode === 0);
+        $this->curlError = $this->curlErrorCode !== 0;
         // Transfer the header callback data and release the temporary store to avoid memory leak.
         $this->rawResponseHeaders = $this->headerCallbackData->rawResponseHeaders;
         $this->responseCookies = $this->headerCallbackData->responseCookies;
@@ -523,7 +524,7 @@ class Curl
         }
         $this->call($this->completeCallback);
         // Close open file handles and reset the curl instance.
-        if (!($this->fileHandle === null)) {
+        if ($this->fileHandle !== null) {
             $this->downloadComplete($this->fileHandle);
         }
     }
@@ -1038,7 +1039,7 @@ class Curl
     public function setOpt($option, $value)
     {
         $required_options = array(CURLOPT_RETURNTRANSFER => 'CURLOPT_RETURNTRANSFER');
-        if (in_array($option, array_keys($required_options), true) && !($value === true)) {
+        if (in_array($option, array_keys($required_options), true) && $value !== true) {
             trigger_error($required_options[$option] . ' is a required option', E_USER_WARNING);
         }
         $success = curl_setopt($this->curl, $option, $value);

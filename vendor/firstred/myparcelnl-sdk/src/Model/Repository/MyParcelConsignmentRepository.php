@@ -35,7 +35,7 @@ class MyParcelConsignmentRepository extends \MyParcelModule\MyParcelNL\Sdk\src\M
     /**
      * Regular expression used to split street name from house number.
      */
-    const SPLIT_STREET_REGEX_BE = '~^(?P<street>.*?)\\s(?P<street_suffix>(?P<number>[^\\s#]{1,8})\\s*(?P<box_separator>(bus|Bus|boîte|Boîte|boite|Boite|box|Box|bte|Bte|app|App|appt|Appt|/|\\\\|#)?)?\\s*(?P<box_number>\\d{0,8}$))$~';
+    const SPLIT_STREET_REGEX_BE = '~^(?P<street>.*?)\\s(?P<street_suffix>(?P<number>\\d[^\\s#]{1,8})\\s*(?P<box_separator>(bus|Bus|boîte|Boîte|boite|Boite|box|Box|bte|Bte|app|App|appt|Appt|/|\\|#)?)?\\s*(?P<box_number>\\d{0,8}$))$~';
     /**
      * Consignment types
      */

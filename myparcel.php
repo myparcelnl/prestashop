@@ -191,7 +191,7 @@ class MyParcel extends Module
     {
         $this->name = 'myparcel';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.3.6';
+        $this->version = '2.3.7';
         $this->author = 'MyParcel';
         $this->module_key = 'c9bb3b85a9726a7eda0de2b54b34918d';
         $this->bootstrap = true;
@@ -1062,7 +1062,7 @@ class MyParcel extends Module
                             'action'      => 'NavigateGoodsNomenclature',
                         )
                     ),
-                    'mpMultistore'                   => Shop::isFeatureActive() && in_array(Shop::getContext(), array(Shop::CONTEXT_ALL, Shop::CONTEXT_GROUP)),
+                    'mpMultistore'                   => Shop::isFeatureActive() && in_array(Shop::getContext(), array(Shop::CONTEXT_ALL, Shop::CONTEXT_GROUP)) && MyParcelTools::isMultiKeyEnvironment(),
                 )
             );
             $html .= $this->display(__FILE__, 'views/templates/admin/ordergrid/adminvars.tpl');
@@ -7113,16 +7113,38 @@ class MyParcel extends Module
     protected function downloadModuleFromLocation($moduleName, $location)
     {
         $zipLocation = _PS_MODULE_DIR_.$moduleName.'.zip';
+
         if (@!file_exists($zipLocation)) {
-            $curl = new \MyParcelModule\MyParcelHttpClient();
-            $curl->setOpt(CURLOPT_ENCODING, '');
-            $curl->setOpt(CURLOPT_FOLLOWLOCATION, 1);
-            if (!$curl->download($location, _PS_MODULE_DIR_.'myparcel-update.zip')) {
-                if (!empty($curl->errorMessage)) {
-                    @$errorMessage = (string) $curl->errorMessage;
-                    $this->context->controller->errors[] = "Download error: $errorMessage";
+            if (class_exists('\\GuzzleHttp\\Client') && interface_exists('\\GuzzleHttp\\ClientInterface')) {
+                $tempZipFile = fopen(_PS_MODULE_DIR_.'myparcel-update.zip', 'w');
+                if (!$tempZipFile) {
+                    $this->context->controller->errors[] = 'Download error: target location not writable';
+
+                    return false;
                 }
-                return false;
+                $client = new \GuzzleHttp\Client();
+                $sinkOrSaveTo = 'save_to';
+                if (version_compare(\GuzzleHttp\ClientInterface::VERSION, '6.0', '>=')) {
+                   $sinkOrSaveTo = 'sink';
+                }
+                try {
+                    $client->get($location, array($sinkOrSaveTo => $tempZipFile));
+                } catch (\GuzzleHttp\Exception\RequestException $e) {
+                    $this->context->controller->errors[] = "Download error: {$e->getMessage()}";
+
+                    return false;
+                }
+            } else {
+                $curl = new \MyParcelModule\MyParcelHttpClient();
+                $curl->setOpt(CURLOPT_ENCODING, '');
+                $curl->setOpt(CURLOPT_FOLLOWLOCATION, 1);
+                if (!$curl->download($location, _PS_MODULE_DIR_.'myparcel-update.zip')) {
+                    if (!empty($curl->errorMessage)) {
+                        @$errorMessage = (string) $curl->errorMessage;
+                        $this->context->controller->errors[] = "Download error: $errorMessage";
+                    }
+                    return false;
+                }
             }
         }
 

@@ -464,7 +464,7 @@ class MyParcelCarrierDeliverySetting extends MyParcelObjectModel
 
         $mcds = new static();
         foreach (static::$definition['fields'] as $key => $field) {
-            if ($field['required'] && $field['default']) {
+            if (!empty($field['required']) && isset($field['default'])) {
                 $mcds->{$key} = $field['default'];
             }
         }

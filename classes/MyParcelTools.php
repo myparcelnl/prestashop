@@ -833,4 +833,14 @@ class MyParcelTools
 
         return false;
     }
+
+    /**
+     * Detect multi-key env (uses multiple MyParcel API keys)
+     *
+     * @throws PrestaShopException
+     */
+    public static function isMultiKeyEnvironment()
+    {
+        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT COUNT(DISTINCT `value`) FROM `'._DB_PREFIX_.'configuration` WHERE `name` = "'.pSQL(MyParcel::API_KEY).'" AND `value` IS NOT NULL AND `value` != ""') > 1;
+    }
 }
