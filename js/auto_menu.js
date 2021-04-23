@@ -31,7 +31,7 @@ $( document ).ready(function() {
     $('.menu-items').html(indexHtml);
 
 
-    $('body')
+    $('.all-content')
         .scrollspy({target: '.menu-items'})
         .on('activate.bs.scrollspy', function () {
             $('.h2item').hide();
