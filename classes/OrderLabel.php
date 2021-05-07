@@ -256,7 +256,7 @@ class OrderLabel extends \ObjectModel
                 if ($dayFrom) {
                     $dayFull = "{$dayFrom} - {$dayTo}";
                 } else {
-                    $dayFull = Translate::getModuleTranslation('myparcelnl', 'Closed', 'myparcelnl');
+                    $dayFull = Translate::getModuleTranslation('myparcelnl', 'Closed', 'myparcelbe');
                 }
                 $templateVars["{opening_hours_{$day}_from}"] = $dayFrom;
                 $templateVars["{opening_hours_{$day}_to}"] = $dayTo;

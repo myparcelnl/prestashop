@@ -102,7 +102,7 @@ class MyParcelNL extends CarrierModule
     {
         $this->name = 'myparcelnl';
         $this->tab = 'shipping_logistics';
-        $this->version = '1.0.2';
+        $this->version = '1.0.4';
         $this->author = 'Gett';
         $this->need_instance = 1;
         $this->bootstrap = true;

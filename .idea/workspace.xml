@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="abace106-f63b-4ae9-9fc9-4fd3f95d7fdc" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.babelrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/myparcelnl.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/OrderLabel.php" beforeDir="false" afterPath="$PROJECT_DIR$/classes/OrderLabel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/admin/AdminMyParcelNLController.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/admin/AdminMyParcelNLController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/admin/AdminMyParcelNLLabelController.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/admin/AdminMyParcelNLLabelController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/front/checkout.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/front/checkout.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/front/hook.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/front/hook.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/front/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/front/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/front.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_mailboxpackage_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_mailboxpackage_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_mailboxpackage_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_mailboxpackage_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_pickup_noinfo_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_pickup_noinfo_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_pickup_noinfo_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_pickup_noinfo_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_pickup_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_pickup_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_pickup_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_pickup_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_standard_noinfo_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_standard_noinfo_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_standard_noinfo_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_standard_noinfo_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_standard_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_standard_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/en/myparcel_standard_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/en/myparcel_standard_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/mails/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_mailboxpackage_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_mailboxpackage_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_mailboxpackage_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_mailboxpackage_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_pickup_noinfo_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_pickup_noinfo_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_pickup_noinfo_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_pickup_noinfo_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_pickup_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_pickup_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_pickup_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_pickup_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_standard_noinfo_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_standard_noinfo_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_standard_noinfo_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_standard_noinfo_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_standard_shipped.html" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_standard_shipped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mails/nl/myparcel_standard_shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mails/nl/myparcel_standard_shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myparcelnl.php" beforeDir="false" afterPath="$PROJECT_DIR$/myparcelnl.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Carrier/AbstractPackageCalculator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Carrier/AbstractPackageCalculator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Carrier/PackageFormatCalculator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Carrier/PackageFormatCalculator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Carrier/PackageTypeCalculator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Carrier/PackageTypeCalculator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Constant.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Constant.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controllers/Admin/LabelController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controllers/Admin/LabelController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controllers/Admin/MyparcelProductController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controllers/Admin/MyparcelProductController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Database/CreateCarrierConfigurationTableMigration.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Database/CreateCarrierConfigurationTableMigration.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Database/CreateDeliverySettingTableMigration.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Database/CreateDeliverySettingTableMigration.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Database/CreateOrderLabelTableMigration.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Database/CreateOrderLabelTableMigration.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Database/CreateProductConfigurationTableMigration.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Database/CreateProductConfigurationTableMigration.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Database/Migration.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Database/Migration.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/MyparcelOrderLabel.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/MyparcelOrderLabel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Factory/Consignment/ConsignmentFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Factory/Consignment/ConsignmentFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Grid/Action/Bulk/IconBulkAction.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Grid/Action/Bulk/IconBulkAction.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Grid/Action/Bulk/IconModalBulkAction.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Grid/Action/Bulk/IconModalBulkAction.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Grid/Column/BarcodeTypeColumn.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Grid/Column/BarcodeTypeColumn.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Label/LabelOptionsResolver.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Label/LabelOptionsResolver.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Listener/MyparcelOrderLabelListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Listener/MyparcelOrderLabelListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Logger/Logger.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Logger/Logger.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/MyParcelRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/MyParcelRequest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/Webhook/Subscription.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/Webhook/Subscription.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Carrier/ExclusiveField.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Carrier/ExclusiveField.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Carrier/Provider/CarrierSettingsProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Carrier/Provider/CarrierSettingsProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Carrier/Provider/DeliveryOptionsProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Carrier/Provider/DeliveryOptionsProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/AbstractForm.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/AbstractForm.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/ApiForm.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/ApiForm.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/Carriers.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/Carriers.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/Configure.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/Configure.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/CustomsForm.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/CustomsForm.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/GeneralForm.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/GeneralForm.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/LabelForm.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/LabelForm.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Configuration/OrderForm.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Configuration/OrderForm.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/CarrierHooks.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/CarrierHooks.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/DisplayAdminProductsExtra.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/DisplayAdminProductsExtra.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/DisplayBackOfficeHeader.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/DisplayBackOfficeHeader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/FrontHooks.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/FrontHooks.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/Helpers/AbstractAdminOrder.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/Helpers/AbstractAdminOrder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/Helpers/AdminOrderList.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/Helpers/AdminOrderList.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/Helpers/AdminOrderView.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/Helpers/AdminOrderView.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/LegacyOrderPageHooks.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/LegacyOrderPageHooks.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/OrderHooks.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/OrderHooks.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/OrderLabelHooks.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/OrderLabelHooks.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Hooks/OrdersGridHooks.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Hooks/OrdersGridHooks.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Installer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Installer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Tools/Tools.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Tools/Tools.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Module/Uninstaller.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Module/Uninstaller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Provider/OrderLabelProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Provider/OrderLabelProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/OrderLabelRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/OrderLabelRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/CarrierConfigurationProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/CarrierConfigurationProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/CarrierName.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/CarrierName.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Consignment/Create.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Consignment/Create.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Consignment/Download.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Consignment/Download.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Consignment/Update.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Consignment/Update.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/DeliverySettingsProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/DeliverySettingsProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/ErrorMessage.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/ErrorMessage.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/MyparcelStatusProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/MyparcelStatusProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Order/OrderDeliveryDate.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Order/OrderDeliveryDate.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Order/OrderStatusChange.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Order/OrderStatusChange.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Order/OrderTotalWeight.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Order/OrderTotalWeight.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/OrderLabelStatusChange.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/OrderLabelStatusChange.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/ProductConfigurationProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/ProductConfigurationProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Tracktrace.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Tracktrace.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/WebhookService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/WebhookService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/upgrade/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/upgrade/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/upgrade/upgrade-1.0.1.php" beforeDir="false" afterPath="$PROJECT_DIR$/upgrade/upgrade-1.0.1.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Actions/Bulk/icon_button.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Actions/Bulk/icon_button.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Actions/Bulk/icon_modal.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Actions/Bulk/icon_modal.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Actions/Row/create_label.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Actions/Row/create_label.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Columns/Content/create_label.html.twig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Columns/Content/label_list.html.twig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Columns/Content/myparcel_barcode.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/views/PrestaShop/Admin/Common/Grid/Columns/Content/myparcel_barcode.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/css/myparcel.css" beforeDir="false" afterPath="$PROJECT_DIR$/views/css/myparcel.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/css/myparceladmin.css" beforeDir="false" afterPath="$PROJECT_DIR$/views/css/myparceladmin.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/dist/front.js" beforeDir="false" afterPath="$PROJECT_DIR$/views/dist/front.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/dist/myparcel.js" beforeDir="false" afterPath="$PROJECT_DIR$/views/dist/myparcel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/js/admin/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/js/admin/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/js/admin/myparcelbo.js" beforeDir="false" afterPath="$PROJECT_DIR$/views/js/admin/myparcelbo.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/js/admin/order.js" beforeDir="false" afterPath="$PROJECT_DIR$/views/js/admin/order.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/js/admin/symfony/orders-list.js" beforeDir="false" afterPath="$PROJECT_DIR$/views/js/admin/symfony/orders-list.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/js/myparcelinit.js" beforeDir="false" afterPath="$PROJECT_DIR$/views/js/myparcelinit.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/_configure/helpers/form/form.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/_configure/helpers/form/form.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/_configure/helpers/form/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/_configure/helpers/form/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/_configure/helpers/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/_configure/helpers/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/_configure/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/_configure/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/label-concept-177.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/label-concept-177.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/label-concept.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/label-concept.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/label-list-177.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/label-list-177.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/label-list.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/label-list.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/label-return-form-177.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/label-return-form-177.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/label-return-form.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/label-return-form.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/order-label-block-177.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/order-label-block-177.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/order-label-block.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/order-label-block.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/orders_popups.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/orders_popups.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/hook/products_form.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/hook/products_form.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/icon-concept.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/icon-concept.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/icon-labels.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/icon-labels.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/navbar.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/navbar.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/admin/order/return-form.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/admin/order/return-form.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/hook/carrier.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/hook/carrier.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/templates/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/templates/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webpack.config.js" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1sD384xIwFcY2RQJidAiRMXf2wn" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="web.server" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="abace106-f63b-4ae9-9fc9-4fd3f95d7fdc" name="Default Changelist" comment="" />
+      <created>1620393170322</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1620393170322</updated>
+      <workItem from="1620393171537" duration="12000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+</project>
