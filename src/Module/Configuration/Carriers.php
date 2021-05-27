@@ -187,6 +187,7 @@ class Carriers extends AbstractForm
             $carrierConfigs = [];
             $configFields = Constant::CARRIER_CONFIGURATION_FIELDS;
             array_push($configFields, 'carrierName');
+            array_push($configFields, 'configurationName');
 
             foreach($configFields as $field) {
                 $carrierConfigs[] = [
@@ -299,6 +300,19 @@ class Carriers extends AbstractForm
                 'label' => $this->module->l('Carrier Name', 'carriers'),
                 'name' => 'carrierName',
             ];
+
+            $fields[] = [
+                'tab' => 'form',
+                'tab' => 'form',
+                'type' => 'select',
+                'label' => $this->module->l('Carrier Option', 'carriers'),
+                'name' => 'configurationName',
+                'options' => [
+                    'query' => $this->getCarrierType(),
+                    'id' => 'configuration_name',
+                    'name' => 'name',
+                ],
+            ];
         }
 
         $formTabFields = $this->getFormTabFields($carrier, $currency);
@@ -306,6 +320,20 @@ class Carriers extends AbstractForm
         $returnTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions, 'return');
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
+    }
+
+    private function getCarrierType()
+    {
+        if ($this->module->isBE()) {
+            return [
+                ['name' => 'Bpost', 'configuration_name' => Constant::BPOST_CONFIGURATION_NAME],
+                ['name' => 'DPD', 'configuration_name' => Constant::DPD_CONFIGURATION_NAME],
+            ];
+        } else {
+            return [
+                ['name' => 'PostNL', 'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME],
+            ];
+        }
     }
 
     private function getFormTabFields(Carrier $carrier, Currency $currency)
@@ -1014,9 +1042,22 @@ class Carriers extends AbstractForm
 
     private function createNewCarrier()
     {
+        $configurationName = Tools::getValue('configurationName');
+        $carrierName = Tools::getValue('carrierName');
+        
+        if ($this->module->isBE()) {
+            $image = 'dpd.jpg';
+            if($configurationName == Constant::BPOST_CONFIGURATION_NAME) {
+                $image = 'bpost.jpg';
+            }
+        } else {
+            $image = 'postnl.jpg';
+        }
+
         $carrier = $this->addCarrier(
-            ['name' => Tools::getValue('carrierName'), 'image' => 'postnl.jpg', 'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME]
+            ['name' => $carrierName, 'image' => $image, 'configuration_name' => $configurationName]
         );
+
         $this->updateConfigurationFields($carrier->id);
         
         $this->addZones($carrier);
