@@ -231,9 +231,11 @@ class Carriers extends AbstractForm
                 'title' => $this->module->l('ID', 'carriers'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
+                'search' => false
             ],
             'name' => [
                 'title' => $this->module->l('Name', 'carriers'),
+                'search' => false
             ],
         ];
 
