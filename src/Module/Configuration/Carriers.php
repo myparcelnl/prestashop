@@ -2,13 +2,12 @@
 
 namespace Gett\MyparcelBE\Module\Configuration;
 
-use Carrier;
-use Configuration;
-use Currency;
 use Db;
+use Carrier;
+use Currency;
+use Configuration;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Module\Tools\Tools;
-use Gett\MyparcelBE\Service\DeliverySettingsProvider;
 
 class Carriers extends AbstractForm
 {
@@ -18,16 +17,6 @@ class Carriers extends AbstractForm
     {
         parent::__construct($module);
         $this->context = \Context::getContext();
-    }
-
-    protected function getLegend(): string
-    {
-        return '';
-    }
-
-    protected function getFields(): array
-    {
-        return [];
     }
 
     public function __invoke(): string
@@ -56,6 +45,115 @@ class Carriers extends AbstractForm
         return $this->getList();
     }
 
+    protected function getLegend(): string
+    {
+        return '';
+    }
+
+    protected function getFields(): array
+    {
+        return [];
+    }
+
+    protected function addCarrier($configuration)
+    {
+        $carrier = new Carrier();
+
+        $carrier->name = $configuration['name'];
+        $carrier->is_module = true;
+        $carrier->active = 1;
+        $carrier->range_behavior = 1;
+        $carrier->need_range = 1;
+        $carrier->shipping_external = true;
+        $carrier->range_behavior = 0;
+        $carrier->external_module_name = $this->module->name;
+        $carrier->shipping_method = 2;
+
+        foreach (\Language::getLanguages() as $lang) {
+            $carrier->delay[$lang['id_lang']] = 'Super fast delivery';
+        }
+
+        try {
+            if ($carrier->add()) {
+                @copy(
+                    _PS_MODULE_DIR_ . 'myparcel/views/images/' . $configuration['image'],
+                    _PS_SHIP_IMG_DIR_ . '/' . (int) $carrier->id . '.jpg'
+                );
+                Configuration::updateValue($configuration['configuration_name'], $carrier->id);
+                $insert = [];
+                foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
+                    $insert[] = ['id_carrier' => $carrier->id, 'name' => $item];
+                }
+                Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
+
+                return $carrier;
+            }
+        } catch (\PrestaShopDatabaseException $e) {
+            \PrestaShopLogger::addLog(
+                sprintf(
+                    '[MYPARCEL] PrestaShopDatabaseException carrier "%s" install: %s',
+                    ($configuration['name'] ?? 'empty'),
+                    $e->getMessage()
+                ),
+                1,
+                null,
+                'Cart',
+                $carrier->id ?? null,
+                true
+            );
+        } catch (\PrestaShopException $e) {
+            \PrestaShopLogger::addLog(
+                sprintf(
+                    '[MYPARCEL] PrestaShopException carrier "%s" install: %s',
+                    ($configuration['name'] ?? 'empty'),
+                    $e->getMessage()
+                ),
+                1,
+                null,
+                'Cart',
+                $carrier->id ?? null,
+                true
+            );
+        }
+
+        return false;
+    }
+
+    protected function addGroups($carrier)
+    {
+        $groups_ids = [];
+        $groups = \Group::getGroups(\Context::getContext()->language->id);
+        foreach ($groups as $group) {
+            $groups_ids[] = $group['id_group'];
+        }
+
+        $carrier->setGroups($groups_ids);
+    }
+
+    protected function addRanges($carrier)
+    {
+        $range_price = new \RangePrice();
+        $range_price->id_carrier = $carrier->id;
+        $range_price->delimiter1 = '0';
+        $range_price->delimiter2 = '10000';
+        $range_price->add();
+
+        $range_weight = new \RangeWeight();
+        $range_weight->id_carrier = $carrier->id;
+        $range_weight->delimiter1 = '0';
+        $range_weight->delimiter2 = '10000';
+        $range_weight->add();
+    }
+
+    protected function addZones($carrier)
+    {
+        $zones = \Zone::getZones();
+
+        foreach ($zones as $zone) {
+            $carrier->addZone($zone['id_zone']);
+        }
+    }
+
     private function updateConfigurationFields(int $carrierId)
     {
         $dropOff = [];
@@ -78,36 +176,49 @@ class Carriers extends AbstractForm
                     switch ($field) {
                         case 'priceMondayDelivery':
                             $label = $this->module->l('Delivery Monday price', 'carriers');
+
                             break;
+
                         case 'priceMorningDelivery':
                             $label = $this->module->l('Delivery morning price', 'carriers');
+
                             break;
-//                            case 'priceStandardDelivery':
-//                                $label = $this->module->l('Delivery standard price', 'carriers');
-//                                break;
+
                         case 'priceEveningDelivery':
                             $label = $this->module->l('Delivery evening price', 'carriers');
+
                             break;
+
                         case 'priceSaturdayDelivery':
                             $label = $this->module->l('Delivery Saturday price', 'carriers');
+
                             break;
+
                         case 'priceSignature':
                             $label = $this->module->l('Signature price', 'carriers');
+
                             break;
+
                         case 'priceOnlyRecipient':
                             $label = $this->module->l('Only recipient price', 'carriers');
+
                             break;
+
                         case 'pricePickup':
                             $label = $this->module->l('Pickup price', 'carriers');
+
                             break;
+
                         default:
                             $label = $this->module->l('Price field', 'carriers');
+
                             break;
                     }
                     $this->context->controller->errors[] = sprintf(
                         $this->module->l('Wrong price format for %s', 'carriers'),
                         $label
                     );
+
                     continue;
                 }
             }
@@ -121,9 +232,12 @@ class Carriers extends AbstractForm
 
     private function getForm(bool $isNew = false)
     {
-        $carrierName = ($isNew)? $this->module->l('Add new Carrier', 'carriers') : $this->module->l('Carriers', 'carriers');
+        $carrierName = $isNew ? $this->module->l('Add new Carrier', 'carriers') : $this->module->l('Carriers', 'carriers');
+
         $id_carrier = (int) Tools::getValue('id_carrier');
+
         $carrier = new Carrier($id_carrier, $this->context->language->id);
+
         if (!empty($carrier->name)) {
             $carrierName = $carrier->name;
         }
@@ -131,6 +245,7 @@ class Carriers extends AbstractForm
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
         $countryIso = $this->module->getModuleCountry();
         $tabs = [];
+
         if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_STANDARD_FORM')) {
             $tabs['form'] = $this->module->l('Checkout delivery form', 'carriers');
         }
@@ -170,26 +285,30 @@ class Carriers extends AbstractForm
         $helper->default_form_language = $this->context->language->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
-        $helper->submit_action = ($isNew)? 'addNewMyparcelCarrierSettings':'submitMyparcelCarrierSettings';
+        $helper->submit_action = $isNew ? 'addNewMyparcelCarrierSettings' : 'submitMyparcelCarrierSettings';
+
         $helper->currentIndex = \AdminController::$currentIndex
             . '&configure=' . $this->module->name
             . '&id_carrier=' . (int) $carrier->id
             . '&menu=' . Tools::getValue('menu', 0)
-            . '&' . (($isNew)? 'addcarrier':'updatecarrier');
+            . '&' . ($isNew ? 'addcarrier' : 'updatecarrier');
+
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
         $carrierConfigs = Db::getInstance()->executeS('SELECT *
             FROM `' . _DB_PREFIX_ . 'myparcelbe_carrier_configuration`
             WHERE `id_carrier` = ' . $id_carrier);
+
         $vars = [];
 
-        if($isNew) {
+        if ($isNew) {
             $carrierConfigs = [];
             $configFields = Constant::CARRIER_CONFIGURATION_FIELDS;
+
             array_push($configFields, 'carrierName');
             array_push($configFields, 'configurationName');
 
-            foreach($configFields as $field) {
+            foreach ($configFields as $field) {
                 $carrierConfigs[] = [
                     'id_configuration' => 0,
                     'id_carrier' => 0,
@@ -205,6 +324,7 @@ class Carriers extends AbstractForm
                 foreach ($temp as $value) {
                     $vars['dropOffDays_' . $value] = 1;
                 }
+
                 continue;
             }
             if ($row['name'] == Constant::CUTOFF_EXCEPTIONS) {
@@ -216,7 +336,9 @@ class Carriers extends AbstractForm
         }
 
         $vars['id_carrier'] = $id_carrier;
+
         $this->setExclusiveFieldsValues($carrier, $vars);
+
         $helper->tpl_vars = [
             'fields_value' => $vars,
         ];
@@ -231,11 +353,11 @@ class Carriers extends AbstractForm
                 'title' => $this->module->l('ID', 'carriers'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
-                'search' => false
+                'search' => false,
             ],
             'name' => [
                 'title' => $this->module->l('Name', 'carriers'),
-                'search' => false
+                'search' => false,
             ],
         ];
 
@@ -253,7 +375,7 @@ class Carriers extends AbstractForm
                 . '&menu=' . Tools::getValue('menu', 0)
                 . '&addcarrier='
                 . '&token=' . Tools::getAdminTokenLite('AdminModules'),
-            ]
+            ],
         ];
         $helper->module = $this;
         $helper->has_bulk_actions = false;
@@ -288,14 +410,16 @@ class Carriers extends AbstractForm
             3 => $this->module->l('Letter', 'carriers'),
             4 => $this->module->l('Digital stamp', 'carriers'),
         ];
+
         $packageFormatOptions = [
             1 => $this->module->l('Normal', 'carriers'),
             2 => $this->module->l('Large', 'carriers'),
             3 => $this->module->l('Automatic', 'carriers'),
         ];
+
         $fields = [];
 
-        if($isNew) {
+        if ($isNew) {
             $fields[] = [
                 'tab' => 'form',
                 'type' => 'text',
@@ -331,11 +455,11 @@ class Carriers extends AbstractForm
                 ['name' => 'Bpost', 'configuration_name' => Constant::BPOST_CONFIGURATION_NAME],
                 ['name' => 'DPD', 'configuration_name' => Constant::DPD_CONFIGURATION_NAME],
             ];
-        } else {
-            return [
-                ['name' => 'PostNL', 'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME],
-            ];
         }
+
+        return [
+            ['name' => 'PostNL', 'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME],
+        ];
     }
 
     private function getFormTabFields(Carrier $carrier, Currency $currency)
@@ -343,6 +467,7 @@ class Carriers extends AbstractForm
         $fields = [];
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
         $countryIso = $this->module->getModuleCountry();
+
         if (!$this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_STANDARD_FORM')) {
             return $fields;
         }
@@ -353,6 +478,7 @@ class Carriers extends AbstractForm
                 'name' => $this->module->l('Hide days', 'carriers'),
             ],
         ];
+
         for ($i = 1; $i < 15; ++$i) {
             $deliveryDaysOptions[] = [
                 'id' => $i,
@@ -370,12 +496,14 @@ class Carriers extends AbstractForm
                 'name' => $this->module->l('1 day', 'carriers'),
             ],
         ];
+
         for ($i = 2; $i < 15; ++$i) {
             $dropOffDelayOptions[] = [
                 'id' => $i,
                 'name' => sprintf($this->module->l('%d days', 'carriers'), $i),
             ];
         }
+
         $cutoffTimeValues = [];
         foreach (Constant::WEEK_DAYS as $index => $day) {
             $cutoffTimeValues[$index] = [
@@ -414,7 +542,7 @@ class Carriers extends AbstractForm
             'cutoff_time' => $cutoffTimeValues,
             'desc' => [
                 sprintf($this->module->l(
-                'This option allows the Merchant to set the days he normally goes to %s to hand in the 
+                    'This option allows the Merchant to set the days he normally goes to %s to hand in the 
                         parcels. Monday is 1 and Saturday is 6.',
                     'carriers'
                 ), $carrier->name),
@@ -487,14 +615,6 @@ class Carriers extends AbstractForm
                 'carriers'
             ),
         ];
-//        $fields[] = [
-//            'type' => 'text',
-//            'label' => $this->module->l('Delivery standard price', 'carriers'),
-//            'name' => 'priceStandardDelivery',
-//            'suffix' => $currency->getSign(),
-//            'class' => 'col-lg-2',
-//            'tab' => 'form',
-//        ];
         if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'allowMondayDelivery')) {
             $fields[] = [
                 'tab' => 'form',
@@ -1046,14 +1166,14 @@ class Carriers extends AbstractForm
     {
         $configurationName = Tools::getValue('configurationName');
         $carrierName = Tools::getValue('carrierName');
+
+        $image = 'postnl.jpg';
         
         if ($this->module->isBE()) {
             $image = 'dpd.jpg';
-            if($configurationName == Constant::BPOST_CONFIGURATION_NAME) {
+            if ($configurationName == Constant::BPOST_CONFIGURATION_NAME) {
                 $image = 'bpost.jpg';
             }
-        } else {
-            $image = 'postnl.jpg';
         }
 
         $carrier = $this->addCarrier(
@@ -1061,108 +1181,8 @@ class Carriers extends AbstractForm
         );
 
         $this->updateConfigurationFields($carrier->id);
-        
         $this->addZones($carrier);
         $this->addGroups($carrier);
         $this->addRanges($carrier);
-    }
-
-    protected function addCarrier($configuration)
-    {
-        $carrier = new Carrier();
-
-        $carrier->name = $configuration['name'];
-        $carrier->is_module = true;
-        $carrier->active = 1;
-        $carrier->range_behavior = 1;
-        $carrier->need_range = 1;
-        $carrier->shipping_external = true;
-        $carrier->range_behavior = 0;
-        $carrier->external_module_name = $this->module->name;
-        $carrier->shipping_method = 2;
-
-        foreach (\Language::getLanguages() as $lang) {
-            $carrier->delay[$lang['id_lang']] = 'Super fast delivery';
-        }
-
-        try {
-            if ($carrier->add()) {
-                @copy(
-                    _PS_MODULE_DIR_ . 'myparcel/views/images/' . $configuration['image'],
-                    _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg'
-                );
-                Configuration::updateValue($configuration['configuration_name'], $carrier->id);
-                $insert = [];
-                foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
-                    $insert[] = ['id_carrier' => $carrier->id, 'name' => $item];
-                }
-                Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
-
-                return $carrier;
-            }
-        } catch (\PrestaShopDatabaseException $e) {
-            \PrestaShopLogger::addLog(
-                sprintf(
-                    '[MYPARCEL] PrestaShopDatabaseException carrier "%s" install: %s',
-                    ($configuration['name'] ?? 'empty'),
-                    $e->getMessage()
-                ),
-                1,
-                null,
-                'Cart',
-                $carrier->id ?? null,
-                true
-            );
-        } catch (\PrestaShopException $e) {
-            \PrestaShopLogger::addLog(
-                sprintf(
-                    '[MYPARCEL] PrestaShopException carrier "%s" install: %s',
-                    ($configuration['name'] ?? 'empty'),
-                    $e->getMessage()
-                ),
-                1,
-                null,
-                'Cart',
-                $carrier->id ?? null,
-                true
-            );
-        }
-
-        return false;
-    }
-
-    protected function addGroups($carrier)
-    {
-        $groups_ids = [];
-        $groups = \Group::getGroups(\Context::getContext()->language->id);
-        foreach ($groups as $group) {
-            $groups_ids[] = $group['id_group'];
-        }
-
-        $carrier->setGroups($groups_ids);
-    }
-
-    protected function addRanges($carrier)
-    {
-        $range_price = new \RangePrice();
-        $range_price->id_carrier = $carrier->id;
-        $range_price->delimiter1 = '0';
-        $range_price->delimiter2 = '10000';
-        $range_price->add();
-
-        $range_weight = new \RangeWeight();
-        $range_weight->id_carrier = $carrier->id;
-        $range_weight->delimiter1 = '0';
-        $range_weight->delimiter2 = '10000';
-        $range_weight->add();
-    }
-
-    protected function addZones($carrier)
-    {
-        $zones = \Zone::getZones();
-
-        foreach ($zones as $zone) {
-            $carrier->addZone($zone['id_zone']);
-        }
     }
 }
