@@ -85,6 +85,7 @@ class Constant
     const LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME = 'MYPARCELBE_LABEL_CREATED_ORDER_STATUS';
 
     const CARRIER_CONFIGURATION_FIELDS = [
+        'carrierType',
         'deliveryTitle',
         'dropOffDays',
         //'cutoffTime',
