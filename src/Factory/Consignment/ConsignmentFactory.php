@@ -20,6 +20,7 @@ use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use Tools;
+use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 
 class ConsignmentFactory
 {
@@ -342,15 +343,21 @@ class ConsignmentFactory
         if (!\Validate::isLoadedObject($carrier)) {
             throw new Exception('No carrier found.');
         }
-        if ($carrier->id_reference == $this->configuration::get(Constant::POSTNL_CONFIGURATION_NAME)) {
+        
+        $carrierType = CarrierConfigurationProvider::get($id_carrier, 'carrierType');
+
+        if ($carrier->id_reference == $this->configuration::get(Constant::POSTNL_CONFIGURATION_NAME)
+            || $carrierType == Constant::POSTNL_CARRIER_NAME) {
             return PostNLConsignment::CARRIER_ID;
         }
 
-        if ($carrier->id_reference == $this->configuration::get(Constant::BPOST_CONFIGURATION_NAME)) {
+        if ($carrier->id_reference == $this->configuration::get(Constant::BPOST_CONFIGURATION_NAME)
+            || $carrierType == Constant::BPOST_CARRIER_NAME) {
             return BpostConsignment::CARRIER_ID;
         }
 
-        if ($carrier->id_reference == $this->configuration::get(Constant::DPD_CONFIGURATION_NAME)) {
+        if ($carrier->id_reference == $this->configuration::get(Constant::DPD_CONFIGURATION_NAME)
+            || $carrierType == Constant::DPD_CARRIER_NAME) {
             return DPDConsignment::CARRIER_ID;
         }
 

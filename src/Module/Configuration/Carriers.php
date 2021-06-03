@@ -8,6 +8,7 @@ use Currency;
 use Configuration;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Module\Tools\Tools;
+use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 
 class Carriers extends AbstractForm
 {
@@ -82,8 +83,6 @@ class Carriers extends AbstractForm
                     _PS_SHIP_IMG_DIR_ . '/' . (int) $carrier->id . '.jpg'
                 );
 
-                $this->updateConfigurationFields($carrier->id, true, $configuration['name'] . '-' .$carrier->id);
-
                 return $carrier;
             }
         } catch (\PrestaShopDatabaseException $e) {
@@ -156,6 +155,7 @@ class Carriers extends AbstractForm
     {
         $dropOff = [];
         $postFields = Tools::getAllValues();
+
         foreach ($postFields as $key => $value) {
             if (stripos($key, 'dropOffDays') !== false) {
                 $temp = explode('_', $key);
@@ -170,7 +170,12 @@ class Carriers extends AbstractForm
         $insert = [];
 
         foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $field) {
+            if(!isset($postFields[$field]) && $field === 'carrierType') {
+                continue;
+            }
+
             $updatedValue = $postFields[$field] ?? '';
+
             if (stripos($field, 'price') === 0) {
                 $price = $updatedValue = Tools::normalizeFloat($updatedValue);
                 if (!empty($price) && !\Validate::isFloat($price)) {
@@ -325,7 +330,6 @@ class Carriers extends AbstractForm
             $configFields = Constant::CARRIER_CONFIGURATION_FIELDS;
 
             array_push($configFields, 'carrierName');
-            array_push($configFields, 'configurationName');
             array_push($configFields, 'psCarriers');
 
             foreach ($configFields as $field) {
@@ -489,7 +493,7 @@ class Carriers extends AbstractForm
                 'tab' => 'form',
                 'type' => 'select',
                 'label' => $this->module->l('Carrier Option', 'carriers'),
-                'name' => 'configurationName',
+                'name' => 'carrierType',
                 'options' => [
                     'query' => $this->getCarrierType(),
                     'id' => 'configuration_name',
@@ -509,13 +513,13 @@ class Carriers extends AbstractForm
     {
         if ($this->module->isBE()) {
             return [
-                ['name' => 'Bpost', 'configuration_name' => Constant::BPOST_CONFIGURATION_NAME],
-                ['name' => 'DPD', 'configuration_name' => Constant::DPD_CONFIGURATION_NAME],
+                ['name' => 'Bpost', 'configuration_name' => Constant::BPOST_CARRIER_NAME],
+                ['name' => 'DPD', 'configuration_name' => Constant::DPD_CARRIER_NAME],
             ];
         }
 
         return [
-            ['name' => 'PostNL', 'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME],
+            ['name' => 'PostNL', 'configuration_name' => Constant::POSTNL_CARRIER_NAME],
         ];
     }
 
@@ -1221,14 +1225,14 @@ class Carriers extends AbstractForm
 
     private function createNewCarrier()
     {
-        $configurationName = Tools::getValue('configurationName');
+        $carrierType = Tools::getValue('carrierType');
         $carrierName = Tools::getValue('carrierName');
 
         $image = 'postnl.jpg';
         
         if ($this->module->isBE()) {
             $image = 'dpd.jpg';
-            if ($configurationName == Constant::BPOST_CONFIGURATION_NAME) {
+            if ($carrierType == Constant::BPOST_CARRIER_NAME) {
                 $image = 'bpost.jpg';
             }
         }
@@ -1236,32 +1240,22 @@ class Carriers extends AbstractForm
         if(Tools::getValue('psCarriers')) {
             $carrier = new Carrier(Tools::getValue('psCarriers'));
 
-            $configurationPsCarriers = Configuration::get("MYPARCEL_PSCARRIERS");
-            $psCarriers = [];
-            if(!empty($configurationPsCarriers)) {
-                $psCarriers = (array) json_decode($configurationPsCarriers);
-            }
-
-            if(!in_array($carrier->id, $psCarriers)) {
-                $this->updateConfigurationFields($carrier->id, true);
-            } else {
-                $this->updateConfigurationFields($carrier->id, false);
-            }
-            
-            $psCarriers[$carrier->id] = $configurationName;
-
-            Configuration::updateValue("MYPARCEL_PSCARRIERS", json_encode($psCarriers));
-
         } else {
             $carrier = $this->addCarrier(
-                ['name' => $carrierName, 'image' => $image, 'configuration_name' => $configurationName]
+                ['name' => $carrierName, 'image' => $image]
             );
             
-            $this->updateConfigurationFields($carrier->id, true);
-
             $this->addZones($carrier);
             $this->addGroups($carrier);
             $this->addRanges($carrier);
+        }
+
+        $configurationPsCarriers = CarrierConfigurationProvider::get($carrier->id, 'carrierType');
+        
+        if(is_null($configurationPsCarriers)) {
+            $this->updateConfigurationFields($carrier->id, true);
+        } else {
+            $this->updateConfigurationFields($carrier->id, false);
         }
     }
 }

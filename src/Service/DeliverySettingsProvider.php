@@ -57,11 +57,10 @@ class DeliverySettingsProvider
         if (\Configuration::get(Constant::USE_ADDRESS2_AS_STREET_NUMBER_CONFIGURATION_NAME)) {
             $houseNumber = trim($address->address2);
         }
-        $carrierName = (new CarrierName())->get((int) $this->idCarrier);
+        $carrierName = CarrierConfigurationProvider::get($this->idCarrier, 'carrierType');
+
         $carrierSettings = [
-            Constant::BPOST_CARRIER_NAME => ['allowDeliveryOptions' => false],
-            Constant::DPD_CARRIER_NAME => ['allowDeliveryOptions' => false],
-            Constant::POSTNL_CARRIER_NAME => ['allowDeliveryOptions' => false],
+            $carrierName => ['allowDeliveryOptions' => false],
         ];
         $activeCarrierSettings = [
             'allowDeliveryOptions' => true,
