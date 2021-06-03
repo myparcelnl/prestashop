@@ -33,8 +33,10 @@ class Carriers extends AbstractForm
             return $this->getForm();
         }
 
-        if (Tools::isSubmit('addNewMyparcelCarrierSettings')) {
-            $this->createNewCarrier();
+        if (Tools::isSubmit('addNewMyparcelCarrierSettings') 
+            || Tools::isSubmit('submitAddMyparcelCarrierSettingsAndStay')) {
+                $this->createNewCarrier();
+            return $this->getList();
         }
 
         if (Tools::isSubmit('addcarrier')
@@ -79,12 +81,8 @@ class Carriers extends AbstractForm
                     _PS_MODULE_DIR_ . 'myparcel/views/images/' . $configuration['image'],
                     _PS_SHIP_IMG_DIR_ . '/' . (int) $carrier->id . '.jpg'
                 );
-                Configuration::updateValue($configuration['configuration_name'], $carrier->id);
-                $insert = [];
-                foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
-                    $insert[] = ['id_carrier' => $carrier->id, 'name' => $item];
-                }
-                Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
+
+                $this->updateConfigurationFields($carrier->id, true, $configuration['name'] . '-' .$carrier->id);
 
                 return $carrier;
             }
@@ -154,7 +152,7 @@ class Carriers extends AbstractForm
         }
     }
 
-    private function updateConfigurationFields(int $carrierId)
+    private function updateConfigurationFields(int $carrierId, bool $isInsert = false)
     {
         $dropOff = [];
         $postFields = Tools::getAllValues();
@@ -168,6 +166,9 @@ class Carriers extends AbstractForm
         if (!empty($dropOff)) {
             $postFields['dropOffDays'] = implode(',', $dropOff);
         }
+
+        $insert = [];
+
         foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $field) {
             $updatedValue = $postFields[$field] ?? '';
             if (stripos($field, 'price') === 0) {
@@ -222,11 +223,24 @@ class Carriers extends AbstractForm
                     continue;
                 }
             }
-            Db::getInstance()->update(
-                'myparcelbe_carrier_configuration',
-                ['value' => pSQL($updatedValue)],
-                'id_carrier = ' . (int) $carrierId . ' AND name = "' . pSQL($field) . '" '
-            );
+
+            if(!$isInsert) {
+                Db::getInstance()->update(
+                    'myparcelbe_carrier_configuration',
+                    ['value' => pSQL($updatedValue)],
+                    'id_carrier = ' . (int) $carrierId . ' AND name = "' . pSQL($field) . '" '
+                );
+            } else {
+                $insert[] = [
+                    'id_carrier' => (int) $carrierId,
+                    'name' => pSQL($field),
+                    'value' => pSQL($updatedValue),
+                ];
+            }
+        }
+        
+        if($isInsert) {
+            Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
         }
     }
 
@@ -266,17 +280,22 @@ class Carriers extends AbstractForm
                 'submit' => [
                     'title' => $this->module->l('Save', 'carriers'),
                 ],
-                'buttons' => [
-                    'save-and-stay' => [
-                        'title' => $this->module->l('Save and stay', 'carriers'),
-                        'name' => 'submitMyparcelCarrierSettingsAndStay',
-                        'type' => 'submit',
-                        'class' => 'btn btn-default pull-right',
-                        'icon' => 'process-icon-save',
-                    ],
-                ],
             ],
         ];
+
+        // Add save and stay if not new
+        if(!$isNew) {
+            $fields['form']['buttons'] = [
+                'save-and-stay' => [
+                    'title' => $this->module->l('Save and stay', 'carriers'),
+                    'name' =>  'submitMyparcelCarrierSettingsAndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ],
+            ];
+        }
+        
 
         $helper = new \HelperForm();
 
@@ -307,6 +326,7 @@ class Carriers extends AbstractForm
 
             array_push($configFields, 'carrierName');
             array_push($configFields, 'configurationName');
+            array_push($configFields, 'psCarriers');
 
             foreach ($configFields as $field) {
                 $carrierConfigs[] = [
@@ -390,10 +410,13 @@ class Carriers extends AbstractForm
         $helper->colorOnBackground = true;
         $helper->no_link = true;
 
+        $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
+
         $list = Db::getInstance()->executeS('SELECT a.*
             FROM `' . _DB_PREFIX_ . 'carrier` a
-            WHERE a.external_module_name = \'' . $this->module->name . '\'
-                AND a.`deleted` = 0
+            WHERE (a.external_module_name = \'' . $this->module->name . '\''
+                . (!empty($psCarriersConfig) ? 'OR id_carrier IN ('. implode(',', array_keys($psCarriersConfig)) .')' : '') .
+            ') AND a.`deleted` = 0
             ORDER BY a.`position` ASC
             LIMIT 0, 50');
 
@@ -420,10 +443,44 @@ class Carriers extends AbstractForm
         $fields = [];
 
         if ($isNew) {
+            $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
+            
+            // Get ps carrier config
+            $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
+            $carriers = [];
+
+            array_unshift($carriers, [
+                'id_carrier' => 0,
+                'name' => 'Select from PS Carriers',
+            ]);
+
+            foreach($psCarriers as $pscarrier) {
+                if(!in_array((int) $pscarrier['id_carrier'], array_keys($psCarriersConfig))) {
+                    $carriers[] =  [
+                        'id_carrier' => $pscarrier['id_carrier'],
+                        'name' => $pscarrier['name'],
+                    ];
+                }
+            }
+
+            $fields[] = [
+                'tab' => 'form',
+                'tab' => 'form',
+                'type' => 'select',
+                'label' => $this->module->l('Select PS Carriers', 'carriers'),
+                'name' => 'psCarriers',
+                'options' => [
+                    'query' => $carriers,
+                    'id' => 'id_carrier',
+                    'name' => 'name',
+                ],
+            ];
+
             $fields[] = [
                 'tab' => 'form',
                 'type' => 'text',
                 'label' => $this->module->l('Carrier Name', 'carriers'),
+                'desc' => $this->module->l('Create new carrier', 'carriers'),
                 'name' => 'carrierName',
             ];
 
@@ -1176,13 +1233,35 @@ class Carriers extends AbstractForm
             }
         }
 
-        $carrier = $this->addCarrier(
-            ['name' => $carrierName, 'image' => $image, 'configuration_name' => $configurationName]
-        );
+        if(Tools::getValue('psCarriers')) {
+            $carrier = new Carrier(Tools::getValue('psCarriers'));
 
-        $this->updateConfigurationFields($carrier->id);
-        $this->addZones($carrier);
-        $this->addGroups($carrier);
-        $this->addRanges($carrier);
+            $configurationPsCarriers = Configuration::get("MYPARCEL_PSCARRIERS");
+            $psCarriers = [];
+            if(!empty($configurationPsCarriers)) {
+                $psCarriers = (array) json_decode($configurationPsCarriers);
+            }
+
+            if(!in_array($carrier->id, $psCarriers)) {
+                $this->updateConfigurationFields($carrier->id, true);
+            } else {
+                $this->updateConfigurationFields($carrier->id, false);
+            }
+            
+            $psCarriers[$carrier->id] = $configurationName;
+
+            Configuration::updateValue("MYPARCEL_PSCARRIERS", json_encode($psCarriers));
+
+        } else {
+            $carrier = $this->addCarrier(
+                ['name' => $carrierName, 'image' => $image, 'configuration_name' => $configurationName]
+            );
+            
+            $this->updateConfigurationFields($carrier->id, true);
+
+            $this->addZones($carrier);
+            $this->addGroups($carrier);
+            $this->addRanges($carrier);
+        }
     }
 }
