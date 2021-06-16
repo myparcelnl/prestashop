@@ -1251,7 +1251,13 @@ class Carriers extends AbstractForm
         }
 
         $configurationPsCarriers = CarrierConfigurationProvider::get($carrier->id, 'carrierType');
-        
+
+        $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
+
+        $psCarriersConfig[$carrier->id] = $carrierType;
+
+        Configuration::updateValue('MYPARCEL_PSCARRIERS', json_encode($psCarriersConfig));
+
         if(is_null($configurationPsCarriers)) {
             $this->updateConfigurationFields($carrier->id, true);
         } else {
