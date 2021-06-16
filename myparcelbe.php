@@ -167,7 +167,9 @@ class MyParcelBE extends CarrierModule
 
     public function getOrderShippingCost($cart, $shipping_cost)
     {
-        if ($this->id_carrier != $cart->id_carrier) {
+        $carrier = \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get($cart->id_carrier,'carrierType');
+
+        if ($this->id_carrier != $cart->id_carrier && is_null($carrier)) {
             return $shipping_cost;
         }
         if (!empty($this->context->controller->requestOriginalShippingCost)) {
@@ -176,6 +178,7 @@ class MyParcelBE extends CarrierModule
 
         $myParcelCost = 0;
         $deliverySettings = Tools::getValue('myparcel-delivery-options', false);
+
         if ($deliverySettings) {
             $deliverySettings = json_decode($deliverySettings, true);
         } else {
