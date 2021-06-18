@@ -8,6 +8,7 @@ use Gett\MyparcelBE\Constant;
 use Configuration;
 use Db;
 use Context;
+use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 
 class Installer
 {
@@ -172,34 +173,22 @@ class Installer
                 foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
                     $insert[] = ['id_carrier' => $carrier->id, 'name' => $item];
                 }
-                Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
 
-                return $carrier;
-
-
-                $insert = [];
-                foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
-                    if($item === 'carrierType') {
-
-                        $carrierType = "";
-                        switch ($configuration['configuration_name']) {
-                            case Constant::POSTNL_CONFIGURATION_NAME:
-                                $carrierType = Constant::POSTNL_CARRIER_NAME;
-                                break;
-                            case Constant::BPOST_CONFIGURATION_NAME:
-                                $carrierType = Constant::BPOST_CARRIER_NAME;
-                                break;
-                            case Constant::DPD_CONFIGURATION_NAME:
-                                $carrierType = Constant::DPD_CARRIER_NAME;
-                                break;
-                        }
-
-                        $insert[] = ['id_carrier' => $carrier->id, 'name' => $item, 'value' => $carrierType];
-                    } else {
-                        $insert[] = ['id_carrier' => $carrier->id, 'name' => $item];
-                    }
+                $carrierType = "";
+                switch ($configuration['configuration_name']) {
+                    case Constant::POSTNL_CONFIGURATION_NAME:
+                        $carrierType = Constant::POSTNL_CARRIER_NAME;
+                        break;
+                    case Constant::BPOST_CONFIGURATION_NAME:
+                        $carrierType = Constant::BPOST_CARRIER_NAME;
+                        break;
+                    case Constant::DPD_CONFIGURATION_NAME:
+                        $carrierType = Constant::DPD_CARRIER_NAME;
+                        break;
                 }
+
                 Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
+                CarrierConfigurationProvider::updateValue($carrier->id, 'carrierType', $carrierType);
 
                 return $carrier;
             }
