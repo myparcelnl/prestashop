@@ -446,9 +446,10 @@ class Carriers extends AbstractForm
 
         $fields = [];
 
+        $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
+        $showCarrierTypeOption = false;
+
         if ($isNew) {
-            $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
-            
             // Get ps carrier config
             $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
             $carriers = [];
@@ -487,7 +488,19 @@ class Carriers extends AbstractForm
                 'desc' => $this->module->l('Create new carrier', 'carriers'),
                 'name' => 'carrierName',
             ];
+            $showCarrierTypeOption = true;
+        }
 
+        // Only if ps carrier
+        if($idCarrier = Tools::getValue('id_carrier')) {
+            $carriers = array_column($psCarriers, 'id_carrier');
+
+            if(in_array($idCarrier, $carriers)) {
+                $showCarrierTypeOption = true;
+            }
+        }
+
+        if($showCarrierTypeOption) {
             $fields[] = [
                 'tab' => 'form',
                 'tab' => 'form',
