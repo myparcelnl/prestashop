@@ -539,6 +539,7 @@ class Carriers extends AbstractForm
             return [
                 ['name' => 'Bpost', 'configuration_name' => Constant::BPOST_CARRIER_NAME],
                 ['name' => 'DPD', 'configuration_name' => Constant::DPD_CARRIER_NAME],
+                ['name' => 'PostNL', 'configuration_name' => Constant::POSTNL_CARRIER_NAME],
             ];
         }
 
