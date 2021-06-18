@@ -156,6 +156,13 @@ class Carriers extends AbstractForm
         $dropOff = [];
         $postFields = Tools::getAllValues();
 
+        $carrierType = CarrierConfigurationProvider::get($carrierId, 'carrierType');
+
+        // if carrier is not found and not insert, should be insert
+        if(is_null($carrierType) && !$isInsert) {
+            $isInsert = true;
+        }
+
         foreach ($postFields as $key => $value) {
             if (stripos($key, 'dropOffDays') !== false) {
                 $temp = explode('_', $key);
@@ -230,11 +237,7 @@ class Carriers extends AbstractForm
             }
 
             if(!$isInsert) {
-                Db::getInstance()->update(
-                    'myparcelbe_carrier_configuration',
-                    ['value' => pSQL($updatedValue)],
-                    'id_carrier = ' . (int) $carrierId . ' AND name = "' . pSQL($field) . '" '
-                );
+                CarrierConfigurationProvider::updateValue($carrierId, $field, $updatedValue);
             } else {
                 $insert[] = [
                     'id_carrier' => (int) $carrierId,
@@ -242,6 +245,20 @@ class Carriers extends AbstractForm
                     'value' => pSQL($updatedValue),
                 ];
             }
+        }
+
+        $carrier = new Carrier($carrierId);
+
+        if($carrier->external_module_name !== $this->module->name) {
+            $carrier->external_module_name = 'myparcelbe';
+            $carrier->is_module = true;
+            $carrier->active = 1;
+            $carrier->range_behavior = 1;
+            $carrier->need_range = 1;
+            $carrier->shipping_external = true;
+            $carrier->range_behavior = 0;
+            $carrier->shipping_method = 2;
+            $carrier->update();
         }
         
         if($isInsert) {
@@ -414,13 +431,9 @@ class Carriers extends AbstractForm
         $helper->colorOnBackground = true;
         $helper->no_link = true;
 
-        $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
-
         $list = Db::getInstance()->executeS('SELECT a.*
             FROM `' . _DB_PREFIX_ . 'carrier` a
-            WHERE (a.external_module_name = \'' . $this->module->name . '\''
-                . (!empty($psCarriersConfig) ? 'OR id_carrier IN ('. implode(',', array_keys($psCarriersConfig)) .')' : '') .
-            ') AND a.`deleted` = 0
+            WHERE (a.external_module_name = \'' . $this->module->name . '\') AND a.`deleted` = 0
             ORDER BY a.`position` ASC
             LIMIT 0, 50');
 
@@ -446,12 +459,10 @@ class Carriers extends AbstractForm
 
         $fields = [];
 
-        $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
         $showCarrierTypeOption = false;
 
         if ($isNew) {
             // Get ps carrier config
-            $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
             $carriers = [];
 
             array_unshift($carriers, [
@@ -459,13 +470,12 @@ class Carriers extends AbstractForm
                 'name' => 'Select from PS Carriers',
             ]);
 
+            $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
             foreach($psCarriers as $pscarrier) {
-                if(!in_array((int) $pscarrier['id_carrier'], array_keys($psCarriersConfig))) {
-                    $carriers[] =  [
-                        'id_carrier' => $pscarrier['id_carrier'],
-                        'name' => $pscarrier['name'],
-                    ];
-                }
+                $carriers[] =  [
+                    'id_carrier' => $pscarrier['id_carrier'],
+                    'name' => $pscarrier['name'],
+                ];
             }
 
             $fields[] = [
@@ -493,7 +503,8 @@ class Carriers extends AbstractForm
 
         // Only if ps carrier
         if($idCarrier = Tools::getValue('id_carrier')) {
-            $carriers = array_column($psCarriers, 'id_carrier');
+            $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
+            $carriers = array_keys($psCarriersConfig);
 
             if(in_array($idCarrier, $carriers)) {
                 $showCarrierTypeOption = true;
@@ -1252,7 +1263,15 @@ class Carriers extends AbstractForm
 
         if(Tools::getValue('psCarriers')) {
             $carrier = new Carrier(Tools::getValue('psCarriers'));
-
+            $carrier->external_module_name = 'myparcelbe';
+            $carrier->is_module = true;
+            $carrier->active = 1;
+            $carrier->range_behavior = 1;
+            $carrier->need_range = 1;
+            $carrier->shipping_external = true;
+            $carrier->range_behavior = 0;
+            $carrier->shipping_method = 2;
+            $carrier->update();
         } else {
             $carrier = $this->addCarrier(
                 ['name' => $carrierName, 'image' => $image]
@@ -1263,14 +1282,11 @@ class Carriers extends AbstractForm
             $this->addRanges($carrier);
         }
 
-        $configurationPsCarriers = CarrierConfigurationProvider::get($carrier->id, 'carrierType');
-
         $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
-
         $psCarriersConfig[$carrier->id] = $carrierType;
-
         Configuration::updateValue('MYPARCEL_PSCARRIERS', json_encode($psCarriersConfig));
 
+        $configurationPsCarriers = CarrierConfigurationProvider::get($carrier->id, 'carrierType');
         if(is_null($configurationPsCarriers)) {
             $this->updateConfigurationFields($carrier->id, true);
         } else {
