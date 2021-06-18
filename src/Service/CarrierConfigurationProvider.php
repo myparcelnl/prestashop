@@ -24,12 +24,10 @@ class CarrierConfigurationProvider
 
     public static function updateValue(int $carrier_id, string $name, string $value)
     {
-        if (Validate::isConfigName($name)) {
-            Db::getInstance()->update(
-                'myparcelbe_carrier_configuration',
-                ['value' => pSQL($value)],
-                'id_carrier = ' . (int) $carrier_id . ' AND name = "' . pSQL($name) . '" '
-            );
-        }
+        Db::getInstance()->update(
+            'myparcelbe_carrier_configuration',
+            ['value' => pSQL($value)],
+            'id_carrier = ' . (int) $carrier_id . ' AND name = "' . pSQL($name) . '" '
+        );
     }
 }
