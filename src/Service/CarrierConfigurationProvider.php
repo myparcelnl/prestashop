@@ -18,4 +18,13 @@ class CarrierConfigurationProvider
 
         return isset(static::$configuration[$carrier_id][$name]) && static::$configuration[$carrier_id][$name] ? static::$configuration[$carrier_id][$name] : $default;
     }
+
+    public static function updateValue(int $carrier_id, string $name, string $value)
+    {
+        \Db::getInstance()->update(
+            'myparcelbe_carrier_configuration',
+            ['value' => pSQL($value)],
+            'id_carrier = ' . (int) $carrier_id . ' AND name = "' . pSQL($name) . '" '
+        );
+    }
 }
