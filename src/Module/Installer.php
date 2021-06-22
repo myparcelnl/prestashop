@@ -8,6 +8,7 @@ use Gett\MyparcelBE\Constant;
 use Configuration;
 use Db;
 use Context;
+use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 
 class Installer
 {
@@ -167,11 +168,27 @@ class Installer
                     _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg'
                 );
                 Configuration::updateValue($configuration['configuration_name'], $carrier->id);
+
                 $insert = [];
                 foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
                     $insert[] = ['id_carrier' => $carrier->id, 'name' => $item];
                 }
+
+                $carrierType = "";
+                switch ($configuration['configuration_name']) {
+                    case Constant::POSTNL_CONFIGURATION_NAME:
+                        $carrierType = Constant::POSTNL_CARRIER_NAME;
+                        break;
+                    case Constant::BPOST_CONFIGURATION_NAME:
+                        $carrierType = Constant::BPOST_CARRIER_NAME;
+                        break;
+                    case Constant::DPD_CONFIGURATION_NAME:
+                        $carrierType = Constant::DPD_CARRIER_NAME;
+                        break;
+                }
+
                 Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
+                CarrierConfigurationProvider::updateValue($carrier->id, 'carrierType', $carrierType);
 
                 return $carrier;
             }

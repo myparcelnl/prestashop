@@ -53,6 +53,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  $(document).on('change', '#psCarriers', function() {
+    showCarrierName()
+  });
+
+  showCarrierName()
+
+  function showCarrierName() {
+    var psCarrier = $('#psCarriers').val();
+    var carrierParent = $('#carrierName').parent().parent();
+      
+    if(parseInt(psCarrier) === 0) {
+      $(carrierParent).removeClass('hidden')
+    } else {
+      $(carrierParent).addClass('hidden')
+    }
+  }
+
   if ($('body').hasClass('adminmodules') && $('#configuration_form').length) {
     $('.toggle-parent-field input[type="radio"]').on('change', function() {
       toggleFieldsVisibility($(this));

@@ -5,6 +5,7 @@ namespace Gett\MyparcelBE\Module\Carrier;
 use Carrier;
 use Configuration;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 
 class ExclusiveField
 {
@@ -37,6 +38,24 @@ class ExclusiveField
     {
         $carrierReference = (int) $carrier->id_reference;
         $carrierType = null;
+        
+        $configurationPsCarrierType = CarrierConfigurationProvider::get((int) $carrier->id, 'carrierType');
+
+        if(!is_null($configurationPsCarrierType)) {
+            switch ($configurationPsCarrierType) {
+                case Constant::DPD_CARRIER_NAME:
+                    $carrierType = 'DPD';
+                    break;
+                case Constant::BPOST_CARRIER_NAME:
+                    $carrierType = 'BPOST';
+                    break;
+                case Constant::POSTNL_CARRIER_NAME:
+                default:
+                    $carrierType = 'POSTNL';
+                    break;
+            }
+        }
+
         switch ($carrierReference) {
             case (int) Configuration::get(Constant::DPD_CONFIGURATION_NAME):
                 $carrierType = 'DPD';

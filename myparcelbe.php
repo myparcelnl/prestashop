@@ -176,6 +176,7 @@ class MyParcelBE extends CarrierModule
 
         $myParcelCost = 0;
         $deliverySettings = Tools::getValue('myparcel-delivery-options', false);
+
         if ($deliverySettings) {
             $deliverySettings = json_decode($deliverySettings, true);
         } else {

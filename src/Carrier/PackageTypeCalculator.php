@@ -15,6 +15,13 @@ class PackageTypeCalculator extends AbstractPackageCalculator
 {
     public function isMyParcelCarrier(int $idCarrier): bool
     {
+        $carrierType = CarrierConfigurationProvider::get($idCarrier, 'carrierType');
+
+        if  (!is_null($carrierType)
+        && in_array($carrierType, [Constant::BPOST_CARRIER_NAME, Constant::DPD_CARRIER_NAME, Constant::POSTNL_CARRIER_NAME])) {
+            return true;
+        }
+
         $allowedCarriers = array_map('intval', [
             Configuration::get(Constant::DPD_CONFIGURATION_NAME),
             Configuration::get(Constant::BPOST_CONFIGURATION_NAME),
