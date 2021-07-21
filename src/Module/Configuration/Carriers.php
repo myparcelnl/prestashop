@@ -1266,12 +1266,8 @@ class Carriers extends AbstractForm
             $carrier = new Carrier(Tools::getValue('psCarriers'));
             $carrier->external_module_name = 'myparcelbe';
             $carrier->is_module = true;
-            $carrier->active = 1;
-            $carrier->range_behavior = 1;
             $carrier->need_range = 1;
             $carrier->shipping_external = true;
-            $carrier->range_behavior = 0;
-            $carrier->shipping_method = 2;
             $carrier->update();
         } else {
             $carrier = $this->addCarrier(
