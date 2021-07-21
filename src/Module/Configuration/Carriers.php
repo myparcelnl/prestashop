@@ -465,11 +465,6 @@ class Carriers extends AbstractForm
             // Get ps carrier config
             $carriers = [];
 
-            array_unshift($carriers, [
-                'id_carrier' => 0,
-                'name' => 'Select from PS Carriers',
-            ]);
-
             $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
             foreach($psCarriers as $pscarrier) {
                 $carriers[] =  [
@@ -477,6 +472,11 @@ class Carriers extends AbstractForm
                     'name' => $pscarrier['name'],
                 ];
             }
+
+            array_unshift($carriers, [
+                'id_carrier' => 0,
+                'name' => $carriers ? 'Select from PS Carriers' : '--',
+            ]);
 
             $fields[] = [
                 'tab' => 'form',
