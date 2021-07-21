@@ -116,12 +116,14 @@ class DeliverySettingsProvider
         $shippingOptions = $this->module->getShippingOptions($this->idCarrier, $address);
 
         $taxRate = $shippingOptions['tax_rate'];
+        $priceStandardDelivery = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
 
         return [
             'config' => [
                 'platform' => ($this->module->isBE() ? 'belgie' : 'myparcel'),
                 'carrierSettings' => $carrierSettings,
                 'priceMorningDelivery' => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceMorningDelivery') * $taxRate, 2),
+                'priceStandardDelivery' => Tools::ps_round($priceStandardDelivery, 2),
                 'priceEveningDelivery' => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceEveningDelivery') * $taxRate, 2),
                 'priceSignature' => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceSignature') * $taxRate, 2),
                 'priceOnlyRecipient' => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceOnlyRecipient') * $taxRate, 2),
