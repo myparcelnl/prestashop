@@ -285,10 +285,10 @@ class Carriers extends AbstractForm
         if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_STANDARD_FORM')) {
             $tabs['form'] = $this->module->l('Checkout delivery form', 'carriers');
         }
-        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_DELIVERY_FORM')) {
+        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_DELIVERY_FORM') && !$isNew) {
             $tabs['delivery'] = $this->module->l('Delivery', 'carriers');
         }
-        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_RETURN_FORM')) {
+        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_RETURN_FORM')  && !$isNew) {
             $tabs['return'] = $this->module->l('Return', 'carriers');
         }
         $fields = [
@@ -527,8 +527,12 @@ class Carriers extends AbstractForm
         }
 
         $formTabFields = $this->getFormTabFields($carrier, $currency);
-        $deliveryTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions);
-        $returnTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions, 'return');
+        $deliveryTabFields = [];
+        $returnTabFields = [];
+        if (!$isNew) {
+            $deliveryTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions);
+            $returnTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions, 'return');
+        }
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
     }
