@@ -285,10 +285,10 @@ class Carriers extends AbstractForm
         if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_STANDARD_FORM')) {
             $tabs['form'] = $this->module->l('Checkout delivery form', 'carriers');
         }
-        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_DELIVERY_FORM')) {
+        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_DELIVERY_FORM') && !$isNew) {
             $tabs['delivery'] = $this->module->l('Delivery', 'carriers');
         }
-        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_RETURN_FORM')) {
+        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_RETURN_FORM')  && !$isNew) {
             $tabs['return'] = $this->module->l('Return', 'carriers');
         }
         $fields = [
@@ -465,11 +465,6 @@ class Carriers extends AbstractForm
             // Get ps carrier config
             $carriers = [];
 
-            array_unshift($carriers, [
-                'id_carrier' => 0,
-                'name' => 'Select from PS Carriers',
-            ]);
-
             $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
             foreach($psCarriers as $pscarrier) {
                 $carriers[] =  [
@@ -477,6 +472,11 @@ class Carriers extends AbstractForm
                     'name' => $pscarrier['name'],
                 ];
             }
+
+            array_unshift($carriers, [
+                'id_carrier' => 0,
+                'name' => $carriers ? 'Select from PS Carriers' : '--',
+            ]);
 
             $fields[] = [
                 'tab' => 'form',
@@ -527,8 +527,12 @@ class Carriers extends AbstractForm
         }
 
         $formTabFields = $this->getFormTabFields($carrier, $currency);
-        $deliveryTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions);
-        $returnTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions, 'return');
+        $deliveryTabFields = [];
+        $returnTabFields = [];
+        if (!$isNew) {
+            $deliveryTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions);
+            $returnTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions, 'return');
+        }
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
     }
@@ -1266,12 +1270,8 @@ class Carriers extends AbstractForm
             $carrier = new Carrier(Tools::getValue('psCarriers'));
             $carrier->external_module_name = 'myparcelbe';
             $carrier->is_module = true;
-            $carrier->active = 1;
-            $carrier->range_behavior = 1;
             $carrier->need_range = 1;
             $carrier->shipping_external = true;
-            $carrier->range_behavior = 0;
-            $carrier->shipping_method = 2;
             $carrier->update();
         } else {
             $carrier = $this->addCarrier(

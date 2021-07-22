@@ -167,12 +167,15 @@ class Installer
                     _PS_MODULE_DIR_ . 'myparcel/views/images/' . $configuration['image'],
                     _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg'
                 );
+
                 Configuration::updateValue($configuration['configuration_name'], $carrier->id);
 
                 $insert = [];
                 foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
-                    $insert[] = ['id_carrier' => $carrier->id, 'name' => $item];
-                }
+                    $insert[] = ['id_carrier' => $carrier->id, 'name' => $item, 'value' => ''];
+                }   
+
+                Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
 
                 $carrierType = "";
                 switch ($configuration['configuration_name']) {
@@ -187,7 +190,6 @@ class Installer
                         break;
                 }
 
-                Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
                 CarrierConfigurationProvider::updateValue($carrier->id, 'carrierType', $carrierType);
 
                 return $carrier;
