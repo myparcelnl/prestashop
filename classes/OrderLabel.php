@@ -139,7 +139,7 @@ class OrderLabel extends \ObjectModel
             '{firstname}' => $address->firstname,
             '{lastname}' => $address->lastname,
             '{shipping_number}' => $order_label->barcode,
-            '{followup}' => "http://postnl.nl/tracktrace/?L={$mailIsoUpper}&B={$order_label->barcode}&P={$address->postcode}&D={$countryIso}&T=C",
+            '{followup}' => $order_label->track_link,
             '{order_name}' => $order->getUniqReference(),
             '{order_id}' => $order->id,
             '{utc_offset}' => date('P'),
