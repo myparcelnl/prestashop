@@ -1,3 +1,4 @@
+console.log('asdasd')
 document.addEventListener("DOMContentLoaded", function (event) {
     let initializeMyParcelForm = function (carrier) {
         if (!carrier || !carrier.length || !carrier.find('input:checked')) {
@@ -10,6 +11,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (!wrapper) {
             return;
         }
+
+        console.log(wrapper, myparcel_carrier_init_url, carrierId)
 
         $.ajax({
             url: myparcel_carrier_init_url + '?id_carrier=' + carrierId,
