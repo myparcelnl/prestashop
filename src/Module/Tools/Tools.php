@@ -40,7 +40,7 @@ class Tools extends ToolsPresta
      * @param string $sameSite
      * @return void
      */
-    public function setCookieSameSite(
+    public static function setCookieSameSite(
         string $name,
         string $value,
         int $expire,
