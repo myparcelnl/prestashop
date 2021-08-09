@@ -1,10 +1,2 @@
-# PrestaShop
-config.xml
-
-# 3rdParty
-vendor/
-node_modules/
-.php_cs.cache
-
 # OS files
 .DS_Store
