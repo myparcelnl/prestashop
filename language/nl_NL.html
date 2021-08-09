@@ -1,0 +1,248 @@
+<head>
+    <script src="js/auto_menu.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="menu col-xs-4 col-lg-3">
+            <nav class="navbar nav nav-pills nav-stacked">
+                <div class="menu-items">
+                </div>
+            </nav>
+        </div>
+        <section class="page-header col-xs-8 col-xs-offset-4 col-lg-9 col-lg-offset-3">
+            <img alt="" height="185" src="media/logo_myparcel.png">
+            <h1 class="project-name">
+                Handleiding Prestashop plugin
+            </h1>
+            <br />
+            <a class="btn" href="https://github.com/myparcelnl/prestashop/releases" target="_blank">Download de laatste versie hier</a>
+<!--            <a target="_blank" class="btn" href=""></a>-->
+        </section>
+        <section class="main-content col-xs-8 col-xs-offset-4 col-lg-7 col-lg-offset-4">
+
+            <div style="margin-top:10px">
+                <h1 id="1">1. Installatie</h1>
+                <p>
+                   Om gebruik te maken van de module heb je een MyParcel-acccount nodig. Je kunt je registreren op <a href="https://www.myparcel.nl" style="color: #FF8C00;" target="blank">MyParcel.nl</a>.
+                </p>
+                <ol>
+                    <li><i>Verwijder de oude module (v2.3.8) als je hiervan gebruik hebt gemaakt.</i></li>
+                    <li>Download het .zip-bestand via <a href="https://github.com/myparcelnl/prestashop/releases/latest" target="blank">Github</a>.</li>
+                    <li>Open je Prestashop admin en ga naar <span class="nice">Modules > Module Manager</span>.</li>
+                    <li>Klik op <span class="nice">Upload</span> en upload het .zip-bestand.</li>
+                    <li>Klik op <span class="nice">Configure</span> om de plugin te configureren.</li>
+                </ol>
+                <p>
+                    Je kunt de module vinden onder <span class="nice">Verzending > MyParcel</span>.
+                </p>
+                
+                <h1 id="2">2. Configuratie</h1>
+                <p>
+                    Ga in het linkermenu naar het kopje <span class="nice">Verzending > MyParcel</span> om de MyParcel module te configureren.
+                </p>
+                <h2 id="2_A">2.1 API instellingen</h2>
+                <img src="media/prestashop_apisettings.png" alt="apisettings" >
+                <h3 id="2_A_A">2.1.1 Jouw API key</h3>
+                <p>
+                    Om zendingen in het juiste account terecht te laten komen, zal je de API key uit je MyParcel-account moeten invullen.
+                    Als je ingelogd bent in jouw MyParcel account, kun je deze vinden bij het
+                    <img alt="" height="25" src="media/myparcel_account_icoon.png">-teken > <span class="nice">Shopinstellingen</span> > <span class="nice">Algemeen</span>.
+                    Het kan zijn dat je de API key nog niet ziet, maar deze eerst nog moet 'genereren'.
+                    Klik dan op <span class="nice">Genereer API-key</span> en kopieer de API-key.
+                </p>
+                <h3 id="2_A_B">2.2.2 API logging</h3>
+                <p>Zet dit aan als je problemen ervaart met de module. Support kan hiermee de communicatie tussen de API
+                </p>
+                <h2 id="2_B">2.2 Algemene instellingen</h2>
+                <img src="media/prestashop_generalsettings.png" alt="generalsettings">
+                <h3 id="2_B_A">2.2.1 Deel mailadres klant</h3>
+                <p>
+                    Deel het mailadres van je klant met MyParcel om Track en trace te kunnen versturen vanuit MyParcel.
+                </p>
+                <h3 id="2_B_B">2.2.2 Deel telefoonnummer klant</h3>
+                <p>
+                    Deel het telefoonnummer van je klant met MyParcel.
+                </p>
+                <h3 id="2_B_C">2.2.3 Gebruik tweede adresveld als huisnummer</h3>
+                <p>
+                    Deze instelling zal er voor zorgen dat adresveld 2 als huisnummer wordt genomen bij het aanmaken van een zending.
+                </p>
+
+                <h2 id="2_C">2.3 Label instellingen</h2>
+                <img src="media/prestashop_labelsettings.png" alt="labelsettings">
+                <h3 id="2_C_A">2.3.1 Eigen kenmerk label</h3>
+                <p>
+                    Geef hier aan wat je als eigen kenmerk wilt tonen op je label. Je kunt hier ook kiezen voor een ordernummer of referentie door hier een variabele in te vullen. De beschikbare variabelen zijn:
+                </p>
+                <ul>
+                    <li>{order.id}</li>
+                    <li>{order.reference}</li>
+                </ul>
+                <h3 id="2_C_B">2.3.2 Label formaat</h3>
+                <p>
+                    Hier geef je aan of je het label op een standaard (A4) of op een labelprinter (A6) wilt printen.
+                </p>
+                <h3 id="2_C_C">2.3.3 Standaard label positie</h3>
+                <p>
+                    Hier geef je aan op welke plek je het label standaard wilt hebben, wanneer je kiest voor het A4 labelformaat.
+                </p>
+                <h3 id="2_C_D">2.3.4 Label openen of alleen downloaden</h3>
+                <p>
+                    Kies hier of het label gelijk moet worden geopend na downloaden.
+                </p>
+                <h3 id="2_C_E">2.3.5 Vraag om startpositie bij printen</h3>
+                <p>
+                    Met deze optie kan je verder gaan met printen waar je de laatste keer was gebleven. Hierdoor kun je alle stickers op het A4-vel gebruiken.
+                </p>
+                <h2 id="2_D">2.4 Order opties</h2>
+                <img src="media/prestashop_ordersettings.png" alt="Order_settings">
+                <h3 id="2_D_A">2.4.1 Automatische orderstatus</h3>
+                <p>
+                    Stel in welke status je orders krijgen na exporteren, scannen bij PostNL en wanneer de zending is afgeleverd.
+                </p>
+                <h3 id="2_D_B">2.4.2 Negeer orderstatussen</h3>
+                <p>
+                    Hier kun je orderstatussen selecteren die moeten worden genegeerd met bovenstaande instelling.
+                </p>
+                <h3 id="2_D_C">2.4.3 Order status mail</h3>
+                <p>
+                    Wanneer er een notificatie moet worden verstuurd op het moment van veranderen van de orderstatus.
+                </p>
+                <h3 id="2_D_D">2.4.4 Moment van notificatie versturen</h3>
+                <p>
+                    Kies er voor om de notificatie te versturen na het scannen van het label bij PostNL of na het downloaden van het label.
+                </p>
+                <h3 id="2_D_E">2.4.5 Moment van notificatie versturen</h3>
+                <p>
+                    Kies er voor om de notificatie te versturen na het scannen van het label bij PostNL of na het downloaden van het label.
+                </p>
+                <h3 id="2_D_F">2.4.5 Notificatie versturen bij digitale postzegels</h3>
+                <p>
+                    Als je een notificatie wilt verzenden op het moment van downloaden van een digitale postzegel, kies je hier voor 'Ja'.
+                </p>
+
+                <h2 id="2_E">2.5 Customs instellingen</h2>
+                <p>
+                    Ga naar <span class="nice">Catalogus > Producten > <i>-product-</i> </span> om de gegevens die nodig zijn voor de customs declaration in te stellen. Om een zending te kunnen  zult een gewicht en een HS code moeten instellen. Ook is een land van herkomst nodig.
+                </p>
+                <img src="media/prestashop_product_customsdec.png" alt="customsdec">
+                <p>
+                    Kies voor 'Verzending' om een gewicht in te stellen. Klik daarna op 'Modules' en kies voor 'MyParcel > Customs' om in te stellen welke HS code voor dit product moet worden gebruikt en geef aan wat het land van herkomst is. Wanneer hier niets is ingevuld, kun je bij de instellingen van de module <span class="nice">Modules > Module Manager > MyParcelNL > Configureren > Customs Options</span> standaard waarden instellen.
+                </p>
+                <h3 id="2_E_A">2.5.1 Default customs form</h3>
+                <p>
+                    Je kunt bij het product zelf kiezen om dit product op het customs formulier te tonen of juist over te slaan. Ga naar <span class="nice">Catalogus > Producten > <i>-product-</i> > Modules > MyParcel > Customs</span> om dit in te stellen per product.
+                </p>
+
+                <h3 id="2_E_B">2.5.2 Default customs code</h3>
+                <p>
+                    Hier vul je een HS-code in die wordt gebruikt wanneer er geen HS-code is ingevuld bij het product. Ga naar <span class="nice">Catalogus > Producten > <i>-product-</i> > Modules > MyParcel > Customs</span> om dit in te stellen per product.
+                </p>
+
+                <h3 id="2_E_C">2.5.3 Default customs origin</h3>
+                <p>
+                    Geef hier aan welk land van herkomst er moet worden gebruikt als er geen land is ingevuld bij het product. Ga naar <span class="nice">Catalogus > Producten > <i>-product-</i> > Modules > MyParcel > Customs</span> om dit in te stellen per product.
+                </p>
+                <h3 id="2_E_D">2.5.4 Default customs age check</h3>
+                <p>
+                    Wanneer er standaard op leeftijd moet worden gecontroleerd, kies je hier voor 'Ja'.<br> Ga naar <span class="nice">Catalogus > Producten > <i>-product-</i> > Modules > MyParcel > Customs</span> om dit in te stellen per product.
+                </p>
+
+                <h2 id="2_F">2.6 Vervoerders opties</h2>
+                <img src="media/prestashop_deliveryoptions.png" alt="Delivery_options">
+                <p>
+                    Klik op 'Wijzig' om de bezorgopties voor PostNL aan te passen.
+                </p>
+
+                <h3 id="2_F_A">2.6.1 Checkout delivery form</h3>
+                <p>
+                    Stel hier de titel van de bezorgopties in. Dit zal boven de bezorgopties qorden getoond in de checkout. Geef hier ook aan op welke dagen je de pakketten bij PostNL inlevert en welke cut-off tijd je hiervoor aanhoudt. De bezorgopties zullen aan de hand van deze gegevens worden getoond.
+                </p>
+                <p>
+                    Geef ook aan welke dagen afwijken van de standaard drop off days, bijvoorbeeld bij feestdagen of vakanties.
+                </p>
+                <p>
+                    Met <strong>'Delivery days window'</strong> optie kun je aangeven tot hoever in de toekomst jouw klanten een leverdag kunnen kiezen. Wannerr je kiest voor 'Hide days' worden er geen dagen getoond in de checkout.
+                </p>
+                <p>
+                    Bij <strong>'Drop off delay'</strong> geef je aan hoeveel dagen er nodig zijn tot een pakket kan worden verstuurd. Bijvoorbeeld wanneer je het product nog moet maken op het moment van bestellen.
+                </p>
+                <p>
+                    Bij de verschillende bezorgopties is het mogelijk een toeslag in te stellen. Deze zal worden getoond in de checkout en worden doorberekend aan jouw klant.
+                </p>
+
+                <h3 id="2_F_B">2.6.2 Delivery</h3>
+                <p>
+                    Stel hier in welk pakkettype er standaard moet worden gebruikt, wanneer er geen pakkettype is ingevuld bij het product. Om dit bij het product in te stellen, ga je naar <span class="nice">Catalogus > Producten > <i>-product-</i> > Modules > MyParcel > Delivery</span> en stel je de juiste waarden voor dat product in.
+                </p>
+                <p>
+                    Je kunt er hier ook voor kiezen om alle zendingen een bezorgoptie mee te geven. <span class="nice">Let op: Dit kan alleen voor pakketten binnen Nederland!</span>
+                </p>
+                <h3 id="2_F_C">2.6.3 Returns</h3>
+                <p>
+                    Stel hier in welk pakkettype er standaard moet worden gebruikt voor retourzendingen.
+                </p>
+
+                <h1 id="3">3 Gebruik van de plugin</h1>
+<!--                <h2 id="3_A">3.1 Aanmaken van labels</h2>-->
+	            <p>
+		            Het aanmaken van labels kan op verschillende manieren. Je kunt dit doen vanuit het bestellingenoverzicht zoals te zien is op onderstaand filmpje. Op deze manier maak je gemakkelijk meerdere labels tegelijk aan.
+	            </p>
+	            <video width="100%" controls>
+		            <source src="media/prestashop_createlabel_part1.mp4" type="video/mp4">
+	            </video>
+	            <p>
+		            Ook kun je het pakkettype per zending vanuit het bestellingoverzicht wijzigen. Dit doe je door op 'Aanmaken' te klikken bij de bestelling en een ander pakkettype te kiezen en op te slaan. In het filmpje wordt getoond hoe je dit doet.
+	            </p>
+	            <video width="100%" controls>
+		            <source src="media/prestashop_createlabel_part2.mp4" type="video/mp4">
+	            </video>
+	            <p>
+		            Ook wanneer je een bestelling opent, kun je labels aanmaken. Hoe je dit doet, zie je in onderstaand filmpje.
+	            </p>
+	            <video width="100%" controls>
+		            <source src="media/prestashop_createlabel_part3.mp4" type="video/mp4">
+	            </video>
+
+                <footer class="site-footer">
+                    <p>
+                        <span class="site-footer-owner">MyParcel</span>
+                    </p>
+                    <span class="site-footer-credits">
+                            <strong>Adres </strong>Antareslaan 31, 2132 JE Hoofddorp<br />
+                            <strong>Telefoon </strong>023 30 30 315&nbsp
+                            <strong>E-mail</strong> &nbsp;info@myparcel.nl<br />
+                            <strong>Website </strong><a href="https://www.myparcel.nl">www.myparcel.nl</a>&nbsp;
+                            <strong>IBAN </strong>NL48ABNA0447850539&nbsp;<br />
+                            <strong>KvK </strong>Amsterdam 34 09 97 58
+                            <strong>BTW-nr. </strong>NL8045.33.258.B01
+                        </span>
+                    <br />
+                    &nbsp;
+                </footer>
+            </div>
+        </section>
+    </div>
+</div>
+<script>
+    // Set postman button attributes in one place
+    postman_buttons = document.getElementsByClassName('postman-run-button');
+
+    for (i = 0; i < postman_buttons.length; i++) {
+        postman_buttons[i].setAttribute('data-postman-action', 'collection/import');
+        postman_buttons[i].setAttribute('data-postman-var-1', '065786285c2e5ed75509');
+        postman_buttons[i].setAttribute('data-postman-param', 'env%5BMyParcel%20public%5D=W3siZW5hYmxlZCI6dHJ1ZSwia2V5IjoiYXBpX2tleSIsInZhbHVlIjoiIn0seyJrZXkiOiJVc2VyLUFnZW50IiwidmFsdWUiOiJ7e1VzZXItQWdlbnR9fSIsImRlc2NyaXB0aW9uIjoiIiwiZW5hYmxlZCI6dHJ1ZX0seyJrZXkiOiJhdXRoX3Rva2VuIiwidmFsdWUiOiIiLCJkZXNjcmlwdGlvbiI6IiIsImVuYWJsZWQiOnRydWV9XQ==');
+    }
+
+    (function (p,o,s,t,m,a,n) {
+        !p[s] && (p[s] = function () { (p[t] || (p[t] = [])).push(arguments); });
+        !o.getElementById(s+t) && o.getElementsByTagName("head")[0].appendChild((
+            (n = o.createElement("script")),
+                (n.id = s+t), (n.async = 1), (n.src = m), n
+        ));
+    }(window, document, "_pm", "PostmanRunObject", "https://run.pstmn.io/button.js"));
+</script>
+
+</body>
+</html>
