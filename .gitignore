@@ -2,10 +2,13 @@
 config*.xml
 
 # 3rdParty
-vendor/
+dist/
 node_modules/
+vendor/
+views/dist/
 .php_cs.cache
 .php-cs-fixer.cache
 
 # OS files
 .DS_Store
+
