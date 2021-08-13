@@ -1,0 +1,13 @@
+{
+  "preset": "conventionalcommits",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    ["@semantic-release/github", {
+      "assets": [
+        { "path": "dist/myparcelbe.zip", "label": "MyParcelBE <%= nextRelease.gitTag %>" },
+        { "path": "dist/myparcelnl.zip", "label": "MyParcelNL <%= nextRelease.gitTag %>" }
+      ]
+    }],
+    "@semantic-release/release-notes-generator"
+  ]
+}

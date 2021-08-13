@@ -1,0 +1,15 @@
+{
+  "extends": "@myparcel/eslint-config/preset-es6",
+  "overrides": [
+    {
+      "files": [
+        "./gulpfile.js",
+        "./private/**/*"
+      ],
+      "env": {
+        "node": true,
+        "browser": false
+      }
+    }
+  ]
+}
