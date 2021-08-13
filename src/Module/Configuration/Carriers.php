@@ -3,6 +3,7 @@
 namespace Gett\MyparcelBE\Module\Configuration;
 
 use Db;
+use Link;
 use Carrier;
 use Currency;
 use Configuration;
@@ -37,7 +38,9 @@ class Carriers extends AbstractForm
         if (Tools::isSubmit('addNewMyparcelCarrierSettings') 
             || Tools::isSubmit('submitAddMyparcelCarrierSettingsAndStay')) {
                 $this->createNewCarrier();
-            return $this->getList();
+            
+            $this->cookie->{'myparcelbe.message'} = $this->module->l('A new carrier has been added to myparcel');
+            $this->redirectToCarrierList();
         }
 
         if (Tools::isSubmit('addcarrier')
@@ -45,7 +48,35 @@ class Carriers extends AbstractForm
             return $this->getForm(true);
         }
 
-        return $this->getList();
+        return $this->getMessage().$this->getList();
+    }
+
+    protected function redirectToCarrierList(): void
+    {
+        // Redirect back to list
+        Tools::redirectAdmin((new Link())->getAdminLink('AdminModules', true, [], [
+            'configure' => 'myparcelbe',
+            'tab_module' => 'shipping_logistics',
+            'module_name' => 'myparcelbe',
+            'menu' => 5,
+        ]));
+    }
+
+    protected function getMessage(): string
+    {
+        if (!isset($this->cookie)) {
+            return '';
+        }
+
+        $message = $this->cookie->{'myparcelbe.message'};
+
+        if ($message) {
+            $message = $this->module->displayConfirmation($message);
+        }
+
+        unset($this->cookie->{'myparcelbe.message'});
+
+        return $message ?? '';
     }
 
     protected function getLegend(): string
