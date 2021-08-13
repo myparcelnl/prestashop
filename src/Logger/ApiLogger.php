@@ -4,9 +4,11 @@ namespace Gett\MyparcelBE\Logger;
 
 use Configuration;
 use Gett\MyparcelBE\Constant;
-use PrestaShopLogger;
 
-class Logger
+/**
+ * Only logs data if API Logging is enabled in the MyParcel settings.
+ */
+class ApiLogger extends Logger
 {
     /**
      * @param        $message
@@ -22,15 +24,8 @@ class Logger
         $severity = 1,
         $errorCode = null
     ) {
-        if ($is_exception || Configuration::get(Constant::API_LOGGING_CONFIGURATION_NAME)) {
-            PrestaShopLogger::addLog(
-                '[MYPARCEL] ' . $message,
-                $severity,
-                $errorCode,
-                null,
-                null,
-                $allowDuplicate
-            );
+        if (Configuration::get(Constant::API_LOGGING_CONFIGURATION_NAME)) {
+            parent::addLog($message, $is_exception, $allowDuplicate, $severity, $errorCode);
         }
     }
 }

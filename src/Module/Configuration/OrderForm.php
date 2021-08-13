@@ -8,6 +8,9 @@ use OrderState;
 
 class OrderForm extends AbstractForm
 {
+    public const SEND_NOTIFICATION_AFTER_FIRST_SCAN = 'first_scan';
+    public const SEND_NOTIFICATION_AFTER_PRINTED    = 'printed';
+
     protected $icon = 'cog';
 
     protected function getLegend(): string
@@ -94,12 +97,12 @@ class OrderForm extends AbstractForm
                 'options' => [
                     'query' => [
                         [
-                            'id' => 'first_scan',
-                            'name' => $this->module->l('Label has passed first scan', 'orderform')
+                            'id'   => self::SEND_NOTIFICATION_AFTER_FIRST_SCAN,
+                            'name' => $this->module->l('Label has passed first scan', 'orderform'),
                         ],
                         [
-                            'id' => 'printed',
-                            'name' => $this->module->l('Label is printed', 'orderform')
+                            'id'   => self::SEND_NOTIFICATION_AFTER_PRINTED,
+                            'name' => $this->module->l('Label is printed', 'orderform'),
                         ],
                     ],
                     'id' => 'id',

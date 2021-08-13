@@ -2,10 +2,10 @@
 
 namespace Gett\MyparcelBE\Service\Consignment;
 
-use Gett\MyparcelBE\OrderLabel;
 use Doctrine\ORM\EntityManagerInterface;
 use Gett\MyparcelBE\Service\MyparcelStatusProvider;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
+use OrderLabel;
 
 class Create
 {

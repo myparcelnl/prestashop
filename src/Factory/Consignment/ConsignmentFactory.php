@@ -8,8 +8,8 @@ use DateTime;
 use Exception;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
+use OrderLabel;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
-use Gett\MyparcelBE\OrderLabel;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Module;
@@ -343,7 +343,7 @@ class ConsignmentFactory
         if (!\Validate::isLoadedObject($carrier)) {
             throw new Exception('No carrier found.');
         }
-        
+
         $carrierType = CarrierConfigurationProvider::get($id_carrier, 'carrierType');
 
         if ($carrier->id_reference == $this->configuration::get(Constant::POSTNL_CONFIGURATION_NAME)

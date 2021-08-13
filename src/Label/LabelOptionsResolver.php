@@ -5,7 +5,7 @@ namespace Gett\MyparcelBE\Label;
 use Gett\MyparcelBE\Carrier\PackageFormatCalculator;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\OrderLabel;
+use OrderLabel;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 
@@ -13,7 +13,7 @@ class LabelOptionsResolver
 {
     public function getLabelOptions(array $params)
     {
-        $delivery_settings = OrderLabel::getOrderDeliveryOptions($params['id_order']);
+        $delivery_settings = OrderLabel::getOrderDeliveryOptions((int) $params['id_order']);
 
         $order_products = OrderLabel::getOrderProducts($params['id_order']);
 

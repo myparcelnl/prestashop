@@ -7,6 +7,16 @@ use Tools as ToolsPresta;
 class Tools extends ToolsPresta
 {
     /**
+     * @param mixed $value
+     *
+     * @return int|null
+     */
+    public static function intOrNull($value): ?int
+    {
+        return $value ? (int) $value : null;
+    }
+
+    /**
      * Clean comma, spaces and dot signs from numbers
      * @param string|int|float $val
      * @return string
@@ -22,6 +32,16 @@ class Tools extends ToolsPresta
         }
 
         return $number;
+    }
+
+    /**
+     * @param  object $object
+     *
+     * @return array
+     */
+    public static function objectToArray(object $object): array
+    {
+        return json_decode(json_encode($object), true);
     }
 
     /**

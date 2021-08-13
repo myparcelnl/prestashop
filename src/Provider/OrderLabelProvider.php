@@ -3,8 +3,8 @@
 namespace Gett\MyparcelBE\Provider;
 
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
-use Gett\MyparcelBE\OrderLabel;
 use Order;
+use OrderLabel;
 
 class OrderLabelProvider
 {

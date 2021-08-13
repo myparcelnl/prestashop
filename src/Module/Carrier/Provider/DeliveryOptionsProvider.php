@@ -3,7 +3,7 @@
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use DateTime;
-use Gett\MyparcelBE\OrderLabel;
+use OrderLabel;
 
 class DeliveryOptionsProvider
 {
@@ -12,7 +12,7 @@ class DeliveryOptionsProvider
 
     public function provide(int $orderId)
     {
-        $deliveryOptions = OrderLabel::getOrderDeliveryOptions($orderId);
+        $deliveryOptions = OrderLabel::getOrderDeliveryOptions( $orderId);
         if (empty($deliveryOptions)) {
             $deliveryOptions = json_decode(json_encode(['date' => '']));
         }

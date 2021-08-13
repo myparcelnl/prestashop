@@ -1,31 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Service;
 
-use MyParcelNL\Sdk\src\Model\MyParcelRequest;
 use Gett\MyparcelBE\Model\MyParcelRequest as Request;
+use Gett\MyparcelBE\Service\Concern\HasApiKey;
+use MyParcelNL\Sdk\src\Model\MyParcelRequest;
 
-class Tracktrace
+class Tracktrace extends AbstractEndpoint
 {
-    private $api_key;
+    use HasApiKey;
 
-    public function __construct(string $api_key)
-    {
-        $this->api_key = $api_key;
-    }
-
-    public function getTrackTrace(int $id_label, $withDeliveryMoment = false)
+    /**
+     * @param  int  $shipmentId
+     * @param  bool $withDeliveryMoment
+     *
+     * @return mixed|null
+     * @throws \MyParcelNL\Sdk\src\Exception\ApiException
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     */
+    public function getTrackTrace(int $shipmentId, bool $withDeliveryMoment = false)
     {
         $extraInfo = $withDeliveryMoment ? '?extra_info=delivery_moment' : '';
-        $request = (new MyParcelRequest())
-            ->setUserAgent('prestashop' . '/' . _PS_VERSION_)
+        $request   = $this->createRequest()
             ->setRequestParameters(
-                $this->api_key,
-                '',
+                $this->apiKey,
+                null,
                 MyParcelRequest::REQUEST_HEADER_RETRIEVE_SHIPMENT
             )
-            ->sendRequest('GET', Request::REQUEST_TYPE_TRACKTRACE . "/{$id_label}" . $extraInfo)
-        ;
+            ->sendRequest('GET', Request::REQUEST_TYPE_TRACKTRACE . "/{$shipmentId}{$extraInfo}");
 
         return $request->getResult();
     }

@@ -7,7 +7,6 @@ use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
 use Gett\MyparcelBE\Module\Tools\Tools;
-use Gett\MyparcelBE\OrderLabel;
 use Gett\MyparcelBE\Provider\OrderLabelProvider;
 use Gett\MyparcelBE\Service\Consignment\Download;
 use Gett\MyparcelBE\Service\DeliverySettingsProvider;
@@ -57,7 +56,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 $consignment = (ConsignmentFactorySdk::createByCarrierId(PostNLConsignment::CARRIER_ID))
                     ->setApiKey(Configuration::get(Constant::API_KEY_CONFIGURATION_NAME))
                     ->setReferenceId($order->id)
-                    ->setCountry(CountryCore::getIsoById($address->id_country))
+                    ->setCountry(Country::getIsoById($address->id_country))
                     ->setPerson($address->firstname . ' ' . $address->lastname)
                     ->setFullStreet($address->address1)
                     ->setPostalCode($address->postcode)
@@ -807,7 +806,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             $consignment = (ConsignmentFactorySdk::createByCarrierId($factory->getMyParcelCarrierId($order->id_carrier)))
                 ->setApiKey(Configuration::get(Constant::API_KEY_CONFIGURATION_NAME))
                 ->setReferenceId($order->id)
-                ->setCountry(CountryCore::getIsoById($address->id_country))
+                ->setCountry(Country::getIsoById($address->id_country))
                 ->setPerson($postValues['label_name'] ?? ($address->firstname . ' ' . $address->lastname))
                 ->setFullStreet($address->address1)
                 ->setPostalCode($address->postcode)

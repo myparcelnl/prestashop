@@ -1,63 +1,105 @@
 <?php
 
-if (!defined('_PS_VERSION_')) {
+declare(strict_types=1);
+
+use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Model\Webhook\WebhookException;
+use Gett\MyparcelBE\Model\Webhook\WebhookPayloadFactory;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+
+if (! defined('_PS_VERSION_')) {
     return;
 }
 
-require_once dirname(__FILE__) . '/../../myparcelbe.php';
-
-class MyParcelBEHookModuleFrontController extends ModuleFrontController
+class MyParcelBEHookModuleFrontController extends FrontController
 {
-    public $module;
-
     /**
      * Initialize content and block unauthorized calls.
-     *
-     * @throws Adapter_Exception
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     * @throws ErrorException
      *
      * @since 2.0.0
      */
     public function initContent()
     {
-        if (!Module::isEnabled('myparcelbe')) {
-            header('Content-Type: application/json; charset=utf8');
-            die(json_encode(['data' => ['message' => 'Module is not enabled']]));
+        if (! Module::isEnabled(MyParcelBE::MODULE_NAME)) {
+            $this->sendResponse(400, 'Module is not enabled');
         }
 
         $this->processWebhook();
 
-        die('1');
+        Response::create()->setStatusCode(204)->send();
+        die(0);
     }
 
-    protected function processWebhook()
+    /**
+     * Disable the maintenance page
+     */
+    protected function displayMaintenancePage(): void { }
+
+    /**
+     * Handle the webhook.
+     */
+    protected function processWebhook(): void
     {
-        $content = file_get_contents('php://input');
-        // @codingStandardsIgnoreEnd
-        if (Configuration::get(\Gett\MyparcelBE\Constant::API_LOGGING_CONFIGURATION_NAME)) {
-            $logContent = ($content);
-            \Gett\MyparcelBE\Logger\Logger::addLog("MyParcel - incoming webhook\n{$logContent}");
+        if (! $this->validateHash()) {
+            $this->sendResponse(400, 'Invalid hash');
         }
 
-        $data = @json_decode($content, true);
-        if (isset($data['data']['hooks']) && is_array($data['data']['hooks'])) {
-            foreach ($data['data']['hooks'] as &$item) {
-                if (isset($item['shipment_id'], $item['status'], $item['barcode'])
-                ) {
-                    \Gett\MyparcelBE\OrderLabel::updateStatus($item['shipment_id'], $item['barcode'], $item['status']);
-                }
+        $content = file_get_contents('php://input');
+
+        if (Configuration::get(Constant::API_LOGGING_CONFIGURATION_NAME)) {
+            ApiLogger::addLog("Incoming webhook: $content");
+        }
+
+        $data     = json_decode($content, true);
+        $hookData = $data['data']['hooks'] ?? null;
+
+        if (! is_array($hookData)) {
+            ApiLogger::addLog('Invalid data format', true);
+            $this->sendResponse(400, 'Invalid data format');
+        }
+
+        foreach ($hookData as $webhook) {
+            try {
+                $webhook = WebhookPayloadFactory::create($webhook);
+            } catch (WebhookException $e) {
+                ApiLogger::addLog($e->getMessage(), true);
+                continue;
             }
 
-            die('0');
+            $webhook->onReceive();
         }
-
-        die('1');
     }
 
-    protected function displayMaintenancePage()
+    /**
+     * @param  int    $statusCode
+     * @param  string $message
+     */
+    protected function sendResponse(int $statusCode, string $message): void
     {
-        // Disable the maintenance page
+        JsonResponse::create([
+            'data' => [
+                'message' => $message,
+            ],
+        ])
+            ->setStatusCode($statusCode)
+            ->send();
+        die(1);
+    }
+
+    /**
+     * @return bool
+     */
+    private function validateHash(): bool
+    {
+        $hash = $_REQUEST['hash'] ?? null;
+
+        if (! $hash || $hash !== Configuration::get(Constant::WEBHOOK_HASH_CONFIGURATION_NAME)) {
+            ApiLogger::addLog('Invalid webhook hash used: ' . $hash);
+            return false;
+        }
+
+        return true;
     }
 }
