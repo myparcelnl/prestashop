@@ -21,6 +21,7 @@ class MyParcelBE extends CarrierModule
     use \Gett\MyparcelBE\Module\Hooks\OrderHooks;
 
     public const MODULE_NAME = 'myparcelbe';
+    public const VERSION = '1.1.0';
 
     public $baseUrl;
     public $id_carrier;
@@ -106,7 +107,7 @@ class MyParcelBE extends CarrierModule
     {
         $this->name = self::MODULE_NAME;
         $this->tab = 'shipping_logistics';
-        $this->version = '1.1.0';
+        $this->version = self::VERSION;
         $this->author = 'Gett';
         $this->need_instance = 1;
         $this->bootstrap = true;
