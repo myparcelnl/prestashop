@@ -35,11 +35,10 @@ class Carriers extends AbstractForm
             return $this->getForm();
         }
 
-        if (Tools::isSubmit('addNewMyparcelCarrierSettings') 
+        if (Tools::isSubmit('addNewMyparcelCarrierSettings')
             || Tools::isSubmit('submitAddMyparcelCarrierSettingsAndStay')) {
-                $this->createNewCarrier();
-            
-            $this->cookie->{'myparcelbe.message'} = $this->module->l('A new carrier has been added to myparcel');
+            $this->createNewCarrier();
+            $this->context->cookie->{'myparcelbe.message'} = $this->module->l('A new carrier has been added to myparcel');
             $this->redirectToCarrierList();
         }
 
@@ -64,17 +63,17 @@ class Carriers extends AbstractForm
 
     protected function getMessage(): string
     {
-        if (!isset($this->cookie)) {
+        if (!isset($this->context->cookie)) {
             return '';
         }
 
-        $message = $this->cookie->{'myparcelbe.message'};
+        $message = $this->context->cookie->{'myparcelbe.message'};
 
         if ($message) {
             $message = $this->module->displayConfirmation($message);
         }
 
-        unset($this->cookie->{'myparcelbe.message'});
+        unset($this->context->cookie->{'myparcelbe.message'});
 
         return $message ?? '';
     }
@@ -291,7 +290,7 @@ class Carriers extends AbstractForm
             $carrier->shipping_method = 2;
             $carrier->update();
         }
-        
+
         if($isInsert) {
             Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
         }
@@ -348,7 +347,7 @@ class Carriers extends AbstractForm
                 ],
             ];
         }
-        
+
 
         $helper = new \HelperForm();
 
@@ -663,16 +662,16 @@ class Carriers extends AbstractForm
             'cutoff_time' => $cutoffTimeValues,
             'desc' => [
                 sprintf($this->module->l(
-                    'This option allows the Merchant to set the days he normally goes to %s to hand in the 
+                    'This option allows the Merchant to set the days he normally goes to %s to hand in the
                         parcels. Monday is 1 and Saturday is 6.',
                     'carriers'
                 ), $carrier->name),
                 sprintf($this->module->l(
-                    'The Cutoff Time option allows the Merchant to indicate the latest cut-off time before an order will 
-                        still be picked, packed and dispatched on the same/first set dropoff day, taking into account 
-                        the dropoff-delay. Industry standard default time is 17:00. For example, if cutoff time is 
-                        17:00, Monday is a delivery day and there\'s no delivery delay; all orders placed Monday 
-                        before 17:00 will be dropped of at %s on that same Monday in time for the Monday collection 
+                    'The Cutoff Time option allows the Merchant to indicate the latest cut-off time before an order will
+                        still be picked, packed and dispatched on the same/first set dropoff day, taking into account
+                        the dropoff-delay. Industry standard default time is 17:00. For example, if cutoff time is
+                        17:00, Monday is a delivery day and there\'s no delivery delay; all orders placed Monday
+                        before 17:00 will be dropped of at %s on that same Monday in time for the Monday collection
                         and delivery on Tuesday.',
                     'carriers'
                 ), $carrier->name),
@@ -702,10 +701,10 @@ class Carriers extends AbstractForm
                 'name' => 'name',
             ],
             'desc' => sprintf($this->module->l(
-                'This option allows the Merchant to set the number of days into the future for which he wants to 
-                show his consumers delivery options. For example; If set to 3 (days) in his checkout, a consumer 
-                ordering on Monday will see possible delivery options for Tuesday, Wednesday and Thursday (provided 
-                there is no drop-off delay, it\'s before the cut-off time and he goes to %s on Mondays). Min. is 
+                'This option allows the Merchant to set the number of days into the future for which he wants to
+                show his consumers delivery options. For example; If set to 3 (days) in his checkout, a consumer
+                ordering on Monday will see possible delivery options for Tuesday, Wednesday and Thursday (provided
+                there is no drop-off delay, it\'s before the cut-off time and he goes to %s on Mondays). Min. is
                 1 and max. is 14.',
                 'carriers'
             ), $carrier->name),
@@ -721,7 +720,7 @@ class Carriers extends AbstractForm
                 'name' => 'name',
             ],
             'desc' => sprintf($this->module->l(
-                'This option allows the Merchant to set the number of days it takes him to pick, pack and hand in 
+                'This option allows the Merchant to set the number of days it takes him to pick, pack and hand in
                 his parcel at %s when ordered before the cutoff time. By default this is 0 and max. is 14.',
                 'carriers'
             ), $carrier->name),
@@ -744,9 +743,9 @@ class Carriers extends AbstractForm
                 'label' => $this->module->l('Allow Monday delivery', 'carriers'),
                 'name' => 'allowMondayDelivery',
                 'desc' => sprintf($this->module->l(
-                    'Monday delivery is only possible when the package is delivered before 15.00 on Saturday at 
-                    the designated %s locations. Note: To activate Monday delivery value 6 must be given with 
-                    dropOffDays and value 1 must be given by monday_delivery. On Saturday the cutoffTime must be before 
+                    'Monday delivery is only possible when the package is delivered before 15.00 on Saturday at
+                    the designated %s locations. Note: To activate Monday delivery value 6 must be given with
+                    dropOffDays and value 1 must be given by monday_delivery. On Saturday the cutoffTime must be before
                     15:00 (14:30 recommended) so that Monday will be shown.',
                     'carriers'
                 ), $carrier->name),
@@ -795,9 +794,9 @@ class Carriers extends AbstractForm
                 'label' => $this->module->l('Allow morning delivery', 'carriers'),
                 'name' => 'allowMorningDelivery',
                 'desc' => sprintf($this->module->l(
-                    'Monday delivery is only possible when the package is delivered before 15.00 on Saturday at the 
-                    designated %s locations. Note: To activate Monday delivery value 6 must be given with 
-                    dropOffDays and value 1 must be given by monday_delivery. On Saturday the cutoffTime must be before 
+                    'Monday delivery is only possible when the package is delivered before 15.00 on Saturday at the
+                    designated %s locations. Note: To activate Monday delivery value 6 must be given with
+                    dropOffDays and value 1 must be given by monday_delivery. On Saturday the cutoffTime must be before
                     15:00 (14:30 recommended) so that Monday will be shown.',
                     'carriers'
                 ), $carrier->name),
@@ -890,8 +889,8 @@ class Carriers extends AbstractForm
                 'label' => $this->module->l('Allow Saturday delivery', 'carriers'),
                 'name' => 'allowSaturdayDelivery',
                 'desc' => sprintf($this->module->l(
-                    'Saturday delivery is only possible when the package is delivered before 15:00 on Friday 
-                    at the designated %s locations. Note: To allow Saturday delivery, Friday must be enabled in 
+                    'Saturday delivery is only possible when the package is delivered before 15:00 on Friday
+                    at the designated %s locations. Note: To allow Saturday delivery, Friday must be enabled in
                     Drop-off days.',
                     'carriers'
                 ), $carrier->name),
@@ -1038,8 +1037,8 @@ class Carriers extends AbstractForm
                 'suffix' => $currency->getSign(),
                 'class' => 'col-lg-2',
                 'desc' => $this->module->l(
-                    'It\'s possible to fill in a positive or negative amount. Would you like to give a discount 
-                    for the use of this feature or would you like to calculate extra costs? If the amount is negative 
+                    'It\'s possible to fill in a positive or negative amount. Would you like to give a discount
+                    for the use of this feature or would you like to calculate extra costs? If the amount is negative
                     the price will appear green in the checkout.',
                     'carriers'
                 ),
@@ -1289,7 +1288,7 @@ class Carriers extends AbstractForm
         $carrierName = Tools::getValue('carrierName');
 
         $image = 'postnl.jpg';
-        
+
         if ($this->module->isBE()) {
             $image = 'dpd.jpg';
             if ($carrierType == Constant::BPOST_CARRIER_NAME) {
@@ -1308,7 +1307,7 @@ class Carriers extends AbstractForm
             $carrier = $this->addCarrier(
                 ['name' => $carrierName, 'image' => $image]
             );
-            
+
             $this->addZones($carrier);
             $this->addGroups($carrier);
             $this->addRanges($carrier);
