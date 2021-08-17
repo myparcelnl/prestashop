@@ -15,6 +15,7 @@ use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Module;
 use MyParcelBE;
+use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as ConsignmentSdkFactory;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
@@ -23,6 +24,7 @@ use MyParcelNL\Sdk\src\Model\Consignment\BpostConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
+use MyParcelNL\Sdk\src\Support\Arr;
 use Order;
 use Tools;
 use Validate;
@@ -40,7 +42,7 @@ class ConsignmentFactory
     private $carrierSettings;
 
     /**
-     * @var \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @var AbstractDeliveryOptionsAdapter
      */
     private $deliveryOptions;
 
@@ -65,9 +67,9 @@ class ConsignmentFactory
     private $orderData;
 
     /**
-     * @param string        $apiKey
-     * @param array         $request
-     * @param Module        $module
+     * @param string $apiKey
+     * @param array  $request
+     * @param Module $module
      */
     public function __construct(string $apiKey, array $request, Module $module)
     {
@@ -77,7 +79,7 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  array $orders
+     * @param array $orders
      *
      * @return MyParcelCollection
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
@@ -101,7 +103,7 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  array $order
+     * @param array $order
      *
      * @return MyParcelCollection
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
@@ -146,7 +148,7 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  array $order
+     * @param array $order
      *
      * @throws \Exception
      */
@@ -173,7 +175,7 @@ class ConsignmentFactory
             ->setReferenceId($this->orderData['id_order'])
             ->setPackageType($this->getPackageType())
             ->setDeliveryDate($this->getDeliveryDate())
-            ->setDeliveryType($this->deliveryOptions->getDeliveryType())
+            ->setDeliveryType($this->getDeliveryType())
             ->setLabelDescription($this->getFormattedLabelDescription())
             ->setTotalWeight((new OrderTotalWeight())->convertWeightToGrams($floatWeight));
     }
@@ -217,6 +219,16 @@ class ConsignmentFactory
         }
 
         return $deliveryDateTime;
+    }
+
+    /**
+     * @return int
+     */
+    private function getDeliveryType(): int
+    {
+        $deliveryTypeId = Arr::get(AbstractConsignment::DELIVERY_TYPES_NAMES_IDS_MAP, $this->deliveryOptions->getDeliveryType());
+
+        return $deliveryTypeId ?? AbstractConsignment::DELIVERY_TYPE_STANDARD;
     }
 
     /**
@@ -292,7 +304,7 @@ class ConsignmentFactory
      */
     private function hasOnlyRecipient(): bool
     {
-        $shipmentOptions = $this->deliveryOptions->getShipmentOptions();
+        $shipmentOptions  = $this->deliveryOptions->getShipmentOptions();
         $hasOnlyRecipient = $shipmentOptions && $shipmentOptions->hasOnlyRecipient();
 
         if ($this->consignment instanceof PostNLConsignment && $hasOnlyRecipient) {
@@ -605,7 +617,7 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  int $carrierId
+     * @param int $carrierId
      *
      * @return int
      * @throws \Exception
