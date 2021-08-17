@@ -21,7 +21,7 @@ class MyParcelBE extends CarrierModule
     use \Gett\MyparcelBE\Module\Hooks\OrderHooks;
 
     public const MODULE_NAME = 'myparcelbe';
-    public const VERSION = '1.1.0';
+    public const VERSION = '1.1.1';
 
     public $baseUrl;
     public $id_carrier;
