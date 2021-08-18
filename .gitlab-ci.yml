@@ -10,10 +10,10 @@ cache:
 
 .script:
   rename:
-    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/myparcelbe/myparcelnl/" {} \;
-    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/MyparcelBE/MyparcelNL/" {} \;
-    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/MyParcelBE/MyParcelNL/" {} \;
-    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/MYPARCELBE/MYPARCELNL/" {} \;
+    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/myparcelbe/myparcelnl/g" {} \;
+    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/MyparcelBE/MyparcelNL/g" {} \;
+    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/MyParcelBE/MyParcelNL/g" {} \;
+    - find . -type d \( -name node_modules -o -name .git -o -name vendor \) -prune -false -o -type f \( ! -iname "*.png" ! -iname "*.jpg" \) -exec sed -i "s/MYPARCELBE/MYPARCELNL/g" {} \;
     - mv myparcelbe.php myparcelnl.php
     - mv controllers/admin/AdminMyParcelBEController.php controllers/admin/AdminMyParcelNLController.php
     - mv controllers/admin/AdminMyParcelBELabelController.php controllers/admin/AdminMyParcelNLLabelController.php
