@@ -19,7 +19,7 @@ cache:
     - mv controllers/admin/AdminMyParcelBELabelController.php controllers/admin/AdminMyParcelNLLabelController.php
   prepare:
     - php -v
-    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts --no-dev
     - npm --version
     - npm ci
   build:

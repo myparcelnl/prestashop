@@ -186,9 +186,9 @@ class ConsignmentFactory
     private function getPackageType(): int
     {
         $packageType = $this->request['packageType'] ?? (new PackageTypeCalculator())->getOrderPackageType(
-                $this->orderData['id_order'],
-                $this->orderData['id_carrier']
-            );
+            $this->orderData['id_order'],
+            $this->orderData['id_carrier']
+        );
 
         if (! isset($this->carrierSettings['delivery']['packageType'][(int) $packageType])) {
             $packageType = AbstractConsignment::PACKAGE_TYPE_PACKAGE; // TODO: for NL the DPD and Bpost don't allow any.

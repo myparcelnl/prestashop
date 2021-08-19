@@ -112,7 +112,7 @@ class DeliverySettingsProvider
                 break;
             }
         }
-        
+
         $shippingOptions = $this->module->getShippingOptions($this->idCarrier, $address);
 
         $taxRate = $shippingOptions['tax_rate'];

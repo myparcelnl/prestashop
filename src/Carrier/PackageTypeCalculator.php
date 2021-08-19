@@ -17,7 +17,7 @@ class PackageTypeCalculator extends AbstractPackageCalculator
     {
         $carrierType = CarrierConfigurationProvider::get($idCarrier, 'carrierType');
 
-        if  (!is_null($carrierType)
+        if (!is_null($carrierType)
         && in_array($carrierType, [Constant::BPOST_CARRIER_NAME, Constant::DPD_CARRIER_NAME, Constant::POSTNL_CARRIER_NAME])) {
             return true;
         }
@@ -44,7 +44,8 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         }
 
         $packageType = (int) CarrierConfigurationProvider::get(
-            $id_carrier, Constant::PACKAGE_TYPE_CONFIGURATION_NAME
+            $id_carrier,
+            Constant::PACKAGE_TYPE_CONFIGURATION_NAME
         );
 
         return $packageType ?: 1;

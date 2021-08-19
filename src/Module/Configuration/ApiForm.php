@@ -92,8 +92,8 @@ class ApiForm extends AbstractForm
     {
         $parent        = parent::update();
         $apiKeyChanged = Tools::getValue(Constant::API_KEY_CONFIGURATION_NAME) !== Configuration::get(
-                Constant::API_KEY_CONFIGURATION_NAME
-            );
+            Constant::API_KEY_CONFIGURATION_NAME
+        );
 
         try {
             if ($apiKeyChanged || Tools::isSubmit('resetHook')) {

@@ -1,15 +1,21 @@
 {
   "name": "gett/myparcelbe",
-  "description": "PrestaShop module to integrate with MyParcel NL and\nMyParcel BE",
+  "description": "PrestaShop module to integrate with MyParcel NL and MyParcel BE",
   "require": {
     "php": ">=7.2.0",
     "myparcelnl/sdk": "^5.2"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.0"
   },
   "autoload": {
     "psr-4": {
       "Gett\\MyparcelBE\\": "src/"
     },
-    "classmap": ["myparcelbe.php", "src/Model/OrderLabel.php"],
+    "classmap": [
+      "myparcelbe.php",
+      "src/Model/OrderLabel.php"
+    ],
     "exclude-from-classmap": []
   },
   "config": {
@@ -17,5 +23,8 @@
     "prepend-autoloader": false
   },
   "type": "prestashop-module",
-  "license": "General terms and conditions <https://gettonline.com/terms-and-conditions/>"
+  "license": "General terms and conditions <https://gettonline.com/terms-and-conditions/>",
+  "scripts": {
+    "format": "vendor/bin/php-cs-fixer fix ."
+  }
 }

@@ -742,8 +742,10 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         try {
             $collection = MyParcelCollection::findMany(
                 $labelIds,
-                Configuration::get(Constant::API_KEY_CONFIGURATION_NAME
-                ));
+                Configuration::get(
+                    Constant::API_KEY_CONFIGURATION_NAME
+                )
+            );
 
             $collection->setLinkOfLabels();
             Logger::addLog($collection->toJson());

@@ -38,10 +38,10 @@ class ExclusiveField
     {
         $carrierReference = (int) $carrier->id_reference;
         $carrierType = null;
-        
+
         $configurationPsCarrierType = CarrierConfigurationProvider::get((int) $carrier->id, 'carrierType');
 
-        if(!is_null($configurationPsCarrierType)) {
+        if (!is_null($configurationPsCarrierType)) {
             switch ($configurationPsCarrierType) {
                 case Constant::DPD_CARRIER_NAME:
                     $carrierType = 'DPD';

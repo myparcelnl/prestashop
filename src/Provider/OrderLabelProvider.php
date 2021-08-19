@@ -35,5 +35,4 @@ class OrderLabelProvider
     {
         return OrderLabel::getOrderIdByLabelId($labelId);
     }
-
 }

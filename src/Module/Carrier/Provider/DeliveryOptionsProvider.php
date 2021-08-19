@@ -12,7 +12,7 @@ class DeliveryOptionsProvider
 
     public function provide(int $orderId)
     {
-        $deliveryOptions = OrderLabel::getOrderDeliveryOptions( $orderId);
+        $deliveryOptions = OrderLabel::getOrderDeliveryOptions($orderId);
         if (empty($deliveryOptions)) {
             $deliveryOptions = json_decode(json_encode(['date' => '']));
         }

@@ -311,7 +311,7 @@ class MyParcelBE extends CarrierModule
         $displayTaxLabel = (Configuration::get('PS_TAX') && !Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
 
         return [
-            'tax_rate' => ($includeTax)? $taxRate : 1,
+            'tax_rate' => ($includeTax) ? $taxRate : 1,
             'include_tax' => $includeTax,
             'display_tax_label' => $displayTaxLabel,
         ];

@@ -173,7 +173,7 @@ class Installer
                 $insert = [];
                 foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
                     $insert[] = ['id_carrier' => $carrier->id, 'name' => $item, 'value' => ''];
-                }   
+                }
 
                 Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
 

@@ -21,7 +21,8 @@ class PackageFormatCalculator extends AbstractPackageCalculator
         }
 
         $packageFormat = CarrierConfigurationProvider::get(
-            $id_carrier, Constant::PACKAGE_FORMAT_CONFIGURATION_NAME
+            $id_carrier,
+            Constant::PACKAGE_FORMAT_CONFIGURATION_NAME
         );
 
         return $packageFormat ?: 1;

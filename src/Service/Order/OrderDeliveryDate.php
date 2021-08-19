@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gett\MyparcelBE\Service\Order;
-
 
 use DateTime;
 use Gett\MyparcelBE\Constant;

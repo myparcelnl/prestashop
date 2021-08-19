@@ -189,7 +189,7 @@ class Carriers extends AbstractForm
         $carrierType = CarrierConfigurationProvider::get($carrierId, 'carrierType');
 
         // if carrier is not found and not insert, should be insert
-        if(is_null($carrierType) && !$isInsert) {
+        if (is_null($carrierType) && !$isInsert) {
             $isInsert = true;
         }
 
@@ -207,7 +207,7 @@ class Carriers extends AbstractForm
         $insert = [];
 
         foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $field) {
-            if(!isset($postFields[$field]) && $field === 'carrierType') {
+            if (!isset($postFields[$field]) && $field === 'carrierType') {
                 continue;
             }
 
@@ -266,7 +266,7 @@ class Carriers extends AbstractForm
                 }
             }
 
-            if(!$isInsert) {
+            if (!$isInsert) {
                 CarrierConfigurationProvider::updateValue($carrierId, $field, $updatedValue);
             } else {
                 $insert[] = [
@@ -279,7 +279,7 @@ class Carriers extends AbstractForm
 
         $carrier = new Carrier($carrierId);
 
-        if($carrier->external_module_name !== $this->module->name) {
+        if ($carrier->external_module_name !== $this->module->name) {
             $carrier->external_module_name = 'myparcelbe';
             $carrier->is_module = true;
             $carrier->active = 1;
@@ -291,7 +291,7 @@ class Carriers extends AbstractForm
             $carrier->update();
         }
 
-        if($isInsert) {
+        if ($isInsert) {
             Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
         }
     }
@@ -336,7 +336,7 @@ class Carriers extends AbstractForm
         ];
 
         // Add save and stay if not new
-        if(!$isNew) {
+        if (!$isNew) {
             $fields['form']['buttons'] = [
                 'save-and-stay' => [
                     'title' => $this->module->l('Save and stay', 'carriers'),
@@ -496,7 +496,7 @@ class Carriers extends AbstractForm
             $carriers = [];
 
             $psCarriers = Carrier::getCarriers($this->context->language->id, true, false, false, null);
-            foreach($psCarriers as $pscarrier) {
+            foreach ($psCarriers as $pscarrier) {
                 $carriers[] =  [
                     'id_carrier' => $pscarrier['id_carrier'],
                     'name' => $pscarrier['name'],
@@ -532,16 +532,16 @@ class Carriers extends AbstractForm
         }
 
         // Only if ps carrier
-        if($idCarrier = Tools::getValue('id_carrier')) {
+        if ($idCarrier = Tools::getValue('id_carrier')) {
             $psCarriersConfig = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
             $carriers = array_keys($psCarriersConfig);
 
-            if(in_array($idCarrier, $carriers)) {
+            if (in_array($idCarrier, $carriers)) {
                 $showCarrierTypeOption = true;
             }
         }
 
-        if($showCarrierTypeOption) {
+        if ($showCarrierTypeOption) {
             $fields[] = [
                 'tab' => 'form',
                 'tab' => 'form',
@@ -1296,7 +1296,7 @@ class Carriers extends AbstractForm
             }
         }
 
-        if(Tools::getValue('psCarriers')) {
+        if (Tools::getValue('psCarriers')) {
             $carrier = new Carrier(Tools::getValue('psCarriers'));
             $carrier->external_module_name = 'myparcelbe';
             $carrier->is_module = true;
@@ -1318,7 +1318,7 @@ class Carriers extends AbstractForm
         Configuration::updateValue('MYPARCEL_PSCARRIERS', json_encode($psCarriersConfig));
 
         $configurationPsCarriers = CarrierConfigurationProvider::get($carrier->id, 'carrierType');
-        if(is_null($configurationPsCarriers)) {
+        if (is_null($configurationPsCarriers)) {
             $this->updateConfigurationFields($carrier->id, true);
         } else {
             $this->updateConfigurationFields($carrier->id, false);

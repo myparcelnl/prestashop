@@ -35,7 +35,9 @@ class MyParcelBEHookModuleFrontController extends FrontController
     /**
      * Disable the maintenance page
      */
-    protected function displayMaintenancePage(): void { }
+    protected function displayMaintenancePage(): void
+    {
+    }
 
     /**
      * Handle the webhook.

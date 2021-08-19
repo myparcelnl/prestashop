@@ -77,7 +77,7 @@ trait FrontHooks
             $address->address1 = preg_replace('/[^0-9]/', '', $address->address1);
 
             $shippingOptions = $this->getShippingOptions($params['carrier']['id'], $address);
-            $cost = ($shippingOptions['include_tax'])? $params['carrier']['price_with_tax'] : $params['carrier']['price_without_tax'];
+            $cost = ($shippingOptions['include_tax']) ? $params['carrier']['price_with_tax'] : $params['carrier']['price_without_tax'];
 
             $shipping_cost = Tools::displayPrice(
                 $cost,
