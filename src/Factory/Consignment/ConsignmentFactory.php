@@ -6,8 +6,10 @@ use Carrier;
 use Configuration;
 use Country;
 use Exception;
+use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use OrderLabel;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
@@ -159,7 +161,15 @@ class ConsignmentFactory
 
         $this->orderData       = $order;
         $this->carrierSettings = $carrierSettingsProvider->provide($order['id_carrier']);
-        $this->deliveryOptions = DeliveryOptionsAdapterFactory::create($deliveryOptionsData);
+
+        try {
+            // Create new instance from known json
+            $this->deliveryOptions = DeliveryOptionsAdapterFactory::create((array) $deliveryOptionsData);
+        } catch (\BadMethodCallException $e) {
+            // Create new instance from unknown json data
+            $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();
+            $this->deliveryOptions = new DeliveryOptionsFromOrderAdapter($deliveryOptions);
+        }
     }
 
     /**
@@ -372,7 +382,6 @@ class ConsignmentFactory
         $products = OrderLabel::getCustomsOrderProducts($this->orderData['id_order']);
 
         foreach ($products as $product) {
-            $product = $product->get_product();
 
             if (! $product) {
                 continue;
@@ -432,7 +441,8 @@ class ConsignmentFactory
      */
     private function createConsignment(): void
     {
-        $this->consignment = ConsignmentSdkFactory::createByCarrierId($this->getMyParcelCarrierId($this->orderData['id_carrier']));
+        $carrierId         = $this->getMyParcelCarrierId($this->orderData['id_carrier']);
+        $this->consignment = ConsignmentSdkFactory::createByCarrierId($carrierId);
     }
 
     /**
