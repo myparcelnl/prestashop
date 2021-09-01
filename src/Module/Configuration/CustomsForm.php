@@ -5,6 +5,7 @@ namespace Gett\MyparcelBE\Module\Configuration;
 use Context;
 use Country;
 use Gett\MyparcelBE\Constant;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 
 class CustomsForm extends AbstractForm
 {
@@ -58,6 +59,7 @@ class CustomsForm extends AbstractForm
                     'id' => 'iso_code',
                     'name' => 'name',
                 ],
+                'default_value' => $this->module->isBE() ? AbstractConsignment::CC_BE : AbstractConsignment::CC_NL,
             ],
             Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME => [
                 'type' => 'switch',

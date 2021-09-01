@@ -61,15 +61,15 @@ trait DisplayAdminProductsExtra
             $return[$item['name']] = $item['value'] ?: 0;
         }
 
-        if (empty($return[Constant::CUSTOMS_FORM_CONFIGURATION_NAME])) {
+        if (! $return[Constant::CUSTOMS_FORM_CONFIGURATION_NAME]) {
             $return[Constant::CUSTOMS_FORM_CONFIGURATION_NAME] = Configuration::get(
                 Constant::CUSTOMS_FORM_CONFIGURATION_NAME
             );
         }
 
-        if (empty($return[Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME])) {
+        if (! $return[Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME]) {
             $return[Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME] = Configuration::get(
-                Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME
+                Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME
             );
         }
 

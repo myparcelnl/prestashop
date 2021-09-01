@@ -421,7 +421,6 @@ class OrderLabel extends ObjectModel
         $qb->from('order_detail', 'od');
         $qb->leftJoin('myparcelbe_product_configuration', 'pc', 'od.product_id = pc.id_product');
         $qb->where('od.id_order = ' . $id_order);
-        $qb->where('pc.name = "' . pSQL(Constant::CUSTOMS_FORM_CONFIGURATION_NAME) . '"');
 
         $return = Db::getInstance()->executeS($qb);
         foreach ($return as $item) {

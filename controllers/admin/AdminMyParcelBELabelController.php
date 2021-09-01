@@ -167,7 +167,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             if ($consignment->isCdCountry()) {
                 $products = OrderLabel::getCustomsOrderProducts((int) $consignment->getReferenceId());
                 if ($products) {
-                    $orderObject = new Order();
+                    $orderObject = new Order($consignment->getReferenceId());
                     if (!$orderObject->hasInvoice()) {
                         $this->errors[] = sprintf(
                             $this->module->l('International order ID#%s must have invoice.', 'adminlabelcontroller'),
@@ -503,7 +503,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                     if ($consignment->isCdCountry()) {
                         $products = OrderLabel::getCustomsOrderProducts($order['id_order']);
                         if ($products) {
-                            $orderObject = new Order();
+                            $orderObject = new Order($order['id_order']);
                             if (!$orderObject->hasInvoice()) {
                                 unset($consignments[$consignmentKey]);
                                 $this->errors[] = sprintf(
