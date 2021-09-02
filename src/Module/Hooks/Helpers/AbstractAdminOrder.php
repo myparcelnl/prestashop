@@ -14,6 +14,7 @@ abstract class AbstractAdminOrder
         return Configuration::getMultiple([
             Constant::LABEL_SIZE_CONFIGURATION_NAME,
             Constant::LABEL_POSITION_CONFIGURATION_NAME,
+            Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
         ]);
     }
 

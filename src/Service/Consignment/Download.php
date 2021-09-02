@@ -37,13 +37,15 @@ class Download
                     ->setPdfOfLabels($this->fetchPositions());
                 $isPdf = is_string($collection->getLabelPdf());
                 if ($isPdf) {
-                    $collection->downloadPdfOfLabels($this->configuration::get(
-                        Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
-                        false,
-                        null,
-                        null,
-                        false
-                    ));
+                    $collection->downloadPdfOfLabels(
+                        'true' === $this->configuration::get(
+                            Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
+                            false,
+                            null,
+                            null,
+                            false
+                        )
+                    );
                 }
                 Logger::addLog($collection->toJson());
                 if (!$isPdf) {
