@@ -147,7 +147,12 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="{$labelUrl}" method="post" id="print_label_form">
+        <form
+                action="{$labelUrl}"
+                method="post"
+                id="print_label_form"
+                {if $labelConfiguration.MYPARCELBE_LABEL_OPEN_DOWNLOAD eq 'true'}target="_blank"{/if}
+        >
           <input type="hidden" name="action" value="printOrderLabel">
           <div class="myparcel-radio-wrapper">
             <div class="myparcel-radio-container">

@@ -361,10 +361,12 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 $this->context->link->getAdminLink('AdminOrders', true, [], $redirectParams)
             );
         }
-        $collection->downloadPdfOfLabels(Configuration::get(
-            Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
-            false
-        ));
+        $collection->downloadPdfOfLabels(
+            'true' === Configuration::get(
+                Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
+                false
+            )
+        );
     }
 
     public function ajaxProcessSaveConcept()

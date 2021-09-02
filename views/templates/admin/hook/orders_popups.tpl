@@ -9,7 +9,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{$download_action}" method="post" id="print-form">
+                <form
+                        action="{$download_action}"
+                        method="post"
+                        id="print-form"
+                        {if $labelConfiguration.MYPARCELBE_LABEL_OPEN_DOWNLOAD eq 'true'}target="_blank"{/if}
+                >
                     <input type="hidden" name="label_id" id="id_label">
                     <div class="myparcel-radio-wrapper">
                         <div class="myparcel-radio-container">
@@ -92,7 +97,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{$print_bulk_action}" method="post" id="print-bulk-form">
+                <form
+                        action="{$print_bulk_action}"
+                        method="post"
+                        id="print-bulk-form"
+                        {if $labelConfiguration.MYPARCELBE_LABEL_OPEN_DOWNLOAD eq 'true'}target="_blank"{/if}
+                >
                     <div class="myparcel-radio-wrapper">
                         <div class="myparcel-radio-container">
                             <input
