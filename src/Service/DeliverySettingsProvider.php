@@ -129,7 +129,7 @@ class DeliverySettingsProvider
                 'priceOnlyRecipient' => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceOnlyRecipient') * $taxRate, 2),
                 'pricePickup' => Tools::ps_round((CarrierConfigurationProvider::get($this->idCarrier, 'pricePickup') * $taxRate), 2),
                 'allowSignature' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowSignature'),
-
+                'showPriceSurcharge' => (bool) \Configuration::get(Constant::DELIVERY_OPTIONS_PRICE_FORMAT),
                 'dropOffDays' => array_map(
                     'intval',
                     explode(',', CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDays'))

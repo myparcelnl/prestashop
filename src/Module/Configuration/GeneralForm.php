@@ -73,6 +73,26 @@ class GeneralForm extends AbstractForm
                     ],
                 ],
             ],
+            Constant::DELIVERY_OPTIONS_PRICE_FORMAT => [
+                'type' => 'select',
+                'label' => $this->module->l('Show prices as', 'generalform'),
+                'name' => Constant::DELIVERY_OPTIONS_PRICE_FORMAT,
+                'default_value' => '0',
+                'options' => [
+                    'query' => [
+                        [
+                            'id' => 0,
+                            'name' => $this->module->l('Total price', 'generalform'),
+                        ],
+                        [
+                            'id' => 1,
+                            'name' => $this->module->l('Surcharge', 'generalform'),
+                        ]
+                    ],
+                    'id' => 'id',
+                    'name' => 'name',
+                ],
+            ]
         ];
     }
 }
