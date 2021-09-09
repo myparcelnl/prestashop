@@ -125,6 +125,7 @@ class DeliverySettingsProvider
                 'pricePickup' => Tools::ps_round((CarrierConfigurationProvider::get($this->idCarrier, 'pricePickup') * $taxRate), 2),
                 'allowSignature' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowSignature'),
                 'dropOffDays' => $dropOffDays,
+                'showPriceSurcharge' => (bool) \Configuration::get(Constant::DELIVERY_OPTIONS_PRICE_FORMAT),
                 'cutoffTime' => $cutoffTimeToday,
                 'deliveryDaysWindow' => $deliveryDaysWindow,
                 'dropOffDelay' => $dropOffDelay,
