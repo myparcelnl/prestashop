@@ -2,6 +2,7 @@
 
 namespace Gett\MyparcelBE\Module;
 
+use Gett\MyparcelBE\Database\Table;
 use Tab;
 use Carrier;
 use Gett\MyparcelBE\Constant;
@@ -175,7 +176,7 @@ class Installer
                     $insert[] = ['id_carrier' => $carrier->id, 'name' => $item, 'value' => ''];
                 }
 
-                Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
+                Db::getInstance()->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
 
                 $carrierType = "";
                 switch ($configuration['configuration_name']) {

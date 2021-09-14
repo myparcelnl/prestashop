@@ -6,10 +6,11 @@ use Db;
 use Exception;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\CarrierName;
 use Gett\MyparcelBE\Service\Order\OrderDeliveryDate;
-use StdClass;
+use stdClass;
 
 trait OrderHooks
 {
@@ -39,17 +40,17 @@ trait OrderHooks
         if (isset(Constant::PACKAGE_TYPES[$packageTypeId])) {
             $packageType = Constant::PACKAGE_TYPES[$packageTypeId];
         }
-        $optionsObj = new StdClass();
+        $optionsObj = new stdClass();
         $optionsObj->isPickup = false;
         $optionsObj->date = (new OrderDeliveryDate())->get((int) $order->id_carrier);
         $optionsObj->carrier = (new CarrierName())->get((int) $order->id_carrier);
         $optionsObj->packageType = $packageType;
         $optionsObj->deliveryType = 'standard';
-        $optionsObj->shipmentOptions = new StdClass();
+        $optionsObj->shipmentOptions = new stdClass();
         $options = json_encode($optionsObj);
         try {
             Db::getInstance(_PS_USE_SQL_SLAVE_)->insert(
-                'myparcelbe_delivery_settings',
+                Table::TABLE_DELIVERY_SETTINGS,
                 ['id_cart' => (int) $order->id_cart, 'delivery_settings' => pSQL($options)],
                 false,
                 true,

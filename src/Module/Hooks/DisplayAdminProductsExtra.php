@@ -5,22 +5,28 @@ namespace Gett\MyparcelBE\Module\Hooks;
 use Configuration;
 use Db;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
 
 trait DisplayAdminProductsExtra
 {
+    /**
+     * @throws \PrestaShopDatabaseException
+     */
     public function hookActionProductUpdate(array $params): void
     {
-        Db::getInstance()->delete(
-            'myparcelbe_product_configuration',
-            'id_product = ' . (int) $params['id_product']
-        );
+        Db::getInstance()
+            ->delete(
+                Table::TABLE_PRODUCT_CONFIGURATION,
+                'id_product = ' . (int) $params['id_product']
+            );
         foreach ($_POST as $key => $item) {
-            if (stripos($key, $this->name) === 0) {
-                Db::getInstance()->insert('myparcelbe_product_configuration', [
-                    'id_product' => (int) $params['id_product'],
-                    'name' => $key,
-                    'value' => $item,
-                ]);
+            if (0 === stripos($key, $this->name)) {
+                Db::getInstance()
+                    ->insert(Table::TABLE_PRODUCT_CONFIGURATION, [
+                        'id_product' => (int) $params['id_product'],
+                        'name'       => $key,
+                        'value'      => $item,
+                    ]);
             }
         }
     }
@@ -51,11 +57,22 @@ trait DisplayAdminProductsExtra
         return $this->display($this->name, 'views/templates/admin/hook/products_form.tpl');
     }
 
+    /**
+     * @param  int $id_product
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     */
     private function getProductSettings(int $id_product): array
     {
-        $result = Db::getInstance()->executeS('SELECT *
-            FROM ' . _DB_PREFIX_ . 'myparcelbe_product_configuration
-            WHERE id_product = ' . (int) $id_product);
+        $table  = Table::withPrefix(Table::TABLE_PRODUCT_CONFIGURATION);
+        $result = Db::getInstance()
+            ->executeS(
+                <<<SQL
+SELECT *
+FROM $table WHERE id_product = $id_product
+SQL
+            );
         $return = [];
         foreach ($result as $item) {
             $return[$item['name']] = $item['value'] ?: 0;

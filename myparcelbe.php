@@ -170,6 +170,12 @@ class MyParcelBE extends CarrierModule
         return $output . $configuration(Tools::getValue('menu'));
     }
 
+    /**
+     * @param $cart
+     * @param $shipping_cost
+     *
+     * @return float|int
+     */
     public function getOrderShippingCost($cart, $shipping_cost)
     {
         if ($this->id_carrier != $cart->id_carrier) {
@@ -185,7 +191,7 @@ class MyParcelBE extends CarrierModule
         if ($deliverySettings) {
             $deliverySettings = json_decode($deliverySettings, true);
         } else {
-            $deliverySettings = $this->getDeliverySettingsByCart((int) $cart->id);
+            $deliverySettings = \Gett\MyparcelBE\DeliveryOptions\DeliveryOptions::queryByCart((int) $cart->id);
         }
 
         if (empty($deliverySettings)) {
@@ -283,21 +289,6 @@ class MyParcelBE extends CarrierModule
         $fragment = isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : '';
 
         return "{$scheme}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
-    }
-
-    public function getDeliverySettingsByCart(int $idCart)
-    {
-        $query = new DbQuery();
-        $query->select('delivery_settings');
-        $query->from('myparcelbe_delivery_settings');
-        $query->where('id_cart = ' . (int) $idCart);
-        $query->orderBy('id_delivery_setting DESC');
-        $deliverySettings = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query);
-        if (empty($deliverySettings)) {
-            return null;
-        }
-
-        return json_decode($deliverySettings, true);
     }
 
     public function getShippingOptions($id_carrier, $address)

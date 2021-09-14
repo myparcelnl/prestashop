@@ -2,14 +2,15 @@
 
 namespace Gett\MyparcelBE\Module\Configuration;
 
-use Db;
-use Link;
 use Carrier;
-use Currency;
 use Configuration;
+use Currency;
+use Db;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use Link;
 
 class Carriers extends AbstractForm
 {
@@ -292,10 +293,13 @@ class Carriers extends AbstractForm
         }
 
         if ($isInsert) {
-            Db::getInstance()->insert('myparcelbe_carrier_configuration', $insert);
+            Db::getInstance()->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
         }
     }
 
+    /**
+     * @throws \PrestaShopDatabaseException
+     */
     private function getForm(bool $isNew = false)
     {
         $carrierName = $isNew ? $this->module->l('Add new Carrier', 'carriers') : $this->module->l('Carriers', 'carriers');
@@ -366,9 +370,16 @@ class Carriers extends AbstractForm
 
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
-        $carrierConfigs = Db::getInstance()->executeS('SELECT *
-            FROM `' . _DB_PREFIX_ . 'myparcelbe_carrier_configuration`
-            WHERE `id_carrier` = ' . $id_carrier);
+        $table          = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+        $carrierConfigs = Db::getInstance()
+            ->executeS(
+                <<<SQL
+SELECT *
+FROM `$table`
+WHERE `id_carrier` = $id_carrier
+SQL
+
+            );
 
         $vars = [];
 
@@ -469,7 +480,7 @@ class Carriers extends AbstractForm
         $helper->no_link = true;
 
         $list = Db::getInstance()->executeS('SELECT a.*
-            FROM `' . _DB_PREFIX_ . 'carrier` a
+            FROM `' . Table::withPrefix('carrier')  . '` a
             WHERE (a.external_module_name = \'' . $this->module->name . '\') AND a.`deleted` = 0
             ORDER BY a.`position` ASC
             LIMIT 0, 50');

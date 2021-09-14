@@ -6,6 +6,7 @@ use Context;
 use Country;
 use DateTime;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Module;
 use Tools;
 use Validate;
@@ -163,7 +164,7 @@ class DeliverySettingsProvider
                 'postalCode' => $address->postcode,
                 'number' => $houseNumber,
             ],
-            'delivery_settings' => $this->module->getDeliverySettingsByCart((int) $this->context->cart->id),
+            'delivery_settings' => DeliveryOptions::queryByCart((int) $this->context->cart->id),
         ];
     }
 

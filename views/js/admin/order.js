@@ -663,6 +663,7 @@ $(function() {
     e.preventDefault();
   });
   $('#deliveryDateModal').on('shown.bs.modal', function (e) {
+    console.log('initializeMyParcelForm');
     initializeMyParcelForm();
   });
   document.addEventListener(

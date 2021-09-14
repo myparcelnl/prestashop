@@ -3,14 +3,17 @@
 namespace Gett\MyparcelBE\Module\Hooks;
 
 use Address;
-use Configuration;
+use Carrier;
 use Currency;
 use Db;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Product;
+use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Media;
+use OrderController;
+use stdClass;
 use Tools;
 use Validate;
-use Media;
 
 trait FrontHooks
 {
@@ -22,14 +25,14 @@ trait FrontHooks
             $optionsObj = json_decode($options);
             // Signature is required for pickup delivery type
             if (!empty($optionsObj->isPickup)) {
-                $optionsObj->shipmentOptions = new \StdClass();
+                $optionsObj->shipmentOptions = new stdClass();
                 $optionsObj->shipmentOptions->signature = true;
             }
             $options = json_encode($optionsObj);
         }
         if (Tools::isSubmit('confirmDeliveryOption') && !empty($options)) {
             Db::getInstance(_PS_USE_SQL_SLAVE_)->insert(
-                'myparcelbe_delivery_settings',
+                Table::TABLE_DELIVERY_SETTINGS,
                 ['id_cart' => $params['cart']->id, 'delivery_settings' => pSQL($options)],
                 false,
                 true,
@@ -42,15 +45,15 @@ trait FrontHooks
             if (is_array($id_carrier)) {
                 $id_carrier = (int) reset($id_carrier);
             }
-            $carrier = new \Carrier($id_carrier);
+            $carrier = new Carrier($id_carrier);
             if (Validate::isLoadedObject($carrier)) {
                 $optionsObj = json_decode($options);
                 if ($optionsObj === null) {
-                    $optionsObj = new \StdClass();
+                    $optionsObj = new stdClass();
                 }
                 $optionsObj->carrier = str_replace(' ', '', strtolower($carrier->name));
                 Db::getInstance(_PS_USE_SQL_SLAVE_)->insert(
-                    'myparcelbe_delivery_settings',
+                    Table::TABLE_DELIVERY_SETTINGS,
                     ['id_cart' => $params['cart']->id, 'delivery_settings' => pSQL(json_encode($optionsObj))],
                     false,
                     true,
@@ -109,10 +112,10 @@ trait FrontHooks
             }
 
             $this->context->smarty->assign([
-                'address' => $address,
-                'delivery_settings' => $this->getDeliverySettingsByCart((int) $this->context->cart->id),
-                'shipping_cost' => $shipping_cost,
-                'carrier' => $params['carrier'],
+                'address'               => $address,
+                'delivery_settings'     => DeliveryOptions::queryByCart((int) $this->context->cart->id),
+                'shipping_cost'         => $shipping_cost,
+                'carrier'               => $params['carrier'],
                 'enableDeliveryOptions' => (new PackageTypeCalculator())
                     ->allowDeliveryOptions($this->context->cart, $this->getModuleCountry()),
             ]);

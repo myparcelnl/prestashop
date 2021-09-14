@@ -35,13 +35,27 @@ class Tools extends ToolsPresta
     }
 
     /**
-     * @param  object $object
+     * @param  null|object $object
      *
      * @return array
      */
-    public static function objectToArray(object $object): array
+    public static function objectToArray(?object $object): array
     {
-        return json_decode(json_encode($object), true);
+        return json_decode(json_encode($object ?? []), true);
+    }
+
+    /**
+     * @param  array $array
+     *
+     * @return null|object
+     */
+    public static function arrayToObject(array $array): ?object
+    {
+        if (empty($array)) {
+            return null;
+        }
+
+        return json_decode(json_encode($array), false);
     }
 
     /**
