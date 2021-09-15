@@ -401,6 +401,13 @@ class Carriers extends AbstractForm
             if ($row['name'] == Constant::CUTOFF_EXCEPTIONS) {
                 if (empty($row['value'])) {
                     $row['value'] = '{}';
+                } else {
+                    //TODO remove this once the pc_myparcelbe_carrier_configuration can hold all data for 'value'
+                    // (issue #15)
+                    json_decode($row['value'], true);
+                    if (JSON_ERROR_NONE !== json_last_error()) {
+                        $row['value'] = '{}';
+                    }
                 }
             }
             $vars[$row['name']] = $row['value'];
