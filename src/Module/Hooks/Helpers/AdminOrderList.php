@@ -88,8 +88,8 @@ class AdminOrderList extends AbstractAdminOrder
             $this->module->l('Export and print labels', 'adminorderlist')
         );
 
-        $this->context->controller->addCss($this->module->getPathUri() . 'views/css/myparcel.css');
-        $this->context->controller->addJs($this->module->getPathUri() . 'views/dist/myparcel.js');
-        $this->context->controller->addJS($this->module->getPathUri() . 'views/js/admin/order.js');
+        $this->context->controller->addCSS($this->module->getPathUri() . 'views/css/myparcel.css');
+        $this->context->controller->addJS($this->module->getPathUri() . 'views/dist/js/myparcel.js');
+        $this->context->controller->addJS($this->module->getPathUri() . 'views/dist/js/admin/order.js');
     }
 }

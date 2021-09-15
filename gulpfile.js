@@ -28,12 +28,14 @@ const lastGitTag = execSync('git describe --abbrev=0 --t').toString().trim();
  * @type {string[]}
  */
 const sourceFiles = [
-  './controllers/**/*',
-  './mails/**/*',
-  './src/**/*',
-  './upgrade/**/*',
-  './views/**/*',
-  '!./views/dist/**/*',
+  'controllers/**/*',
+  'mails/**/*',
+  'src/**/*',
+  'upgrade/**/*',
+  'views/**/*',
+  '!views/js/**/*',
+  '!views/js',
+  '!views/dist/**/*',
   'composer.json',
   'index.php',
   'myparcelbe.php',
@@ -45,7 +47,7 @@ const sourceFiles = [
  * @type {string[]}
  */
 const copyFiles = [
-  './views/dist/**/*',
+  'views/dist/**/*',
   'composer.lock',
   'logo.png',
   'package-lock.json',
@@ -156,7 +158,7 @@ function createTasksForAllModules(task) {
 /**
  * Run babel on the javascript files.
  */
-gulp.task('js:build', () => gulp.src(['./views/*.js'], {read: false})
+gulp.task('js:build', () => gulp.src(['./views/js/**/*.js'], {read: false})
   .pipe(tap((file) => {
     file.contents = browserify(file.path)
       .transform(babelify)
@@ -166,13 +168,13 @@ gulp.task('js:build', () => gulp.src(['./views/*.js'], {read: false})
   .pipe(sourcemaps.init())
   .pipe(uglify())
   .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest('views/dist')));
+  .pipe(gulp.dest('views/dist/js')));
 
 /**
  * Copy the js to dist without doing any processing on it.
  */
-gulp.task('js:copy', () => gulp.src('views/js/**/*.js')
-  .pipe(gulp.dest('views/dist')));
+gulp.task('js:copy', () => gulp.src('./views/js/**/*.js')
+  .pipe(gulp.dest('views/dist/js')));
 
 /**
  *
@@ -204,12 +206,12 @@ createTasksForAllModules('zip');
  * Copy delivery options into module.
  */
 gulp.task('copy:delivery-options', () => gulp.src('./node_modules/@myparcel/delivery-options/dist/myparcel.js')
-  .pipe(gulp.dest('views/dist/')));
+  .pipe(gulp.dest('views/dist/js/vendor/')));
 
 /**
- * Empty the dist folder.
+ * Empty the dist folders.
  */
-gulp.task('clean', () => gulp.src('dist/*', {read: false})
+gulp.task('clean', () => gulp.src(['dist/*', 'views/dist/*'], {read: false})
   .pipe(clean({force: true})));
 
 /**

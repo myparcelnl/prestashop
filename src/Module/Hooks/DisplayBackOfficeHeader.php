@@ -6,10 +6,10 @@ use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 
 trait DisplayBackOfficeHeader
 {
-    public function hookDisplayBackOfficeHeader()
+    public function hookDisplayBackOfficeHeader(): void
     {
-        $this->context->controller->addCss($this->_path . 'views/css/myparceladmin.css');
-        $this->context->controller->addJs($this->_path . 'views/js/admin/myparcelbo.js');
+        $this->context->controller->addCSS($this->_path . 'views/css/myparceladmin.css');
+        $this->context->controller->addJS($this->_path . 'views/dist/js/admin/myparcelbo.js');
     }
 
     public function hookDisplayAdminAfterHeader(): string
