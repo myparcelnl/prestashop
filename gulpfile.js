@@ -2,6 +2,7 @@ const babelify = require('babelify');
 const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const clean = require('gulp-clean');
+const {execSync} = require('child_process');
 const gulp = require('gulp');
 const rename = require('gulp-rename');
 const {replaceCaseSensitive} = require('./private/replaceCaseSensitive');
@@ -13,8 +14,13 @@ const {exec} = require('child_process');
 
 const MODULE_NAME_NL = 'myparcelnl';
 const MODULE_NAME_BE = 'myparcelbe';
-
 const modules = [MODULE_NAME_BE, MODULE_NAME_NL];
+const moduleNameMap = {
+  [MODULE_NAME_NL]: 'MyParcelNL',
+  [MODULE_NAME_BE]: 'MyParcelBE',
+};
+
+const lastGitTag = execSync('git describe --abbrev=0 --t').toString().trim();
 
 /**
  * Files where module name should be transformed in filenames and contents.
@@ -71,7 +77,6 @@ function execCallback(callback, err, stdout, stderr) {
     // eslint-disable-next-line no-console
     console.warn(stderr);
   }
-
   if (typeof callback === 'function') {
     callback(err);
   }
@@ -137,7 +142,7 @@ function createZipTask(moduleName) {
     `./dist/${moduleName}/**/*`,
     ...excludeFiles.map((filename) => `!./dist/${moduleName}/${filename}`),
   ], {base: 'dist'})
-    .pipe(zip(`${moduleName}.zip`))
+    .pipe(zip(`${moduleNameMap[moduleName]}-${lastGitTag}.zip`))
     .pipe(gulp.dest('dist'));
 }
 
@@ -176,7 +181,7 @@ gulp.task('js:copy', () => gulp.src('views/js/**/*.js')
  */
 function createComposerTask(moduleName) {
   return (callback) => {
-    exec(`cd dist/${moduleName} && composer update`, (...params) => execCallback(callback, ...params));
+    exec(`cd dist/${moduleName} && composer install --no-dev`, (...params) => execCallback(callback, ...params));
   };
 }
 
