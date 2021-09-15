@@ -74,8 +74,7 @@ jobs:
         with:
           name: dist
           path: |
-            dist/myparcelnl.zip
-            dist/myparcelbe.zip
+            dist/*.zip
 
   release:
     name: Publish 🚀

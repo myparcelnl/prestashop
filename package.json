@@ -5,7 +5,7 @@
     "watch": "gulp watch",
     "build": "gulp build",
     "zip": "gulp",
-    "postinstall": "cp node_modules/@myparcel/delivery-options/dist/myparcel.js views/dist/myparcel.js"
+    "postinstall": "cp node_modules/@myparcel/delivery-options/dist/myparcel.js views/dist/js/external/myparcel.js"
   },
   "dependencies": {
     "@myparcel/delivery-options": "^4.3.0"

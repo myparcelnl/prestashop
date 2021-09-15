@@ -60,12 +60,12 @@ trait FrontHooks
         }
     }
 
-    public function hookDisplayHeader()
+    public function hookDisplayHeader(): void
     {
         if ($this->context->controller instanceof \OrderController) {
-            $this->context->controller->addCss($this->_path . 'views/css/myparcel.css');
-            $this->context->controller->addJs($this->_path . 'views/dist/myparcel.js');
-            $this->context->controller->addJs($this->_path . 'views/dist/front.js');
+            $this->context->controller->addCSS($this->_path . 'views/css/myparcel.css');
+            $this->context->controller->addJS($this->_path . 'views/dist/js/external/myparcel.js');
+            $this->context->controller->addJS($this->_path . 'views/dist/js/myparcelinit.js');
             Media::addJsDefL('myparcel_carrier_init_url', $this->context->link->getModuleLink($this->name, 'checkout', [], null, null, null, true));
         }
     }

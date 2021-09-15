@@ -2,6 +2,7 @@ const babelify = require('babelify');
 const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const clean = require('gulp-clean');
+const {execSync} = require('child_process');
 const gulp = require('gulp');
 const rename = require('gulp-rename');
 const {replaceCaseSensitive} = require('./private/replaceCaseSensitive');
@@ -13,8 +14,13 @@ const {exec} = require('child_process');
 
 const MODULE_NAME_NL = 'myparcelnl';
 const MODULE_NAME_BE = 'myparcelbe';
-
 const modules = [MODULE_NAME_BE, MODULE_NAME_NL];
+const moduleNameMap = {
+  [MODULE_NAME_NL]: 'MyParcelNL',
+  [MODULE_NAME_BE]: 'MyParcelBE',
+};
+
+const lastGitTag = execSync('git describe --abbrev=0 --t').toString().trim();
 
 /**
  * Files where module name should be transformed in filenames and contents.
@@ -22,12 +28,14 @@ const modules = [MODULE_NAME_BE, MODULE_NAME_NL];
  * @type {string[]}
  */
 const sourceFiles = [
-  './controllers/**/*',
-  './mails/**/*',
-  './src/**/*',
-  './upgrade/**/*',
-  './views/**/*',
-  '!./views/dist/**/*',
+  'controllers/**/*',
+  'mails/**/*',
+  'src/**/*',
+  'upgrade/**/*',
+  'views/**/*',
+  '!views/js/**/*',
+  '!views/js',
+  '!views/dist/**/*',
   'composer.json',
   'index.php',
   'myparcelbe.php',
@@ -39,7 +47,7 @@ const sourceFiles = [
  * @type {string[]}
  */
 const copyFiles = [
-  './views/dist/**/*',
+  'views/dist/**/*',
   'composer.lock',
   'logo.png',
   'package-lock.json',
@@ -71,7 +79,6 @@ function execCallback(callback, err, stdout, stderr) {
     // eslint-disable-next-line no-console
     console.warn(stderr);
   }
-
   if (typeof callback === 'function') {
     callback(err);
   }
@@ -137,7 +144,7 @@ function createZipTask(moduleName) {
     `./dist/${moduleName}/**/*`,
     ...excludeFiles.map((filename) => `!./dist/${moduleName}/${filename}`),
   ], {base: 'dist'})
-    .pipe(zip(`${moduleName}.zip`))
+    .pipe(zip(`${moduleNameMap[moduleName]}-${lastGitTag}.zip`))
     .pipe(gulp.dest('dist'));
 }
 
@@ -151,7 +158,7 @@ function createTasksForAllModules(task) {
 /**
  * Run babel on the javascript files.
  */
-gulp.task('js:build', () => gulp.src(['./views/*.js'], {read: false})
+gulp.task('js:build', () => gulp.src(['./views/js/**/*.js'], {read: false})
   .pipe(tap((file) => {
     file.contents = browserify(file.path)
       .transform(babelify)
@@ -161,13 +168,13 @@ gulp.task('js:build', () => gulp.src(['./views/*.js'], {read: false})
   .pipe(sourcemaps.init())
   .pipe(uglify())
   .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest('views/dist')));
+  .pipe(gulp.dest('views/dist/js')));
 
 /**
  * Copy the js to dist without doing any processing on it.
  */
-gulp.task('js:copy', () => gulp.src('views/js/**/*.js')
-  .pipe(gulp.dest('views/dist')));
+gulp.task('js:copy', () => gulp.src('./views/js/**/*.js')
+  .pipe(gulp.dest('views/dist/js')));
 
 /**
  *
@@ -176,7 +183,7 @@ gulp.task('js:copy', () => gulp.src('views/js/**/*.js')
  */
 function createComposerTask(moduleName) {
   return (callback) => {
-    exec(`cd dist/${moduleName} && composer update`, (...params) => execCallback(callback, ...params));
+    exec(`cd dist/${moduleName} && composer install --no-dev`, (...params) => execCallback(callback, ...params));
   };
 }
 
@@ -199,12 +206,12 @@ createTasksForAllModules('zip');
  * Copy delivery options into module.
  */
 gulp.task('copy:delivery-options', () => gulp.src('./node_modules/@myparcel/delivery-options/dist/myparcel.js')
-  .pipe(gulp.dest('views/dist/')));
+  .pipe(gulp.dest('views/dist/js/external/')));
 
 /**
- * Empty the dist folder.
+ * Empty the dist folders.
  */
-gulp.task('clean', () => gulp.src('dist/*', {read: false})
+gulp.task('clean', () => gulp.src(['dist/*', 'views/dist/*'], {read: false})
   .pipe(clean({force: true})));
 
 /**
