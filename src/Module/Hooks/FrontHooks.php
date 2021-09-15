@@ -65,7 +65,7 @@ trait FrontHooks
         if ($this->context->controller instanceof \OrderController) {
             $this->context->controller->addCSS($this->_path . 'views/css/myparcel.css');
             $this->context->controller->addJS($this->_path . 'views/dist/js/vendor/myparcel.js');
-            $this->context->controller->addJS($this->_path . 'views/dist/js/front.js');
+            $this->context->controller->addJS($this->_path . 'views/dist/js/myparcelinit.js');
             Media::addJsDefL('myparcel_carrier_init_url', $this->context->link->getModuleLink($this->name, 'checkout', [], null, null, null, true));
         }
     }
