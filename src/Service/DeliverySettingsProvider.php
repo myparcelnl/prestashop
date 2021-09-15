@@ -58,6 +58,7 @@ class DeliverySettingsProvider
             $houseNumber = trim($address->address2);
         }
         $carrierName = CarrierConfigurationProvider::get($this->idCarrier, 'carrierType');
+        $deliveryDaysWindow = (int) (CarrierConfigurationProvider::get($this->idCarrier, 'deliveryDaysWindow') ?? 1);
 
         $carrierSettings = [
             $carrierName => ['allowDeliveryOptions' => false],
@@ -71,13 +72,13 @@ class DeliverySettingsProvider
             'allowOnlyRecipient' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowOnlyRecipient'),
             'allowSignature' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowSignature'),
             'allowPickupPoints' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowPickupPoints'),
-            'deliveryDaysWindow' => (int) (CarrierConfigurationProvider::get($this->idCarrier, 'deliveryDaysWindow') ?? 1),
+            'deliveryDaysWindow' => $deliveryDaysWindow,
+            'allowShowDeliveryDate' => (-1 !== $deliveryDaysWindow),
             // TODO: remove allowPickupLocations after fixing the allowPickupPoints reference
             'allowPickupLocations' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowPickupPoints'),
         ];
         $carrierSettings[$carrierName] = array_merge($carrierSettings[$carrierName], $activeCarrierSettings);
-        $dropOffDelay = (int) CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDelay');
-        $deliveryDaysWindow = (int) (CarrierConfigurationProvider::get($this->idCarrier, 'deliveryDaysWindow') ?? 1);
+        $dropOffDelay = (int) CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDelay', 0);
         $cutoffExceptions = CarrierConfigurationProvider::get($this->idCarrier, Constant::CUTOFF_EXCEPTIONS);
         $cutoffExceptions = @json_decode(
             $cutoffExceptions,
@@ -86,31 +87,24 @@ class DeliverySettingsProvider
         if (!is_array($cutoffExceptions)) {
             $cutoffExceptions = [];
         }
-        $now = new DateTime('now');
         $dropOffDateObj = new DateTime('today');
-        $deliveryDateObj = new DateTime('tomorrow'); // Delivery is next day
         $weekDayNumber = $dropOffDateObj->format('N');
         $dayName = Constant::WEEK_DAYS[$weekDayNumber];
         $cutoffTimeToday = CarrierConfigurationProvider::get($this->idCarrier, $dayName . 'CutoffTime');
-        $this->updateDatesByDropOffDelay($dropOffDelay, $dropOffDateObj, $deliveryDateObj);
+        $dropOffDays = array_map(
+            'intval',
+            explode(',', CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDays'))
+        );
 
-        // Update the dropOffDateObj with the cutoff time. Ex. 17:00 hour
         $this->updateCutoffTime($cutoffTimeToday, $dropOffDateObj, $cutoffExceptions);
-        if ($now > $dropOffDateObj) {
-            ++$dropOffDelay;
-        }
 
-        $exceptionCutoffToday = null;
+        $updatedDropOffDays = $this->updateDropOffDays($dropOffDays, $dropOffDateObj, $cutoffExceptions);
 
-        foreach (range(1, ($deliveryDaysWindow > 1 ? $deliveryDaysWindow : 1)) as $day) {
-            if (!isset($cutoffExceptions[$deliveryDateObj->format('d-m-Y')]['cutoff'])
-                && isset($cutoffExceptions[$deliveryDateObj->format('d-m-Y')]['nodispatch'])) {
-                $deliveryDateObj->modify('+1 day');
-                ++$dropOffDelay;
-            } else {
-                // first available day found
-                break;
-            }
+        // no dropoffdays left for the coming week, just schedule it for next week
+        if (! $updatedDropOffDays) {
+            $dropOffDelay += 7;
+        } else {
+            $dropOffDays = array_values($updatedDropOffDays);
         }
 
         $shippingOptions = $this->module->getShippingOptions($this->idCarrier, $address);
@@ -129,11 +123,7 @@ class DeliverySettingsProvider
                 'priceOnlyRecipient' => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceOnlyRecipient') * $taxRate, 2),
                 'pricePickup' => Tools::ps_round((CarrierConfigurationProvider::get($this->idCarrier, 'pricePickup') * $taxRate), 2),
                 'allowSignature' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowSignature'),
-
-                'dropOffDays' => array_map(
-                    'intval',
-                    explode(',', CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDays'))
-                ),
+                'dropOffDays' => $dropOffDays,
                 'cutoffTime' => $cutoffTimeToday,
                 'deliveryDaysWindow' => $deliveryDaysWindow,
                 'dropOffDelay' => $dropOffDelay,
@@ -177,14 +167,6 @@ class DeliverySettingsProvider
         ];
     }
 
-    private function updateDatesByDropOffDelay($dropOffDelay, $dropOffDateObj, $deliveryDateObj): void
-    {
-        if ($dropOffDelay > 0) {
-            $dropOffDateObj->modify('+' . $dropOffDelay . ' day');
-            $deliveryDateObj->modify('+' . $dropOffDelay . ' day');
-        }
-    }
-
     private function updateCutoffTime(&$cutoffTimeToday, $dropOffDateObj, $cutoffExceptions): void
     {
         if (isset($cutoffExceptions[$dropOffDateObj->format('d-m-Y')]['cutoff']) && $cutoffTimeToday !== false) {
@@ -194,8 +176,35 @@ class DeliverySettingsProvider
             $cutoffTimeToday = Constant::DEFAULT_CUTOFF_TIME;
         }
 
-        list($hour, $minute) = explode(':', $cutoffTimeToday);
+        [$hour, $minute] = explode(':', $cutoffTimeToday);
         $dropOffDateObj->setTime((int) $hour, (int) $minute, 0, 0);
+    }
+
+    /**
+     * @param array     $dropOffDays
+     * @param \DateTime $dropOffDateObj
+     * @param           $cutoffExceptions
+     *
+     * @return array
+     */
+    private function updateDropOffDays(array $dropOffDays, DateTime $dropOffDateObj, $cutoffExceptions): array
+    {
+        // remove days with nodispatch from the dropoffdays the coming week (still better than nothing)
+        $aWeekFromNowDateObj = (new DateTime('today'))->modify('+7 day');
+
+        do {
+            if (
+                ! isset($cutoffExceptions[$dropOffDateObj->format('d-m-Y')]['cutoff'])
+                && isset($cutoffExceptions[$dropOffDateObj->format('d-m-Y')]['nodispatch'])
+            ) {
+                $key = array_search($dropOffDateObj->format('N'), $dropOffDays);
+                if (false !== $key) {
+                    unset($dropOffDays[$key]);
+                }
+            }
+        } while ($dropOffDateObj->modify('+1 day') < $aWeekFromNowDateObj);
+
+        return $dropOffDays;
     }
 
     private function initCart(): void
