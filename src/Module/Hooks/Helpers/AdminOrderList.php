@@ -89,7 +89,7 @@ class AdminOrderList extends AbstractAdminOrder
         );
 
         $this->context->controller->addCSS($this->module->getPathUri() . 'views/css/myparcel.css');
-        $this->context->controller->addJS($this->module->getPathUri() . 'views/dist/js/myparcel.js');
+        $this->context->controller->addJS($this->module->getPathUri() . 'views/dist/js/external/myparcel.js');
         $this->context->controller->addJS($this->module->getPathUri() . 'views/dist/js/admin/order.js');
     }
 }

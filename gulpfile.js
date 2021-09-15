@@ -206,7 +206,7 @@ createTasksForAllModules('zip');
  * Copy delivery options into module.
  */
 gulp.task('copy:delivery-options', () => gulp.src('./node_modules/@myparcel/delivery-options/dist/myparcel.js')
-  .pipe(gulp.dest('views/dist/js/vendor/')));
+  .pipe(gulp.dest('views/dist/js/external/')));
 
 /**
  * Empty the dist folders.
