@@ -175,6 +175,7 @@ class MyParcelBE extends CarrierModule
      * @param $shipping_cost
      *
      * @return float|int
+     * @throws \PrestaShopDatabaseException
      */
     public function getOrderShippingCost($cart, $shipping_cost)
     {

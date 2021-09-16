@@ -1,5 +1,6 @@
 <?php
 
+use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 
 /**
@@ -22,13 +23,13 @@ SQL;
     foreach (Db::getInstance()
                  ->executeS($query) as $record) {
         if (preg_match('/Post\s?NL/', $record)) {
-            $carrierType = \Gett\MyparcelBE\Constant::POSTNL_CARRIER_NAME;
+            $carrierType = Constant::POSTNL_CARRIER_NAME;
         } elseif (strpos($record, 'DPD')) {
-            $carrierType = \Gett\MyparcelBE\Constant::DPD_CARRIER_NAME;
+            $carrierType = Constant::DPD_CARRIER_NAME;
         } else {
             $carrierType = $module->isNL()
-                ? \Gett\MyparcelBE\Constant::POSTNL_CARRIER_NAME
-                : \Gett\MyparcelBE\Constant::BPOST_CARRIER_NAME;
+                ? Constant::POSTNL_CARRIER_NAME
+                : Constant::BPOST_CARRIER_NAME;
         }
 
         Db::getInstance()

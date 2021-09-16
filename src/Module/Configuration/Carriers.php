@@ -479,11 +479,18 @@ SQL
         $helper->colorOnBackground = true;
         $helper->no_link = true;
 
-        $list = Db::getInstance()->executeS('SELECT a.*
-            FROM `' . Table::withPrefix('carrier')  . '` a
-            WHERE (a.external_module_name = \'' . $this->module->name . '\') AND a.`deleted` = 0
-            ORDER BY a.`position` ASC
-            LIMIT 0, 50');
+        $table = Table::withPrefix('carrier');
+        $list = Db::getInstance()
+            ->executeS(
+                <<<SQL
+SELECT *
+FROM $table
+WHERE (external_module_name = '{$this->module->name}'
+         AND deleted = 0 
+         ORDER BY position ASC
+         LIMIT 0, 50
+SQL
+            );
 
         return $helper->generateList($list, $fieldsList);
     }
