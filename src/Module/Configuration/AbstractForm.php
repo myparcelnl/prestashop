@@ -162,7 +162,7 @@ abstract class AbstractForm
             return $this->getFieldDefaults($field);
         }, $this->getFields());
 
-        return array_merge_recursive($defaults, $this->getFields());
+        return array_replace_recursive($defaults, $this->getFields());
     }
 
     /**
