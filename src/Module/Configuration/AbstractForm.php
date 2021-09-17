@@ -2,16 +2,20 @@
 
 namespace Gett\MyparcelBE\Module\Configuration;
 
+use AdminController;
+use Configuration;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
-use Tools;
-use Module;
 use HelperForm;
-use Configuration;
-use AdminController;
+use Module;
+use Tools;
+use Validate;
 
 abstract class AbstractForm
 {
+    protected const FIELD_TYPE_SELECT = 'select';
+    protected const FIELD_TYPE_SWITCH = 'switch';
+
     /** @var Module */
     protected $module;
 
@@ -70,7 +74,7 @@ abstract class AbstractForm
     {
         $result = true;
 
-        foreach (array_keys($this->getFields()) as $name) {
+        foreach (array_keys($this->getFieldsNormalized()) as $name) {
             if ($name == Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME) {
                 $ignored = [];
                 foreach (Tools::getAllValues() as $key => $value) {
@@ -98,36 +102,106 @@ abstract class AbstractForm
 
     abstract protected function getFields(): array;
 
+    /**
+     * TODO: MY-29719 make abstract when refactoring forms further.
+     *
+     * @return string
+     */
+    protected function getNamespace(): string
+    {
+        return '';
+    }
+
+    /**
+     * @param  array $field
+     *
+     * @return array
+     */
+    private function getFieldDefaults(array $field): array
+    {
+        $defaults = [
+            'required' => false,
+            'is_bool'  => false,
+        ];
+
+        switch ($field['type']) {
+            case 'switch':
+                $defaults['values']  = [
+                    [
+                        'id'    => 'active_on',
+                        'value' => 1,
+                        'label' => $this->module->l('Enabled', $this->getNamespace()),
+                    ],
+                    [
+                        'id'    => 'active_off',
+                        'value' => 0,
+                        'label' => $this->module->l('Disabled', $this->getNamespace()),
+                    ],
+                ];
+                $defaults['is_bool'] = true;
+                break;
+            case 'select':
+                $defaults['options']       = [
+                    'query' => [],
+                    'id'    => 'id',
+                    'name'  => 'name',
+                ];
+                $defaults['default_value'] = $field['options']['query'][0]['id'] ?? null;
+                break;
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * @return array
+     */
+    private function getFieldsNormalized(): array
+    {
+        $defaults = array_map(function (array $field) {
+            return $this->getFieldDefaults($field);
+        }, $this->getFields());
+
+        return array_merge_recursive($defaults, $this->getFields());
+    }
+
+    /**
+     * @return bool
+     */
     protected function validate(): bool
     {
-        $result = true;
+        $isValid = true;
 
-        foreach ($this->getFields() as $name => $field) {
+        foreach ($this->getFieldsNormalized() as $name => $field) {
             $value = Tools::getValue($name, Configuration::get($name));
 
-            if (!$field['required'] && empty($value)) {
+            if (! $field['required'] && empty($value)) {
                 continue; // Not required
             }
 
-            $result &= $result
-                && !is_null($value)
-                && $value !== ''
+            $isValid &= $isValid
+                && null !== $value
+                && '' !== $value
                 && call_user_func([Validate::class, $field['validate']], $value);
         }
 
-        return $result;
+        return $isValid;
     }
 
+    /**
+     * @return array
+     */
     protected function getValues(): array
     {
         $values = [];
-        foreach ($this->getFields() as $name => $field) {
+
+        foreach ($this->getFieldsNormalized() as $name => $field) {
             $values[$name] = Configuration::get(
                 $name,
                 null,
                 null,
                 null,
-                isset($field['default']) ? $field['default'] : null
+                $field['default'] ?? null
             );
             if ($name == Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME) {
                 $temp = explode(',', $values[$name]);
@@ -168,7 +242,7 @@ abstract class AbstractForm
             ],
         ];
 
-        foreach ($this->getFields() as $name => $field) {
+        foreach ($this->getFieldsNormalized() as $name => $field) {
             $field['name'] = $name;
             $field['desc'] = isset($field['desc']) ? implode(' ', (array) $field['desc']) : null;
 
