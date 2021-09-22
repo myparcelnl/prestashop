@@ -485,9 +485,9 @@ SQL
                 <<<SQL
 SELECT *
 FROM $table
-WHERE (external_module_name = '{$this->module->name}'
+WHERE external_module_name = '{$this->module->name}'
          AND deleted = 0 
-         ORDER BY position ASC
+         ORDER BY position
          LIMIT 0, 50
 SQL
             );
