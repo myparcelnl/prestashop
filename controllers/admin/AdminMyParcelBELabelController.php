@@ -1,6 +1,9 @@
 <?php
 
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsFromSaveConceptAdapter;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Logger\Logger;
@@ -369,21 +372,32 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         );
     }
 
-    public function ajaxProcessSaveConcept()
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function ajaxProcessSaveConcept(): void
     {
         $postValues = Tools::getAllValues();
-        if (!isset($postValues['id_order'])) {
+
+        if (! isset($postValues['id_order'])) {
             $this->errors[] = $this->module->l('Order not found by ID', 'adminlabelcontroller');
         }
-        if (!empty($this->errors)) {
+
+        if (! empty($this->errors)) {
             $this->returnAjaxResponse();
         }
-        $currency = Currency::getDefaultCurrency();
-        $deliveryOptions = OrderLabel::getOrderDeliveryOptions((int) $postValues['id_order']);
+
+        $orderId              = (int) $postValues['id_order'];
+        $currency             = Currency::getDefaultCurrency();
+        $deliveryOptionsArray = DeliveryOptions::queryByOrderId($orderId);
+        $deliveryOptions      = Tools::arrayToObject($deliveryOptionsArray) ?? new stdClass();
+
         try {
-            $order = new Order((int) $postValues['id_order']);
-            $deliveryOptions->date = $postValues['deliveryDate'] . 'T00:00:00.000Z';
-            $deliveryOptions->shipmentOptions = new StdClass(); // Reset shipment options
+            $order                            = new Order($orderId);
+            $deliveryOptions->date            = $postValues['deliveryDate'] . 'T00:00:00.000Z';
+            $deliveryOptions->shipmentOptions = new stdClass(); // Reset shipment options
+
             foreach (Constant::SINGLE_LABEL_CREATION_OPTIONS as $key => $name) {
                 if (isset($postValues[$key])) {
                     switch ($key) {
@@ -408,7 +422,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                             $deliveryOptions->shipmentOptions->signature = true;
                             break;
                         case 'insurance':
-                            $deliveryOptions->shipmentOptions->insurance = new StdClass();
+                            $deliveryOptions->shipmentOptions->insurance = new stdClass();
                             if (isset($postValues['insuranceAmount'])) {
                                 if (strpos($postValues['insuranceAmount'], 'amount') !== false) {
                                     $insuranceValue = (int) str_replace(
@@ -417,7 +431,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                                         $postValues['insuranceAmount']
                                     );
                                 } else {
-                                    $insuranceValue = (int) $postValues['insurance-amount-custom-value'] ?? 0;
+                                    $insuranceValue = (int) ($postValues['insurance-amount-custom-value'] ?? 0);
                                 }
                                 $deliveryOptions->shipmentOptions->insurance->amount = $insuranceValue * 100; // cents
                                 $deliveryOptions->shipmentOptions->insurance->currency = $currency->iso_code;
@@ -656,7 +670,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $order = new Order($postValues['id_order'] ?? 0);
         if ($action === 'updateDeliveryOptions' && !empty($options) && !empty($order->id_cart)) {
             Db::getInstance(_PS_USE_SQL_SLAVE_)->insert(
-                'myparcelbe_delivery_settings',
+                Table::TABLE_DELIVERY_SETTINGS,
                 ['id_cart' => $order->id_cart, 'delivery_settings' => pSQL($options)],
                 false,
                 true,

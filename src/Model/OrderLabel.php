@@ -1,15 +1,15 @@
 <?php
 
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Logger\Logger;
-use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\MyparcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
-use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Collection;
 
@@ -70,7 +70,7 @@ class OrderLabel extends ObjectModel
      * {@inheritdoc}
      */
     public static $definition = [
-        'table'     => 'myparcelbe_order_label',
+        'table'     => Table::TABLE_ORDER_LABEL,
         'primary'   => 'id_order_label',
         'multilang' => false,
         'fields'    => [
@@ -109,7 +109,13 @@ class OrderLabel extends ObjectModel
      */
     public static function findByLabelId(int $shipmentId): OrderLabel
     {
-        $id = Db::getInstance()->getValue('SELECT id_order_label FROM ' . _DB_PREFIX_ . self::$definition['table'] . " WHERE id_label = '" . $shipmentId . "' ");
+        $table = Table::withPrefix(self::$definition['table']);
+        $id    = Db::getInstance()
+            ->getValue(
+                <<<SQL
+SELECT id_order_label FROM $table where id_label = $shipmentId
+SQL
+            );
 
         return new OrderLabel($id);
     }
@@ -137,8 +143,12 @@ class OrderLabel extends ObjectModel
         }
 
         $address            = new Address($order->id_address_delivery);
-        $deliveryOptions    = self::getDeliveryOptions((int) $order_label->id_order);
-        $oldDeliveryOptions = self::getOrderDeliveryOptions((int) $order_label->id_order);
+        $deliveryOptions    = DeliveryOptions::getFromOrder($order);
+
+        /** @deprecated use $deliveryOptions */
+        $oldDeliveryOptions = DeliveryOptions::queryByOrder($order);
+        $oldDeliveryOptions = \Gett\MyparcelBE\Module\Tools\Tools::arrayToObject($oldDeliveryOptions);
+
         $orderIso           = Language::getIsoById($order->id_lang);
         $templateVars       = [
             '{firstname}'       => $address->firstname,
@@ -290,65 +300,30 @@ class OrderLabel extends ObjectModel
     public static function getDataForLabelsCreate(array $orderIds)
     {
         $qb = new DbQuery();
-        $qb->select('o.id_order,
-                    o.id_order AS id,
-                    o.reference,
-                    co.iso_code,
-                    CONCAT(a.firstname, " ",a.lastname) as person,
-                    CONCAT(a.address1, " ", a.address2) as full_street,
-                    a.postcode,
-                    a.city,
-                    c.email,
-                    a.phone,
-                    ds.delivery_settings,
-                    o.id_carrier,
-                    a.id_country,
-                    o.invoice_number
+        $qb->select('orders.id_order,
+                    orders.id_order AS id,
+                    orders.reference,
+                    country.iso_code,
+                    CONCAT(address.firstname, " ",address.lastname) as person,
+                    CONCAT(address.address1, " ", address.address2) as full_street,
+                    address.postcode,
+                    address.city,
+                    customer.email,
+                    address.phone,
+                    delivery_settings.delivery_settings,
+                    orders.id_carrier,
+                    address.id_country,
+                    orders.invoice_number
                     ');
-        $qb->from('orders', 'o');
-        $qb->innerJoin('address', 'a', 'o.id_address_delivery = a.id_address');
-        $qb->innerJoin('country', 'co', 'co.id_country = a.id_country');
-        $qb->innerJoin('customer', 'c', 'o.id_customer = c.id_customer');
-        $qb->innerJoin('myparcelbe_delivery_settings', 'ds', 'o.id_cart = ds.id_cart');
+        $qb->from('orders', 'orders');
+        $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
+        $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
+        $qb->innerJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
+        $qb->leftJoin(Table::TABLE_DELIVERY_SETTINGS, 'delivery_settings', 'orders.id_cart = delivery_settings.id_cart');
 
-        $qb->where('o.id_order IN (' . implode(',', $orderIds) . ') ');
+        $qb->where('id_order IN (' . implode(',', $orderIds) . ') ');
 
         return Db::getInstance()->executeS($qb);
-    }
-
-    /**
-     * @param  int $id_order
-     *
-     * @return false|mixed
-     * @throws \PrestaShopDatabaseException
-     * @deprecated use getDeliveryOptions()
-     */
-    public static function getOrderDeliveryOptions(int $id_order)
-    {
-        $qb = new DbQuery();
-        $qb->select('ds.delivery_settings');
-        $qb->from('myparcelbe_delivery_settings', 'ds');
-        $qb->innerJoin('orders', 'o', 'o.id_cart = ds.id_cart');
-        $qb->where('o.id_order = "' . $id_order . '" ');
-
-        $res = Db::getInstance()->executeS($qb);
-
-        if (isset($res[0]['delivery_settings'])) {
-            return json_decode($res[0]['delivery_settings']);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param  int $orderId
-     *
-     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
-     * @throws \Exception
-     */
-    public static function getDeliveryOptions(int $orderId): AbstractDeliveryOptionsAdapter
-    {
-        return DeliveryOptionsAdapterFactory::create(Tools::objectToArray(self::getOrderDeliveryOptions($orderId)));
     }
 
     /**
@@ -376,7 +351,7 @@ class OrderLabel extends ObjectModel
     {
         $qb = new DbQuery();
         $qb->select('ol.id_label');
-        $qb->from('myparcelbe_order_label', 'ol');
+        $qb->from(Table::TABLE_ORDER_LABEL, 'ol');
         $qb->where('ol.id_order IN (' . implode(',', $orders_id) . ') ');
 
         $return = [];
@@ -398,7 +373,7 @@ class OrderLabel extends ObjectModel
     {
         $sql = new DbQuery();
         $sql->select('*');
-        $sql->from('myparcelbe_order_label');
+        $sql->from(Table::TABLE_ORDER_LABEL);
         $sql->where('id_order = ' . (int) $order_id);
         if (!empty($label_ids)) {
             $sql->where('id_label IN(' . implode(',', $label_ids) . ')');
@@ -419,7 +394,7 @@ class OrderLabel extends ObjectModel
         $qb->select('od.product_id, pc.value , od.product_quantity, od.product_name, od.product_weight');
         $qb->select('od.unit_price_tax_incl');
         $qb->from('order_detail', 'od');
-        $qb->leftJoin('myparcelbe_product_configuration', 'pc', 'od.product_id = pc.id_product');
+        $qb->leftJoin(Table::TABLE_PRODUCT_CONFIGURATION, 'pc', 'od.product_id = pc.id_product');
         $qb->where('od.id_order = ' . $id_order);
 
         $return = Db::getInstance()->executeS($qb);
@@ -471,7 +446,7 @@ class OrderLabel extends ObjectModel
     {
         $sql = new DbQuery();
         $sql->select('id_order');
-        $sql->from('myparcelbe_order_label');
+        $sql->from(Table::TABLE_ORDER_LABEL);
         $sql->where('id_label = ' . (int) $labelId);
 
         return (int) Db::getInstance()->getValue($sql);
@@ -570,8 +545,13 @@ class OrderLabel extends ObjectModel
      */
     private static function orderHistoryContainsStatus(Order $order, int $status): bool
     {
+        $table   = Table::withPrefix('order_history');
         $history = Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->executeS('SELECT `id_order_state` FROM ' . _DB_PREFIX_ . "order_history WHERE `id_order` = $order->id");
+            ->executeS(
+                <<<SQL
+SELECT `id_order_state` FROM $table WHERE `id_order` = $order->id 
+SQL
+            );
 
         if (is_array($history)) {
             $statuses = array_column($history, 'id_order_state');

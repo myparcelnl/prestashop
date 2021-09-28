@@ -5,9 +5,12 @@ namespace Gett\MyparcelBE\Module\Hooks;
 use Configuration;
 use Dispatcher;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Module\Tools\Tools;
 use Order;
 use Validate;
 
@@ -42,7 +45,7 @@ trait LegacyOrderPageHooks
         $params['select'] .= ', ' . $prefix . '.`name` AS carrier_name';
 
         $params['join'] .= '
-            LEFT JOIN ' . _DB_PREFIX_ . 'carrier ' . $prefix . ' ON (a.id_carrier = ' . $prefix . '.id_carrier)';
+            LEFT JOIN ' . Table::withPrefix('carrier') . $prefix . ' ON (a.id_carrier = ' . $prefix . '.id_carrier)';
 
         $params['fields']['myparcel_void_0'] = [
             'title' => $this->l('Delivery date', 'legacyorderpagehooks'),
@@ -80,7 +83,7 @@ trait LegacyOrderPageHooks
         }
         $sql = new \DbQuery();
         $sql->select('*');
-        $sql->from('myparcelbe_order_label');
+        $sql->from(Table::TABLE_ORDER_LABEL);
         $sql->where('id_order = "' . pSQL($params['id_order']) . '" ');
         $result = \Db::getInstance()->executeS($sql);
         $link = $this->context->link;
@@ -165,7 +168,9 @@ trait LegacyOrderPageHooks
         if (!$adminOrderList->isMyParcelCarrier((int) $row['id_carrier_reference'])) {
             return '';
         }
-        $deliverySettings = $this->getDeliverySettingsByCart($row['id_cart']);
+
+        $deliverySettings = DeliveryOptions::queryByCart($row['id_cart']);
+
         try {
             if (empty($deliverySettings['date'])) {
                 return '';

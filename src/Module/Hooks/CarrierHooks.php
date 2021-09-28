@@ -2,21 +2,25 @@
 
 namespace Gett\MyparcelBE\Module\Hooks;
 
-use Gett\MyparcelBE\Constant;
+use Db;
+use Gett\MyparcelBE\Database\Table;
 
 trait CarrierHooks
 {
     public function hookActionCarrierUpdate(array $params): void
     {
         $oldCarrierId = (int) $params['id_carrier'];
-        $newCarrier = $params['carrier']; // Carrier object
+        $newCarrier   = $params['carrier']; // Carrier object
+        $table        = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
 
-        \Db::getInstance(_PS_USE_SQL_SLAVE_)->execute(
-            'INSERT INTO `' . _DB_PREFIX_ . 'myparcelbe_carrier_configuration`
-            (`id_carrier`, `name`, `value`)
-            SELECT ' . (int) $newCarrier->id . ' AS `id_carrier`, `name`, `value`
-            FROM `' . _DB_PREFIX_ . 'myparcelbe_carrier_configuration` 
-            WHERE `id_carrier` = ' . (int) $oldCarrierId
-        );
+        Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->execute(
+                <<<SQL
+INSERT INTO `$table` (`id_carrier`, `name`, `value`) 
+SELECT $newCarrier->id AS `id_carrier`, `name`, `value` FROM 
+`$table`
+WHERE `id_carrier` = $oldCarrierId
+SQL
+            );
     }
 }
