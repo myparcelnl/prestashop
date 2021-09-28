@@ -2,61 +2,63 @@
 
 namespace Gett\MyparcelBE\Service;
 
-use Db;
 use Gett\MyparcelBE\Database\Table;
+use PrestaShop\PrestaShop\Adapter\Entity\Db;
+use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
 class CarrierConfigurationProvider
 {
     /**
      * @var array
      */
-    public static $configuration;
+    private static $configuration;
 
     /**
      * @var string
      */
-    protected static $table = Table::TABLE_PRODUCT_CONFIGURATION;
+    private static $table = Table::TABLE_CARRIER_CONFIGURATION;
 
     /**
-     * @param  int    $carrier_id
+     * @param  int    $carrierId
      * @param  string $name
      * @param  null   $default
      *
      * @return null|mixed
      * @throws \PrestaShopDatabaseException
      */
-    public static function get(int $carrier_id, string $name, $default = null)
+    public static function get(int $carrierId, string $name, $default = null)
     {
-        if (! isset(static::$configuration[$carrier_id][$name])) {
-            $table  = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+        if (! isset(static::$configuration[$carrierId][$name])) {
+            $query = (new DbQuery())
+                ->select('name, value')
+                ->from(self::$table)
+                ->where('id_carrier = ' . $carrierId);
+
             $result = Db::getInstance()
-                ->executeS(
-                    <<<SQL
-SELECT name,value FROM `$table` WHERE id_carrier = $carrier_id 
-SQL
-                );
+                ->executeS($query);
 
             foreach ($result as $item) {
-                static::$configuration[$carrier_id][$item['name']] = $item['value'];
+                static::$configuration[$carrierId][$item['name']] = $item['value'];
             }
         }
 
-        return isset(static::$configuration[$carrier_id][$name]) && static::$configuration[$carrier_id][$name]
-            ? static::$configuration[$carrier_id][$name] : $default;
+        return isset(static::$configuration[$carrierId][$name]) && static::$configuration[$carrierId][$name]
+            ? static::$configuration[$carrierId][$name]
+            : $default;
     }
 
     /**
-     * @param  int    $carrier_id
+     * @param  int    $carrierId
      * @param  string $name
      * @param  string $value
      */
-    public static function updateValue(int $carrier_id, string $name, string $value): void
+    public static function updateValue(int $carrierId, string $name, string $value): void
     {
         Db::getInstance()
             ->update(
                 self::$table,
                 ['value' => pSQL($value)],
-                'id_carrier = ' . $carrier_id . ' AND name = "' . pSQL($name) . '" '
+                'id_carrier = ' . $carrierId . ' AND name = "' . pSQL($name) . '" '
             );
     }
 }
