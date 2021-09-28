@@ -12,20 +12,20 @@ class ApiLogger extends Logger
 {
     /**
      * @param        $message
-     * @param  bool  $is_exception
+     * @param  bool  $isException
      * @param  false $allowDuplicate
      * @param  int   $severity
      * @param  null  $errorCode
      */
     public static function addLog(
-        $message,
-        bool $is_exception = false,
-        $allowDuplicate = false,
-        $severity = 1,
-        $errorCode = null
+             $message,
+        bool $isException = false,
+        bool $allowDuplicate = false,
+        int  $severity = 1,
+             $errorCode = null
     ) {
         if (Configuration::get(Constant::API_LOGGING_CONFIGURATION_NAME)) {
-            parent::addLog($message, $is_exception, $allowDuplicate, $severity, $errorCode);
+            parent::addLog($message, $isException, $allowDuplicate, $severity, $errorCode);
         }
     }
 }

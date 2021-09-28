@@ -6,6 +6,8 @@ use Configuration;
 use DateTime;
 use Exception;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconBulkAction;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconModalBulkAction;
 use Gett\MyparcelBE\Grid\Column\LabelsColumn;
@@ -35,7 +37,7 @@ trait OrdersGridHooks
         $searchQueryBuilder->addSelect('o.id_cart');
         $searchQueryBuilder->leftJoin(
             'o',
-            _DB_PREFIX_ . 'carrier',
+            Table::withPrefix('carrier'),
             $prefix,
             'o.id_carrier = ' . $prefix . '.id_carrier'
         );
@@ -125,7 +127,7 @@ trait OrdersGridHooks
             ];
 
             // Delivery date
-            $deliverySettings = $this->getDeliverySettingsByCart($row['id_cart']);
+            $deliverySettings = DeliveryOptions::queryByCart($row['id_cart']);
             if (empty($deliverySettings['date'])) {
                 $row['delivery_info'] = null;
                 continue;

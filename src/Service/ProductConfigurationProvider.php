@@ -2,21 +2,42 @@
 
 namespace Gett\MyparcelBE\Service;
 
+use Gett\MyparcelBE\Database\Table;
+use PrestaShop\PrestaShop\Adapter\Entity\Db;
+use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
+
 class ProductConfigurationProvider
 {
+    /**
+     * @var array
+     */
     public static $products = [];
 
-    public static function get(int $id_product, string $param, $default = null)
+    /**
+     * @param  int    $productId
+     * @param  string $param
+     * @param  null   $default
+     *
+     * @return null|mixed
+     * @throws \PrestaShopDatabaseException
+     */
+    public static function get(int $productId, string $param, $default = null)
     {
-        if (!isset(static::$products[$id_product][$param])) {
-            $result = \Db::getInstance()->executeS(
-                'SELECT name, value FROM ' . _DB_PREFIX_ . "myparcelbe_product_configuration WHERE id_product = '{$id_product}' "
-            );
+        if (! isset(static::$products[$productId][$param])) {
+            $query = (new DbQuery())
+            ->select('name, value')
+            ->from(Table::TABLE_PRODUCT_CONFIGURATION)
+            ->where('id_product = ' . $productId);
+
+            $result = Db::getInstance()
+                ->executeS($query);
+
             foreach ($result as $item) {
-                static::$products[$id_product][$item['name']] = $item['value'];
+                static::$products[$productId][$item['name']] = $item['value'];
             }
         }
 
-        return isset(static::$products[$id_product][$param]) && static::$products[$id_product][$param] ? static::$products[$id_product][$param] : $default;
+        return isset(static::$products[$productId][$param]) && static::$products[$productId][$param]
+            ? static::$products[$productId][$param] : $default;
     }
 }
