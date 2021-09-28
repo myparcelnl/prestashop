@@ -2,15 +2,15 @@ const babelify = require('babelify');
 const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const clean = require('gulp-clean');
-const {execSync} = require('child_process');
+const {exec} = require('child_process');
 const gulp = require('gulp');
+const packageJson = require('./package.json');
 const rename = require('gulp-rename');
 const {replaceCaseSensitive} = require('./private/replaceCaseSensitive');
 const sourcemaps = require('gulp-sourcemaps');
 const tap = require('gulp-tap');
 const uglify = require('gulp-uglify');
 const zip = require('gulp-zip');
-const {exec} = require('child_process');
 
 const MODULE_NAME_NL = 'myparcelnl';
 const MODULE_NAME_BE = 'myparcelbe';
@@ -20,7 +20,7 @@ const moduleNameMap = {
   [MODULE_NAME_BE]: 'MyParcelBE',
 };
 
-const lastGitTag = execSync('git describe --abbrev=0 --t').toString().trim();
+const {version} = packageJson;
 
 /**
  * Files where module name should be transformed in filenames and contents.
@@ -60,7 +60,6 @@ const copyFiles = [
  * @type {string[]}
  */
 const excludeFiles = [
-  'composer.json',
   'composer.lock',
   'package-lock.json',
   'package.json',
@@ -144,7 +143,7 @@ function createZipTask(moduleName) {
     `./dist/${moduleName}/**/*`,
     ...excludeFiles.map((filename) => `!./dist/${moduleName}/${filename}`),
   ], {base: 'dist'})
-    .pipe(zip(`${moduleNameMap[moduleName]}-${lastGitTag}.zip`))
+    .pipe(zip(`${moduleNameMap[moduleName]}-${version}.zip`))
     .pipe(gulp.dest('dist'));
 }
 
