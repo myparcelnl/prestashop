@@ -3,12 +3,25 @@
   "overrides": [
     {
       "files": [
-        "./gulpfile.js",
+        "./*.js",
         "./private/**/*"
       ],
       "env": {
         "node": true,
         "browser": false
+      },
+      "rules": {
+        "max-len": "off",
+        "no-magic-numbers": "off",
+        "no-console": "off"
+      }
+    },
+    {
+      "files": [
+        "./release.config.js"
+      ],
+      "rules": {
+        "no-template-curly-in-string": "off"
       }
     }
   ]

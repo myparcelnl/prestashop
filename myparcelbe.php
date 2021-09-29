@@ -21,7 +21,6 @@ class MyParcelBE extends CarrierModule
     use \Gett\MyparcelBE\Module\Hooks\OrderHooks;
 
     public const MODULE_NAME = 'myparcelbe';
-    public const VERSION = '1.2.0';
 
     public $baseUrl;
     public $id_carrier;
@@ -105,12 +104,12 @@ class MyParcelBE extends CarrierModule
 
     public function __construct()
     {
-        $this->name = self::MODULE_NAME;
-        $this->tab = 'shipping_logistics';
-        $this->version = self::VERSION;
-        $this->author = 'Gett';
+        $this->name          = self::MODULE_NAME;
+        $this->tab           = 'shipping_logistics';
+        $this->version       = $this->getVersion();
+        $this->author        = 'Gett';
         $this->need_instance = 1;
-        $this->bootstrap = true;
+        $this->bootstrap     = true;
 
         parent::__construct();
 
@@ -135,7 +134,7 @@ class MyParcelBE extends CarrierModule
             );
         }
         $this->displayName = $this->l('MyParcelBE');
-        $this->description = $this->l('PrestaShop module to intergratie with MyParcel NL and MyParcel BE');
+        $this->description = $this->l('PrestaShop module which integrates with MyParcel NL');
 
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
         $this->registerHook('displayAdminOrderMain');
@@ -275,6 +274,19 @@ class MyParcelBE extends CarrierModule
     public function isBE()
     {
         return $this->getModuleCountry() === 'BE';
+    }
+
+    /**
+     * Get the package version from composer.json.
+     *
+     * @return string
+     */
+    private function getVersion(): string
+    {
+        $filename     = __DIR__ . '/composer.json';
+        $composerData = json_decode(file_get_contents($filename), true);
+
+        return $composerData['version'];
     }
 
     private function mypa_stringify_url($parsedUrl)

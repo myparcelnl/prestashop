@@ -19,9 +19,9 @@ on:
       - package.json
 
 jobs:
-  build:
-    name: Build 📦
-    runs-on: ubuntu-20.04
+  release:
+    name: Build and publish 🚀
+    runs-on: ubuntu-latest
     steps:
       # Set up environment
       - name: Set up PHP
@@ -60,43 +60,13 @@ jobs:
 
       # Install dependencies
       - name: Install composer dependencies
-        run: composer install --no-dev
+        run: composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --optimize-autoloader
       - name: Install npm dependencies
-        run: npm ci --no-optional
+        run: npm ci --production=false --no-optional
 
-      # Build the modules
-      - name: Create build
-        run: npx gulp build
-
-      # Upload artifacts for publish stage
-      - name: Upload build
-        uses: actions/upload-artifact@v2
-        with:
-          name: dist
-          path: |
-            dist/*.zip
-
-  release:
-    name: Publish 🚀
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - uses: actions/checkout@v2
-      - name: Handle NPM cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Get build
-        uses: actions/download-artifact@v1
-        with:
-          name: dist
-      - name: Install semantic release plugins
-        run: npm i conventional-changelog-conventionalcommits --no-optional
-      - name: Run semantic release
-        uses: cycjimmy/semantic-release-action@v2
+      # Run release tasks
+      - name: Release
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release
