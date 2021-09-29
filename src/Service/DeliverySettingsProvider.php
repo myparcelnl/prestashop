@@ -106,10 +106,10 @@ class DeliverySettingsProvider
         $updatedDropOffDays = $this->updateDropOffDays($dropOffDays, $dropOffDateObj, $cutoffExceptions);
 
         // no dropoffdays left for the coming week, just schedule it for next week
-        if (! $updatedDropOffDays) {
-            $dropOffDelay += 7;
-        } else {
+        if ($updatedDropOffDays) {
             $dropOffDays = array_values($updatedDropOffDays);
+        } else {
+            $dropOffDelay += 7;
         }
 
         $shippingOptions = $this->module->getShippingOptions($this->idCarrier, $address);
@@ -120,12 +120,14 @@ class DeliverySettingsProvider
         $surchargeOption    = Configuration::get(Constant::DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME);
         $showPriceSurcharge = Constant::DELIVERY_OPTIONS_PRICE_FORMAT_SURCHARGE === $surchargeOption;
 
+        $priceStandardDelivery = $showPriceSurcharge ? null : Tools::ps_round($priceStandardDelivery, 2);
+
         return [
             'config' => [
                 'platform'              => ($this->module->isBE() ? 'belgie' : 'myparcel'),
                 'carrierSettings'       => $carrierSettings,
                 'priceMorningDelivery'  => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceMorningDelivery') * $taxRate, 2),
-                'priceStandardDelivery' => Tools::ps_round($priceStandardDelivery, 2),
+                'priceStandardDelivery' => $priceStandardDelivery,
                 'priceEveningDelivery'  => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceEveningDelivery') * $taxRate, 2),
                 'priceSignature'        => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceSignature') * $taxRate, 2),
                 'priceOnlyRecipient'    => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceOnlyRecipient') * $taxRate, 2),
@@ -167,10 +169,10 @@ class DeliverySettingsProvider
                 'retry'                 => CarrierConfigurationProvider::get($this->idCarrier, 'retry'),
             ],
             'address' => [
-                'cc' => strtoupper(Country::getIsoById($address->id_country)),
-                'city' => $address->city,
+                'cc'         => strtoupper(Country::getIsoById($address->id_country)),
+                'city'       => $address->city,
                 'postalCode' => $address->postcode,
-                'number' => $houseNumber,
+                'number'     => $houseNumber,
             ],
             'delivery_settings' => DeliveryOptions::queryByCart((int) $this->context->cart->id),
         ];
