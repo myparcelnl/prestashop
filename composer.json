@@ -1,6 +1,6 @@
 {
-  "name": "gett/myparcelbe",
-  "description": "PrestaShop module to integrate with MyParcel NL and MyParcel BE",
+  "name": "myparcelnl/prestashop-module",
+  "version": "1.1.2",
   "require": {
     "php": ">=7.2.0",
     "myparcelnl/sdk": "^5.2"
@@ -16,7 +16,7 @@
       "myparcelbe.php",
       "src/Model/OrderLabel.php"
     ],
-    "exclude-from-classmap": []
+    "exclude-from-classmap": [ ]
   },
   "config": {
     "preferred-install": "dist",
