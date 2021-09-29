@@ -3,7 +3,6 @@
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsFromSaveConceptAdapter;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Logger\Logger;
@@ -26,13 +25,11 @@ if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
     require_once _PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php';
 }
 
+/**
+ * @property \MyParcelBE $module
+ */
 class AdminMyParcelBELabelController extends ModuleAdminController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function initContent()
     {
         parent::initContent();
@@ -44,7 +41,6 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
 
         die();
-        //Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrders'));
     }
 
     public function processReturn()
@@ -464,10 +460,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
 
         if ($idOrder) {
-            $psVersion = '';
-            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
-                $psVersion = '-177';
-            }
+
             $labelList = OrderLabel::getOrderLabels((int) $idOrder, []);
             $labelListHtml = $this->context->smarty->createData(
                 $this->context->smarty
@@ -478,7 +471,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             ]);
 
             $labelListHtmlTpl = $this->context->smarty->createTemplate(
-                $this->module->getTemplatePath('views/templates/admin/hook/label-list' . $psVersion . '.tpl'),
+                $this->getTemplatePath() . 'hook/label-list' . $this->getTemplateSuffix() . '.tpl',
                 $labelListHtml
             );
 
@@ -658,24 +651,31 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $this->returnAjaxResponse();
     }
 
-    public function ajaxProcessUpdateDeliveryOptions()
+    /**
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     * @throws \SmartyException
+     * @throws \Exception
+     */
+    public function ajaxProcessUpdateDeliveryOptions(): void
     {
-        $psVersion = '';
-        if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
-            $psVersion = '-177';
-        }
         $postValues = Tools::getAllValues();
-        $options = $postValues['myparcel-delivery-options'] ?? null;
-        $action = $postValues['action'] ?? null;
-        $order = new Order($postValues['id_order'] ?? 0);
-        if ($action === 'updateDeliveryOptions' && !empty($options) && !empty($order->id_cart)) {
-            Db::getInstance(_PS_USE_SQL_SLAVE_)->insert(
-                Table::TABLE_DELIVERY_SETTINGS,
-                ['id_cart' => $order->id_cart, 'delivery_settings' => pSQL($options)],
-                false,
-                true,
-                Db::REPLACE
-            );
+        $options    = $postValues['myparcel-delivery-options'] ?? null;
+        $action     = $postValues['action'] ?? null;
+        $order      = new \Gett\MyparcelBE\Model\Core\Order($postValues['id_order'] ?? 0);
+
+        if ('updateDeliveryOptions' === $action && ! empty($options) && ! empty($order->id_cart)) {
+            Db::getInstance(_PS_USE_SQL_SLAVE_)
+                ->insert(
+                    Table::TABLE_DELIVERY_SETTINGS,
+                    [
+                        'id_cart'           => $order->id_cart,
+                        'delivery_settings' => pSQL($options),
+                    ],
+                    false,
+                    true,
+                    Db::REPLACE
+                );
         } else {
             $this->errors[] = $this->module->l(
                 'Error updating the delivery options.',
@@ -684,25 +684,26 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
 
         $deliveryOptionsProvider = new DeliveryOptionsProvider();
-        $deliveryOptions = $deliveryOptionsProvider->provide($order->id);
+        $deliveryOptions         = $deliveryOptionsProvider->provide($order->getId());
         $carrierSettingsProvider = new CarrierSettingsProvider($this->module);
-        $currency = Currency::getDefaultCurrency();
-        $labelOptionsResolver = new LabelOptionsResolver();
+        $currency                = Currency::getDefaultCurrency();
+        $labelOptionsResolver    = new LabelOptionsResolver();
 
         $labelConceptHtml = $this->context->smarty->createData($this->context->smarty);
         $labelConceptHtml->assign([
-            'deliveryOptions' => json_decode(json_encode($deliveryOptions), true),
-            'carrierSettings' => $carrierSettingsProvider->provide($order->id_carrier),
-            'date_warning_display' => $deliveryOptionsProvider->provideWarningDisplay($order->id),
-            'isBE' => $this->module->isBE(),
-            'currencySign' => $currency->getSign(),
-            'labelOptions' => $labelOptionsResolver->getLabelOptions([
-                'id_order' => (int) $order->id,
-                'id_carrier' => (int) $order->id_carrier,
+            'deliveryOptions'      => $deliveryOptions,
+            'carrierSettings'      => $carrierSettingsProvider->provide($order->getIdCarrier()),
+            'date_warning_display' => $deliveryOptionsProvider->provideWarningDisplay($order->getId()),
+            'isBE'                 => $this->module->isBE(),
+            'currencySign'         => $currency->getSign(),
+            'labelOptions'         => $labelOptionsResolver->getLabelOptions([
+                'id_order'   => $order->getId(),
+                'id_carrier' => $order->getIdCarrier(),
             ]),
         ]);
+
         $labelConceptHtmlTpl = $this->context->smarty->createTemplate(
-            $this->module->getTemplatePath('views/templates/admin/hook/label-concept' . $psVersion . '.tpl'),
+            $this->getTemplatePath() . 'hook/label-concept' . $this->getTemplateSuffix() . '.tpl',
             $labelConceptHtml
         );
 
@@ -902,5 +903,19 @@ class AdminMyParcelBELabelController extends ModuleAdminController
 
         echo json_encode($params);
         exit;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTemplateSuffix(): string
+    {
+        $suffix = '';
+
+        if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
+            $suffix = '-177';
+        }
+
+        return $suffix;
     }
 }
