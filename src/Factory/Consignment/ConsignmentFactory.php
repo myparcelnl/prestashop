@@ -9,10 +9,9 @@ use Exception;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
-use OrderLabel;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Module;
@@ -28,6 +27,7 @@ use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use MyParcelNL\Sdk\src\Support\Arr;
 use Order;
+use OrderLabel;
 use Tools;
 use Validate;
 
@@ -140,12 +140,13 @@ class ConsignmentFactory
 
     /**
      * @return array
+     * @throws \Exception
      */
     private function getUserAgent(): array
     {
         return [
             'PrestaShop'            => _PS_VERSION_,
-            'MyParcelBE-PrestaShop' => MyParcelBE::VERSION,
+            'MyParcelBE-PrestaShop' => MyParcelBE::getModule()->version,
         ];
     }
 

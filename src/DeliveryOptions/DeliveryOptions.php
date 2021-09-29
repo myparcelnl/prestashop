@@ -44,7 +44,7 @@ class DeliveryOptions
         $deliveryOptions = self::queryByOrder($order);
 
         if ($deliveryOptions) {
-            return DeliveryOptionsAdapterFactory::create(Tools::objectToArray($deliveryOptions));
+            return DeliveryOptionsAdapterFactory::create($deliveryOptions);
         }
 
         return null;

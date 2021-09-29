@@ -1,38 +1,67 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use DateTime;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
 
 class DeliveryOptionsProvider
 {
-    protected $nextDeliveryDate;
+    /**
+     * @var DateTime
+     */
     protected $deliveryDate;
 
-    public function provide(int $orderId)
+    /**
+     * @var DateTime
+     */
+    protected $nextDeliveryDate;
+
+    /**
+     * @param  int $orderId
+     *
+     * @return array - Delivery options array
+     * @throws \Exception
+     */
+    public function provide(int $orderId): array
     {
-        $deliveryOptions = DeliveryOptions::queryByOrderId($orderId);
-        if (empty($deliveryOptions)) {
-            $deliveryOptions = json_decode(json_encode(['date' => '']));
+        $deliveryOptions = DeliveryOptions::getFromOrder($orderId);
+
+        if (! $deliveryOptions) {
+            $deliveryOptions = new DeliveryOptionsV3Adapter();
         }
-        $this->nextDeliveryDate = new DateTime('tomorrow');// TODO: get next available delivery date
-        if (!empty($deliveryOptions->date)) {
-            $this->deliveryDate = new DateTime($deliveryOptions->date);
-            $deliveryOptions->date = $this->deliveryDate->format('Y-m-d');
+
+        $deliveryOptionsArray = $deliveryOptions->toArray();
+
+        if ($deliveryOptions->getDate()) {
+            $this->deliveryDate     = new DateTime($deliveryOptions->getDate());
+            $this->nextDeliveryDate = new DateTime('tomorrow'); // TODO: get next available delivery date
+
             if ($this->nextDeliveryDate > $this->deliveryDate) {
-                $deliveryOptions->date = $this->nextDeliveryDate->format('Y-m-d');
+                $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
             }
         } else {
-            $deliveryOptions->date = $this->nextDeliveryDate->format('Y-m-d');
+            $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
         }
 
-        return $deliveryOptions;
+        // Prestashop's formatDate function, (which is used in templates) can't handle our date formats.
+        $deliveryOptionsArray['date'] = (new DateTime($deliveryOptionsArray['date']))->format('Y-m-d');
+
+        return $deliveryOptionsArray;
     }
 
-    public function provideWarningDisplay(int $orderId)
+    /**
+     * @param  int $orderId
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function provideWarningDisplay(int $orderId): bool
     {
-        if (!$this->nextDeliveryDate) {
+        if (! $this->nextDeliveryDate) {
             $this->provide($orderId);
         }
 
