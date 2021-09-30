@@ -7,11 +7,9 @@ namespace Gett\MyparcelBE\Entity;
 interface OrderStatusUpdateInterface
 {
     /**
-     * The new status the order should get when this update is applied.
-     *
-     * @return int|null
+     * @return string
      */
-    public function getNewOrderStatus(): ?int;
+    public function getOrderStatusSetting(): string;
 
     /**
      * Logic that should be run when this update is applied.
