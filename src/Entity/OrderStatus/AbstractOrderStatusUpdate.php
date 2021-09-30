@@ -8,7 +8,9 @@ use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Entity\OrderStatusUpdateInterface;
+use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Logger\Logger;
+use Gett\MyparcelBE\Module\Tools\Tools;
 use OrderLabel;
 
 abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
@@ -29,9 +31,34 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
         $this->sendMail   = $sendMail;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getNewOrderStatus(): ?int
+    {
+        return Tools::intOrNull(Configuration::get($this->getOrderStatusSetting()));
+    }
+
+    /**
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     */
     public function onExecute(): void
     {
-        OrderLabel::setOrderStatus($this->shipmentId, $this->getNewOrderStatus());
+        $newOrderStatus = $this->getNewOrderStatus();
+
+        if (! $newOrderStatus) {
+            ApiLogger::addLog(
+                sprintf(
+                    "Order status for %d won't be updated because setting %s is not set.",
+                    $this->shipmentId,
+                    $this->getOrderStatusSetting()
+                )
+            );
+            return;
+        }
+
+        OrderLabel::setOrderStatus($this->shipmentId, $newOrderStatus);
     }
 
     /**

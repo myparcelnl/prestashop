@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Entity\OrderStatus;
 
-use Configuration;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Tools\Tools;
 
 class DeliveredOrderStatusUpdate extends AbstractOrderStatusUpdate
 {
     /**
-     * @return int|null
+     * @return string
      */
-    public function getNewOrderStatus(): ?int
+    public function getOrderStatusSetting(): string
     {
-        return Tools::intOrNull(Configuration::get(Constant::DELIVERED_ORDER_STATUS_CONFIGURATION_NAME));
+        return Constant::DELIVERED_ORDER_STATUS_CONFIGURATION_NAME;
     }
 }

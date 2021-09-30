@@ -3,9 +3,9 @@
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsFromSaveConceptAdapter;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
+use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
@@ -552,6 +552,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             }
             Logger::addLog($collection->toJson());
             $collection->setLinkOfLabels();
+            ApiLogger::addLog(json_encode($collection->toArray(), JSON_PRETTY_PRINT));
             if ($this->module->isNL()
                 && ($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0)) {
                 $collection->generateReturnConsignments(true);
