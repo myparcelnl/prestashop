@@ -115,6 +115,6 @@ class StatusChangeWebhookPayload implements AbstractWebhookPayload
      */
     public function onReceive(): void
     {
-        OrderLabel::updateStatus($this->shipmentId, $this->status);
+        OrderLabel::updateStatus((int) $this->shipmentId, (int) $this->status);
     }
 }

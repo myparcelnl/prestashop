@@ -48,25 +48,22 @@ class MyParcelBEHookModuleFrontController extends FrontController
             $this->sendResponse(400, 'Invalid hash');
         }
 
-        $content = file_get_contents('php://input');
-
-        if (Configuration::get(Constant::API_LOGGING_CONFIGURATION_NAME)) {
-            ApiLogger::addLog("Incoming webhook: $content");
-        }
-
+        $content  = file_get_contents('php://input');
         $data     = json_decode($content, true);
         $hookData = $data['data']['hooks'] ?? null;
 
         if (! is_array($hookData)) {
-            ApiLogger::addLog('Invalid data format', true);
+            ApiLogger::addLog('Invalid data format', ApiLogger::WARNING);
             $this->sendResponse(400, 'Invalid data format');
         }
+
+        ApiLogger::addLog('Incoming webhook: ' . json_encode($hookData));
 
         foreach ($hookData as $webhook) {
             try {
                 $webhook = WebhookPayloadFactory::create($webhook);
             } catch (WebhookException $e) {
-                ApiLogger::addLog($e->getMessage(), true);
+                ApiLogger::addLog($e->getMessage(), ApiLogger::WARNING);
                 continue;
             }
 

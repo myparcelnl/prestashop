@@ -5,6 +5,7 @@ use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
+use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\MyparcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
@@ -280,8 +281,9 @@ SQL
      */
     public static function setOrderStatus(int $shipmentId, int $newOrderStatus): void
     {
-        $orderLabel = self::findByLabelId($shipmentId);
-        $order      = new Order($orderLabel->id_order);
+        $orderLabel     = self::findByLabelId($shipmentId);
+        $order          = new Order($orderLabel->id_order);
+        $oldOrderStatus = $order->getCurrentState();
 
         if (! self::validateSetOrderStatus($orderLabel, $order, $newOrderStatus)) {
             return;
@@ -289,6 +291,14 @@ SQL
 
         $order->setCurrentState($newOrderStatus);
         $order->save();
+        ApiLogger::addLog(
+            sprintf(
+                'Order %d status changed from %d to %d',
+                $orderLabel->id_order,
+                $oldOrderStatus,
+                $newOrderStatus
+            )
+        );
     }
 
     /**
@@ -524,12 +534,17 @@ SQL
     protected static function validateSetOrderStatus(OrderLabel $orderLabel, Order $order, int $newOrderStatus): bool
     {
         if (! Validate::isLoadedObject($orderLabel) || ! Validate::isLoadedObject($order)) {
-            Logger::addLog('No order found for shipment id ' . $orderLabel->id_label, true);
+            ApiLogger::addLog('No order found for given shipment id.', ApiLogger::ERROR);
             return false;
         }
 
-        if (self::orderStatusShouldBeIgnored($order)
-            || self::orderHistoryContainsStatus($order, $newOrderStatus)) {
+        if (self::orderStatusShouldBeIgnored($order)) {
+            ApiLogger::addLog('Current order status is ignored.');
+            return false;
+        }
+
+        if (self::orderHistoryContainsStatus($order, $newOrderStatus)) {
+            ApiLogger::addLog('New order status is already present in order history.');
             return false;
         }
 
