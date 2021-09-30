@@ -16,19 +16,21 @@
                 Handleiding Prestashop plugin
             </h1>
             <br />
-            <a class="btn" href="https://github.com/myparcelnl/prestashop/releases" target="_blank">Download de laatste versie hier</a>
-<!--            <a target="_blank" class="btn" href=""></a>-->
+            <a class="btn" href="https://github.com/myparcelnl/prestashop/releases" target="_blank">Download de laatste versie</a>
         </section>
         <section class="main-content col-xs-8 col-xs-offset-4 col-lg-7 col-lg-offset-4">
-
+            <h1>Inleiding</h1>
+            <p>
+                De MyParcel Prestashop plugin is voor Nederland en België het zelfde te installeren. De plugins hebben een paar kleine verschillen. Als er een instelling specifiek voor één van de twee versies is, zal dit hierbij vermeld staan. Wanneer er niets staat dan zal het in beide plugins hetzelfde zijn.
+            </p>
             <div style="margin-top:10px">
                 <h1 id="1">1. Installatie</h1>
                 <p>
-                   Om gebruik te maken van de module heb je een MyParcel-acccount nodig. Je kunt je registreren op <a href="https://www.myparcel.nl" style="color: #FF8C00;" target="blank">MyParcel.nl</a>.
+                   Om gebruik te maken van de module heb je een MyParcel-acccount nodig. Je kunt je registreren op <a href="https://www.myparcel.nl" style="color: #FF8C00;" target="blank">MyParcel.nl</a> voor een Nederlands account en op <a href="https://sendmyparcel.be/" style="color: #FF8C00;" target="blank">sendmyparcel.be</a> voor een Belgisch account.
                 </p>
                 <ol>
                     <li><i>Verwijder de oude module (v2.3.8) als je hiervan gebruik hebt gemaakt.</i></li>
-                    <li>Download het .zip-bestand via <a href="https://github.com/myparcelnl/prestashop/releases/latest" target="blank">Github</a>.</li>
+                    <li>Download het .zip-bestand via de link bovenaan de handleiding. (Let op dat je de juiste versie download)</li>
                     <li>Open je Prestashop admin en ga naar <span class="nice">Modules > Module Manager</span>.</li>
                     <li>Klik op <span class="nice">Upload</span> en upload het .zip-bestand.</li>
                     <li>Klik op <span class="nice">Configure</span> om de plugin te configureren.</li>
@@ -128,7 +130,7 @@
                 </p>
                 <img src="media/prestashop_product_customsdec.png" alt="customsdec">
                 <p>
-                    Kies voor 'Verzending' om een gewicht in te stellen. Klik daarna op 'Modules' en kies voor 'MyParcel > Customs' om in te stellen welke HS code voor dit product moet worden gebruikt en geef aan wat het land van herkomst is. Wanneer hier niets is ingevuld, kun je bij de instellingen van de module <span class="nice">Modules > Module Manager > MyParcelNL > Configureren > Customs Options</span> standaard waarden instellen.
+                    Kies voor 'Verzending' om een gewicht in te stellen. Klik daarna op 'Modules' en kies voor 'MyParcel > Customs' om in te stellen welke HS code voor dit product moet worden gebruikt en geef aan wat het land van herkomst is. Wanneer hier niets is ingevuld, kun je bij de instellingen van de module <span class="nice">Modules > Module Manager > MyParcelNL/MyParcelBE > Configureren > Customs Options</span> standaard waarden instellen.
                 </p>
                 <h3 id="2_E_A">2.5.1 Default customs form</h3>
                 <p>
@@ -150,11 +152,10 @@
                 </p>
 
                 <h2 id="2_F">2.6 Vervoerders opties</h2>
-                <img src="media/prestashop_deliveryoptions.png" alt="Delivery_options">
                 <p>
-                    Klik op 'Wijzig' om de bezorgopties voor PostNL aan te passen.
+                    Bij installatie van de plugin wordt automatisch de vervoerder PostNL (in BE bpost, dpd en PostNL) aangemaakt. Het is ook mogelijk om andere en reeds aangemaakte vervoerders te koppelen, waardoor de MyParcel bezorgopties en acties beschikbaar worden voor orders met deze vervoerder. Dit doe je vanuit de Carrier options tab in de plugin. Klik hier op het plusteken (+) om een vervoerder te koppelen aan MyParcel. In het scherm wat hierop volgt kun je via 'Select PS carrier' een bestaande vervoerder kiezen of via carrier name een nieuwe vervoerder aanmaken. In de plugin staat de 'Carrier option' standaard op PostNL. Nadat de vervoerder gekoppeld is kun je voor deze vervoerder bezorgopties configureren en kun je voor orders gedaan met deze vervoerder (met terugwerkende kracht) labels printen in het orders overzicht.
                 </p>
-
+                <img src="media/prestashop_deliveryoptions.png" alt="Delivery_options">
                 <h3 id="2_F_A">2.6.1 Checkout delivery form</h3>
                 <p>
                     Stel hier de titel van de bezorgopties in. Dit zal boven de bezorgopties qorden getoond in de checkout. Geef hier ook aan op welke dagen je de pakketten bij PostNL inlevert en welke cut-off tijd je hiervoor aanhoudt. De bezorgopties zullen aan de hand van deze gegevens worden getoond.
@@ -185,7 +186,7 @@
                 </p>
 
                 <h1 id="3">3 Gebruik van de plugin</h1>
-<!--                <h2 id="3_A">3.1 Aanmaken van labels</h2>-->
+                <h2 id="3_A">3.1 Aanmaken van labels</h2>
 	            <p>
 		            Het aanmaken van labels kan op verschillende manieren. Je kunt dit doen vanuit het bestellingenoverzicht zoals te zien is op onderstaand filmpje. Op deze manier maak je gemakkelijk meerdere labels tegelijk aan.
 	            </p>
@@ -204,7 +205,11 @@
 	            <video width="100%" controls>
 		            <source src="media/prestashop_createlabel_part3.mp4" type="video/mp4">
 	            </video>
-
+                <h2 id="3_B">3.2 FAQ</h2>
+                <h3>Er zijn geen MyParcel acties beschikbaar in het orders overzicht. Wat moet ik doen?</h3>
+                <p>
+                    Het kan zijn dat je geen gebruik wil maken van de vervoerder die standaard door de plugin wordt aangemaakt, of dat je oude orders hebt die je wil verwerken met een andere vervoerder. Voor deze vervoerders zijn de MyParcel acties in het order overzicht niet standaard zichtbaar, daarvoor moet de vervoerder eerst gekoppeld worden. Volg hiervoor de stappen die beschreven staan onder vervoerders koppelen. Mocht je vervoerder al gekoppeld zijn maar je ziet nog steeds geen bezorgopties, probeer dan een nieuwe vervoerder aan te maken en die te koppelen. Als je dan nog steeds geen MyParcel acties ziet kun je contact opnemen met support@myparcel.nl.
+                </p>
                 <footer class="site-footer">
                     <p>
                         <span class="site-footer-owner">MyParcel</span>
