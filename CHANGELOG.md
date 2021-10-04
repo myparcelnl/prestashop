@@ -1,3 +1,25 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.2.0](https://github.com/myparcelnl/prestashop/compare/v1.1.3...v1.2.0) (2021-10-04)
+
+
+### :sparkles: New Features
+
+* add surcharge option to delivery options ([5d9e711](https://github.com/myparcelnl/prestashop/commit/5d9e711b7acfcc07e39759d534992ca579e61342))
+
+
+### :bug: Bug Fixes
+
+* cutofftime and dropoffdelay work according to current specifications ([48baf5e](https://github.com/myparcelnl/prestashop/commit/48baf5e1e0d633aea518b4533ae0d60709833ddf))
+* fix error when loading order which has delivery options ([56722a4](https://github.com/myparcelnl/prestashop/commit/56722a44b4ad2c227f56a762e5cadacc055f4af2))
+* fix status change webhook not triggering sometimes ([954bc18](https://github.com/myparcelnl/prestashop/commit/954bc187360b1fa96f3385bd05e085bd45c8a9db))
+* make surcharge mode work as expected ([77ed3b7](https://github.com/myparcelnl/prestashop/commit/77ed3b7b675fc0d48a0275b24b97417c1dfcc269))
+* no order found error ([b8a6eea](https://github.com/myparcelnl/prestashop/commit/b8a6eea1bf899981d976ba3c802e684b2128eb1f)), closes [#7](https://github.com/myparcelnl/prestashop/issues/7)
+* open new tab and request inline pdf correctly according to setting ([1f1d154](https://github.com/myparcelnl/prestashop/commit/1f1d1545158a28ff1ed406c1b2b2fed27e60faf5))
+
 ### [1.1.2](https://github.com/myparcelnl/prestashop/compare/v1.1.3...v1.1.2) (2021-09-30)
 
 
@@ -146,4 +168,3 @@
 ### [1.0.1](https://github.com/myparcelnl/prestashop/compare/v1.0.0...v1.0.1) (2021-03-25)
 
 ## 1.0.0 (2021-01-28)
-
