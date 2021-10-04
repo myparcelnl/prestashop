@@ -11,8 +11,8 @@
     "@myparcel/delivery-options": "^4.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.6",
     "@myparcel/semantic-release-config": "^1.2.2",
     "@types/gulp": "^4.0.9",
     "@types/gulp-rename": "^2.0.1",
