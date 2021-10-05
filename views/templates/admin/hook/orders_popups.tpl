@@ -187,7 +187,7 @@
                 <input type="hidden" id="order_id" name="id_order">
                 <div class="form-group">
                     <label for="labels_amount">{l s='Amount of labels' mod='myparcelbe'}</label>
-                    <input id="labels_amount" name="label_amount" value="1" type="number" min="1" class="form-control">
+                    <input id="labels_amount" name="labelAmount" value="1" type="number" min="1" class="form-control">
                 </div>
 
                 <div class="form-group">
@@ -200,7 +200,20 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-for_package_type="4">
+                    <label for="digitalStampWeight">{l s='Calculated digital stamp weight' mod='myparcelbe'}
+                      <span id="calculatedDigitalStampWeight"></span>
+                    </label>
+                    <select name="digitalStampWeight" class="custom-select" id="digitalStampWeight">
+                        <option value="15">{l s='0 - 20 gr' mod='myparcelbe'}</option>
+                        <option value="35">{l s='20 - 50 gr' mod='myparcelbe'}</option>
+                        <option value="75">{l s='50 - 100 gr' mod='myparcelbe'}</option>
+                        <option value="225">{l s='100 - 350 gr' mod='myparcelbe'}</option>
+                        <option value="1175">{l s='350 - 2000 gr' mod='myparcelbe'}</option>
+                    </select>
+                </div>
+
+                <div class="form-group" data-for_package_type="1">
                     <label for="packageFormat">{l s='Package format' mod='myparcelbe'}</label>
                     <select name="packageFormat" class="custom-select" id="packageFormat">
                         <option value="1">{l s='Normal' mod='myparcelbe'}</option>
@@ -209,31 +222,31 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-for_package_type="1">
                     <input type="checkbox" value="1" id="onlyRecipient" name="onlyRecipient">
                     <label for="onlyRecipient">{l s='Only to receipient' mod='myparcelbe'}</label>
                 </div>
 
                 {if !$isBE}
-                <div class="form-group">
+                <div class="form-group" data-for_package_type="1">
                     <input type="checkbox" value="1" id="ageCheck" name="ageCheck">
                     <label for="ageCheck">{l s='Age check' mod='myparcelbe'}</label>
                 </div>
                 {/if}
 
                 {if !$isBE}
-                <div class="form-group">
+                <div class="form-group" data-for_package_type="1">
                     <input type="checkbox" value="1" id="returnUndelivered" name="returnUndelivered">
                     <label for="returnUndelivered">{l s='Return package' mod='myparcelbe'}</label>
                 </div>
                 {/if}
 
-                <div class="form-group">
+                <div class="form-group" data-for_package_type="1">
                     <input type="checkbox" value="1" id="signatureRequired" name="signatureRequired">
                     <label for="signatureRequired">{l s='Signature' mod='myparcelbe'}</label>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-for_package_type="1">
                     <input type="checkbox" class="myparcel-insurance-checkbox" value="1" id="insurance" name="insurance">
                     <label for="insurance">{l s='Insurance' mod='myparcelbe'}</label>
                 </div>
@@ -284,8 +297,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{l s='Close' mod='myparcelbe'}</button>
-                <button type="button" id="add" class="btn btn-primary">{l s='Save changes' mod='myparcelbe'}</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{l s='Cancel' mod='myparcelbe'}</button>
+                <button type="button" id="add" class="btn btn-primary">{l s='Export' mod='myparcelbe'}</button>
             </div>
         </div>
     </div>

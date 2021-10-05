@@ -4,21 +4,33 @@
   <div class="col-lg-3">
     <select name="packageType" class="form-control custom-select">
       {if !empty($carrierSettings.delivery.packageType[1])}
-        <option value="1"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq 1} selected{/if}>{l s='Parcel' mod='myparcelbe'}</option>
+        <option value="1"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '1'} selected{/if}>{l s='Parcel' mod='myparcelbe'}</option>
       {/if}
       {if !empty($carrierSettings.delivery.packageType[2])}
-        <option value="2"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq 2} selected{/if}>{l s='Mailbox package' mod='myparcelbe'}</option>
+        <option value="2"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '2'} selected{/if}>{l s='Mailbox package' mod='myparcelbe'}</option>
       {/if}
       {if !empty($carrierSettings.delivery.packageType[3])}
-        <option value="3"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq 3} selected{/if}>{l s='Letter' mod='myparcelbe'}</option>
+        <option value="3"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '3'} selected{/if}>{l s='Letter' mod='myparcelbe'}</option>
       {/if}
       {if !empty($carrierSettings.delivery.packageType[4])}
-        <option value="4"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq 4} selected{/if}>{l s='Digital stamp' mod='myparcelbe'}</option>
+        <option value="4"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '4'} selected{/if}>{l s='Digital stamp' mod='myparcelbe'}</option>
       {/if}
     </select>
   </div>
 </div>
-<div class="form-group">
+<div class="form-group row" data-for_package_type="4">
+  <label class="col-sm-4 col-form-label" for="digitalStampWeight">{l s='Calculated digital stamp weight' mod='myparcelbe'} {$weight}gr</label>
+  <div class="col-sm-8">
+    <select name="digitalStampWeight" class="custom-select" id="digitalStampWeight">
+      <option value="15">{l s='0 - 20 gr' mod='myparcelbe'}</option>
+      <option value="35"{if $digitalStampWeight>20} selected{/if}>{l s='20 - 50 gr' mod='myparcelbe'}</option>
+      <option value="75"{if $digitalStampWeight>50} selected{/if}>{l s='50 - 100 gr' mod='myparcelbe'}</option>
+      <option value="225"{if $digitalStampWeight>100} selected{/if}>{l s='100 - 350 gr' mod='myparcelbe'}</option>
+      <option value="1175"{if $digitalStampWeight>350} selected{/if}>{l s='350 - 2000 gr' mod='myparcelbe'}</option>
+    </select>
+  </div>
+</div>
+<div class="form-group" data-for_package_type="1">
   <label class="col-lg-3 control-label">{l s='Package format' mod='myparcelbe'}</label>
   <div class="col-lg-3">
     <select name="packageFormat" class="form-control custom-select">
@@ -36,11 +48,11 @@
 </div>
 <div class="form-group">
   <label class="col-lg-3 control-label">{l s='Number of labels' mod='myparcelbe'}</label>
-  <div class="col-lg-2">
-    <input class="form-control" id="label_amount" name="label_amount" type="number" min="1" max="10" value="1">
+  <div class="col-lg-3">
+    <input class="form-control" id="labelAmount" name="labelAmount" type="number" min="1" max="10" value="1">
   </div>
 </div>
-<div class="form-group label-delivery-options">
+<div class="form-group label-delivery-options" data-for_package_type="1">
   <div class="col-lg-9 col-lg-offset-3">
     {if $carrierSettings.delivery.onlyRecipient}
       <p class="checkbox">
@@ -118,8 +130,8 @@
                   type="radio"
                   id="insurance_amount_100"
                   value="amount100"
-                  {if !empty($deliveryOptions.shipmentOptions.insurance.amount)
-                  && $deliveryOptions.shipmentOptions.insurance.amount eq 10000
+                  {if !empty($deliveryOptions.shipmentOptions.insurance)
+                  && $deliveryOptions.shipmentOptions.insurance eq 10000
                   || (empty($deliveryOptions.shipmentOptions.insurance) && !empty($labelOptions.insurance))}checked{/if}
           />
           {l s='Up to € 100' mod='myparcelbe'}
@@ -130,8 +142,8 @@
                   type="radio"
                   id="insurance_amount_250"
                   value="amount250"
-                  {if !empty($deliveryOptions.shipmentOptions.insurance.amount)
-                  && $deliveryOptions.shipmentOptions.insurance.amount eq 25000}checked{/if}
+                  {if !empty($deliveryOptions.shipmentOptions.insurance)
+                  && $deliveryOptions.shipmentOptions.insurance eq 25000}checked{/if}
           />
           {l s='Up to € 250' mod='myparcelbe'}
         </label>
@@ -141,8 +153,8 @@
                   type="radio"
                   id="insurance_amount_500"
                   value="amount500"
-                  {if !empty($deliveryOptions.shipmentOptions.insurance.amount)
-                  && $deliveryOptions.shipmentOptions.insurance.amount eq 50000}checked{/if}
+                  {if !empty($deliveryOptions.shipmentOptions.insurance)
+                  && $deliveryOptions.shipmentOptions.insurance eq 50000}checked{/if}
           />
           {l s='Up to € 500' mod='myparcelbe'}
         </label>
@@ -153,9 +165,9 @@
                       type="radio"
                       id="insurance_amount_custom"
                       value="-1"
-                      {if !empty($deliveryOptions.shipmentOptions.insurance.amount)
-                      && !in_array($deliveryOptions.shipmentOptions.insurance.amount, ['10000', '25000', '50000'])
-                      && $deliveryOptions.shipmentOptions.insurance.amount|intval >= 100
+                      {if !empty($deliveryOptions.shipmentOptions.insurance)
+                      && !in_array($deliveryOptions.shipmentOptions.insurance, ['10000', '25000', '50000'])
+                      && $deliveryOptions.shipmentOptions.insurance|intval >= 100
                       }checked{/if}
               />
               <span>{l s='More than € 500' mod='myparcelbe'}</span>
@@ -166,10 +178,10 @@
                         type="text"
                         id="insurance-amount-custom-value"
                         name="insurance-amount-custom-value"
-                        value="{if !empty($deliveryOptions.shipmentOptions.insurance.amount)
-                        && !in_array($deliveryOptions.shipmentOptions.insurance.amount, ['10000', '25000', '50000'])
-                        && $deliveryOptions.shipmentOptions.insurance.amount|intval >= 100
-                        }{$deliveryOptions.shipmentOptions.insurance.amount / 100}{else}1000{/if}"
+                        value="{if !empty($deliveryOptions.shipmentOptions.insurance)
+                        && !in_array($deliveryOptions.shipmentOptions.insurance, ['10000', '25000', '50000'])
+                        && $deliveryOptions.shipmentOptions.insurance|intval >= 100
+                        }{$deliveryOptions.shipmentOptions.insurance / 100}{else}1000{/if}"
                 />
               </div>
             </label>

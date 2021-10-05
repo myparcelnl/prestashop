@@ -2,7 +2,8 @@
 
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
+use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Logger\ApiLogger;
@@ -17,10 +18,12 @@ use Gett\MyparcelBE\Service\ErrorMessage;
 use Gett\MyparcelBE\Service\MyparcelStatusProvider;
 use MyParcelNL\Sdk\src\Exception\InvalidConsignmentException;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as ConsignmentFactorySdk;
+use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
+use PrestaShop\PrestaShop\Adapter\Entity\Db;
 
 if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
     require_once _PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php';
@@ -386,42 +389,40 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
 
         $orderId              = (int) $postValues['id_order'];
-        $currency             = Currency::getDefaultCurrency();
-        $deliveryOptionsArray = DeliveryOptions::queryByOrderId($orderId);
-        $deliveryOptions      = Tools::arrayToObject($deliveryOptionsArray) ?? new stdClass();
+        $order                = new Order($orderId);
+        $deliveryOptionsArray = DeliverySettings::getDeliveryOptionsFromOrder($order)->toArray();
+        $extraOptions         = new ExtraOptions($postValues);
 
         try {
-            $order                            = new Order($orderId);
-            $deliveryOptions->date            = $postValues['deliveryDate'] . 'T00:00:00.000Z';
-            $deliveryOptions->shipmentOptions = new stdClass(); // Reset shipment options
-
+            $deliveryOptionsArray['date']            = $postValues['deliveryDate'] . 'T00:00:00.000Z';
+            $deliveryOptionsArray['shipmentOptions'] = [];
             foreach (Constant::SINGLE_LABEL_CREATION_OPTIONS as $key => $name) {
                 if (isset($postValues[$key])) {
                     switch ($key) {
                         case 'packageType':
-                            $deliveryOptions->shipmentOptions->package_type = $postValues[$key];
+                            $deliveryOptionsArray['packageType'] = Constant::PACKAGE_TYPES[$postValues[$key]] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE;
                             break;
                         case 'packageFormat':
-                            if (Constant::PACKAGE_FORMATS[$postValues[$key]] == 'large') {
-                                $deliveryOptions->shipmentOptions->large_format = true;
+                            if ('large' === Constant::PACKAGE_FORMATS[$postValues[$key]]) {
+                                $deliveryOptionsArray['shipmentOptions']['large_format'] = true;
                             }
                             break;
                         case 'onlyRecipient':
-                            $deliveryOptions->shipmentOptions->only_recipient = true;
+                            $deliveryOptionsArray['shipmentOptions']['only_recipient'] = true;
                             break;
                         case 'ageCheck':
-                            $deliveryOptions->shipmentOptions->age_check = true;
+                            $deliveryOptionsArray['shipmentOptions']['age_check'] = true;
                             break;
                         case 'returnUndelivered':
-                            $deliveryOptions->shipmentOptions->return = true;
+                            $deliveryOptionsArray['shipmentOptions']['return'] = true;
                             break;
                         case 'signatureRequired':
-                            $deliveryOptions->shipmentOptions->signature = true;
+                            $deliveryOptionsArray['shipmentOptions']['signature'] = true;
                             break;
                         case 'insurance':
-                            $deliveryOptions->shipmentOptions->insurance = new stdClass();
+                            $deliveryOptionsArray['shipmentOptions']['insurance'] = [];
                             if (isset($postValues['insuranceAmount'])) {
-                                if (strpos($postValues['insuranceAmount'], 'amount') !== false) {
+                                if (false !== strpos($postValues['insuranceAmount'], 'amount')) {
                                     $insuranceValue = (int) str_replace(
                                         'amount',
                                         '',
@@ -430,8 +431,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                                 } else {
                                     $insuranceValue = (int) ($postValues['insurance-amount-custom-value'] ?? 0);
                                 }
-                                $deliveryOptions->shipmentOptions->insurance->amount = $insuranceValue * 100; // cents
-                                $deliveryOptions->shipmentOptions->insurance->currency = $currency->iso_code;
+                                $deliveryOptionsArray['shipmentOptions']['insurance'] = $insuranceValue * 100;
                             }
                             break;
                         default:
@@ -439,11 +439,10 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                     }
                 }
             }
-            Db::getInstance(_PS_USE_SQL_SLAVE_)->update(
-                'myparcelbe_delivery_settings',
-                ['delivery_settings' => pSQL(json_encode($deliveryOptions))],
-                'id_cart = ' . (int) $order->id_cart
-            );
+            $deliveryOptions = DeliveryOptionsAdapterFactory::create($deliveryOptionsArray);
+            DeliverySettings::setDeliveryOptionsForOrder($deliveryOptions, $order);
+            DeliverySettings::setExtraOptionsForOrder($extraOptions, $order);
+            DeliverySettings::persist();
         } catch (Exception $e) {
             $this->errors[] = $this->module->l('Error loading the delivery options.', 'adminlabelcontroller');
             $this->errors[] = $e->getMessage();
@@ -461,7 +460,6 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
 
         if ($idOrder) {
-
             $labelList = OrderLabel::getOrderLabels((int) $idOrder, []);
             $labelListHtml = $this->context->smarty->createData(
                 $this->context->smarty

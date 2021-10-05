@@ -120,7 +120,7 @@ class ConsignmentFactory
 
         $myParcelCollection = (new MyParcelCollection());
 
-        for ($i = 0; $i < $this->request['label_amount']; ++$i) {
+        for ($i = 0; $i < $this->request['labelAmount']; ++$i) {
             $consignment = $this->initConsignment();
             foreach (Constant::SINGLE_LABEL_CREATION_OPTIONS as $key => $option) {
                 if (isset($this->request[$key])) {
@@ -459,6 +459,13 @@ class ConsignmentFactory
         $this->setShipmentOptions();
         $this->setPickupLocation();
         $this->setCustomsDeclaration();
+
+        if (
+            isset($this->request['digitalStampWeight'])
+            && AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP === $this->consignment->getPackageType()
+        ) {
+            $this->consignment->setTotalWeight($this->request['digitalStampWeight']);
+        }
 
         return $this->consignment;
     }

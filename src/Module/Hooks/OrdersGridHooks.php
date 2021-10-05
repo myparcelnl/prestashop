@@ -7,13 +7,14 @@ use DateTime;
 use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconBulkAction;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconModalBulkAction;
 use Gett\MyparcelBE\Grid\Column\LabelsColumn;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
@@ -117,7 +118,6 @@ trait OrdersGridHooks
 
             $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
 
-            // MyParcel created labels and label settings
             $row['myparcel'] = [
                 'labels' => $orderHelper->getLabels(),
                 'options' => (new LabelOptionsResolver())->getLabelOptions($row),
@@ -126,17 +126,22 @@ trait OrdersGridHooks
                 'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
             ];
 
-            // Delivery date
-            $deliverySettings = DeliveryOptions::queryByCart($row['id_cart']);
-            if (empty($deliverySettings['date'])) {
+            $deliveryOptions = DeliverySettingsRepository::getInstance()::getDeliveryOptionsByCartId($row['id_cart']);
+            if (! $deliveryOptions) {
                 $row['delivery_info'] = null;
                 continue;
             }
 
+            $extraOptions = DeliverySettingsRepository::getInstance()::getExtraOptionsByCartId($row['id_cart']);
+
+            $row['myparcel']['extraOptions'] = $extraOptions->toArray();
+
+            $row['weight']  = (new OrderTotalWeight())->convertWeightToGrams($orderHelper->getWeight());
+
             try {
                 $row['delivery_info'] = sprintf(
                     '[%s] %s',
-                    (new DateTime($deliverySettings['date']))
+                    (new DateTime($deliveryOptions->getDate()))
                         ->format($this->context->language->date_format_lite),
                     $row['delivery_info']
                 );

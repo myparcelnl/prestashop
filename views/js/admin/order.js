@@ -11,7 +11,6 @@ $(function() {
     ps177 = true;
   }
 
-
   let addBulkOption = function (link) {
     if (ps177) {
       return;
@@ -230,8 +229,16 @@ $(function() {
   });
   $('button[data-target="#create"]').click(function(){
     var id = $(this).data('order-id'),
-      options = $(this).data('label-options');
+      options = $(this).data('label-options'),
+      labelAmount = $(this).data('labelAmount'),
+      digitalStampWeight = $(this).data('digitalStampWeight'),
+      weight = $(this).data('weight'),
+      insuranceInEuro,
+      el;
     $('#order_id').val(id);
+    $('#labels_amount').val(labelAmount);
+    $('#digitalStampWeight').val(digitalStampWeight);
+    $('#calculatedDigitalStampWeight').text(weight);
     $('#packageType').val(options.package_type);
     $('#packageFormat').val(options.package_format);
     if ($(this).data('allowSetOnlyRecipient') === 0) {
@@ -258,7 +265,17 @@ $(function() {
     }
     if (options.insurance) {
       $('#insurance').prop('checked', true);
+      insuranceInEuro = (options.insurance / 100).toString();
+      el = document.getElementById('upto' + insuranceInEuro) || null;
+      if (el) {
+        $(el).prop('checked', true);
+      } else {
+        $('#heigherthen500').prop('checked', true);
+        $('#myparcel-insurance-higher-amount').val(insuranceInEuro);
+      }
     }
+    // change event on packageType select list will update visibility of options
+    document.getElementById('packageType').dispatchEvent(new CustomEvent('change'));
   });
   $('#print_button').click(function () {
     var intervalLimit = 100;

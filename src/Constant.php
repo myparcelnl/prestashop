@@ -2,6 +2,9 @@
 
 namespace Gett\MyparcelBE;
 
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
+use PrestaShopBundle\Form\Admin\Sell\Order\Invoices\GenerateByDateType;
+
 class Constant
 {
     public const MENU_API_SETTINGS     = 0;
@@ -32,6 +35,7 @@ class Constant
     public const CUSTOMS_ORIGIN_CONFIGURATION_NAME         = 'MYPARCELBE_CUSTOMS_ORIGIN';
     public const DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME = 'MYPARCELBE_DEFAULT_CUSTOMS_ORIGIN';
     public const CUSTOMS_AGE_CHECK_CONFIGURATION_NAME      = 'MYPARCELBE_CUSTOMS_AGE_CHECK';
+    public const DIGITAL_STAMP_WEIGHT_CONFIGURATION_NAME   = 'MYPARCELBE_DIGITAL_STAMP_WEIGHT';
 
     public const SINGLE_LABEL_CREATION_OPTIONS                          = [
         'packageType'       => self::PACKAGE_TYPE_CONFIGURATION_NAME,
@@ -58,11 +62,19 @@ class Constant
     public const PACKAGE_TYPE_MAILBOX                                   = 2;
     public const PACKAGE_TYPE_LETTER                                    = 3;
     public const PACKAGE_TYPE_DIGITAL_STAMP                             = 4;
-    public const PACKAGE_TYPES                                          = [
+    public const PACKAGE_TYPES                                          = [ // TODO remove this
         self::PACKAGE_TYPE_PACKAGE       => 'package',
         self::PACKAGE_TYPE_MAILBOX       => 'mailbox package',
         self::PACKAGE_TYPE_LETTER        => 'letter',
         self::PACKAGE_TYPE_DIGITAL_STAMP => 'digital stamp',
+    ];
+    public const PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP = [
+        'mailbox package'                                    => AbstractConsignment::PACKAGE_TYPE_MAILBOX,
+        'digital stamp'                                      => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP,
+        AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME       => AbstractConsignment::PACKAGE_TYPE_PACKAGE,
+        AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME       => AbstractConsignment::PACKAGE_TYPE_MAILBOX,
+        AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
+        AbstractConsignment::PACKAGE_TYPE_LETTER_NAME        => AbstractConsignment::PACKAGE_TYPE_LETTER,
     ];
 
     public const PACKAGE_TYPE_WEIGHT_LIMIT                              = 2; // Kg
