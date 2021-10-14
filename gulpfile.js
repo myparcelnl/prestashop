@@ -2,25 +2,19 @@ const babelify = require('babelify');
 const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const clean = require('gulp-clean');
-const {exec} = require('child_process');
 const gulp = require('gulp');
-const packageJson = require('./package.json');
 const rename = require('gulp-rename');
 const {replaceCaseSensitive} = require('./private/replaceCaseSensitive');
 const sourcemaps = require('gulp-sourcemaps');
 const tap = require('gulp-tap');
 const uglify = require('gulp-uglify');
 const zip = require('gulp-zip');
+const {exec} = require('child_process');
 
 const MODULE_NAME_NL = 'myparcelnl';
 const MODULE_NAME_BE = 'myparcelbe';
-const modules = [MODULE_NAME_BE, MODULE_NAME_NL];
-const moduleNameMap = {
-  [MODULE_NAME_NL]: 'MyParcelNL',
-  [MODULE_NAME_BE]: 'MyParcelBE',
-};
 
-const {version} = packageJson;
+const modules = [MODULE_NAME_BE, MODULE_NAME_NL];
 
 /**
  * Files where module name should be transformed in filenames and contents.
@@ -28,14 +22,12 @@ const {version} = packageJson;
  * @type {string[]}
  */
 const sourceFiles = [
-  'controllers/**/*',
-  'mails/**/*',
-  'src/**/*',
-  'upgrade/**/*',
-  'views/**/*',
-  '!views/js/**/*',
-  '!views/js',
-  '!views/dist/**/*',
+  './controllers/**/*',
+  './mails/**/*',
+  './src/**/*',
+  './upgrade/**/*',
+  './views/**/*',
+  '!./views/dist/**/*',
   'composer.json',
   'index.php',
   'myparcelbe.php',
@@ -47,7 +39,7 @@ const sourceFiles = [
  * @type {string[]}
  */
 const copyFiles = [
-  'views/dist/**/*',
+  './views/dist/**/*',
   'composer.lock',
   'logo.png',
   'package-lock.json',
@@ -60,6 +52,7 @@ const copyFiles = [
  * @type {string[]}
  */
 const excludeFiles = [
+  'composer.json',
   'composer.lock',
   'package-lock.json',
   'package.json',
@@ -78,6 +71,7 @@ function execCallback(callback, err, stdout, stderr) {
     // eslint-disable-next-line no-console
     console.warn(stderr);
   }
+
   if (typeof callback === 'function') {
     callback(err);
   }
@@ -143,7 +137,7 @@ function createZipTask(moduleName) {
     `./dist/${moduleName}/**/*`,
     ...excludeFiles.map((filename) => `!./dist/${moduleName}/${filename}`),
   ], {base: 'dist'})
-    .pipe(zip(`${moduleNameMap[moduleName]}-${version}.zip`))
+    .pipe(zip(`${moduleName}.zip`))
     .pipe(gulp.dest('dist'));
 }
 
@@ -157,7 +151,7 @@ function createTasksForAllModules(task) {
 /**
  * Run babel on the javascript files.
  */
-gulp.task('js:build', () => gulp.src(['./views/js/**/*.js'], {read: false})
+gulp.task('js:build', () => gulp.src(['./views/*.js'], {read: false})
   .pipe(tap((file) => {
     file.contents = browserify(file.path)
       .transform(babelify)
@@ -167,12 +161,12 @@ gulp.task('js:build', () => gulp.src(['./views/js/**/*.js'], {read: false})
   .pipe(sourcemaps.init())
   .pipe(uglify())
   .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest('views/dist/js')));
+  .pipe(gulp.dest('views/dist')));
 
 /**
  * Copy the js to dist without doing any processing on it.
  */
-gulp.task('js:copy', () => gulp.src('./views/js/**/*.js')
+gulp.task('js:copy', () => gulp.src('views/js/**/*.js')
   .pipe(gulp.dest('views/dist/js')));
 
 /**
@@ -182,7 +176,7 @@ gulp.task('js:copy', () => gulp.src('./views/js/**/*.js')
  */
 function createComposerTask(moduleName) {
   return (callback) => {
-    exec(`cd dist/${moduleName} && composer install --no-dev`, (...params) => execCallback(callback, ...params));
+    exec(`cd dist/${moduleName} && composer update`, (...params) => execCallback(callback, ...params));
   };
 }
 
@@ -205,13 +199,28 @@ createTasksForAllModules('zip');
  * Copy delivery options into module.
  */
 gulp.task('copy:delivery-options', () => gulp.src('./node_modules/@myparcel/delivery-options/dist/myparcel.js')
-  .pipe(gulp.dest('views/dist/js/external/')));
+  .pipe(gulp.dest('views/dist/')));
 
 /**
- * Empty the dist folders.
+ * @param string moduleName
  */
-gulp.task('clean', () => gulp.src(['dist/*', 'views/dist/*'], {read: false})
-  .pipe(clean({force: true})));
+function createCleanTask(moduleName) {
+  return () => gulp.src(`dist/${moduleName}/*`,
+    {
+      read: false,
+      base: `dist/${moduleName}`,
+    })
+    .pipe(clean({force: true}));
+}
+
+/**
+ * Empty the dist folder.
+ */
+gulp.task('clean', gulp.parallel(
+  () => gulp.src('dist/*.*', {read: false}).pipe(clean({force: true})),
+  createCleanTask('myparcelnl'),
+  createCleanTask('myparcelbe'),
+));
 
 /**
  * The default task.
