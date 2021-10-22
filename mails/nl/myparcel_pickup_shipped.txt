@@ -2,7 +2,7 @@
 
 Beste {firstname} {lastname},
 
-Uw pakket is verzonden en kunt u via onderstaande link volgen via PostNL:
+Uw bestelling is verzonden en volgbaar via onderstaande link:
 
 {followup}
 

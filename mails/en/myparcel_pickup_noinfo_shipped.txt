@@ -2,7 +2,7 @@
 
 Hi {firstname} {lastname},
 
-Your order has been shipped and you can follow it via the following link via PostNL:
+Your order has been shipped, you can follow it via the following link:
 
 {followup}
 
