@@ -4,14 +4,13 @@ Uw bestelling is verzonden!
 
 Beste {firstname} {lastname},
 
-Uw bestelling is bij PostNL aangeboden en wordt zo snel mogelijk bij u bezorgd.
-Het product is verstuurd als brievenbuszending, u hoeft niet thuis te blijven om het pakket in ontvangst te nemen want het pakketje past door de brievenbus.
+Uw bestelling is verzonden en wordt zo snel mogelijk bij u bezorgd. De bestelling is verstuurd als brievenbuspakket dus u hoeft niet thuis te blijven om het pakket in ontvangst te nemen.
 
-U kunt uw zending volgen via deze track &amp; trace link: {followup}.
+U kunt uw zending volgen via deze Track &amp; Trace link: {followup}.
 Het kan zijn dat er nog geen informatie beschikbaar is. De informatie wordt meestal 's avonds voor het eerst zichtbaar.
 
 Als u nog vragen heeft over de bezorging van uw bestelling, horen wij het graag.
 
 {shop_name} [{shop_url}] powered
-by PrestaShop(tm) [http://www.prestashop.com/] 
+by PrestaShop(tm) [http://www.prestashop.com/]
 
