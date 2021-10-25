@@ -21,7 +21,7 @@ class DeliveryOptionsProvider
     protected $nextDeliveryDate;
 
     /**
-     * @param  int $orderId
+     * @param  int  $orderId
      *
      * @return array - Delivery options array
      * @throws \Exception
@@ -34,11 +34,11 @@ class DeliveryOptionsProvider
             $deliveryOptions = new DeliveryOptionsV3Adapter();
         }
 
-        $deliveryOptionsArray = $deliveryOptions->toArray();
+        $deliveryOptionsArray   = $deliveryOptions->toArray();
+        $this->nextDeliveryDate = new DateTime('tomorrow'); // TODO: get next available delivery date
 
         if ($deliveryOptions->getDate()) {
-            $this->deliveryDate     = new DateTime($deliveryOptions->getDate());
-            $this->nextDeliveryDate = new DateTime('tomorrow'); // TODO: get next available delivery date
+            $this->deliveryDate = new DateTime($deliveryOptions->getDate());
 
             if ($this->nextDeliveryDate > $this->deliveryDate) {
                 $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
@@ -54,7 +54,7 @@ class DeliveryOptionsProvider
     }
 
     /**
-     * @param  int $orderId
+     * @param  int  $orderId
      *
      * @return bool
      * @throws \Exception
