@@ -21,7 +21,7 @@ class DeliveryOptionsProvider
     protected $nextDeliveryDate;
 
     /**
-     * @param  int $orderId
+     * @param int $orderId
      *
      * @return array - Delivery options array
      * @throws \Exception
@@ -30,25 +30,27 @@ class DeliveryOptionsProvider
     {
         $deliveryOptions = DeliveryOptions::getFromOrder($orderId);
 
-        if (! $deliveryOptions) {
+        if (!$deliveryOptions) {
             $deliveryOptions = new DeliveryOptionsV3Adapter();
         }
 
         $deliveryOptionsArray = $deliveryOptions->toArray();
-
+        
         if ($deliveryOptions->getDate()) {
-            $this->deliveryDate     = new DateTime($deliveryOptions->getDate());
+            $this->deliveryDate = new DateTime($deliveryOptions->getDate());
             $this->nextDeliveryDate = new DateTime('tomorrow'); // TODO: get next available delivery date
 
             if ($this->nextDeliveryDate > $this->deliveryDate) {
                 $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
             }
-        } else {
+        } elseif ($this->nextDeliveryDate) {
             $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
         }
 
         // Prestashop's formatDate function, (which is used in templates) can't handle our date formats.
-        $deliveryOptionsArray['date'] = (new DateTime($deliveryOptionsArray['date']))->format('Y-m-d');
+        if ($deliveryOptionsArray['date']) {
+            $deliveryOptionsArray['date'] = (new DateTime($deliveryOptionsArray['date']))->format('Y-m-d');
+        }
 
         return $deliveryOptionsArray;
     }
