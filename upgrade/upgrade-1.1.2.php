@@ -10,21 +10,22 @@ function upgrade_module_1_1_2(MyParcelBE $module): bool
 {
     $carrier              = Table::withPrefix('carrier');
     $carrierConfiguration = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+    $moduleName           = $module::MODULE_NAME;
 
     $query = <<<SQL
 SELECT carrier.* FROM $carrier AS carrier
   LEFT JOIN $carrierConfiguration 
     AS config 
-    ON carrier.id_carrier = config.id_carrier AND config.name = carriertype
-WHERE carrier.external_module_name = {$module::MODULE_NAME}
+    ON carrier.id_carrier = config.id_carrier AND config.name = 'carrierType'
+WHERE carrier.external_module_name = '$moduleName'
 AND config.id_configuration IS NULL
 SQL;
 
     foreach (Db::getInstance()
                  ->executeS($query) as $record) {
-        if (preg_match('/Post\s?NL/', $record)) {
+        if (preg_match('/Post\s?NL/', $record['name'])) {
             $carrierType = Constant::POSTNL_CARRIER_NAME;
-        } elseif (strpos($record, 'DPD')) {
+        } elseif (strpos($record['name'], 'DPD')) {
             $carrierType = Constant::DPD_CARRIER_NAME;
         } else {
             $carrierType = $module->isNL()
