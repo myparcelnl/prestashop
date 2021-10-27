@@ -175,6 +175,9 @@ gulp.task('js:build', () => gulp.src(['./views/js/**/*.js'], {read: false})
 gulp.task('js:copy', () => gulp.src('./views/js/**/*.js')
   .pipe(gulp.dest('views/dist/js')));
 
+gulp.task('js:clean', () => gulp.src('./views/dist/*', {allowEmpty: true, read: false})
+  .pipe(clean({force: true})));
+
 /**
  *
  * @param {string} moduleName
@@ -197,6 +200,7 @@ modules.forEach((moduleName) => {
 
 createTasksForAllModules('build');
 createTasksForAllModules('transform');
+createTasksForAllModules('copy');
 createTasksForAllModules('transfer');
 createTasksForAllModules('composer:update');
 createTasksForAllModules('zip');
@@ -231,7 +235,7 @@ const build = gulp.series(
 gulp.task('build', build);
 
 const watch = () => {
-  gulp.watch(['views/js/**/*'], null, gulp.series('js:copy'));
+  gulp.watch(['views/js/**/*'], null, gulp.series('js:clean', 'js:copy', 'copy:delivery-options', 'copy'));
 
   // When files are modified, just transfer them.
   gulp.watch(sourceFiles, {events: ['change']}, gulp.series('transfer'));
