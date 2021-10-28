@@ -62,7 +62,7 @@ class Constant
     public const PACKAGE_TYPE_MAILBOX                                   = 2;
     public const PACKAGE_TYPE_LETTER                                    = 3;
     public const PACKAGE_TYPE_DIGITAL_STAMP                             = 4;
-    public const PACKAGE_TYPES                                          = [ // TODO remove this
+    public const PACKAGE_TYPES                                          = [
         self::PACKAGE_TYPE_PACKAGE       => 'package',
         self::PACKAGE_TYPE_MAILBOX       => 'mailbox package',
         self::PACKAGE_TYPE_LETTER        => 'letter',

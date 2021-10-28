@@ -13,7 +13,14 @@ use OrderLabel;
 
 class LabelOptionsResolver
 {
-    public function getLabelOptions(array $params)
+    /**
+     * @param array $params
+     *
+     * @return string
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function getLabelOptions(array $params): string
     {
         $delivery_settings = DeliveryOptions::queryByOrderId((int) $params['id_order']);
 
@@ -23,6 +30,7 @@ class LabelOptionsResolver
             (new PackageTypeCalculator())->getOrderPackageType($params['id_order'], $params['id_carrier']);
         $packageFormat = ($delivery_settings['shipmentOptions']['large_format'] ?? false) ? 2 :
             (new PackageFormatCalculator())->getOrderPackageFormat($params['id_order'], $params['id_carrier']);
+
         // packageType is a string in delivery options, but we need the packageType int constant for the application
         if (! (int) $packageType) {
             $packageType = Constant::PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP[$packageType] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE;
@@ -39,7 +47,15 @@ class LabelOptionsResolver
         ]);
     }
 
-    private function getOnlyToRecipient(array $delivery_settings, array $products, int $id_carrier)
+    /**
+     * @param array $delivery_settings
+     * @param array $products
+     * @param int   $id_carrier
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getOnlyToRecipient(array $delivery_settings, array $products, int $id_carrier): bool
     {
         if (isset($delivery_settings['shipmentOptions']['only_recipient']) && true === $delivery_settings['shipmentOptions']['only_recipient']) {
             return true;
@@ -51,10 +67,18 @@ class LabelOptionsResolver
             }
         }
 
-        return CarrierConfigurationProvider::get($id_carrier, Constant::ONLY_RECIPIENT_CONFIGURATION_NAME, false);
+        return (bool) CarrierConfigurationProvider::get($id_carrier, Constant::ONLY_RECIPIENT_CONFIGURATION_NAME, false);
     }
 
-    private function getAgeCheck(array $delivery_settings, array $products, int $id_carrier)
+    /**
+     * @param array $delivery_settings
+     * @param array $products
+     * @param int   $id_carrier
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getAgeCheck(array $delivery_settings, array $products, int $id_carrier): bool
     {
         if (isset($delivery_settings['shipmentOptions']['age_check']) && $delivery_settings['shipmentOptions']['age_check']) {
             return true;
@@ -66,10 +90,18 @@ class LabelOptionsResolver
             }
         }
 
-        return CarrierConfigurationProvider::get($id_carrier, Constant::AGE_CHECK_CONFIGURATION_NAME, false);
+        return (bool) CarrierConfigurationProvider::get($id_carrier, Constant::AGE_CHECK_CONFIGURATION_NAME, false);
     }
 
-    private function getSignature(array $delivery_settings, array $products, int $id_carrier)
+    /**
+     * @param array $delivery_settings
+     * @param array $products
+     * @param int   $id_carrier
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getSignature(array $delivery_settings, array $products, int $id_carrier): bool
     {
         if (isset($delivery_settings['shipmentOptions']['signature']) && true === $delivery_settings['shipmentOptions']['signature']) {
             return true;
@@ -84,9 +116,17 @@ class LabelOptionsResolver
             }
         }
 
-        return CarrierConfigurationProvider::get($id_carrier, Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME, false);
+        return (bool) CarrierConfigurationProvider::get($id_carrier, Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME, false);
     }
 
+    /**
+     * @param       $delivery_settings
+     * @param array $products
+     * @param int   $id_carrier
+     *
+     * @return bool|mixed|null
+     * @throws \PrestaShopDatabaseException
+     */
     private function getInsurance($delivery_settings, array $products, int $id_carrier)
     {
         if (isset($delivery_settings['shipmentOptions']['insurance']) && $delivery_settings['shipmentOptions']['insurance']) {
@@ -102,7 +142,14 @@ class LabelOptionsResolver
         return CarrierConfigurationProvider::get($id_carrier, Constant::INSURANCE_CONFIGURATION_NAME, false);
     }
 
-    private function getReturnUndelivered(array $products, int $id_carrier)
+    /**
+     * @param array $products
+     * @param int   $id_carrier
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getReturnUndelivered(array $products, int $id_carrier): bool
     {
         foreach ($products as $product) {
             if (ProductConfigurationProvider::get($product['product_id'], Constant::RETURN_PACKAGE_CONFIGURATION_NAME)) {
@@ -110,6 +157,6 @@ class LabelOptionsResolver
             }
         }
 
-        return CarrierConfigurationProvider::get($id_carrier, Constant::RETURN_PACKAGE_CONFIGURATION_NAME, false);
+        return (bool) CarrierConfigurationProvider::get($id_carrier, Constant::RETURN_PACKAGE_CONFIGURATION_NAME, false);
     }
 }

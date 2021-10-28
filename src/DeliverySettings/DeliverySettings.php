@@ -29,8 +29,10 @@ class DeliverySettings
         return DeliverySettingsRepository::getInstance()::getExtraOptionsByCartId((int) $order->id_cart);
     }
 
-    public static function setDeliveryOptionsForOrder(AbstractDeliveryOptionsAdapter $deliveryOptions, OrderCore
-    $order): void
+    public static function setDeliveryOptionsForOrder(
+        AbstractDeliveryOptionsAdapter $deliveryOptions,
+        OrderCore $order
+    ): void
     {
         DeliverySettingsRepository::getInstance()::setDeliveryOptionsForOrder($deliveryOptions, $order);
     }

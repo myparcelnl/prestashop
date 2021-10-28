@@ -20,16 +20,10 @@ class DeliverySettingsRepository
 
     private static $deliverySettingsByCartId = [];
 
-    private function __construct()
-    {
-    }
-
-    private function __clone()
-    {
-    }
-
-    public static function setDeliveryOptionsForOrder(AbstractDeliveryOptionsAdapter $deliveryOptions, OrderCore
-    $order): void
+    public static function setDeliveryOptionsForOrder(
+        AbstractDeliveryOptionsAdapter $deliveryOptions,
+        OrderCore $order
+    ): void
     {
         self::$deliverySettingsByCartId[$order->id_cart]['deliveryOptions'] = $deliveryOptions;
     }

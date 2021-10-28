@@ -6,12 +6,26 @@ namespace Gett\MyparcelBE\DeliverySettings;
 
 class ExtraOptions
 {
+    /**
+     * @var int
+     */
     private $labelAmount;
 
+    /**
+     * @var int|null
+     */
     private $digitalStampWeight;
 
+    /**
+     * The default label amount for a consignment
+     */
     public const DEFAULT_LABEL_AMOUNT = 1;
 
+    /**
+     * ExtraOptions constructor.
+     *
+     * @param array $extraOptions
+     */
     public function __construct(array $extraOptions = [])
     {
         $this->labelAmount        = (int) ($extraOptions['labelAmount'] ?? self::DEFAULT_LABEL_AMOUNT);
