@@ -323,8 +323,10 @@ SQL
                     delivery_settings.delivery_settings,
                     orders.id_carrier,
                     address.id_country,
-                    orders.invoice_number
+                    orders.invoice_number,
+                    orders.shipping_number
                     ');
+
         $qb->from('orders', 'orders');
         $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
         $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
@@ -460,6 +462,40 @@ SQL
         $sql->where('id_label = ' . (int) $labelId);
 
         return (int) Db::getInstance()->getValue($sql);
+    }
+
+    /**
+     * @param  string  $orderId
+     * @param  string  $tracktrace
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public static function updateOrderTrackingNumber(string $orderId, string $tracktrace): bool
+    {
+        $order = new Order($orderId);
+
+        if (! Validate::isLoadedObject($order)) {
+            return false;
+        }
+
+        $orderCarrierId = $order->getIdOrderCarrier();
+        $orderCarrier   = new OrderCarrier($orderCarrierId);
+
+        if (! Validate::isTrackingNumber($tracktrace)) {
+            return false;
+        }
+
+        $order->shipping_number = $tracktrace;
+        $order->update();
+
+        if (Validate::isLoadedObject($orderCarrier)) {
+            $orderCarrier->tracking_number = pSQL($tracktrace);
+            return $orderCarrier->update();
+        }
+
+        return false;
     }
 
     /**
