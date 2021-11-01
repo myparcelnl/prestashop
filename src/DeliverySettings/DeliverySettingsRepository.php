@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\DeliverySettings;
 
 use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\Service\Concern\HasInstance;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
@@ -16,10 +17,17 @@ if (! class_exists('DeliverySettingsRepository')) :
 
 class DeliverySettingsRepository
 {
-    private static $instance;
+    use HasInstance;
 
+    /**
+     * @var array
+     */
     private static $deliverySettingsByCartId = [];
 
+    /**
+     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param \OrderCore                                                                 $order
+     */
     public static function setDeliveryOptionsForOrder(
         AbstractDeliveryOptionsAdapter $deliveryOptions,
         OrderCore $order
@@ -28,11 +36,18 @@ class DeliverySettingsRepository
         self::$deliverySettingsByCartId[$order->id_cart]['deliveryOptions'] = $deliveryOptions;
     }
 
+    /**
+     * @param \Gett\MyparcelBE\DeliverySettings\ExtraOptions $extraOptions
+     * @param \OrderCore                                     $order
+     */
     public static function setExtraOptionsForOrder(ExtraOptions $extraOptions, OrderCore $order): void
     {
         self::$deliverySettingsByCartId[$order->id_cart]['extraOptions'] = $extraOptions;
     }
 
+    /**
+     * @param int $cartId
+     */
     private static function loadDeliverySettingsByCartId(int $cartId): void
     {
         if (array_key_exists($cartId, self::$deliverySettingsByCartId)) {
@@ -96,20 +111,22 @@ class DeliverySettingsRepository
      */
     public static function persist(): void
     {
+        $deliverySettingsArray = [];
         foreach (self::$deliverySettingsByCartId as $cartId => $deliverySettings) {
-            Db::getInstance(_PS_USE_SQL_SLAVE_)
-                ->insert(
-                    Table::TABLE_DELIVERY_SETTINGS,
-                    [
-                        'id_cart'           => $cartId,
-                        'delivery_settings' => pSQL(json_encode($deliverySettings['deliveryOptions']->toArray())),
-                        'extra_options'     => pSQL(json_encode($deliverySettings['extraOptions']->toArray())),
-                    ],
-                    false,
-                    true,
-                    Db::REPLACE
-                );
+            $deliverySettingsArray[] = [
+                'id_cart'           => $cartId,
+                'delivery_settings' => pSQL(json_encode($deliverySettings['deliveryOptions']->toArray())),
+                'extra_options'     => pSQL(json_encode($deliverySettings['extraOptions']->toArray())),
+            ];
         }
+        Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->insert(
+                Table::TABLE_DELIVERY_SETTINGS,
+                $deliverySettingsArray,
+                false,
+                true,
+                Db::REPLACE
+            );
     }
 
     /**
@@ -136,18 +153,6 @@ class DeliverySettingsRepository
         $query->select('delivery_settings, extra_options');
         $query->from(Table::TABLE_DELIVERY_SETTINGS);
         return $query;
-    }
-
-    /**
-     * @return self
-     */
-    public static function getInstance(): DeliverySettingsRepository
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
     }
 }
 
