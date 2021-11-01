@@ -177,8 +177,10 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                     }
                 }
             }
+
             try {
                 OrderLabel::createFromConsignment($consignment, $status_provider);
+                OrderLabel::updateOrderTrackingNumber($orderId, $consignment->getBarcode());
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
             }
@@ -484,6 +486,10 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         die(json_encode($results));
     }
 
+    /**
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     */
     public function ajaxProcessCreateLabel()
     {
         $postValues = Tools::getAllValues();
@@ -602,6 +608,8 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         if (!empty($postValues['listingPage'])) {
             $idOrder = null;
         }
+
+        OrderLabel::updateOrderTrackingNumber($order['id_order'], $consignment->getBarcode());
 
         $this->returnAjaxResponse(['labelIds' => $labelIds], $idOrder);
     }
