@@ -16,6 +16,7 @@ use Gett\MyparcelBE\Service\Consignment\Download;
 use Gett\MyparcelBE\Service\DeliverySettingsProvider;
 use Gett\MyparcelBE\Service\ErrorMessage;
 use Gett\MyparcelBE\Service\MyparcelStatusProvider;
+use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use MyParcelNL\Sdk\src\Exception\InvalidConsignmentException;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as ConsignmentFactorySdk;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
@@ -683,6 +684,9 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             );
         }
 
+        $weight                  = (new OrderTotalWeight())->convertWeightToGrams($order->getTotalWeight());
+        $extraOptions            = DeliverySettings::getExtraOptionsFromOrder($order);
+        $digitalStampWeight      = $extraOptions->getDigitalStampWeight() ?? $weight;
         $deliveryOptionsProvider = new DeliveryOptionsProvider();
         $deliveryOptions         = $deliveryOptionsProvider->provide($order->getId());
         $carrierSettingsProvider = new CarrierSettingsProvider($this->module);
@@ -700,6 +704,9 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 'id_order'   => $order->getId(),
                 'id_carrier' => $order->getIdCarrier(),
             ]),
+            'weight'               => $weight,
+            'labelAmount'          => $extraOptions->getLabelAmount(),
+            'digitalStampWeight'   => $digitalStampWeight,
         ]);
 
         $labelConceptHtmlTpl = $this->context->smarty->createTemplate(
