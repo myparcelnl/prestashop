@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use DateTime;
-use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
 
 class DeliveryOptionsProvider
@@ -40,15 +40,25 @@ class DeliveryOptionsProvider
         if ($deliveryOptions->getDate()) {
             $this->deliveryDate = new DateTime($deliveryOptions->getDate());
 
-            if ($this->nextDeliveryDate && $this->nextDeliveryDate > $this->deliveryDate) {
+            if ($this->nextDeliveryDate > $this->deliveryDate) {
                 $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
             }
-        } elseif ($this->nextDeliveryDate) {
+        } else {
             $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
         }
 
-        // Prestashop's formatDate function, (which is used in templates) can't handle our date formats.
-        $deliveryOptionsArray['date'] = (new DateTime($deliveryOptionsArray['date']))->format('Y-m-d');
+        $shipmentOptions = $deliveryOptions->getShipmentOptions();
+
+        if ($shipmentOptions && $shipmentOptions->getInsurance()) {
+            $deliveryOptionsArray['shipmentOptions']['insurance'] = [
+                'amount' => $shipmentOptions->getInsurance() * 100,
+            ];
+        }
+
+        if (isset($deliveryOptionsArray['date'])) {
+            // Prestashop's formatDate function, (which is used in templates) can't handle our date formats.
+            $deliveryOptionsArray['date'] = (new DateTime($deliveryOptionsArray['date']))->format('Y-m-d');
+        }
 
         return $deliveryOptionsArray;
     }

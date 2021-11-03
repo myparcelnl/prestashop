@@ -121,13 +121,7 @@ class AdminOrderView extends AbstractAdminOrder
             'date_warning_display' => $deliveryOptionsProvider->provideWarningDisplay($order->getId()),
             'isBE'                 => $this->module->isBE(),
             'currencySign'         => $currencySign,
-            'labelOptions'         => json_decode(
-                $labelOptionsResolver->getLabelOptions([
-                    'id_order'   => (int) $order->getId(),
-                    'id_carrier' => $order->getIdCarrier(),
-                ]),
-                true
-            ),
+            'labelOptions'         => json_decode($labelOptionsResolver->getLabelOptions($order), true),
             'weight'               => $weight,
             'labelAmount'          => $extraOptions->getLabelAmount(),
             'digitalStampWeight'   => $digitalStampWeight,

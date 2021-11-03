@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\DeliverySettings;
+namespace Gett\MyparcelBE\DeliveryOptions;
 
 use Exception;
+use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use Order;
+use PrestaShop\PrestaShop\Adapter\Entity\Db;
 
 class DeliveryOptions
 {
@@ -39,7 +42,7 @@ class DeliveryOptions
         $order           = self::getOrder($orderOrId);
         $deliveryOptions = self::queryByOrder($order);
 
-        if ($deliveryOptions) {
+        if (! empty($deliveryOptions)) {
             return DeliveryOptionsAdapterFactory::create($deliveryOptions);
         }
 
@@ -87,6 +90,47 @@ class DeliveryOptions
         $order = new Order($orderId);
         /** @noinspection PhpCastIsUnnecessaryInspection */
         return self::queryByCart((int) $order->id_cart);
+    }
+
+    /**
+     * @param  array $deliveryOptions
+     * @param  int   $cartId
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     */
+    public static function save(array $deliveryOptions, int $cartId): void
+    {
+        Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->insert(
+                Table::TABLE_DELIVERY_SETTINGS,
+                [
+                    'id_cart'           => $cartId,
+                    'delivery_settings' => pSQL(json_encode($deliveryOptions)),
+                ],
+                false,
+                true,
+                Db::REPLACE
+            );
+    }
+
+    /**
+     * @param  \DbQuery $query
+     *
+     * @return array
+     */
+    private static function executeQuery(DbQuery $query): array
+    {
+        $query->orderBy('id_delivery_setting DESC');
+
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->getValue($query);
+
+        if ('null' === $result || empty($result)) {
+            return [];
+        }
+
+        return json_decode($result, true);
     }
 
     /**

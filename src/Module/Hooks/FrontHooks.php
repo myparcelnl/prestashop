@@ -4,12 +4,9 @@ namespace Gett\MyparcelBE\Module\Hooks;
 
 use Address;
 use Currency;
-use Db;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Media;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use OrderControllerCore;
 use Tools;
@@ -43,12 +40,8 @@ trait FrontHooks
         $action    = Tools::getValue('action');
         $carrierId = Tools::getValue('delivery_option');
 
-        if (Tools::isSubmit('confirmDeliveryOption')) {
-            $this->saveDeliveryOptions($cart->id, $deliveryOptions);
-        }
-
-        if ('selectDeliveryOption' === $action && ! empty($carrierId)) {
-            $this->saveDeliveryOptions($cart->id, $deliveryOptions);
+        if (('selectDeliveryOption' === $action && ! empty($carrierId)) || Tools::isSubmit('confirmDeliveryOption')) {
+            DeliveryOptions::save($deliveryOptions->toArray(), $cart->id);
         }
     }
 
@@ -75,11 +68,10 @@ trait FrontHooks
 
         $this->context->smarty->assign([
             'address'               => $address,
-            'delivery_settings'     => DeliveryOptions::queryByCart((int) $this->context->cart->id),
             'shipping_cost'         => $this->getShippingCost($params['carrier'], $address),
             'carrier'               => $params['carrier'],
             'enableDeliveryOptions' => (new PackageTypeCalculator())
-                ->allowDeliveryOptions($this->context->cart, $this->getModuleCountry()),
+                ->deliveryOptionsAllowed($this->context->cart, $this->getModuleCountry()),
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier.tpl');
@@ -99,30 +91,6 @@ trait FrontHooks
             'myparcel_carrier_init_url',
             $this->context->link->getModuleLink($this->name, 'checkout', [], null, null, null, true)
         );
-    }
-
-    /**
-     * @param  int                                                                        $cartId
-     * @param  \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
-     *
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     */
-    protected function saveDeliveryOptions(int $cartId, AbstractDeliveryOptionsAdapter $deliveryOptions): void
-    {
-        $deliveryOptionsJson = json_encode($deliveryOptions->toArray());
-
-        Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->insert(
-                Table::TABLE_DELIVERY_SETTINGS,
-                [
-                    'id_cart'           => $cartId,
-                    'delivery_settings' => pSQL($deliveryOptionsJson),
-                ],
-                false,
-                true,
-                Db::REPLACE
-            );
     }
 
     /**
