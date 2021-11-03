@@ -14,7 +14,7 @@ use Gett\MyparcelBE\Grid\Column\LabelsColumn;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
-use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
+use Gett\MyparcelBE\Service\WeightService;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
@@ -106,7 +106,16 @@ trait OrdersGridHooks
         );
     }
 
-    public function hookActionOrderGridPresenterModifier(array &$params)
+    /**
+     * Executed when loading order grid shipment modal.
+     *
+     * @param  array $params
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function hookActionOrderGridPresenterModifier(array &$params): void
     {
         $rows = $params['presented_grid']['data']['records']->all();
 
@@ -119,24 +128,35 @@ trait OrdersGridHooks
             $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
 
             $row['myparcel'] = [
-                'labels' => $orderHelper->getLabels(),
-                'options' => (new LabelOptionsResolver())->getLabelOptions($row),
-                'allowSetOnlyRecipient' => $orderHelper->allowSetOnlyRecipient((int) $row['id_carrier_reference']),
-                'allowSetSignature' => $orderHelper->allowSetSignature((int) $row['id_carrier_reference']),
+                'labels'                 => $orderHelper->getLabels(),
+                'options'                => (new LabelOptionsResolver())->getLabelOptions($row),
+                'allowSetOnlyRecipient'  => $orderHelper->allowSetOnlyRecipient((int) $row['id_carrier_reference']),
+                'allowSetSignature'      => $orderHelper->allowSetSignature((int) $row['id_carrier_reference']),
                 'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
             ];
 
-            $deliveryOptions = DeliverySettingsRepository::getInstance()::getDeliveryOptionsByCartId($row['id_cart']);
+            $deliverySettingsRepository = DeliverySettingsRepository::getInstance();
+            $orderWeight                = (new WeightService($orderHelper->getWeight()))->convertToGrams()->getWeight();
+
+            $row['weight'] = $orderWeight;
+            $extraOptions  = $deliverySettingsRepository::getExtraOptionsByCartId($row['id_cart']);
+
+            if (! $extraOptions->getDigitalStampWeight()) {
+                $extraOptions->setDigitalStampWeight(
+                    (new WeightService($orderWeight))
+                        ->convertToDigitalStampWeight()
+                        ->getWeight()
+                );
+            }
+
+            $row['myparcel']['extraOptions'] = $extraOptions->toArray();
+
+            $deliveryOptions = $deliverySettingsRepository::getDeliveryOptionsByCartId($row['id_cart']);
+
             if (! $deliveryOptions) {
                 $row['delivery_info'] = null;
                 continue;
             }
-
-            $extraOptions = DeliverySettingsRepository::getInstance()::getExtraOptionsByCartId($row['id_cart']);
-
-            $row['myparcel']['extraOptions'] = $extraOptions->toArray();
-
-            $row['weight']  = (new OrderTotalWeight())->convertWeightToGrams($orderHelper->getWeight());
 
             try {
                 $row['delivery_info'] = sprintf(

@@ -10,6 +10,7 @@ use Configuration;
 use Context;
 use Currency;
 use Customer;
+use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
@@ -38,6 +39,11 @@ class AdminOrderView extends AbstractAdminOrder
      */
     private $context;
 
+    /**
+     * @var \Gett\MyparcelBE\Model\Core\Order
+     */
+    private $order;
+
     public function __construct(Module $module, int $idOrder, Context $context = null)
     {
         $this->module = $module;
@@ -53,7 +59,7 @@ class AdminOrderView extends AbstractAdminOrder
      */
     public function display(): string
     {
-        $order = new Order($this->idOrder);
+        $order = $this->getOrder();
 
         if (! Validate::isLoadedObject($order) || ! $this->isMyParcelCarrier($order->getIdCarrier())) {
             return '';
@@ -216,9 +222,22 @@ class AdminOrderView extends AbstractAdminOrder
     public function getWeight(): float
     {
         try {
-            return (new Order($this->idOrder))->getTotalWeight();
-        } catch (\Exception $exception) {
+            return $this->getOrder()->getTotalWeight();
+        } catch (Exception $exception) {
             return 0;
         }
+    }
+
+    /**
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getOrder(): Order
+    {
+        if (! $this->order) {
+            $this->order = new Order($this->idOrder);
+        }
+
+        return $this->order;
     }
 }

@@ -19,7 +19,7 @@
   </div>
 </div>
 <div class="form-group row" data-for_package_type="4">
-  <label class="col-sm-4 col-form-label" for="digitalStampWeight">{l s='Calculated digital stamp weight' mod='myparcelbe'} {$weight}gr</label>
+  <label class="col-sm-4 col-form-label" for="digitalStampWeight">{l s='Calculated digital stamp weight' mod='myparcelbe'}: {$weight}g</label>
   <div class="col-sm-8">
     <select name="digitalStampWeight" class="custom-select" id="digitalStampWeight">
       <option value="15">{l s='0 - 20 gr' mod='myparcelbe'}</option>

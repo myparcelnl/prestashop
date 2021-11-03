@@ -201,8 +201,8 @@
                 </div>
 
                 <div class="form-group" data-for_package_type="4">
-                    <label for="digitalStampWeight">{l s='Calculated digital stamp weight' mod='myparcelbe'}
-                      <span id="calculatedDigitalStampWeight"></span>
+                    <label for="digitalStampWeight">{l s='Calculated digital stamp weight' mod='myparcelbe'}:
+                        <span id="calculatedDigitalStampWeight"></span>g
                     </label>
                     <select name="digitalStampWeight" class="custom-select" id="digitalStampWeight">
                         <option value="15">{l s='0 - 20 gr' mod='myparcelbe'}</option>
