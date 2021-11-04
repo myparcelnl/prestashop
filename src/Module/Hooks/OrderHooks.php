@@ -10,6 +10,7 @@ use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\CarrierName;
 use Gett\MyparcelBE\Service\Order\OrderDeliveryDate;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use stdClass;
 
 trait OrderHooks
@@ -33,13 +34,7 @@ trait OrderHooks
             return;
         }
         $packageTypeId = $packageTypeCalculator->getOrderPackageType((int) $order->id, (int) $order->id_carrier);
-        if (!$packageTypeId) {
-            $packageTypeId = 1;
-        }
-        $packageType = Constant::PACKAGE_TYPES[Constant::PACKAGE_TYPE_PACKAGE];
-        if (isset(Constant::PACKAGE_TYPES[$packageTypeId])) {
-            $packageType = Constant::PACKAGE_TYPES[$packageTypeId];
-        }
+        $packageType = Constant::PACKAGE_TYPES[$packageTypeId] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
         $optionsObj = new stdClass();
         $optionsObj->isPickup = false;
         $optionsObj->date = (new OrderDeliveryDate())->get((int) $order->id_carrier);

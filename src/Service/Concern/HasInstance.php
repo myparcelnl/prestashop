@@ -16,7 +16,7 @@ trait HasInstance
      *
      * @return static
      */
-    private static function getInstance(...$arguments): self
+    public static function getInstance(...$arguments): self
     {
         if (self::$instance) {
             return self::$instance;
