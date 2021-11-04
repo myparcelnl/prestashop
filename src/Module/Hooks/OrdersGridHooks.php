@@ -7,13 +7,14 @@ use DateTime;
 use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconBulkAction;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconModalBulkAction;
 use Gett\MyparcelBE\Grid\Column\LabelsColumn;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Service\WeightService;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
@@ -105,7 +106,16 @@ trait OrdersGridHooks
         );
     }
 
-    public function hookActionOrderGridPresenterModifier(array &$params)
+    /**
+     * Executed when loading order grid shipment modal.
+     *
+     * @param  array $params
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function hookActionOrderGridPresenterModifier(array &$params): void
     {
         $rows = $params['presented_grid']['data']['records']->all();
 
@@ -117,18 +127,33 @@ trait OrdersGridHooks
 
             $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
 
-            // MyParcel created labels and label settings
             $row['myparcel'] = [
-                'labels' => $orderHelper->getLabels(),
-                'options' => (new LabelOptionsResolver())->getLabelOptions($row),
-                'allowSetOnlyRecipient' => $orderHelper->allowSetOnlyRecipient((int) $row['id_carrier_reference']),
-                'allowSetSignature' => $orderHelper->allowSetSignature((int) $row['id_carrier_reference']),
+                'labels'                 => $orderHelper->getLabels(),
+                'options'                => (new LabelOptionsResolver())->getLabelOptions($row),
+                'allowSetOnlyRecipient'  => $orderHelper->allowSetOnlyRecipient((int) $row['id_carrier_reference']),
+                'allowSetSignature'      => $orderHelper->allowSetSignature((int) $row['id_carrier_reference']),
                 'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
             ];
 
-            // Delivery date
-            $deliverySettings = DeliveryOptions::queryByCart($row['id_cart']);
-            if (empty($deliverySettings['date'])) {
+            $deliverySettingsRepository = DeliverySettingsRepository::getInstance();
+            $orderWeight                = (new WeightService($orderHelper->getWeight()))->convertToGrams()->getWeight();
+
+            $row['weight'] = $orderWeight;
+            $extraOptions  = $deliverySettingsRepository::getExtraOptionsByCartId($row['id_cart']);
+
+            if (! $extraOptions->getDigitalStampWeight()) {
+                $extraOptions->setDigitalStampWeight(
+                    (new WeightService($orderWeight))
+                        ->convertToDigitalStampWeight()
+                        ->getWeight()
+                );
+            }
+
+            $row['myparcel']['extraOptions'] = $extraOptions->toArray();
+
+            $deliveryOptions = $deliverySettingsRepository::getDeliveryOptionsByCartId($row['id_cart']);
+
+            if (! $deliveryOptions) {
                 $row['delivery_info'] = null;
                 continue;
             }
@@ -136,7 +161,7 @@ trait OrdersGridHooks
             try {
                 $row['delivery_info'] = sprintf(
                     '[%s] %s',
-                    (new DateTime($deliverySettings['date']))
+                    (new DateTime($deliveryOptions->getDate()))
                         ->format($this->context->language->date_format_lite),
                     $row['delivery_info']
                 );

@@ -8,7 +8,7 @@ use Currency;
 use Db;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
 use Media;
 use OrderController;
 use stdClass;

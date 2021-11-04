@@ -191,7 +191,7 @@ class MyParcelBE extends CarrierModule
         if ($deliverySettings) {
             $deliverySettings = json_decode($deliverySettings, true);
         } else {
-            $deliverySettings = \Gett\MyparcelBE\DeliveryOptions\DeliveryOptions::queryByCart((int) $cart->id);
+            $deliverySettings = \Gett\MyparcelBE\DeliverySettings\DeliveryOptions::queryByCart((int) $cart->id);
         }
 
         if (empty($deliverySettings)) {

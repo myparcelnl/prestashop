@@ -9,7 +9,7 @@ use Context;
 use Country;
 use DateTime;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
 use Module;
 use Order;
 use Tools;
@@ -105,11 +105,10 @@ class DeliverySettingsProvider
 
         $updatedDropOffDays = $this->updateDropOffDays($dropOffDays, $dropOffDateObj, $cutoffExceptions);
 
-        // no dropoffdays left for the coming week, just schedule it for next week
-        if ($updatedDropOffDays) {
-            $dropOffDays = array_values($updatedDropOffDays);
-        } else {
+        if (! $updatedDropOffDays) {
             $dropOffDelay += 7;
+        } else {
+            $dropOffDays = array_values($updatedDropOffDays);
         }
 
         $shippingOptions = $this->module->getShippingOptions($this->idCarrier, $address);

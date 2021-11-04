@@ -10,12 +10,15 @@ use Configuration;
 use Context;
 use Currency;
 use Customer;
+use Exception;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
 use Gett\MyparcelBE\Provider\OrderLabelProvider;
+use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Module;
 use Validate;
 
@@ -36,6 +39,11 @@ class AdminOrderView extends AbstractAdminOrder
      */
     private $context;
 
+    /**
+     * @var \Gett\MyparcelBE\Model\Core\Order
+     */
+    private $order;
+
     public function __construct(Module $module, int $idOrder, Context $context = null)
     {
         $this->module = $module;
@@ -51,7 +59,7 @@ class AdminOrderView extends AbstractAdminOrder
      */
     public function display(): string
     {
-        $order = new Order($this->idOrder);
+        $order = $this->getOrder();
 
         if (! Validate::isLoadedObject($order) || ! $this->isMyParcelCarrier($order->getIdCarrier())) {
             return '';
@@ -63,6 +71,7 @@ class AdminOrderView extends AbstractAdminOrder
         }
 
         $currency = Currency::getDefaultCurrency();
+        $weight   = (new OrderTotalWeight())->convertWeightToGrams($order->getTotalWeight());
 
         $link                     = $this->context->link;
         $labelUrl                 = $link->getAdminLink('AdminMyParcelBELabel', true, [], ['id_order' => $order->getId()]);
@@ -79,9 +88,11 @@ class AdminOrderView extends AbstractAdminOrder
                 'icon' => 'icon-print',
             ],
         ];
+        $extraOptions             = DeliverySettings::getExtraOptionsFromOrder($order);
         $deliveryOptionsProvider  = new DeliveryOptionsProvider();
         $deliveryOptions          = $deliveryOptionsProvider->provide($order->getId());
         $labelList                = $this->getLabels();
+        $digitalStampWeight       = $extraOptions->getDigitalStampWeight() ?? $weight;
 
         $labelListHtml = $this->context->smarty->createData($this->context->smarty);
         $labelListHtml->assign([
@@ -112,21 +123,27 @@ class AdminOrderView extends AbstractAdminOrder
             'currencySign'         => $currencySign,
             'labelOptions'         => json_decode(
                 $labelOptionsResolver->getLabelOptions([
-                    'id_order'   => (int) $order->id,
+                    'id_order'   => (int) $order->getId(),
                     'id_carrier' => $order->getIdCarrier(),
                 ]),
                 true
             ),
+            'weight'               => $weight,
+            'labelAmount'          => $extraOptions->getLabelAmount(),
+            'digitalStampWeight'   => $digitalStampWeight,
         ]);
 
         $labelReturnHtml->assign([
-            'deliveryOptions' => $deliveryOptions,
-            'carrierSettings' => $carrierSettings,
-            'isBE'            => $this->module->isBE(),
-            'currencySign'    => $currencySign,
-            'customerName'    => trim($deliveryAddress->firstname . ' ' . $deliveryAddress->lastname),
-            'customerEmail'   => $customer->email,
-            'labelUrl'        => $labelUrl,
+            'deliveryOptions'    => $deliveryOptions,
+            'carrierSettings'    => $carrierSettings,
+            'isBE'               => $this->module->isBE(),
+            'currencySign'       => $currencySign,
+            'customerName'       => trim($deliveryAddress->firstname . ' ' . $deliveryAddress->lastname),
+            'customerEmail'      => $customer->email,
+            'labelUrl'           => $labelUrl,
+            'weight'             => $weight,
+            'labelAmount'        => $extraOptions->getLabelAmount(),
+            'digitalStampWeight' => $digitalStampWeight,
         ]);
 
         $labelConceptHtmlTpl = $this->context->smarty->createTemplate(
@@ -183,6 +200,9 @@ class AdminOrderView extends AbstractAdminOrder
             'currencySign'               => $currencySign,
             'labelConfiguration'         => $this->getLabelDefaultConfiguration(),
             'promptForLabelPosition'     => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
+            'weight'                     => $weight,
+            'labelAmount'                => $extraOptions->getLabelAmount(),
+            'digitalStampWeight'         => $digitalStampWeight,
         ]);
 
         return $this->module->display(
@@ -194,5 +214,30 @@ class AdminOrderView extends AbstractAdminOrder
     public function getLabels()
     {
         return (new OrderLabelProvider($this->module))->provideLabels($this->idOrder, []);
+    }
+
+    /**
+     * @return float
+     */
+    public function getWeight(): float
+    {
+        try {
+            return $this->getOrder()->getTotalWeight();
+        } catch (Exception $exception) {
+            return 0;
+        }
+    }
+
+    /**
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getOrder(): Order
+    {
+        if (! $this->order) {
+            $this->order = new Order($this->idOrder);
+        }
+
+        return $this->order;
     }
 }

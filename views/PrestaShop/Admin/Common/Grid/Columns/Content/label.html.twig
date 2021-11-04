@@ -30,6 +30,9 @@
             type="button"
             data-toggle="modal"
             data-order-id="{{ record.id_order }}"
+            data-weight="{{ record.weight|default(0) }}"
+            data-label-amount="{{ record.myparcel.extraOptions.labelAmount }}"
+            data-digital-stamp-weight="{{ record.myparcel.extraOptions.digitalStampWeight }}"
             data-label-options='{{ record.myparcel.options|raw }}'{# Single quotes to allow json format #}
             data-allow-set-only-recipient="{{ record.myparcel.allowSetOnlyRecipient|number_format }}"
             data-allow-set-signature="{{ record.myparcel.allowSetSignature|number_format }}"

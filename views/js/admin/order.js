@@ -11,7 +11,6 @@ $(function() {
     ps177 = true;
   }
 
-
   let addBulkOption = function (link) {
     if (ps177) {
       return;
@@ -228,37 +227,72 @@ $(function() {
       $('#print_button').trigger('click');
     }
   });
-  $('button[data-target="#create"]').click(function(){
-    var id = $(this).data('order-id'),
-      options = $(this).data('label-options');
+
+  /**
+   * On clicking the "Create" button in order list/grid, stuff gets modified in the template (orders_popups.tpl).
+   */
+  $('button[data-target="#create"]').click(function() {
+    const $self = $(this);
+    const id = $self.data('order-id');
+    const options = $self.data('label-options');
+    const labelAmount = $self.data('labelAmount');
+    const digitalStampWeight = $self.data('digitalStampWeight');
+    const weight = $self.data('weight');
+
+    let insuranceInEuro;
+    let el;
+
     $('#order_id').val(id);
+    $('#labels_amount').val(labelAmount);
+    $('#calculatedDigitalStampWeight').text(weight);
     $('#packageType').val(options.package_type);
     $('#packageFormat').val(options.package_format);
-    if ($(this).data('allowSetOnlyRecipient') === 0) {
+    $('#digitalStampWeight option')
+      .removeAttr('selected')
+      .filter(`[value=${digitalStampWeight}]`)
+      .attr('selected', true);
+
+    if ($self.data('allowSetOnlyRecipient') === 0) {
       $('#onlyRecipient').prop('checked', false).prop('disabled', true);
     } else {
       $('#onlyRecipient').prop('disabled', false);
     }
-    if (options.only_to_recipient == true && $(this).data('allowSetOnlyRecipient') === 1) {
+
+    if (options.only_to_recipient && $self.data('allowSetOnlyRecipient') === 1) {
       $('#onlyRecipient').prop('checked', true);
     }
-    if (options.age_check == true) {
-      $('#ageCheck').prop('checked', true)
+
+    if (options.age_check) {
+      $('#ageCheck').prop('checked', true);
     }
-    if (options.return_undelivered == true) {
-      $('#returnUndelivered').prop('checked', true)
+
+    if (options.return_undelivered) {
+      $('#returnUndelivered').prop('checked', true);
     }
-    if ($(this).data('allowSetSignature') === 0) {
+
+    if ($self.data('allowSetSignature') === 0) {
       $('#signatureRequired').prop('checked', false).prop('disabled', true);
     } else {
       $('#signatureRequired').prop('disabled', false);
     }
-    if (options.signature == true && $(this).data('allowSetSignature') === 1) {
+
+    if (options.signature && $self.data('allowSetSignature') === 1) {
       $('#signatureRequired').prop('checked', true);
     }
+
     if (options.insurance) {
       $('#insurance').prop('checked', true);
+      insuranceInEuro = (options.insurance / 100).toString();
+      el = document.getElementById(`upto${insuranceInEuro}`) || null;
+      if (el) {
+        $(el).prop('checked', true);
+      } else {
+        $('#heigherthen500').prop('checked', true);
+        $('#myparcel-insurance-higher-amount').val(insuranceInEuro);
+      }
     }
+    // change event on packageType select list will update visibility of options
+    document.getElementById('packageType').dispatchEvent(new CustomEvent('change'));
   });
   $('#print_button').click(function () {
     var intervalLimit = 100;
