@@ -74,10 +74,9 @@ class DeliverySettingsRepository
         }
         self::$deliverySettingsByCartId[$cartId]['deliveryOptions'] = $deliveryOptions;
 
+        $extraOptions = [];
         if (isset($row['extra_options'])) {
             $extraOptions = json_decode($row['extra_options'], true);
-        } else {
-            $extraOptions = [];
         }
         self::$deliverySettingsByCartId[$cartId]['extraOptions'] = new ExtraOptions($extraOptions);
     }

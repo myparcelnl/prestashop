@@ -23,12 +23,10 @@ class LabelOptionsResolver
     public function getLabelOptions(array $params): string
     {
         $delivery_settings = DeliveryOptions::queryByOrderId((int) $params['id_order']);
-
-        $order_products = OrderLabel::getOrderProducts($params['id_order']);
-
-        $packageType = $delivery_settings['packageType'] ??
+        $order_products    = OrderLabel::getOrderProducts($params['id_order']);
+        $packageType       = $delivery_settings['packageType'] ??
             (new PackageTypeCalculator())->getOrderPackageType($params['id_order'], $params['id_carrier']);
-        $packageFormat = ($delivery_settings['shipmentOptions']['large_format'] ?? false) ? 2 :
+        $packageFormat     = ($delivery_settings['shipmentOptions']['large_format'] ?? false) ? 2 :
             (new PackageFormatCalculator())->getOrderPackageFormat($params['id_order'], $params['id_carrier']);
 
         // packageType is a string in delivery options, but we need the packageType int constant for the application
@@ -37,13 +35,17 @@ class LabelOptionsResolver
         }
 
         return json_encode([
-            'package_type' => $packageType,
-            'package_format' => $packageFormat,
-            'only_to_recipient' => $this->getOnlyToRecipient($delivery_settings, $order_products, $params['id_carrier']),
-            'age_check' => $this->getAgeCheck($delivery_settings, $order_products, $params['id_carrier']),
-            'signature' => $this->getSignature($delivery_settings, $order_products, $params['id_carrier']),
-            'insurance' => $this->getInsurance($delivery_settings, $order_products, $params['id_carrier']),
-            'return_undelivered' => $this->getReturnUndelivered($order_products, $params['id_carrier']),
+            'package_type'       => $packageType,
+            'package_format'     => $packageFormat,
+            'only_to_recipient'  => $this->hasOnlyToRecipient(
+                $delivery_settings,
+                $order_products,
+                $params['id_carrier']
+            ),
+            'age_check'          => $this->hasAgeCheck($delivery_settings, $order_products, $params['id_carrier']),
+            'signature'          => $this->hasSignature($delivery_settings, $order_products, $params['id_carrier']),
+            'insurance'          => $this->getInsurance($delivery_settings, $order_products, $params['id_carrier']),
+            'return_undelivered' => $this->hasReturnUndelivered($order_products, $params['id_carrier']),
         ]);
     }
 
@@ -55,7 +57,7 @@ class LabelOptionsResolver
      * @return bool
      * @throws \PrestaShopDatabaseException
      */
-    private function getOnlyToRecipient(array $delivery_settings, array $products, int $id_carrier): bool
+    private function hasOnlyToRecipient(array $delivery_settings, array $products, int $id_carrier): bool
     {
         if (isset($delivery_settings['shipmentOptions']['only_recipient']) && true === $delivery_settings['shipmentOptions']['only_recipient']) {
             return true;
@@ -78,7 +80,7 @@ class LabelOptionsResolver
      * @return bool
      * @throws \PrestaShopDatabaseException
      */
-    private function getAgeCheck(array $delivery_settings, array $products, int $id_carrier): bool
+    private function hasAgeCheck(array $delivery_settings, array $products, int $id_carrier): bool
     {
         if (isset($delivery_settings['shipmentOptions']['age_check']) && $delivery_settings['shipmentOptions']['age_check']) {
             return true;
@@ -101,7 +103,7 @@ class LabelOptionsResolver
      * @return bool
      * @throws \PrestaShopDatabaseException
      */
-    private function getSignature(array $delivery_settings, array $products, int $id_carrier): bool
+    private function hasSignature(array $delivery_settings, array $products, int $id_carrier): bool
     {
         if (isset($delivery_settings['shipmentOptions']['signature']) && true === $delivery_settings['shipmentOptions']['signature']) {
             return true;
@@ -149,7 +151,7 @@ class LabelOptionsResolver
      * @return bool
      * @throws \PrestaShopDatabaseException
      */
-    private function getReturnUndelivered(array $products, int $id_carrier): bool
+    private function hasReturnUndelivered(array $products, int $id_carrier): bool
     {
         foreach ($products as $product) {
             if (ProductConfigurationProvider::get($product['product_id'], Constant::RETURN_PACKAGE_CONFIGURATION_NAME)) {
