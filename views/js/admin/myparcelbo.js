@@ -1,5 +1,37 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+  const packageTypeSelectList = document.getElementById('packageTypeSelect') || document.getElementById('packageType');
+
+  if (packageTypeSelectList) {
+    const findParentModal = function(element) {
+      while ((element = element.parentElement)) {
+        if (element.classList.contains('modal-content')) {
+          return element;
+        }
+        if (element.classList.contains('card-body')) {
+          return element;
+        }
+      }
+      return document;
+    };
+
+    const toggleOptionsForPackageType = function() {
+      const packageType = packageTypeSelectList.options[packageTypeSelectList.selectedIndex].value;
+      const elements    = findParentModal(packageTypeSelectList).querySelectorAll('[data-for_package_type]');
+
+      for (let i = 0, len = elements.length; i < len; ++i) {
+        const forPackageTypes = elements[i].getAttribute('data-for_package_type').split(',');
+        if (forPackageTypes.includes(packageType)) {
+          elements[i].style.removeProperty('display');
+        } else {
+          elements[i].style.display = 'none';
+        }
+      }
+    };
+    packageTypeSelectList.addEventListener('change', toggleOptionsForPackageType);
+    toggleOptionsForPackageType();
+  }
+
   const insuranceCheckboxSelector = '.myparcel-insurance-checkbox';
   let toggleInsuranceAdditional = function() {
     const insuranceAdditionalActiveClassname = 'insurance-active';

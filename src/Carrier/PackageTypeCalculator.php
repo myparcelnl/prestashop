@@ -9,6 +9,7 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use Order;
 
 class PackageTypeCalculator extends AbstractPackageCalculator
@@ -113,7 +114,7 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         $exclusiveField = new ExclusiveField();
         $carrierType = $exclusiveField->getCarrierType($carrier);
         $packageTypes = [];
-        foreach (Constant::PACKAGE_TYPES as $packageType => $packageName) {
+        foreach (AbstractConsignment::PACKAGE_TYPES_IDS as $packageType) {
             if ($exclusiveField->isAvailable(
                 $countryIso,
                 $carrierType,

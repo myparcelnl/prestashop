@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use DateTime;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
 
 class DeliveryOptionsProvider
