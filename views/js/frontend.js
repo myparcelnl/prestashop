@@ -1,5 +1,6 @@
 /**
  * @member {string} window.myparcel_carrier_init_url
+ * @member {Object} window.prestashop
  * @member {jQuery} $
  */
 
@@ -168,7 +169,7 @@
 
     initialized = true;
 
-    prestashop.on('updatedDeliveryForm', (event) => {
+    window.prestashop.on('updatedDeliveryForm', (event) => {
       initializeMyParcelForm(event.deliveryOption);
     });
 
@@ -187,10 +188,24 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     if (!document.querySelector('#checkout-delivery-step.js-current-step')) {
-      prestashop.on('changedCheckoutStep', start);
+      window.prestashop.on('changedCheckoutStep', start);
       return;
     }
 
     start();
+  });
+
+  // Hack to keep prestashop from hiding the checkout when icons inside the delivery options are clicked.
+  window.prestashop.on('changedCheckoutStep', (values) => {
+    const $currentTarget = $(values.event.currentTarget);
+
+    if (!$currentTarget.hasClass('-current')) {
+      const $activeStep = $('.checkout-step.-current');
+
+      if (!$activeStep.length) {
+        $currentTarget.addClass('-current');
+        $currentTarget.addClass('js-current-step');
+      }
+    }
   });
 })();
