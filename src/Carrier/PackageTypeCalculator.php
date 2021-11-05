@@ -57,7 +57,9 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         if (empty($cart->id) || empty($cart->id_carrier)) {
             return false;
         }
+
         $carrier = new Carrier($cart->id_carrier);
+
         if (empty($carrier->id)) {
             return false;
         }

@@ -18,7 +18,7 @@ use Validate;
 class DeliverySettingsProvider
 {
     /**
-     * @var Module
+     * @var \MyParcelBE
      */
     private $module;
 
@@ -51,69 +51,32 @@ class DeliverySettingsProvider
         return $this;
     }
 
+    /**
+     * @throws \PrestaShopDatabaseException
+     */
     public function get(): array
     {
         $this->initCart();
-        if (!Validate::isLoadedObject($this->context->cart)) {
+
+        if (! Validate::isLoadedObject($this->context->cart)) {
             return [];
         }
-        $address = new Address($this->context->cart->id_address_delivery);
+
+        $address     = new Address($this->context->cart->id_address_delivery);
         $houseNumber = preg_replace('/[^0-9]/', '', $address->address1);
+
         if (Configuration::get(Constant::USE_ADDRESS2_AS_STREET_NUMBER_CONFIGURATION_NAME)) {
             $houseNumber = trim($address->address2);
         }
+
         $carrierName = CarrierConfigurationProvider::get($this->idCarrier, 'carrierType');
-        $deliveryDaysWindow = (int) (CarrierConfigurationProvider::get($this->idCarrier, 'deliveryDaysWindow') ?? 1);
-
-        $carrierSettings = [
-            $carrierName => ['allowDeliveryOptions' => false],
-        ];
-        $activeCarrierSettings = [
-            'allowDeliveryOptions' => true,
-            'allowEveningDelivery' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowEveningDelivery'),
-            'allowMondayDelivery' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowMondayDelivery'),
-            'allowMorningDelivery' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowMorningDelivery'),
-            'allowSaturdayDelivery' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowSaturdayDelivery'),
-            'allowOnlyRecipient' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowOnlyRecipient'),
-            'allowSignature' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowSignature'),
-            'allowPickupPoints' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowPickupPoints'),
-            'deliveryDaysWindow' => $deliveryDaysWindow,
-            'allowShowDeliveryDate' => (-1 !== $deliveryDaysWindow),
-            // TODO: remove allowPickupLocations after fixing the allowPickupPoints reference
-            'allowPickupLocations' => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowPickupPoints'),
-        ];
-        $carrierSettings[$carrierName] = array_merge($carrierSettings[$carrierName], $activeCarrierSettings);
-        $dropOffDelay = (int) CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDelay', 0);
-        $cutoffExceptions = CarrierConfigurationProvider::get($this->idCarrier, Constant::CUTOFF_EXCEPTIONS);
-        $cutoffExceptions = @json_decode(
-            $cutoffExceptions,
-            true
-        );
-        if (!is_array($cutoffExceptions)) {
-            $cutoffExceptions = [];
-        }
-        $dropOffDateObj = new DateTime('today');
-        $weekDayNumber = $dropOffDateObj->format('N');
-        $dayName = Constant::WEEK_DAYS[$weekDayNumber];
-        $cutoffTimeToday = CarrierConfigurationProvider::get($this->idCarrier, $dayName . 'CutoffTime');
-        $dropOffDays = array_map(
-            'intval',
-            explode(',', CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDays'))
-        );
-
-        $this->updateCutoffTime($cutoffTimeToday, $dropOffDateObj, $cutoffExceptions);
-
-        $updatedDropOffDays = $this->updateDropOffDays($dropOffDays, $dropOffDateObj, $cutoffExceptions);
-
-        if (! $updatedDropOffDays) {
-            $dropOffDelay += 7;
-        } else {
-            $dropOffDays = array_values($updatedDropOffDays);
+        if (! $carrierName) {
+            return [];
         }
 
-        $shippingOptions = $this->module->getShippingOptions($this->idCarrier, $address);
+        $carrierSettings = $this->getCarrierSettings($carrierName);
 
-        $taxRate               = $shippingOptions['tax_rate'];
+        $shippingOptions       = $this->module->getShippingOptions($this->idCarrier, $address);
         $priceStandardDelivery = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
 
         $surchargeOption    = Configuration::get(Constant::DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME);
@@ -121,53 +84,54 @@ class DeliverySettingsProvider
 
         $priceStandardDelivery = $showPriceSurcharge ? null : Tools::ps_round($priceStandardDelivery, 2);
 
+        [$dropOffDelay, $cutoffTime, $dropOffDays] = $this->calculateDropOff();
+
         return [
-            'config' => [
+            'config'            => [
                 'platform'              => ($this->module->isBE() ? 'belgie' : 'myparcel'),
                 'carrierSettings'       => $carrierSettings,
-                'priceMorningDelivery'  => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceMorningDelivery') * $taxRate, 2),
+                'priceMorningDelivery'  => $this->getPrice('priceMorningDelivery', $shippingOptions),
                 'priceStandardDelivery' => $priceStandardDelivery,
-                'priceEveningDelivery'  => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceEveningDelivery') * $taxRate, 2),
-                'priceSignature'        => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceSignature') * $taxRate, 2),
-                'priceOnlyRecipient'    => Tools::ps_round(CarrierConfigurationProvider::get($this->idCarrier, 'priceOnlyRecipient') * $taxRate, 2),
-                'pricePickup'           => Tools::ps_round((CarrierConfigurationProvider::get($this->idCarrier, 'pricePickup') * $taxRate), 2),
-                'allowSignature'        => (bool) CarrierConfigurationProvider::get($this->idCarrier, 'allowSignature'),
-                'dropOffDays'           => $dropOffDays,
+                'priceEveningDelivery'  => $this->getPrice('priceEveningDelivery', $shippingOptions),
+                'priceSignature'        => $this->getPrice('priceSignature', $shippingOptions),
+                'priceOnlyRecipient'    => $this->getPrice('priceOnlyRecipient', $shippingOptions),
+                'pricePickup'           => $this->getPrice('pricePickup', $shippingOptions),
+                'allowSignature'        => $this->isEnabledInCarrier('allowSignature'),
                 'showPriceSurcharge'    => $showPriceSurcharge,
-                'cutoffTime'            => $cutoffTimeToday,
-                'deliveryDaysWindow'    => $deliveryDaysWindow,
+                'cutoffTime'            => $cutoffTime,
+                'dropOffDays'           => $dropOffDays,
                 'dropOffDelay'          => $dropOffDelay,
             ],
-            'strings' => [
+            'strings'           => [
                 'wrongPostalCodeCity'   => CarrierConfigurationProvider::get($this->idCarrier, 'wrongPostalCodeCity'),
                 'saturdayDeliveryTitle' => CarrierConfigurationProvider::get($this->idCarrier, 'saturdayDeliveryTitle'),
 
-                'city'                  => CarrierConfigurationProvider::get($this->idCarrier, 'city'),
-                'postcode'              => CarrierConfigurationProvider::get($this->idCarrier, 'postcode'),
-                'houseNumber'           => CarrierConfigurationProvider::get($this->idCarrier, 'houseNumber'),
-                'addressNotFound'       => CarrierConfigurationProvider::get($this->idCarrier, 'addressNotFound'),
+                'city'            => CarrierConfigurationProvider::get($this->idCarrier, 'city'),
+                'postcode'        => CarrierConfigurationProvider::get($this->idCarrier, 'postcode'),
+                'houseNumber'     => CarrierConfigurationProvider::get($this->idCarrier, 'houseNumber'),
+                'addressNotFound' => CarrierConfigurationProvider::get($this->idCarrier, 'addressNotFound'),
 
                 'deliveryEveningTitle'  => CarrierConfigurationProvider::get($this->idCarrier, 'deliveryEveningTitle'),
                 'deliveryMorningTitle'  => CarrierConfigurationProvider::get($this->idCarrier, 'deliveryMorningTitle'),
                 'deliveryStandardTitle' => CarrierConfigurationProvider::get($this->idCarrier, 'deliveryStandardTitle'),
 
-                'deliveryTitle'         => CarrierConfigurationProvider::get($this->idCarrier, 'deliveryTitle'),
-                'pickupTitle'           => CarrierConfigurationProvider::get($this->idCarrier, 'pickupTitle'),
+                'deliveryTitle' => CarrierConfigurationProvider::get($this->idCarrier, 'deliveryTitle'),
+                'pickupTitle'   => CarrierConfigurationProvider::get($this->idCarrier, 'pickupTitle'),
 
-                'onlyRecipientTitle'    => CarrierConfigurationProvider::get($this->idCarrier, 'onlyRecipientTitle'),
-                'signatureTitle'        => CarrierConfigurationProvider::get($this->idCarrier, 'signatureTitle'),
+                'onlyRecipientTitle' => CarrierConfigurationProvider::get($this->idCarrier, 'onlyRecipientTitle'),
+                'signatureTitle'     => CarrierConfigurationProvider::get($this->idCarrier, 'signatureTitle'),
 
-                'pickUpFrom'            => CarrierConfigurationProvider::get($this->idCarrier, 'pickUpFrom'),
-                'openingHours'          => CarrierConfigurationProvider::get($this->idCarrier, 'openingHours'),
+                'pickUpFrom'   => CarrierConfigurationProvider::get($this->idCarrier, 'pickUpFrom'),
+                'openingHours' => CarrierConfigurationProvider::get($this->idCarrier, 'openingHours'),
 
-                'closed'                => CarrierConfigurationProvider::get($this->idCarrier, 'closed'),
-                'discount'              => CarrierConfigurationProvider::get($this->idCarrier, 'discount'),
-                'free'                  => CarrierConfigurationProvider::get($this->idCarrier, 'free'),
-                'from'                  => CarrierConfigurationProvider::get($this->idCarrier, 'from'),
-                'loadMore'              => CarrierConfigurationProvider::get($this->idCarrier, 'loadMore'),
-                'retry'                 => CarrierConfigurationProvider::get($this->idCarrier, 'retry'),
+                'closed'   => CarrierConfigurationProvider::get($this->idCarrier, 'closed'),
+                'discount' => CarrierConfigurationProvider::get($this->idCarrier, 'discount'),
+                'free'     => CarrierConfigurationProvider::get($this->idCarrier, 'free'),
+                'from'     => CarrierConfigurationProvider::get($this->idCarrier, 'from'),
+                'loadMore' => CarrierConfigurationProvider::get($this->idCarrier, 'loadMore'),
+                'retry'    => CarrierConfigurationProvider::get($this->idCarrier, 'retry'),
             ],
-            'address' => [
+            'address'           => [
                 'cc'         => strtoupper(Country::getIsoById($address->id_country)),
                 'city'       => $address->city,
                 'postalCode' => $address->postcode,
@@ -177,6 +141,112 @@ class DeliverySettingsProvider
         ];
     }
 
+    /**
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     */
+    private function calculateDropOff(): array
+    {
+        $dropOffDelay     = (int) CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDelay', 0);
+        $cutoffExceptions = CarrierConfigurationProvider::get(
+            $this->idCarrier,
+            Constant::CUTOFF_EXCEPTIONS
+        );
+
+        $cutoffExceptions = json_decode(
+            $cutoffExceptions,
+            true
+        );
+
+        if (! is_array($cutoffExceptions)) {
+            $cutoffExceptions = [];
+        }
+
+        $dropOffDateObj  = new DateTime('today');
+        $weekDayNumber   = $dropOffDateObj->format('N');
+        $dayName         = Constant::WEEK_DAYS[$weekDayNumber];
+        $cutoffTimeToday = CarrierConfigurationProvider::get($this->idCarrier, $dayName . 'CutoffTime');
+        $dropOffDays     = array_map(
+            'intval',
+            explode(',', CarrierConfigurationProvider::get($this->idCarrier, 'dropOffDays'))
+        );
+
+        $this->updateCutoffTime($cutoffTimeToday, $dropOffDateObj, $cutoffExceptions);
+
+        $updatedDropOffDays = $this->updateDropOffDays($dropOffDays, $dropOffDateObj, $cutoffExceptions);
+
+        // no dropoffdays left for the coming week, just schedule it for next week
+        if ($updatedDropOffDays) {
+            $dropOffDays = array_values($updatedDropOffDays);
+        } else {
+            $dropOffDelay += 7;
+        }
+        return [$dropOffDelay, $cutoffTimeToday, $dropOffDays];
+    }
+
+    /**
+     * @param  string $carrierName
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getCarrierSettings(string $carrierName): array
+    {
+        $deliveryDaysWindow = (int) (CarrierConfigurationProvider::get($this->idCarrier, 'deliveryDaysWindow') ?? 1);
+
+        return [
+            $carrierName => [
+                'allowDeliveryOptions'  => true,
+                'allowEveningDelivery'  => $this->isEnabledInCarrier('allowEveningDelivery'),
+                'allowMondayDelivery'   => $this->isEnabledInCarrier('allowMondayDelivery'),
+                'allowMorningDelivery'  => $this->isEnabledInCarrier('allowMorningDelivery'),
+                'allowSaturdayDelivery' => $this->isEnabledInCarrier('allowSaturdayDelivery'),
+                'allowOnlyRecipient'    => $this->isEnabledInCarrier('allowOnlyRecipient'),
+                'allowSignature'        => $this->isEnabledInCarrier('allowSignature'),
+                'allowPickupPoints'     => $this->isEnabledInCarrier('allowPickupPoints'),
+                'deliveryDaysWindow'    => $deliveryDaysWindow,
+                'allowShowDeliveryDate' => (-1 !== $deliveryDaysWindow),
+                // TODO: remove allowPickupLocations after fixing the allowPickupPoints reference
+                'allowPickupLocations'  => $this->isEnabledInCarrier('allowPickupPoints'),
+            ],
+        ];
+    }
+
+    /**
+     * @param  string $name
+     * @param         $shippingOptions
+     *
+     * @return float
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getPrice(string $name, $shippingOptions): float
+    {
+        $taxRate = $shippingOptions['tax_rate'];
+
+        return Tools::ps_round(
+            CarrierConfigurationProvider::get($this->idCarrier, $name) * $taxRate,
+            2
+        );
+    }
+
+    /**
+     * @param  string $setting
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     */
+    private function isEnabledInCarrier(string $setting): bool
+    {
+        return (bool) CarrierConfigurationProvider::get($this->idCarrier, $setting);
+    }
+
+    /**
+     * @param $cutoffTimeToday
+     * @param $dropOffDateObj
+     * @param $cutoffExceptions
+     *
+     * @return void
+     */
     private function updateCutoffTime(&$cutoffTimeToday, $dropOffDateObj, $cutoffExceptions): void
     {
         if (isset($cutoffExceptions[$dropOffDateObj->format('d-m-Y')]['cutoff']) && $cutoffTimeToday !== false) {
