@@ -40,10 +40,10 @@ class DeliveryOptionsProvider
         if ($deliveryOptions->getDate()) {
             $this->deliveryDate = new DateTime($deliveryOptions->getDate());
 
-            if ($this->nextDeliveryDate > $this->deliveryDate) {
+            if ($this->nextDeliveryDate && $this->nextDeliveryDate > $this->deliveryDate) {
                 $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
             }
-        } else {
+        } elseif ($this->nextDeliveryDate) {
             $deliveryOptionsArray['date'] = $this->nextDeliveryDate->format('Y-m-d');
         }
 

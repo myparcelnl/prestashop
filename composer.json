@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "require": {
     "php": ">=7.2.0",
-    "myparcelnl/sdk": "^5.2"
+    "myparcelnl/sdk": "^v5.4.0-beta.1"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0"
