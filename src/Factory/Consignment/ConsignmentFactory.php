@@ -271,6 +271,7 @@ class ConsignmentFactory
             ->setFullStreet($this->orderData['full_street'])
             ->setPostalCode($this->orderData['postcode'])
             ->setCity($this->orderData['city'])
+            ->setRegion($this->orderData['state_name'])
             ->setEmail($this->getEmailConfiguration())
             ->setPhone($this->getPhoneConfiguration())
             ->setSaveRecipientAddress(false);
@@ -391,10 +392,6 @@ class ConsignmentFactory
             $weight      = (new OrderTotalWeight())->convertWeightToGrams($product['product_weight']);
             $description = $product['product_name'];
             $itemValue   = Tools::ps_round($product['unit_price_tax_incl'] * 100);
-
-            if (strlen($description) > Constant::ITEM_DESCRIPTION_MAX_LENGTH) {
-                $description = substr_replace($description, '...', Constant::ITEM_DESCRIPTION_MAX_LENGTH - 3);
-            }
 
             $this->consignment->addItem(
                 (new MyParcelCustomsItem())

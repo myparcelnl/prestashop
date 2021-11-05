@@ -314,6 +314,7 @@ SQL
                     orders.id_order AS id,
                     orders.reference,
                     country.iso_code,
+                    state.name AS state_name,
                     CONCAT(address.firstname, " ",address.lastname) as person,
                     CONCAT(address.address1, " ", address.address2) as full_street,
                     address.postcode,
@@ -331,6 +332,7 @@ SQL
         $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
         $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
         $qb->innerJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
+        $qb->leftJoin('state', 'state', 'state.id_state = address.id_state');
         $qb->leftJoin(Table::TABLE_DELIVERY_SETTINGS, 'delivery_settings', 'orders.id_cart = delivery_settings.id_cart');
 
         $qb->where('id_order IN (' . implode(',', $orderIds) . ') ');
