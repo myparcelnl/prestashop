@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "require": {
     "php": ">=7.2.0",
-    "myparcelnl/sdk": "^v5.4.0-beta.1"
+    "myparcelnl/sdk": "v6.0.0-beta.4"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0"
@@ -16,7 +16,7 @@
       "myparcelbe.php",
       "src/Model/OrderLabel.php"
     ],
-    "exclude-from-classmap": []
+    "exclude-from-classmap": [ ]
   },
   "config": {
     "preferred-install": "dist",

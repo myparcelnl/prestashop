@@ -6,12 +6,11 @@ use Configuration;
 use Dispatcher;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
+use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
-use Gett\MyparcelBE\Module\Tools\Tools;
-use Order;
 use Validate;
 
 trait LegacyOrderPageHooks
@@ -97,19 +96,24 @@ trait LegacyOrderPageHooks
         return $this->display($this->name, 'views/templates/admin/icon-labels.tpl');
     }
 
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
     public function printMyParcelIcon($id, $params)
     {
-        if (!$this->searchMyParcelCarrier((int) $params['id_carrier'])) {
+        if (! $this->searchMyParcelCarrier((int) $params['id_carrier'])) {
             return '';
         }
 
         $labelOptionsResolver = new LabelOptionsResolver();
-        $carrierReference = (int) $this->carrierList[(int) $params['id_carrier']];
-        $orderHelper = new AdminOrderList($this);
+        $carrierReference     = (int) $this->carrierList[(int) $params['id_carrier']];
+        $orderHelper          = new AdminOrderList($this);
+        $order                = new Order((int) $params['id_order']);
 
         $this->context->smarty->assign([
-            'label_options' => $labelOptionsResolver->getLabelOptions($params),
-            'allowSetSignature' => $orderHelper->allowSetSignature($carrierReference),
+            'label_options'         => $labelOptionsResolver->getLabelOptions($order),
+            'allowSetSignature'     => $orderHelper->allowSetSignature($carrierReference),
             'allowSetOnlyRecipient' => $orderHelper->allowSetOnlyRecipient($carrierReference),
         ]);
 

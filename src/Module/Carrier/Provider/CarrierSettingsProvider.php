@@ -6,14 +6,20 @@ use Carrier;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
 use Module;
+use MyParcelBE;
 
 class CarrierSettingsProvider
 {
     protected $module;
 
-    public function __construct($module)
+    /**
+     * @param  \Module|null $module
+     *
+     * @throws \Exception
+     */
+    public function __construct(Module $module = null)
     {
-        $this->module = $module;
+        $this->module = $module ?? MyParcelBE::getModule();
     }
 
     public function provide(int $carrierId)

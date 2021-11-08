@@ -12,6 +12,7 @@ use Gett\MyparcelBE\Grid\Action\Bulk\IconBulkAction;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconModalBulkAction;
 use Gett\MyparcelBE\Grid\Column\LabelsColumn;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
+use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
 use Gett\MyparcelBE\Service\WeightService;
@@ -120,16 +121,17 @@ trait OrdersGridHooks
         $rows = $params['presented_grid']['data']['records']->all();
 
         foreach ($rows as &$row) {
-            if (!(new AdminOrderList($this))->isMyParcelCarrier((int) $row['id_carrier_reference'])) {
+            if (! (new AdminOrderList($this))->isMyParcelCarrier((int) $row['id_carrier_reference'])) {
                 $row['delivery_info'] = null;
                 continue;
             }
 
             $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
+            $order       = new Order((int) $row['id_order']);
 
             $row['myparcel'] = [
                 'labels'                 => $orderHelper->getLabels(),
-                'options'                => (new LabelOptionsResolver())->getLabelOptions($row),
+                'options'                => (new LabelOptionsResolver())->getLabelOptions($order),
                 'allowSetOnlyRecipient'  => $orderHelper->allowSetOnlyRecipient((int) $row['id_carrier_reference']),
                 'allowSetSignature'      => $orderHelper->allowSetSignature((int) $row['id_carrier_reference']),
                 'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),

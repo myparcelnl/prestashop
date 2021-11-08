@@ -14,6 +14,6 @@ class AbstractEndpoint
     protected function createRequest(): MyParcelRequest
     {
         return (new MyParcelRequest())
-            ->setUserAgent('prestashop' . '/' . _PS_VERSION_);
+            ->setUserAgent('PrestaShop', _PS_VERSION_);
     }
 }
