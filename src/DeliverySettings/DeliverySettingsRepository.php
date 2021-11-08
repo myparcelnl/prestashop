@@ -13,8 +13,6 @@ use OrderCore;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
-if (! class_exists('DeliverySettingsRepository')) :
-
 class DeliverySettingsRepository
 {
     use HasInstance;
@@ -154,5 +152,3 @@ class DeliverySettingsRepository
         return $query;
     }
 }
-
-endif;

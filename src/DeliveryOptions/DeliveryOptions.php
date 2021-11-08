@@ -11,6 +11,7 @@ use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use Order;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
+use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
 class DeliveryOptions
 {
@@ -93,21 +94,31 @@ class DeliveryOptions
     }
 
     /**
-     * @param  array $deliveryOptions
      * @param  int   $cartId
+     * @param  array $deliveryOptions
+     * @param  array $extraOptions
      *
      * @return void
      * @throws \PrestaShopDatabaseException
      */
-    public static function save(array $deliveryOptions, int $cartId): void
+    public static function save(int $cartId, array $deliveryOptions = [], array $extraOptions = []): void
     {
+        $values = [
+            'id_cart' => $cartId,
+        ];
+
+        if (! empty($deliveryOptions)) {
+            $values['delivery_settings'] = pSQL(json_encode($deliveryOptions));
+        }
+
+        if (! empty($extraOptions)) {
+            $values['extra_options'] = pSQL(json_encode($extraOptions));
+        }
+
         Db::getInstance(_PS_USE_SQL_SLAVE_)
             ->insert(
                 Table::TABLE_DELIVERY_SETTINGS,
-                [
-                    'id_cart'           => $cartId,
-                    'delivery_settings' => pSQL(json_encode($deliveryOptions)),
-                ],
+                $values,
                 false,
                 true,
                 Db::REPLACE
@@ -115,7 +126,7 @@ class DeliveryOptions
     }
 
     /**
-     * @param  \DbQuery $query
+     * @param  \PrestaShop\PrestaShop\Adapter\Entity\DbQuery $query
      *
      * @return array
      */

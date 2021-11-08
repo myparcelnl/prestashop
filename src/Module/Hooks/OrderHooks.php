@@ -51,7 +51,7 @@ trait OrderHooks
         ]);
 
         try {
-            DeliveryOptions::save($deliveryOptions->toArray(), $order->getIdCart());
+            DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
         } catch (Exception $exception) {
             Logger::addLog($exception->getMessage(), true, true);
             Logger::addLog($exception->getFile(), true, true);

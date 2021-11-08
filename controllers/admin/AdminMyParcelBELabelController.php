@@ -650,7 +650,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $order      = new Order($postValues['id_order'] ?? 0);
 
         if ('updateDeliveryOptions' === $action && ! empty($options)) {
-            DeliveryOptions::save(json_decode($options, true), $order->getIdCart());
+            DeliveryOptions::save($order->getIdCart(), json_decode($options, true));
         } else {
             $this->errors[] = $this->module->l(
                 'Error updating the delivery options.',
@@ -911,7 +911,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             new DeliveryOptionsFromFormAdapter($values)
         );
 
-        DeliveryOptions::save($deliveryOptions->toArray(), $order->getIdCart());
+        DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
         return $deliveryOptions;
     }
 }

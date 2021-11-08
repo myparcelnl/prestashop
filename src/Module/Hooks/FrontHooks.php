@@ -41,7 +41,7 @@ trait FrontHooks
         $carrierId = Tools::getValue('delivery_option');
 
         if (('selectDeliveryOption' === $action && ! empty($carrierId)) || Tools::isSubmit('confirmDeliveryOption')) {
-            DeliveryOptions::save($deliveryOptions->toArray(), $cart->id);
+            DeliveryOptions::save($cart->id, $deliveryOptions->toArray());
         }
     }
 
