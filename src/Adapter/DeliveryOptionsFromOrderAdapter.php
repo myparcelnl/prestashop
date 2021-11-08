@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Adapter;
 
+use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
 class DeliveryOptionsFromOrderAdapter extends AbstractDeliveryOptionsAdapter
 {
     /**
-     * @param array $inputData
+     * @param  array $data
+     *
+     * @throws \Exception
      */
-    public function __construct(array $inputData = [])
+    public function __construct(array $data = [])
     {
-        $this->carrier         = $inputData['carrier'] ?? null;
-        $this->date            = $inputData['date'] ?? null;
-        $this->deliveryType    = $inputData['deliveryType'] ?? null;
-        $this->packageType     = $inputData['packageType'] ?? null;
-        $this->shipmentOptions = new ShipmentOptionsFromAdapter($inputData);
+        $this->carrier         = $data['carrier'] ?? null;
+        $this->date            = $data['date'] ?? null;
+        $this->deliveryType    = $data['deliveryType'] ?? null;
+        $this->packageType     = (new PackageTypeCalculator())->convertToName($data['packageType']);
+        $this->shipmentOptions = new ShipmentOptionsFromAdapter($data);
     }
 }

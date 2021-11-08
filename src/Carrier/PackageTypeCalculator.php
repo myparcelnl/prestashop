@@ -6,53 +6,44 @@ use Carrier;
 use Cart;
 use Configuration;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use Order;
 
 class PackageTypeCalculator extends AbstractPackageCalculator
 {
-    public function isMyParcelCarrier(int $idCarrier): bool
+    /**
+     * @param  mixed $packageType
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function convertToName($packageType): ?string
     {
-        $carrierType = CarrierConfigurationProvider::get($idCarrier, 'carrierType');
+        $packageTypeName = $packageType;
 
-        if (!is_null($carrierType)
-        && in_array($carrierType, [Constant::BPOST_CARRIER_NAME, Constant::DPD_CARRIER_NAME, Constant::POSTNL_CARRIER_NAME])) {
-            return true;
+        if (is_numeric($packageType)) {
+            $map = array_flip(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP);
+
+            if (! in_array((int) $packageType, $map, true)) {
+                return null;
+            }
+
+            $packageTypeName = $map[$packageType];
         }
 
-        $allowedCarriers = array_map('intval', [
-            Configuration::get(Constant::DPD_CONFIGURATION_NAME),
-            Configuration::get(Constant::BPOST_CONFIGURATION_NAME),
-            Configuration::get(Constant::POSTNL_CONFIGURATION_NAME),
-        ]);
-
-        return in_array($idCarrier, $allowedCarriers);
+        return $packageTypeName;
     }
 
-    public function getOrderPackageType(int $id_order, int $id_carrier): int
-    {
-        $package_types = array_unique($this->getOrderProductsPackageTypes($id_order));
-
-        if (!empty($package_types)) {
-            $order = new Order($id_order);
-            $cart = new Cart($order->id_cart);
-            $weight = $cart->getTotalWeight();
-
-            return $this->getProductsPackageType($package_types, $weight);
-        }
-
-        $packageType = (int) CarrierConfigurationProvider::get(
-            $id_carrier,
-            Constant::PACKAGE_TYPE_CONFIGURATION_NAME
-        );
-
-        return $packageType ?: 1;
-    }
-
-    public function allowDeliveryOptions(Cart $cart, string $countryIso): bool
+    /**
+     * @param  \Cart  $cart
+     * @param  string $countryIso
+     *
+     * @return bool
+     */
+    public function deliveryOptionsAllowed(Cart $cart, string $countryIso): bool
     {
         if (empty($cart->id) || empty($cart->id_carrier)) {
             return false;
@@ -68,8 +59,9 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         if (empty($carrierPackageTypes)) {
             return false;
         }
+
         // If only parcel type is set then return true
-        if (count($carrierPackageTypes) === 1 && $carrierPackageTypes[0] === Constant::PACKAGE_TYPE_PACKAGE) {
+        if (1 === count($carrierPackageTypes) && $carrierPackageTypes[0] === Constant::PACKAGE_TYPE_PACKAGE) {
             return true;
         }
 
@@ -79,12 +71,17 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         }
 
         // 1. At least 1 product in cart is of type parcel, regardless of weight: order is considered parcel
-        if (in_array(Constant::PACKAGE_TYPE_PACKAGE, $productsPackageTypes)) {
+        if (in_array(Constant::PACKAGE_TYPE_PACKAGE, $productsPackageTypes, true)) {
             return true; // delivery options
         }
 
         // 2. Only products in cart of type letter, regardless of total weight: order is considered letter
-        if (count($productsPackageTypes) === 1 && in_array(Constant::PACKAGE_TYPE_LETTER, $productsPackageTypes)) {
+        if (1 === count($productsPackageTypes)
+            && in_array(
+                Constant::PACKAGE_TYPE_LETTER,
+                $productsPackageTypes,
+                true
+            )) {
             return false; // no delivery options
         }
 
@@ -98,24 +95,58 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         return false; // no delivery options
     }
 
-    private function getOrderProductsPackageTypes(int $id_order): array
+    /**
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return int
+     * @throws \PrestaShopDatabaseException
+     */
+    public function getOrderPackageType(Order $order): int
     {
-        $result = $this->getOrderProductsConfiguration($id_order);
-        $package_types = [];
-        foreach ($result as $item) {
-            if ($item['name'] == 'MYPARCELBE_PACKAGE_TYPE' && $item['value']) {
-                $package_types[$item['id_product']] = (int) $item['value'];
-            }
+        $packageTypes = array_unique($this->getOrderProductsPackageTypes($order->getId()));
+
+        if (! empty($packageTypes)) {
+            $cart   = new Cart($order->getIdCart());
+            $weight = $cart->getTotalWeight();
+
+            return $this->getProductsPackageType($packageTypes, $weight);
         }
 
-        return $package_types;
+        $packageType = (int) CarrierConfigurationProvider::get(
+            $order->getIdCarrier(),
+            Constant::PACKAGE_TYPE_CONFIGURATION_NAME
+        );
+
+        return $packageType ?: 1;
+    }
+
+    public function isMyParcelCarrier(int $idCarrier): bool
+    {
+        $carrierType = CarrierConfigurationProvider::get($idCarrier, 'carrierType');
+
+        if (null !== $carrierType
+            && in_array(
+                $carrierType,
+                [Constant::BPOST_CARRIER_NAME, Constant::DPD_CARRIER_NAME, Constant::POSTNL_CARRIER_NAME],
+                false
+            )) {
+            return true;
+        }
+
+        $allowedCarriers = array_map('intval', [
+            Configuration::get(Constant::DPD_CONFIGURATION_NAME),
+            Configuration::get(Constant::BPOST_CONFIGURATION_NAME),
+            Configuration::get(Constant::POSTNL_CONFIGURATION_NAME),
+        ]);
+
+        return in_array($idCarrier, $allowedCarriers, true);
     }
 
     private function getCarrierPackageTypes(Carrier $carrier, string $countryIso): array
     {
         $exclusiveField = new ExclusiveField();
-        $carrierType = $exclusiveField->getCarrierType($carrier);
-        $packageTypes = [];
+        $carrierType    = $exclusiveField->getCarrierType($carrier);
+        $packageTypes   = [];
         foreach (AbstractConsignment::PACKAGE_TYPES_IDS as $packageType) {
             if ($exclusiveField->isAvailable(
                 $countryIso,
@@ -130,27 +161,25 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         return $packageTypes;
     }
 
-    private function getProductsPackageTypes(Cart $cart): array
+    private function getOrderProductsPackageTypes(int $id_order): array
     {
-        $products = $cart->getProducts();
-        if (empty($products)) {
-            return [];
-        }
-        $types = [];
-        foreach ($products as $product) {
-            $type = (int) ProductConfigurationProvider::get(
-                (int) $product['id_product'],
-                Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
-                Constant::PACKAGE_TYPE_PACKAGE
-            );
-            if (!in_array($type, $types)) {
-                $types[] = $type;
+        $result        = $this->getOrderProductsConfiguration($id_order);
+        $package_types = [];
+        foreach ($result as $item) {
+            if ('MYPARCELBE_PACKAGE_TYPE' === $item['name'] && $item['value']) {
+                $package_types[$item['id_product']] = (int) $item['value'];
             }
         }
 
-        return $types;
+        return $package_types;
     }
 
+    /**
+     * @param  array $productsPackageTypes
+     * @param        $weight
+     *
+     * @return int
+     */
     private function getProductsPackageType(array $productsPackageTypes, $weight): int
     {
         // 1. At least 1 product in cart is of type parcel, regardless of weight: order is considered parcel
@@ -159,7 +188,7 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         }
 
         // 2. Only products in cart of type letter, regardless of total weight: order is considered letter
-        if (count($productsPackageTypes) === 1 && in_array(Constant::PACKAGE_TYPE_LETTER, $productsPackageTypes)) {
+        if (1 === count($productsPackageTypes) && in_array(Constant::PACKAGE_TYPE_LETTER, $productsPackageTypes)) {
             return Constant::PACKAGE_TYPE_LETTER;
         }
 
@@ -180,5 +209,35 @@ class PackageTypeCalculator extends AbstractPackageCalculator
 
         // Fall back to Package
         return Constant::PACKAGE_TYPE_PACKAGE;
+    }
+
+    /**
+     * @param  \Cart $cart
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getProductsPackageTypes(Cart $cart): array
+    {
+        $products = $cart->getProducts();
+
+        if (empty($products)) {
+            return [];
+        }
+
+        $types = [];
+
+        foreach ($products as $product) {
+            $type = (int) ProductConfigurationProvider::get(
+                (int) $product['id_product'],
+                Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
+                Constant::PACKAGE_TYPE_PACKAGE
+            );
+            if (! in_array($type, $types)) {
+                $types[] = $type;
+            }
+        }
+
+        return $types;
     }
 }

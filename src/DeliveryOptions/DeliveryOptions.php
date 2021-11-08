@@ -2,12 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\DeliverySettings;
+namespace Gett\MyparcelBE\DeliveryOptions;
 
 use Exception;
+use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use Order;
+use PrestaShop\PrestaShop\Adapter\Entity\Db;
+use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
 class DeliveryOptions
 {
@@ -39,7 +43,7 @@ class DeliveryOptions
         $order           = self::getOrder($orderOrId);
         $deliveryOptions = self::queryByOrder($order);
 
-        if ($deliveryOptions) {
+        if (! empty($deliveryOptions)) {
             return DeliveryOptionsAdapterFactory::create($deliveryOptions);
         }
 
@@ -87,6 +91,57 @@ class DeliveryOptions
         $order = new Order($orderId);
         /** @noinspection PhpCastIsUnnecessaryInspection */
         return self::queryByCart((int) $order->id_cart);
+    }
+
+    /**
+     * @param  int   $cartId
+     * @param  array $deliveryOptions
+     * @param  array $extraOptions
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     */
+    public static function save(int $cartId, array $deliveryOptions = [], array $extraOptions = []): void
+    {
+        $values = [
+            'id_cart' => $cartId,
+        ];
+
+        if (! empty($deliveryOptions)) {
+            $values['delivery_settings'] = pSQL(json_encode($deliveryOptions));
+        }
+
+        if (! empty($extraOptions)) {
+            $values['extra_options'] = pSQL(json_encode($extraOptions));
+        }
+
+        Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->insert(
+                Table::TABLE_DELIVERY_SETTINGS,
+                $values,
+                false,
+                true,
+                Db::REPLACE
+            );
+    }
+
+    /**
+     * @param  \PrestaShop\PrestaShop\Adapter\Entity\DbQuery $query
+     *
+     * @return array
+     */
+    private static function executeQuery(DbQuery $query): array
+    {
+        $query->orderBy('id_delivery_setting DESC');
+
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->getValue($query);
+
+        if ('null' === $result || empty($result)) {
+            return [];
+        }
+
+        return json_decode($result, true);
     }
 
     /**

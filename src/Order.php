@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE;
 
-use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
 class Order extends \Order

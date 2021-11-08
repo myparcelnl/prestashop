@@ -3,13 +3,20 @@
 namespace Gett\MyparcelBE\Carrier;
 
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 
 class PackageFormatCalculator extends AbstractPackageCalculator
 {
-    public function getOrderPackageFormat(int $id_order, int $id_carrier): int
+    /**
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return int
+     * @throws \PrestaShopDatabaseException
+     */
+    public function getOrderPackageFormat(Order $order): int
     {
-        $productPackageFormats = array_unique($this->getOrderProductsPackageFormats($id_order));
+        $productPackageFormats = array_unique($this->getOrderProductsPackageFormats($order));
         $largePackageTypeIndex = Constant::PACKAGE_FORMAT_LARGE_INDEX;
 
         if ($productPackageFormats) {
@@ -21,19 +28,25 @@ class PackageFormatCalculator extends AbstractPackageCalculator
         }
 
         $packageFormat = CarrierConfigurationProvider::get(
-            $id_carrier,
+            $order->getIdCarrier(),
             Constant::PACKAGE_FORMAT_CONFIGURATION_NAME
         );
 
         return $packageFormat ?: 1;
     }
 
-    private function getOrderProductsPackageFormats(int $id_order): array
+    /**
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return array
+     */
+    private function getOrderProductsPackageFormats(Order $order): array
     {
-        $result = $this->getOrderProductsConfiguration($id_order);
+        $result         = $this->getOrderProductsConfiguration($order->getId());
         $packageFormats = [];
+
         foreach ($result as $item) {
-            if ($item['name'] == Constant::PACKAGE_FORMAT_CONFIGURATION_NAME && $item['value']) {
+            if (Constant::PACKAGE_FORMAT_CONFIGURATION_NAME === $item['name'] && $item['value']) {
                 $packageFormats[$item['id_product']] = (int) $item['value'];
             }
         }

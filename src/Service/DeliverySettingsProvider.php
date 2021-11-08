@@ -9,7 +9,7 @@ use Context;
 use Country;
 use DateTime;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Module;
 use Order;
 use Tools;
