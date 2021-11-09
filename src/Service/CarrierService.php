@@ -6,7 +6,6 @@ namespace Gett\MyparcelBE\Service;
 
 use Carrier;
 use Configuration;
-use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;

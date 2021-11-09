@@ -36,9 +36,9 @@ class DeliveryOptionsFromFormAdapter extends AbstractDeliveryOptionsAdapter
      *
      * @return null|int
      */
-    private function getInsurance(array $data): ?int
+    private function getInsurance(array $data): int
     {
-        $insurance = null;
+        $insurance = 0;
 
         if (isset($data['insuranceAmount']) && $this->isEnabled($data['insurance'] ?? null)) {
             $amount    = str_replace('amount', '', $data['insuranceAmount']);

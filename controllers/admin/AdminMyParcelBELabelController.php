@@ -1,8 +1,11 @@
 <?php
 
+use Gett\MyparcelBE\Adapter\DeliveryOptionsFromDefaultExportSettingsAdapter;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromFormAdapter;
+use Gett\MyparcelBE\Carrier\CarrierCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\DeliveryOptions\DefaultExportSettingsRepository;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
@@ -11,6 +14,7 @@ use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Model\Core\Order;
+use Gett\MyparcelBE\Model\Webhook\StatusChangeWebhookPayload;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
 use Gett\MyparcelBE\Module\Tools\Tools;
@@ -24,8 +28,6 @@ use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\InvalidConsignmentException;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
-use \Gett\MyparcelBE\Model\Webhook\StatusChangeWebhookPayload;
 
 if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
     require_once _PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php';
@@ -437,8 +439,8 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             $this->returnAjaxResponse();
         }
 
-        $orderId         = (int) $postValues['id_order'];
-        $order           = new Order($orderId);
+        $orderId = (int) $postValues['id_order'];
+        $order   = new Order($orderId);
 
         try {
             $this->updateDeliveryOptions($order, $postValues);
@@ -716,7 +718,6 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             'date_warning_display' => $deliveryOptionsProvider->provideWarningDisplay($order->getId()),
             'isBE'                 => $this->module->isBE(),
             'currencySign'         => $currency->getSign(),
-            'labelOptions'         => $labelOptionsResolver->getLabelOptions($order),
             'weight'               => $weight,
             'labelAmount'          => $extraOptions->getLabelAmount(),
             'digitalStampWeight'   => $digitalStampWeight,
@@ -938,6 +939,51 @@ class AdminMyParcelBELabelController extends ModuleAdminController
     }
 
     /**
+     * @param  \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     *
+     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    private function getDefaultExportDeliveryOptions(
+        AbstractDeliveryOptionsAdapter $deliveryOptions
+    ): AbstractDeliveryOptionsAdapter {
+        $carrier = $deliveryOptions->getCarrier() ?? PlatformServiceFactory::create()
+                ->getDefaultCarrier()
+                ->getName();
+
+        $carrierCalculator = new CarrierCalculator($carrier, CarrierCalculator::SOURCE_MYPARCEL);
+        $prestaShopCarrier = $carrierCalculator->getPrestaShopCarrier();
+
+        $defaultExportSettings = DefaultExportSettingsRepository::getInstance()
+            ->getByCarrier($prestaShopCarrier->id);
+
+        return new DeliveryOptionsFromDefaultExportSettingsAdapter($defaultExportSettings);
+    }
+
+    /**
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    private function getDeliveryOptionsArray(Order $order): array
+    {
+        $orderDeliveryOptions = DeliveryOptions::getFromOrder($order->getId());
+        $deliveryOptionsArray = [];
+
+        if ($orderDeliveryOptions) {
+            $defaultExportDeliveryOptions = $this->getDefaultExportDeliveryOptions($orderDeliveryOptions);
+            $deliveryOptionsArray[]       = $defaultExportDeliveryOptions;
+        }
+
+        $deliveryOptionsArray[] = $orderDeliveryOptions;
+
+        return $deliveryOptionsArray;
+    }
+
+    /**
      * @return string
      */
     private function getTemplateSuffix(): string
@@ -970,10 +1016,9 @@ class AdminMyParcelBELabelController extends ModuleAdminController
      */
     private function updateDeliveryOptions(Order $order, array $values): AbstractDeliveryOptionsAdapter
     {
-        $deliveryOptions = DeliveryOptionsMerger::create(
-            DeliveryOptions::getFromOrder($order->getId()),
-            new DeliveryOptionsFromFormAdapter($values)
-        );
+        $deliveryOptionsToMerge   = $this->getDeliveryOptionsArray($order);
+        $deliveryOptionsToMerge[] = new DeliveryOptionsFromFormAdapter($values);
+        $deliveryOptions          = DeliveryOptionsMerger::create(...$deliveryOptionsToMerge);
 
         DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
         return $deliveryOptions;
