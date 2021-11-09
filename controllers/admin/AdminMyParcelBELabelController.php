@@ -71,7 +71,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 ;
 
                 $myParcelCollection = (new MyParcelCollection())
-                    ->setUserAgents(['prestashop' => _PS_VERSION_])
+                    ->setUserAgents(ConsignmentFactory::getUserAgent())
                     ->addConsignment($consignment)
                     ->setPdfOfLabels()->sendReturnLabelMails();
                 Logger::addLog($myParcelCollection->toJson());
@@ -838,7 +838,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             }
 
             $myParcelCollection = (new MyParcelCollection())
-                ->setUserAgents(['prestashop' => _PS_VERSION_])
+                ->setUserAgents(ConsignmentFactory::getUserAgent())
                 ->addConsignment($consignment)
                 ->setPdfOfLabels()
                 ->sendReturnLabelMails();
