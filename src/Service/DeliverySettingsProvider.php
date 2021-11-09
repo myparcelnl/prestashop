@@ -63,7 +63,7 @@ class DeliverySettingsProvider
         }
 
         $address     = new Address($this->context->cart->id_address_delivery);
-        $houseNumber = preg_replace('/[^0-9]/', '', $address->address1);
+        $houseNumber = preg_replace('/[^0-9]/', '', $address->address1 . $address->address2);
 
         if (Configuration::get(Constant::USE_ADDRESS2_AS_STREET_NUMBER_CONFIGURATION_NAME)) {
             $houseNumber = trim($address->address2);
