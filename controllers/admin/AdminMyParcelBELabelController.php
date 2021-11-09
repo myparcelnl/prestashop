@@ -136,30 +136,38 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 if ($options->package_type && count($consignment->getItems()) == 0) {
                     $consignment->setPackageType($options->package_type);
                 } else {
-                    $consignment->setPackageType(1);
-                }
-                if ($options->only_to_recipient == 1 && $consignment instanceof PostNLConsignment) {
-                    $consignment->setOnlyRecipient(true);
-                } else {
-                    $consignment->setOnlyRecipient(false);
-                }
-                if ($options->age_check == 1 && count($consignment->getItems()) == 0) {
-                    $consignment->setAgeCheck(true);
-                } else {
-                    $consignment->setAgeCheck(false);
-                }
-                if ($options->signature == 1 && !($consignment instanceof DPDConsignment)) {
-                    $consignment->setSignature(true);
-                } else {
-                    $consignment->setSignature(false);
-                }
-                if ($options->insurance) {
-                    $consignment->setInsurance(2500);
+                    $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
                 }
                 $consignment->setDeliveryDate($this->fixPastDeliveryDate($consignment->getDeliveryDate()));
                 $this->sanitizeSignature($consignment);
-                $this->sanitizeDeliveryType($consignment);
                 $this->sanitizePackageType($consignment);
+                $this->sanitizeDeliveryType($consignment);
+                if (AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()) {
+                    if ($options->only_to_recipient == 1
+                        && $consignment->canHaveShipmentOption(
+                            AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
+                        )) {
+                        $consignment->setOnlyRecipient(true);
+                    } else {
+                        $consignment->setOnlyRecipient(false);
+                    }
+                    if (1 == $options->age_check && count($consignment->getItems()) == 0) {
+                        $consignment->setAgeCheck(true);
+                    } else {
+                        $consignment->setAgeCheck(false);
+                    }
+                    if (1 == $options->signature
+                        && $consignment->canHaveShipmentOption(
+                            AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
+                        )) {
+                        $consignment->setSignature(true);
+                    } else {
+                        $consignment->setSignature(false);
+                    }
+                    if ($options->insurance) {
+                        $consignment->setInsurance(2500);
+                    }
+                }
             }
             $collection->setPdfOfLabels($printPosition);
             Logger::addLog($collection->toJson());
@@ -321,7 +329,8 @@ class AdminMyParcelBELabelController extends ModuleAdminController
      */
     public function sanitizeSignature(AbstractConsignment $consignment): void
     {
-        if ($consignment->getCountry() !== $this->module->getModuleCountry()) {
+        if (! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE)
+            || $consignment->getCountry() !== $this->module->getModuleCountry()) {
             $consignment->setSignature(false);
         }
     }
@@ -333,7 +342,11 @@ class AdminMyParcelBELabelController extends ModuleAdminController
      */
     public function sanitizeDeliveryType(AbstractConsignment $consignment): void
     {
-        if (! $this->module->isBE()) {
+        if (
+            AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()
+            &&
+            ! $this->module->isBE()
+        ) {
             return;
         }
 
@@ -461,6 +474,16 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $postValues = Tools::getAllValues();
         $orderId    = (int) ($postValues['id_order'] ?? null);
 
+        if ('-1' === $postValues['insuranceAmount']) {
+            $postValues['insuranceAmount'] = $postValues['insurance-amount-custom-value'];
+        }
+        if (! isset($postValues['insurance']) || ! $postValues['insurance'] ||
+            (string) AbstractConsignment::PACKAGE_TYPE_PACKAGE !== ($postValues['packageType'] ?? '')
+        ) {
+            unset($postValues['insuranceAmount']);
+            unset($postValues['insurance-amount-custom-value']);
+        }
+
         if (! $orderId) {
             $this->errors[] = $this->module->l('No order ID found.', 'adminlabelcontroller');
             $this->returnAjaxResponse();
@@ -508,8 +531,8 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 ->map(function (AbstractConsignment $consignment) {
                     $consignment->setDeliveryDate($this->fixPastDeliveryDate($consignment->getDeliveryDate()));
                     $this->sanitizeSignature($consignment);
-                    $this->sanitizeDeliveryType($consignment);
                     $this->sanitizePackageType($consignment);
+                    $this->sanitizeDeliveryType($consignment);
 
                     return $consignment;
                 });

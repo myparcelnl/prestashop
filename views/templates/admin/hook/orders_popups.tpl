@@ -250,7 +250,7 @@
                     <input type="checkbox" class="myparcel-insurance-checkbox" value="1" id="insurance" name="insurance">
                     <label for="insurance">{l s='Insurance' mod='myparcelbe'}</label>
                 </div>
-                <div class="insurance-additional-container">
+                <div class="insurance-additional-container" data-for_package_type="1">
                     <div class="form-group insurance-additional-predefined">
                         <div class="myparcel-radio-container">
                             <input
