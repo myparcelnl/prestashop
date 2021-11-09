@@ -73,7 +73,7 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
             try {
                 OrderLabel::sendShippedNotification($this->shipmentId);
             } catch (Exception $e) {
-                Logger::addLog($e, true);
+                Logger::addLog($e->getMessage(), true);
             }
         }
     }
