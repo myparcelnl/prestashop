@@ -143,8 +143,12 @@ SQL
             return;
         }
 
-        $address            = new Address($order->id_address_delivery);
-        $deliveryOptions    = DeliveryOptions::getFromOrder($order);
+        $address         = new Address($order->id_address_delivery);
+        $deliveryOptions = DeliveryOptions::getFromOrder($order);
+
+        if (! $deliveryOptions) {
+            throw new Exception('Delivery options are missing');
+        }
 
         /** @deprecated use $deliveryOptions */
         $oldDeliveryOptions = DeliveryOptions::queryByOrder($order);
@@ -161,28 +165,33 @@ SQL
             '{utc_offset}'      => date('P'),
         ];
 
-        $tracktraceInfo = self::getTrackTraceInfo($order_label);
+        $trackTraceInfo = self::getTrackTraceInfo($order_label);
 
-        $deliveryDate                        = $tracktraceInfo['delivery_moment']['start']['date'] ?? $tracktraceInfo['options']['delivery_date'] ?? $deliveryOptions->getDate();
-        $deliveryDateFrom                    = $tracktraceInfo['delivery_moment']['start']['date'] ?? $deliveryOptions->getDate();
-        $deliveryDateTo                      = $tracktraceInfo['delivery_moment']['end']['date'] ?? $deliveryOptions->getDate();
-        $monthNumber                         = (int) date('n', strtotime($deliveryDate));
-        $templateVars['{delivery_street}']   = $tracktraceInfo['recipient']['street'];
-        $templateVars['{delivery_number}']   = $tracktraceInfo['recipient']['street_additional_info'] . ' ' . $tracktraceInfo['recipient']['number'];
-        $templateVars['{delivery_postcode}'] = $tracktraceInfo['recipient']['postal_code'];
-        $templateVars['{delivery_city}']     = $tracktraceInfo['recipient']['city'];
-        $templateVars['{delivery_cc}']       = $tracktraceInfo['recipient']['cc'];
-        $templateVars['{pickup_name}']       = $tracktraceInfo['pickup']['location_name'];
-        $templateVars['{pickup_street}']     = $tracktraceInfo['pickup']['street'];
-        $templateVars['{pickup_number}']     = $tracktraceInfo['pickup']['number'];
-        $templateVars['{pickup_postcode}']   = strtoupper(
-            str_replace(' ', '', $tracktraceInfo['pickup']['postal_code'])
-        );
-        $templateVars['{pickup_region}']     = $tracktraceInfo['pickup']['region'] ?: '-';
-        $templateVars['{pickup_city}']       = $tracktraceInfo['pickup']['city'];
-        $templateVars['{pickup_cc}']         = $tracktraceInfo['recipient']['cc'];
+        $templateVars['{delivery_street}']   = $trackTraceInfo['recipient']['street'];
+        $templateVars['{delivery_number}']   = $trackTraceInfo['recipient']['street_additional_info'] . ' ' . $trackTraceInfo['recipient']['number'];
+        $templateVars['{delivery_postcode}'] = $trackTraceInfo['recipient']['postal_code'];
+        $templateVars['{delivery_city}']     = $trackTraceInfo['recipient']['city'];
+        $templateVars['{delivery_cc}']       = $trackTraceInfo['recipient']['cc'];
+
+        $deliveryDate     = $trackTraceInfo['delivery_moment']['start']['date'] ?? $trackTraceInfo['options']['delivery_date'] ?? $deliveryOptions->getDate();
+        $deliveryDateFrom = $trackTraceInfo['delivery_moment']['start']['date'] ?? $deliveryOptions->getDate();
+        $deliveryDateTo   = $trackTraceInfo['delivery_moment']['end']['date'] ?? $deliveryOptions->getDate();
+        $monthNumber      = (int) date('n', strtotime($deliveryDate));
 
         if ($deliveryOptions->isPickup()) {
+            if ($trackTraceInfo['pickup']) {
+                $templateVars['{pickup_name}']     = $trackTraceInfo['pickup']['location_name'];
+                $templateVars['{pickup_street}']   = $trackTraceInfo['pickup']['street'];
+                $templateVars['{pickup_number}']   = $trackTraceInfo['pickup']['number'];
+                $templateVars['{pickup_postcode}'] = strtoupper(
+                    str_replace(' ', '', $trackTraceInfo['pickup']['postal_code'])
+                );
+                $templateVars['{pickup_region}']   = $trackTraceInfo['pickup']['region'] ?: '-';
+                $templateVars['{pickup_city}']     = $trackTraceInfo['pickup']['city'];
+            }
+
+            $templateVars['{pickup_cc}'] = $trackTraceInfo['recipient']['cc'];
+
             if ('nl' === $orderIso) {
                 $dayNumber                                      = (int) date('w', strtotime($deliveryDateFrom));
                 $templateVars['{delivery_day_name}']            = Constant::NL_DAYS[$dayNumber];
