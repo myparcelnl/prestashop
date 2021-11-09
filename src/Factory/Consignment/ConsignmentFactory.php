@@ -350,6 +350,8 @@ class ConsignmentFactory
 
         $this->consignment
             ->setOnlyRecipient($shipmentOptions && true === $shipmentOptions->hasOnlyRecipient())
+            ->setLargeFormat($shipmentOptions && $shipmentOptions->hasLargeFormat())
+            ->setReturn($shipmentOptions && $shipmentOptions->isReturn())
             ->setSignature($this->hasSignature())
             ->setInsurance($shipmentOptions ? $shipmentOptions->getInsurance() : null)
             ->setAgeCheck($shipmentOptions && true === $shipmentOptions->hasAgeCheck())
