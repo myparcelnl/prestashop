@@ -19,6 +19,8 @@ class Tracktrace extends AbstractEndpoint
      * @return mixed|null
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
+     * @throws \Exception
      */
     public function getTrackTrace(int $shipmentId, bool $withDeliveryMoment = false)
     {
@@ -27,7 +29,7 @@ class Tracktrace extends AbstractEndpoint
             ->setRequestParameters(
                 $this->apiKey,
                 null,
-                MyParcelRequest::REQUEST_HEADER_RETRIEVE_SHIPMENT
+                MyParcelRequest::HEADER_ACCEPT_APPLICATION_PDF
             )
             ->sendRequest('GET', Request::REQUEST_TYPE_TRACKTRACE . "/{$shipmentId}{$extraInfo}");
 
