@@ -100,7 +100,7 @@ class ConsignmentFactory
             $this->setOrderData($order);
             $this->createConsignment();
             $myParcelCollection
-                ->setUserAgents($this->getUserAgent())
+                ->setUserAgents(self::getUserAgent())
                 ->addConsignment($this->initConsignment());
         }
 
@@ -133,7 +133,7 @@ class ConsignmentFactory
             }
 
             $myParcelCollection
-                ->setUserAgents($this->getUserAgent())
+                ->setUserAgents(self::getUserAgent())
                 ->addConsignment($consignment);
         }
 
@@ -162,7 +162,7 @@ class ConsignmentFactory
      * @return array
      * @throws \Exception
      */
-    private function getUserAgent(): array
+    public static function getUserAgent(): array
     {
         return [
             'PrestaShop'            => _PS_VERSION_,
