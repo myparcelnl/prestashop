@@ -5,6 +5,7 @@ namespace Gett\MyparcelBE\Service\Consignment;
 use Configuration;
 use Context;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Logger\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
@@ -33,7 +34,8 @@ class Download
         try {
             $collection = MyParcelCollection::findMany($id_labels, $this->api_key);
             if (!empty($collection->getConsignments())) {
-                $collection->setUserAgents(['prestashop' => _PS_VERSION_])
+                $collection
+                    ->setUserAgents(ConsignmentFactory::getUserAgent())
                     ->setPdfOfLabels($this->fetchPositions());
                 $isPdf = is_string($collection->getLabelPdf());
                 if ($isPdf) {
