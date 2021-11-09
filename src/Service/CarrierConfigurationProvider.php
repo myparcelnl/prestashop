@@ -38,7 +38,7 @@ class CarrierConfigurationProvider
             $query = (new DbQuery())
                 ->select('name, value')
                 ->from(self::$table)
-                ->where('id_carrier = ' . static::$legacyCarrierIdMap[$carrierId]);
+                ->where('id_carrier = ' . (static::$legacyCarrierIdMap[$carrierId] ?? 0));
 
             $result = Db::getInstance()
                 ->executeS($query);
