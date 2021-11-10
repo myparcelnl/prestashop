@@ -6,7 +6,6 @@ use BadMethodCallException;
 use Configuration;
 use Country;
 use Exception;
-use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\Logger;
@@ -20,6 +19,7 @@ use Module;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
+use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsFromOrderAdapter;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as ConsignmentSdkFactory;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
@@ -94,14 +94,12 @@ class ConsignmentFactory
      */
     public function fromOrders(array $orders): MyParcelCollection
     {
-        $myParcelCollection = (new MyParcelCollection());
+        $myParcelCollection = new MyParcelCollection();
 
         foreach ($orders as $order) {
             $this->setOrderData($order);
             $this->createConsignment();
-            $myParcelCollection
-                ->setUserAgents(self::getUserAgent())
-                ->addConsignment($this->initConsignment());
+            $myParcelCollection->addConsignment($this->initConsignment());
         }
 
         return $myParcelCollection;
@@ -122,7 +120,7 @@ class ConsignmentFactory
         $this->setOrderData($order, $deliveryOptions);
         $this->createConsignment();
 
-        $myParcelCollection = (new MyParcelCollection());
+        $myParcelCollection = new MyParcelCollection();
 
         for ($i = 0; $i < $this->request['labelAmount']; ++$i) {
             $consignment = $this->initConsignment();
@@ -132,9 +130,7 @@ class ConsignmentFactory
                 }
             }
 
-            $myParcelCollection
-                ->setUserAgents(self::getUserAgent())
-                ->addConsignment($consignment);
+            $myParcelCollection->addConsignment($consignment);
         }
 
         return $myParcelCollection;
@@ -165,8 +161,8 @@ class ConsignmentFactory
     public static function getUserAgent(): array
     {
         return [
-            'PrestaShop'            => _PS_VERSION_,
             'MyParcelBE-PrestaShop' => MyParcelBE::getModule()->version,
+            'PrestaShop'            => _PS_VERSION_,
         ];
     }
 
