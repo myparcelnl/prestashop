@@ -25,7 +25,6 @@ use MyParcelNL\Sdk\src\Exception\InvalidConsignmentException;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as ConsignmentFactorySdk;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 
 if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
@@ -73,7 +72,8 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 $myParcelCollection = (new MyParcelCollection())
                     ->setUserAgents(ConsignmentFactory::getUserAgent())
                     ->addConsignment($consignment)
-                    ->setPdfOfLabels()->sendReturnLabelMails();
+                    ->setPdfOfLabels()
+                    ->generateReturnConsignments(true);
                 Logger::addLog($myParcelCollection->toJson());
             } catch (Exception $e) {
                 Logger::addLog($e->getMessage(), true, true);
@@ -169,7 +169,11 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                     }
                 }
             }
-            $collection->setPdfOfLabels($printPosition);
+
+            $collection
+                ->setUserAgents(ConsignmentFactory::getUserAgent())
+                ->setPdfOfLabels($printPosition);
+
             Logger::addLog($collection->toJson());
         } catch (Exception $e) {
             Logger::addLog($e->getMessage(), true, true);
@@ -510,24 +514,26 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             $deliveryOptions = $this->updateDeliveryOptions($orderObject, $postValues);
 
             $collection = $factory->fromOrder($order, $deliveryOptions)
-                ->filter(function (AbstractConsignment $consignment) use ($orderObject) {
-                    if ($consignment->isCdCountry()) {
-                        $products = OrderLabel::getCustomsOrderProducts($orderObject->getId());
+                ->filter(
+                    function (AbstractConsignment $consignment) use ($orderObject) {
+                        if ($consignment->isCdCountry()) {
+                            $products = OrderLabel::getCustomsOrderProducts($orderObject->getId());
 
-                        if ($products && ! $orderObject->hasInvoice()) {
-                            $this->errors[] = sprintf(
-                                $this->module->l(
-                                    'International order ID#%s must have invoice.',
-                                    'adminlabelcontroller'
-                                ),
-                                $orderObject->getId()
-                            );
-                            return false;
+                            if ($products && ! $orderObject->hasInvoice()) {
+                                $this->errors[] = sprintf(
+                                    $this->module->l(
+                                        'International order ID#%s must have invoice.',
+                                        'adminlabelcontroller'
+                                    ),
+                                    $orderObject->getId()
+                                );
+                                return false;
+                            }
                         }
-                    }
 
-                    return true;
-                })
+                        return true;
+                    }
+                )
                 ->map(function (AbstractConsignment $consignment) {
                     $consignment->setDeliveryDate($this->fixPastDeliveryDate($consignment->getDeliveryDate()));
                     $this->sanitizeSignature($consignment);
@@ -538,7 +544,9 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 });
 
             Logger::addLog($collection->toJson());
-            $collection->setLinkOfLabels();
+            $collection
+                ->setUserAgents(ConsignmentFactory::getUserAgent())
+                ->setLinkOfLabels();
             ApiLogger::addLog(json_encode($collection->toArray(), JSON_PRETTY_PRINT));
 
             if (($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0) && $this->module->isNL()) {
@@ -864,7 +872,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 ->setUserAgents(ConsignmentFactory::getUserAgent())
                 ->addConsignment($consignment)
                 ->setPdfOfLabels()
-                ->sendReturnLabelMails();
+                ->generateReturnConsignments(true);
             Logger::addLog($myParcelCollection->toJson());
 
             $consignment = $myParcelCollection->first();
