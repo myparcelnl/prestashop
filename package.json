@@ -8,7 +8,7 @@
     "zip": "gulp"
   },
   "dependencies": {
-    "@myparcel/delivery-options": "^4.3.0"
+    "@myparcel/delivery-options": "^4.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
