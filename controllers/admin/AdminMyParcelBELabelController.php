@@ -601,6 +601,14 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 }
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
+                continue;
+            }
+
+            try {
+                OrderLabel::updateStatus($labelId, $consignment->getStatus());
+            } catch (Exception $e) {
+                $this->errors[] = $e->getMessage();
+                ApiLogger::addLog(printf('Could not set status immediately for shipment %s', $labelId));
             }
         }
 
