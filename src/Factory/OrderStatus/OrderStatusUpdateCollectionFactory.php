@@ -32,12 +32,12 @@ class OrderStatusUpdateCollectionFactory
 
         if (self::SHIPMENT_STATUS_PRINTED_STAMP === $shipmentStatus) {
             $module = MyParcelBE::getModule();
+            $updates->push(new PrintedOrderStatusUpdate($shipmentId));
 
             if ($module->isNL() && Configuration::get(Constant::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME)) {
                 $updates->push(new ShippedOrderStatusUpdate($shipmentId));
             }
 
-            $updates->push(new PrintedOrderStatusUpdate($shipmentId));
             return $updates;
         }
 
