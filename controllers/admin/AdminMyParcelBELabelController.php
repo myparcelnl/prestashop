@@ -478,7 +478,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $postValues = Tools::getAllValues();
         $orderId    = (int) ($postValues['id_order'] ?? null);
 
-        if ('-1' === $postValues['insuranceAmount']) {
+        if (isset($postValues['insuranceAmount']) && '-1' === $postValues['insuranceAmount']) {
             $postValues['insuranceAmount'] = $postValues['insurance-amount-custom-value'];
         }
         if (! isset($postValues['insurance']) || ! $postValues['insurance'] ||
