@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.0](https://github.com/myparcelnl/prestashop/compare/v1.2.0...v1.3.0) (2021-11-11)
+
+
+### :sparkles: New Features
+
+* add track trace in default prestashop field ([a274f3f](https://github.com/myparcelnl/prestashop/commit/a274f3fd16311fdfe65484e6571efb6b3f4c3add))
+* export region field ([#58](https://github.com/myparcelnl/prestashop/issues/58)) ([0950fae](https://github.com/myparcelnl/prestashop/commit/0950fae6575e3066eb90269eae978fdbf872c4d5))
+
+
+### :bug: Bug Fixes
+
+* add second address line to first address line for delivery options ([#61](https://github.com/myparcelnl/prestashop/issues/61)) ([0ed533b](https://github.com/myparcelnl/prestashop/commit/0ed533baa5b06c0925beb84905e8f03552284cab))
+* allow insurance options only for package type package ([#62](https://github.com/myparcelnl/prestashop/issues/62)) ([af7497c](https://github.com/myparcelnl/prestashop/commit/af7497c11d1445be73fa106fb791f7b39b18776b))
+* correct 1.1.2 upgrade ([#52](https://github.com/myparcelnl/prestashop/issues/52)) ([4c33988](https://github.com/myparcelnl/prestashop/commit/4c3398822ace63887250af809f7977a55202317a))
+* dpz weight classes automatically selected and retained ([#53](https://github.com/myparcelnl/prestashop/issues/53)) ([e398582](https://github.com/myparcelnl/prestashop/commit/e398582dc191ea0ef7e9ebbc30b70b6a4853841a))
+* fix delivery options in frontend not loading fully sometimes ([#54](https://github.com/myparcelnl/prestashop/issues/54)) ([2ef3009](https://github.com/myparcelnl/prestashop/commit/2ef300906429c75424cd1a80b5cb4b31f7191d6c))
+* fix delivery options not being persisted in ps 1.7.8.0 ([#57](https://github.com/myparcelnl/prestashop/issues/57)) ([d625781](https://github.com/myparcelnl/prestashop/commit/d625781411a4ea551dbf7af998daee3eb5fdd88e)), closes [#49](https://github.com/myparcelnl/prestashop/issues/49)
+* fix large format and return not being exported ([#64](https://github.com/myparcelnl/prestashop/issues/64)) ([17c1e4d](https://github.com/myparcelnl/prestashop/commit/17c1e4dd5698d0ece6079e4b1c8c4c66c7d1dd47))
+* fix track trace emails not being sent ([#66](https://github.com/myparcelnl/prestashop/issues/66)) ([dcebc16](https://github.com/myparcelnl/prestashop/commit/dcebc16651b43f1c6c4dfc899e96fa25653e0128))
+* fix user agent not being sent correctly ([#65](https://github.com/myparcelnl/prestashop/issues/65)) ([801f00b](https://github.com/myparcelnl/prestashop/commit/801f00b9e5f95c080de1f2451b6d6bf94d9344c0))
+* fix user agents not being sent ([607adc9](https://github.com/myparcelnl/prestashop/commit/607adc93797f49079662fb013bb06448f791f56a))
+* make possible to export without insurance from order detail page ([2610e67](https://github.com/myparcelnl/prestashop/commit/2610e674d1cd7165e1c0931583580ea80025308d))
+* migration will be to version 1.3.0 ([199a078](https://github.com/myparcelnl/prestashop/commit/199a078ff57ba128666d529a8f5da79cf45b9625))
+* remove hard coded carrier from email templates and improve language ([23595c9](https://github.com/myparcelnl/prestashop/commit/23595c905872cfcd570c83f7cfb51e1595f8f82b))
+* set nextDeliveryDate when deliveryOptions are empty ([#47](https://github.com/myparcelnl/prestashop/issues/47)) ([20ab7a7](https://github.com/myparcelnl/prestashop/commit/20ab7a7e4e8f4b120f0d67b4f89e0b901462a993))
+* shipment status order for digital stamp ([20dbf91](https://github.com/myparcelnl/prestashop/commit/20dbf91613f42924c1956bf4825a92a84c8a49e1))
+* update orderlabel status during export ([03a7690](https://github.com/myparcelnl/prestashop/commit/03a7690b0b3a7173c7c1408f494679c4cc27a63c))
+
 ## [1.2.0](https://github.com/myparcelnl/prestashop/compare/v1.1.3...v1.2.0) (2021-10-04)
 
 
