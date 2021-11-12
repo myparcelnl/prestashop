@@ -11,7 +11,7 @@ class CreateCarrierConfigurationTableMigration implements Migration
   `id_configuration` int(11) NOT NULL AUTO_INCREMENT,
   `id_carrier` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `value` varchar(100) NOT NULL,
+  `value` text NOT NULL,
   PRIMARY KEY (`id_configuration`)
 ) ENGINE={ENGINE} DEFAULT CHARSET=utf8
 SQL;
