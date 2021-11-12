@@ -11,7 +11,7 @@ function upgrade_module_1_4_0(MyParcelBE $module): bool
     $carrierConfigurationTable = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
 
     $query = <<<SQL
-ALTER TABLE $carrierConfigurationTable ALTER COLUMN type text;
+ALTER TABLE $carrierConfigurationTable MODIFY value TEXT;
 SQL;
 
     Db::getInstance()->execute($query);
