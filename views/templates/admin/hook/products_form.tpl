@@ -159,9 +159,6 @@
             <div class="form-group">
                 <label for="custom-form">{l s='Custom Form' mod='myparcelbe'}</label>
                 <select class="form-control" id="custom-form" name = "{$CUSTOMS_FORM}">
-                    <option value="No"{if $params[$CUSTOMS_FORM] == 'No'} selected{/if}>
-                        {l s='Do not automatically generate customs form' mod='myparcelbe'}
-                    </option>
                     <option value="Add"{if $params[$CUSTOMS_FORM] == 'Add'} selected{/if}>
                         {l s='Add this product to customs form' mod='myparcelbe'}
                     </option>
