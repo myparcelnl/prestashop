@@ -26,6 +26,7 @@ use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as ConsignmentFactorySdk;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
+use \Gett\MyparcelBE\Model\Webhook\StatusChangeWebhookPayload;
 
 if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
     require_once _PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php';
@@ -609,7 +610,9 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 }
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
+                continue;
             }
+            $this->updateStatus($labelId, $consignment->getStatus());
         }
 
         if (! empty($postValues['listingPage'])) {
@@ -618,6 +621,24 @@ class AdminMyParcelBELabelController extends ModuleAdminController
 
         OrderLabel::updateOrderTrackingNumber($order['id_order'], $consignment->getBarcode());
         $this->returnAjaxResponse(['labelIds' => $labelIds], $orderId);
+    }
+
+    /**
+     * @param int $labelId
+     * @param int $shipmentStatus
+     */
+    public function updateStatus(int $labelId, int $shipmentStatus): void
+    {
+        if (! in_array($shipmentStatus, StatusChangeWebhookPayload::STATUS_CHANGE_DURING_EXPORT_NOT_WEBHOOK)) {
+            return;
+        }
+
+        try {
+            OrderLabel::updateStatus($labelId, $shipmentStatus);
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+            ApiLogger::addLog(printf('Could not set status for shipment %s', $labelId));
+        }
     }
 
     /**

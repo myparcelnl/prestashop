@@ -17,6 +17,10 @@ class StatusChangeWebhookPayload implements AbstractWebhookPayload
         'status',
     ];
 
+    public const STATUS_CHANGE_DURING_EXPORT_NOT_WEBHOOK = [
+        1, 2, 12, 14
+    ];
+
     /**
      * @var int|null
      */
@@ -115,6 +119,10 @@ class StatusChangeWebhookPayload implements AbstractWebhookPayload
      */
     public function onReceive(): void
     {
+        if (in_array($this->getStatus(), self::STATUS_CHANGE_DURING_EXPORT_NOT_WEBHOOK)) {
+            return;
+        }
+
         OrderLabel::updateStatus((int) $this->shipmentId, (int) $this->status);
     }
 }
