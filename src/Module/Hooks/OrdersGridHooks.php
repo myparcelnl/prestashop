@@ -15,6 +15,8 @@ use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Service\CarrierService;
+use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use Gett\MyparcelBE\Service\WeightService;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
@@ -115,15 +117,20 @@ trait OrdersGridHooks
      * @return void
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Exception
      */
     public function hookActionOrderGridPresenterModifier(array &$params): void
     {
-        $rows = $params['presented_grid']['data']['records']->all();
+        $rows = array_map(function (array $row) {
+            // todo remove
+            $row['is_myparcel'] = (new AdminOrderList($this))->isMyParcelCarrier((int) $row['id_carrier_reference']);
 
-        foreach ($rows as &$row) {
-            if (! (new AdminOrderList($this))->isMyParcelCarrier((int) $row['id_carrier_reference'])) {
-                $row['delivery_info'] = null;
-                continue;
+            if ((new AdminOrderList($this))->isMyParcelCarrier((int) $row['id_carrier_reference'])) {
+                $psCarrierId = (int) $row['id_carrier_reference'];
+                $carrier = CarrierService::getMyParcelCarrier($psCarrierId);
+            } else {
+                $carrier     = PlatformServiceFactory::create()->getDefaultCarrier();
+                $psCarrierId = CarrierService::getPrestashopCarrierId($carrier);
             }
 
             $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
@@ -131,14 +138,16 @@ trait OrdersGridHooks
 
             $row['myparcel'] = [
                 'labels'                 => $orderHelper->getLabels(),
+                'carrier'                => $carrier->getHuman(),
                 'options'                => (new LabelOptionsResolver())->getLabelOptions($order),
-                'allowSetOnlyRecipient'  => $orderHelper->allowSetOnlyRecipient((int) $row['id_carrier_reference']),
-                'allowSetSignature'      => $orderHelper->allowSetSignature((int) $row['id_carrier_reference']),
+                'allowSetOnlyRecipient'  => $orderHelper->allowSetOnlyRecipient($psCarrierId),
+                'allowSetSignature'      => $orderHelper->allowSetSignature($psCarrierId),
                 'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
             ];
 
             $deliverySettingsRepository = DeliverySettingsRepository::getInstance();
-            $orderWeight                = (new WeightService($orderHelper->getWeight()))->convertToGrams()->getWeight();
+            $orderWeight                = (new WeightService($orderHelper->getWeight()))->convertToGrams()
+                ->getWeight();
 
             $row['weight'] = $orderWeight;
             $extraOptions  = $deliverySettingsRepository::getExtraOptionsByCartId($row['id_cart']);
@@ -157,7 +166,7 @@ trait OrdersGridHooks
 
             if (! $deliveryOptions) {
                 $row['delivery_info'] = null;
-                continue;
+                return $row;
             }
 
             try {
@@ -170,7 +179,9 @@ trait OrdersGridHooks
             } catch (Exception $e) {
                 $row['delivery_info'] = null;
             }
-        }
+
+            return $row;
+        }, $params['presented_grid']['data']['records']->all());
 
         $params['presented_grid']['data']['records'] = new RecordCollection($rows);
     }

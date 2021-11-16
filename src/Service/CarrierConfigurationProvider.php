@@ -3,20 +3,20 @@
 namespace Gett\MyparcelBE\Service;
 
 use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\Sdk\src\Support\Collection;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
 class CarrierConfigurationProvider
 {
-    /**
-     * @var array
-     */
-    private static $configuration;
+    public const COLUMN_ID_CARRIER = 'id_carrier';
+    public const COLUMN_NAME       = 'name';
+    public const COLUMN_VALUE      = 'value';
 
     /**
-     * @var array
+     * @var \MyParcelNL\Sdk\src\Support\Collection
      */
-    private static $legacyCarrierIdMap;
+    private static $configuration;
 
     /**
      * @var string
@@ -24,38 +24,48 @@ class CarrierConfigurationProvider
     private static $table = Table::TABLE_CARRIER_CONFIGURATION;
 
     /**
-     * @param int    $carrierId
-     * @param string $name
-     * @param null   $default
+     * @return \MyParcelNL\Sdk\src\Support\Collection
+     * @throws \PrestaShopDatabaseException
+     */
+    public static function all(): Collection
+    {
+        if (isset(static::$configuration)) {
+            return static::$configuration;
+        }
+
+        $query = (new DbQuery())->select(implode(',', [self::COLUMN_NAME, self::COLUMN_VALUE, self::COLUMN_ID_CARRIER]))
+            ->from(self::$table);
+
+        $result = Db::getInstance()
+            ->executeS($query);
+
+        static::$configuration = new Collection($result);
+
+        return static::$configuration;
+    }
+
+    /**
+     * @param  int    $carrierId
+     * @param  string $name
+     * @param  null   $default
      *
-     * @return null|mixed
+     * @return mixed
      * @throws \PrestaShopDatabaseException
      */
     public static function get(int $carrierId, string $name, $default = null)
     {
-        self::fetchLegacyCarrierIdMap();
-        if (! isset(static::$configuration[$carrierId][$name])) {
-            $query = (new DbQuery())->select('name, value')
-                ->from(self::$table)
-                ->where('id_carrier = ' . (static::$legacyCarrierIdMap[$carrierId] ?? 0));
+        $first = self::all()
+            ->where(self::COLUMN_NAME, $name)
+            ->where(self::COLUMN_ID_CARRIER, $carrierId)
+            ->first();
 
-            $result = Db::getInstance()
-                ->executeS($query);
-
-            foreach ($result as $item) {
-                static::$configuration[$carrierId][$item['name']] = $item['value'];
-            }
-        }
-
-        return isset(static::$configuration[$carrierId][$name]) && static::$configuration[$carrierId][$name]
-            ? static::$configuration[$carrierId][$name]
-            : $default;
+        return $first ? $first['value'] : $default;
     }
 
     /**
-     * @param int    $carrierId
-     * @param string $name
-     * @param string $value
+     * @param  int    $carrierId
+     * @param  string $name
+     * @param  string $value
      */
     public static function updateValue(int $carrierId, string $name, string $value): void
     {
@@ -63,31 +73,7 @@ class CarrierConfigurationProvider
             ->update(
                 self::$table,
                 ['value' => pSQL($value)],
-                'id_carrier = ' . $carrierId . ' AND name = "' . pSQL($name) . '" '
+                sprintf('%s = %d AND %s = "%s"', self::COLUMN_ID_CARRIER, $carrierId, self::COLUMN_NAME, pSQL($name))
             );
-    }
-
-    /**
-     * @throws \PrestaShopDatabaseException
-     */
-    private static function fetchLegacyCarrierIdMap(): void
-    {
-        if (isset(static::$legacyCarrierIdMap)) {
-            return;
-        }
-
-        $query = new DbQuery();
-        $query->select('current.id_carrier as current_carrier_id, old.id_carrier as old_carrier_id');
-        $query->from('carrier', 'current');
-        $query->innerJoin('carrier', 'old', 'old.name = current.name');
-        $query->where('current.active=1');
-        $query->where('current.deleted=0');
-        $query->orderBy('current.id_carrier DESC');
-
-        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->executeS($query);
-        foreach ($rows as $row) {
-            static::$legacyCarrierIdMap[$row['old_carrier_id']] = $row['current_carrier_id'];
-        }
     }
 }

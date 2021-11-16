@@ -4,53 +4,70 @@ namespace Gett\MyparcelBE\Service\Consignment;
 
 use Configuration;
 use Context;
+use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Logger\Logger;
-use Symfony\Component\HttpFoundation\Request;
-use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
-use PrestaShop\PrestaShop\Core\ConfigurationInterface;
+use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use Tools;
 
 class Download
 {
+    /**
+     * @var string
+     */
     private $api_key;
+
+    /**
+     * @var array
+     */
     private $request;
+
+    /**
+     * @var \Configuration
+     */
     private $configuration;
 
-    public function __construct(string $api_key, array $request, Configuration $configuration)
+    /**
+     * @param  string         $apiKey
+     * @param  array          $request
+     * @param  \Configuration $configuration
+     */
+    public function __construct(string $apiKey, array $request, Configuration $configuration)
     {
-        $this->api_key = $api_key;
-        $this->request = $request;
+        $this->api_key       = $apiKey;
+        $this->request       = $request;
         $this->configuration = $configuration;
     }
 
-    public function downloadLabel(array $id_labels)
+    /**
+     * @param  array $labelIds
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function downloadLabel(array $labelIds): void
     {
-        if (\Configuration::get(Constant::ORDER_NOTIFICATION_AFTER_CONFIGURATION_NAME == 'printed')) {
-            //TODO send notification
-        }
+        $platformService = PlatformServiceFactory::create();
 
         try {
-            $collection = MyParcelCollection::findMany($id_labels, $this->api_key);
-            if (!empty($collection->getConsignments())) {
+            $collection = ConsignmentCollection::findMany($labelIds, $this->api_key);
+
+            if (! empty($collection->getConsignments())) {
                 $collection
-                    ->setUserAgents(ConsignmentFactory::getUserAgent())
+                    ->setUserAgents($platformService->getUserAgents())
                     ->setPdfOfLabels($this->fetchPositions());
                 $isPdf = is_string($collection->getLabelPdf());
+
                 if ($isPdf) {
                     $collection->downloadPdfOfLabels(
                         'true' === $this->configuration::get(
                             Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
-                            false,
-                            null,
-                            null,
                             false
                         )
                     );
                 }
                 Logger::addLog($collection->toJson());
-                if (!$isPdf) {
+                if (! $isPdf) {
                     Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminOrders'));
                 }
             } else {
