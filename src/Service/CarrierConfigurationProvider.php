@@ -78,8 +78,8 @@ class CarrierConfigurationProvider
 
         $query = new DbQuery();
         $query->select('current.id_carrier as current_carrier_id, old.id_carrier as old_carrier_id');
-        $query->from(Table::withPrefix('carrier'), 'current');
-        $query->innerJoin(Table::withPrefix('carrier'), 'old', 'old.name = current.name');
+        $query->from('carrier', 'current');
+        $query->innerJoin('carrier', 'old', 'old.name = current.name');
         $query->where('current.active=1');
         $query->where('current.deleted=0');
         $query->orderBy('current.id_carrier DESC');
