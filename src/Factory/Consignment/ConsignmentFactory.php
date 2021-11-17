@@ -399,10 +399,10 @@ class ConsignmentFactory
      */
     private function setCustomsDeclaration(): void
     {
-        $shippingCountry         = Country::getIdZone($this->orderData['id_country']);
+        $isCdCountry             = $this->consignment->isCdCountry();
         $customFormConfiguration = Configuration::get(Constant::CUSTOMS_FORM_CONFIGURATION_NAME);
 
-        if (1 !== $shippingCountry && 'No' !== $customFormConfiguration) {
+        if ($isCdCountry && 'No' !== $customFormConfiguration) {
             $this->setCustomItems();
         }
     }
