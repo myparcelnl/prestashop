@@ -8,63 +8,53 @@ use Carrier;
 use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use Validate;
 
 class CarrierService
 {
     /**
-     * @param  int $carrierId
+     * @return int[]
+     */
+    public static function carriersWithMyParcel(): array
+    {
+        return array_map(
+            static function (string $carrierName) {
+                return (int) Configuration::get($carrierName);
+            },
+            self::getMyParcelCarrierNames()
+        );
+    }
+
+    /**
+     * @param  int $psCarrierId
      *
      * @return \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier
      * @throws \Exception
      */
-    public static function getMyParcelCarrier(int $carrierId): AbstractCarrier
+    public static function getMyParcelCarrier(int $psCarrierId): AbstractCarrier
     {
-        return CarrierFactory::createFromId(self::getMyParcelCarrierId($carrierId));
+        $carrierId = self::getMyParcelCarrierId($psCarrierId)
+            ?? PlatformServiceFactory::create()
+                ->getDefaultCarrier()
+                ->getId();
+
+        return CarrierFactory::createFromId($carrierId);
     }
 
     /**
-     * @param  int $carrierId
-     *
-     * @return int
-     * @throws \Exception
+     * @return string[]
      */
-    public static function getMyParcelCarrierId(int $carrierId): int
+    public static function getMyParcelCarrierNames(): array
     {
-        $carrier = new Carrier($carrierId);
-
-        if (! Validate::isLoadedObject($carrier)) {
-            throw new Exception('No carrier found.');
-        }
-
-        $carrierType = CarrierConfigurationProvider::get($carrierId, 'carrierType');
-
-        if ($carrierType === Constant::POSTNL_CARRIER_NAME
-            || $carrier->id_reference === (int) Configuration::get(Constant::POSTNL_CONFIGURATION_NAME)) {
-            return CarrierPostNL::ID;
-        }
-
-        if ($carrierType === Constant::BPOST_CARRIER_NAME
-            || $carrier->id_reference === (int) Configuration::get(Constant::BPOST_CONFIGURATION_NAME)) {
-            return CarrierBpost::ID;
-        }
-
-        if ($carrierType === Constant::DPD_CARRIER_NAME
-            || $carrier->id_reference === (int) Configuration::get(Constant::DPD_CONFIGURATION_NAME)) {
-            return CarrierDPD::ID;
-        }
-
-        FileLogger::addLog('Falling back to default carrier.');
-        return PlatformServiceFactory::create()
-            ->getDefaultCarrier()
-            ->getId();
+        return array_map(
+            static function (string $carrierClass) {
+                return $carrierClass::NAME;
+            },
+            CarrierFactory::CARRIER_CLASSES
+        );
     }
 
     /**
@@ -81,5 +71,44 @@ class CarrierService
             ->first();
 
         return $matchingCarrier['id_carrier'] ? (int) $matchingCarrier['id_carrier'] : null;
+    }
+
+    /**
+     * @param  int $psCarrierId
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public static function hasMyParcelCarrier(int $psCarrierId): bool
+    {
+        return (bool) self::getMyParcelCarrierId($psCarrierId);
+    }
+
+    /**
+     * @param  int $psCarrierId
+     *
+     * @return null|int
+     * @throws \Exception
+     */
+    private static function getMyParcelCarrierId(int $psCarrierId): ?int
+    {
+        $carrier = new Carrier($psCarrierId);
+
+        if (! Validate::isLoadedObject($carrier)) {
+            throw new Exception("PrestaShop carrier with id $psCarrierId could not be found");
+        }
+
+        $carrierType = CarrierConfigurationProvider::get($psCarrierId, 'carrierType');
+
+        foreach (Constant::CARRIER_CONFIGURATION_MAP as $myParcelCarrier => $configuration) {
+            if (
+                $carrierType === $myParcelCarrier::NAME
+                || $carrier->id_reference === (int) Configuration::get($configuration)
+            ) {
+                return $myParcelCarrier::ID;
+            }
+        }
+
+        return null;
     }
 }

@@ -614,7 +614,13 @@ SQL
         ];
     }
 
-    private function getFormTabFields(Carrier $carrier, Currency $currency)
+    /**
+     * @param  \Carrier  $carrier
+     * @param  \Currency $currency
+     *
+     * @return array
+     */
+    private function getFormTabFields(Carrier $carrier, Currency $currency): array
     {
         $fields = [];
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
@@ -817,7 +823,6 @@ SQL
                 ), $carrier->name),
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -850,7 +855,6 @@ SQL
                 ],
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -889,7 +893,6 @@ SQL
                 ), $carrier->name),
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -922,7 +925,6 @@ SQL
                 ],
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -955,7 +957,6 @@ SQL
                 ],
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -988,7 +989,6 @@ SQL
                 ],
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -1035,8 +1035,6 @@ SQL
                 'name' => 'pricePickupExpress',
                 'form_group_class' => 'toggle-child-field allowPickupExpress',
             ];
-        }
-        if ($this->module->isBE()) {
         }
 
         return $fields;

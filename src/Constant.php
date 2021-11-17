@@ -2,8 +2,10 @@
 
 namespace Gett\MyparcelBE;
 
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use PrestaShopBundle\Form\Admin\Sell\Order\Invoices\GenerateByDateType;
 
 class Constant
 {
@@ -166,9 +168,18 @@ class Constant
     public const BPOST_CONFIGURATION_NAME                               = 'MYPARCELBE_BPOST';
     public const DPD_CONFIGURATION_NAME                                 = 'MYPARCELBE_DPD';
 
-    public const POSTNL_CARRIER_NAME                                    = 'postnl';
-    public const BPOST_CARRIER_NAME                                     = 'bpost';
-    public const DPD_CARRIER_NAME                                       = 'dpd';
+    public const CARRIER_CONFIGURATION_MAP = [
+        CarrierPostNL::class => Constant::POSTNL_CONFIGURATION_NAME,
+        CarrierBpost::class  => Constant::BPOST_CONFIGURATION_NAME,
+        CarrierDPD::class    => Constant::DPD_CONFIGURATION_NAME,
+    ];
+
+    /** @deprecated use CarrierPostNL::NAME */
+    public const POSTNL_CARRIER_NAME = CarrierPostNL::NAME;
+    /** @deprecated use CarrierBpost::NAME */
+    public const BPOST_CARRIER_NAME = CarrierBpost::NAME;
+    /** @deprecated use CarrierDPD::NAME */
+    public const DPD_CARRIER_NAME = CarrierDPD::NAME;
 
     public const EXCLUSIVE_FIELDS_NL                                    = [
         self::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME,

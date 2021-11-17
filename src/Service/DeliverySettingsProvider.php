@@ -39,7 +39,12 @@ class DeliverySettingsProvider
      */
     private $context;
 
-    public function __construct(Module $module, array $carriers =[], Context $context = null)
+    /**
+     * @param  \Module       $module
+     * @param  array         $carriers
+     * @param  \Context|null $context
+     */
+    public function __construct(Module $module, array $carriers = [], Context $context = null)
     {
         $this->module   = $module;
         $this->carriers = $carriers;
@@ -74,14 +79,13 @@ class DeliverySettingsProvider
         $surchargeOption    = Configuration::get(Constant::DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME);
         $showPriceSurcharge = Constant::DELIVERY_OPTIONS_PRICE_FORMAT_SURCHARGE === $surchargeOption;
 
-
         $carrierSettings = $this->generateCarrierSettings($address, $showPriceSurcharge);
 
         return [
             'config'            => [
-                'platform'              => ($this->module->isBE() ? 'belgie' : 'myparcel'),
-                'carrierSettings'       => $carrierSettings,
-                'showPriceSurcharge'    => $showPriceSurcharge,
+                'platform'           => ($this->module->isBE() ? 'belgie' : 'myparcel'),
+                'carrierSettings'    => $carrierSettings,
+                'showPriceSurcharge' => $showPriceSurcharge,
             ],
             'strings'           => [
                 'addressNotFound'       => Configuration::get(CheckoutForm::CONFIGURATION_ADDRESS_NOT_FOUND),

@@ -175,10 +175,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 }
             }
 
-            $collection
-                ->setUserAgents(ConsignmentFactory::getUserAgent())
-                ->setPdfOfLabels($printPosition);
-
+            $collection->setPdfOfLabels($printPosition);
             Logger::addLog($collection->toJson());
         } catch (Exception $e) {
             $this->logError($e);
@@ -558,9 +555,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 });
 
             Logger::addLog($collection->toJson());
-            $collection
-                ->setUserAgents(ConsignmentFactory::getUserAgent())
-                ->setLinkOfLabels();
+            $collection->setLinkOfLabels();
             ApiLogger::addLog(json_encode($collection->toArray(), JSON_PRETTY_PRINT));
 
             if (($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0) && $this->module->isNL()) {

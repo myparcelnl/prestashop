@@ -26,7 +26,7 @@ class SettingsMenu
     private const MENU_LABEL_SETTINGS_NAME    = 'label_settings';
     private const MENU_ORDER_SETTINGS_NAME    = 'order_settings';
 
-    /** @var Module */
+    /** @var \MyParcelBE */
     private $module;
 
     /**

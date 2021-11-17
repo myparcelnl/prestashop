@@ -137,7 +137,6 @@ SQL;
         $nameString = implode('\', \'', $oldCarrierConfigurationNames);
         $query      = "DELETE FROM $carrierConfigurationTable WHERE name IN ('$nameString')";
 
-        //    $query;
-        //    $db->execute($query);
+        $this->db->execute($query);
     }
 }

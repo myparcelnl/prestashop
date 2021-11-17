@@ -3,7 +3,6 @@
 namespace Gett\MyparcelBE\Factory\Consignment;
 
 use BadMethodCallException;
-use Carrier;
 use Configuration;
 use Country;
 use Exception;
@@ -13,7 +12,6 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
@@ -24,14 +22,10 @@ use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsFromOrderAdapter;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
-use PrestaShop\PrestaShop\Adapter\Entity\Validate;
 use Tools;
 
 class ConsignmentFactory
@@ -95,6 +89,7 @@ class ConsignmentFactory
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Exception
      */
     public function fromOrders(array $orders): ConsignmentCollection
     {
@@ -457,9 +452,9 @@ class ConsignmentFactory
      */
     private function createConsignment(): void
     {
-        $carrierId         = CarrierService::getMyParcelCarrierId($this->orderData['id_carrier']);
+        $carrier           = CarrierService::getMyParcelCarrier($this->orderData['id_carrier']);
         $this->consignment = PlatformServiceFactory::create()
-            ->generateConsignment($carrierId);
+            ->generateConsignment($carrier);
     }
 
     /**

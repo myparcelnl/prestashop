@@ -35,8 +35,8 @@ class Create
         MyparcelStatusProvider $statusProvider,
         ConsignmentFactory     $factory
     ) {
-        $this->entity_manager  = $entityManager;
-        $this->status_provider = $statusProvider;
+        $this->entity_manager      = $entityManager;
+        $this->status_provider     = $statusProvider;
         $this->consignment_factory = $factory;
     }
 
@@ -114,7 +114,6 @@ class Create
             $orderLabel->new_order_state = $consignment->getStatus();
             $orderLabel->status          = $this->status_provider->getStatus($consignment->getStatus());
             $orderLabel->add();
-            //$paymentUrl = $collection->setPdfOfLabels()->getLabelPdf()['data']['payment_instructions']['0']['payment_url'];
         }
     }
 }

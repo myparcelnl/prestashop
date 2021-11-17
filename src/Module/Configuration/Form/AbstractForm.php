@@ -9,7 +9,7 @@ use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
 use HelperForm;
 use Module;
 use MyParcelBE;
-use MyParcelNL\Sdk\src\Support\Arr;
+use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 use Tools;
 use Validate;
 
@@ -269,10 +269,15 @@ abstract class AbstractForm
         return ['form' => $form];
     }
 
+    /**
+     * @param  string $fieldType
+     * @param  string $field
+     *
+     * @return string
+     */
     protected function getExclusiveNlFieldType(string $fieldType, string $field): string
     {
-        $countryIso = $this->module->getModuleCountry();
-        if (!$this->module->isNl() && in_array($field, Constant::EXCLUSIVE_FIELDS_NL)) {
+        if (! $this->module->isNL() && in_array($field, Constant::EXCLUSIVE_FIELDS_NL)) {
             $fieldType = 'hidden';
         }
 
@@ -280,12 +285,12 @@ abstract class AbstractForm
     }
 
     /**
-     * @param        $carrier
-     * @param  array $vars
+     * @param  \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
+     * @param  array                                         $vars
      *
      * @return void
      */
-    protected function setExclusiveFieldsValues($carrier, array &$vars): void
+    protected function setExclusiveFieldsValues(Carrier $carrier, array &$vars): void
     {
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
         $countryIso  = $this->module->getModuleCountry();

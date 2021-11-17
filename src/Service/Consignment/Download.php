@@ -53,9 +53,7 @@ class Download
             $collection = ConsignmentCollection::findMany($labelIds, $this->api_key);
 
             if (! empty($collection->getConsignments())) {
-                $collection
-                    ->setUserAgents($platformService->getUserAgents())
-                    ->setPdfOfLabels($this->fetchPositions());
+                $collection->setPdfOfLabels($this->fetchPositions());
                 $isPdf = is_string($collection->getLabelPdf());
 
                 if ($isPdf) {
