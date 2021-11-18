@@ -26,18 +26,11 @@ class CustomsForm extends AbstractForm
                 'options' => [
                     'query' => [
                         [
-                            'id' => 'No',
-                            'name' => $this->module->l(
-                                'Do not automatically generate customs form',
-                                'customsform'
-                            )
-                        ],
-                        [
-                            'id' => 'Add',
+                            'id' => Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD,
                             'name' => $this->module->l('Add this product to customs form', 'customsform')
                         ],
                         [
-                            'id' => 'Skip',
+                            'id' => Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_SKIP,
                             'name' => $this->module->l('Skip this product on customs form', 'customsform')
                         ],
                     ],

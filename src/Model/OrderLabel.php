@@ -408,7 +408,7 @@ SQL
     /**
      * @param  int $id_order
      *
-     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     * @return array|\mysqli_result|\PDOStatement|resource
      * @throws \PrestaShopDatabaseException
      */
     public static function getCustomsOrderProducts(int $id_order)
@@ -419,15 +419,10 @@ SQL
         $qb->from('order_detail', 'od');
         $qb->leftJoin(Table::TABLE_PRODUCT_CONFIGURATION, 'pc', 'od.product_id = pc.id_product');
         $qb->where('od.id_order = ' . $id_order);
+        $qb->where('pc.name = "' . Constant::CUSTOMS_FORM_CONFIGURATION_NAME . '"');
+        $qb->where('pc.value = "' . Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD . '"');
 
-        $return = Db::getInstance()->executeS($qb);
-        foreach ($return as $item) {
-            if ($item['value'] && $item['value'] == 'No') {
-                return false;
-            }
-        }
-
-        return $return;
+        return Db::getInstance()->executeS($qb) ?? [];
     }
 
     /**
