@@ -13,8 +13,10 @@ use Validate;
 
 abstract class AbstractForm
 {
-    protected const FIELD_TYPE_SELECT = 'select';
-    protected const FIELD_TYPE_SWITCH = 'switch';
+    protected const FIELD_TYPE_SELECT   = 'select';
+    protected const FIELD_TYPE_SWITCH   = 'switch';
+    protected const FIELD_TYPE_TEXT     = 'text';
+    protected const FIELD_TYPE_CHECKBOX = 'checkbox';
 
     /** @var Module */
     protected $module;

@@ -320,6 +320,10 @@ class ConsignmentFactory
      */
     private function getEmailConfiguration(): string
     {
+        if ($this->module->isBE()) {
+            return $this->orderData['email'];
+        }
+
         $emailConfiguration = Configuration::get(Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME);
 
         return $emailConfiguration ? $this->orderData['email'] : '';

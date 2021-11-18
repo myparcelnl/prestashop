@@ -20,7 +20,10 @@ class GeneralForm extends AbstractForm
     {
         return [
             Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME          => [
-                'type'     => self::FIELD_TYPE_SWITCH,
+                'type' => $this->getExclusiveNlFieldType(
+                    self::FIELD_TYPE_SWITCH,
+                    Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME
+                ),
                 'label'    => $this->module->l('Share customer email with MyParcel', $this->getNamespace()),
                 'name'     => Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
             ],
