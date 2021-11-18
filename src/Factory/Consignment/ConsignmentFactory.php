@@ -306,6 +306,7 @@ class ConsignmentFactory
         $this->consignment
             ->setCountry(strtoupper($this->orderData['iso_code']))
             ->setPerson($this->orderData['person'])
+            ->setCompany($this->orderData['company'])
             ->setFullStreet($this->orderData['full_street'])
             ->setPostalCode($this->orderData['postcode'])
             ->setCity($this->orderData['city'])
