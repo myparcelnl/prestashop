@@ -17,8 +17,16 @@ class StatusChangeWebhookPayload implements AbstractWebhookPayload
         'status',
     ];
 
+    public const SHIPMENT_STATUS_PENDING_CONCEPT       = 1;
+    public const SHIPMENT_STATUS_PENDING_REGISTERED    = 2;
+    public const SHIPMENT_STATUS_PRINTED_LETTER        = 12;
+    public const SHIPMENT_STATUS_PRINTED_DIGITAL_STAMP = 14;
+
     public const STATUS_CHANGE_DURING_EXPORT_NOT_WEBHOOK = [
-        1, 2, 12, 14
+        self::SHIPMENT_STATUS_PENDING_CONCEPT,
+        self::SHIPMENT_STATUS_PENDING_REGISTERED,
+        self::SHIPMENT_STATUS_PRINTED_LETTER,
+        self::SHIPMENT_STATUS_PRINTED_DIGITAL_STAMP,
     ];
 
     /**

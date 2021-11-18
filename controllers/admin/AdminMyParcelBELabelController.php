@@ -637,7 +637,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             OrderLabel::updateStatus($labelId, $shipmentStatus);
         } catch (Exception $e) {
             $this->errors[] = $e->getMessage();
-            ApiLogger::addLog(printf('Could not set status for shipment %s', $labelId));
+            ApiLogger::addLog(sprintf('Could not set status for shipment %s', $labelId));
         }
     }
 
