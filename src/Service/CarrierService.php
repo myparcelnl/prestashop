@@ -8,6 +8,7 @@ use Carrier;
 use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
@@ -95,7 +96,8 @@ class CarrierService
         $carrier = new Carrier($psCarrierId);
 
         if (! Validate::isLoadedObject($carrier)) {
-            throw new Exception("PrestaShop carrier with id $psCarrierId could not be found");
+            Logger::addLog("PrestaShop carrier with id $psCarrierId could not be found");
+            return null;
         }
 
         $carrierType = CarrierConfigurationProvider::get($psCarrierId, 'carrierType');
