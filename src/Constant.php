@@ -186,6 +186,7 @@ class Constant
 
     public const EXCLUSIVE_FIELDS_NL                                    = [
         self::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME,
+        self::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
     ];
     public const CARRIER_EXCLUSIVE              = [
         'POSTNL' => [
