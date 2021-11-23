@@ -20,7 +20,7 @@ class CustomsForm extends AbstractForm
     {
         return [
             Constant::CUSTOMS_FORM_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Default customs form', 'customsform'),
                 'name' => Constant::CUSTOMS_FORM_CONFIGURATION_NAME,
                 'options' => [
@@ -39,12 +39,12 @@ class CustomsForm extends AbstractForm
                 ],
             ],
             Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME => [
-                'type' => 'text',
+                'type' => self::FIELD_TYPE_TEXT,
                 'label' => $this->module->l('Default customs code', 'customsform'),
                 'name' => Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME,
             ],
             Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Default customs origin', 'customsform'),
                 'name' => Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME,
                 'options' => [
@@ -55,7 +55,7 @@ class CustomsForm extends AbstractForm
                 'default_value' => $this->module->isBE() ? AbstractConsignment::CC_BE : AbstractConsignment::CC_NL,
             ],
             Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME => [
-                'type' => 'switch',
+                'type' => self::FIELD_TYPE_SWITCH,
                 'label' => $this->module->l('Default customs age check', 'customsform'),
                 'name' => Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME,
                 'is_bool' => true,
