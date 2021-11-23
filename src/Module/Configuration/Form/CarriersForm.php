@@ -2,7 +2,6 @@
 
 namespace Gett\MyparcelBE\Module\Configuration\Form;
 
-use Carrier;
 use Configuration;
 use Currency;
 use Db;
@@ -11,12 +10,14 @@ use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Link;
+use MyParcelBE;
+use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 
 class CarriersForm extends AbstractForm
 {
     private $context;
 
-    public function __construct(\Module $module)
+    public function __construct(MyParcelBE $module)
     {
         parent::__construct($module);
         $this->context = \Context::getContext();
