@@ -11,6 +11,7 @@ class CreateDeliverySettingTableMigration
   `id_delivery_setting` int(11) NOT NULL AUTO_INCREMENT,
   `id_cart` int(11) NOT NULL,
   `delivery_settings` text,
+  `extra_options` text,
   PRIMARY KEY (`id_delivery_setting`),
   UNIQUE `id_cart_index` (`id_cart`)
 ) ENGINE={ENGINE} DEFAULT CHARSET=utf8
