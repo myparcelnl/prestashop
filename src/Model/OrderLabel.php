@@ -328,6 +328,7 @@ SQL
                     CONCAT(address.address1, " ", address.address2) AS full_street,
                     address.postcode,
                     address.city,
+                    address.company,
                     customer.email,
                     address.phone,
                     delivery_settings.delivery_settings,
