@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace Gett\MyparcelBE\Module\Configuration\Form;
 
 use Gett\MyparcelBE\Constant;
 
@@ -17,7 +17,7 @@ class LabelForm extends AbstractForm
     {
         return [
             Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME => [
-                'type' => 'text',
+                'type' => self::FIELD_TYPE_TEXT,
                 'label' => $this->module->l('Label description', 'labelform'),
                 'name' => Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME,
                 'placeholder' => '{order.id} {order.reference}',
@@ -36,7 +36,7 @@ class LabelForm extends AbstractForm
                 ],
             ],
             Constant::LABEL_SIZE_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Default label size', 'labelform'),
                 'name' => Constant::LABEL_SIZE_CONFIGURATION_NAME,
                 'options' => [
@@ -49,7 +49,7 @@ class LabelForm extends AbstractForm
                 ],
             ],
             Constant::LABEL_POSITION_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Default label position', 'labelform'),
                 'name' => Constant::LABEL_POSITION_CONFIGURATION_NAME,
                 'form_group_class' => 'label_position',
@@ -65,7 +65,7 @@ class LabelForm extends AbstractForm
                 ],
             ],
             Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Open or download label', 'labelform'),
                 'name' => Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
                 'options' => [
@@ -78,7 +78,7 @@ class LabelForm extends AbstractForm
                 ],
             ],
             Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME => [
-                'type' => 'switch',
+                'type' => self::FIELD_TYPE_SWITCH,
                 'label' => $this->module->l('Prompt for label position', 'labelform'),
                 'name' => Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME,
                 'required' => false,

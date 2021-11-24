@@ -11,6 +11,9 @@ use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Service\CarrierService;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use Validate;
 
 trait LegacyOrderPageHooks
@@ -97,24 +100,31 @@ trait LegacyOrderPageHooks
     }
 
     /**
+     * @param $id
+     * @param $params
+     *
+     * @return mixed
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
     public function printMyParcelIcon($id, $params)
     {
-        if (! $this->searchMyParcelCarrier((int) $params['id_carrier'])) {
-            return '';
-        }
+        $psCarrierId = (int) $params['id_carrier'];
+        $carrier     = CarrierService::getMyParcelCarrier($psCarrierId);
 
         $labelOptionsResolver = new LabelOptionsResolver();
-        $carrierReference     = (int) $this->carrierList[(int) $params['id_carrier']];
-        $orderHelper          = new AdminOrderList($this);
         $order                = new Order((int) $params['id_order']);
+
+        $consignment = ConsignmentFactory::createFromCarrier($carrier);
 
         $this->context->smarty->assign([
             'label_options'         => $labelOptionsResolver->getLabelOptions($order),
-            'allowSetSignature'     => $orderHelper->allowSetSignature($carrierReference),
-            'allowSetOnlyRecipient' => $orderHelper->allowSetOnlyRecipient($carrierReference),
+            'allowSetOnlyRecipient' => $consignment->canHaveShipmentOption(
+                AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
+            ),
+            'allowSetSignature'     => $consignment->canHaveShipmentOption(
+                AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
+            ),
         ]);
 
         return $this->display($this->name, 'views/templates/admin/icon-concept.tpl');
@@ -163,13 +173,20 @@ trait LegacyOrderPageHooks
         return $adminOrderView->display();
     }
 
+    /**
+     * @param $id
+     * @param $row
+     *
+     * @return mixed|string
+     * @throws \Exception
+     */
     public function printMyParcelDeliveryInfo($id, $row)
     {
         if (empty($row['id_carrier_reference'])) {
             return '';
         }
-        $adminOrderList = new AdminOrderList($this);
-        if (!$adminOrderList->isMyParcelCarrier((int) $row['id_carrier_reference'])) {
+
+        if (! CarrierService::hasMyParcelCarrier((int) $row['id_carrier_reference'])) {
             return '';
         }
 

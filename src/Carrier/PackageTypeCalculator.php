@@ -4,7 +4,6 @@ namespace Gett\MyparcelBE\Carrier;
 
 use Carrier;
 use Cart;
-use Configuration;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
@@ -118,28 +117,6 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         );
 
         return $packageType ?: 1;
-    }
-
-    public function isMyParcelCarrier(int $idCarrier): bool
-    {
-        $carrierType = CarrierConfigurationProvider::get($idCarrier, 'carrierType');
-
-        if (null !== $carrierType
-            && in_array(
-                $carrierType,
-                [Constant::BPOST_CARRIER_NAME, Constant::DPD_CARRIER_NAME, Constant::POSTNL_CARRIER_NAME],
-                false
-            )) {
-            return true;
-        }
-
-        $allowedCarriers = array_map('intval', [
-            Configuration::get(Constant::DPD_CONFIGURATION_NAME),
-            Configuration::get(Constant::BPOST_CONFIGURATION_NAME),
-            Configuration::get(Constant::POSTNL_CONFIGURATION_NAME),
-        ]);
-
-        return in_array($idCarrier, $allowedCarriers, true);
     }
 
     private function getCarrierPackageTypes(Carrier $carrier, string $countryIso): array

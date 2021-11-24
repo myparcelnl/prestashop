@@ -1,5 +1,5 @@
 /**
- * @member {string} window.myparcel_carrier_init_url
+ * @member {string} window.myparcel_delivery_options_url
  * @member {Object} window.prestashop
  * @member {jQuery} $
  */
@@ -116,7 +116,7 @@
 
     if (!hasCarrierConfig) {
       $.ajax({
-        url: `${window.myparcel_carrier_init_url}?id_carrier=${carrierId}`,
+        url: `${window.myparcel_delivery_options_url}?carrier_id=${carrierId}`,
         dataType: 'json',
         async: false,
         success: function(data) {

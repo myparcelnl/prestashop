@@ -154,19 +154,22 @@ class MyParcelBE extends CarrierModule
         return $this->mypa_stringify_url($url);
     }
 
-    public function getContent()
+    /**
+     * @return string
+     */
+    public function getContent(): string
     {
-        $configuration = new \Gett\MyparcelBE\Module\Configuration\Configure($this);
+        $configuration = new \Gett\MyparcelBE\Module\Configuration\SettingsMenu($this);
 
         $this->context->smarty->assign([
             'menutabs' => $configuration->initNavigation(),
-            'ajaxUrl' => $this->baseUrlWithoutToken,
+            'ajaxUrl'  => $this->baseUrlWithoutToken,
         ]);
 
         $this->context->smarty->assign('module_dir', $this->_path);
         $output = $this->display(__FILE__, 'views/templates/admin/navbar.tpl');
 
-        return $output . $configuration(Tools::getValue('menu'));
+        return $output . $configuration->renderMenu(Tools::getValue('menu'));
     }
 
     /**
@@ -274,6 +277,19 @@ class MyParcelBE extends CarrierModule
     public function isBE()
     {
         return $this->getModuleCountry() === 'BE';
+    }
+
+    /**
+     * @param  class-string $class
+     *
+     * @return bool
+     */
+    public function upgrade(string $class): bool
+    {
+        /** @var \Gett\MyparcelBE\Module\Upgrade\AbstractUpgrade $upgrade */
+        $upgrade = new $class($this);
+
+        return $upgrade->execute();
     }
 
     /**

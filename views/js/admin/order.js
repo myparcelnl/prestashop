@@ -1,3 +1,7 @@
+/**
+ * @member {string} window.myparcel_delivery_options_url
+ */
+
 $(function() {
   let ps177 = false;
   // Bulk actions
@@ -653,31 +657,38 @@ $(function() {
     $('i.icon-refresh', $(this)).remove();
   });
 
-  let initializeMyParcelForm = function () {
-    var $wrapper = $('#deliveryDateUpdateWrapper');
+  /**
+   * On clicking the "edit" button in the MyParcel panel on an order page.
+   */
+  function initializeMyParcelForm() {
+    const $wrapper = $('#deliveryDateUpdateWrapper');
     if (!$wrapper.length) {
       return;
     }
 
-    let carrierId = $('input[name="id_carrier"]', $wrapper).val();
+    const carrierId = $('input[name="id_carrier"]', $wrapper).val();
+
     if (!(parseInt(carrierId) > 0)) {
       return;
     }
 
     $.ajax({
-      url: delivery_settings_route + '&id_carrier=' + carrierId,
-      dataType: "json",
-      success: function (data) {
+      url: `${window.myparcel_delivery_options_url}`,
+      dataType: 'json',
+      success: (data) => {
         window.MyParcelConfig = data;
-        let $form = $('.myparcel-delivery-options');
+        const $form = $('.myparcel-delivery-options');
+
         if ($form) {
           $form.remove();
         }
+
         $wrapper.append('<div id="myparcel-delivery-options"></div>');
         document.dispatchEvent(new Event('myparcel_render_delivery_options'));
-      }
+      },
     });
   }
+
   let updateMypaInput = function(dataObj) {
     let $input = $('#mypa-input');
     if (!$input.length) {

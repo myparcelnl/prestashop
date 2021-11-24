@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace Gett\MyparcelBE\Module\Configuration\Form;
 
 use Context;
 use Country;
@@ -20,24 +20,17 @@ class CustomsForm extends AbstractForm
     {
         return [
             Constant::CUSTOMS_FORM_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Default customs form', 'customsform'),
                 'name' => Constant::CUSTOMS_FORM_CONFIGURATION_NAME,
                 'options' => [
                     'query' => [
                         [
-                            'id' => 'No',
-                            'name' => $this->module->l(
-                                'Do not automatically generate customs form',
-                                'customsform'
-                            )
-                        ],
-                        [
-                            'id' => 'Add',
+                            'id' => Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD,
                             'name' => $this->module->l('Add this product to customs form', 'customsform')
                         ],
                         [
-                            'id' => 'Skip',
+                            'id' => Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_SKIP,
                             'name' => $this->module->l('Skip this product on customs form', 'customsform')
                         ],
                     ],
@@ -46,12 +39,12 @@ class CustomsForm extends AbstractForm
                 ],
             ],
             Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME => [
-                'type' => 'text',
+                'type' => self::FIELD_TYPE_TEXT,
                 'label' => $this->module->l('Default customs code', 'customsform'),
                 'name' => Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME,
             ],
             Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Default customs origin', 'customsform'),
                 'name' => Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME,
                 'options' => [
@@ -62,7 +55,7 @@ class CustomsForm extends AbstractForm
                 'default_value' => $this->module->isBE() ? AbstractConsignment::CC_BE : AbstractConsignment::CC_NL,
             ],
             Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME => [
-                'type' => 'switch',
+                'type' => self::FIELD_TYPE_SWITCH,
                 'label' => $this->module->l('Default customs age check', 'customsform'),
                 'name' => Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME,
                 'is_bool' => true,

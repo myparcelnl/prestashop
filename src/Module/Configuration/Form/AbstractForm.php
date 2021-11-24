@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace Gett\MyparcelBE\Module\Configuration\Form;
 
 use AdminController;
 use Configuration;
@@ -8,15 +8,19 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
 use HelperForm;
 use Module;
+use MyParcelBE;
+use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 use Tools;
 use Validate;
 
 abstract class AbstractForm
 {
-    protected const FIELD_TYPE_SELECT = 'select';
-    protected const FIELD_TYPE_SWITCH = 'switch';
+    protected const FIELD_TYPE_SELECT   = 'select';
+    protected const FIELD_TYPE_SWITCH   = 'switch';
+    protected const FIELD_TYPE_TEXT     = 'text';
+    protected const FIELD_TYPE_CHECKBOX = 'checkbox';
 
-    /** @var Module */
+    /** @var \MyParcelBE */
     protected $module;
 
     /** @var string */
@@ -31,14 +35,20 @@ abstract class AbstractForm
     /** @var Module */
     protected $exclusiveField;
 
-    public function __construct(Module $module)
+    /**
+     * @param  \MyParcelBE $module
+     */
+    public function __construct(MyParcelBE $module)
     {
-        $this->module = $module;
-        $this->name = str_replace(' ', '', $module->displayName) . self::class;
+        $this->module         = $module;
+        $this->name           = str_replace(' ', '', $module->displayName) . self::class;
         $this->exclusiveField = new ExclusiveField();
     }
 
-    public function __invoke(): string
+    /**
+     * @return string
+     */
+    public function render(): string
     {
         $helper = new HelperForm();
 
@@ -158,11 +168,12 @@ abstract class AbstractForm
      */
     private function getFieldsNormalized(): array
     {
+        $fields   = $this->getFields();
         $defaults = array_map(function (array $field) {
             return $this->getFieldDefaults($field);
-        }, $this->getFields());
+        }, $fields);
 
-        return array_replace_recursive($defaults, $this->getFields());
+        return array_replace_recursive($defaults, $fields);
     }
 
     /**
@@ -176,10 +187,10 @@ abstract class AbstractForm
             $value = Tools::getValue($name, Configuration::get($name));
 
             if (! $field['required'] && empty($value)) {
-                continue; // Not required
+                continue;
             }
 
-            $isValid &= $isValid
+            $isValid = $isValid
                 && null !== $value
                 && '' !== $value
                 && call_user_func([Validate::class, $field['validate']], $value);
@@ -230,12 +241,12 @@ abstract class AbstractForm
         $form = [
             'form' => [
                 'id_form' => strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->name)),
-                'legend' => [
+                'legend'  => [
                     'title' => $this->getLegend(),
-                    'icon' => 'icon-' . $this->icon,
+                    'icon'  => 'icon-' . $this->icon,
                 ],
-                'input' => [],
-                'submit' => [
+                'input'   => [],
+                'submit'  => [
                     'title' => $this->module->l('Save', 'abstractform'),
                 ],
                 'buttons' => [],
@@ -258,22 +269,34 @@ abstract class AbstractForm
         return ['form' => $form];
     }
 
+    /**
+     * @param  string $fieldType
+     * @param  string $field
+     *
+     * @return string
+     */
     protected function getExclusiveNlFieldType(string $fieldType, string $field): string
     {
-        $countryIso = $this->module->getModuleCountry();
-        if ($countryIso != 'NL' && in_array($field, Constant::EXCLUSIVE_FIELDS_NL)) {
+        if (! $this->module->isNL() && in_array($field, Constant::EXCLUSIVE_FIELDS_NL)) {
             $fieldType = 'hidden';
         }
 
         return $fieldType;
     }
 
-    protected function setExclusiveFieldsValues($carrier, array &$vars): void
+    /**
+     * @param  \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
+     * @param  array                                         $vars
+     *
+     * @return void
+     */
+    protected function setExclusiveFieldsValues(Carrier $carrier, array &$vars): void
     {
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
-        $countryIso = $this->module->getModuleCountry();
+        $countryIso  = $this->module->getModuleCountry();
+
         foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $field) {
-            if (!$this->exclusiveField->isAvailable($countryIso, $carrierType, $field, 1)) {
+            if (! $this->exclusiveField->isAvailable($countryIso, $carrierType, $field, 1)) {
                 $vars[$field] = 0;
             }
         }

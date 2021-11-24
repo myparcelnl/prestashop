@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace Gett\MyparcelBE\Module\Configuration\Form;
 
 use Context;
 use Gett\MyparcelBE\Constant;
@@ -30,7 +30,7 @@ class OrderForm extends AbstractForm
 
         return [
             Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Order status when label created', 'orderform'),
                 'name' => Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME,
                 'options' => [
@@ -40,7 +40,7 @@ class OrderForm extends AbstractForm
                 ],
             ],
             Constant::LABEL_SCANNED_ORDER_STATUS_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Order status when label scanned', 'orderform'),
                 'name' => Constant::LABEL_SCANNED_ORDER_STATUS_CONFIGURATION_NAME,
                 'default_value' => '0',
@@ -51,7 +51,7 @@ class OrderForm extends AbstractForm
                 ],
             ],
             Constant::DELIVERED_ORDER_STATUS_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Order status when delivered', 'orderform'),
                 'name' => Constant::DELIVERED_ORDER_STATUS_CONFIGURATION_NAME,
                 'options' => [
@@ -61,7 +61,7 @@ class OrderForm extends AbstractForm
                 ],
             ],
             Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME => [
-                'type' => 'checkbox',
+                'type' => self::FIELD_TYPE_CHECKBOX,
                 'label' => $this->module->l('Ignore order statuses', 'orderform'),
                 'name' => Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME,
                 'multiple' => true,
@@ -72,7 +72,7 @@ class OrderForm extends AbstractForm
                 ],
             ],
             Constant::STATUS_CHANGE_MAIL_CONFIGURATION_NAME => [
-                'type' => 'switch',
+                'type' => self::FIELD_TYPE_SWITCH,
                 'label' => $this->module->l('Order status mail', 'orderform'),
                 'name' => Constant::STATUS_CHANGE_MAIL_CONFIGURATION_NAME,
                 'required' => false,
@@ -91,7 +91,7 @@ class OrderForm extends AbstractForm
                 ],
             ],
             Constant::ORDER_NOTIFICATION_AFTER_CONFIGURATION_NAME => [
-                'type' => 'select',
+                'type' => self::FIELD_TYPE_SELECT,
                 'label' => $this->module->l('Send notification after', 'orderform'),
                 'name' => Constant::ORDER_NOTIFICATION_AFTER_CONFIGURATION_NAME,
                 'options' => [
@@ -111,7 +111,7 @@ class OrderForm extends AbstractForm
             ],
             Constant::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME => [
                 'type' => $this->getExclusiveNlFieldType(
-                    'switch',
+                    self::FIELD_TYPE_SWITCH,
                     Constant::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME
                 ),
                 'label' => $this->module->l('Automatic set order state to ‘sent’ for digital stamp', 'orderform'),

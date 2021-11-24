@@ -88,7 +88,7 @@ trait FrontHooks
         $this->context->controller->addJS($this->_path . 'views/dist/js/frontend.js');
 
         Media::addJsDefL(
-            'myparcel_carrier_init_url',
+            'myparcel_delivery_options_url',
             $this->context->link->getModuleLink($this->name, 'checkout', [], null, null, null, true)
         );
     }

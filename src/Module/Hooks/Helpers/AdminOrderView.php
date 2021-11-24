@@ -61,7 +61,7 @@ class AdminOrderView extends AbstractAdminOrder
     {
         $order = $this->getOrder();
 
-        if (! Validate::isLoadedObject($order) || ! $this->isMyParcelCarrier($order->getIdCarrier())) {
+        if (! Validate::isLoadedObject($order)) {
             return '';
         }
 
