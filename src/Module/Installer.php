@@ -2,18 +2,20 @@
 
 namespace Gett\MyparcelBE\Module;
 
-use Gett\MyparcelBE\Database\Table;
-use Tab;
 use Carrier;
-use Gett\MyparcelBE\Constant;
 use Configuration;
-use Db;
 use Context;
+use Db;
+use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use Language;
+use MyParcelBE;
+use Tab;
 
 class Installer
 {
-    /** @var \Module */
+    /** @var \MyParcelBE */
     private $module;
 
     private static $carriers_nl = [
@@ -24,7 +26,7 @@ class Installer
         ['name' => 'DPD', 'image' => 'dpd.jpg', 'configuration_name' => Constant::DPD_CONFIGURATION_NAME],
     ];
 
-    public function __construct(\Module $module)
+    public function __construct(MyParcelBE $module)
     {
         $this->module = $module;
     }
@@ -123,22 +125,26 @@ class Installer
         return $res;
     }
 
-    public function getAdminTabsDefinition()
+    /**
+     * @return array[]
+     */
+    public function getAdminTabsDefinition(): array
     {
         $languages = [];
-        foreach (\Language::getLanguages(true) as $lang) {
+
+        foreach (Language::getLanguages(true) as $lang) {
             $languages['MyParcelLabelController'][$lang['id_lang']] = 'MyParcel Carriers';
-            $languages['MyParcelController'][$lang['id_lang']] = 'MyParcelBE';
+            $languages['MyParcelController'][$lang['id_lang']]      = 'MyParcelBE';
         }
 
         return [
             'MyParcelLabelController' => [
-                'class_name' => 'AdminMyParcelBELabel',
-                'name' => $languages['MyParcelLabelController'],
+                'class_name' => 'AdminLabel',
+                'name'       => $languages['MyParcelLabelController'],
             ],
-            'MyParcelController' => [
-                'class_name' => 'AdminMyParcelBE',
-                'name' => $languages['MyParcelController'],
+            'MyParcelController'      => [
+                'class_name'   => 'Admin',
+                'name'         => $languages['MyParcelController'],
                 'parent_class' => 'AdminParentShipping',
             ],
         ];
@@ -158,7 +164,7 @@ class Installer
         $carrier->external_module_name = $this->module->name;
         $carrier->shipping_method = 2;
 
-        foreach (\Language::getLanguages() as $lang) {
+        foreach (Language::getLanguages() as $lang) {
             $carrier->delay[$lang['id_lang']] = 'Super fast delivery';
         }
 

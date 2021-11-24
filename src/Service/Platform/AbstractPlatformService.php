@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Service\Platform;
 
+use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use MyParcelBE;
@@ -18,9 +19,12 @@ abstract class AbstractPlatformService
     use HasInstance;
 
     /**
-     * @return \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier
+     * If getDefaultCarrier is not overridden, the first entry in this list is considered the default carrier.
+     *
+     * @return class-string[]
+     * @see \Gett\MyparcelBE\Service\Platform\AbstractPlatformService::getDefaultCarrier()
      */
-    abstract public function getDefaultCarrier(): AbstractCarrier;
+    abstract public function getCarriers(): array;
 
     /**
      * @param  \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier|int|string|null $carrier
@@ -36,6 +40,22 @@ abstract class AbstractPlatformService
 
         return ConsignmentFactory::createFromCarrier($carrier)
             ->setApiKey(Configuration::get(Constant::API_KEY_CONFIGURATION_NAME));
+    }
+
+    /**
+     * @return \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier
+     * @throws \Exception
+     */
+    public function getDefaultCarrier(): AbstractCarrier
+    {
+        $carriers = $this->getCarriers();
+
+        if (empty($carriers)) {
+            throw new Exception('No carriers set for ' . static::class);
+        }
+
+        $carrier = $carriers[0];
+        return new $carrier();
     }
 
     /**

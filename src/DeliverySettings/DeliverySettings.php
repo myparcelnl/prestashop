@@ -16,7 +16,7 @@ class DeliverySettings
      */
     public static function getDeliveryOptionsFromOrder(Order $order): AbstractDeliveryOptionsAdapter
     {
-        return DeliverySettingsRepository::getInstance()::getDeliveryOptionsByCartId((int) $order->id_cart);
+        return DeliverySettingsRepository::getInstance()::getDeliveryOptionsByCartId($order->getIdCart());
     }
 
     /**
@@ -26,7 +26,7 @@ class DeliverySettings
      */
     public static function getExtraOptionsFromOrder(Order $order): ExtraOptions
     {
-        return DeliverySettingsRepository::getInstance()::getExtraOptionsByCartId((int) $order->id_cart);
+        return DeliverySettingsRepository::getInstance()::getExtraOptionsByCartId($order->getIdCart());
     }
 
     /**

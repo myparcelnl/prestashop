@@ -10,15 +10,17 @@ use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 class ExclusiveField
 {
     /**
-     * @param string $countryIso Expected values: 'BE', 'NL'
-     * @param string $carrierType Expected values: 'BPOST', 'DPD', 'POSTNL'
-     * @param string $field As declared in Constant::CARRIER_CONFIGURATION_FIELDS
-     * @param int|null $key When $field is array checks the available options by key index
+     * @param  string   $countryIso Expected values: 'BE', 'NL'
+     * @param  string   $carrierName
+     * @param  string   $field      As declared in Constant::CARRIER_CONFIGURATION_FIELDS
+     * @param  int|null $key        When $field is array checks the available options by key index
      *
      * @return bool
      */
-    public function isAvailable(string $countryIso, string $carrierType, string $field, int $key = null): bool
+    public function isAvailable(string $countryIso, string $carrierName, string $field, int $key = null): bool
     {
+        $carrierType = strtoupper($carrierName);
+
         if (!isset(Constant::CARRIER_EXCLUSIVE[$carrierType][$field])) {
             return true;
         }

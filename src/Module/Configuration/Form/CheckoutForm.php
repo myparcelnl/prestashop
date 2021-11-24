@@ -107,4 +107,9 @@ class CheckoutForm extends AbstractForm
     {
         return $this->module->l('Checkout options', self::TRANSLATION_KEY);
     }
+
+    protected function getNamespace(): string
+    {
+        return 'checkoutform';
+    }
 }

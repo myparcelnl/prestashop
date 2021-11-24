@@ -32,18 +32,28 @@ class LabelOptionsResolver
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
      */
-    public function getLabelOptions(Order $order)
+    public function getLabelOptionsJson(Order $order)
+    {
+        return json_encode($this->getLabelOptions($order));
+    }
+
+    /**
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    public function getLabelOptions(Order $order): array
     {
         $deliveryOptions = DeliveryOptions::getFromOrder($order->getId());
 
-        return json_encode(
-            array_merge(
-                $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
-                [
-                    'package_type'   => $this->getPackageType($order, $deliveryOptions),
-                    'package_format' => $this->getPackageFormat($order, $deliveryOptions),
-                ]
-            )
+        return array_merge(
+            $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
+            [
+                'package_type'   => $this->getPackageType($order, $deliveryOptions),
+                'package_format' => $this->getPackageFormat($order, $deliveryOptions),
+            ]
         );
     }
 
@@ -89,6 +99,7 @@ class LabelOptionsResolver
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
      *v
+     *
      * @return int
      * @throws \PrestaShopDatabaseException
      */

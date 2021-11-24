@@ -2,6 +2,7 @@
 
 namespace Gett\MyparcelBE\Module;
 
+use MyParcelBE;
 use Tab;
 use Configuration;
 use DbQuery;
@@ -11,10 +12,10 @@ use Gett\MyparcelBE\Constant;
 
 class Uninstaller
 {
-    /** @var \Module */
+    /** @var \MyParcelBE */
     private $module;
 
-    public function __construct(\Module $module)
+    public function __construct(MyParcelBE $module)
     {
         $this->module = $module;
     }
@@ -52,7 +53,7 @@ class Uninstaller
     {
         $res = true;
 
-        $tabs = ['AdminMyParcelBE', 'AdminMyParcelBELabel'];
+        $tabs = ['AdminMyParcelBE', 'AdminMyParcelBELabel', 'Loading'];
 
         foreach ($tabs as $tabName) {
             $id_tab = (int) Tab::getIdFromClassName($tabName);

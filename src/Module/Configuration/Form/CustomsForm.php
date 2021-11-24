@@ -74,4 +74,9 @@ class CustomsForm extends AbstractForm
             ],
         ];
     }
+
+    protected function getNamespace(): string
+    {
+        return 'customsform';
+    }
 }

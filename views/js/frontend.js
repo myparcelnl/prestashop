@@ -125,7 +125,7 @@
       });
     }
 
-    window.MyParcelConfig = deliveryOptionsConfigStore[carrierId];
+    window.MyParcelConfig = deliveryOptionsConfigStore[carrierId].data;
   }
 
   /**

@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
+use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\DeliverySettingsProvider;
+use MyParcelNL\Sdk\src\Support\Arr;
 
 class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
 {
@@ -10,23 +14,33 @@ class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
     public $requestOriginalShippingCost = false;
 
     /**
-     * Called when doing a request to `myparcel_carrier_init_url` from frontend.
+     * Called when doing a request to MyParcelActions.deliveryOptionsUrl from frontend.
      *
-     * @return void
+     * @return bool
      * @throws \PrestaShopDatabaseException
+     * @throws \Exception
      */
-    public function postProcess(): void
+    public function postProcess(): bool
     {
-        $carriers  = [];
-        $carrierId = (int) Tools::getValue('carrier_id');
+        $postValues = Tools::getAllValues();
 
-        if ($carrierId) {
-            $carriers = [$carrierId];
+        $carriers  = [];
+        $carrier   = $postValues['carrier'] ?? $postValues['carrierId'] ?? $postValues['carrier_id'] ?? null;
+        $addressId = $postValues['addressId'] ?? $postValues['address_id'] ?? null;
+
+        if ($carrier) {
+            $carriers = [$carrier];
         }
 
-        $params = (new DeliverySettingsProvider($this->module, $carriers, $this->context))->get();
+        if (! empty($carriers)) {
+            $carriers = array_map(static function (string $psCarrierId) {
+                return CarrierService::getMyParcelCarrier((int) $psCarrierId)->getName();
+            }, $carriers);
+        }
 
-        echo json_encode($params);
-        exit;
+        $params = (new DeliverySettingsProvider($this->context, $carriers))->get($addressId ? (int) $addressId : null);
+
+        echo json_encode(['data' => $params]);
+        return true;
     }
 }

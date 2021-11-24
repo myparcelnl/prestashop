@@ -1,6 +1,4 @@
-<?php
-
-use PrestaShopBundle\Exception\InvalidModuleException;
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -339,7 +337,6 @@ class MyParcelBE extends CarrierModule
 
     /**
      * @return self
-     * @throws \Exception
      */
     public static function getModule(): self
     {
@@ -349,7 +346,7 @@ class MyParcelBE extends CarrierModule
         $module = Module::getInstanceByName(self::MODULE_NAME);
 
         if (! $module) {
-            throw new InvalidModuleException('Failed to get module instance');
+            throw new \PrestaShopBundle\Exception\InvalidModuleException('Failed to get module instance');
         }
 
         return $module;

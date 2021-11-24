@@ -39,6 +39,7 @@ trait DisplayAdminProductsExtra
      *
      * @return string
      * @throws \PrestaShopDatabaseException
+     * @throws \Exception
      */
     public function hookDisplayAdminProductsExtra(array $params): string
     {

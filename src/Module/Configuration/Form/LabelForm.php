@@ -6,8 +6,6 @@ use Gett\MyparcelBE\Constant;
 
 class LabelForm extends AbstractForm
 {
-    protected $icon = 'cog';
-
     protected function getLegend(): string
     {
         return $this->module->l('Label Settings', 'labelform');
@@ -97,5 +95,10 @@ class LabelForm extends AbstractForm
                 ],
             ],
         ];
+    }
+
+    protected function getNamespace(): string
+    {
+        return 'labelform';
     }
 }

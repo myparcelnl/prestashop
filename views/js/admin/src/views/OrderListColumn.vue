@@ -1,0 +1,69 @@
+<template>
+  <div>
+    <TransitionGroup
+      name="mypa__fade"
+      appear>
+      <LabelCard
+        v-for="label in labels"
+        :key="label.barcode"
+        :label="label" />
+    </TransitionGroup>
+
+    <div class="btn-group">
+      <PsButton
+        variant="outline-secondary"
+        data-toggle="modal"
+        data-target="#shipmentOptions"
+        :click-context="{ orderId }">
+        <MaterialIcon icon="label" />
+        {{ $filters.translate('create') }}
+      </PsButton>
+
+      <PsButton
+        v-if="labels.length"
+        variant="primary"
+        @click="print">
+        <MaterialIcon icon="print" />
+        {{ $filters.translate('print') }}
+      </PsButton>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { computed, defineComponent } from '@vue/composition-api';
+import { ContextKey } from '@/data/global/context';
+import LabelCard from '@/components/LabelCard.vue';
+import MaterialIcon from '@/components/common/MaterialIcon.vue';
+import { OrderAction } from '@/data/global/actions';
+import PsButton from '@/components/common/PsButton.vue';
+import { executeOrderAction } from '@/services/actions/executeOrderAction';
+import { useGlobalInstanceContext } from '@/composables/context/useGlobalInstanceContext';
+
+export default defineComponent({
+  name: 'OrderListColumn',
+  components: {
+    MaterialIcon,
+    LabelCard,
+    PsButton,
+  },
+
+  setup: () => {
+    const shipmentLabelsContext = useGlobalInstanceContext(ContextKey.SHIPMENT_LABELS);
+    const shipmentOptionsContext = useGlobalInstanceContext(ContextKey.SHIPMENT_OPTIONS);
+
+    const { orderId } = shipmentOptionsContext.value;
+
+    return {
+      orderId,
+      labels: computed(() => {
+        return shipmentLabelsContext.value.labels.filter((label) => Number(label.id_order) === orderId);
+      }),
+
+      print: async(): Promise<void> => {
+        await executeOrderAction(OrderAction.PRINT, orderId ?? undefined);
+      },
+    };
+  },
+});
+</script>

@@ -3,21 +3,13 @@
 namespace Gett\MyparcelBE\Module\Hooks;
 
 use Configuration;
-use DateTime;
-use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use Gett\MyparcelBE\Grid\Action\Bulk\IconBulkAction;
-use Gett\MyparcelBE\Grid\Action\Bulk\IconModalBulkAction;
 use Gett\MyparcelBE\Grid\Column\LabelsColumn;
-use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
+use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
-use Gett\MyparcelBE\Service\CarrierService;
-use Gett\MyparcelBE\Service\WeightService;
-use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
-use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
@@ -47,7 +39,14 @@ trait OrdersGridHooks
         );
     }
 
-    public function hookActionOrderGridDefinitionModifier(array $params)
+    /**
+     * Extends order grid hooks. Adds custom columns and bulk actions.
+     *
+     * @param  array $params
+     *
+     * @return void
+     */
+    public function hookActionOrderGridDefinitionModifier(array $params): void
     {
         $promptForLabelPosition = Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME);
 
@@ -61,9 +60,6 @@ trait OrdersGridHooks
                 (new LabelsColumn('labels'))
                     ->setName($this->l('Labels', 'ordersgridhooks'))
             )
-        ;
-        $definition
-            ->getColumns()
             ->addBefore(
                 'labels',
                 (new DataColumn('delivery_info'))
@@ -71,46 +67,20 @@ trait OrdersGridHooks
                     ->setOptions([
                         'field' => 'delivery_info',
                     ])
-            )
-        ;
-        $definition->getBulkActions()->add(
-            (new IconModalBulkAction('print_label'))
-                ->setName('Print labels')
-                ->setOptions([
-                    'submit_route' => '',
-                    'modal_id' => $promptForLabelPosition ? 'bulk-print' : '',
-                    'material_icon' => 'download',
-                ])
-        );
-        $definition->getBulkActions()->add(
-            (new IconBulkAction('refresh_label'))
-                ->setName('Refresh labels')
-                ->setOptions([
-                    'submit_route' => '',
-                    'material_icon' => 'download',
-                ])
-        );
-        $definition->getBulkActions()->add(
-            (new IconBulkAction('create_label'))
-                ->setName('Export labels')
-                ->setOptions([
-                    'submit_route' => '',
-                    'material_icon' => 'download',
-                ])
-        );
-        $definition->getBulkActions()->add(
-            (new IconModalBulkAction('create_print_label'))
-                ->setName('Export and print labels')
-                ->setOptions([
-                    'submit_route' => '',
-                    'modal_id' => $promptForLabelPosition ? 'bulk-export-print' : '',
-                    'material_icon' => 'download',
-                ])
-        );
+            );
+
+        $bulkActions = $definition->getBulkActions();
+        foreach ($this->getBulkActionsMap() as $action => $data) {
+            $bulkActions->add(
+                (new IconBulkAction($action))
+                    ->setName(AdminOrderList::getTranslation($data['label']))
+                    ->setOptions(['material_icon' => $data['icon']])
+            );
+        }
     }
 
     /**
-     * Executed when loading order grid shipment modal.
+     * Executed when loading order list modal by clicking the "create" button.
      *
      * @param  array $params
      *
@@ -122,84 +92,58 @@ trait OrdersGridHooks
     public function hookActionOrderGridPresenterModifier(array &$params): void
     {
         $params['presented_grid']['data']['records'] = new RecordCollection(
-            array_map(function (array $row) {
-                $psCarrierId = (int) $row['id_carrier_reference'];
-                $carrier     = CarrierService::getMyParcelCarrier($psCarrierId);
-
-                $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
-                $order       = new Order((int) $row['id_order']);
-
-                $consignment = ConsignmentFactory::createFromCarrier($carrier);
+            array_map(static function (array $row) {
+                $order   = new Order((int) $row['id_order']);
+                $service = new AdminPanelRenderService();
 
                 $row['myparcel'] = [
-                    'labels'                 => $orderHelper->getLabels(),
-                    'carrier'                => $carrier->getHuman(),
-                    'options'                => (new LabelOptionsResolver())->getLabelOptions($order),
-                    'allowSetOnlyRecipient'  => $consignment->canHaveShipmentOption(
-                        AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
-                    ),
-                    'allowSetSignature'      => $consignment->canHaveShipmentOption(
-                        AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
-                    ),
-                    'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
+                    AdminPanelRenderService::ID_SHIPMENT_LABELS  => $service->getShipmentLabelsContext($order),
+                    AdminPanelRenderService::ID_SHIPMENT_OPTIONS => $service->getShipmentOptionsContext($order),
                 ];
-
-                $deliverySettingsRepository = DeliverySettingsRepository::getInstance();
-                $orderWeight                = (new WeightService($orderHelper->getWeight()))->convertToGrams()
-                    ->getWeight();
-
-                $row['weight'] = $orderWeight;
-                $extraOptions  = $deliverySettingsRepository::getExtraOptionsByCartId($row['id_cart']);
-
-                if (! $extraOptions->getDigitalStampWeight()) {
-                    $extraOptions->setDigitalStampWeight(
-                        (new WeightService($orderWeight))
-                            ->convertToDigitalStampWeight()
-                            ->getWeight()
-                    );
-                }
-
-                $row['myparcel']['extraOptions'] = $extraOptions->toArray();
-
-                $deliveryOptions = $deliverySettingsRepository::getDeliveryOptionsByCartId($row['id_cart']);
-
-                if (! $deliveryOptions) {
-                    $row['delivery_info'] = null;
-                    return $row;
-                }
-
-                try {
-                    $row['delivery_info'] = sprintf(
-                        '[%s] %s',
-                        (new DateTime($deliveryOptions->getDate()))
-                            ->format($this->context->language->date_format_lite),
-                        $row['delivery_info']
-                    );
-                } catch (Exception $e) {
-                    $row['delivery_info'] = null;
-                }
 
                 return $row;
             }, $params['presented_grid']['data']['records']->all())
         );
     }
 
+    /**
+     * @param array $params
+     *
+     * @return string
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
     public function hookDisplayAdminOrderMain($params): string
     {
-        $adminOrderView = new AdminOrderView($this, (int) $params['id_order'], $this->context);
-
-        return $adminOrderView->display();
+        return (new AdminOrderView((int) $params['id_order']))->display();
     }
 
-    private function getOrderId(): int
+    /**
+     * @return array
+     */
+    private function getBulkActionsMap(): array
     {
-        $parts = explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-        foreach ($parts as $part) {
-            if (is_numeric($part)) {
-                return $part;
-            }
-        }
-
-        return 0;
+        return [
+            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::print */
+            'print'         => [
+                'icon'  => 'cloud_download',
+                'label' => 'action_print_labels',
+            ],
+            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::refreshLabels */
+            'refreshLabels' => [
+                'icon'  => 'refresh',
+                'label' => 'action_refresh_labels',
+            ],
+            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::export */
+            'export'        => [
+                'icon'  => 'add',
+                'label' => 'action_export_labels',
+            ],
+            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::exportPrint */
+            'exportPrint'   => [
+                'icon'  => 'print',
+                'label' => 'action_export_and_print_labels',
+            ],
+        ];
     }
 }

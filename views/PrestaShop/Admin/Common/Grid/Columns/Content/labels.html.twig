@@ -1,0 +1,12 @@
+{# Labels column content for each order #}
+{% if record.myparcel is defined %}
+    {% set id = 'div-' ~ random() %}
+    <div class="myparcel-order-grid-labels"></div>
+
+    <script id="{{ id }}">
+    (() => {
+      window.MyParcel.renderOrderListColumn('.myparcel-order-grid-labels', {{ record.myparcel | json_encode | raw }});
+      document.querySelector('#{{ id }}').remove();
+    })();
+    </script>
+{% endif %}

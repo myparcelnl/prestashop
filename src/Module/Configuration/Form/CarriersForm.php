@@ -3,24 +3,30 @@
 namespace Gett\MyparcelBE\Module\Configuration\Form;
 
 use Configuration;
+use Context;
 use Currency;
 use Db;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use Gett\MyparcelBE\Service\CarrierService;
 use Link;
 use MyParcelBE;
 use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 
 class CarriersForm extends AbstractForm
 {
+    /**
+     * @var \Context
+     */
     private $context;
 
     public function __construct(MyParcelBE $module)
     {
         parent::__construct($module);
-        $this->context = \Context::getContext();
+        $this->context = Context::getContext();
     }
 
     public function render(): string
@@ -90,6 +96,11 @@ class CarriersForm extends AbstractForm
         return [];
     }
 
+    protected function getNamespace(): string
+    {
+        return 'carriersform';
+    }
+
     protected function addCarrier($configuration)
     {
         $carrier = new Carrier();
@@ -151,7 +162,7 @@ class CarriersForm extends AbstractForm
     protected function addGroups($carrier)
     {
         $groups_ids = [];
-        $groups = \Group::getGroups(\Context::getContext()->language->id);
+        $groups = \Group::getGroups(Context::getContext()->language->id);
         foreach ($groups as $group) {
             $groups_ids[] = $group['id_group'];
         }
@@ -506,21 +517,7 @@ SQL
     private function getFormInputs(Carrier $carrier, bool $isNew = false)
     {
         $currency = Currency::getDefaultCurrency();
-
-        $packageTypeOptions = [
-            1 => $this->module->l('Parcel', 'carriers'),
-            2 => $this->module->l('Mailbox package', 'carriers'),
-            3 => $this->module->l('Letter', 'carriers'),
-            4 => $this->module->l('Digital stamp', 'carriers'),
-        ];
-
-        $packageFormatOptions = [
-            1 => $this->module->l('Normal', 'carriers'),
-            2 => $this->module->l('Large', 'carriers'),
-            3 => $this->module->l('Automatic', 'carriers'),
-        ];
-
-        $fields = [];
+        $fields   = [];
 
         $showCarrierTypeOption = false;
 
@@ -592,9 +589,9 @@ SQL
         $formTabFields = $this->getFormTabFields($carrier, $currency);
         $deliveryTabFields = [];
         $returnTabFields = [];
-        if (!$isNew) {
-            $deliveryTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions);
-            $returnTabFields = $this->getExtraTabFields($carrier, $packageTypeOptions, $packageFormatOptions, 'return');
+        if (! $isNew) {
+            $deliveryTabFields = $this->getExtraTabFields($carrier);
+            $returnTabFields   = $this->getExtraTabFields($carrier, 'return');
         }
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
@@ -1011,72 +1008,59 @@ SQL
         return $fields;
     }
 
-    private function getExtraTabFields(
-        Carrier $carrier,
-        array $packageTypeOptions,
-        array $packageFormatOptions,
-        string $prefix = ''
-    ) {
-        $fields = [];
-        $carrierType = $this->exclusiveField->getCarrierType($carrier);
-        $countryIso = $this->module->getModuleCountry();
-        $tabName = 'ALLOW_DELIVERY_FORM';
-        $tabId = 'delivery';
-        if ($prefix == 'return') {
+    /**
+     * @param  \Carrier $carrier
+     * @param  string   $prefix
+     *
+     * @return array
+     * @throws \Exception
+     */
+    private function getExtraTabFields(Carrier $carrier, string $prefix = ''): array
+    {
+        $fields      = [];
+        $countryIso  = $this->module->getModuleCountry();
+        $tabName     = 'ALLOW_DELIVERY_FORM';
+        $tabId       = 'delivery';
+
+        if ('return' === $prefix) {
             $tabName = 'ALLOW_RETURN_FORM';
-            $tabId = $prefix;
-            $prefix .= '_';
+            $tabId   = $prefix;
+            $prefix  .= '_';
         }
-        if (!$this->exclusiveField->isAvailable($countryIso, $carrierType, $tabName)) {
+
+        $myParcelCarrier = CarrierService::getMyParcelCarrier($carrier->id);
+        $carrierType     = $myParcelCarrier->getName();
+
+        if (! $this->exclusiveField->isAvailable($countryIso, $carrierType, $tabName)) {
             return $fields;
         }
 
-        $packageTypes = [];
-        foreach ($packageTypeOptions as $index => $label) {
-            if ($this->exclusiveField->isAvailable(
-                $countryIso,
-                $carrierType,
-                $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
-                $index
-            )) {
-                $packageTypes[] = ['id' => $index, 'name' => $label];
-            }
-        }
-
-        $packageFormat = [];
-        foreach ($packageFormatOptions as $index => $label) {
-            if ($this->exclusiveField->isAvailable(
-                $countryIso,
-                $carrierType,
-                $prefix . Constant::PACKAGE_FORMAT_CONFIGURATION_NAME,
-                $index
-            )) {
-                $packageFormat[] = ['id' => $index, 'name' => $label];
-            }
-        }
+        $carrierOptionsCalculator = (new CarrierOptionsCalculator($myParcelCarrier));
 
         $fields[] = [
-            'tab' => $tabId,
-            'type' => 'select',
-            'label' => $this->module->l('Default package type', 'carriers'),
-            'name' => $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
+            'tab'     => $tabId,
+            'type'    => 'select',
+            'label'   => $this->module->l('Default package type', 'carriers'),
+            'name'    => $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
             'options' => [
-                'query' => $packageTypes,
-                'id' => 'id',
-                'name' => 'name',
+                'query' => $carrierOptionsCalculator->getAvailablePackageTypes($prefix),
+                'id'    => 'value',
+                'name'  => 'label',
             ],
         ];
+
         $fields[] = [
-            'tab' => $tabId,
-            'type' => 'select',
-            'label' => $this->module->l('Default package format', 'carriers'),
-            'name' => $prefix . Constant::PACKAGE_FORMAT_CONFIGURATION_NAME,
+            'tab'     => $tabId,
+            'type'    => 'select',
+            'label'   => $this->module->l('Default package format', 'carriers'),
+            'name'    => $prefix . Constant::PACKAGE_FORMAT_CONFIGURATION_NAME,
             'options' => [
-                'query' => $packageFormat,
-                'id' => 'id',
-                'name' => 'name',
+                'query' => $carrierOptionsCalculator->getAvailablePackageFormats($prefix),
+                'id'    => 'value',
+                'name'  => 'label',
             ],
         ];
+
         if ($this->exclusiveField->isAvailable(
             $countryIso,
             $carrierType,

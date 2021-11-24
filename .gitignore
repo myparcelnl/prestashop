@@ -12,3 +12,11 @@ views/dist/
 # OS files
 .DS_Store
 
+# Yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

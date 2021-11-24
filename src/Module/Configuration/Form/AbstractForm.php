@@ -113,14 +113,9 @@ abstract class AbstractForm
     abstract protected function getFields(): array;
 
     /**
-     * TODO: MY-29719 make abstract when refactoring forms further.
-     *
      * @return string
      */
-    protected function getNamespace(): string
-    {
-        return '';
-    }
+    abstract protected function getNamespace(): string;
 
     /**
      * @param  array $field

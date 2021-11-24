@@ -3,26 +3,23 @@
 namespace Gett\MyparcelBE\Service;
 
 use Address;
+use Carrier;
 use Cart;
 use Configuration;
 use Context;
 use Country;
 use DateTime;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
-use Module;
+use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use Order;
 use Tools;
 use Validate;
 
-class DeliverySettingsProvider
+class DeliverySettingsProvider extends AbstractProvider
 {
-    /**
-     * @var \MyParcelBE
-     */
-    private $module;
-
     /**
      * @var int[]
      */
@@ -34,42 +31,29 @@ class DeliverySettingsProvider
     private $idOrder;
 
     /**
-     * @var Context
-     */
-    private $context;
-
-    /**
-     * @param  \Module       $module
-     * @param  array         $carriers
      * @param  \Context|null $context
+     * @param  array         $carriers
+     *
+     * @throws \Exception
      */
-    public function __construct(Module $module, array $carriers = [], Context $context = null)
+    public function __construct(Context $context = null, array $carriers = [])
     {
-        $this->module   = $module;
-        $this->carriers = $carriers;
-        $this->context  = $context ?? Context::getContext();
-    }
-
-    public function setOrderId(int $idOrder): self
-    {
-        $this->idOrder = $idOrder;
-
-        return $this;
+        parent::__construct($context);
+        $this->carriers  = empty($carriers) ? $this->getPlatformCarrierNames() : $carriers;
     }
 
     /**
      * @throws \PrestaShopDatabaseException
      */
-    public function get(): array
+    public function get(int $addressId = null): array
     {
-        $this->initCart();
+        $address = new Address($addressId ?? $this->getAddressFromCart());
 
-        if (! Validate::isLoadedObject($this->context->cart)) {
+        if (! Validate::isLoadedObject($address)) {
             return [];
         }
 
-        $address     = new Address($this->context->cart->id_address_delivery);
-        $houseNumber = preg_replace('/[^0-9]/', '', $address->address1 . $address->address2);
+        $houseNumber = preg_replace('/\D/', '', $address->address1 . $address->address2);
 
         if (Configuration::get(Constant::USE_ADDRESS2_AS_STREET_NUMBER_CONFIGURATION_NAME)) {
             $houseNumber = trim($address->address2);
@@ -78,23 +62,47 @@ class DeliverySettingsProvider
         $surchargeOption    = Configuration::get(Constant::DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME);
         $showPriceSurcharge = Constant::DELIVERY_OPTIONS_PRICE_FORMAT_SURCHARGE === $surchargeOption;
 
-        $carrierSettings = $this->generateCarrierSettings($address, $showPriceSurcharge);
-
         return [
-            'config'            => [
+            'config'  => [
                 'platform'           => ($this->module->isBE() ? 'belgie' : 'myparcel'),
-                'carrierSettings'    => $carrierSettings,
+                'carrierSettings'    => $this->generateCarrierSettings($address, $showPriceSurcharge),
                 'showPriceSurcharge' => $showPriceSurcharge,
             ],
-            'strings'           => $this->getDeliveryOptionsStrings(),
-            'address'           => [
+            'strings' => $this->getDeliveryOptionsStrings(),
+            'address' => [
                 'cc'         => strtoupper(Country::getIsoById($address->id_country)),
+                'street'     => $address->address1,
                 'city'       => $address->city,
                 'postalCode' => $address->postcode,
                 'number'     => $houseNumber,
             ],
-            'delivery_settings' => DeliveryOptions::queryByCart((int) $this->context->cart->id),
         ];
+    }
+
+    /**
+     * @param  int $idOrder
+     *
+     * @return $this
+     */
+    public function setOrderId(int $idOrder): self
+    {
+        $this->idOrder = $idOrder;
+
+        return $this;
+    }
+
+    /**
+     * @return null|\Address
+     */
+    protected function getAddressFromCart(): ?int
+    {
+        $this->initCart();
+
+        if (! Validate::isLoadedObject($this->context->cart)) {
+            return null;
+        }
+
+        return $this->context->cart->id_address_delivery;
     }
 
     /**
@@ -102,7 +110,7 @@ class DeliverySettingsProvider
      */
     protected function getDeliveryOptionsStrings(): array
     {
-        $getConfigurationString = static function(string $settings) {
+        $getConfigurationString = static function (string $settings) {
             return Configuration::get($settings) ?: null;
         };
 
@@ -128,6 +136,84 @@ class DeliverySettingsProvider
             'saturdayDeliveryTitle' => $getConfigurationString(CheckoutForm::CONFIGURATION_SATURDAY_DELIVERY_TITLE),
             'signatureTitle'        => $getConfigurationString(CheckoutForm::CONFIGURATION_SIGNATURE_TITLE),
             'wrongPostalCodeCity'   => $getConfigurationString(CheckoutForm::CONFIGURATION_WRONG_POSTAL_CODE_CITY),
+        ];
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    protected function getPlatformCarrierNames(): array
+    {
+        $platformService = PlatformServiceFactory::create();
+
+        return array_map(
+            static function (string $carrierClass) {
+                return $carrierClass::NAME;
+            },
+            $platformService->getCarriers()
+        );
+    }
+
+    /**
+     * @param  \Address $address
+     * @param  bool     $showPriceSurcharge
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    private function generateCarrierSettings(Address $address, bool $showPriceSurcharge): array
+    {
+        $carrierSettings = [];
+
+        foreach ($this->carriers as $carrierName) {
+            $psCarrier             = $this->getPsCarrier($carrierName);
+            $shippingOptions       = $this->module->getShippingOptions($psCarrier->id, $address);
+            $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
+            $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
+
+            $carrierSettings[$carrierName] = array_merge(
+                $this->getCarrierSettings($psCarrier->id, $shippingOptions),
+                $this->getDropOffSettings($psCarrier->id),
+                [
+                    'allowDeliveryOptions'  => true,
+                    'priceStandardDelivery' => $priceStandardDelivery,
+                ]
+            );
+        }
+
+        return $carrierSettings;
+    }
+
+    /**
+     * @param  int   $psCarrierId
+     * @param  array $shippingOptions
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getCarrierSettings(int $psCarrierId, array $shippingOptions): array
+    {
+        $deliveryDaysWindow = (int) (CarrierConfigurationProvider::get($psCarrierId, 'deliveryDaysWindow') ?? 1);
+        $taxRate            = $shippingOptions['tax_rate'];
+
+        return [
+            'allowEveningDelivery'  => $this->isEnabledInCarrier($psCarrierId, 'allowEveningDelivery'),
+            'allowMondayDelivery'   => $this->isEnabledInCarrier($psCarrierId, 'allowMondayDelivery'),
+            'allowMorningDelivery'  => $this->isEnabledInCarrier($psCarrierId, 'allowMorningDelivery'),
+            'allowOnlyRecipient'    => $this->isEnabledInCarrier($psCarrierId, 'allowOnlyRecipient'),
+            'allowPickupLocations'  => $this->isEnabledInCarrier($psCarrierId, 'allowPickupPoints'),
+            'allowPickupPoints'     => $this->isEnabledInCarrier($psCarrierId, 'allowPickupPoints'),
+            'allowSaturdayDelivery' => $this->isEnabledInCarrier($psCarrierId, 'allowSaturdayDelivery'),
+            'allowShowDeliveryDate' => -1 !== $deliveryDaysWindow,
+            'allowSignature'        => $this->isEnabledInCarrier($psCarrierId, 'allowSignature'),
+            'deliveryDaysWindow'    => $deliveryDaysWindow,
+            'priceEveningDelivery'  => $this->getPrice($psCarrierId, 'priceEveningDelivery', $taxRate),
+            'priceMorningDelivery'  => $this->getPrice($psCarrierId, 'priceMorningDelivery', $taxRate),
+            'priceOnlyRecipient'    => $this->getPrice($psCarrierId, 'priceOnlyRecipient', $taxRate),
+            'pricePickup'           => $this->getPrice($psCarrierId, 'pricePickup', $taxRate),
+            'priceSignature'        => $this->getPrice($psCarrierId, 'priceSignature', $taxRate),
         ];
     }
 
@@ -174,72 +260,6 @@ class DeliverySettingsProvider
     }
 
     /**
-     * @param  \Address $address
-     * @param  bool     $showPriceSurcharge
-     *
-     * @return array
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
-     */
-    private function generateCarrierSettings(Address $address, bool $showPriceSurcharge): array
-    {
-        $carrierSettings = [];
-
-        foreach ($this->carriers as $psCarrierId) {
-            if (! CarrierConfigurationProvider::get($psCarrierId, 'carrierType')) {
-                continue;
-            }
-
-            $shippingOptions       = $this->module->getShippingOptions($psCarrierId, $address);
-            $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
-            $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
-
-            $myParcelCarrier = CarrierService::getMyParcelCarrier($psCarrierId);
-            $carrierSettings[$myParcelCarrier->getName()] = array_merge(
-                $this->getCarrierSettings($psCarrierId, $shippingOptions),
-                $this->getDropOffSettings($psCarrierId),
-                [
-                    'allowDeliveryOptions'  => true,
-                    'priceStandardDelivery' => $priceStandardDelivery,
-                ]
-            );
-        }
-
-        return $carrierSettings;
-    }
-
-    /**
-     * @param  int   $psCarrierId
-     * @param  array $shippingOptions
-     *
-     * @return array
-     * @throws \PrestaShopDatabaseException
-     */
-    private function getCarrierSettings(int $psCarrierId, array $shippingOptions): array
-    {
-        $deliveryDaysWindow = (int) (CarrierConfigurationProvider::get($psCarrierId, 'deliveryDaysWindow') ?? 1);
-        $taxRate            = $shippingOptions['tax_rate'];
-
-        return [
-            'allowEveningDelivery'  => $this->isEnabledInCarrier($psCarrierId, 'allowEveningDelivery'),
-            'allowMondayDelivery'   => $this->isEnabledInCarrier($psCarrierId, 'allowMondayDelivery'),
-            'allowMorningDelivery'  => $this->isEnabledInCarrier($psCarrierId, 'allowMorningDelivery'),
-            'allowOnlyRecipient'    => $this->isEnabledInCarrier($psCarrierId, 'allowOnlyRecipient'),
-            'allowPickupLocations'  => $this->isEnabledInCarrier($psCarrierId, 'allowPickupPoints'),
-            'allowPickupPoints'     => $this->isEnabledInCarrier($psCarrierId, 'allowPickupPoints'),
-            'allowSaturdayDelivery' => $this->isEnabledInCarrier($psCarrierId, 'allowSaturdayDelivery'),
-            'allowShowDeliveryDate' => -1 !== $deliveryDaysWindow,
-            'allowSignature'        => $this->isEnabledInCarrier($psCarrierId, 'allowSignature'),
-            'deliveryDaysWindow'    => $deliveryDaysWindow,
-            'priceEveningDelivery'  => $this->getPrice($psCarrierId, 'priceEveningDelivery', $taxRate),
-            'priceMorningDelivery'  => $this->getPrice($psCarrierId, 'priceMorningDelivery', $taxRate),
-            'priceOnlyRecipient'    => $this->getPrice($psCarrierId, 'priceOnlyRecipient', $taxRate),
-            'pricePickup'           => $this->getPrice($psCarrierId, 'pricePickup', $taxRate),
-            'priceSignature'        => $this->getPrice($psCarrierId, 'priceSignature', $taxRate),
-        ];
-    }
-
-    /**
      * @param  int    $carrierId
      * @param  string $name
      * @param  float  $taxRate
@@ -251,6 +271,28 @@ class DeliverySettingsProvider
     {
         $price = CarrierConfigurationProvider::get($carrierId, $name) ?: 0;
         return Tools::ps_round($price * $taxRate, 2);
+    }
+
+    /**
+     * @param  string $carrierName
+     *
+     * @return \Carrier
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    private function getPsCarrier(string $carrierName): Carrier
+    {
+        $myParcelCarrier = CarrierFactory::createFromName($carrierName);
+        return CarrierService::getPrestashopCarrier($myParcelCarrier);
+    }
+
+    private function initCart(): void
+    {
+        if ((! isset($this->context->cart) || ! $this->context->cart->id) && $this->idOrder) {
+            $order               = new Order($this->idOrder);
+            $cart                = new Cart($order->id_cart);
+            $this->context->cart = $cart;
+        }
     }
 
     /**
@@ -289,9 +331,9 @@ class DeliverySettingsProvider
     }
 
     /**
-     * @param array     $dropOffDays
-     * @param \DateTime $dropOffDateObj
-     * @param           $cutoffExceptions
+     * @param  array     $dropOffDays
+     * @param  \DateTime $dropOffDateObj
+     * @param            $cutoffExceptions
      *
      * @return array
      */
@@ -313,14 +355,5 @@ class DeliverySettingsProvider
         } while ($dropOffDateObj->modify('+1 day') < $aWeekFromNowDateObj);
 
         return $dropOffDays;
-    }
-
-    private function initCart(): void
-    {
-        if ((!isset($this->context->cart) || !$this->context->cart->id) && $this->idOrder) {
-            $order = new Order($this->idOrder);
-            $cart = new Cart($order->id_cart);
-            $this->context->cart = $cart;
-        }
     }
 }

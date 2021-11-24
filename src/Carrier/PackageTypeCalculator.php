@@ -17,16 +17,16 @@ class PackageTypeCalculator extends AbstractPackageCalculator
      * @param  mixed $packageType
      *
      * @return string
-     * @throws \Exception
      */
     public function convertToName($packageType): ?string
     {
         $packageTypeName = $packageType;
 
         if (is_numeric($packageType)) {
-            $map = array_flip(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP);
+            $packageType = (int) $packageType;
+            $map         = array_flip(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP);
 
-            if (! in_array((int) $packageType, $map, true)) {
+            if (! array_key_exists($packageType, $map)) {
                 return null;
             }
 

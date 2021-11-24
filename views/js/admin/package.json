@@ -1,0 +1,27 @@
+{
+  "name": "vue",
+  "version": "0.1.0",
+  "private": true,
+  "license": "ISC",
+  "scripts": {
+    "build": "vue-cli-service build --no-clean",
+    "build:dev": "vue-cli-service build --no-clean --mode development",
+    "serve": "vue-cli-service build --no-clean --mode development --watch",
+    "preinstall": "npx -q only-allow yarn"
+  },
+  "dependencies": {
+    "@vue/composition-api": "^1.4.0",
+    "mitt": "^3.0.0",
+    "vue": "^2.6.14"
+  },
+  "devDependencies": {
+    "@myparcel/delivery-options": "^4.4.0",
+    "@types/jquery": "^3.5.11",
+    "@vue/cli-plugin-typescript": "^4.5.15",
+    "@vue/cli-service": "^4.5.15",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
+    "vue-template-compiler": "^2.6.14",
+    "webpack": "^4.46.0"
+  }
+}

@@ -23,7 +23,7 @@ trait LegacyOrderPageHooks
     public function hookDisplayAdminListBefore()
     {
         if ($this->context->controller instanceof \AdminOrdersController) {
-            $adminOrderList = new AdminOrderList($this);
+            $adminOrderList = new AdminOrderList();
 
             return $adminOrderList->getAdminAfterHeader();
         }
@@ -118,7 +118,7 @@ trait LegacyOrderPageHooks
         $consignment = ConsignmentFactory::createFromCarrier($carrier);
 
         $this->context->smarty->assign([
-            'label_options'         => $labelOptionsResolver->getLabelOptions($order),
+            'label_options'         => $labelOptionsResolver->getLabelOptionsJson($order),
             'allowSetOnlyRecipient' => $consignment->canHaveShipmentOption(
                 AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
             ),
@@ -130,11 +130,13 @@ trait LegacyOrderPageHooks
         return $this->display($this->name, 'views/templates/admin/icon-concept.tpl');
     }
 
-    public function hookActionAdminControllerSetMedia()
+    /**
+     * @throws \Exception
+     */
+    public function hookActionAdminControllerSetMedia(): void
     {
-        if ($this->context->controller instanceof \AdminOrdersController
-            || $this->context->controller->php_self == 'AdminOrders') {
-            $adminOrder = new AdminOrderList($this);
+        if ('AdminOrders' === $this->context->controller->php_self || is_a($this->context->controller, '\AdminOrdersController')) {
+            $adminOrder = new AdminOrderList();
             $adminOrder->setHeaderContent();
         }
     }
@@ -168,7 +170,7 @@ trait LegacyOrderPageHooks
         if (!Validate::isLoadedObject($order)) {
             return '';
         }
-        $adminOrderView = new AdminOrderView($this, (int) $params['id_order'], $this->context);
+        $adminOrderView = new AdminOrderView((int) $params['id_order']);
 
         return $adminOrderView->display();
     }

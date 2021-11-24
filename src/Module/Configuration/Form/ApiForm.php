@@ -14,6 +14,11 @@ use Tools;
 
 class ApiForm extends AbstractForm
 {
+    protected function getNamespace(): string
+    {
+        return 'apiform';
+    }
+
     /**
      * @return array[]
      */

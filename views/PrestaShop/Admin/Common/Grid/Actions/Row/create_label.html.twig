@@ -1,12 +1,11 @@
-<button class="btn btn-outline-secondary addLabel"
-        type="button"
-        data-toggle="modal"
-        data-order-id="{{ idOrder }}"
-        data-label-options='{{ labelOptions|raw }}'{# Single quotes to allow json format #}
-        data-allow-set-only-recipient="{{ allowSetOnlyRecipient|number_format }}"
-        data-allow-set-signature="{{ allowSetSignature|number_format }}"
-        data-target="#create"
->
+{# Create button in order grid #}
+<code>create_label.html.twig</code>
+<button
+    class="btn btn-outline-secondary text-nowrap"
+    type="button"
+    data-toggle="modal"
+    data-context="{{ context | json_encode | raw }}"
+    data-target="#shipmentOptions">
     <i class="material-icons"> label</i>
-    {{ 'Create'|trans({}, 'Admin.Actions') }}
+    {{ 'Create' | trans({}, 'Admin.Actions') }}
 </button>

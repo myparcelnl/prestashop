@@ -2,23 +2,27 @@
 
 namespace Gett\MyparcelBE\Factory\Consignment;
 
+use BadMethodCallException;
 use Configuration;
 use DateInterval;
 use DateTime;
 use Exception;
+use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierService;
+use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as SdkConsignmentFactory;
+use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use OrderLabel;
@@ -27,11 +31,6 @@ use Tools;
 class ConsignmentFactory
 {
     private const FORMAT_TIMESTAMP = 'Y-m-d H:i:s';
-
-    /**
-     * @var string
-     */
-    private $api_key;
 
     /**
      * @var array|array[]
@@ -69,41 +68,18 @@ class ConsignmentFactory
     private $orderData;
 
     /**
-     * @param  string      $apiKey
-     * @param  array       $request
-     * @param  \MyParcelBE $module
-     */
-    public function __construct(string $apiKey, array $request, MyParcelBE $module)
-    {
-        $this->api_key = $apiKey;
-        $this->module  = $module;
-        $this->request = $request;
-    }
-
-    /**
-     * @param  array $orders
+     * @param  array $request
      *
-     * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      * @throws \Exception
      */
-    public function fromOrders(array $orders): ConsignmentCollection
+    public function __construct(array $request)
     {
-        $collection = new ConsignmentCollection();
-
-        foreach ($orders as $order) {
-            $this->setOrderData($order);
-            $this->createConsignment();
-            $collection->addConsignment($this->initConsignment());
-        }
-
-        return $collection;
+        $this->request = $request;
+        $this->module  = MyParcelBE::getModule();
     }
 
     /**
-     * @param  array                                                                           $order
+     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
      *
      * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
@@ -112,21 +88,17 @@ class ConsignmentFactory
      * @throws \PrestaShopException
      * @throws \Exception
      */
-    public function fromOrder(array $order, AbstractDeliveryOptionsAdapter $deliveryOptions = null): ConsignmentCollection
-    {
+    public function fromOrder(
+        Order                          $order,
+        AbstractDeliveryOptionsAdapter $deliveryOptions = null
+    ): ConsignmentCollection {
         $this->setOrderData($order, $deliveryOptions);
         $this->createConsignment();
 
-        $collection = new ConsignmentCollection();
+        $collection  = new ConsignmentCollection();
+        $consignment = $this->initConsignment();
 
-        for ($i = 0; $i < $this->request['labelAmount']; ++$i) {
-            $consignment = $this->initConsignment();
-            foreach (Constant::SINGLE_LABEL_CREATION_OPTIONS as $key => $option) {
-                if (isset($this->request[$key]) && method_exists($this, $option)) {
-                    $consignment = $this->{$option}($consignment);
-                }
-            }
-
+        for ($i = 0; $i < ($this->request['extraOptions']['labelAmount'] ?? 1); ++$i) {
             $collection->addConsignment($consignment);
         }
 
@@ -142,25 +114,22 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  array                                                                           $order
-     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
-     *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @return void
      * @throws \Exception
      */
-    private function setOrderData(array $order, AbstractDeliveryOptionsAdapter $deliveryOptions = null): void
+    private function setDeliveryOptions(): void
     {
-        $carrierSettingsProvider = new CarrierSettingsProvider($this->module);
+        $deliveryOptionsData = json_decode($this->orderData['delivery_settings'] ?? '', true);
 
-        $this->orderData       = $order;
-        $this->orderObject     = new Order((int) $order['id_order']);
-        $this->carrierSettings = $carrierSettingsProvider->provide($order['id_carrier']);
+        try {
+            // Create new instance from known json
+            $this->deliveryOptions = DeliveryOptionsAdapterFactory::create((array) $deliveryOptionsData);
+        } catch (BadMethodCallException $e) {
+            Logger::addLog($e->getMessage());
 
-        if ($deliveryOptions) {
-            $this->deliveryOptions = $deliveryOptions;
-        } else {
-            $this->deliveryOptions = DeliveryOptions::updateDeliveryOptions($this->orderObject);
+            // Create new instance from unknown json data
+            $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();
+            $this->deliveryOptions = new DeliveryOptionsFromOrderAdapter($deliveryOptions);
         }
     }
 
@@ -171,7 +140,7 @@ class ConsignmentFactory
     {
         $floatWeight = $this->orderObject->getTotalWeight();
         $this->consignment
-            ->setApiKey($this->api_key)
+            ->setApiKey(Configuration::get(Constant::API_KEY_CONFIGURATION_NAME))
             ->setReferenceIdentifier($this->orderData['id_order'])
             ->setPackageType($this->getPackageType())
             ->setDeliveryDate($this->getDeliveryDate())
@@ -218,13 +187,15 @@ class ConsignmentFactory
      */
     private function getDeliveryType(): int
     {
+        $deliveryType = $this->deliveryOptions->getDeliveryTypeId() ?? $this->consignment->getDeliveryType();
+
         if ($this->module->isBE()) {
-            return $this->consignment->getDeliveryType() < AbstractConsignment::DELIVERY_TYPE_PICKUP
+            return $deliveryType < AbstractConsignment::DELIVERY_TYPE_PICKUP
                 ? AbstractConsignment::DELIVERY_TYPE_STANDARD
                 : AbstractConsignment::DELIVERY_TYPE_PICKUP;
         }
 
-        return $this->deliveryOptions->getDeliveryTypeId() ?? AbstractConsignment::DELIVERY_TYPE_STANDARD;
+        return $deliveryType;
     }
 
     /**
@@ -241,6 +212,29 @@ class ConsignmentFactory
         }
 
         return $labelDescription;
+    }
+
+    /**
+     * @param                                                                                  $order
+     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     * @throws \Exception
+     */
+    private function setOrderData($order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
+    {
+        $this->orderObject       = $order;
+        $this->orderData         = OrderLabel::getDataForLabelsCreate([$order->getId()])[0];
+        $carrierSettingsProvider = new CarrierSettingsProvider();
+        $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
+
+        if ($deliveryOptions) {
+            $this->deliveryOptions = $deliveryOptions;
+        } else {
+            $this->setDeliveryOptions();
+        }
     }
 
     /**
@@ -331,9 +325,7 @@ class ConsignmentFactory
     {
         $pickupLocation = $this->deliveryOptions->getPickupLocation();
 
-        if (! $pickupLocation
-            || ! $this->deliveryOptions->isPickup()
-            || $this->consignment->getDeliveryType() !== AbstractConsignment::DELIVERY_TYPE_PICKUP) {
+        if (! $pickupLocation || AbstractConsignment::DELIVERY_TYPE_PICKUP !== $this->getDeliveryType()) {
             return;
         }
 
@@ -354,17 +346,18 @@ class ConsignmentFactory
      */
     private function setCustomsDeclaration(): void
     {
-        $isCdCountry             = $this->consignment->isCdCountry();
+        $isToRowCountry          = $this->consignment->isCdCountry();
         $customFormConfiguration = Configuration::get(Constant::CUSTOMS_FORM_CONFIGURATION_NAME);
 
-        if ($isCdCountry && 'No' !== $customFormConfiguration) {
-            $this->setCustomItems();
+        if (! $isToRowCountry || 'No' === $customFormConfiguration) {
+            return;
         }
+
+        $this->setCustomItems();
     }
 
     /**
      * @return void
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      * @throws \PrestaShopDatabaseException
      */
     private function setCustomItems(): void
@@ -372,7 +365,6 @@ class ConsignmentFactory
         $products = OrderLabel::getCustomsOrderProducts($this->orderData['id_order']);
 
         foreach ($products as $product) {
-
             if (! $product) {
                 continue;
             }
@@ -381,15 +373,19 @@ class ConsignmentFactory
             $description = $product['product_name'];
             $itemValue   = Tools::ps_round($product['unit_price_tax_incl'] * 100);
 
-            $this->consignment->addItem(
-                (new MyParcelCustomsItem())
-                    ->setDescription($description)
-                    ->setAmount($product['product_quantity'])
-                    ->setWeight($weight)
-                    ->setItemValue($itemValue)
-                    ->setCountry($this->getCountryOfOrigin($product['product_id']))
-                    ->setClassification($this->getHsCode($product['product_id']))
-            );
+            try {
+                $this->consignment->addItem(
+                    (new MyParcelCustomsItem())
+                        ->setDescription($description)
+                        ->setAmount($product['product_quantity'])
+                        ->setWeight($weight)
+                        ->setItemValue($itemValue)
+                        ->setCountry($this->getCountryOfOrigin($product['product_id']))
+                        ->setClassification($this->getHsCode($product['product_id']))
+                );
+            } catch (Exception $e) {
+                Logger::addLog($e);
+            }
         }
     }
 
@@ -429,9 +425,8 @@ class ConsignmentFactory
      */
     private function createConsignment(): void
     {
-        $carrier           = CarrierService::getMyParcelCarrier($this->orderData['id_carrier']);
-        $this->consignment = PlatformServiceFactory::create()
-            ->generateConsignment($carrier);
+        $carrier           = CarrierService::getMyParcelCarrier($this->orderObject->getIdCarrier());
+        $this->consignment = SdkConsignmentFactory::createByCarrierId($carrier->getId());
     }
 
     /**
