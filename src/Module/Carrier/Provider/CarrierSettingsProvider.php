@@ -2,9 +2,8 @@
 
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
-use Carrier;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
+use Gett\MyparcelBE\Service\CarrierService;
 use Module;
 use MyParcelBE;
 
@@ -22,23 +21,31 @@ class CarrierSettingsProvider
         $this->module = $module ?? MyParcelBE::getModule();
     }
 
-    public function provide(int $carrierId)
+    /**
+     * @param  int $carrierId
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function provide(int $carrierId): array
     {
-        $exclusiveField = new ExclusiveField();
-        $carrier = new Carrier($carrierId);
-        $carrierType = $exclusiveField->getCarrierType($carrier);
-        $countryIso = $this->module->getModuleCountry();
-        $carrierSettings = Constant::CARRIER_EXCLUSIVE[$carrierType];
+        $carrier = CarrierService::getMyParcelCarrier($carrierId);
+
+        $countryIso      = $this->module->getModuleCountry();
+        $carrierSettings = Constant::CARRIER_EXCLUSIVE[strtoupper($carrier->getName())];
+
         $carrierLabelSettings = [
             'delivery' => [],
-            'return' => []
+            'return'   => [],
         ];
+
         foreach (Constant::SINGLE_LABEL_CREATION_OPTIONS as $key => $field) {
             $carrierLabelSettings['delivery'][$key] = $carrierSettings[$field][$countryIso];
-            $carrierLabelSettings['return'][$key] = $carrierSettings['return_' . $field][$countryIso];
+            $carrierLabelSettings['return'][$key]   = $carrierSettings['return_' . $field][$countryIso];
         }
+
         $carrierLabelSettings['delivery']['ALLOW_FORM'] = $carrierSettings['ALLOW_DELIVERY_FORM'][$countryIso];
-        $carrierLabelSettings['return']['ALLOW_FORM'] = $carrierSettings['ALLOW_RETURN_FORM'][$countryIso];
+        $carrierLabelSettings['return']['ALLOW_FORM']   = $carrierSettings['ALLOW_RETURN_FORM'][$countryIso];
 
         return $carrierLabelSettings;
     }

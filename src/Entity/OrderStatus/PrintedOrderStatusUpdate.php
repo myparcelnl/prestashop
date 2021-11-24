@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Entity\OrderStatus;
 
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Configuration\OrderForm;
+use Gett\MyparcelBE\Module\Configuration\Form\OrderForm;
 
 class PrintedOrderStatusUpdate extends AbstractOrderStatusUpdate
 {

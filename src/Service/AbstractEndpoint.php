@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Service;
 
-use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
+use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\MyParcelRequest;
 
 class AbstractEndpoint
@@ -16,6 +16,9 @@ class AbstractEndpoint
     protected function createRequest(): MyParcelRequest
     {
         return (new MyParcelRequest())
-            ->setUserAgents(ConsignmentFactory::getUserAgent());
+            ->setUserAgents(
+                PlatformServiceFactory::create()
+                    ->getUserAgents()
+            );
     }
 }

@@ -3,32 +3,61 @@
 namespace Gett\MyparcelBE\Service\Consignment;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Service\MyparcelStatusProvider;
-use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use OrderLabel;
 
 class Update
 {
+    /**
+     * @var string
+     */
     private $api_key;
+
+    /**
+     * @var \Doctrine\ORM\EntityManagerInterface
+     */
     private $entity_manager;
+
+    /**
+     * @var \Gett\MyparcelBE\Service\MyparcelStatusProvider
+     */
     private $status_provider;
 
-    public function __construct(string $api_key, EntityManagerInterface $entityManager, MyparcelStatusProvider $status_provider)
-    {
-        $this->api_key = $api_key;
-        $this->entity_manager = $entityManager;
-        $this->status_provider = $status_provider;
+    /**
+     * @param  string                                          $apiKey
+     * @param  \Doctrine\ORM\EntityManagerInterface            $entityManager
+     * @param  \Gett\MyparcelBE\Service\MyparcelStatusProvider $statusProvider
+     */
+    public function __construct(
+        string                 $apiKey,
+        EntityManagerInterface $entityManager,
+        MyparcelStatusProvider $statusProvider
+    ) {
+        $this->api_key         = $apiKey;
+        $this->entity_manager  = $entityManager;
+        $this->status_provider = $statusProvider;
     }
 
-    public function updateLabel(array $id_labels)
+    /**
+     * @param  array $labelIds
+     *
+     * @return bool
+     * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
+     * @throws \MyParcelNL\Sdk\src\Exception\ApiException
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function updateLabel(array $labelIds): bool
     {
-        $collection = MyParcelCollection::findMany($id_labels, $this->api_key);
+        $collection = ConsignmentCollection::findMany($labelIds, $this->api_key);
         $collection->setLinkOfLabels();
 
         foreach ($collection as $consignment) {
-            $order_label = OrderLabel::findByLabelId($consignment->getConsignmentId());
-            $order_label->status = $this->status_provider->getStatus($consignment->getStatus());
-            $order_label->save();
+            $orderLabel         = OrderLabel::findByLabelId($consignment->getConsignmentId());
+            $orderLabel->status = $this->status_provider->getStatus($consignment->getStatus());
+            $orderLabel->save();
         }
 
         return true;

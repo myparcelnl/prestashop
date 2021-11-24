@@ -8,7 +8,6 @@ use Currency;
 use Gett\MyparcelBE\Constant;
 use Media;
 use Module;
-use Tools;
 
 class AdminOrderList extends AbstractAdminOrder
 {
@@ -61,21 +60,34 @@ class AdminOrderList extends AbstractAdminOrder
 
     public function setHeaderContent(): void
     {
-        $link = $this->context->link;
+        $labelSize           = Configuration::get(Constant::LABEL_SIZE_CONFIGURATION_NAME);
+        $labelPosition       = Configuration::get(Constant::LABEL_POSITION_CONFIGURATION_NAME);
+        $labelPromptPosition = Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME);
+
+        $deliveryOptionsUrl = $this->context->link->getModuleLink(
+            \MyParcelBE::getModule()->name,
+            'checkout',
+            [],
+            null,
+            null,
+            null,
+            true
+        );
+
         Media::addJsDef(
             [
-                'default_label_size' => Configuration::get(Constant::LABEL_SIZE_CONFIGURATION_NAME) == false ? 'a4' : Configuration::get(Constant::LABEL_SIZE_CONFIGURATION_NAME),
-                'default_label_position' => Configuration::get(Constant::LABEL_POSITION_CONFIGURATION_NAME) == false ? '1' : Configuration::get(Constant::LABEL_POSITION_CONFIGURATION_NAME),
-                'prompt_for_label_position' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME) == false ? '0' : Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
-                'delivery_settings_route' => $link->getAdminLink('AdminMyParcelBELabel', true, [], [
-                    'action' => 'getDeliverySettings',
-                    'id_order' => Tools::getValue('id_order'),
-                ]),
-                'create_labels_bulk_route' => $link->getAdminLink('AdminMyParcelBELabel', true, [], ['action' => 'createb']),
-                'refresh_labels_bulk_route' => $link->getAdminLink('AdminMyParcelBELabel', true, [], ['action' => 'refresh']),
-                'create_label_action' => $link->getAdminLink('AdminMyParcelBELabel', true, [], ['action' => 'createLabel', 'listingPage' => true]),
-                'create_label_error' => $this->module->l('Cannot create label for orders', 'adminorderlist'),
-                'no_order_selected_error' => $this->module->l('Please select at least one order that has MyParcel carrier.', 'adminorderlist'),
+                'default_label_size'            => false === $labelSize ? 'a4' : $labelSize,
+                'default_label_position'        => false === $labelPosition ? '1' : $labelPosition,
+                'prompt_for_label_position'     => false === $labelPromptPosition ? '0' : $labelPromptPosition,
+                'myparcel_delivery_options_url' => $deliveryOptionsUrl,
+                'create_labels_bulk_route'      => $this->getLink('create'),
+                'refresh_labels_bulk_route'     => $this->getLink('refresh'),
+                'create_label_action'           => $this->getLink('createLabel', ['listingPage' => true]),
+                'create_label_error'            => $this->module->l('Cannot create label for orders', 'adminorderlist'),
+                'no_order_selected_error'       => $this->module->l(
+                    'Please select at least one order that has MyParcel carrier.',
+                    'adminorderlist'
+                ),
             ]
         );
         $this->context->controller->addJqueryPlugin(['scrollTo']);
@@ -91,5 +103,21 @@ class AdminOrderList extends AbstractAdminOrder
         $this->context->controller->addCSS($this->module->getPathUri() . 'views/css/myparcel.css');
         $this->context->controller->addJS($this->module->getPathUri() . 'views/dist/js/external/myparcel.js');
         $this->context->controller->addJS($this->module->getPathUri() . 'views/dist/js/admin/order.js');
+    }
+
+    /**
+     * @param  string $action
+     * @param  array  $params
+     *
+     * @return string
+     */
+    private function getLink(string $action, array $params = []): string
+    {
+        return $this->context->link->getAdminLink(
+            'AdminMyParcelBELabel',
+            true,
+            [],
+            array_merge(['action' => $action], $params)
+        );
     }
 }

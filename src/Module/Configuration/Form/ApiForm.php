@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace Gett\MyparcelBE\Module\Configuration\Form;
 
 use Configuration;
 use Exception;

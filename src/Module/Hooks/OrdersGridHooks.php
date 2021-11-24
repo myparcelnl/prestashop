@@ -13,9 +13,11 @@ use Gett\MyparcelBE\Grid\Action\Bulk\IconModalBulkAction;
 use Gett\MyparcelBE\Grid\Column\LabelsColumn;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\WeightService;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
@@ -115,64 +117,71 @@ trait OrdersGridHooks
      * @return void
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Exception
      */
     public function hookActionOrderGridPresenterModifier(array &$params): void
     {
-        $rows = $params['presented_grid']['data']['records']->all();
+        $params['presented_grid']['data']['records'] = new RecordCollection(
+            array_map(function (array $row) {
+                $psCarrierId = (int) $row['id_carrier_reference'];
+                $carrier     = CarrierService::getMyParcelCarrier($psCarrierId);
 
-        foreach ($rows as &$row) {
-            if (! (new AdminOrderList($this))->isMyParcelCarrier((int) $row['id_carrier_reference'])) {
-                $row['delivery_info'] = null;
-                continue;
-            }
+                $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
+                $order       = new Order((int) $row['id_order']);
 
-            $orderHelper = new AdminOrderView($this, (int) $row['id_order'], $this->context);
-            $order       = new Order((int) $row['id_order']);
+                $consignment = ConsignmentFactory::createFromCarrier($carrier);
 
-            $row['myparcel'] = [
-                'labels'                 => $orderHelper->getLabels(),
-                'options'                => (new LabelOptionsResolver())->getLabelOptions($order),
-                'allowSetOnlyRecipient'  => $orderHelper->allowSetOnlyRecipient((int) $row['id_carrier_reference']),
-                'allowSetSignature'      => $orderHelper->allowSetSignature((int) $row['id_carrier_reference']),
-                'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
-            ];
+                $row['myparcel'] = [
+                    'labels'                 => $orderHelper->getLabels(),
+                    'carrier'                => $carrier->getHuman(),
+                    'options'                => (new LabelOptionsResolver())->getLabelOptions($order),
+                    'allowSetOnlyRecipient'  => $consignment->canHaveShipmentOption(
+                        AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
+                    ),
+                    'allowSetSignature'      => $consignment->canHaveShipmentOption(
+                        AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
+                    ),
+                    'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
+                ];
 
-            $deliverySettingsRepository = DeliverySettingsRepository::getInstance();
-            $orderWeight                = (new WeightService($orderHelper->getWeight()))->convertToGrams()->getWeight();
+                $deliverySettingsRepository = DeliverySettingsRepository::getInstance();
+                $orderWeight                = (new WeightService($orderHelper->getWeight()))->convertToGrams()
+                    ->getWeight();
 
-            $row['weight'] = $orderWeight;
-            $extraOptions  = $deliverySettingsRepository::getExtraOptionsByCartId($row['id_cart']);
+                $row['weight'] = $orderWeight;
+                $extraOptions  = $deliverySettingsRepository::getExtraOptionsByCartId($row['id_cart']);
 
-            if (! $extraOptions->getDigitalStampWeight()) {
-                $extraOptions->setDigitalStampWeight(
-                    (new WeightService($orderWeight))
-                        ->convertToDigitalStampWeight()
-                        ->getWeight()
-                );
-            }
+                if (! $extraOptions->getDigitalStampWeight()) {
+                    $extraOptions->setDigitalStampWeight(
+                        (new WeightService($orderWeight))
+                            ->convertToDigitalStampWeight()
+                            ->getWeight()
+                    );
+                }
 
-            $row['myparcel']['extraOptions'] = $extraOptions->toArray();
+                $row['myparcel']['extraOptions'] = $extraOptions->toArray();
 
-            $deliveryOptions = $deliverySettingsRepository::getDeliveryOptionsByCartId($row['id_cart']);
+                $deliveryOptions = $deliverySettingsRepository::getDeliveryOptionsByCartId($row['id_cart']);
 
-            if (! $deliveryOptions) {
-                $row['delivery_info'] = null;
-                continue;
-            }
+                if (! $deliveryOptions) {
+                    $row['delivery_info'] = null;
+                    return $row;
+                }
 
-            try {
-                $row['delivery_info'] = sprintf(
-                    '[%s] %s',
-                    (new DateTime($deliveryOptions->getDate()))
-                        ->format($this->context->language->date_format_lite),
-                    $row['delivery_info']
-                );
-            } catch (Exception $e) {
-                $row['delivery_info'] = null;
-            }
-        }
+                try {
+                    $row['delivery_info'] = sprintf(
+                        '[%s] %s',
+                        (new DateTime($deliveryOptions->getDate()))
+                            ->format($this->context->language->date_format_lite),
+                        $row['delivery_info']
+                    );
+                } catch (Exception $e) {
+                    $row['delivery_info'] = null;
+                }
 
-        $params['presented_grid']['data']['records'] = new RecordCollection($rows);
+                return $row;
+            }, $params['presented_grid']['data']['records']->all())
+        );
     }
 
     public function hookDisplayAdminOrderMain($params): string

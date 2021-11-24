@@ -18,12 +18,12 @@ trait HasInstance
      */
     public static function getInstance(...$arguments): self
     {
-        if (self::$instance) {
-            return self::$instance;
+        if (static::$instance) {
+            return static::$instance;
         }
 
-        self::$instance = (new self(...$arguments));
+        static::$instance = (new static(...$arguments));
 
-        return self::$instance;
+        return static::$instance;
     }
 }
