@@ -107,7 +107,7 @@ class MyParcelBE extends CarrierModule
         $this->name          = self::MODULE_NAME;
         $this->tab           = 'shipping_logistics';
         $this->version       = $this->getVersion();
-        $this->author        = 'Gett';
+        $this->author        = 'MyParcel';
         $this->need_instance = 1;
         $this->bootstrap     = true;
 
