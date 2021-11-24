@@ -17,6 +17,18 @@ class StatusChangeWebhookPayload implements AbstractWebhookPayload
         'status',
     ];
 
+    public const SHIPMENT_STATUS_PENDING_CONCEPT       = 1;
+    public const SHIPMENT_STATUS_PENDING_REGISTERED    = 2;
+    public const SHIPMENT_STATUS_PRINTED_LETTER        = 12;
+    public const SHIPMENT_STATUS_PRINTED_DIGITAL_STAMP = 14;
+
+    public const STATUS_CHANGE_DURING_EXPORT_NOT_WEBHOOK = [
+        self::SHIPMENT_STATUS_PENDING_CONCEPT,
+        self::SHIPMENT_STATUS_PENDING_REGISTERED,
+        self::SHIPMENT_STATUS_PRINTED_LETTER,
+        self::SHIPMENT_STATUS_PRINTED_DIGITAL_STAMP,
+    ];
+
     /**
      * @var int|null
      */
@@ -115,6 +127,10 @@ class StatusChangeWebhookPayload implements AbstractWebhookPayload
      */
     public function onReceive(): void
     {
+        if (in_array($this->getStatus(), self::STATUS_CHANGE_DURING_EXPORT_NOT_WEBHOOK)) {
+            return;
+        }
+
         OrderLabel::updateStatus((int) $this->shipmentId, (int) $this->status);
     }
 }
