@@ -1,8 +1,7 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace Gett\MyparcelBE\Module\Configuration\Form;
 
-use Carrier;
 use Configuration;
 use Currency;
 use Db;
@@ -11,18 +10,20 @@ use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Link;
+use MyParcelBE;
+use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 
-class Carriers extends AbstractForm
+class CarriersForm extends AbstractForm
 {
     private $context;
 
-    public function __construct(\Module $module)
+    public function __construct(MyParcelBE $module)
     {
         parent::__construct($module);
         $this->context = \Context::getContext();
     }
 
-    public function __invoke(): string
+    public function render(): string
     {
         if (Tools::isSubmit('submitMyparcelCarrierSettings')
             || Tools::isSubmit('submitMyparcelCarrierSettingsAndStay')) {
@@ -182,7 +183,15 @@ class Carriers extends AbstractForm
         }
     }
 
-    private function updateConfigurationFields(int $carrierId, bool $isInsert = false)
+    /**
+     * @param  int  $carrierId
+     * @param  bool $isInsert
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    private function updateConfigurationFields(int $carrierId, bool $isInsert = false): void
     {
         $dropOff = [];
         $postFields = Tools::getAllValues();
@@ -267,33 +276,32 @@ class Carriers extends AbstractForm
                 }
             }
 
-            if (!$isInsert) {
-                CarrierConfigurationProvider::updateValue($carrierId, $field, $updatedValue);
-            } else {
+            if ($isInsert) {
                 $insert[] = [
-                    'id_carrier' => (int) $carrierId,
-                    'name' => pSQL($field),
-                    'value' => pSQL($updatedValue),
+                    'id_carrier' => $carrierId,
+                    'name'       => pSQL($field),
+                    'value'      => pSQL($updatedValue),
                 ];
+            } else {
+                CarrierConfigurationProvider::updateValue($carrierId, $field, $updatedValue);
             }
+        }
+
+        if ($isInsert) {
+            Db::getInstance()->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
         }
 
         $carrier = new Carrier($carrierId);
 
         if ($carrier->external_module_name !== $this->module->name) {
             $carrier->external_module_name = 'myparcelbe';
-            $carrier->is_module = true;
-            $carrier->active = 1;
-            $carrier->range_behavior = 1;
-            $carrier->need_range = 1;
-            $carrier->shipping_external = true;
-            $carrier->range_behavior = 0;
-            $carrier->shipping_method = 2;
+            $carrier->is_module            = true;
+            $carrier->active               = 1;
+            $carrier->need_range           = 1;
+            $carrier->shipping_external    = true;
+            $carrier->range_behavior       = 0;
+            $carrier->shipping_method      = 2;
             $carrier->update();
-        }
-
-        if ($isInsert) {
-            Db::getInstance()->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
         }
     }
 
@@ -387,8 +395,8 @@ SQL
             $carrierConfigs = [];
             $configFields = Constant::CARRIER_CONFIGURATION_FIELDS;
 
-            array_push($configFields, 'carrierName');
-            array_push($configFields, 'psCarriers');
+            $configFields[] = 'carrierName';
+            $configFields[] = 'psCarriers';
 
             foreach ($configFields as $field) {
                 $carrierConfigs[] = [
@@ -607,7 +615,13 @@ SQL
         ];
     }
 
-    private function getFormTabFields(Carrier $carrier, Currency $currency)
+    /**
+     * @param  \Carrier  $carrier
+     * @param  \Currency $currency
+     *
+     * @return array
+     */
+    private function getFormTabFields(Carrier $carrier, Currency $currency): array
     {
         $fields = [];
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
@@ -657,13 +671,6 @@ SQL
                 'prefix' => $this->module->l('Cutoff Time', 'carriers'),
             ];
         }
-        $fields[] = [
-            'tab' => 'form',
-            'type' => 'text',
-            'label' => $this->module->l('Delivery Title', 'carriers'),
-            'name' => 'deliveryTitle',
-            'desc' => $this->module->l('General delivery title', 'carriers'),
-        ];
         $fields[] = [
             'tab' => 'form',
             'type' => 'checkbox',
@@ -750,16 +757,6 @@ SQL
                 'carriers'
             ), $carrier->name),
         ];
-        $fields[] = [
-            'type' => 'text',
-            'label' => $this->module->l('Delivery standard title', 'carriers'),
-            'name' => 'deliveryStandardTitle',
-            'tab' => 'form',
-            'desc' => $this->module->l(
-                'When there is no title, the delivery time will automatically be visible.',
-                'carriers'
-            ),
-        ];
         if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'allowMondayDelivery')) {
             $fields[] = [
                 'tab' => 'form',
@@ -827,18 +824,6 @@ SQL
                 ), $carrier->name),
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('Delivery morning title', 'carriers'),
-                'name' => 'deliveryMorningTitle',
-                'desc' => $this->module->l(
-                    'When there is no title, the delivery time will automatically be visible.',
-                    'carriers'
-                ),
-                'form_group_class' => 'toggle-child-field allowMorningDelivery',
-            ];
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -870,18 +855,6 @@ SQL
                     ],
                 ],
                 'form_group_class' => 'toggle-parent-field',
-            ];
-            // Disable title automatically when the option is not available
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('Delivery evening title', 'carriers'),
-                'name' => 'deliveryEveningTitle',
-                'desc' => $this->module->l(
-                    'When there is no title, the delivery time will automatically be visible.',
-                    'carriers'
-                ),
-                'form_group_class' => 'toggle-child-field allowEveningDelivery',
             ];
             // Disable price automatically when the option is not available
             $fields[] = [
@@ -921,18 +894,6 @@ SQL
                 ), $carrier->name),
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('Delivery Saturday title', 'carriers'),
-                'name' => 'saturdayDeliveryTitle',
-                'desc' => $this->module->l(
-                    'When there is no title, the delivery time will automatically be visible.',
-                    'carriers'
-                ),
-                'form_group_class' => 'toggle-child-field allowSaturdayDelivery',
-            ];
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -964,14 +925,6 @@ SQL
                     ],
                 ],
                 'form_group_class' => 'toggle-parent-field',
-            ];
-            // Disable title automatically when the option is not available
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('Signature title', 'carriers'),
-                'name' => 'signatureTitle',
-                'form_group_class' => 'toggle-child-field allowSignature',
             ];
             // Disable price automatically when the option is not available
             $fields[] = [
@@ -1005,14 +958,6 @@ SQL
                 ],
                 'form_group_class' => 'toggle-parent-field',
             ];
-            // Disable title automatically when the option is not available
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('Only recipient title', 'carriers'),
-                'name' => 'onlyRecipientTitle',
-                'form_group_class' => 'toggle-child-field allowOnlyRecipient',
-            ];
             // Disable price automatically when the option is not available
             $fields[] = [
                 'tab' => 'form',
@@ -1044,14 +989,6 @@ SQL
                     ],
                 ],
                 'form_group_class' => 'toggle-parent-field',
-            ];
-            // Disable title automatically when the option is not available
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('Pickup title', 'carriers'),
-                'name' => 'pickupTitle',
-                'form_group_class' => 'toggle-child-field allowPickupPoints',
             ];
             // Disable price automatically when the option is not available
             $fields[] = [
@@ -1098,14 +1035,6 @@ SQL
                 'label' => $this->module->l('Price pickup express', 'carriers'),
                 'name' => 'pricePickupExpress',
                 'form_group_class' => 'toggle-child-field allowPickupExpress',
-            ];
-        }
-        if ($this->module->isBE()) {
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('BE delivery title', 'carriers'),
-                'name' => 'BEdeliveryTitle',
             ];
         }
 

@@ -2,23 +2,19 @@
 
 namespace Gett\MyparcelBE;
 
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use PrestaShopBundle\Form\Admin\Sell\Order\Invoices\GenerateByDateType;
 
 class Constant
 {
-    public const MENU_API_SETTINGS     = 0;
-    public const MENU_GENERAL_SETTINGS = 1;
-    public const MENU_LABEL_SETTINGS   = 2;
-    public const MENU_ORDER_SETTINGS   = 3;
-    public const MENU_CUSTOMS_SETTINGS = 4;
-    public const MENU_CARRIER_SETTINGS = 5;
-
     /**
      * Maximum characters length of item description.
      */
     public const ITEM_DESCRIPTION_MAX_LENGTH  = 50;
     public const ORDER_DESCRIPTION_MAX_LENGTH = 45;
+
 
     public const API_KEY_CONFIGURATION_NAME                = 'MYPARCELBE_API_KEY';
     public const API_LOGGING_CONFIGURATION_NAME            = 'MYPARCELBE_API_LOGGING';
@@ -101,9 +97,11 @@ class Constant
     public const LABEL_PROMPT_POSITION_CONFIGURATION_NAME      = 'MYPARCELBE_LABEL_PROMPT_POSITION';
     public const LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME = 'MYPARCELBE_LABEL_CREATED_ORDER_STATUS';
 
+    // Field used in <platform>_carrier_configuration to link myparcel carrier to prestashop carrier.
+    public const CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE = 'carrierType';
+
     public const CARRIER_CONFIGURATION_FIELDS                           = [
-        'carrierType',
-        'deliveryTitle',
+        self::CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE,
         'dropOffDays',
         self::CUTOFF_EXCEPTIONS,
         'mondayCutoffTime',
@@ -119,27 +117,17 @@ class Constant
         'priceMondayDelivery',
         'saturdayCutoffTime',
         'allowMorningDelivery',
-        'deliveryMorningTitle',
         'priceMorningDelivery',
-        'deliveryStandardTitle',
         'allowEveningDelivery',
-        'deliveryEveningTitle',
         'priceEveningDelivery',
         'allowSaturdayDelivery',
-        'saturdayDeliveryTitle',
         'priceSaturdayDelivery',
         'allowSignature',
-        'signatureTitle',
         'priceSignature',
         'allowOnlyRecipient',
-        'onlyRecipientTitle',
         'priceOnlyRecipient',
         'allowPickupPoints',
-        'pickupTitle',
         'pricePickup',
-        'allowPickupExpress',
-        'pricePickupExpress',
-        'BEdeliveryTitle',
         self::PACKAGE_TYPE_CONFIGURATION_NAME,
         self::PACKAGE_FORMAT_CONFIGURATION_NAME,
         self::AGE_CHECK_CONFIGURATION_NAME,
@@ -180,9 +168,18 @@ class Constant
     public const BPOST_CONFIGURATION_NAME                               = 'MYPARCELBE_BPOST';
     public const DPD_CONFIGURATION_NAME                                 = 'MYPARCELBE_DPD';
 
-    public const POSTNL_CARRIER_NAME                                    = 'postnl';
-    public const BPOST_CARRIER_NAME                                     = 'bpost';
-    public const DPD_CARRIER_NAME                                       = 'dpd';
+    public const CARRIER_CONFIGURATION_MAP = [
+        CarrierPostNL::class => Constant::POSTNL_CONFIGURATION_NAME,
+        CarrierBpost::class  => Constant::BPOST_CONFIGURATION_NAME,
+        CarrierDPD::class    => Constant::DPD_CONFIGURATION_NAME,
+    ];
+
+    /** @deprecated use CarrierPostNL::NAME */
+    public const POSTNL_CARRIER_NAME = CarrierPostNL::NAME;
+    /** @deprecated use CarrierBpost::NAME */
+    public const BPOST_CARRIER_NAME = CarrierBpost::NAME;
+    /** @deprecated use CarrierDPD::NAME */
+    public const DPD_CARRIER_NAME = CarrierDPD::NAME;
 
     public const EXCLUSIVE_FIELDS_NL                                    = [
         self::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME,
@@ -191,7 +188,6 @@ class Constant
     public const CARRIER_EXCLUSIVE              = [
         'POSTNL' => [
             'ALLOW_STANDARD_FORM'                                   => ['BE' => true, 'NL' => true],
-            'deliveryStandardTitle'                                 => ['BE' => true, 'NL' => true],
             'dropOffDays'                                           => ['BE' => true, 'NL' => true],
             'cutoffTime'                                            => ['BE' => true, 'NL' => true],
             'deliveryDaysWindow'                                    => ['BE' => true, 'NL' => true],
@@ -201,16 +197,11 @@ class Constant
             'allowEveningDelivery'                                  => ['BE' => false, 'NL' => true],
             'allowSaturdayDelivery'                                 => ['BE' => false, 'NL' => false],
             'priceSaturdayDelivery'                                 => ['BE' => false, 'NL' => false],
-            'saturdayDeliveryTitle'                                 => ['BE' => false, 'NL' => false],
             'allowSignature'                                        => ['BE' => true, 'NL' => true],
             'priceSignature'                                        => ['BE' => true, 'NL' => true],
-            'signatureTitle'                                        => ['BE' => true, 'NL' => true],
             'allowOnlyRecipient'                                    => ['BE' => true, 'NL' => true],
             'priceOnlyRecipient'                                    => ['BE' => true, 'NL' => true],
-            'onlyRecipientTitle'                                    => ['BE' => true, 'NL' => true],
             'allowPickupPoints'                                     => ['BE' => true, 'NL' => true],
-            'allowPickupExpress'                                    => ['BE' => false, 'NL' => false],
-            'pricePickupExpress'                                    => ['BE' => false, 'NL' => false],
             // Delivery form
             'ALLOW_DELIVERY_FORM'                                   => ['BE' => true, 'NL' => true],
             self::PACKAGE_TYPE_CONFIGURATION_NAME                   => [
@@ -241,7 +232,6 @@ class Constant
         ],
         'BPOST'  => [
             'ALLOW_STANDARD_FORM'                                   => ['BE' => true, 'NL' => true],
-            'deliveryStandardTitle'                                 => ['BE' => true, 'NL' => false],
             'dropOffDays'                                           => ['BE' => true, 'NL' => false],
             'cutoffTime'                                            => ['BE' => true, 'NL' => false],
             'deliveryDaysWindow'                                    => ['BE' => true, 'NL' => false],
@@ -251,16 +241,11 @@ class Constant
             'allowEveningDelivery'                                  => ['BE' => false, 'NL' => false],
             'allowSaturdayDelivery'                                 => ['BE' => true, 'NL' => false],
             'priceSaturdayDelivery'                                 => ['BE' => true, 'NL' => false],
-            'saturdayDeliveryTitle'                                 => ['BE' => true, 'NL' => false],
             'allowSignature'                                        => ['BE' => true, 'NL' => false],
             'priceSignature'                                        => ['BE' => true, 'NL' => false],
-            'signatureTitle'                                        => ['BE' => true, 'NL' => false],
             'allowOnlyRecipient'                                    => ['BE' => false, 'NL' => false],
             'priceOnlyRecipient'                                    => ['BE' => false, 'NL' => false],
-            'onlyRecipientTitle'                                    => ['BE' => false, 'NL' => false],
             'allowPickupPoints'                                     => ['BE' => true, 'NL' => false],
-            'allowPickupExpress'                                    => ['BE' => false, 'NL' => false],
-            'pricePickupExpress'                                    => ['BE' => false, 'NL' => false],
             // Delivery form
             'ALLOW_DELIVERY_FORM'                                   => ['BE' => true, 'NL' => true],
             self::PACKAGE_TYPE_CONFIGURATION_NAME                   => [
@@ -288,7 +273,6 @@ class Constant
         ],
         'DPD'    => [
             'ALLOW_STANDARD_FORM'                                   => ['BE' => true, 'NL' => true],
-            'deliveryStandardTitle'                                 => ['BE' => true, 'NL' => false],
             'dropOffDays'                                           => ['BE' => true, 'NL' => false],
             'cutoffTime'                                            => ['BE' => true, 'NL' => false],
             'deliveryDaysWindow'                                    => ['BE' => true, 'NL' => false],
@@ -298,16 +282,11 @@ class Constant
             'allowEveningDelivery'                                  => ['BE' => false, 'NL' => false],
             'allowSaturdayDelivery'                                 => ['BE' => false, 'NL' => false],
             'priceSaturdayDelivery'                                 => ['BE' => false, 'NL' => false],
-            'saturdayDeliveryTitle'                                 => ['BE' => false, 'NL' => false],
             'allowSignature'                                        => ['BE' => false, 'NL' => false],
             'priceSignature'                                        => ['BE' => false, 'NL' => false],
-            'signatureTitle'                                        => ['BE' => false, 'NL' => false],
             'allowOnlyRecipient'                                    => ['BE' => false, 'NL' => false],
             'priceOnlyRecipient'                                    => ['BE' => false, 'NL' => false],
-            'onlyRecipientTitle'                                    => ['BE' => false, 'NL' => false],
             'allowPickupPoints'                                     => ['BE' => true, 'NL' => false],
-            'allowPickupExpress'                                    => ['BE' => false, 'NL' => false],
-            'pricePickupExpress'                                    => ['BE' => false, 'NL' => false],
             // Delivery form
             'ALLOW_DELIVERY_FORM'                                   => ['BE' => true, 'NL' => true],
             self::PACKAGE_TYPE_CONFIGURATION_NAME                   => [

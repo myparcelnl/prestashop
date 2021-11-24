@@ -7,6 +7,7 @@ use Configuration;
 use Country;
 use Exception;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
+use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Model\Core\Order;
@@ -14,15 +15,13 @@ use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
+use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Module;
-use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsFromOrderAdapter;
-use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as ConsignmentSdkFactory;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
-use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -84,43 +83,42 @@ class ConsignmentFactory
     }
 
     /**
-     * @param array $orders
+     * @param  array $orders
      *
-     * @return MyParcelCollection
+     * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      * @throws \Exception
      */
-    public function fromOrders(array $orders): MyParcelCollection
+    public function fromOrders(array $orders): ConsignmentCollection
     {
-        $myParcelCollection = new MyParcelCollection();
+        $collection = new ConsignmentCollection();
 
         foreach ($orders as $order) {
             $this->setOrderData($order);
             $this->createConsignment();
-            $myParcelCollection->addConsignment($this->initConsignment());
+            $collection->addConsignment($this->initConsignment());
         }
 
-        return $myParcelCollection;
+        return $collection;
     }
 
     /**
      * @param  array                                                                           $order
      * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
      *
-     * @return MyParcelCollection
+     * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
-     * @throws \Exception
      */
-    public function fromOrder(array $order, AbstractDeliveryOptionsAdapter $deliveryOptions = null): MyParcelCollection
+    public function fromOrder(array $order, AbstractDeliveryOptionsAdapter $deliveryOptions = null): ConsignmentCollection
     {
         $this->setOrderData($order, $deliveryOptions);
         $this->createConsignment();
 
-        $myParcelCollection = new MyParcelCollection();
+        $collection = new ConsignmentCollection();
 
         for ($i = 0; $i < $this->request['labelAmount']; ++$i) {
             $consignment = $this->initConsignment();
@@ -130,20 +128,10 @@ class ConsignmentFactory
                 }
             }
 
-            $myParcelCollection->addConsignment($consignment);
+            $collection->addConsignment($consignment);
         }
 
-        return $myParcelCollection;
-    }
-
-    /**
-     * @return null|int
-     */
-    private function getInsurance(): ?int
-    {
-        $shipmentOptions = $this->deliveryOptions->getShipmentOptions();
-
-        return $shipmentOptions ? $shipmentOptions->getInsurance() : null;
+        return $collection;
     }
 
     /**
@@ -152,18 +140,6 @@ class ConsignmentFactory
     private function getShipmentOptions(): ?AbstractShipmentOptionsAdapter
     {
         return $this->deliveryOptions->getShipmentOptions();
-    }
-
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public static function getUserAgent(): array
-    {
-        return [
-            'MyParcelBE-PrestaShop' => MyParcelBE::getModule()->version,
-            'PrestaShop'            => _PS_VERSION_,
-        ];
     }
 
     /**
@@ -231,13 +207,10 @@ class ConsignmentFactory
 
     /**
      * @return int
-     * @throws \PrestaShopDatabaseException
      */
     private function getPackageType(): int
     {
-        $packageType = $this->request['packageType'] ?? (new PackageTypeCalculator())->getOrderPackageType(
-                $this->orderObject
-            );
+        $packageType = $this->request['packageType'] ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
 
         if (! isset($this->carrierSettings['delivery']['packageType'][(int) $packageType])) {
             $packageType = AbstractConsignment::PACKAGE_TYPE_PACKAGE; // TODO: for NL the DPD and Bpost don't allow any.
@@ -479,8 +452,9 @@ class ConsignmentFactory
      */
     private function createConsignment(): void
     {
-        $carrierId         = CarrierService::getMyParcelCarrierId($this->orderData['id_carrier']);
-        $this->consignment = ConsignmentSdkFactory::createByCarrierId($carrierId);
+        $carrier           = CarrierService::getMyParcelCarrier($this->orderData['id_carrier']);
+        $this->consignment = PlatformServiceFactory::create()
+            ->generateConsignment($carrier);
     }
 
     /**

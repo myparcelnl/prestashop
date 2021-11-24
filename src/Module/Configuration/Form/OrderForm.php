@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace Gett\MyparcelBE\Module\Configuration\Form;
 
 use Context;
 use Gett\MyparcelBE\Constant;

@@ -1,17 +1,30 @@
 <?php
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\DeliverySettingsProvider;
 
 class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
 {
+    /**
+     * @var bool
+     */
     public $requestOriginalShippingCost = false;
 
-    public function postProcess()
+    /**
+     * Called when doing a request to `myparcel_carrier_init_url` from frontend.
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     */
+    public function postProcess(): void
     {
-        $id_carrier = intval(Tools::getValue('id_carrier'));
-        $params = (new DeliverySettingsProvider($this->module, $id_carrier, $this->context))->get();
+        $carriers  = [];
+        $carrierId = (int) Tools::getValue('carrier_id');
+
+        if ($carrierId) {
+            $carriers = [$carrierId];
+        }
+
+        $params = (new DeliverySettingsProvider($this->module, $carriers, $this->context))->get();
 
         echo json_encode($params);
         exit;

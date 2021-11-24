@@ -8,57 +8,109 @@ use Carrier;
 use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Logger\Logger;
+use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
-use MyParcelNL\Sdk\src\Model\Consignment\BpostConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use Validate;
 
 class CarrierService
 {
     /**
-     * @param  int $carrierId
+     * @return int[]
+     */
+    public static function carriersWithMyParcel(): array
+    {
+        return array_map(
+            static function (string $carrierName) {
+                return (int) Configuration::get($carrierName);
+            },
+            self::getMyParcelCarrierNames()
+        );
+    }
+
+    /**
+     * @param  int $psCarrierId
      *
      * @return \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier
      * @throws \Exception
      */
-    public static function getMyParcelCarrier(int $carrierId): AbstractCarrier
+    public static function getMyParcelCarrier(int $psCarrierId): AbstractCarrier
     {
-        return CarrierFactory::createFromId(self::getMyParcelCarrierId($carrierId));
+        $carrierId = self::getMyParcelCarrierId($psCarrierId)
+            ?? PlatformServiceFactory::create()
+                ->getDefaultCarrier()
+                ->getId();
+
+        return CarrierFactory::createFromId($carrierId);
     }
 
     /**
-     * @param  int $carrierId
+     * @return string[]
+     */
+    public static function getMyParcelCarrierNames(): array
+    {
+        return array_map(
+            static function (string $carrierClass) {
+                return $carrierClass::NAME;
+            },
+            CarrierFactory::CARRIER_CLASSES
+        );
+    }
+
+    /**
+     * @param  \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $carrier
      *
-     * @return int
+     * @return null|int
+     * @throws \PrestaShopDatabaseException
+     */
+    public static function getPrestashopCarrierId(AbstractCarrier $carrier): ?int
+    {
+        $matchingCarrier = CarrierConfigurationProvider::all()
+            ->where(CarrierConfigurationProvider::COLUMN_NAME, Constant::CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE)
+            ->where(CarrierConfigurationProvider::COLUMN_VALUE, $carrier->getName())
+            ->first();
+
+        return $matchingCarrier['id_carrier'] ? (int) $matchingCarrier['id_carrier'] : null;
+    }
+
+    /**
+     * @param  int $psCarrierId
+     *
+     * @return bool
      * @throws \Exception
      */
-    public static function getMyParcelCarrierId(int $carrierId): int
+    public static function hasMyParcelCarrier(int $psCarrierId): bool
     {
-        $carrier = new Carrier($carrierId);
+        return (bool) self::getMyParcelCarrierId($psCarrierId);
+    }
+
+    /**
+     * @param  int $psCarrierId
+     *
+     * @return null|int
+     * @throws \Exception
+     */
+    private static function getMyParcelCarrierId(int $psCarrierId): ?int
+    {
+        $carrier = new Carrier($psCarrierId);
 
         if (! Validate::isLoadedObject($carrier)) {
-            throw new Exception('No carrier found.');
+            Logger::addLog("PrestaShop carrier with id $psCarrierId could not be found");
+            return null;
         }
 
-        $carrierType = CarrierConfigurationProvider::get($carrierId, 'carrierType');
+        $carrierType = CarrierConfigurationProvider::get($psCarrierId, 'carrierType');
 
-        if ($carrierType === Constant::POSTNL_CARRIER_NAME
-            || $carrier->id_reference === (int) Configuration::get(Constant::POSTNL_CONFIGURATION_NAME)) {
-            return PostNLConsignment::CARRIER_ID;
+        foreach (Constant::CARRIER_CONFIGURATION_MAP as $myParcelCarrier => $configuration) {
+            if (
+                $carrierType === $myParcelCarrier::NAME
+                || $carrier->id_reference === (int) Configuration::get($configuration)
+            ) {
+                return $myParcelCarrier::ID;
+            }
         }
 
-        if ($carrierType === Constant::BPOST_CARRIER_NAME
-            || $carrier->id_reference === (int) Configuration::get(Constant::BPOST_CONFIGURATION_NAME)) {
-            return BpostConsignment::CARRIER_ID;
-        }
-
-        if ($carrierType === Constant::DPD_CARRIER_NAME
-            || $carrier->id_reference === (int) Configuration::get(Constant::DPD_CONFIGURATION_NAME)) {
-            return DPDConsignment::CARRIER_ID;
-        }
-
-        throw new Exception('No carrier found for id ' . $carrierId);
+        return null;
     }
 }
