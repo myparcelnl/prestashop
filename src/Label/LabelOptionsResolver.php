@@ -5,7 +5,7 @@ namespace Gett\MyparcelBE\Label;
 use Gett\MyparcelBE\Carrier\PackageFormatCalculator;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
@@ -18,11 +18,11 @@ class LabelOptionsResolver
      * Map of array key to array of 0: config entry and 1: AbstractShipmentOptionsAdapter method.
      */
     private const SHIPMENT_OPTIONS_MAP = [
-        'only_to_recipient'  => [Constant::ONLY_RECIPIENT_CONFIGURATION_NAME, 'hasOnlyRecipient',],
-        'signature'          => [Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME, 'hasSignature',],
-        'age_check'          => [Constant::AGE_CHECK_CONFIGURATION_NAME],
-        'insurance'          => [Constant::INSURANCE_CONFIGURATION_NAME, 'getInsurance'],
-        'return_undelivered' => [Constant::RETURN_PACKAGE_CONFIGURATION_NAME],
+        'only_recipient' => [Constant::ONLY_RECIPIENT_CONFIGURATION_NAME, 'hasOnlyRecipient',],
+        'signature'      => [Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME, 'hasSignature',],
+        'age_check'      => [Constant::AGE_CHECK_CONFIGURATION_NAME],
+        'insurance'      => [Constant::INSURANCE_CONFIGURATION_NAME, 'getInsurance'],
+        'return'         => [Constant::RETURN_PACKAGE_CONFIGURATION_NAME],
     ];
 
     /**
@@ -32,19 +32,57 @@ class LabelOptionsResolver
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
      */
-    public function getLabelOptions(Order $order)
+    public function getLabelOptionsJson(Order $order)
     {
-        $deliveryOptions = DeliveryOptions::getFromOrder($order->getId());
+        return json_encode($this->getLabelOptions($order));
+    }
 
-        return json_encode(
-            array_merge(
-                $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
-                [
-                    'package_type'   => $this->getPackageType($order, $deliveryOptions),
-                    'package_format' => $this->getPackageFormat($order, $deliveryOptions),
-                ]
-            )
+    /**
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    public function getLabelOptions(Order $order): array
+    {
+        $deliveryOptions = OrderSettingsFactory::create($order)
+            ->getDeliveryOptions();
+
+        return array_merge(
+            $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
+            [
+                'package_type'   => $this->getPackageType($order, $deliveryOptions),
+                'package_format' => $this->getPackageFormat($order, $deliveryOptions),
+            ]
         );
+    }
+
+    /**
+     * @param \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    public function getDeliveryOptions(Order $order): array
+    {
+        $deliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
+        $shipmentOptions = $this->getShipmentOptions(
+            $deliveryOptions,
+            $order->getProducts(),
+            $order->getIdCarrier()
+        );
+
+        if (isset($shipmentOptions['insurance'])) {
+            $shipmentOptions['insurance'] = false === $shipmentOptions['insurance'] ? 0 : 500;
+        }
+
+        return [
+            'shipmentOptions' => $shipmentOptions,
+            'package_type'    => $this->getPackageType($order, $deliveryOptions),
+            'package_format'  => $this->getPackageFormat($order, $deliveryOptions),
+        ];
     }
 
     /**
@@ -89,6 +127,7 @@ class LabelOptionsResolver
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
      *v
+     *
      * @return int
      * @throws \PrestaShopDatabaseException
      */

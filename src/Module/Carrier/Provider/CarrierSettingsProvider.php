@@ -1,26 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Service\CarrierService;
-use Module;
 use MyParcelBE;
 
 class CarrierSettingsProvider
 {
-    protected $module;
-
-    /**
-     * @param  \Module|null $module
-     *
-     * @throws \Exception
-     */
-    public function __construct(Module $module = null)
-    {
-        $this->module = $module ?? MyParcelBE::getModule();
-    }
-
     /**
      * @param  int $carrierId
      *
@@ -31,7 +20,7 @@ class CarrierSettingsProvider
     {
         $carrier = CarrierService::getMyParcelCarrier($carrierId);
 
-        $countryIso      = $this->module->getModuleCountry();
+        $countryIso      = MyParcelBE::getModule()->getModuleCountry();
         $carrierSettings = Constant::CARRIER_EXCLUSIVE[strtoupper($carrier->getName())];
 
         $carrierLabelSettings = [

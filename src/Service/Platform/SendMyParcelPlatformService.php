@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Service\Platform;
 
-use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 
 class SendMyParcelPlatformService extends AbstractPlatformService
 {
     /**
-     * @return \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier
+     * @return class-string[]
      */
-    public function getDefaultCarrier(): AbstractCarrier
+    public function getCarriers(): array
     {
-        return new CarrierBpost();
+        return [
+            CarrierBpost::class,
+            CarrierDPD::class,
+            CarrierPostNL::class,
+        ];
     }
 }

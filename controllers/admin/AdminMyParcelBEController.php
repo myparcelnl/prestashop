@@ -1,18 +1,14 @@
 <?php
 
-if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
-    require_once _PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php';
-}
+declare(strict_types=1);
 
+/**
+ * @property \MyParcelBE $module
+ */
 class AdminMyParcelBEController extends ModuleAdminController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function init()
     {
-        Tools::redirectAdmin($this->module->baseUrl);
+        Tools::redirectAdmin($this->module->getBaseUrl());
     }
 }

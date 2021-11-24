@@ -32,8 +32,6 @@ class Constant
     public const DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME   = 'MYPARCELBE_DEFAULT_CUSTOMS_CODE';
     public const CUSTOMS_ORIGIN_CONFIGURATION_NAME         = 'MYPARCELBE_CUSTOMS_ORIGIN';
     public const DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME = 'MYPARCELBE_DEFAULT_CUSTOMS_ORIGIN';
-    public const CUSTOMS_AGE_CHECK_CONFIGURATION_NAME      = 'MYPARCELBE_CUSTOMS_AGE_CHECK';
-    public const DIGITAL_STAMP_WEIGHT_CONFIGURATION_NAME   = 'MYPARCELBE_DIGITAL_STAMP_WEIGHT';
 
     public const SINGLE_LABEL_CREATION_OPTIONS                          = [
         'packageType'       => self::PACKAGE_TYPE_CONFIGURATION_NAME,
@@ -71,16 +69,16 @@ class Constant
         'digital stamp'                                      => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP,
         AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME       => AbstractConsignment::PACKAGE_TYPE_PACKAGE,
         AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME       => AbstractConsignment::PACKAGE_TYPE_MAILBOX,
-        AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
+        AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP,
         AbstractConsignment::PACKAGE_TYPE_LETTER_NAME        => AbstractConsignment::PACKAGE_TYPE_LETTER,
     ];
 
     public const PACKAGE_TYPE_WEIGHT_LIMIT                              = 2; // Kg
-    public const PACKAGE_FORMATS                                        = [
-        1 => 'normal',
-        2 => 'large',
-        3 => 'automatic',
-    ];
+
+    public const PACKAGE_FORMAT_NORMAL    = 1;
+    public const PACKAGE_FORMAT_LARGE     = 2;
+    public const PACKAGE_FORMAT_AUTOMATIC = 3;
+
     public const PACKAGE_FORMAT_LARGE_INDEX                             = 2;
     public const SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME                = 'MYPARCELBE_SHARE_CUSTOMER_EMAIL';
     public const SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME                = 'MYPARCELBE_SHARE_CUSTOMER_PHONE';
@@ -210,9 +208,17 @@ class Constant
                 'NL' => [1 => true, 2 => true, 3 => true, 4 => true],
             ],
             self::ONLY_RECIPIENT_CONFIGURATION_NAME                 => ['BE' => true, 'NL' => true],
-            self::PACKAGE_FORMAT_CONFIGURATION_NAME                 => [
-                'BE' => [1 => true, 2 => true],
-                'NL' => [1 => true, 2 => true],
+            self::PACKAGE_FORMAT_CONFIGURATION_NAME => [
+                'BE' => [
+                    self::PACKAGE_FORMAT_NORMAL    => true,
+                    self::PACKAGE_FORMAT_LARGE     => true,
+                    self::PACKAGE_FORMAT_AUTOMATIC => true,
+                ],
+                'NL' => [
+                    self::PACKAGE_FORMAT_NORMAL    => true,
+                    self::PACKAGE_FORMAT_LARGE     => true,
+                    self::PACKAGE_FORMAT_AUTOMATIC => true,
+                ],
             ],
             self::SIGNATURE_REQUIRED_CONFIGURATION_NAME             => ['BE' => true, 'NL' => true],
             self::INSURANCE_CONFIGURATION_NAME                      => ['BE' => true, 'NL' => true],

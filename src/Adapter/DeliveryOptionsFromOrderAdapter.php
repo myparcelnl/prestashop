@@ -20,6 +20,6 @@ class DeliveryOptionsFromOrderAdapter extends AbstractDeliveryOptionsAdapter
         $this->date            = $data['date'] ?? null;
         $this->deliveryType    = $data['deliveryType'] ?? null;
         $this->packageType     = (new PackageTypeCalculator())->convertToName($data['packageType']);
-        $this->shipmentOptions = new ShipmentOptionsFromAdapter($data);
+        $this->shipmentOptions = new ShipmentOptionsFromOrderAdapter($data);
     }
 }

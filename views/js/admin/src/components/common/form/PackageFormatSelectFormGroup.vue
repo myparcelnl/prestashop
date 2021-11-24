@@ -1,0 +1,38 @@
+<template>
+  <SelectFormGroup
+    v-model="mutableValue"
+    :disabled="disabled"
+    :options="options"
+    label="shipment_options_package_format" />
+</template>
+
+<script lang="ts">
+import { ContextKey } from '@/data/global/context';
+import SelectFormGroup from '@/components/common/form/SelectFormGroup.vue';
+import { defineComponent } from '@vue/composition-api';
+import { disabledProps } from '@/composables/props/disabledProps';
+import { useGlobalContext } from '@/composables/context/useGlobalContext';
+import { useSelectModel } from '@/composables/props/model/useSelectModel';
+
+const { model, props, setup } = useSelectModel();
+
+export default defineComponent({
+  name: 'PackageFormatSelectFormGroup',
+  components: { SelectFormGroup },
+  model,
+
+  props: {
+    ...props,
+    ...disabledProps,
+  },
+
+  setup: (props, ctx) => {
+    const contextData = useGlobalContext(ContextKey.SHIPMENT_OPTIONS);
+
+    return {
+      ...setup(props, ctx),
+      options: contextData.value.options.packageFormat,
+    };
+  },
+});
+</script>

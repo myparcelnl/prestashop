@@ -1,8 +1,12 @@
 <?php
 
-use PrestaShopBundle\Exception\InvalidModuleException;
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
-if (!defined('_PS_VERSION_')) {
+declare(strict_types=1);
+
+use Gett\MyparcelBE\Module\Tools\Tools;
+
+if (! defined('_PS_VERSION_')) {
     exit;
 }
 
@@ -23,15 +27,11 @@ class MyParcelBE extends CarrierModule
     public const MODULE_NAME = 'myparcelbe';
 
     public $baseUrl;
+
+    /**
+     * @var int
+     */
     public $id_carrier;
-    public $migrations = [
-        \Gett\MyparcelBE\Database\CreateProductConfigurationTableMigration::class,
-        \Gett\MyparcelBE\Database\CreateCarrierConfigurationTableMigration::class,
-        \Gett\MyparcelBE\Database\CreateOrderLabelTableMigration::class,
-        \Gett\MyparcelBE\Database\CreateDeliverySettingTableMigration::class,
-    ];
-    public $carrierStandardShippingCost = [];
-    public $cartCarrierStandardShippingCost = null;
 
     public $configItems = [
         \Gett\MyparcelBE\Constant::POSTNL_CONFIGURATION_NAME,
@@ -62,7 +62,6 @@ class MyParcelBE extends CarrierModule
         \Gett\MyparcelBE\Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME,
         \Gett\MyparcelBE\Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME,
         \Gett\MyparcelBE\Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME,
-        \Gett\MyparcelBE\Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME,
 
         \Gett\MyparcelBE\Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
         \Gett\MyparcelBE\Constant::SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME,
@@ -76,7 +75,7 @@ class MyParcelBE extends CarrierModule
         \Gett\MyparcelBE\Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME,
     ];
 
-    public $hooks = [
+    public $hooks       = [
         'displayAdminProductsExtra',
         'displayBackOfficeHeader',
         'actionProductUpdate',
@@ -99,8 +98,21 @@ class MyParcelBE extends CarrierModule
         'displayAdminAfterHeader',
         'actionValidateOrder',
     ];
-    /** @var string */
-    protected $baseUrlWithoutToken;
+
+    /**
+     * @var class-string<\Gett\MyparcelBE\Database\Migration>[]
+     */
+    public $migrations = [
+        \Gett\MyparcelBE\Database\CreateProductConfigurationTableMigration::class,
+        \Gett\MyparcelBE\Database\CreateCarrierConfigurationTableMigration::class,
+        \Gett\MyparcelBE\Database\CreateOrderLabelTableMigration::class,
+        \Gett\MyparcelBE\Database\CreateDeliverySettingTableMigration::class,
+    ];
+
+    /**
+     * @var \Gett\MyparcelBE\Module\ModuleService
+     */
+    private $moduleService;
 
     public function __construct()
     {
@@ -112,27 +124,13 @@ class MyParcelBE extends CarrierModule
         $this->bootstrap     = true;
 
         parent::__construct();
+        $this->moduleService = (new \Gett\MyparcelBE\Module\ModuleService($this, $this->context));
 
-        if (!empty(Context::getContext()->employee->id)) {
-            $this->baseUrlWithoutToken = $this->getAdminLink(
-                'AdminModules',
-                false,
-                [
-                    'configure' => $this->name,
-                    'tab_module' => $this->tab,
-                    'module_name' => $this->name,
-                ]
-            );
-            $this->baseUrl = $this->getAdminLink(
-                'AdminModules',
-                true,
-                [
-                    'configure' => $this->name,
-                    'tab_module' => $this->tab,
-                    'module_name' => $this->name,
-                ]
-            );
+        if (! empty(Context::getContext()->employee->id)) {
+            $this->baseUrlWithoutToken = $this->getBaseUrl(true);
+            $this->baseUrl             = $this->getBaseUrl();
         }
+
         $this->displayName = $this->l('MyParcelBE');
         $this->description = $this->l('PrestaShop module which integrates with MyParcel NL');
 
@@ -140,18 +138,29 @@ class MyParcelBE extends CarrierModule
         $this->registerHook('displayAdminOrderMain');
     }
 
-    public function getAdminLink(string $controller, bool $withToken = true, array $params = [])
+    /**
+     * @param  bool $withoutToken
+     *
+     * @return string
+     */
+    public function getBaseUrl(bool $withoutToken = false): string
     {
-        $url = parse_url($this->context->link->getAdminLink($controller, $withToken));
-        $url['query'] = isset($url['query']) ? $url['query'] : '';
-        parse_str($url['query'], $query);
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
-            $url['query'] = http_build_query($query + $params, PHP_QUERY_RFC1738);
-        } else {
-            $url['query'] = http_build_query($query + $params);
+        if (empty(Context::getContext()->employee->id)) {
+            \Gett\MyparcelBE\Logger\FileLogger::addLog(
+                'Unauthenticated user tried getting base url',
+                FileLogger::WARNING
+            );
+            throw new RuntimeException('Not authenticated');
         }
 
-        return $this->mypa_stringify_url($url);
+        return Tools::appendQuery(
+            $this->context->link->getAdminLink('AdminModules', ! $withoutToken),
+            [
+                'configure'   => $this->name,
+                'tab_module'  => $this->tab,
+                'module_name' => $this->name,
+            ]
+        );
     }
 
     /**
@@ -159,124 +168,106 @@ class MyParcelBE extends CarrierModule
      */
     public function getContent(): string
     {
-        $configuration = new \Gett\MyparcelBE\Module\Configuration\SettingsMenu($this);
-
-        $this->context->smarty->assign([
-            'menutabs' => $configuration->initNavigation(),
-            'ajaxUrl'  => $this->baseUrlWithoutToken,
-        ]);
-
-        $this->context->smarty->assign('module_dir', $this->_path);
-        $output = $this->display(__FILE__, 'views/templates/admin/navbar.tpl');
-
-        return $output . $configuration->renderMenu(Tools::getValue('menu'));
+        return $this->moduleService->getContent();
     }
 
     /**
-     * @param $cart
-     * @param $shipping_cost
-     *
-     * @return float|int
-     * @throws \PrestaShopDatabaseException
+     * @return self
      */
-    public function getOrderShippingCost($cart, $shipping_cost)
+    public static function getModule(): self
     {
-        if ($this->id_carrier != $cart->id_carrier) {
-            return $shipping_cost;
-        }
-        if (!empty($this->context->controller->requestOriginalShippingCost)) {
-            return $shipping_cost;
-        }
+        /**
+         * @var self|false $module
+         */
+        $module = Module::getInstanceByName(self::MODULE_NAME);
 
-        $myParcelCost = 0;
-        $deliverySettings = Tools::getValue('myparcel-delivery-options', false);
-
-        if ($deliverySettings) {
-            $deliverySettings = json_decode($deliverySettings, true);
-        } else {
-            $deliverySettings = \Gett\MyparcelBE\DeliveryOptions\DeliveryOptions::queryByCart((int) $cart->id);
+        if (! $module) {
+            throw new \PrestaShopBundle\Exception\InvalidModuleException('Failed to get module instance');
         }
 
-        if (empty($deliverySettings)) {
-            return $shipping_cost;
-        }
-
-        $isPickup = (isset($deliverySettings['isPickup'])) ? $deliverySettings['isPickup'] : false;
-        if ($isPickup) {
-            $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                $cart->id_carrier,
-                'pricePickup'
-            );
-        } else {
-            $deliveryType = (isset($deliverySettings['deliveryType'])) ? $deliverySettings['deliveryType'] : 'standard';
-            if ($deliveryType !== 'standard') {
-                $priceHourInterval = 'price' . ucfirst($deliveryType) . 'Delivery';
-                $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                    $cart->id_carrier,
-                    $priceHourInterval
-                );
-            }
-            if (!empty($deliverySettings['shipmentOptions']['only_recipient'])) {
-                $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                    $cart->id_carrier,
-                    'priceOnlyRecipient'
-                );
-            }
-            if (!empty($deliverySettings['shipmentOptions']['signature'])) {
-                $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                    $cart->id_carrier,
-                    'priceSignature'
-                );
-            }
-        }
-
-        return $shipping_cost + $myParcelCost;
+        return $module;
     }
 
-    public function getOrderShippingCostExternal($params)
-    {
-        return true;
-    }
-
-    public function install(): bool
-    {
-        return parent::install()
-            && (new \Gett\MyparcelBE\Module\Installer($this))();
-    }
-
-    public function uninstall(): bool
-    {
-        return (new \Gett\MyparcelBE\Module\Uninstaller($this))()
-            && parent::uninstall();
-    }
-
-    public function appendQueryToUrl($urlString, $query = [])
-    {
-        $url = parse_url($urlString);
-        $url['query'] = isset($url['query']) ? $url['query'] : '';
-        parse_str($url['query'], $oldQuery);
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
-            $url['query'] = http_build_query($oldQuery + $query, PHP_QUERY_RFC1738);
-        } else {
-            $url['query'] = http_build_query($oldQuery + $query);
-        }
-
-        return $this->mypa_stringify_url($url);
-    }
-
-    public function getModuleCountry()
+    /**
+     * @return string
+     */
+    public function getModuleCountry(): string
     {
         return (strpos($this->name, 'be') !== false) ? 'BE' : 'NL';
     }
 
-    public function isNL()
+    /**
+     * @param  \Cart $cart
+     * @param  \int  $shippingCost
+     *
+     * @return float|int
+     * @throws \PrestaShopDatabaseException
+     */
+    public function getOrderShippingCost($cart, $shippingCost)
+    {
+        return $this->moduleService->getOrderShippingCost($cart, $shippingCost);
+    }
+
+    /**
+     * @param  \Cart $params
+     *
+     * @return bool
+     */
+    public function getOrderShippingCostExternal($params): bool
+    {
+        return true;
+    }
+
+    public function getShippingOptions($id_carrier, $address)
+    {
+        $carrier = new Carrier($id_carrier);
+
+        $taxRate = ($carrier->getTaxesRate($address) / 100) + 1;
+
+        $includeTax      = ! Product::getTaxCalculationMethod((int) $this->context->cart->id_customer)
+            && (int) Configuration::get('PS_TAX');
+        $displayTaxLabel = (Configuration::get('PS_TAX') && ! Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
+
+        return [
+            'tax_rate'          => ($includeTax) ? $taxRate : 1,
+            'include_tax'       => $includeTax,
+            'display_tax_label' => $displayTaxLabel,
+        ];
+    }
+
+    /**
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function install(): bool
+    {
+        return parent::install() && (new \Gett\MyparcelBE\Module\Installer())->install();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBE(): bool
+    {
+        return $this->getModuleCountry() === 'BE';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNL(): bool
     {
         return $this->getModuleCountry() === 'NL';
     }
 
-    public function isBE()
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function uninstall(): bool
     {
-        return $this->getModuleCountry() === 'BE';
+        return (new \Gett\MyparcelBE\Module\Uninstaller())->uninstall() && parent::uninstall();
     }
 
     /**
@@ -303,55 +294,5 @@ class MyParcelBE extends CarrierModule
         $composerData = json_decode(file_get_contents($filename), true);
 
         return $composerData['version'];
-    }
-
-    private function mypa_stringify_url($parsedUrl)
-    {
-        $scheme = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'] . '://' : '';
-        $host = isset($parsedUrl['host']) ? $parsedUrl['host'] : '';
-        $port = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
-        $user = isset($parsedUrl['user']) ? $parsedUrl['user'] : '';
-        $pass = isset($parsedUrl['pass']) ? ':' . $parsedUrl['pass'] : '';
-        $pass = ($user || $pass) ? "{$pass}@" : '';
-        $path = isset($parsedUrl['path']) ? $parsedUrl['path'] : '';
-        $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
-        $fragment = isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : '';
-
-        return "{$scheme}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
-    }
-
-    public function getShippingOptions($id_carrier, $address)
-    {
-        $carrier = new Carrier($id_carrier);
-
-        $taxRate = ($carrier->getTaxesRate($address) / 100) + 1;
-
-        $includeTax = !Product::getTaxCalculationMethod((int) $this->context->cart->id_customer)
-                && (int) Configuration::get('PS_TAX');
-        $displayTaxLabel = (Configuration::get('PS_TAX') && !Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
-
-        return [
-            'tax_rate' => ($includeTax) ? $taxRate : 1,
-            'include_tax' => $includeTax,
-            'display_tax_label' => $displayTaxLabel,
-        ];
-    }
-
-    /**
-     * @return self
-     * @throws \Exception
-     */
-    public static function getModule(): self
-    {
-        /**
-         * @var self|false $module
-         */
-        $module = Module::getInstanceByName(self::MODULE_NAME);
-
-        if (! $module) {
-            throw new InvalidModuleException('Failed to get module instance');
-        }
-
-        return $module;
     }
 }

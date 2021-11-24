@@ -2,34 +2,62 @@
 
 namespace Gett\MyparcelBE\Module;
 
-use Gett\MyparcelBE\Database\Table;
-use Tab;
 use Carrier;
-use Gett\MyparcelBE\Constant;
 use Configuration;
-use Db;
 use Context;
+use Db;
+use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use Group;
+use Language;
+use MyParcelBE;
+use PrestaShopDatabaseException;
+use PrestaShopException;
+use PrestaShopLogger;
+use RangePrice;
+use RangeWeight;
+use Tab;
+use Zone;
 
 class Installer
 {
-    /** @var \Module */
+    /**
+     * @var \MyParcelBE
+     */
     private $module;
 
     private static $carriers_nl = [
-        ['name' => 'PostNL', 'image' => 'postnl.jpg', 'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME],
-    ];
-    private static $carriers_be = [
-        ['name' => 'Bpost', 'image' => 'bpost.jpg', 'configuration_name' => Constant::BPOST_CONFIGURATION_NAME],
-        ['name' => 'DPD', 'image' => 'dpd.jpg', 'configuration_name' => Constant::DPD_CONFIGURATION_NAME],
+        [
+            'name'               => 'PostNL',
+            'image'              => 'postnl.jpg',
+            'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME,
+        ],
     ];
 
-    public function __construct(\Module $module)
+    private static $carriers_be = [
+        [
+            'name'               => 'Bpost',
+            'image'              => 'bpost.jpg',
+            'configuration_name' => Constant::BPOST_CONFIGURATION_NAME,
+        ],
+        [
+            'name'               => 'DPD',
+            'image'              => 'dpd.jpg',
+            'configuration_name' => Constant::DPD_CONFIGURATION_NAME,
+        ],
+    ];
+
+    public function __construct()
     {
-        $this->module = $module;
+        $this->module = MyParcelBE::getModule();
     }
 
-    public function __invoke(): bool
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function install(): bool
     {
         $result = true;
         $result &= $this->migrate();
@@ -54,91 +82,59 @@ class Installer
         return $result;
     }
 
-    public function installTabs()
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function installTabs(): bool
     {
-        $res = $this->uninstallTabs();
+        $status = (new Uninstaller())->uninstallTabs();
 
-        if (!$res) {
+        if (! $status) {
             return false;
         }
 
-        foreach ($this->getAdminTabsDefinition() as $key => $admin_tab) {
-            $res &= $this->installTab($key);
+        foreach (self::getAdminTabsDefinition() as $tab) {
+            $status &= $this->installTab($tab);
         }
 
-        return $res;
+        return $status;
     }
 
-    public function uninstallTabs($tabs = null)
+    /**
+     * @param  array $newTab
+     *
+     * @return bool
+     */
+    public function installTab(array $newTab): bool
     {
-        $res = true;
+        $tab             = new Tab();
+        $tab->active     = 1;
+        $tab->class_name = $newTab['class_name'];
+        $tab->name       = $newTab['name'];
+        $tab->id_parent  = (! empty($newTab['parent_class'])
+            ? (int) Tab::getIdFromClassName($newTab['parent_class'])
+            : -1);
+        $tab->module     = $this->module->name;
 
-        if ($tabs === null) {
-            $tabs = $this->getAdminTabsDefinition();
-        }
-
-        foreach ($this->getAdminTabsDefinition() as $key => $admin_tab) {
-            $res &= $this->uninstallTab($key);
-        }
-
-        return $res;
+        return $tab->add();
     }
 
-    public function installTab($tabName)
-    {
-        $res = $this->uninstallTab($tabName);
-
-        if (!$res) {
-            return false;
-        }
-
-        $tabsDef = $this->getAdminTabsDefinition();
-
-        if (!empty($tabsDef[$tabName])) {
-            $admin_tab = $tabsDef[$tabName];
-            $tab = new Tab();
-            $tab->active = 1;
-            $tab->class_name = $admin_tab['class_name'];
-            $tab->name = $admin_tab['name'];
-            $tab->id_parent = (!empty($admin_tab['parent_class'])
-                ? (int) Tab::getIdFromClassName($admin_tab['parent_class'])
-                : -1);
-            $tab->module = $this->module->name;
-            $res &= $tab->add();
-        }
-
-        return $res;
-    }
-
-    public function uninstallTab($tabName)
-    {
-        $res = true;
-
-        $id_tab = (int) Tab::getIdFromClassName($tabName);
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
-            $res &= $tab->delete();
-        }
-
-        return $res;
-    }
-
-    public function getAdminTabsDefinition()
+    /**
+     * @return array[]
+     */
+    public static function getAdminTabsDefinition(): array
     {
         $languages = [];
-        foreach (\Language::getLanguages(true) as $lang) {
-            $languages['MyParcelLabelController'][$lang['id_lang']] = 'MyParcel Carriers';
-            $languages['MyParcelController'][$lang['id_lang']] = 'MyParcelBE';
+
+        foreach (Language::getLanguages(true) as $lang) {
+            $languages['AdminMyParcelBE'][$lang['id_lang']] = 'MyParcelBE';
         }
 
         return [
-            'MyParcelLabelController' => [
-                'class_name' => 'AdminMyParcelBELabel',
-                'name' => $languages['MyParcelLabelController'],
-            ],
-            'MyParcelController' => [
-                'class_name' => 'AdminMyParcelBE',
-                'name' => $languages['MyParcelController'],
+            [
+                'class_name'   => 'AdminMyParcelBE',
+                'name'         => $languages['AdminMyParcelBE'],
                 'parent_class' => 'AdminParentShipping',
             ],
         ];
@@ -148,17 +144,17 @@ class Installer
     {
         $carrier = new Carrier();
 
-        $carrier->name = $configuration['name'];
-        $carrier->is_module = true;
-        $carrier->active = 1;
-        $carrier->range_behavior = 1;
-        $carrier->need_range = 1;
-        $carrier->shipping_external = true;
-        $carrier->range_behavior = 0;
+        $carrier->name                 = $configuration['name'];
+        $carrier->is_module            = true;
+        $carrier->active               = 1;
+        $carrier->range_behavior       = 1;
+        $carrier->need_range           = 1;
+        $carrier->shipping_external    = true;
+        $carrier->range_behavior       = 0;
         $carrier->external_module_name = $this->module->name;
-        $carrier->shipping_method = 2;
+        $carrier->shipping_method      = 2;
 
-        foreach (\Language::getLanguages() as $lang) {
+        foreach (Language::getLanguages() as $lang) {
             $carrier->delay[$lang['id_lang']] = 'Super fast delivery';
         }
 
@@ -166,7 +162,7 @@ class Installer
             if ($carrier->add()) {
                 @copy(
                     _PS_MODULE_DIR_ . 'myparcel/views/images/' . $configuration['image'],
-                    _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg'
+                    _PS_SHIP_IMG_DIR_ . '/' . (int) $carrier->id . '.jpg'
                 );
 
                 Configuration::updateValue($configuration['configuration_name'], $carrier->id);
@@ -176,7 +172,8 @@ class Installer
                     $insert[] = ['id_carrier' => $carrier->id, 'name' => $item, 'value' => ''];
                 }
 
-                Db::getInstance()->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
+                Db::getInstance()
+                    ->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
 
                 $carrierType = "";
                 switch ($configuration['configuration_name']) {
@@ -195,8 +192,8 @@ class Installer
 
                 return $carrier;
             }
-        } catch (\PrestaShopDatabaseException $e) {
-            \PrestaShopLogger::addLog(
+        } catch (PrestaShopDatabaseException $e) {
+            PrestaShopLogger::addLog(
                 sprintf(
                     '[MYPARCEL] PrestaShopDatabaseException carrier "%s" install: %s',
                     ($configuration['name'] ?? 'empty'),
@@ -208,8 +205,8 @@ class Installer
                 $carrier->id ?? null,
                 true
             );
-        } catch (\PrestaShopException $e) {
-            \PrestaShopLogger::addLog(
+        } catch (PrestaShopException $e) {
+            PrestaShopLogger::addLog(
                 sprintf(
                     '[MYPARCEL] PrestaShopException carrier "%s" install: %s',
                     ($configuration['name'] ?? 'empty'),
@@ -229,7 +226,7 @@ class Installer
     protected function addGroups($carrier)
     {
         $groups_ids = [];
-        $groups = \Group::getGroups(Context::getContext()->language->id);
+        $groups     = Group::getGroups(Context::getContext()->language->id);
         foreach ($groups as $group) {
             $groups_ids[] = $group['id_group'];
         }
@@ -239,22 +236,22 @@ class Installer
 
     protected function addRanges($carrier)
     {
-        $range_price = new \RangePrice();
-        $range_price->id_carrier = $carrier->id;
-        $range_price->delimiter1 = '0';
-        $range_price->delimiter2 = '10000';
-        $range_price->add();
+        $rangePrice             = new RangePrice();
+        $rangePrice->id_carrier = $carrier->id;
+        $rangePrice->delimiter1 = '0';
+        $rangePrice->delimiter2 = '10000';
+        $rangePrice->add();
 
-        $range_weight = new \RangeWeight();
-        $range_weight->id_carrier = $carrier->id;
-        $range_weight->delimiter1 = '0';
-        $range_weight->delimiter2 = '10000';
-        $range_weight->add();
+        $rangeWeight             = new RangeWeight();
+        $rangeWeight->id_carrier = $carrier->id;
+        $rangeWeight->delimiter1 = '0';
+        $rangeWeight->delimiter2 = '10000';
+        $rangeWeight->add();
     }
 
     protected function addZones($carrier)
     {
-        $zones = \Zone::getZones();
+        $zones = Zone::getZones();
 
         foreach ($zones as $zone) {
             $carrier->addZone($zone['id_zone']);
@@ -264,16 +261,18 @@ class Installer
     private function hooks(): bool
     {
         $result = true;
+
         foreach ($this->module->hooks as $hook) {
             $result &= $this->module->registerHook($hook);
         }
-        //$this->module->registerHook('actionOrderIndexAfter'); //IDK why but module reset is not working if this hook is in array of hooks
+
         return $result;
     }
 
     private function migrate(): bool
     {
         $result = true;
+
         foreach ($this->module->migrations as $migration) {
             $result &= $migration::up();
         }
@@ -292,6 +291,7 @@ class Installer
             Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME => false,
             Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME => 1,
         ];
+
         foreach ($configs as $key => $value) {
             $result &= Configuration::updateValue($key, $value);
         }

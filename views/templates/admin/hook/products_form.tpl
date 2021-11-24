@@ -1,3 +1,4 @@
+{* todo: migrate to vue *}
 <style>
     .form-group > .col-lg-8 {
         overflow: hidden;
@@ -36,7 +37,7 @@
     <ul class="list-tab">
         <li>
             <a href="#tab-1" class="toolbar_btn btn-tab active">
-                {l s='Delivery&Return' mod='myparcelbe'}
+                {l s='Delivery & Return' mod='myparcelbe'}
             </a>
         </li>
         <li>
@@ -157,7 +158,7 @@
     <div id="tab-2" class="tabs-sm clear row" style="display: none;">
         <div class="col-lg-4">
             <div class="form-group">
-                <label for="custom-form">{l s='Custom Form' mod='myparcelbe'}</label>
+                <label for="custom-form">{l s='Customs Form' mod='myparcelbe'}</label>
                 <select class="form-control" id="custom-form" name = "{$CUSTOMS_FORM}">
                     <option value="Add"{if $params[$CUSTOMS_FORM] == 'Add'} selected{/if}>
                         {l s='Add this product to customs form' mod='myparcelbe'}
@@ -168,13 +169,12 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="custom-code">{l s='Custom Code' mod='myparcelbe'}</label>
+                <label for="custom-code">{l s='HS Code' mod='myparcelbe'}</label>
                 <input
-                        type="text"
+                        type="number"
                         class="form-control"
                         id="custom-code"
                         value="{$params[$CUSTOMS_CODE]}"
-                        placeholder="Example input"
                         name="{$CUSTOMS_CODE}"
                 >
             </div>

@@ -8,11 +8,6 @@ use Gett\MyparcelBE\Constant;
 
 class GeneralForm extends AbstractForm
 {
-    protected function getNamespace(): string
-    {
-        return 'generalform';
-    }
-
     /**
      * @return array[]
      */
@@ -60,5 +55,10 @@ class GeneralForm extends AbstractForm
     protected function getLegend(): string
     {
         return $this->module->l('General Settings', $this->getNamespace());
+    }
+
+    protected function getNamespace(): string
+    {
+        return 'generalform';
     }
 }

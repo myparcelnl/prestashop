@@ -38,27 +38,14 @@ class WeightService
     ];
 
     /**
-     * @var float|int
-     */
-    private $weight;
-
-    /**
-     * @param  float|int $weight
-     */
-    public function __construct($weight)
-    {
-        $this->weight = $weight;
-    }
-
-    /**
      * @return self
      */
-    public function convertToDigitalStampWeight(): self
+    public static function convertToDigitalStampWeight(int $weight): int
     {
         $results = Arr::where(
             self::DIGITAL_STAMP_RANGES,
-            function ($range) {
-                return $this->weight > $range['min'];
+            static function ($range) use ($weight) {
+                return $weight > $range['min'];
             }
         );
 
@@ -68,26 +55,6 @@ class WeightService
             $digitalStampRangeWeight = Arr::last($results)['average'];
         }
 
-        $this->weight = $digitalStampRangeWeight;
-        return $this;
-    }
-
-    /**
-     * Returns the weight of the order in grams.
-     *
-     * @return self
-     */
-    public function convertToGrams(): self
-    {
-        $this->weight = (new OrderTotalWeight())->convertWeightToGrams($this->weight);
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getWeight(): int
-    {
-        return (int) $this->weight;
+        return $digitalStampRangeWeight;
     }
 }
