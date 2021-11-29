@@ -87,29 +87,7 @@ class DeliverySettingsProvider
                 'carrierSettings'    => $carrierSettings,
                 'showPriceSurcharge' => $showPriceSurcharge,
             ],
-            'strings'           => [
-                'addressNotFound'       => Configuration::get(CheckoutForm::CONFIGURATION_ADDRESS_NOT_FOUND),
-                'city'                  => Configuration::get(CheckoutForm::CONFIGURATION_CITY),
-                'closed'                => Configuration::get(CheckoutForm::CONFIGURATION_CLOSED),
-                'deliveryEveningTitle'  => Configuration::get(CheckoutForm::CONFIGURATION_DELIVERY_EVENING_TITLE),
-                'deliveryMorningTitle'  => Configuration::get(CheckoutForm::CONFIGURATION_DELIVERY_MORNING_TITLE),
-                'deliveryStandardTitle' => Configuration::get(CheckoutForm::CONFIGURATION_DELIVERY_STANDARD_TITLE),
-                'deliveryTitle'         => Configuration::get(CheckoutForm::CONFIGURATION_DELIVERY_TITLE),
-                'discount'              => Configuration::get(CheckoutForm::CONFIGURATION_DISCOUNT),
-                'free'                  => Configuration::get(CheckoutForm::CONFIGURATION_FREE),
-                'from'                  => Configuration::get(CheckoutForm::CONFIGURATION_FROM),
-                'houseNumber'           => Configuration::get(CheckoutForm::CONFIGURATION_HOUSE_NUMBER),
-                'loadMore'              => Configuration::get(CheckoutForm::CONFIGURATION_LOAD_MORE),
-                'onlyRecipientTitle'    => Configuration::get(CheckoutForm::CONFIGURATION_ONLY_RECIPIENT_TITLE),
-                'openingHours'          => Configuration::get(CheckoutForm::CONFIGURATION_OPENING_HOURS),
-                'pickUpFrom'            => Configuration::get(CheckoutForm::CONFIGURATION_PICK_UP_FROM),
-                'pickupTitle'           => Configuration::get(CheckoutForm::CONFIGURATION_PICKUP_TITLE),
-                'postcode'              => Configuration::get(CheckoutForm::CONFIGURATION_POSTCODE),
-                'retry'                 => Configuration::get(CheckoutForm::CONFIGURATION_RETRY),
-                'saturdayDeliveryTitle' => Configuration::get(CheckoutForm::CONFIGURATION_SATURDAY_DELIVERY_TITLE),
-                'signatureTitle'        => Configuration::get(CheckoutForm::CONFIGURATION_SIGNATURE_TITLE),
-                'wrongPostalCodeCity'   => Configuration::get(CheckoutForm::CONFIGURATION_WRONG_POSTAL_CODE_CITY),
-            ],
+            'strings'           => $this->getDeliveryOptionsStrings(),
             'address'           => [
                 'cc'         => strtoupper(Country::getIsoById($address->id_country)),
                 'city'       => $address->city,
@@ -117,6 +95,40 @@ class DeliverySettingsProvider
                 'number'     => $houseNumber,
             ],
             'delivery_settings' => DeliveryOptions::queryByCart((int) $this->context->cart->id),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDeliveryOptionsStrings(): array
+    {
+        $getConfigurationString = static function(string $settings) {
+            return Configuration::get($settings) ?: null;
+        };
+
+        return [
+            'addressNotFound'       => $getConfigurationString(CheckoutForm::CONFIGURATION_ADDRESS_NOT_FOUND),
+            'city'                  => $getConfigurationString(CheckoutForm::CONFIGURATION_CITY),
+            'closed'                => $getConfigurationString(CheckoutForm::CONFIGURATION_CLOSED),
+            'deliveryEveningTitle'  => $getConfigurationString(CheckoutForm::CONFIGURATION_DELIVERY_EVENING_TITLE),
+            'deliveryMorningTitle'  => $getConfigurationString(CheckoutForm::CONFIGURATION_DELIVERY_MORNING_TITLE),
+            'deliveryStandardTitle' => $getConfigurationString(CheckoutForm::CONFIGURATION_DELIVERY_STANDARD_TITLE),
+            'deliveryTitle'         => $getConfigurationString(CheckoutForm::CONFIGURATION_DELIVERY_TITLE),
+            'discount'              => $getConfigurationString(CheckoutForm::CONFIGURATION_DISCOUNT),
+            'free'                  => $getConfigurationString(CheckoutForm::CONFIGURATION_FREE),
+            'from'                  => $getConfigurationString(CheckoutForm::CONFIGURATION_FROM),
+            'houseNumber'           => $getConfigurationString(CheckoutForm::CONFIGURATION_HOUSE_NUMBER),
+            'loadMore'              => $getConfigurationString(CheckoutForm::CONFIGURATION_LOAD_MORE),
+            'onlyRecipientTitle'    => $getConfigurationString(CheckoutForm::CONFIGURATION_ONLY_RECIPIENT_TITLE),
+            'openingHours'          => $getConfigurationString(CheckoutForm::CONFIGURATION_OPENING_HOURS),
+            'pickUpFrom'            => $getConfigurationString(CheckoutForm::CONFIGURATION_PICK_UP_FROM),
+            'pickupTitle'           => $getConfigurationString(CheckoutForm::CONFIGURATION_PICKUP_TITLE),
+            'postcode'              => $getConfigurationString(CheckoutForm::CONFIGURATION_POSTCODE),
+            'retry'                 => $getConfigurationString(CheckoutForm::CONFIGURATION_RETRY),
+            'saturdayDeliveryTitle' => $getConfigurationString(CheckoutForm::CONFIGURATION_SATURDAY_DELIVERY_TITLE),
+            'signatureTitle'        => $getConfigurationString(CheckoutForm::CONFIGURATION_SIGNATURE_TITLE),
+            'wrongPostalCodeCity'   => $getConfigurationString(CheckoutForm::CONFIGURATION_WRONG_POSTAL_CODE_CITY),
         ];
     }
 
