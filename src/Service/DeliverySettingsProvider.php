@@ -202,7 +202,7 @@ class DeliverySettingsProvider
 
             $shippingOptions       = $this->module->getShippingOptions($carrierId, $address);
             $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
-            $priceStandardDelivery = $showPriceSurcharge ? null : Tools::ps_round($basePrice, 2);
+            $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
 
             $carrierSettings[$carrier->getName()] = array_merge(
                 $this->getCarrierSettings($carrierId, $shippingOptions),
