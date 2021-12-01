@@ -12,7 +12,6 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
 use Module;
-use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use Order;
 use Tools;
 use Validate;
@@ -169,7 +168,7 @@ class DeliverySettingsProvider
 
         return [
             'dropOffDelay' => $dropOffDelay,
-            'cutOffTime'   => $updatedCutoffTime,
+            'cutoffTime'   => $updatedCutoffTime,
             'dropOffDays'  => $dropOffDays,
         ];
     }
