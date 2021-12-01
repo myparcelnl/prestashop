@@ -50,9 +50,7 @@ class DeliveryOptionsProvider
         $shipmentOptions = $deliveryOptions->getShipmentOptions();
 
         if ($shipmentOptions && $shipmentOptions->getInsurance()) {
-            $deliveryOptionsArray['shipmentOptions']['insurance'] = [
-                'amount' => $shipmentOptions->getInsurance() * 100,
-            ];
+            $deliveryOptionsArray['shipmentOptions']['insurance'] = $shipmentOptions->getInsurance() * 100;
         }
 
         if (isset($deliveryOptionsArray['date'])) {

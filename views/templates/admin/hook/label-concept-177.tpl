@@ -4,16 +4,16 @@
   <div class="col-sm-8">
     <select name="packageType" class="form-control custom-select" id="packageTypeSelect">
       {if !empty($carrierSettings.delivery.packageType[1])}
-        <option value="1"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '1'} selected{/if}>{l s='Parcel' mod='myparcelbe'}</option>
+        <option value="1"{if $deliveryOptions.package_type eq 'package'} selected{/if}>{l s='Parcel' mod='myparcelbe'}</option>
       {/if}
       {if !empty($carrierSettings.delivery.packageType[2])}
-        <option value="2"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '2'} selected{/if}>{l s='Mailbox package' mod='myparcelbe'}</option>
+        <option value="2"{if $deliveryOptions.package_type eq 'mailbox'} selected{/if}>{l s='Mailbox package' mod='myparcelbe'}</option>
       {/if}
       {if !empty($carrierSettings.delivery.packageType[3])}
-        <option value="3"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '3'} selected{/if}>{l s='Letter' mod='myparcelbe'}</option>
+        <option value="3"{if $deliveryOptions.package_type eq 'letter'} selected{/if}>{l s='Letter' mod='myparcelbe'}</option>
       {/if}
       {if !empty($carrierSettings.delivery.packageType[4])}
-        <option value="4"{if !empty($labelOptions.package_type) && $labelOptions.package_type eq '4'} selected{/if}>{l s='Digital stamp' mod='myparcelbe'}</option>
+        <option value="4"{if $deliveryOptions.package_type eq 'digital_stamp'} selected{/if}>{l s='Digital stamp' mod='myparcelbe'}</option>
       {/if}
     </select>
   </div>
@@ -23,10 +23,10 @@
   <div class="col-sm-8">
     <select name="digitalStampWeight" class="custom-select" id="digitalStampWeight">
       <option value="15">{l s='0 - 20 gr' mod='myparcelbe'}</option>
-      <option value="35"{if $digitalStampWeight>20} selected{/if}>{l s='20 - 50 gr' mod='myparcelbe'}</option>
-      <option value="75"{if $digitalStampWeight>50} selected{/if}>{l s='50 - 100 gr' mod='myparcelbe'}</option>
-      <option value="225"{if $digitalStampWeight>100} selected{/if}>{l s='100 - 350 gr' mod='myparcelbe'}</option>
-      <option value="1175"{if $digitalStampWeight>350} selected{/if}>{l s='350 - 2000 gr' mod='myparcelbe'}</option>
+      <option value="35"{if $extraOptions.digitalStampWeight>20} selected{/if}>{l s='20 - 50 gr' mod='myparcelbe'}</option>
+      <option value="75"{if $extraOptions.digitalStampWeight>50} selected{/if}>{l s='50 - 100 gr' mod='myparcelbe'}</option>
+      <option value="225"{if $extraOptions.digitalStampWeight>100} selected{/if}>{l s='100 - 350 gr' mod='myparcelbe'}</option>
+      <option value="1175"{if $extraOptions.digitalStampWeight>350} selected{/if}>{l s='350 - 2000 gr' mod='myparcelbe'}</option>
     </select>
   </div>
 </div>
@@ -50,7 +50,7 @@
   <label class="col-sm-4 col-form-label" for="labelAmount">{l s='Number of labels' mod='myparcelbe'}</label>
   <div class="col-lg-3">
     <input class="form-control" id="labelAmount" name="labelAmount" type="number" min="1" max="10"
-            value="{if $labelAmount}{$labelAmount}{else}1{/if}">
+            value="{if $extraOptions.labelAmount}{$extraOptions.labelAmount}{else}1{/if}">
   </div>
 </div>
 <div class="form-group row label-delivery-options" data-for_package_type="1">
@@ -63,7 +63,7 @@
                 type="checkbox"
                 id="label_recipient_only"
                 value="1"
-                {if !empty($deliveryOptions.shipmentOptions.only_recipient) || !empty($labelOptions.only_to_recipient)}checked{/if}
+                {if !empty($deliveryOptions.shipmentOptions.only_recipient)}checked{/if}
         />
         <label class="form-check-label" for="label_recipient_only">
           {l s='Recipient only' mod='myparcelbe'}
@@ -78,7 +78,7 @@
                 type="checkbox"
                 id="label_require_signature"
                 value="1"
-                {if !empty($deliveryOptions.shipmentOptions.signature) || !empty($labelOptions.signature)}checked{/if}
+                {if !empty($deliveryOptions.shipmentOptions.signature)}checked{/if}
         />
         <label class="form-check-label" for="label_require_signature">
           {l s='Requires a signature' mod='myparcelbe'}
@@ -93,7 +93,7 @@
                 type="checkbox"
                 id="label_return"
                 value="1"
-                {if !empty($deliveryOptions.shipmentOptions.return) || !empty($labelOptions.return_undelivered)}checked{/if}
+                {if !empty($deliveryOptions.shipmentOptions.return)}checked{/if}
         />
         <label class="form-check-label" for="label_return">
           {l s='Return when undeliverable' mod='myparcelbe'}
@@ -108,7 +108,7 @@
                 type="checkbox"
                 id="label_age_check"
                 value="1"
-                {if !empty($deliveryOptions.shipmentOptions.age_check) || !empty($labelOptions.age_check)}checked{/if}
+                {if !empty($deliveryOptions.shipmentOptions.age_check) || !empty($deliveryOptions.age_check)}checked{/if}
         />
         <label class="form-check-label" for="label_age_check">
           {l s='Age check 18+' mod='myparcelbe'}
@@ -123,23 +123,21 @@
                 type="checkbox"
                 id="label_insurance"
                 value="1"
-                {if !empty($deliveryOptions.shipmentOptions.insurance) || !empty($labelOptions.insurance)}checked{/if}
+                {if !empty($deliveryOptions.shipmentOptions.insurance)}checked{/if}
         />
         <label class="form-check-label" for="label_insurance">
           {l s='Insurance' mod='myparcelbe'}
         </label>
       </div>
       <div class="insurance-values">
-        <div class="form-check mt-1">
+          <div class="form-check mt-1">
           <input
                   class="form-check-input"
                   name="insuranceAmount"
                   type="radio"
                   id="insurance_amount_100"
                   value="amount100"
-                  {if !empty($deliveryOptions.shipmentOptions.insurance)
-                  && $deliveryOptions.shipmentOptions.insurance eq 10000
-                  || (empty($deliveryOptions.shipmentOptions) && !empty($labelOptions.insurance))}checked{/if}
+                  {if $deliveryOptions.shipmentOptions.insurance eq 10000}checked{/if}
           />
           <label class="form-check-label" for="insurance_amount_100">
             {l s='Up to € 100' mod='myparcelbe'}
@@ -152,8 +150,7 @@
                   type="radio"
                   id="insurance_amount_250"
                   value="amount250"
-                  {if !empty($deliveryOptions.shipmentOptions.insurance)
-                  && $deliveryOptions.shipmentOptions.insurance eq 25000}checked{/if}
+                  {if $deliveryOptions.shipmentOptions.insurance eq 25000}checked{/if}
           />
           <label class="form-check-label" for="insurance_amount_250">
             {l s='Up to € 250' mod='myparcelbe'}
@@ -166,8 +163,7 @@
                   type="radio"
                   id="insurance_amount_500"
                   value="amount500"
-                  {if !empty($deliveryOptions.shipmentOptions.insurance)
-                  && $deliveryOptions.shipmentOptions.insurance eq 50000}checked{/if}
+                  {if $deliveryOptions.shipmentOptions.insurance eq 50000}checked{/if}
           />
           <label class="form-check-label" for="insurance_amount_500">
             {l s='Up to € 500' mod='myparcelbe'}

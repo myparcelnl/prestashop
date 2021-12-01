@@ -58,7 +58,7 @@ class WebhookService extends AbstractEndpoint
     {
         $content = (new Curl())
             ->setHeader('Authorization', 'basic ' . base64_encode($this->apiKey))
-            ->setHeader('User-Agent', $this->createRequest()->getUserAgent())
+            ->setHeader('User-Agent', $this->createRequest()->getUserAgentHeader())
             ->setHeader('Content-Type', 'application/json; charset=utf-8')
             ->delete(MyParcelRequest::REQUEST_URL . '/' . $url);
 
