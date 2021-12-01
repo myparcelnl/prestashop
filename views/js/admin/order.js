@@ -394,13 +394,30 @@ $(function() {
     }
   });
 
+  /**
+   * Hack to include unchecked checkboxes in serialization.
+   *
+   * @param {jQuery} $form
+   * @return {String}
+   * @see https://stackoverflow.com/a/22025124/10225966
+   */
+  function serializeWithUnchecked($form) {
+    const checkboxes = $form.find(':checkbox:not(:checked)');
+
+    checkboxes.attr('value', 0).prop('checked', true);
+    const serialized = $form.find(':input').serialize();
+    checkboxes.prop('checked', false);
+
+    return serialized;
+  }
+
   // Save order label new settings
   $('#submitCreateConcept').on('click', function (e) {
     e.preventDefault();
     $.ajax({
       method: 'POST',
       url: $(this).closest('#myparcel-order-panel').data('url'),
-      data: $('.concept-label-wrapper :input').serialize() + '&action=saveConcept&ajax=1&rand=' + Math.random(),
+      data: `${serializeWithUnchecked($('.concept-label-wrapper'))}&action=saveConcept&ajax=1&rand=${Math.random()}`,
       dataType: 'json',
       async: true,
       cache: false,

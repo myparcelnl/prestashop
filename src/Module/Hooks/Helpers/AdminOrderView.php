@@ -13,7 +13,6 @@ use Customer;
 use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
-use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
@@ -88,11 +87,15 @@ class AdminOrderView extends AbstractAdminOrder
                 'icon' => 'icon-print',
             ],
         ];
-        $extraOptions             = DeliverySettings::getExtraOptionsFromOrder($order);
+
+        $extraOptions = DeliverySettings::getExtraOptionsFromOrder($order);
+        if (! $extraOptions->getDigitalStampWeight()) {
+            $extraOptions->setDigitalStampWeight($weight);
+        }
+
         $deliveryOptionsProvider  = new DeliveryOptionsProvider();
         $deliveryOptions          = $deliveryOptionsProvider->provide($order->getId());
         $labelList                = $this->getLabels();
-        $digitalStampWeight       = $extraOptions->getDigitalStampWeight() ?? $weight;
 
         $labelListHtml = $this->context->smarty->createData($this->context->smarty);
         $labelListHtml->assign([
@@ -110,35 +113,34 @@ class AdminOrderView extends AbstractAdminOrder
         $carrierSettingsProvider = new CarrierSettingsProvider($this->module);
         $deliveryAddress         = new Address($order->id_address_delivery);
         $customer                = new Customer($order->id_customer);
-        $labelOptionsResolver    = new LabelOptionsResolver();
 
         $carrierSettings = $carrierSettingsProvider->provide($order->getIdCarrier());
         $currencySign    = $currency->getSign();
 
-        $labelConceptHtml->assign([
-            'deliveryOptions'      => $deliveryOptions,
-            'carrierSettings'      => $carrierSettings,
-            'date_warning_display' => $deliveryOptionsProvider->provideWarningDisplay($order->getId()),
-            'isBE'                 => $this->module->isBE(),
-            'currencySign'         => $currencySign,
-            'labelOptions'         => json_decode($labelOptionsResolver->getLabelOptions($order), true),
-            'weight'               => $weight,
-            'labelAmount'          => $extraOptions->getLabelAmount(),
-            'digitalStampWeight'   => $digitalStampWeight,
-        ]);
+        $common = [
+            'currencySign'           => $currencySign,
+            'deliveryOptions'        => $deliveryOptions,
+            'extraOptions'           => $extraOptions->toArray(),
+            'weight'                 => $weight,
+        ];
 
-        $labelReturnHtml->assign([
-            'deliveryOptions'    => $deliveryOptions,
-            'carrierSettings'    => $carrierSettings,
-            'isBE'               => $this->module->isBE(),
-            'currencySign'       => $currencySign,
-            'customerName'       => trim($deliveryAddress->firstname . ' ' . $deliveryAddress->lastname),
-            'customerEmail'      => $customer->email,
-            'labelUrl'           => $labelUrl,
-            'weight'             => $weight,
-            'labelAmount'        => $extraOptions->getLabelAmount(),
-            'digitalStampWeight' => $digitalStampWeight,
-        ]);
+        $labelConceptHtml->assign(
+            array_merge($common, [
+                'carrierSettings'      => $carrierSettings,
+                'date_warning_display' => $deliveryOptionsProvider->provideWarningDisplay($order->getId()),
+                'isBE'                 => $this->module->isBE(),
+            ])
+        );
+
+        $labelReturnHtml->assign(
+            array_merge($common, [
+                'carrierSettings' => $carrierSettings,
+                'customerEmail'   => $customer->email,
+                'customerName'    => trim($deliveryAddress->firstname . ' ' . $deliveryAddress->lastname),
+                'isBE'            => $this->module->isBE(),
+                'labelUrl'        => $labelUrl,
+            ])
+        );
 
         $labelConceptHtmlTpl = $this->context->smarty->createTemplate(
             $this->module->getTemplatePath('views/templates/admin/hook/label-concept' . $psVersion . '.tpl'),
@@ -150,7 +152,7 @@ class AdminOrderView extends AbstractAdminOrder
             $labelReturnHtml
         );
 
-        $this->context->smarty->assign([
+        $this->context->smarty->assign(array_merge($common, [
             'modulePathUri'              => $this->module->getPathUri(),
             'id_order'                   => $order->getId(),
             'id_carrier'                 => $order->getIdCarrier(),
@@ -190,14 +192,9 @@ class AdminOrderView extends AbstractAdminOrder
                 ['action' => 'exportPrint']
             ),
             'carrierLabels'              => Constant::SINGLE_LABEL_CREATION_OPTIONS,
-            'deliveryOptions'            => $deliveryOptions,
-            'currencySign'               => $currencySign,
             'labelConfiguration'         => $this->getLabelDefaultConfiguration(),
             'promptForLabelPosition'     => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
-            'weight'                     => $weight,
-            'labelAmount'                => $extraOptions->getLabelAmount(),
-            'digitalStampWeight'         => $digitalStampWeight,
-        ]);
+        ]));
 
         return $this->module->display(
             $this->module->name,
