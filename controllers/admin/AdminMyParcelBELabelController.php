@@ -2,7 +2,6 @@
 
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromDefaultExportSettingsAdapter;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromFormAdapter;
-use Gett\MyparcelBE\Carrier\CarrierCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DefaultExportSettingsRepository;
@@ -948,13 +947,11 @@ class AdminMyParcelBELabelController extends ModuleAdminController
     private function getDefaultExportDeliveryOptions(
         AbstractDeliveryOptionsAdapter $deliveryOptions
     ): AbstractDeliveryOptionsAdapter {
-        $carrier = $deliveryOptions->getCarrier() ?? PlatformServiceFactory::create()
+        $myParcelCarrierName = $deliveryOptions->getCarrier() ?? PlatformServiceFactory::create()
                 ->getDefaultCarrier()
                 ->getName();
 
-        $carrierCalculator = new CarrierCalculator($carrier, CarrierCalculator::SOURCE_MYPARCEL);
-        $prestaShopCarrier = $carrierCalculator->getPrestaShopCarrier();
-
+        $prestaShopCarrier     = CarrierService::getPrestashopCarrier($myParcelCarrierName);
         $defaultExportSettings = DefaultExportSettingsRepository::getInstance()
             ->getByCarrier($prestaShopCarrier->id);
 

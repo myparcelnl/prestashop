@@ -58,19 +58,32 @@ class CarrierService
     }
 
     /**
-     * @param  \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $carrier
+     * @param  string|int|class-string|\MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
      *
      * @return null|int
      * @throws \PrestaShopDatabaseException
+     * @throws \Exception
      */
-    public static function getPrestashopCarrierId(AbstractCarrier $carrier): ?int
+    public static function getPrestaShopCarrierId($myParcelCarrier): ?int
     {
+        $carrierClass    = CarrierFactory::create($myParcelCarrier);
         $matchingCarrier = CarrierConfigurationProvider::all()
             ->where(CarrierConfigurationProvider::COLUMN_NAME, Constant::CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE)
-            ->where(CarrierConfigurationProvider::COLUMN_VALUE, $carrier->getName())
+            ->where(CarrierConfigurationProvider::COLUMN_VALUE, $carrierClass->getName())
             ->first();
 
         return $matchingCarrier['id_carrier'] ? (int) $matchingCarrier['id_carrier'] : null;
+    }
+
+    /**
+     * @param  string|int|class-string|\MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
+     *
+     * @return \Carrier
+     * @throws \PrestaShopDatabaseException
+     */
+    public static function getPrestashopCarrier($myParcelCarrier): Carrier
+    {
+        return new Carrier(self::getPrestaShopCarrierId($myParcelCarrier));
     }
 
     /**

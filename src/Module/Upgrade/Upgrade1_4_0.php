@@ -90,7 +90,7 @@ class Upgrade1_4_0 extends AbstractUpgrade
         $carrierConfigurationTable = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
         $configurationTable        = Table::withPrefix('configuration');
         $defaultCarrier            = $this->platformService->getDefaultCarrier();
-        $prestashopCarrierId       = CarrierService::getPrestashopCarrierId($defaultCarrier);
+        $prestashopCarrierId       = CarrierService::getPrestaShopCarrierId($defaultCarrier);
 
         $query = <<<SQL
 SELECT * FROM $carrierConfigurationTable
