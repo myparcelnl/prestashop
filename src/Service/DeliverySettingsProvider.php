@@ -133,23 +133,16 @@ class DeliverySettingsProvider
     }
 
     /**
-     * @param  \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $carrier
+     * @param  int $psCarrierId
      *
      * @return array
      * @throws \PrestaShopDatabaseException
      */
-    private function getDropOffSettings(AbstractCarrier $carrier): array
+    private function getDropOffSettings(int $psCarrierId): array
     {
-        $dropOffDelay     = (int) CarrierConfigurationProvider::get($carrier->getId(), 'dropOffDelay', 0);
-        $cutoffExceptions = CarrierConfigurationProvider::get(
-            $carrier->getId(),
-            Constant::CUTOFF_EXCEPTIONS
-        );
-
-        $cutoffExceptions = json_decode(
-            $cutoffExceptions,
-            true
-        );
+        $dropOffDelay     = (int) CarrierConfigurationProvider::get($psCarrierId, 'dropOffDelay', 0);
+        $cutoffExceptions = CarrierConfigurationProvider::get($psCarrierId, Constant::CUTOFF_EXCEPTIONS);
+        $cutoffExceptions = json_decode($cutoffExceptions, true);
 
         if (! is_array($cutoffExceptions)) {
             $cutoffExceptions = [];
@@ -158,10 +151,10 @@ class DeliverySettingsProvider
         $dropOffDateObj  = new DateTime('today');
         $weekDayNumber   = $dropOffDateObj->format('N');
         $dayName         = Constant::WEEK_DAYS[$weekDayNumber];
-        $cutoffTimeToday = CarrierConfigurationProvider::get($carrier->getId(), $dayName . 'CutoffTime');
+        $cutoffTimeToday = CarrierConfigurationProvider::get($psCarrierId, $dayName . 'CutoffTime');
         $dropOffDays     = array_map(
             'intval',
-            explode(',', CarrierConfigurationProvider::get($carrier->getId(), 'dropOffDays'))
+            explode(',', CarrierConfigurationProvider::get($psCarrierId, 'dropOffDays'))
         );
 
         $updatedCutoffTime  = $this->updateCutoffTime($cutoffTimeToday, $dropOffDateObj, $cutoffExceptions);
@@ -193,20 +186,19 @@ class DeliverySettingsProvider
     {
         $carrierSettings = [];
 
-        foreach ($this->carriers as $carrierId) {
-            if (! CarrierConfigurationProvider::get($carrierId, 'carrierType')) {
+        foreach ($this->carriers as $psCarrierId) {
+            if (! CarrierConfigurationProvider::get($psCarrierId, 'carrierType')) {
                 continue;
             }
 
-            $carrier = CarrierService::getMyParcelCarrier($carrierId);
-
-            $shippingOptions       = $this->module->getShippingOptions($carrierId, $address);
+            $shippingOptions       = $this->module->getShippingOptions($psCarrierId, $address);
             $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
             $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
 
-            $carrierSettings[$carrier->getName()] = array_merge(
-                $this->getCarrierSettings($carrierId, $shippingOptions),
-                $this->getDropOffSettings($carrier),
+            $myParcelCarrier = CarrierService::getMyParcelCarrier($psCarrierId);
+            $carrierSettings[$myParcelCarrier->getName()] = array_merge(
+                $this->getCarrierSettings($psCarrierId, $shippingOptions),
+                $this->getDropOffSettings($psCarrierId),
                 [
                     'allowDeliveryOptions'  => true,
                     'priceStandardDelivery' => $priceStandardDelivery,
