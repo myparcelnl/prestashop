@@ -250,7 +250,7 @@ class ConsignmentFactory
     {
         $deliveryTypeId = Arr::get(AbstractConsignment::DELIVERY_TYPES_NAMES_IDS_MAP, $this->deliveryOptions->getDeliveryType());
 
-        return $deliveryTypeId ?? AbstractConsignment::DELIVERY_TYPE_STANDARD;
+        return is_int($deliveryTypeId) ? $deliveryTypeId : AbstractConsignment::DELIVERY_TYPE_STANDARD;
     }
 
     /**
