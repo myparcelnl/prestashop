@@ -1007,36 +1007,6 @@ SQL
                 'form_group_class' => 'toggle-child-field allowPickupPoints',
             ];
         }
-        if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'allowPickupExpress')) {
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'switch',
-                'is_bool' => true,
-                'label' => $this->module->l('Allow pickup express', 'carriers'),
-                'name' => 'allowPickupExpress',
-                'values' => [
-                    [
-                        'id' => 'allowPickupExpress_on',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carriers'),
-                    ],
-                    [
-                        'id' => 'allowPickupExpress_off',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carriers'),
-                    ],
-                ],
-                'form_group_class' => 'toggle-parent-field',
-            ];
-            // Disable price automatically when the option is not available
-            $fields[] = [
-                'tab' => 'form',
-                'type' => 'text',
-                'label' => $this->module->l('Price pickup express', 'carriers'),
-                'name' => 'pricePickupExpress',
-                'form_group_class' => 'toggle-child-field allowPickupExpress',
-            ];
-        }
 
         return $fields;
     }
