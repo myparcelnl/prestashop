@@ -27,7 +27,7 @@ class DefaultExportSettingsRepository extends AbstractSettingsRepository
                 if (is_array($item)) {
                     return $item['id_carrier'] === (string) $psCarrierId;
                 }
-                return false; //
+                return false;
             });
     }
 }
