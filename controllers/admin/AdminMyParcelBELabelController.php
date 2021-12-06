@@ -26,6 +26,7 @@ use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\InvalidConsignmentException;
+use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 
 if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
@@ -209,8 +210,19 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 $this->errors[] = $e->getMessage();
             }
         }
+        $this->updateOrderStatuses($collection);
 
         return $collection;
+    }
+
+    /**
+     * @param \MyParcelNL\Sdk\src\Helper\MyParcelCollection $collection
+     */
+    private function updateOrderStatuses(MyParcelCollection $collection): void
+    {
+        foreach ($collection as $consignment) {
+            $this->updateStatus($consignment->getConsignmentId(), $consignment->getStatus());
+        }
     }
 
     /**
