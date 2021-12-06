@@ -248,9 +248,7 @@ class ConsignmentFactory
      */
     private function getDeliveryType(): int
     {
-        $deliveryTypeId = Arr::get(AbstractConsignment::DELIVERY_TYPES_NAMES_IDS_MAP, $this->deliveryOptions->getDeliveryType());
-
-        return $deliveryTypeId ?? AbstractConsignment::DELIVERY_TYPE_STANDARD;
+        return $this->deliveryOptions->getDeliveryTypeId() ?? AbstractConsignment::DELIVERY_TYPE_STANDARD;
     }
 
     /**

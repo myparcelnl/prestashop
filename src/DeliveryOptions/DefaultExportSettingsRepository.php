@@ -23,8 +23,11 @@ class DefaultExportSettingsRepository extends AbstractSettingsRepository
     public function getByCarrier($psCarrierId): Collection
     {
         return $this->get()
-            ->filter(static function (array $item) use ($psCarrierId): bool {
-                return $item['id_carrier'] === (string) $psCarrierId;
+            ->filter(static function ($item) use ($psCarrierId): bool {
+                if (is_array($item)) {
+                    return $item['id_carrier'] === (string) $psCarrierId;
+                }
+                return false;
             });
     }
 }
