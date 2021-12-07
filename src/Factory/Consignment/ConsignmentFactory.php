@@ -2,26 +2,23 @@
 
 namespace Gett\MyparcelBE\Factory\Consignment;
 
-use BadMethodCallException;
 use Configuration;
-use Country;
+use DateInterval;
+use DateTime;
 use Exception;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\Logger;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierService;
-use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
-use Module;
+use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsFromOrderAdapter;
-use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -30,6 +27,8 @@ use Tools;
 
 class ConsignmentFactory
 {
+    private const FORMAT_TIMESTAMP = 'Y-m-d H:i:s';
+
     /**
      * @var string
      */
@@ -56,7 +55,7 @@ class ConsignmentFactory
     private $request;
 
     /**
-     * @var \Module
+     * @var \MyParcelBE
      */
     private $module;
 
@@ -71,11 +70,11 @@ class ConsignmentFactory
     private $orderData;
 
     /**
-     * @param string $apiKey
-     * @param array  $request
-     * @param Module $module
+     * @param  string      $apiKey
+     * @param  array       $request
+     * @param  \MyParcelBE $module
      */
-    public function __construct(string $apiKey, array $request, Module $module)
+    public function __construct(string $apiKey, array $request, MyParcelBE $module)
     {
         $this->api_key = $apiKey;
         $this->module  = $module;
@@ -112,6 +111,7 @@ class ConsignmentFactory
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Exception
      */
     public function fromOrder(array $order, AbstractDeliveryOptionsAdapter $deliveryOptions = null): ConsignmentCollection
     {
@@ -143,28 +143,6 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  array $order
-     *
-     * @return void
-     * @throws \Exception
-     */
-    private function setDeliveryOptions(array $order): void
-    {
-        $deliveryOptionsData = json_decode($order['delivery_settings'], true);
-
-        try {
-            // Create new instance from known json
-            $this->deliveryOptions = DeliveryOptionsAdapterFactory::create((array) $deliveryOptionsData);
-        } catch (BadMethodCallException $e) {
-            Logger::addLog($e->getMessage());
-
-            // Create new instance from unknown json data
-            $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();
-            $this->deliveryOptions = new DeliveryOptionsFromOrderAdapter($deliveryOptions);
-        }
-    }
-
-    /**
      * @param  array                                                                           $order
      * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
      *
@@ -183,13 +161,11 @@ class ConsignmentFactory
         if ($deliveryOptions) {
             $this->deliveryOptions = $deliveryOptions;
         } else {
-            $this->setDeliveryOptions($order);
+            $this->deliveryOptions = DeliveryOptions::updateDeliveryOptions($this->orderObject);
         }
     }
 
     /**
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      * @throws \Exception
      */
     private function setBaseData(): void
@@ -207,9 +183,14 @@ class ConsignmentFactory
 
     /**
      * @return int
+     * @throws \PrestaShopDatabaseException
      */
     private function getPackageType(): int
     {
+        if ($this->module->isBE()) {
+            return AbstractConsignment::PACKAGE_TYPE_PACKAGE;
+        }
+
         $packageType = $this->request['packageType'] ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
 
         if (! isset($this->carrierSettings['delivery']['packageType'][(int) $packageType])) {
@@ -230,17 +211,7 @@ class ConsignmentFactory
             return null;
         }
 
-        $timestamp        = strtotime($date);
-        $deliveryDateTime = date('Y-m-d H:i:s', $timestamp);
-        $deliveryDate     = date('Y-m-d', $timestamp);
-        $dateOfToday      = date('Y-m-d');
-        $dateOfTomorrow   = date('Y-m-d H:i:s', strtotime('now +1 day'));
-
-        if ($deliveryDate <= $dateOfToday) {
-            return $dateOfTomorrow;
-        }
-
-        return $deliveryDateTime;
+        return $this->fixPastDeliveryDate($date);
     }
 
     /**
@@ -248,6 +219,12 @@ class ConsignmentFactory
      */
     private function getDeliveryType(): int
     {
+        if ($this->module->isBE()) {
+            return $this->consignment->getDeliveryType() < AbstractConsignment::DELIVERY_TYPE_PICKUP
+                ? AbstractConsignment::DELIVERY_TYPE_STANDARD
+                : AbstractConsignment::DELIVERY_TYPE_PICKUP;
+        }
+
         return $this->deliveryOptions->getDeliveryTypeId() ?? AbstractConsignment::DELIVERY_TYPE_STANDARD;
     }
 
@@ -336,11 +313,14 @@ class ConsignmentFactory
      */
     private function hasSignature(): bool
     {
-        $shipmentOptions = $this->deliveryOptions->getShipmentOptions();
-        $hasSignature    = $shipmentOptions && $shipmentOptions->hasSignature()
-            && $this->consignment->canHaveShipmentOption(
-                AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
-            );
+        $canHaveSignature = $this->consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE);
+        $isHomeCountry    = $this->consignment->getCountry() === $this->module->getModuleCountry();
+        $shipmentOptions  = $this->deliveryOptions->getShipmentOptions();
+
+        $hasSignature = $shipmentOptions
+            && $canHaveSignature
+            && $isHomeCountry
+            && $shipmentOptions->hasSignature();
 
         return $this->consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_PICKUP || $hasSignature;
     }
@@ -456,6 +436,35 @@ class ConsignmentFactory
     }
 
     /**
+     * @param  string $deliveryDate
+     *
+     * @return string
+     */
+    private function fixPastDeliveryDate(string $deliveryDate): string
+    {
+        $tomorrow = new DateTime('tomorrow');
+
+        try {
+            $deliveryDateObject = new DateTime($deliveryDate);
+        } catch (Exception $e) {
+            return $tomorrow->format(self::FORMAT_TIMESTAMP);
+        }
+
+        $oldDate = clone $deliveryDateObject;
+        $tomorrow->setTime(0, 0);
+        $oldDate->setTime(0, 0);
+
+        if ($oldDate < $tomorrow) {
+            do {
+                $deliveryDateObject->add(new DateInterval('P1D'));
+            } while ($deliveryDateObject < $tomorrow || '0' === $deliveryDateObject->format('w'));
+            $deliveryDate = $deliveryDateObject->format(self::FORMAT_TIMESTAMP);
+        }
+
+        return $deliveryDate;
+    }
+
+    /**
      * @return AbstractConsignment
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
@@ -468,13 +477,7 @@ class ConsignmentFactory
         $this->setShipmentOptions();
         $this->setPickupLocation();
         $this->setCustomsDeclaration();
-
-        if (
-            isset($this->request['digitalStampWeight'])
-            && AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP === $this->consignment->getPackageType()
-        ) {
-            $this->consignment->setTotalWeight($this->request['digitalStampWeight']);
-        }
+        $this->setTotalWeight();
 
         return $this->consignment;
     }
@@ -532,5 +535,18 @@ class ConsignmentFactory
         }
 
         return trim($labelParams);
+    }
+
+    /**
+     * @return void
+     */
+    private function setTotalWeight(): void
+    {
+        if (
+            isset($this->request['digitalStampWeight'])
+            && AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP === $this->consignment->getPackageType()
+        ) {
+            $this->consignment->setTotalWeight($this->request['digitalStampWeight']);
+        }
     }
 }

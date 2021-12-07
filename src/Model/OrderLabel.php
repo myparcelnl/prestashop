@@ -472,16 +472,16 @@ SQL
     }
 
     /**
-     * @param  string  $orderId
-     * @param  string  $tracktrace
+     * @param  int|string $orderId
+     * @param  string     $tracktrace
      *
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public static function updateOrderTrackingNumber(string $orderId, string $tracktrace): bool
+    public static function updateOrderTrackingNumber($orderId, string $tracktrace): bool
     {
-        $order = new Order($orderId);
+        $order = new Order((int) $orderId);
 
         if (! Validate::isLoadedObject($order)) {
             return false;
