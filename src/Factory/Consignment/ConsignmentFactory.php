@@ -21,7 +21,6 @@ use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
-use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
 use Tools;
 
@@ -454,14 +453,11 @@ class ConsignmentFactory
         $tomorrow->setTime(0, 0);
         $oldDate->setTime(0, 0);
 
-        if ($oldDate < $tomorrow) {
-            do {
-                $deliveryDateObject->add(new DateInterval('P1D'));
-            } while ($deliveryDateObject < $tomorrow || '0' === $deliveryDateObject->format('w'));
-            $deliveryDate = $deliveryDateObject->format(self::FORMAT_TIMESTAMP);
-        }
+        do {
+            $deliveryDateObject->add(new DateInterval('P1D'));
+        } while ($deliveryDateObject < $tomorrow || '0' === $deliveryDateObject->format('w'));
 
-        return $deliveryDate;
+        return $deliveryDateObject->format(self::FORMAT_TIMESTAMP);
     }
 
     /**
