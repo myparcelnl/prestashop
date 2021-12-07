@@ -9,12 +9,8 @@ use Gett\MyparcelBE\Adapter\DeliveryOptionsFromDefaultExportSettingsAdapter;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromFormAdapter;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
-use Gett\MyparcelBE\Service\CarrierService;
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
-use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use Order;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
@@ -142,7 +138,7 @@ class DeliveryOptions
         \Gett\MyparcelBE\Model\Core\Order $order,
         array                             $values = []
     ): AbstractDeliveryOptionsAdapter {
-        $deliveryOptionsToMerge = self::getDeliveryOptionsArray($order);
+        $deliveryOptionsToMerge = self::getDeliveryOptionsAdapters($order);
 
         if (! empty($values)) {
             $deliveryOptionsToMerge[] = new DeliveryOptionsFromFormAdapter($values);
@@ -173,20 +169,16 @@ class DeliveryOptions
     }
 
     /**
-     * @param  null|\MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $carrier
+     * @param  int $psCarrierId
      *
      * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
      */
-    private static function getDefaultExportDeliveryOptions(
-        ?AbstractCarrier $carrier
-    ): AbstractDeliveryOptionsAdapter {
-        $myParcelCarrier       = $carrier ?? PlatformServiceFactory::create()
-                ->getDefaultCarrier();
-        $prestaShopCarrier     = CarrierService::getPrestashopCarrier($myParcelCarrier);
+    private static function getDefaultExportDeliveryOptions(int $psCarrierId): AbstractDeliveryOptionsAdapter
+    {
         $defaultExportSettings = DefaultExportSettingsRepository::getInstance()
-            ->getByCarrier($prestaShopCarrier->id);
+            ->getByCarrier($psCarrierId);
 
         return new DeliveryOptionsFromDefaultExportSettingsAdapter($defaultExportSettings);
     }
@@ -194,24 +186,21 @@ class DeliveryOptions
     /**
      * @param  \Gett\MyparcelBE\Model\Core\Order $order
      *
-     * @return array
+     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter[]
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
      */
-    private static function getDeliveryOptionsArray(\Gett\MyparcelBE\Model\Core\Order $order): array
+    private static function getDeliveryOptionsAdapters(\Gett\MyparcelBE\Model\Core\Order $order): array
     {
-        $orderDeliveryOptions = self::getFromOrder($order->getId());
         $deliveryOptionsArray = [];
 
-        if ($orderDeliveryOptions) {
-            $carrier = $orderDeliveryOptions->getCarrier()
-                ? CarrierFactory::create($orderDeliveryOptions->getCarrier())
-                : null;
-            $defaultExportDeliveryOptions = self::getDefaultExportDeliveryOptions($carrier);
-            $deliveryOptionsArray[]       = $defaultExportDeliveryOptions;
-        }
+        $defaultExportDeliveryOptions = self::getDefaultExportDeliveryOptions($order->getIdCarrier());
+        $deliveryOptionsArray[]       = $defaultExportDeliveryOptions;
 
-        $deliveryOptionsArray[] = $orderDeliveryOptions;
+        $orderDeliveryOptions = self::getFromOrder($order->getId());
+        if ($orderDeliveryOptions) {
+            $deliveryOptionsArray[] = $orderDeliveryOptions;
+        }
 
         return $deliveryOptionsArray;
     }
