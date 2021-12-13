@@ -100,7 +100,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public function processCreateb(): ConsignmentCollection
+    public function processCreateBulk(): ConsignmentCollection
     {
         $postValues = Tools::getAllValues();
         $printPosition = false;
@@ -325,7 +325,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
 
     public function processExportPrint()
     {
-        $collection = $this->processCreateb();
+        $collection = $this->processCreateBulk();
         Tools::setCookieSameSite(
             'downloadPdfLabel',
             1,
