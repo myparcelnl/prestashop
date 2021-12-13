@@ -97,7 +97,6 @@ class LabelOptionsResolver
         $packageType = $deliveryOptions && $deliveryOptions->getPackageType()
             ? $deliveryOptions->getPackageTypeId()
             : null;
-
         return $packageType ?? (new PackageTypeCalculator())->getOrderPackageType($order);
     }
 

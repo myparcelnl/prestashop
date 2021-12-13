@@ -125,6 +125,60 @@ class AdminMyParcelBELabelController extends ModuleAdminController
 
         try {
             $collection = $factory->fromOrders($orders);
+
+            $labelOptionsResolver = new LabelOptionsResolver();
+
+            foreach ($orderIds as $orderId) {
+                $labelOptions = $labelOptionsResolver->getLabelOptions(new Order((int) $orderId));
+
+                $options = json_decode($labelOptions);
+
+                $consignment = $collection->getConsignmentsByReferenceId($orderId)->getOneConsignment();
+                if ($options->package_type && count($consignment->getItems()) == 0) {
+                    $consignment->setPackageType($options->package_type);
+                } else {
+                    $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+                }
+                if (isset($options->return_undelivered) && true === $options->return_undelivered) {
+                    $consignment->setReturn(true);
+                }
+                if (isset($options->package_format)
+                    && Constant::PACKAGE_FORMAT_LARGE_INDEX === $options->package_format) {
+                    $consignment->setLargeFormat(true);
+                }
+                $consignment->setDeliveryDate($this->fixPastDeliveryDate($consignment->getDeliveryDate()));
+                $this->sanitizeSignature($consignment);
+                $this->sanitizePackageType($consignment);
+                $this->sanitizeDeliveryType($consignment);
+                if (AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()) {
+                    if ($options->only_to_recipient == 1
+                        && $consignment->canHaveShipmentOption(
+                            AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
+                        )) {
+                        $consignment->setOnlyRecipient(true);
+                    } else {
+                        $consignment->setOnlyRecipient(false);
+                    }
+                    if (1 == $options->age_check && count($consignment->getItems()) == 0) {
+                        $consignment->setAgeCheck(true);
+                    } else {
+                        $consignment->setAgeCheck(false);
+                    }
+                    if (1 == $options->signature
+                        && $consignment->canHaveShipmentOption(
+                            AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
+                        )) {
+                        $consignment->setSignature(true);
+                    } else {
+                        $consignment->setSignature(false);
+                    }
+                    if ($options->insurance) {
+                        $consignment->setInsurance(2500);
+                    }
+                }
+            }
+
+
             $collection->setPdfOfLabels($printPosition);
             Logger::addLog($collection->toJson());
         } catch (Exception $e) {
@@ -838,4 +892,76 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
         return true;
     }
+
+    public function fixPastDeliveryDate(?string $deliveryDate): ?string
+    {
+        if (!$deliveryDate) {
+            return $deliveryDate;
+        }
+        $tomorrow = new DateTime('tomorrow');
+        try {
+            $deliveryDateObj = new DateTime($deliveryDate);
+        } catch (Exception $e) {
+            return $tomorrow->format('Y-m-d H:i:s');
+        }
+        $oldDate = clone $deliveryDateObj;
+        $tomorrow->setTime(0, 0, 0, 0);
+        $oldDate->setTime(0, 0, 0, 0);
+        if ($tomorrow > $oldDate) {
+            do {
+                $deliveryDateObj->add(new DateInterval('P1D'));
+            } while ($tomorrow > $deliveryDateObj || $deliveryDateObj->format('w') == 0);
+            $deliveryDate = $deliveryDateObj->format('Y-m-d H:i:s');
+        }
+
+        return $deliveryDate;
+    }
+
+    /**
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     */
+    public function sanitizeSignature(AbstractConsignment $consignment): void
+    {
+        if (! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE)
+            || $consignment->getCountry() !== $this->module->getModuleCountry()) {
+            $consignment->setSignature(false);
+        }
+    }
+
+    /**
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @return void
+     */
+    public function sanitizeDeliveryType(AbstractConsignment $consignment): void
+    {
+        if (
+            AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()
+            &&
+            ! $this->module->isBE()
+        ) {
+            return;
+        }
+
+        $consignment->setDeliveryType(
+            $consignment->getDeliveryType() < AbstractConsignment::DELIVERY_TYPE_PICKUP
+                ? AbstractConsignment::DELIVERY_TYPE_STANDARD
+                : AbstractConsignment::DELIVERY_TYPE_PICKUP
+        );
+    }
+
+    /**
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @return void
+     * @throws \Exception
+     * @throws \Exception
+     */
+    public function sanitizePackageType(AbstractConsignment $consignment): void
+    {
+        if ($this->module->isBE()) {
+            $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+        }
+    }
+
 }

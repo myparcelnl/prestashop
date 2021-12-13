@@ -20,7 +20,7 @@ class PackageFormatCalculator extends AbstractPackageCalculator
         $largePackageTypeIndex = Constant::PACKAGE_FORMAT_LARGE_INDEX;
 
         if ($productPackageFormats) {
-            if (isset($productPackageFormats[$largePackageTypeIndex])) {
+            if (in_array($largePackageTypeIndex, $productPackageFormats)) {
                 return $largePackageTypeIndex;
             }
 
