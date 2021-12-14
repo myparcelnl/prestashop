@@ -184,7 +184,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         } catch (Exception $e) {
             $this->logError($e);
             header('HTTP/1.1 500 Internal Server Error', true, 500);
-            die($this->module->l('An error occurred in the MyParcel module, please try again.', 'adminlabelcontroller'));
+            die($this->getParsedErrorMessage($e));
         }
 
         $statusProvider = new MyparcelStatusProvider();
