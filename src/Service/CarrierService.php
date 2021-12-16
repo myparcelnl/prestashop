@@ -108,7 +108,6 @@ class CarrierService
         $carrier = new Carrier($psCarrierId);
 
         if (! Validate::isLoadedObject($carrier)) {
-            Logger::addLog("PrestaShop carrier with id $psCarrierId could not be found");
             return null;
         }
 

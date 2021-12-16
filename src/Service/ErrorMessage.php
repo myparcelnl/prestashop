@@ -25,6 +25,9 @@ class ErrorMessage
                     'errormessage'
                 );
                 break;
+            case 0 === strpos($message, 'Invoice id is required for international shipments.'):
+                $parsedMessage = $message;
+                break;
         }
 
         return $parsedMessage;

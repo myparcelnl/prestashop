@@ -1,12 +1,8 @@
 <?php
 
-use Gett\MyparcelBE\Adapter\DeliveryOptionsFromDefaultExportSettingsAdapter;
-use Gett\MyparcelBE\Adapter\DeliveryOptionsFromFormAdapter;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DefaultExportSettingsRepository;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
@@ -24,7 +20,6 @@ use Gett\MyparcelBE\Service\ErrorMessage;
 use Gett\MyparcelBE\Service\MyparcelStatusProvider;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\InvalidConsignmentException;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
@@ -100,7 +95,12 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
     }
 
-    public function processCreateb()
+    /**
+     * @return \Gett\MyparcelBE\Collection\ConsignmentCollection|null
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function processCreateBulk(): ConsignmentCollection
     {
         $postValues = Tools::getAllValues();
         $printPosition = false;
@@ -124,28 +124,27 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         }
 
         try {
-            $collection           = $factory->fromOrders($orders);
+            $collection = $factory->fromOrders($orders);
+
             $labelOptionsResolver = new LabelOptionsResolver();
 
             foreach ($orderIds as $orderId) {
-                $orderLabelParams = [
-                    'id_order' => (int) $orderId,
-                    'id_carrier' => 0,
-                ];
-                foreach ($orders as $orderRow) {
-                    if ((int) $orderRow['id_order'] === (int) $orderId) {
-                        $orderLabelParams['id_carrier'] = (int) $orderRow['id_carrier'];
-                        break;
-                    }
-                }
                 $labelOptions = $labelOptionsResolver->getLabelOptions(new Order((int) $orderId));
 
                 $options = json_decode($labelOptions);
+
                 $consignment = $collection->getConsignmentsByReferenceId($orderId)->getOneConsignment();
                 if ($options->package_type && count($consignment->getItems()) == 0) {
                     $consignment->setPackageType($options->package_type);
                 } else {
                     $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+                }
+                if (isset($options->return_undelivered) && true === $options->return_undelivered) {
+                    $consignment->setReturn(true);
+                }
+                if (isset($options->package_format)
+                    && Constant::PACKAGE_FORMAT_LARGE_INDEX === $options->package_format) {
+                    $consignment->setLargeFormat(true);
                 }
                 $consignment->setDeliveryDate($this->fixPastDeliveryDate($consignment->getDeliveryDate()));
                 $this->sanitizeSignature($consignment);
@@ -179,32 +178,26 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 }
             }
 
+
             $collection->setPdfOfLabels($printPosition);
             Logger::addLog($collection->toJson());
         } catch (Exception $e) {
             $this->logError($e);
             header('HTTP/1.1 500 Internal Server Error', true, 500);
-            die($this->module->l('An error occurred in the MyParcel module, please try again.', 'adminlabelcontroller'));
+            die($this->getParsedErrorMessage($e));
         }
 
-        $status_provider = new MyparcelStatusProvider();
+        $statusProvider = new MyparcelStatusProvider();
+
+        /** @var AbstractConsignment $consignment */
         foreach ($collection as $consignment) {
-            if ($consignment->isCdCountry()) {
-                $products = OrderLabel::getCustomsOrderProducts((int) $consignment->getReferenceId());
-                if ($products) {
-                    $orderObject = new Order($consignment->getReferenceId());
-                    if (!$orderObject->hasInvoice()) {
-                        $this->errors[] = sprintf(
-                            $this->module->l('International order ID#%s must have invoice.', 'adminlabelcontroller'),
-                            $consignment->getReferenceId()
-                        );
-                        continue;
-                    }
-                }
+            $orderId = (int) $consignment->getReferenceIdentifier();
+            if (! $this->validateConsignmentInvoice($consignment, $orderId)) {
+                continue;
             }
 
             try {
-                OrderLabel::createFromConsignment($consignment, $status_provider);
+                OrderLabel::createFromConsignment($consignment, $statusProvider);
                 OrderLabel::updateOrderTrackingNumber($orderId, $consignment->getBarcode());
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
@@ -309,30 +302,6 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrders'));
     }
 
-    public function fixPastDeliveryDate(?string $deliveryDate): ?string
-    {
-        if (!$deliveryDate) {
-            return $deliveryDate;
-        }
-        $tomorrow = new DateTime('tomorrow');
-        try {
-            $deliveryDateObj = new DateTime($deliveryDate);
-        } catch (Exception $e) {
-            return $tomorrow->format('Y-m-d H:i:s');
-        }
-        $oldDate = clone $deliveryDateObj;
-        $tomorrow->setTime(0, 0, 0, 0);
-        $oldDate->setTime(0, 0, 0, 0);
-        if ($tomorrow > $oldDate) {
-            do {
-                $deliveryDateObj->add(new DateInterval('P1D'));
-            } while ($tomorrow > $deliveryDateObj || $deliveryDateObj->format('w') == 0);
-            $deliveryDate = $deliveryDateObj->format('Y-m-d H:i:s');
-        }
-
-        return $deliveryDate;
-    }
-
     public function processDownloadLabel()
     {
         Tools::setCookieSameSite(
@@ -354,56 +323,9 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $service->downloadLabel([Tools::getValue('label_id')]);
     }
 
-    /**
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
-     */
-    public function sanitizeSignature(AbstractConsignment $consignment): void
-    {
-        if (! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE)
-            || $consignment->getCountry() !== $this->module->getModuleCountry()) {
-            $consignment->setSignature(false);
-        }
-    }
-
-    /**
-     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
-     *
-     * @return void
-     */
-    public function sanitizeDeliveryType(AbstractConsignment $consignment): void
-    {
-        if (
-            AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()
-            &&
-            ! $this->module->isBE()
-        ) {
-            return;
-        }
-
-        $consignment->setDeliveryType(
-            $consignment->getDeliveryType() < AbstractConsignment::DELIVERY_TYPE_PICKUP
-                ? AbstractConsignment::DELIVERY_TYPE_STANDARD
-                : AbstractConsignment::DELIVERY_TYPE_PICKUP
-        );
-    }
-
-    /**
-     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
-     *
-     * @return void
-     * @throws \Exception
-     * @throws \Exception
-     */
-    public function sanitizePackageType(AbstractConsignment $consignment): void
-    {
-        if ($this->module->isBE()) {
-            $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
-        }
-    }
-
     public function processExportPrint()
     {
-        $collection = $this->processCreateb();
+        $collection = $this->processCreateBulk();
         Tools::setCookieSameSite(
             'downloadPdfLabel',
             1,
@@ -454,7 +376,7 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $order   = new Order($orderId);
 
         try {
-            $this->updateDeliveryOptions($order, $postValues);
+            DeliveryOptions::updateDeliveryOptions($order, $postValues);
         } catch (Exception $e) {
             $this->errors[] = $this->module->l('Error loading the delivery options.', 'adminlabelcontroller');
             $this->errors[] = $e->getMessage();
@@ -519,16 +441,16 @@ class AdminMyParcelBELabelController extends ModuleAdminController
             $this->returnAjaxResponse();
         }
 
-        $orders = OrderLabel::getDataForLabelsCreate([(int) $orderId]);
+        $orders = OrderLabel::getDataForLabelsCreate([$orderId]);
 
         if (empty($orders)) {
             $this->errors[] = $this->module->l('No order found.', 'adminlabelcontroller');
             $this->returnAjaxResponse();
         }
 
-        $order       = reset($orders);
-        $orderObject = new Order($orderId);
-        $collection  = null;
+        $orderArray = reset($orders);
+        $order      = new Order($orderId);
+        $collection = null;
 
         $factory = new ConsignmentFactory(
             Configuration::get(Constant::API_KEY_CONFIGURATION_NAME),
@@ -537,37 +459,8 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         );
 
         try {
-            $deliveryOptions = $this->updateDeliveryOptions($orderObject, $postValues);
-
-            $collection = $factory->fromOrder($order, $deliveryOptions)
-                ->filter(
-                    function (AbstractConsignment $consignment) use ($orderObject) {
-                        if ($consignment->isCdCountry()) {
-                            $products = OrderLabel::getCustomsOrderProducts($orderObject->getId());
-
-                            if ($products && ! $orderObject->hasInvoice()) {
-                                $this->errors[] = sprintf(
-                                    $this->module->l(
-                                        'International order ID#%s must have invoice.',
-                                        'adminlabelcontroller'
-                                    ),
-                                    $orderObject->getId()
-                                );
-                                return false;
-                            }
-                        }
-
-                        return true;
-                    }
-                )
-                ->map(function (AbstractConsignment $consignment) {
-                    $consignment->setDeliveryDate($this->fixPastDeliveryDate($consignment->getDeliveryDate()));
-                    $this->sanitizeSignature($consignment);
-                    $this->sanitizePackageType($consignment);
-                    $this->sanitizeDeliveryType($consignment);
-
-                    return $consignment;
-                });
+            $deliveryOptions = DeliveryOptions::updateDeliveryOptions($order, $postValues);
+            $collection      = $factory->fromOrder($orderArray, $deliveryOptions);
 
             Logger::addLog($collection->toJson());
             $collection->setLinkOfLabels();
@@ -605,6 +498,10 @@ class AdminMyParcelBELabelController extends ModuleAdminController
         $labelIds       = [];
         $statusProvider = new MyparcelStatusProvider();
 
+        if (! empty($postValues['listingPage'])) {
+            $orderId = null;
+        }
+
         foreach ($collection as $consignment) {
             try {
                 $labelId = OrderLabel::createFromConsignment($consignment, $statusProvider);
@@ -615,14 +512,11 @@ class AdminMyParcelBELabelController extends ModuleAdminController
                 $this->errors[] = $e->getMessage();
                 continue;
             }
+
             $this->updateStatus($labelId, $consignment->getStatus());
+            OrderLabel::updateOrderTrackingNumber($orderId, $consignment->getBarcode());
         }
 
-        if (! empty($postValues['listingPage'])) {
-            $orderId = null;
-        }
-
-        OrderLabel::updateOrderTrackingNumber($order['id_order'], $consignment->getBarcode());
         $this->returnAjaxResponse(['labelIds' => $labelIds], $orderId);
     }
 
@@ -950,49 +844,6 @@ class AdminMyParcelBELabelController extends ModuleAdminController
     }
 
     /**
-     * @param  \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
-     *
-     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
-     */
-    private function getDefaultExportDeliveryOptions(
-        AbstractDeliveryOptionsAdapter $deliveryOptions
-    ): AbstractDeliveryOptionsAdapter {
-        $myParcelCarrierName = $deliveryOptions->getCarrier() ?? PlatformServiceFactory::create()
-                ->getDefaultCarrier()
-                ->getName();
-
-        $prestaShopCarrier     = CarrierService::getPrestashopCarrier($myParcelCarrierName);
-        $defaultExportSettings = DefaultExportSettingsRepository::getInstance()
-            ->getByCarrier($prestaShopCarrier->id);
-
-        return new DeliveryOptionsFromDefaultExportSettingsAdapter($defaultExportSettings);
-    }
-
-    /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
-     *
-     * @return array
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
-     */
-    private function getDeliveryOptionsArray(Order $order): array
-    {
-        $orderDeliveryOptions = DeliveryOptions::getFromOrder($order->getId());
-        $deliveryOptionsArray = [];
-
-        if ($orderDeliveryOptions) {
-            $defaultExportDeliveryOptions = $this->getDefaultExportDeliveryOptions($orderDeliveryOptions);
-            $deliveryOptionsArray[]       = $defaultExportDeliveryOptions;
-        }
-
-        $deliveryOptionsArray[] = $orderDeliveryOptions;
-
-        return $deliveryOptionsArray;
-    }
-
-    /**
      * @return string
      */
     private function getTemplateSuffix(): string
@@ -1017,19 +868,100 @@ class AdminMyParcelBELabelController extends ModuleAdminController
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
-     * @param  array                             $values
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     * @param  int                                                       $orderId
      *
-     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    private function validateConsignmentInvoice(AbstractConsignment $consignment, int $orderId): bool
+    {
+        if ($consignment->isCdCountry()) {
+            $products = OrderLabel::getCustomsOrderProducts($orderId);
+            if ($products) {
+                $orderObject = new Order($orderId);
+                if (! $orderObject->hasInvoice()) {
+                    $this->errors[] = sprintf(
+                        $this->module->l('International order ID#%s must have invoice.', 'adminlabelcontroller'),
+                        $orderId
+                    );
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public function fixPastDeliveryDate(?string $deliveryDate): ?string
+    {
+        if (!$deliveryDate) {
+            return $deliveryDate;
+        }
+        $tomorrow = new DateTime('tomorrow');
+        try {
+            $deliveryDateObj = new DateTime($deliveryDate);
+        } catch (Exception $e) {
+            return $tomorrow->format('Y-m-d H:i:s');
+        }
+        $oldDate = clone $deliveryDateObj;
+        $tomorrow->setTime(0, 0, 0, 0);
+        $oldDate->setTime(0, 0, 0, 0);
+        if ($tomorrow > $oldDate) {
+            do {
+                $deliveryDateObj->add(new DateInterval('P1D'));
+            } while ($tomorrow > $deliveryDateObj || $deliveryDateObj->format('w') == 0);
+            $deliveryDate = $deliveryDateObj->format('Y-m-d H:i:s');
+        }
+
+        return $deliveryDate;
+    }
+
+    /**
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     */
+    public function sanitizeSignature(AbstractConsignment $consignment): void
+    {
+        if (! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE)
+            || $consignment->getCountry() !== $this->module->getModuleCountry()) {
+            $consignment->setSignature(false);
+        }
+    }
+
+    /**
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @return void
+     */
+    public function sanitizeDeliveryType(AbstractConsignment $consignment): void
+    {
+        if (
+            AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()
+            &&
+            ! $this->module->isBE()
+        ) {
+            return;
+        }
+
+        $consignment->setDeliveryType(
+            $consignment->getDeliveryType() < AbstractConsignment::DELIVERY_TYPE_PICKUP
+                ? AbstractConsignment::DELIVERY_TYPE_STANDARD
+                : AbstractConsignment::DELIVERY_TYPE_PICKUP
+        );
+    }
+
+    /**
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @return void
+     * @throws \Exception
      * @throws \Exception
      */
-    private function updateDeliveryOptions(Order $order, array $values): AbstractDeliveryOptionsAdapter
+    public function sanitizePackageType(AbstractConsignment $consignment): void
     {
-        $deliveryOptionsToMerge   = $this->getDeliveryOptionsArray($order);
-        $deliveryOptionsToMerge[] = new DeliveryOptionsFromFormAdapter($values);
-        $deliveryOptions          = DeliveryOptionsMerger::create(...$deliveryOptionsToMerge);
-
-        DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
-        return $deliveryOptions;
+        if ($this->module->isBE()) {
+            $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+        }
     }
+
 }
