@@ -414,16 +414,29 @@ SQL
      */
     public static function getCustomsOrderProducts(int $id_order)
     {
-        $qb = new DbQuery();
-        $qb->select('od.product_id, pc.value , od.product_quantity, od.product_name, od.product_weight');
-        $qb->select('od.unit_price_tax_incl');
-        $qb->from('order_detail', 'od');
-        $qb->leftJoin(Table::TABLE_PRODUCT_CONFIGURATION, 'pc', 'od.product_id = pc.id_product');
-        $qb->where('od.id_order = ' . $id_order);
-        $qb->where('pc.name = "' . Constant::CUSTOMS_FORM_CONFIGURATION_NAME . '"');
-        $qb->where('pc.value = "' . Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD . '"');
+        // allow a non-existent myparcel customs setting if the default is 'Add'
+        $default    = Configuration::get(Constant::CUSTOMS_FORM_CONFIGURATION_NAME);
+        $defaultSql = (Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD === $default)
+            ? ' OR pc.name IS NULL'
+            : '';
+        $dbQuery    = new DbQuery();
+        $dbQuery->select('od.product_id, pc.value, od.product_quantity, od.product_name, od.product_weight');
+        $dbQuery->select('od.unit_price_tax_incl');
+        $dbQuery->from('order_detail', 'od');
+        $dbQuery->leftJoin(Table::TABLE_PRODUCT_CONFIGURATION, 'pc', 'od.product_id = pc.id_product');
+        $dbQuery->where(
+            'od.id_order = '
+            . $id_order
+            . ' AND ((pc.name = "'
+            . Constant::CUSTOMS_FORM_CONFIGURATION_NAME
+            . '" AND pc.value = "'
+            . Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD
+            . '")'
+            . $defaultSql
+            . ')'
+        );
 
-        return Db::getInstance()->executeS($qb) ?? [];
+        return Db::getInstance()->executeS($dbQuery) ?? [];
     }
 
     /**
@@ -472,16 +485,16 @@ SQL
     }
 
     /**
-     * @param  string  $orderId
-     * @param  string  $tracktrace
+     * @param  int|string $orderId
+     * @param  string     $tracktrace
      *
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public static function updateOrderTrackingNumber(string $orderId, string $tracktrace): bool
+    public static function updateOrderTrackingNumber($orderId, string $tracktrace): bool
     {
-        $order = new Order($orderId);
+        $order = new Order((int) $orderId);
 
         if (! Validate::isLoadedObject($order)) {
             return false;

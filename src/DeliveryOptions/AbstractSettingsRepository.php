@@ -64,6 +64,6 @@ SQL;
             throw new Exception('Static property $table must be set');
         }
 
-        return Table::withPrefix(static::$table);
+        return static::$table;
     }
 }

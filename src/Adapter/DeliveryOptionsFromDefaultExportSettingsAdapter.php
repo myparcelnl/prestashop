@@ -64,7 +64,7 @@ class DeliveryOptionsFromDefaultExportSettingsAdapter extends AbstractDeliveryOp
      */
     private function getValue(Collection $data, string $name)
     {
-        return $data->firstWhere('name', $name)['value'];
+        return $data->firstWhere('name', $name)['value'] ?? null;
     }
 
     /**

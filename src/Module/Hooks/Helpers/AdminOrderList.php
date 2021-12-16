@@ -80,7 +80,7 @@ class AdminOrderList extends AbstractAdminOrder
                 'default_label_position'        => false === $labelPosition ? '1' : $labelPosition,
                 'prompt_for_label_position'     => false === $labelPromptPosition ? '0' : $labelPromptPosition,
                 'myparcel_delivery_options_url' => $deliveryOptionsUrl,
-                'create_labels_bulk_route'      => $this->getLink('create'),
+                'create_labels_bulk_route'      => $this->getLink('createBulk'),
                 'refresh_labels_bulk_route'     => $this->getLink('refresh'),
                 'create_label_action'           => $this->getLink('createLabel', ['listingPage' => true]),
                 'create_label_error'            => $this->module->l('Cannot create label for orders', 'adminorderlist'),
