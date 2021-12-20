@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.0](https://github.com/myparcelnl/prestashop/compare/v1.3.0...v1.4.0) (2021-12-20)
+
+
+### :sparkles: New Features
+
+* allow exporting to myparcel on orders not linked to a carrier ([#77](https://github.com/myparcelnl/prestashop/issues/77)) ([788e6fb](https://github.com/myparcelnl/prestashop/commit/788e6fb9fb200f37bc286bd3edf07e08f2afa4f8))
+* use default export settings when creating shipment ([#63](https://github.com/myparcelnl/prestashop/issues/63)) ([9546ec5](https://github.com/myparcelnl/prestashop/commit/9546ec55880314671ac2a3e0c5c92363ab26ca58))
+
+
+### :bug: Bug Fixes
+
+* always add client emailaddress to consignment in BE ([#82](https://github.com/myparcelnl/prestashop/issues/82)) ([df9489d](https://github.com/myparcelnl/prestashop/commit/df9489df1567019e46079ec8ca28cab22102f503))
+* auto-translate older carrier ids to the current ones ([#60](https://github.com/myparcelnl/prestashop/issues/60)) ([b7ae0f6](https://github.com/myparcelnl/prestashop/commit/b7ae0f63a4062cc2b10befc032114bb6403bbf47))
+* column `extra_options` for install migration ([a8774c8](https://github.com/myparcelnl/prestashop/commit/a8774c894227325a87f1a900d773c5f570cbd675))
+* export company name to label ([#81](https://github.com/myparcelnl/prestashop/issues/81)) ([e6c97b6](https://github.com/myparcelnl/prestashop/commit/e6c97b621086b8a608f5e76c527a908bc497a890))
+* order status not updating after printing in some cases ([#75](https://github.com/myparcelnl/prestashop/issues/75)) ([3adc1e8](https://github.com/myparcelnl/prestashop/commit/3adc1e86b575caf3d14f90e5ce820e0c5b9b5add))
+* **regression:** delete pickup express option from carrier form ([#90](https://github.com/myparcelnl/prestashop/issues/90)) ([2ed04e2](https://github.com/myparcelnl/prestashop/commit/2ed04e26874d0205adc110e9454a5c51762dd269))
+* **regression:** fix errors in order list ([#91](https://github.com/myparcelnl/prestashop/issues/91)) ([bd99240](https://github.com/myparcelnl/prestashop/commit/bd99240fe4c3985fb36339d10732facefd40678a))
+* **regression:** get correct dropoff configuration in delivery options ([#87](https://github.com/myparcelnl/prestashop/issues/87)) ([69a7f3e](https://github.com/myparcelnl/prestashop/commit/69a7f3e4f93afc044fc4abf1ff0360f384c574e4))
+* **regression:** pass cutoff time to delivery options ([#88](https://github.com/myparcelnl/prestashop/issues/88)) ([edca384](https://github.com/myparcelnl/prestashop/commit/edca38438a234766223b601c0332b8f502ae5b10))
+* **regression:** price standard delivery falls back to 0 ([#86](https://github.com/myparcelnl/prestashop/issues/86)) ([af884a1](https://github.com/myparcelnl/prestashop/commit/af884a1087d53c702a5a443d1ca0b88af6ecf73b))
+* **regression:** show fallback strings in delivery options ([#85](https://github.com/myparcelnl/prestashop/issues/85)) ([79b712e](https://github.com/myparcelnl/prestashop/commit/79b712e9cc002349b357c9e6af2d4adae362642b))
+* **regression:** stabilize order status change ([#89](https://github.com/myparcelnl/prestashop/issues/89)) ([cb8bf47](https://github.com/myparcelnl/prestashop/commit/cb8bf47bb10ce9eb2f6cec6946188e5b9cf22dde))
+* save several days in the Exception schedule ([#59](https://github.com/myparcelnl/prestashop/issues/59)) ([915754d](https://github.com/myparcelnl/prestashop/commit/915754dceb093db86271132f55c340bf8a49998d))
+* show product once on row label ([#74](https://github.com/myparcelnl/prestashop/issues/74)) ([4a28765](https://github.com/myparcelnl/prestashop/commit/4a28765cf8fa96f62511bfce5c201e7f8c43bf07))
+* updated logo and changed plugin author to 'MyParcel' ([#84](https://github.com/myparcelnl/prestashop/issues/84)) ([ec42f5d](https://github.com/myparcelnl/prestashop/commit/ec42f5d6eb06b7cf8d7fb6b09fb43ebcb42596b6))
+* use correct table reference ([#76](https://github.com/myparcelnl/prestashop/issues/76)) ([79de1eb](https://github.com/myparcelnl/prestashop/commit/79de1eb50506701a8d8f852e15ab04f0c7470906))
+* use rest of world countries from SDK ([2bbd0fa](https://github.com/myparcelnl/prestashop/commit/2bbd0fab7d26b0d4baf237b58cc590fba95a8a15))
+
 ## [1.3.0](https://github.com/myparcelnl/prestashop/compare/v1.2.0...v1.3.0) (2021-11-11)
 
 
