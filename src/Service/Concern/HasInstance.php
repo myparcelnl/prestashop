@@ -9,7 +9,7 @@ trait HasInstance
     /**
      * @var self
      */
-    private static $instance;
+    protected static $instance;
 
     /**
      * @param  mixed ...$arguments
