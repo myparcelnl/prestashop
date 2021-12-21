@@ -1,6 +1,6 @@
 {
   "name": "myparcelnl/prestashop-module",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "require": {
     "php": ">=7.2.0",
     "myparcelnl/sdk": "v6.0.0"

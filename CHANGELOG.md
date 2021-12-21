@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.4.1](https://github.com/myparcelnl/prestashop/compare/v1.4.0...v1.4.1) (2021-12-21)
+
+
+### :bug: Bug Fixes
+
+* fix accessibility error on getInstance in some cases ([#102](https://github.com/myparcelnl/prestashop/issues/102)) ([83b982c](https://github.com/myparcelnl/prestashop/commit/83b982cefea1eb48929803aaf873ba3cac652717)), closes [#101](https://github.com/myparcelnl/prestashop/issues/101)
+
 ## [1.4.0](https://github.com/myparcelnl/prestashop/compare/v1.3.0...v1.4.0) (2021-12-20)
 
 

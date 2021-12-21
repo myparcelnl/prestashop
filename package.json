@@ -1,6 +1,6 @@
 {
   "name": "@myparcel/prestashop-module",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "scripts": {
     "cypress:open": "cypress open",
     "watch": "gulp watch",
