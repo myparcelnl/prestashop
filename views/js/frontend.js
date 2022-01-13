@@ -102,10 +102,10 @@
   }
 
   /**
-   * @returns {jQuery|null}
+   * @returns {boolean}
    */
-  function getRenderedDeliveryOptions() {
-    return getElement('form.myparcel-delivery-options');
+  function hasUnRenderedDeliveryOptions() {
+    return Boolean(getElement('#myparcel-delivery-options'));
   }
 
   /**
@@ -152,10 +152,10 @@
    *
    */
   function updateDeliveryOptions() {
-    if (getRenderedDeliveryOptions()) {
-      document.dispatchEvent(new Event('myparcel_update_config'));
-    } else {
+    if (hasUnRenderedDeliveryOptions()) {
       document.dispatchEvent(new Event('myparcel_render_delivery_options'));
+    } else {
+      document.dispatchEvent(new Event('myparcel_update_config'));
     }
   }
 
