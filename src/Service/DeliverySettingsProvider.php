@@ -230,7 +230,7 @@ class DeliverySettingsProvider
             'allowSaturdayDelivery' => $this->isEnabledInCarrier($psCarrierId, 'allowSaturdayDelivery'),
             'allowShowDeliveryDate' => -1 !== $deliveryDaysWindow,
             'allowSignature'        => $this->isEnabledInCarrier($psCarrierId, 'allowSignature'),
-            'deliveryDaysWindow'    => $deliveryDaysWindow,
+            'deliveryDaysWindow'    => abs($deliveryDaysWindow),
             'priceEveningDelivery'  => $this->getPrice($psCarrierId, 'priceEveningDelivery', $taxRate),
             'priceMorningDelivery'  => $this->getPrice($psCarrierId, 'priceMorningDelivery', $taxRate),
             'priceOnlyRecipient'    => $this->getPrice($psCarrierId, 'priceOnlyRecipient', $taxRate),
