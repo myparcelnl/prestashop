@@ -16,6 +16,7 @@ const dist = path.resolve(__dirname, '..', '..', 'dist');
  * @type {string[]}
  */
 const sourceFiles = [
+  'config/**/*',
   'controllers/**/*',
   'mails/**/*',
   'src/**/*',
