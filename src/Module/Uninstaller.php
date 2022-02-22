@@ -22,7 +22,11 @@ class Uninstaller
         $this->module = MyParcelBE::getModule();
     }
 
-    public function __invoke(): bool
+    /**
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     */
+    public function uninstall(): bool
     {
         return $this->hooks()
             && $this->migrate()

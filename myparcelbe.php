@@ -22,12 +22,17 @@ class MyParcelBE extends CarrierModule
 
     public $baseUrl;
     public $id_carrier;
+
+    /**
+     * @var class-string<\Gett\MyparcelBE\Database\Migration>[]
+     */
     public $migrations = [
         \Gett\MyparcelBE\Database\CreateProductConfigurationTableMigration::class,
         \Gett\MyparcelBE\Database\CreateCarrierConfigurationTableMigration::class,
         \Gett\MyparcelBE\Database\CreateOrderLabelTableMigration::class,
         \Gett\MyparcelBE\Database\CreateDeliverySettingTableMigration::class,
     ];
+
     public $carrierStandardShippingCost = [];
     public $cartCarrierStandardShippingCost = null;
 
@@ -97,6 +102,7 @@ class MyParcelBE extends CarrierModule
         'displayAdminAfterHeader',
         'actionValidateOrder',
     ];
+
     /** @var string */
     protected $baseUrlWithoutToken;
 
@@ -238,16 +244,23 @@ class MyParcelBE extends CarrierModule
         return true;
     }
 
+    /**
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
     public function install(): bool
     {
-        return parent::install()
-            && (new \Gett\MyparcelBE\Module\Installer())();
+        return parent::install() && (new \Gett\MyparcelBE\Module\Installer())->install();
     }
 
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
     public function uninstall(): bool
     {
-        return (new \Gett\MyparcelBE\Module\Uninstaller())()
-            && parent::uninstall();
+        return (new \Gett\MyparcelBE\Module\Uninstaller())->uninstall() && parent::uninstall();
     }
 
     public function appendQueryToUrl($urlString, $query = [])

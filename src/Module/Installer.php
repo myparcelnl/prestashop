@@ -2,14 +2,16 @@
 
 namespace Gett\MyparcelBE\Module;
 
-use Gett\MyparcelBE\Database\Table;
-use Tab;
 use Carrier;
-use Gett\MyparcelBE\Constant;
 use Configuration;
-use Db;
 use Context;
+use Db;
+use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use Language;
+use MyParcelBE;
+use Tab;
 
 class Installer
 {
@@ -48,7 +50,7 @@ class Installer
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public function __invoke(): bool
+    public function install(): bool
     {
         $result = true;
         $result &= $this->migrate();
@@ -119,18 +121,10 @@ class Installer
         $languages = [];
 
         foreach (Language::getLanguages(true) as $lang) {
-            //            $languages['MyParcelLabelController'][$lang['id_lang']] = 'MyParcel Carriers';
             $languages['AdminMyParcelBE'][$lang['id_lang']] = 'MyParcelBE';
         }
 
         return [
-            //            [
-            //                // The class name of the controller, without namespace.
-            //                'class_name' => 'AdminMyParcelBELabel',
-            //                // The name of the route in the symfony routes.yml file
-            //                'route_name' => 'myparcelbe_label',
-            //                'name'       => $languages['MyParcelLabelController'],
-            //            ],
             [
                 'class_name'   => 'AdminMyParcelBE',
                 'name'         => $languages['AdminMyParcelBE'],
