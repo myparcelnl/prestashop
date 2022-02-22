@@ -50,8 +50,8 @@ const copyFiles = [
   'views/dist/**/*',
   'composer.lock',
   'logo.png',
-  'package-lock.json',
   'package.json',
+  'yarn.lock',
 ];
 
 /**
@@ -61,8 +61,8 @@ const copyFiles = [
  */
 const excludeFiles = [
   'composer.lock',
-  'package-lock.json',
   'package.json',
+  'yarn.lock',
 ];
 
 const adminAppDir = 'views/js/admin';

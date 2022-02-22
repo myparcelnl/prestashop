@@ -3,19 +3,19 @@
 ## Project setup
 
 ```shell
-npm install
+yarn
 ```
 
 ### Compiles and hot-reloads for development
 
 ```shell
-npm run serve
+yarn serve
 ```
 
 ### Compiles and minifies for production
 
 ```shell
-npm run build
+yarn build
 ```
 
 ### Customize configuration

@@ -8,7 +8,7 @@ const {execute} = require('../execute');
  */
 function createVueInstallTask() {
   return (callback) => {
-    execute('yarn --from-lockfile', {cwd: adminAppDir}, callback);
+    execute('yarn --frozen-lockfile', {cwd: adminAppDir}, callback);
   };
 }
 
