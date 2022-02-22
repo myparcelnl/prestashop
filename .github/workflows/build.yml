@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - config/**/*
       - controllers/**/*
       - mails/**/*
       - src/**/*
