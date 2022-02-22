@@ -2,7 +2,7 @@ myparcelbe_label:
   path: myparcelbe/label
   methods: [ GET, POST ]
   defaults:
-    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelLabelController::index'
+    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelBELabelController::index'
 
 myparcelbe_order:
   path: myparcelbe/order

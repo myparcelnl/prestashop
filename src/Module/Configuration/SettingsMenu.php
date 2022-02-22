@@ -11,7 +11,6 @@ use Gett\MyparcelBE\Module\Configuration\Form\CustomsForm;
 use Gett\MyparcelBE\Module\Configuration\Form\GeneralForm;
 use Gett\MyparcelBE\Module\Configuration\Form\LabelForm;
 use Gett\MyparcelBE\Module\Configuration\Form\OrderForm;
-use Module;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Collection;
 use Tools;

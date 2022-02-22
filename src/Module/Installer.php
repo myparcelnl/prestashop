@@ -2,35 +2,52 @@
 
 namespace Gett\MyparcelBE\Module;
 
-use Carrier;
-use Configuration;
-use Context;
-use Db;
-use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
-use Language;
-use MyParcelBE;
 use Tab;
+use Carrier;
+use Gett\MyparcelBE\Constant;
+use Configuration;
+use Db;
+use Context;
+use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 
 class Installer
 {
-    /** @var \MyParcelBE */
+    /**
+     * @var \MyParcelBE
+     */
     private $module;
 
     private static $carriers_nl = [
-        ['name' => 'PostNL', 'image' => 'postnl.jpg', 'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME],
-    ];
-    private static $carriers_be = [
-        ['name' => 'Bpost', 'image' => 'bpost.jpg', 'configuration_name' => Constant::BPOST_CONFIGURATION_NAME],
-        ['name' => 'DPD', 'image' => 'dpd.jpg', 'configuration_name' => Constant::DPD_CONFIGURATION_NAME],
+        [
+            'name'               => 'PostNL',
+            'image'              => 'postnl.jpg',
+            'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME,
+        ],
     ];
 
-    public function __construct(MyParcelBE $module)
+    private static $carriers_be = [
+        [
+            'name'               => 'Bpost',
+            'image'              => 'bpost.jpg',
+            'configuration_name' => Constant::BPOST_CONFIGURATION_NAME,
+        ],
+        [
+            'name'               => 'DPD',
+            'image'              => 'dpd.jpg',
+            'configuration_name' => Constant::DPD_CONFIGURATION_NAME,
+        ],
+    ];
+
+    public function __construct()
     {
-        $this->module = $module;
+        $this->module = MyParcelBE::getModule();
     }
 
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
     public function __invoke(): bool
     {
         $result = true;
@@ -56,95 +73,67 @@ class Installer
         return $result;
     }
 
-    public function installTabs()
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function installTabs(): bool
     {
-        $res = $this->uninstallTabs();
+        $status = (new Uninstaller())->uninstallTabs();
 
-        if (!$res) {
+        if (! $status) {
             return false;
         }
 
-        foreach ($this->getAdminTabsDefinition() as $key => $admin_tab) {
-            $res &= $this->installTab($key);
+        foreach (self::getAdminTabsDefinition() as $tab) {
+            $status &= $this->installTab($tab);
         }
 
-        return $res;
+        return $status;
     }
 
-    public function uninstallTabs($tabs = null)
+    /**
+     * @param  array $newTab
+     *
+     * @return bool
+     */
+    public function installTab(array $newTab): bool
     {
-        $res = true;
+        $tab             = new Tab();
+        $tab->active     = 1;
+        $tab->class_name = $newTab['class_name'];
+        $tab->name       = $newTab['name'];
+        $tab->id_parent  = (! empty($newTab['parent_class'])
+            ? (int) Tab::getIdFromClassName($newTab['parent_class'])
+            : -1);
+        $tab->module     = $this->module->name;
 
-        if ($tabs === null) {
-            $tabs = $this->getAdminTabsDefinition();
-        }
-
-        foreach ($this->getAdminTabsDefinition() as $key => $admin_tab) {
-            $res &= $this->uninstallTab($key);
-        }
-
-        return $res;
-    }
-
-    public function installTab($tabName)
-    {
-        $res = $this->uninstallTab($tabName);
-
-        if (!$res) {
-            return false;
-        }
-
-        $tabsDef = $this->getAdminTabsDefinition();
-
-        if (!empty($tabsDef[$tabName])) {
-            $admin_tab = $tabsDef[$tabName];
-            $tab = new Tab();
-            $tab->active = 1;
-            $tab->class_name = $admin_tab['class_name'];
-            $tab->name = $admin_tab['name'];
-            $tab->id_parent = (!empty($admin_tab['parent_class'])
-                ? (int) Tab::getIdFromClassName($admin_tab['parent_class'])
-                : -1);
-            $tab->module = $this->module->name;
-            $res &= $tab->add();
-        }
-
-        return $res;
-    }
-
-    public function uninstallTab($tabName)
-    {
-        $res = true;
-
-        $id_tab = (int) Tab::getIdFromClassName($tabName);
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
-            $res &= $tab->delete();
-        }
-
-        return $res;
+        return $tab->add();
     }
 
     /**
      * @return array[]
      */
-    public function getAdminTabsDefinition(): array
+    public static function getAdminTabsDefinition(): array
     {
         $languages = [];
 
         foreach (Language::getLanguages(true) as $lang) {
-            $languages['MyParcelLabelController'][$lang['id_lang']] = 'MyParcel Carriers';
-            $languages['MyParcelController'][$lang['id_lang']]      = 'MyParcelBE';
+            //            $languages['MyParcelLabelController'][$lang['id_lang']] = 'MyParcel Carriers';
+            $languages['AdminMyParcelBE'][$lang['id_lang']] = 'MyParcelBE';
         }
 
         return [
-            'MyParcelLabelController' => [
-                'class_name' => 'AdminLabel',
-                'name'       => $languages['MyParcelLabelController'],
-            ],
-            'MyParcelController'      => [
-                'class_name'   => 'Admin',
-                'name'         => $languages['MyParcelController'],
+            //            [
+            //                // The class name of the controller, without namespace.
+            //                'class_name' => 'AdminMyParcelBELabel',
+            //                // The name of the route in the symfony routes.yml file
+            //                'route_name' => 'myparcelbe_label',
+            //                'name'       => $languages['MyParcelLabelController'],
+            //            ],
+            [
+                'class_name'   => 'AdminMyParcelBE',
+                'name'         => $languages['AdminMyParcelBE'],
                 'parent_class' => 'AdminParentShipping',
             ],
         ];
@@ -164,7 +153,7 @@ class Installer
         $carrier->external_module_name = $this->module->name;
         $carrier->shipping_method = 2;
 
-        foreach (Language::getLanguages() as $lang) {
+        foreach (\Language::getLanguages() as $lang) {
             $carrier->delay[$lang['id_lang']] = 'Super fast delivery';
         }
 

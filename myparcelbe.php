@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
-if (!defined('_PS_VERSION_')) {
+if (! defined('_PS_VERSION_')) {
     exit;
 }
 
@@ -111,26 +111,28 @@ class MyParcelBE extends CarrierModule
 
         parent::__construct();
 
-        if (!empty(Context::getContext()->employee->id)) {
+        if (! empty(Context::getContext()->employee->id)) {
             $this->baseUrlWithoutToken = $this->getAdminLink(
                 'AdminModules',
                 false,
                 [
-                    'configure' => $this->name,
-                    'tab_module' => $this->tab,
+                    'configure'   => $this->name,
+                    'tab_module'  => $this->tab,
                     'module_name' => $this->name,
                 ]
             );
-            $this->baseUrl = $this->getAdminLink(
+
+            $this->baseUrl             = $this->getAdminLink(
                 'AdminModules',
                 true,
                 [
-                    'configure' => $this->name,
-                    'tab_module' => $this->tab,
+                    'configure'   => $this->name,
+                    'tab_module'  => $this->tab,
                     'module_name' => $this->name,
                 ]
             );
         }
+
         $this->displayName = $this->l('MyParcelBE');
         $this->description = $this->l('PrestaShop module which integrates with MyParcel NL');
 
@@ -239,12 +241,12 @@ class MyParcelBE extends CarrierModule
     public function install(): bool
     {
         return parent::install()
-            && (new \Gett\MyparcelBE\Module\Installer($this))();
+            && (new \Gett\MyparcelBE\Module\Installer())();
     }
 
     public function uninstall(): bool
     {
-        return (new \Gett\MyparcelBE\Module\Uninstaller($this))()
+        return (new \Gett\MyparcelBE\Module\Uninstaller())()
             && parent::uninstall();
     }
 

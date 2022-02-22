@@ -2,22 +2,24 @@
 
 namespace Gett\MyparcelBE\Module;
 
+use Carrier;
+use Configuration;
+use Db;
+use DbQuery;
+use Gett\MyparcelBE\Constant;
 use MyParcelBE;
 use Tab;
-use Configuration;
-use DbQuery;
-use Db;
-use Carrier;
-use Gett\MyparcelBE\Constant;
 
 class Uninstaller
 {
-    /** @var \MyParcelBE */
+    /**
+     * @var \MyParcelBE
+     */
     private $module;
 
-    public function __construct(MyParcelBE $module)
+    public function __construct()
     {
-        $this->module = $module;
+        $this->module = MyParcelBE::getModule();
     }
 
     public function __invoke(): bool
@@ -49,21 +51,25 @@ class Uninstaller
         return $result;
     }
 
-    private function uninstallTabs()
+    /**
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     */
+    public function uninstallTabs(): bool
     {
-        $res = true;
+        $status = true;
+        $tabs   = Installer::getAdminTabsDefinition();
 
-        $tabs = ['AdminMyParcelBE', 'AdminMyParcelBELabel', 'Loading'];
+        foreach ($tabs as $adminTab) {
+            $tabId = (int) Tab::getIdFromClassName($adminTab['class_name']);
 
-        foreach ($tabs as $tabName) {
-            $id_tab = (int) Tab::getIdFromClassName($tabName);
-            if ($id_tab) {
-                $tab = new Tab($id_tab);
-                $res &= $tab->delete();
+            if ($tabId) {
+                $tab    = new Tab($tabId);
+                $status &= $tab->delete();
             }
         }
 
-        return $res;
+        return $status;
     }
 
     private function removeCarriers()
