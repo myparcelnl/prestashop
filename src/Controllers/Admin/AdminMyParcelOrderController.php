@@ -12,10 +12,6 @@ use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
 use Symfony\Component\HttpFoundation\Response;
 
-if (file_exists(_PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php')) {
-    require_once _PS_MODULE_DIR_ . 'myparcelbe/vendor/autoload.php';
-}
-
 /**
  * @property \MyParcelBE $module
  */
