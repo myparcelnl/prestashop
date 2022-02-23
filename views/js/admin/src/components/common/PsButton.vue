@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="btn"
+    class="btn text-nowrap"
     :class="{
       [`btn-${size}`]: size,
       [`btn-${variant}`]: variant,
