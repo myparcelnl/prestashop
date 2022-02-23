@@ -2,14 +2,17 @@ const path = require('path');
 
 module.exports = {
   chainWebpack: (config) => {
-    config.optimization.minimize(false)
+    config.optimization.minimize('production' === process.env.NODE_ENV)
     config.plugins.delete('html');
     config.plugins.delete('preload');
     config.plugins.delete('prefetch');
   },
   configureWebpack: {
     devtool: 'sourcemap',
-    output: {filename: '[name].js', chunkFilename: 'chunks/[name].js'},
+    output: {
+      filename: '[name].js',
+      chunkFilename: 'chunks/[name].js'
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
