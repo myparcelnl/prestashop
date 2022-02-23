@@ -16,7 +16,6 @@ use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierService;
@@ -56,7 +55,12 @@ class AdminOrderService
         $collection = $factory->fromOrder($order, $deliveryOptions);
         $collection->setLinkOfLabels();
 
-        ApiLogger::addLog(json_encode($collection->toArray(), JSON_PRETTY_PRINT));
+        ApiLogger::addLog(
+            sprintf(
+                "Creating consignments: %s",
+                json_encode($collection->toArray(), JSON_PRETTY_PRINT)
+            )
+        );
 
         if (($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0)
             && MyParcelBE::getModule()->isNL()) {
@@ -142,7 +146,7 @@ class AdminOrderService
             ->addConsignment($consignment)
             ->setPdfOfLabels()
             ->generateReturnConsignments(true);
-        Logger::addLog($collection->toJson());
+        ApiLogger::addLog($collection->toJson());
 
         $consignment            = $collection->first();
         $orderLabel             = new OrderLabel();
@@ -175,6 +179,7 @@ class AdminOrderService
      */
     public function exportOrder(int $orderId): ConsignmentCollection
     {
+        ApiLogger::addLog('Starting export with order id: ' . $orderId);
         $postValues      = Tools::getAllValues();
         $order           = $this->getOrder($orderId);
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);

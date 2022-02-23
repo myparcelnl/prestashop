@@ -7,7 +7,7 @@ namespace Gett\MyparcelBE\Module\Configuration\Form;
 use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\Logger;
+use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Model\Webhook\Subscription;
 use Gett\MyparcelBE\Service\WebhookService;
 use Tools;
@@ -129,7 +129,7 @@ class ApiForm extends AbstractForm
         if ($response) {
             Configuration::updateValue(Constant::WEBHOOK_ID_CONFIGURATION_NAME, null);
             Configuration::updateValue(Constant::WEBHOOK_HASH_CONFIGURATION_NAME, null);
-            Logger::addLog("Webhook subscription ($subscriptionId) deleted.");
+            ApiLogger::addLog("Webhook subscription ($subscriptionId) deleted.", ApiLogger::INFO);
         }
     }
 
@@ -164,7 +164,7 @@ class ApiForm extends AbstractForm
         if ($subscriptionId) {
             Configuration::updateValue(Constant::WEBHOOK_ID_CONFIGURATION_NAME, $subscriptionId);
             Configuration::updateValue(Constant::WEBHOOK_HASH_CONFIGURATION_NAME, $hash);
-            Logger::addLog("New webhook subscription ($subscriptionId) created. URL: $webhookUrl");
+            ApiLogger::addLog("New webhook subscription ($subscriptionId) created. URL: $webhookUrl", ApiLogger::INFO);
         }
     }
 }

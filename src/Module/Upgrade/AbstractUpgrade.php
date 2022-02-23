@@ -7,7 +7,7 @@ namespace Gett\MyparcelBE\Module\Upgrade;
 defined('_PS_VERSION_') or die();
 
 use Exception;
-use Gett\MyparcelBE\Logger\Logger;
+use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
@@ -50,7 +50,7 @@ abstract class AbstractUpgrade
         try {
             $this->upgrade();
         } catch (Exception $e) {
-            Logger::addLog('Upgrade ' . static::class . ' failed: ' . $e->getMessage(), true);
+            ApiLogger::addLog($e, ApiLogger::ERROR);
             return false;
         }
 

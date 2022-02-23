@@ -13,8 +13,8 @@ use Gett\MyparcelBE\Constant;
 class ApiLogger extends FileLogger
 {
     /**
-     * @param  mixed $message
-     * @param  int   $level
+     * @param  \Exception|array|string $message
+     * @param  int                     $level
      */
     public static function addLog(
         $message,
@@ -25,8 +25,5 @@ class ApiLogger extends FileLogger
         }
 
         parent::addLog($message, $level);
-
-        // Also log to the DB for the time being.
-        Logger::addLog($message, $level > 0, true, $level);
     }
 }

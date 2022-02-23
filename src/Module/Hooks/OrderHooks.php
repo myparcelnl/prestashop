@@ -6,13 +6,12 @@ use Exception;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\Logger\Logger;
+use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierName;
 use Gett\MyparcelBE\Service\Order\OrderDeliveryDate;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use stdClass;
 
 trait OrderHooks
 {
@@ -52,10 +51,8 @@ trait OrderHooks
 
         try {
             DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
-        } catch (Exception $exception) {
-            Logger::addLog($exception->getMessage(), true, true);
-            Logger::addLog($exception->getFile(), true, true);
-            Logger::addLog($exception->getLine(), true, true);
+        } catch (Exception $e) {
+            ApiLogger::addLog($e, ApiLogger::ERROR);
         }
     }
 }

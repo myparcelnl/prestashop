@@ -7,6 +7,7 @@ namespace Gett\MyparcelBE\Service\Consignment;
 use Configuration;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Service\LabelOptionsService;
 use Tools;
 
@@ -20,6 +21,7 @@ class Download
      */
     public function downloadLabel(array $labelIds): ?string
     {
+        ApiLogger::addLog(sprintf("Downloading labels %s", implode(', ', $labelIds)));
         $apiKey     = Configuration::get(Constant::API_KEY_CONFIGURATION_NAME);
         $collection = ConsignmentCollection::findMany($labelIds, $apiKey);
 

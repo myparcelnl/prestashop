@@ -6,7 +6,6 @@ use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
@@ -525,6 +524,7 @@ class OrderLabel extends ObjectModel
         $order->update();
 
         if (Validate::isLoadedObject($orderCarrier)) {
+            ApiLogger::addLog("Updating tracking number for $order->id to $barcode");
             $orderCarrier->tracking_number = pSQL($barcode);
             return $orderCarrier->update();
         }
@@ -573,7 +573,7 @@ SELECT id_order_label FROM $table where id_label in $idsString
 SQL
                 );
         } catch (Exception $e) {
-            Logger::addLog($e->getMessage(), true);
+            ApiLogger::addLog($e, ApiLogger::ERROR);
         }
 
         return (new Collection(Arr::pluck($rows, 'id_order_label')))
@@ -642,7 +642,7 @@ SQL
                 true
             );
         } catch (ApiException $e) {
-            Logger::addLog($e->getMessage(), true);
+            ApiLogger::addLog($e, ApiLogger::ERROR);
         }
 
         return $trackTraceInfo['data']['tracktraces'][0] ?? null;

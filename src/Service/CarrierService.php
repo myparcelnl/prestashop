@@ -7,7 +7,6 @@ namespace Gett\MyparcelBE\Service;
 use Carrier;
 use Configuration;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;

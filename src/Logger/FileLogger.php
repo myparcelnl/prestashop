@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Logger;
 
+use Exception;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -15,8 +16,8 @@ class FileLogger extends PrestaShopFileLogger
     use HasInstance;
 
     /**
-     * @param  mixed $message
-     * @param  int   $level
+     * @param  \Exception|array|string $message
+     * @param  int                     $level
      *
      * @return void
      */
@@ -33,26 +34,37 @@ class FileLogger extends PrestaShopFileLogger
             )
         );
 
-        $string = self::createMessage($message);
+        $string = self::createMessage($level, $message);
 
         $logger->log($string, $level);
     }
 
     /**
-     * @param  mixed $message
+     * @param  \Exception|array|string $message
      *
      * @return void
      */
-    private static function createMessage($message): string
+    private static function createMessage(int $level, $message): string
     {
-        $caller = self::getCaller();
-        $string = sprintf('%s:%s', $caller['file'], $caller['line']);
+        $output = $message;
 
-        if (is_string($message)) {
-            return (string) $message;
+        if (is_a($message, Exception::class)) {
+            $output = $message->getMessage();
+            $source = sprintf('%s:%s', $message->getFile(), $message->getLine());
+        } else {
+            $caller = self::getCaller();
+            $source = sprintf('%s:%s]', $caller['file'], $caller['line']);
         }
 
-        return $string . '] ' . json_encode($message, JSON_PRETTY_PRINT);
+        if (! is_string($message)) {
+            $output = json_encode($message, JSON_PRETTY_PRINT);
+        }
+
+        if ($level === self::ERROR) {
+            return "$output\nSource: $source";
+        }
+
+        return $output;
     }
 
     /**

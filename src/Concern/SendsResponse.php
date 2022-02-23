@@ -37,7 +37,7 @@ trait SendsResponse
             }
         }
 
-        Logger::addLog($e ? $e->getMessage() : $text, true, true);
+        ApiLogger::addLog($e ?: $text, ApiLogger::DEBUG);
 
         $this->errors[] = $text
             ? MyParcelBE::getModule()

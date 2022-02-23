@@ -53,7 +53,8 @@ class AdminMyParcelOrderController extends AbstractAdminController
             }
         }
 
-        $response = ['shipmentLabels' => Arr::collapse($orderLabels)];
+        $orderLabels = Arr::collapse($orderLabels);
+        $response    = ['shipmentLabels' => $orderLabels];
 
         if ($print && ! $this->hasErrors()) {
             try {
