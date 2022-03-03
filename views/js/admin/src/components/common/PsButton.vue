@@ -55,8 +55,6 @@ export default defineComponent({
     },
   },
 
-  emits: ['click'],
-
   setup: (props) => ({
     icons: computed(() => toArray(props.icon)),
 

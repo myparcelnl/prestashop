@@ -18,7 +18,8 @@
         "@typescript-eslint/no-unnecessary-type-assertion": "off",
         "@typescript-eslint/unbound-method": "off",
         "no-void": "off",
-        "vue/require-direct-export": "off"
+        "vue/require-direct-export": "off",
+        "vue/require-explicit-emits": "off"
       }
     }
   ]

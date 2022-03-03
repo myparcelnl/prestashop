@@ -37,7 +37,5 @@ export default defineComponent({
     ...disabledProps,
     ...useOptionsProps<DropdownButtonItem>(),
   },
-
-  emits: ['click'],
 });
 </script>

@@ -10,17 +10,18 @@
     "preinstall": "npx -q only-allow yarn"
   },
   "dependencies": {
-    "@vue/composition-api": "^1.4.0",
+    "@vue/composition-api": "^1.4.9",
     "mitt": "^3.0.0",
     "vue": "^2.6.14"
   },
   "devDependencies": {
     "@myparcel/delivery-options": "^4.4.0",
-    "@types/jquery": "^3.5.11",
+    "@types/jquery": "^3.5.14",
+    "@types/node": "^16.11.26",
     "@vue/cli-plugin-typescript": "^4.5.15",
     "@vue/cli-service": "^4.5.15",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.5.4",
+    "ts-loader": "^9.2.7",
+    "typescript": "^4.6.2",
     "vue-template-compiler": "^2.6.14",
     "webpack": "^4.46.0"
   }

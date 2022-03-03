@@ -70,8 +70,6 @@ export default defineComponent({
     ShipmentLabel,
   },
 
-  emits: ['select'],
-
   setup: (props, ctx) => {
     const contextData = useGlobalContext(ContextKey.SHIPMENT_LABELS);
     const mutableSelectedRows = ref<string[]>([]);

@@ -36,8 +36,6 @@ export default defineComponent({
     ...useOptionsProps(),
   },
 
-  emits: ['change'],
-
   setup: (props, ctx) => {
     const onChange = (event: Event): void => {
       const element = event.target as HTMLSelectElement;

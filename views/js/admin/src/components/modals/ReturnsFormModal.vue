@@ -20,7 +20,5 @@ export default defineComponent({
     ReturnsForm,
     Modal,
   },
-
-  emits: ['alert'],
 });
 </script>

@@ -95,8 +95,6 @@ export default defineComponent({
     ...contextProps,
   },
 
-  emits: ['save', 'leave'],
-
   setup: (props) => {
     const contextData = props.context ? useContext(props.context ?? props.contextKey) : null;
     const modalId = ref<string>(props.id ?? contextData?.id ?? props.contextKey ?? null);

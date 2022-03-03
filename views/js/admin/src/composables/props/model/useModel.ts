@@ -4,7 +4,6 @@ export const useModel: ComposableComponentWithSetup<ReturnType<typeof useVModel>
   event: Event = 'input',
   prop: string = 'value',
 ) => ({
-  emits: [event],
   model: {
     event,
     prop,

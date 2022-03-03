@@ -26,8 +26,6 @@ export default defineComponent({
     DeliveryOptions,
   },
 
-  emits: ['alert'],
-
   setup: () => {
     const onSave: ModalCallback = async() => {
       const contextData = useGlobalContext(ContextKey.SHIPMENT_OPTIONS);
