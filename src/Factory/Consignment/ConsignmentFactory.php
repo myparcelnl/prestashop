@@ -159,13 +159,24 @@ class ConsignmentFactory
             return AbstractConsignment::PACKAGE_TYPE_PACKAGE;
         }
 
-        $packageType = $this->request['packageType'] ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
+        $packageType = $this->getLegacyPackageType() ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
 
         if (! isset($this->carrierSettings['delivery']['packageType'][(int) $packageType])) {
             $packageType = AbstractConsignment::PACKAGE_TYPE_PACKAGE; // TODO: for NL the DPD and Bpost don't allow any.
         }
 
         return (int) $packageType;
+    }
+
+    private function getLegacyPackageType(): ?int
+    {
+        if ($this->orderData['delivery_settings'] ?? false) {
+            $deliverySettings = json_decode($this->orderData['delivery_settings'], true);
+            if ($deliverySettings['packageType'] ?? false) {
+                return Constant::PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP[$deliverySettings->packageType] ?? null;
+            }
+        }
+        return null;
     }
 
     /**
