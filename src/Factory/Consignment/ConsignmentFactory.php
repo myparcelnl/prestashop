@@ -173,7 +173,7 @@ class ConsignmentFactory
         if ($this->orderData['delivery_settings'] ?? false) {
             $deliverySettings = json_decode($this->orderData['delivery_settings'], true);
             if ($deliverySettings['packageType'] ?? false) {
-                return Constant::PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP[$deliverySettings->packageType] ?? null;
+                return Constant::PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP[$deliverySettings['packageType']] ?? null;
             }
         }
         return null;
