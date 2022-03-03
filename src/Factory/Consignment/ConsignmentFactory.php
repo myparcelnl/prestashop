@@ -160,8 +160,8 @@ class ConsignmentFactory
         }
 
         if (isset($this->orderData['delivery_settings'])) {
-            $deliverySettings = json_decode($this->orderData['delivery_settings'], false);
-            if (isset($deliverySettings->packageType)) {
+            $deliverySettings = json_decode($this->orderData['delivery_settings'], true);
+            if ($deliverySettings['packageType']) {
                 $packageType = Constant::PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP[$deliverySettings->packageType];
             }
         }
