@@ -162,7 +162,7 @@ class ConsignmentFactory
         if (isset($this->orderData['delivery_settings'])) {
             $deliverySettings = json_decode($this->orderData['delivery_settings'], false);
             if (isset($deliverySettings->packageType)) {
-                $packageType = AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP[$deliverySettings->packageType];
+                $packageType = Constant::PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP[$deliverySettings->packageType];
             }
         }
         $packageType = $packageType ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
