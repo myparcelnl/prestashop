@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Controllers\Admin;
 
 use Exception;
+use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Listener\MyparcelOrderLabelListener;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\AdminPanelRenderService;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
+use PrestaShop\PrestaShop\Adapter\Configuration;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -51,10 +54,15 @@ class AdminMyParcelOrderController extends AbstractAdminController
 
         $orderLabels = Arr::collapse($orderLabels);
         $response    = ['shipmentLabels' => $orderLabels];
+        $status      = (new Configuration())->get(Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME);
 
         if ($print && ! $this->hasErrors()) {
             try {
                 $response += $this->service->printLabels(Arr::pluck($orderLabels, 'id_label'));
+
+                foreach ($orderLabels as $orderLabel) {
+                    MyparcelOrderLabelListener::prePersist((int) $orderLabel['id_order'], $status);
+                }
             } catch (Exception $e) {
                 $this->addError($e);
             }
@@ -99,10 +107,14 @@ class AdminMyParcelOrderController extends AbstractAdminController
     {
         $orderIds = $this->service->getPostedIds('orderIds');
         $labelIds = OrderLabel::getOrdersLabels($orderIds);
+        $status      = (new Configuration())->get(Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME);
 
         try {
             $response = $this->service->printLabels($labelIds);
             $this->setResponse($response);
+            foreach ($orderIds as $orderId) {
+                MyparcelOrderLabelListener::prePersist($orderId, $status);
+            }
         } catch (Exception $e) {
             $this->addError($e);
         }
