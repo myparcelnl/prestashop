@@ -174,11 +174,10 @@ class DeliverySettingsProvider extends AbstractProvider
             $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
 
             $carrierSettings[$carrierName] = array_merge(
-                $this->getCarrierSettings($psCarrier->id, $shippingOptions),
+                $this->getCarrierSettings($psCarrier->id, $shippingOptions, $priceStandardDelivery),
                 $this->getDropOffSettings($psCarrier->id),
                 [
                     'allowDeliveryOptions'  => true,
-                    'priceStandardDelivery' => $priceStandardDelivery,
                 ]
             );
         }
@@ -193,7 +192,7 @@ class DeliverySettingsProvider extends AbstractProvider
      * @return array
      * @throws \PrestaShopDatabaseException
      */
-    private function getCarrierSettings(int $psCarrierId, array $shippingOptions): array
+    private function getCarrierSettings(int $psCarrierId, array $shippingOptions, float $basePrice): array
     {
         $deliveryDaysWindow = (int) (CarrierConfigurationProvider::get($psCarrierId, 'deliveryDaysWindow') ?? 1);
         $taxRate            = $shippingOptions['tax_rate'];
@@ -208,12 +207,13 @@ class DeliverySettingsProvider extends AbstractProvider
             'allowSaturdayDelivery' => $this->isEnabledInCarrier($psCarrierId, 'allowSaturdayDelivery'),
             'allowShowDeliveryDate' => -1 !== $deliveryDaysWindow,
             'allowSignature'        => $this->isEnabledInCarrier($psCarrierId, 'allowSignature'),
-            'deliveryDaysWindow'    => $deliveryDaysWindow,
-            'priceEveningDelivery'  => $this->getPrice($psCarrierId, 'priceEveningDelivery', $taxRate),
-            'priceMorningDelivery'  => $this->getPrice($psCarrierId, 'priceMorningDelivery', $taxRate),
-            'priceOnlyRecipient'    => $this->getPrice($psCarrierId, 'priceOnlyRecipient', $taxRate),
-            'pricePickup'           => $this->getPrice($psCarrierId, 'pricePickup', $taxRate),
-            'priceSignature'        => $this->getPrice($psCarrierId, 'priceSignature', $taxRate),
+            'deliveryDaysWindow'    => abs($deliveryDaysWindow),
+            'priceStandardDelivery' => $basePrice,
+            'priceEveningDelivery'  => $basePrice + $this->getPrice($psCarrierId, 'priceEveningDelivery', $taxRate),
+            'priceMorningDelivery'  => $basePrice + $this->getPrice($psCarrierId, 'priceMorningDelivery', $taxRate),
+            'priceOnlyRecipient'    => $basePrice + $this->getPrice($psCarrierId, 'priceOnlyRecipient', $taxRate),
+            'pricePickup'           => $basePrice + $this->getPrice($psCarrierId, 'pricePickup', $taxRate),
+            'priceSignature'        => $basePrice + $this->getPrice($psCarrierId, 'priceSignature', $taxRate),
         ];
     }
 
