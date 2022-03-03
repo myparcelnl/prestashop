@@ -11,13 +11,12 @@
 </template>
 
 <script lang="ts">
-import { ContextKey } from '@/data/global/context';
 import Modal from '@/components/Modal.vue';
 import { OrderAction } from '@/data/global/actions';
 import ShipmentOptions from '@/components/order/ShipmentOptions.vue';
+import { ShipmentOptionsContext } from '@/data/global/context';
 import { defineComponent } from '@vue/composition-api';
 import { executeOrderAction } from '@/services/actions/executeOrderAction';
-import { useGlobalContext } from '@/composables/context/useGlobalContext';
 
 export default defineComponent({
   name: 'ShipmentOptionsModal',
@@ -27,11 +26,9 @@ export default defineComponent({
   },
 
   setup: () => {
-    const contextData = useGlobalContext(ContextKey.SHIPMENT_OPTIONS);
-
     return {
-      exportOrder: async(): Promise<void> => {
-        await executeOrderAction(OrderAction.EXPORT, contextData.value.orderId ?? undefined);
+      exportOrder: async(id: string, context: ShipmentOptionsContext): Promise<void> => {
+        await executeOrderAction(OrderAction.EXPORT, context.orderId ?? undefined);
       },
     };
   },

@@ -4,7 +4,7 @@ import { useLoading } from '@/composables/useLoading';
 
 export type ModalData = Record<never, unknown> | null | undefined;
 
-export type ModalCallback = ((id: string) => Promise<void> | void);
+export type ModalCallback = ((id: string, context: AnyContext | null) => Promise<void> | void);
 
 export interface ModalCallbackProps {
   onSave: ModalCallback;
@@ -51,7 +51,7 @@ export const useModalContext: UseModalContext = (modalId, onSave, onLeave) => {
 
     if (callback) {
       setLoading(true);
-      await callback(modalId.value);
+      await callback(modalId.value, additionalContext.value);
       setLoading(false);
     }
 

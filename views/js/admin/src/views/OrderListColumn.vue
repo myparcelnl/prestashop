@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import { defineComponent, ref, watch } from '@vue/composition-api';
 import { ContextKey } from '@/data/global/context';
 import LabelCard from '@/components/LabelCard.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
@@ -51,15 +51,17 @@ export default defineComponent({
   setup: () => {
     const shipmentLabelsContext = useGlobalInstanceContext(ContextKey.SHIPMENT_LABELS);
     const shipmentOptionsContext = useGlobalInstanceContext(ContextKey.SHIPMENT_OPTIONS);
-
     const { orderId } = shipmentOptionsContext.value;
+
+    const labels = ref<ShipmentLabel[]>([]);
+
+    watch(shipmentLabelsContext, (newContext) => {
+      labels.value = newContext.labels;
+    }, { deep: true, immediate: true });
 
     return {
       orderId,
-      labels: computed(() => {
-        return shipmentLabelsContext.value.labels.filter((label) => Number(label.id_order) === orderId);
-      }),
-
+      labels,
       print: async(): Promise<void> => {
         await executeOrderAction(OrderAction.PRINT, orderId ?? undefined);
       },

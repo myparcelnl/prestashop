@@ -23,11 +23,12 @@ interface LabelIdsData {
   labelIds: string[];
 }
 
-interface ShipmentLabelsData {
+export interface ShipmentLabelsData {
   shipmentLabels: ShipmentLabel[];
 }
 
 type PrintData = LabelIdsData & {
+
   /** PDF link or pdf content as base64 encoded string. */
   pdf: string;
 };
@@ -39,7 +40,8 @@ export type ActionResponse<CK = AdminAction> =
         CK extends LabelAction.PRINT ? ActionSuccessResponse<CK, PrintData> :
           CK extends OrderAction.PRINT ? ActionSuccessResponse<CK, PrintData> :
             CK extends LabelAction.REFRESH ? ActionSuccessResponse<CK, ShipmentLabelsData> :
-              never;
+              CK extends OrderAction.REFRESH_LABELS ? ActionSuccessResponse<CK, ShipmentLabelsData> :
+                never;
 
 export type PrintActions = LabelAction.PRINT | OrderAction.EXPORT_PRINT | OrderAction.PRINT;
 
