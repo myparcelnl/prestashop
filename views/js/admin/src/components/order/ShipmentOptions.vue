@@ -52,8 +52,6 @@
         :context="contextData" />
     </div>
 
-    <p></p>
-
     <PsAlert
       v-if="contextData.deliveryOptionsDateChanged"
       variant="warning"
