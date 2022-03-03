@@ -159,7 +159,13 @@ class ConsignmentFactory
             return AbstractConsignment::PACKAGE_TYPE_PACKAGE;
         }
 
-        $packageType = $this->request['packageType'] ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
+        if (isset($this->orderData['delivery_settings'])) {
+            $deliverySettings = json_decode($this->orderData['delivery_settings'], false);
+            if (isset($deliverySettings->packageType)) {
+                $packageType = AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP[$deliverySettings->packageType];
+            }
+        }
+        $packageType = $packageType ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
 
         if (! isset($this->carrierSettings['delivery']['packageType'][(int) $packageType])) {
             $packageType = AbstractConsignment::PACKAGE_TYPE_PACKAGE; // TODO: for NL the DPD and Bpost don't allow any.
