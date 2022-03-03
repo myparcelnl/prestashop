@@ -21,9 +21,7 @@
       v-model="contextData.extraOptions.digitalStampWeight"
       :calculated-weight="contextData.orderWeight || 0" />
 
-    <div
-      v-if="showShipmentOptions"
-      v-show="contextData.labelOptions.package_format !== $PackageFormat.LARGE">
+    <div v-if="showShipmentOptions">
       <FormGroup label="shipment_options_title">
         <PsCheckbox
           v-if="contextData.consignment.canHaveOnlyRecipient"
