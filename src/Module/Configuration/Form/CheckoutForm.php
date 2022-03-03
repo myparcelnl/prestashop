@@ -47,7 +47,7 @@ class CheckoutForm extends AbstractForm
             [
                 'label' => 'Delivery Title',
                 'name'  => self::CONFIGURATION_DELIVERY_TITLE,
-                'desc'  => 'General delivery title that shows up above the delivery options.',
+                'desc'  => 'Title of the delivery option.',
             ],
             [
                 'label' => 'Standard delivery title',
@@ -79,6 +79,7 @@ class CheckoutForm extends AbstractForm
             [
                 'label' => 'Pickup title',
                 'name'  => self::CONFIGURATION_PICKUP_TITLE,
+                'desc'  => 'Title of the pickup option.',
             ],
         ];
     }
