@@ -5,7 +5,7 @@
       appear>
       <LabelCard
         v-for="label in labels"
-        :key="label.barcode"
+        :key="`${label.id_order}_${label.id_order_label}_${label.id_label}`"
         :label="label" />
     </TransitionGroup>
 
