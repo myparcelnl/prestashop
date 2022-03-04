@@ -26,10 +26,10 @@ export const useGlobalContext: UseGlobalContext = (contextKey, context?) => {
       });
 
       if (!foundEntry) {
-        const localContext = ref<AnyContext | null>(null);
+        const localContext = ref<AnyContext>(useContext(context ?? contextKey));
         const createdEntry = computed({
           get() {
-            return localContext.value ?? useContext(context ?? contextKey);
+            return localContext.value;
           },
           set(context: AnyContext) {
             localContext.value = context;
