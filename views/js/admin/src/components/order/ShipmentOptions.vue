@@ -21,7 +21,9 @@
       v-model="contextData.extraOptions.digitalStampWeight"
       :calculated-weight="contextData.orderWeight || 0" />
 
-    <div v-if="showShipmentOptions">
+    <div
+      v-if="canHaveShipmentOptions"
+      v-show="showShipmentOptions">
       <FormGroup label="shipment_options_title">
         <PsCheckbox
           v-if="contextData.consignment.canHaveOnlyRecipient"
@@ -59,7 +61,7 @@
 
 <script lang="ts">
 import { ContextKey, ShipmentOptionsContext } from '@/data/global/context';
-import { computed, defineComponent, watchEffect } from '@vue/composition-api';
+import { computed, defineComponent, ref, watch, watchEffect } from '@vue/composition-api';
 import DigitalStampWeightSelectFormGroup from '@/components/order/DigitalStampWeightSelectFormGroup.vue';
 import FormGroup from '@/components/common/form/FormGroup.vue';
 import InsuranceSelectFormGroup from '@/components/order/InsuranceSelectFormGroup.vue';
@@ -111,12 +113,16 @@ export default defineComponent({
       return contextData.value.deliveryOptions?.shipmentOptions ?? {};
     });
 
-    const showShipmentOptions = computed(() => {
+    const canHaveShipmentOptions = computed(() => {
       const anyShipmentOptionIsSet = CONSIGNMENT_SHIPMENT_OPTIONS_KEYS.some((property) => {
         return Boolean(contextData.value.consignment[property]);
       });
 
       return contextData.value.consignment && anyShipmentOptionIsSet;
+    });
+
+    const showShipmentOptions = computed(() => {
+      return contextData.value.deliveryOptions.packageType === 'package';
     });
 
     /**
@@ -131,7 +137,12 @@ export default defineComponent({
       orderActionsEventBus.update(values);
     });
 
-    return { contextData, showShipmentOptions, shipmentOptions };
+    return {
+      showShipmentOptions,
+      contextData,
+      shipmentOptions,
+      canHaveShipmentOptions,
+    };
   },
 });
 </script>
