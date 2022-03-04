@@ -15,7 +15,7 @@
         {{ $filters.translate('bulk_actions') }}
         <span
           v-if="selectedLabels.length"
-          class="badge badge-light ml-1"
+          class="badge badge-dark ml-1"
           v-text="selectedLabels.length" />
       </PsDropdownButton>
     </template>
