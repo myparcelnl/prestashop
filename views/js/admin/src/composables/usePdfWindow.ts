@@ -5,7 +5,7 @@ let pdfWindow: Ref<Window | null>;
 
 type UsePdfWindow = () => {
   pdfWindow: typeof pdfWindow;
-  open: () => void;
+  open: () => Promise<void>;
   close: () => void;
   navigate: (href: string) => void;
 };
@@ -14,15 +14,25 @@ type UsePdfWindow = () => {
  * Keeps a reference to a window.
  */
 export const usePdfWindow: UsePdfWindow = () => {
-  const open: ReturnType<UsePdfWindow>['open'] = () => {
-    pdfWindow = ref<Window | null>(window.open(getAdminUrl(window.MyParcelActions.pathLoading), '_blank'));
-    if (!pdfWindow.value) {
-      throw new Error('Failed to create new window.');
-    }
+  const open: ReturnType<UsePdfWindow>['open'] = async() => {
+    return new Promise((resolve) => {
+      pdfWindow = ref<Window | null>(null);
+      const newWindow = window.open(getAdminUrl(window.MyParcelActions.pathLoading), '_blank');
 
-    window.focus();
-    pdfWindow.value?.blur();
-    pdfWindow.value.onclose = close;
+      if (!newWindow) {
+        throw new Error('Failed to create new window.');
+      }
+
+      newWindow.onload = (): void => {
+        pdfWindow.value = newWindow;
+
+        window.focus();
+        pdfWindow.value?.blur();
+        pdfWindow.value.onclose = close;
+
+        resolve();
+      };
+    });
   };
 
   const close: ReturnType<UsePdfWindow>['close'] = () => {

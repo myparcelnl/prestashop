@@ -35,8 +35,9 @@ export async function executeAdminAction(
     requestParameters.labelFormat = printOptionsContext.value.labelFormat;
     requestParameters.labelPosition = printOptionsContext.value.labelPosition;
     requestParameters.labelOutput = printOptionsContext.value.labelOutput;
+
     if (printOptionsContext.value.labelOutput === 'open') {
-      usePdfWindow().open();
+      await usePdfWindow().open();
     }
 
     callbacks.push(onPrintLabels as ((res: ActionResponse) => void));
