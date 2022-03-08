@@ -1,6 +1,5 @@
 /* eslint-disable max-len,vue/max-len */
 
-export type ActionUrls = 'adminUrl' | 'deliveryOptionsUrl';
 export type AdminAction = LabelAction | OrderAction;
 
 export enum LabelAction {
@@ -42,8 +41,6 @@ export type ActionResponse<CK = AdminAction> =
             CK extends LabelAction.REFRESH ? ActionSuccessResponse<CK, ShipmentLabelsData> :
               CK extends OrderAction.REFRESH_LABELS ? ActionSuccessResponse<CK, ShipmentLabelsData> :
                 never;
-
-export type PrintActions = LabelAction.PRINT | OrderAction.EXPORT_PRINT | OrderAction.PRINT;
 
 export const printActions = [
   LabelAction.PRINT,
