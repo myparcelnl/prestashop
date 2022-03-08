@@ -117,7 +117,8 @@ class AdminPanelRenderService extends RenderService
             $context['orderId']      = $order->getId();
             $context['orderWeight']  = (new OrderTotalWeight())->convertWeightToGrams($order->getTotalWeight());
             $context['extraOptions'] = [
-                'digitalStampWeight' => $extraOptions->getDigitalStampWeight() ?? $context['orderWeight'],
+                'digitalStampWeight' => $extraOptions->getDigitalStampWeight() ??
+                    WeightService::convertToDigitalStampWeight($context['orderWeight']),
                 'labelAmount'        => $extraOptions->getLabelAmount(),
             ];
             $context['labelOptions'] = (new LabelOptionsResolver())->getLabelOptions($order);
