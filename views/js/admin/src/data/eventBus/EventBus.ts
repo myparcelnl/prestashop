@@ -8,10 +8,17 @@ export enum EventName {
   RESPONSE = 'response',
 }
 
+export interface EmitterRequestData<T> {
+  parameters: RequestParameters;
+  requestOptions: JQuery.AjaxSettings | null;
+  response: T;
+  url: string;
+}
+
 type EventCallback<T> =
-  T extends EventName.BUSY ? (state: boolean) => void :
-    T extends EventName.ERROR ? (errorResponse: ErrorResponse) => void :
-      T extends EventName.RESPONSE ? (response: SuccessResponse) => void :
+  T extends EventName.BUSY ? (data: EmitterRequestData<boolean>) => void :
+    T extends EventName.ERROR ? (data: EmitterRequestData<ErrorResponse>) => void :
+      T extends EventName.RESPONSE ? (data: EmitterRequestData<SuccessResponse>) => void :
         (...args: unknown[]) => void;
 
 type EventBusRequest = (
@@ -68,21 +75,23 @@ export class EventBus {
     parameters = {},
     requestOptions = {},
   ): Promise<RequestResponse> => {
-    this.emit(EventName.BUSY, true);
+    const data = { requestOptions, url, parameters };
+
+    this.emit(EventName.BUSY, { response: true, ...data });
     const response = await doRequest(url, parameters, requestOptions);
-    this.emit(EventName.BUSY, false);
+    this.emit(EventName.BUSY, { response: false, ...data });
 
     if (isOfType<ErrorResponse>(response, 'errors')) {
-      this.emit(EventName.ERROR, response);
+      this.emit(EventName.ERROR, { response, ...data });
     }
 
     if (isOfType<SuccessResponse>(response, 'data')) {
-      this.emit(EventName.RESPONSE, response);
+      this.emit(EventName.RESPONSE, { response, ...data });
       return response;
     }
   };
 
-  protected emit(event: EventName, data: SuccessResponse | ErrorResponse | string | boolean): void {
+  protected emit(event: EventName, data: EmitterRequestData<SuccessResponse | ErrorResponse | boolean>): void {
     this.emitter.emit(event, data);
   }
 

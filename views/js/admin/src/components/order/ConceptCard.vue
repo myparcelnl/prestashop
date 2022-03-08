@@ -42,9 +42,8 @@
 </template>
 
 <script lang="ts">
+import { EmitterRequestData, EventName } from '@/data/eventBus/EventBus';
 import DeliveryMomentSelector from '@/components/order/DeliveryMomentSelector.vue';
-import { EventName } from '@/data/eventBus/EventBus';
-import LoaderOverlay from '@/components/common/LoaderOverlay.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import { OrderAction } from '@/data/global/actions';
 import PsButton from '@/components/common/PsButton.vue';
@@ -60,12 +59,11 @@ export default defineComponent({
   name: 'ConceptCard',
   components: {
     DeliveryMomentSelector,
-    ShippingAddress,
-    PsCard,
     MaterialIcon,
     PsButton,
+    PsCard,
     ShipmentOptions,
-    LoaderOverlay,
+    ShippingAddress,
   },
 
   data() {
@@ -80,8 +78,8 @@ export default defineComponent({
   },
 
   methods: {
-    setLoading(status: boolean): void {
-      this.loading = status;
+    setLoading(data: EmitterRequestData<boolean>): void {
+      this.loading = data.response;
     },
 
     async saveDeliveryOptions(): Promise<void> {

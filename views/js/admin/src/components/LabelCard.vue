@@ -44,7 +44,7 @@ export default defineComponent({
 
   setup: () => {
     const { loading, setLoading } = useLoading();
-    deliveryOptionsEventBus.on(EventName.BUSY, setLoading);
+    deliveryOptionsEventBus.on(EventName.BUSY, ({ response: busy }) => setLoading(busy));
 
     const execute = async(action: LabelAction, label: ShipmentLabel): Promise<void> => {
       await executeLabelAction(action, Number(label.id_label));

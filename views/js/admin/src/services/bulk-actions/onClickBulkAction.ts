@@ -1,4 +1,4 @@
-import { EventName } from '@/data/eventBus/EventBus';
+import { EmitterRequestData, EventName } from '@/data/eventBus/EventBus';
 import { OrderAction } from '@/data/global/actions';
 import { convertErrorToAlertData } from '@/services/convertErrorToAlertData';
 import { executeOrderAction } from '@/services/actions/executeOrderAction';
@@ -16,10 +16,11 @@ export function onClickBulkAction(action: OrderAction): void {
 
   const { addNotice } = useNotices();
 
-  const callback = (error: ErrorResponse): void => {
-    convertErrorToAlertData(error).map(addNotice);
+  const callback: (data: EmitterRequestData<ErrorResponse>) => void = (data): void => {
+    convertErrorToAlertData(data).map(addNotice);
     orderActionsEventBus.off(EventName.ERROR, callback);
   };
+
   orderActionsEventBus.on(EventName.ERROR, callback);
 
   void executeOrderAction(action, selectedOrderIds);

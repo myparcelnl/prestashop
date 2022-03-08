@@ -11,7 +11,7 @@ interface ActionSuccessResponse<Action extends string, Data = AjaxSuccessRespons
   action: Action;
 }
 
-type RequestResponse = SuccessResponse<any> | void;
+type RequestResponse = SuccessResponse | void;
 
 interface AjaxSuccessResponse<Data = any> {
   data: Data;
