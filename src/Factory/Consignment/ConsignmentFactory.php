@@ -106,6 +106,21 @@ class ConsignmentFactory
     }
 
     /**
+     * @return bool
+     */
+    public function hasAgeCheck(): bool
+    {
+        $isToRowCountry  = $this->consignment->isCdCountry();
+        $shipmentOptions = $this->getShipmentOptions();
+
+        if ($isToRowCountry) {
+            return (bool) Configuration::get(Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME);
+        }
+
+        return $shipmentOptions && true === $shipmentOptions->hasAgeCheck();
+    }
+
+    /**
      * @return null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter
      */
     private function getShipmentOptions(): ?AbstractShipmentOptionsAdapter
@@ -312,7 +327,7 @@ class ConsignmentFactory
             ->setReturn($shipmentOptions && $shipmentOptions->isReturn())
             ->setSignature($this->hasSignature())
             ->setInsurance($shipmentOptions ? $shipmentOptions->getInsurance() : null)
-            ->setAgeCheck($shipmentOptions && true === $shipmentOptions->hasAgeCheck())
+            ->setAgeCheck($this->hasAgeCheck())
             ->setContents(AbstractConsignment::PACKAGE_CONTENTS_COMMERCIAL_GOODS)
             ->setInvoice($this->orderData['invoice_number']);
     }
