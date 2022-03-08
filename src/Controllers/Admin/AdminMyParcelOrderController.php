@@ -54,15 +54,13 @@ class AdminMyParcelOrderController extends AbstractAdminController
 
         $orderLabels = Arr::collapse($orderLabels);
         $response    = ['shipmentLabels' => $orderLabels];
-        $status      = (int) (new Configuration())->get(Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME);
 
-        if ($print && ! $this->hasErrors()) {
+        if (! $this->hasErrors()) {
             try {
                 $response += $this->service->printLabels(Arr::pluck($orderLabels, 'id_label'));
 
                 foreach ($orderLabels as $orderLabel) {
-                    MyparcelOrderLabelListener::prePersist((int) $orderLabel['id_order'], $status);
-                    OrderLabel::updateStatus((int) $orderLabel['id_label'], $status);
+                    OrderLabel::updateStatus((int) $orderLabel['id_label'], (int) $orderLabel['new_order_state']);
                 }
             } catch (Exception $e) {
                 $this->addError($e);
@@ -113,9 +111,6 @@ class AdminMyParcelOrderController extends AbstractAdminController
         try {
             $response = $this->service->printLabels($labelIds);
             $this->setResponse($response);
-            foreach ($orderIds as $orderId) {
-                MyparcelOrderLabelListener::prePersist($orderId, $status);
-            }
             foreach ($labelIds as $labelId) {
                 OrderLabel::updateStatus((int) $labelId, $status);
             }
