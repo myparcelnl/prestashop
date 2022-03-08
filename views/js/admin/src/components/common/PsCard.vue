@@ -5,7 +5,7 @@
       class="card-header">
       <slot name="header" />
     </div>
-    <div class="card-body">
+    <div class="card-body overflow-auto">
       <slot />
     </div>
     <div
