@@ -375,6 +375,8 @@ class ConsignmentFactory
     /**
      * @return void
      * @throws \PrestaShopDatabaseException
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     * @throws \Exception
      */
     private function setCustomItems(): void
     {
@@ -389,19 +391,15 @@ class ConsignmentFactory
             $description = $product['product_name'];
             $itemValue   = Tools::ps_round($product['unit_price_tax_incl'] * 100);
 
-            try {
-                $this->consignment->addItem(
-                    (new MyParcelCustomsItem())
-                        ->setDescription($description)
-                        ->setAmount($product['product_quantity'])
-                        ->setWeight($weight)
-                        ->setItemValue($itemValue)
-                        ->setCountry($this->getCountryOfOrigin($product['product_id']))
-                        ->setClassification($this->getHsCode($product['product_id']))
-                );
-            } catch (Exception $e) {
-                ApiLogger::addLog($e, ApiLogger::ERROR);
-            }
+            $this->consignment->addItem(
+                (new MyParcelCustomsItem())
+                    ->setDescription($description)
+                    ->setAmount($product['product_quantity'])
+                    ->setWeight($weight)
+                    ->setItemValue($itemValue)
+                    ->setCountry($this->getCountryOfOrigin($product['product_id']))
+                    ->setClassification($this->getHsCode($product['product_id']))
+            );
         }
     }
 

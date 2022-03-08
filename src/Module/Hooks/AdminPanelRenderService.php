@@ -6,10 +6,12 @@ namespace Gett\MyparcelBE\Module\Hooks;
 
 use Closure;
 use Configuration;
+use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
@@ -28,15 +30,10 @@ use PrestaShop\PrestaShop\Adapter\Entity\Customer;
 class AdminPanelRenderService extends RenderService
 {
     public const  ID_PRINT_OPTIONS                         = 'printOptions';
-
     public const  ID_RETURNS_FORM                          = 'returnsForm';
-
     public const  ID_SHIPMENT_LABELS                       = 'shipmentLabels';
-
     public const  ID_SHIPMENT_OPTIONS                      = 'shipmentOptions';
-
     public const  ID_SHIPPING_ADDRESS                      = 'shippingAddress';
-
     private const CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP = [
         'canHaveAgeCheck'      => 'ageCheck',
         'canHaveInsurance'     => 'insurance',
@@ -44,7 +41,6 @@ class AdminPanelRenderService extends RenderService
         'canHaveReturn'        => 'returnUndelivered',
         'canHaveSignature'     => 'signatureRequired',
     ];
-
     private const CONSIGNMENT_OPTIONS_MAP                  = [
         'canHaveAgeCheck'      => AbstractConsignment::SHIPMENT_OPTION_AGE_CHECK,
         'canHaveInsurance'     => AbstractConsignment::SHIPMENT_OPTION_INSURANCE,
@@ -199,13 +195,11 @@ class AdminPanelRenderService extends RenderService
      * @param  array                             $map
      *
      * @return array
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     protected function getConsignmentOptions(Order $order, array $map): array
     {
         $consignment = $this->createConsignmentForOrder($order);
+
         if (! $consignment) {
             return [];
         }
@@ -244,17 +238,22 @@ class AdminPanelRenderService extends RenderService
      * @param  \Gett\MyparcelBE\Model\Core\Order $order
      *
      * @return null|\MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     * @throws \Exception
      */
     private function createConsignmentForOrder(Order $order): ?AbstractConsignment
     {
-        $deliveryOptions = DeliverySettings::getDeliveryOptionsFromOrder($order);
-        return (new ConsignmentFactory([]))
-            ->fromOrder($order, $deliveryOptions)
-            ->first();
+        $consignment = null;
+
+        try {
+            $deliveryOptions = DeliverySettings::getDeliveryOptionsFromOrder($order);
+            $consignment     = (new ConsignmentFactory([]))
+                ->fromOrder($order, $deliveryOptions)
+                ->first();
+        } catch (Exception $e) {
+            FileLogger::addLog($e->getMessage());
+            $this->addError($e);
+        }
+
+        return $consignment;
     }
 
     /**

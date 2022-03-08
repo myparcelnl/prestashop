@@ -28,11 +28,11 @@ abstract class AbstractAdminController extends FrameworkBundleAdminController
         $action   = Tools::getValue('action', null);
 
         if (! $action) {
-            $this->addError(null, 'Parameter "action" is missing or invalid.');
+            $this->addError('Parameter "action" is missing or invalid.');
         }
 
         if (is_string($action) && ! method_exists($this, $action)) {
-            $this->addError(null, "Action \"$action\" does not exist.");
+            $this->addError("Action \"$action\" does not exist.");
         }
 
         if (! $this->hasErrors()) {
