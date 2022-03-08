@@ -6,7 +6,6 @@ namespace Gett\MyparcelBE\Controllers\Admin;
 
 use Exception;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Listener\MyparcelOrderLabelListener;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\AdminPanelRenderService;
 use Gett\MyparcelBE\Module\Tools\Tools;
@@ -34,11 +33,9 @@ class AdminMyParcelOrderController extends AbstractAdminController
     /**
      * Called from shipment options modal and "New shipment (& print)" buttons on single order view.
      *
-     * @param  bool $print
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function export(bool $print = false): Response
+    public function export(): Response
     {
         $orderIds    = $this->service->getPostedIds('orderIds');
         $orderLabels = [];
@@ -48,7 +45,7 @@ class AdminMyParcelOrderController extends AbstractAdminController
                 $collection    = $this->service->exportOrder($orderId);
                 $orderLabels[] = $this->service->getOrderLabels($collection);
             } catch (Exception $e) {
-                $this->addError($e, "Error exporting order $orderId: " . $e->getMessage());
+                $this->addOrderError($e, $orderId);
             }
         }
 
@@ -76,7 +73,7 @@ class AdminMyParcelOrderController extends AbstractAdminController
      */
     public function exportPrint(): Response
     {
-        return $this->export(true);
+        return $this->export();
     }
 
     /**

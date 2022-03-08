@@ -250,7 +250,7 @@ class AdminPanelRenderService extends RenderService
                 ->first();
         } catch (Exception $e) {
             FileLogger::addLog($e->getMessage());
-            $this->addError($e);
+            $this->addOrderError($e, $order);
         }
 
         return $consignment;
