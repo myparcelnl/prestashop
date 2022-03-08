@@ -1,17 +1,17 @@
 <template>
   <div>
-    <Notices />
+    <HeaderAlerts />
     <Modals />
   </div>
 </template>
 
 <script lang="ts">
+import HeaderAlerts from '@/components/HeaderAlerts.vue';
 import Modals from '@/components/modals/Modals.vue';
-import Notices from '@/components/Notices.vue';
 import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
   name: 'AfterHeader',
-  components: { Notices, Modals },
+  components: { HeaderAlerts, Modals },
 });
 </script>

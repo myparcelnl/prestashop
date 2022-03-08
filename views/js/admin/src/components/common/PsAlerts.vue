@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <TransitionGroup
+    name="mypa__fade"
+    appear>
     <PsAlert
       v-for="(alert, index) in alerts"
       :key="`alert_${index}_${alert.content}`"
       :variant="alert.variant"
       :content="alert.content" />
-  </div>
+  </TransitionGroup>
 </template>
 
 <script lang="ts">
