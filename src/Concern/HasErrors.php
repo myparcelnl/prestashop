@@ -8,6 +8,7 @@ use Exception;
 use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use InvalidArgumentException;
+use MyParcelBE;
 
 trait HasErrors
 {
@@ -37,7 +38,7 @@ trait HasErrors
         }
 
         if (is_string($error)) {
-            $exceptionMessage = $prefix . $this->module->l($error, 'adminlabelcontroller');
+            $exceptionMessage = $prefix . MyParcelBE::getModule()->l($error, 'adminlabelcontroller');
         }
 
         if (! $exceptionMessage) {
@@ -58,7 +59,7 @@ trait HasErrors
     protected function addOrderError($error, $orderOrId): void
     {
         $orderId = $orderOrId instanceof Order ? $orderOrId->getId() : $orderOrId;
-        $prefix  = sprintf('%s #%d: ', $this->module->l('Order', 'AdminGlobal'), $orderId);
+        $prefix  = sprintf('%s #%d: ', MyParcelBE::getModule()->l('Order', 'AdminGlobal'), $orderId);
         $this->addError($error, $prefix);
     }
 
