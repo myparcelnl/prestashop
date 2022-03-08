@@ -58,7 +58,6 @@ trait DisplayAdminProductsExtra
                 'CUSTOMS_FORM'       => Constant::CUSTOMS_FORM_CONFIGURATION_NAME,
                 'CUSTOMS_CODE'       => Constant::CUSTOMS_CODE_CONFIGURATION_NAME,
                 'CUSTOMS_ORIGIN'     => Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME,
-                'CUSTOMS_AGE_CHECK'  => Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME,
                 'countries'          => Country::getCountries(Context::getContext()->language->id),
                 'isBE'               => $this->isBE(),
             ]

@@ -65,7 +65,6 @@ class MyParcelBE extends CarrierModule
         \Gett\MyparcelBE\Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME,
         \Gett\MyparcelBE\Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME,
         \Gett\MyparcelBE\Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME,
-        \Gett\MyparcelBE\Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME,
 
         \Gett\MyparcelBE\Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
         \Gett\MyparcelBE\Constant::SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME,

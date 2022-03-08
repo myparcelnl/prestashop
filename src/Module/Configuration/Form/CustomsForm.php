@@ -54,24 +54,6 @@ class CustomsForm extends AbstractForm
                 ],
                 'default_value' => $this->module->isBE() ? AbstractConsignment::CC_BE : AbstractConsignment::CC_NL,
             ],
-            Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME => [
-                'type' => self::FIELD_TYPE_SWITCH,
-                'label' => $this->module->l('Default customs age check', 'customsform'),
-                'name' => Constant::CUSTOMS_AGE_CHECK_CONFIGURATION_NAME,
-                'is_bool' => true,
-                'values' => [
-                    [
-                        'id' => 'active_on',
-                        'value' => 1,
-                        'label' => $this->module->l('Enabled', 'customsform'),
-                    ],
-                    [
-                        'id' => 'active_off',
-                        'value' => 0,
-                        'label' => $this->module->l('Disabled', 'customsform'),
-                    ],
-                ],
-            ],
         ];
     }
 
