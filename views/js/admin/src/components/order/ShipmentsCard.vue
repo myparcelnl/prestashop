@@ -46,7 +46,7 @@ export default defineComponent({
 
   setup: () => {
     const { loading, setLoading } = useLoading();
-    labelActionsEventBus.on(EventName.BUSY, setLoading);
+    labelActionsEventBus.on(EventName.BUSY, ({ response: busy }) => setLoading(busy));
     const selectedLabels = ref<number[]>([]);
 
     return {
