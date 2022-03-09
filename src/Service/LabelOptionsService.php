@@ -30,7 +30,7 @@ class LabelOptionsService
      */
     public function getLabelOutput(): string
     {
-        return Configuration::get(Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME)
+        return 'true' === Configuration::get(Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME)
             ? self::LABEL_OUTPUT_OPEN
             : self::LABEL_OUTPUT_DOWNLOAD;
     }
