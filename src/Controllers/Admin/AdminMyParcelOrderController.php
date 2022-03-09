@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Controllers\Admin;
 
 use Exception;
-use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\AdminPanelRenderService;
 use Gett\MyparcelBE\Module\Tools\Tools;
+use Gett\MyparcelBE\Service\AdminOrderService;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
-use PrestaShop\PrestaShop\Adapter\Configuration;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -20,22 +19,24 @@ use Symfony\Component\HttpFoundation\Response;
 class AdminMyParcelOrderController extends AbstractAdminController
 {
     /**
-     * @var \Gett\MyparcelBE\Controllers\Admin\AdminOrderService
+     * @var \Gett\MyparcelBE\Service\AdminOrderService
      */
     private $service;
 
     public function __construct()
     {
         parent::__construct();
-        $this->service = new AdminOrderService();
+        $this->service = new AdminOrderService($this->configuration);
     }
 
     /**
      * Called from shipment options modal and "New shipment (& print)" buttons on single order view.
      *
+     * @param  bool $print
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function export(): Response
+    public function export(bool $print = false): Response
     {
         $orderIds    = $this->service->getPostedIds('orderIds');
         $orderLabels = [];
@@ -51,17 +52,12 @@ class AdminMyParcelOrderController extends AbstractAdminController
 
         $orderLabels = Arr::collapse($orderLabels);
         $response    = ['shipmentLabels' => $orderLabels];
+        $labelIds    = Arr::pluck($orderLabels, 'id_label');
 
-        if (! $this->hasErrors()) {
-            try {
-                $response += $this->service->printLabels(Arr::pluck($orderLabels, 'id_label'));
-
-                foreach ($orderLabels as $orderLabel) {
-                    OrderLabel::updateStatus((int) $orderLabel['id_label'], (int) $orderLabel['new_order_state']);
-                }
-            } catch (Exception $e) {
-                $this->addError($e);
-            }
+        if ($print && ! $this->hasErrors()) {
+            [$printLabelsResponse, $errors] = $this->service->printLabels($labelIds);
+            $response += $printLabelsResponse;
+            $this->addErrors($errors);
         }
 
         return $this->sendResponse($response);
@@ -73,7 +69,7 @@ class AdminMyParcelOrderController extends AbstractAdminController
      */
     public function exportPrint(): Response
     {
-        return $this->export();
+        return $this->export(true);
     }
 
     /**
@@ -103,19 +99,26 @@ class AdminMyParcelOrderController extends AbstractAdminController
     {
         $orderIds = $this->service->getPostedIds('orderIds');
         $labelIds = OrderLabel::getOrdersLabels($orderIds);
-        $status   = (int) (new Configuration())->get(Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME);
 
-        try {
-            $response = $this->service->printLabels($labelIds);
-            $this->setResponse($response);
-            foreach ($labelIds as $labelId) {
-                OrderLabel::updateStatus((int) $labelId, $status);
-            }
-        } catch (Exception $e) {
-            $this->addError($e);
-        }
+        $this->setResponse($this->printLabels($labelIds));
 
         return $this->sendResponse();
+    }
+
+    /**
+     * @param  array $labelIds
+     *
+     * @return array
+     */
+    public function printLabels(array $labelIds): array
+    {
+        [$response, $printLabelsErrors] = $this->service->printLabels($labelIds);
+        $updateOrderStatusErrors = $this->service->updateOrderLabelStatusesAfterPrint($labelIds);
+
+        $this->addErrors($printLabelsErrors);
+        $this->addErrors($updateOrderStatusErrors);
+
+        return $response;
     }
 
     /**

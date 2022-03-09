@@ -11,7 +11,7 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
-use Gett\MyparcelBE\Logger\FileLogger;
+use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
@@ -249,7 +249,7 @@ class AdminPanelRenderService extends RenderService
                 ->fromOrder($order, $deliveryOptions)
                 ->first();
         } catch (Exception $e) {
-            FileLogger::addLog($e->getMessage());
+            OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
             $this->addOrderError($e, $order);
         }
 

@@ -6,7 +6,7 @@ use Exception;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierName;
 use Gett\MyparcelBE\Service\Order\OrderDeliveryDate;
@@ -52,7 +52,7 @@ trait OrderHooks
         try {
             DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
         } catch (Exception $e) {
-            ApiLogger::addLog($e, ApiLogger::ERROR);
+            OrderLogger::addLog(['message' => $e, 'order' => $order,], OrderLogger::ERROR);
         }
     }
 }

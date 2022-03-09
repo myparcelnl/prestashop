@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Controllers\Admin;
+namespace Gett\MyparcelBE\Service;
 
 use Address;
 use Configuration;
 use Country;
 use Customer;
+use Exception;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromFormAdapter;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
@@ -16,12 +17,12 @@ use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Tools\Tools;
-use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\Consignment\Download;
-use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use Gett\MyparcelBE\Timer;
 use InvalidArgumentException;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
@@ -31,7 +32,7 @@ use MyParcelNL\Sdk\src\Support\Str;
 use OrderLabel;
 use Validate;
 
-class AdminOrderService
+class AdminOrderService extends AbstractService
 {
     /**
      * @param  array                                                                           $postValues
@@ -55,15 +56,14 @@ class AdminOrderService
         $collection = $factory->fromOrder($order, $deliveryOptions);
         $collection->setLinkOfLabels();
 
-        ApiLogger::addLog(
-            sprintf(
-                "Creating consignments: %s",
-                json_encode($collection->toArray(), JSON_PRETTY_PRINT)
-            )
-        );
+        OrderLogger::addLog([
+            'message' => "Creating consignments: {$collection->toJson()}",
+            'order'   => $order,
+        ]);
 
         if (($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0)
-            && MyParcelBE::getModule()->isNL()) {
+            && MyParcelBE::getModule()
+                ->isNL()) {
             $collection->generateReturnConsignments(true);
         }
 
@@ -146,7 +146,8 @@ class AdminOrderService
             ->addConsignment($consignment)
             ->setPdfOfLabels()
             ->generateReturnConsignments(true);
-        ApiLogger::addLog($collection->toJson());
+
+        OrderLogger::addLog(['message' => 'Creating return shipments: ' . $collection->toJson(), 'order' => $order]);
 
         $consignment            = $collection->first();
         $orderLabel             = new OrderLabel();
@@ -179,7 +180,7 @@ class AdminOrderService
      */
     public function exportOrder(int $orderId): ConsignmentCollection
     {
-        ApiLogger::addLog('Starting export with order id: ' . $orderId);
+        OrderLogger::addLog(['message' => 'Starting export', 'order' => $orderId]);
         $postValues      = Tools::getAllValues();
         $order           = $this->getOrder($orderId);
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
@@ -259,21 +260,21 @@ class AdminOrderService
      * @param  array $labelIds
      *
      * @return array
-     * @throws \Exception
      */
     public function printLabels(array $labelIds): array
     {
-        if (empty($labelIds)) {
-            throw new InvalidArgumentException('No labels found');
+        $response = [];
+        $errors   = [];
+
+        try {
+            $response = $this->downloadLabels($labelIds);
+        } catch (Exception $e) {
+            ApiLogger::addLog('Error printing labels: ' . implode(', ', $labelIds));
+            ApiLogger::addLog($e);
+            $errors[] = $e;
         }
 
-        $service       = new Download();
-        $labelUrlOrPdf = $service->downloadLabel($labelIds);
-
-        return [
-            'label_ids' => $labelIds,
-            'pdf'       => $labelUrlOrPdf,
-        ];
+        return [$response, $errors];
     }
 
     /**
@@ -299,6 +300,13 @@ class AdminOrderService
                 ->getStatus($consignment->getStatus());
             $orderLabel->save();
             $orderLabels[] = $orderLabel;
+
+            OrderLogger::addLog(
+                [
+                    'order'   => $orderLabel->id_order,
+                    'message' => "Refreshed label $orderLabel->id_label",
+                ]
+            );
         }
 
         return $orderLabels;
@@ -325,6 +333,50 @@ class AdminOrderService
 
         DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray(), $extraOptionsArray ?? []);
         return $deliveryOptions;
+    }
+
+    /**
+     * @param  int[] $labelIds
+     *
+     * @return \Exception[]
+     */
+    public function updateOrderLabelStatusesAfterPrint(array $labelIds): array
+    {
+        $status = (int) $this->configuration->get(Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME);
+
+        foreach ($labelIds as $labelId) {
+            try {
+                $timer = new Timer();
+                OrderLabel::updateStatus($labelId, $status);
+                ApiLogger::addLog("Updating status for $labelId took {$timer->getTimeTaken()}ms");
+            } catch (Exception $e) {
+                $errors[] = $e;
+                ApiLogger::addLog($e, ApiLogger::ERROR);
+            }
+        }
+
+        return $errors ?? [];
+    }
+
+    /**
+     * @param  array $labelIds
+     *
+     * @return array
+     * @throws \Exception
+     */
+    private function downloadLabels(array $labelIds): array
+    {
+        if (empty($labelIds)) {
+            throw new InvalidArgumentException('No labels found');
+        }
+
+        $service       = new Download();
+        $labelUrlOrPdf = $service->downloadLabel($labelIds);
+
+        return [
+            'label_ids' => $labelIds,
+            'pdf'       => $labelUrlOrPdf,
+        ];
     }
 
     /**

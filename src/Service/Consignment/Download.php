@@ -9,6 +9,7 @@ use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Service\LabelOptionsService;
+use Gett\MyparcelBE\Timer;
 use Tools;
 
 class Download
@@ -21,25 +22,38 @@ class Download
      */
     public function downloadLabel(array $labelIds): ?string
     {
-        ApiLogger::addLog(sprintf("Downloading labels %s", implode(', ', $labelIds)));
+        ApiLogger::addLog(sprintf('Downloading labels %s', implode(', ', $labelIds)));
+        $timer = new Timer();
+
         $apiKey     = Configuration::get(Constant::API_KEY_CONFIGURATION_NAME);
         $collection = ConsignmentCollection::findMany($labelIds, $apiKey);
 
         if ($collection->isEmpty()) {
+            ApiLogger::addLog('Collection is empty', ApiLogger::WARNING);
             return null;
         }
 
         $positions = $this->getPositions();
 
         if ($this->isDownload()) {
-            return $collection
+            $response = $collection
                 ->setLinkOfLabels($positions)
                 ->getLinkOfLabels();
+        } else {
+            $response = $collection
+                ->setPdfOfLabels($positions)
+                ->getLabelPdf();
         }
 
-        return $collection
-            ->setPdfOfLabels($positions)
-            ->getLabelPdf();
+        ApiLogger::addLog(
+            sprintf(
+                'Finished downloading labels as %s in %d ms',
+                $this->isDownload() ? 'link' : 'PDF',
+                $timer->getTimeTaken()
+            )
+        );
+
+        return $response;
     }
 
     /**

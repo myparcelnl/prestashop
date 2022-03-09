@@ -6,6 +6,7 @@ use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
@@ -303,29 +304,29 @@ class OrderLabel extends ObjectModel
      * @param  int $shipmentId
      * @param  int $newOrderStatus
      *
+     * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public static function setOrderStatus(int $shipmentId, int $newOrderStatus): void
+    public static function setOrderStatus(int $shipmentId, int $newOrderStatus): bool
     {
         $orderLabel     = self::findByLabelId($shipmentId);
         $order          = new Order($orderLabel->id_order);
         $oldOrderStatus = $order->getCurrentState();
 
         if (! self::validateSetOrderStatus($orderLabel, $order, $newOrderStatus)) {
-            return;
+            return false;
         }
 
         $order->setCurrentState($newOrderStatus);
         $order->save();
-        ApiLogger::addLog(
-            sprintf(
-                'Order %d status changed from %d to %d',
-                $orderLabel->id_order,
-                $oldOrderStatus,
-                $newOrderStatus
-            )
-        );
+
+        OrderLogger::addLog([
+            'message' => sprintf('Status changed from %d to %d', $oldOrderStatus, $newOrderStatus),
+            'order'   => $order,
+        ]);
+
+        return true;
     }
 
     /**
@@ -385,23 +386,25 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  array $orders_id
+     * @param  array $orderIds
      *
-     * @return array
+     * @return int[]
      */
-    public static function getOrdersLabels(array $orders_id): array
+    public static function getOrdersLabels(array $orderIds): array
     {
         $qb = new DbQuery();
         $qb->select('ol.id_label');
         $qb->from(Table::TABLE_ORDER_LABEL, 'ol');
-        $qb->where('ol.id_order IN (' . implode(',', $orders_id) . ') ');
+        $qb->where('ol.id_order IN (' . implode(',', $orderIds) . ') ');
 
-        $return = [];
-        foreach (Db::getInstance()->executeS($qb) as $item) {
-            $return[] = $item['id_label'];
+        try {
+            $resource = Db::getInstance()->executeS($qb);
+        } catch (Exception $e) {
+            ApiLogger::addLog($e);
+            return [];
         }
 
-        return $return;
+        return array_map('intval', Arr::pluck($resource, 'id_label'));
     }
 
     /**
@@ -524,7 +527,10 @@ class OrderLabel extends ObjectModel
         $order->update();
 
         if (Validate::isLoadedObject($orderCarrier)) {
-            ApiLogger::addLog("Updating tracking number for $order->id to $barcode");
+            OrderLogger::addLog([
+                'message' => "Updating tracking number to $barcode",
+                'order'   => $order,
+            ]);
             $orderCarrier->tracking_number = pSQL($barcode);
             return $orderCarrier->update();
         }
@@ -561,7 +567,7 @@ class OrderLabel extends ObjectModel
      */
     protected static function getLabelsFromDb(array $labelIds): array
     {
-        $idsString = '("' . implode('","', $labelIds) . '")';
+        $idsString = sprintf("(\"%s\")", implode('","', $labelIds));
         $table     = Table::withPrefix(self::$definition['table']);
         $rows      = [];
 
@@ -664,12 +670,18 @@ SQL
         }
 
         if (self::orderStatusShouldBeIgnored($order)) {
-            ApiLogger::addLog('Current order status is ignored.');
+            OrderLogger::addLog([
+                'message' => 'Current order status is ignored.',
+                'order'   => $order,
+            ]);
             return false;
         }
 
         if (self::orderHistoryContainsStatus($order, $newOrderStatus)) {
-            ApiLogger::addLog('New order status is already present in order history.');
+            OrderLogger::addLog([
+                'message' => "$orderLabel->id_label] New order status '$newOrderStatus' is already present in order history.",
+                'order'   => $order,
+            ]);
             return false;
         }
 

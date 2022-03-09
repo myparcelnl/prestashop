@@ -63,7 +63,7 @@ class MyParcelBEHookModuleFrontController extends FrontController
             try {
                 $webhook = WebhookPayloadFactory::create($webhook);
             } catch (WebhookException $e) {
-                ApiLogger::addLog($e->getMessage(), ApiLogger::WARNING);
+                ApiLogger::addLog($e, ApiLogger::WARNING);
                 continue;
             }
 

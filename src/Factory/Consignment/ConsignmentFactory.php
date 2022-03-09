@@ -11,7 +11,7 @@ use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierService;
@@ -125,7 +125,7 @@ class ConsignmentFactory
             // Create new instance from known json
             $this->deliveryOptions = DeliveryOptionsAdapterFactory::create((array) $deliveryOptionsData);
         } catch (BadMethodCallException $e) {
-            ApiLogger::addLog($e);
+            OrderLogger::addLog(['message' => $e, 'order' => $this->orderData['id_order']], OrderLogger::INFO);
 
             // Create new instance from unknown json data
             $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Controllers\Admin;
 
 use Exception;
+use Gett\MyparcelBE\Service\AdminOrderService;
 use OrderLabel;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,14 +15,14 @@ use Symfony\Component\HttpFoundation\Response;
 class AdminMyParcelLabelController extends AbstractAdminController
 {
     /**
-     * @var \Gett\MyparcelBE\Controllers\Admin\AdminOrderService
+     * @var \Gett\MyparcelBE\Service\AdminOrderService
      */
     private $service;
 
     public function __construct()
     {
         parent::__construct();
-        $this->service = new AdminOrderService();
+        $this->service = new AdminOrderService($this->configuration);
     }
 
     /**
@@ -77,12 +78,10 @@ class AdminMyParcelLabelController extends AbstractAdminController
     {
         $labelIds = $this->service->getPostedOrderLabelIds();
 
-        try {
-            $response = $this->service->printLabels($labelIds);
-            $this->setResponse($response);
-        } catch (Exception $e) {
-            $this->addError($e);
-        }
+        [$response, $errors] = $this->service->printLabels($labelIds);
+
+        $this->setResponse($response);
+        $this->addErrors($errors);
 
         return $this->sendResponse();
     }

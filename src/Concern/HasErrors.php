@@ -38,7 +38,8 @@ trait HasErrors
         }
 
         if (is_string($error)) {
-            $exceptionMessage = $prefix . MyParcelBE::getModule()->l($error, 'adminlabelcontroller');
+            $exceptionMessage = $prefix . MyParcelBE::getModule()
+                    ->l($error, 'adminlabelcontroller');
         }
 
         if (! $exceptionMessage) {
@@ -46,6 +47,19 @@ trait HasErrors
         }
 
         $this->errors[] = $exceptionMessage;
+    }
+
+    /**
+     * @param         $errors
+     * @param  string $prefix
+     *
+     * @return void
+     */
+    protected function addErrors($errors, string $prefix = ''): void
+    {
+        foreach ($errors as $error) {
+            $this->addError($error, $prefix);
+        }
     }
 
     /**
@@ -59,7 +73,12 @@ trait HasErrors
     protected function addOrderError($error, $orderOrId): void
     {
         $orderId = $orderOrId instanceof Order ? $orderOrId->getId() : $orderOrId;
-        $prefix  = sprintf('%s #%d: ', MyParcelBE::getModule()->l('Order', 'AdminGlobal'), $orderId);
+        $prefix  = sprintf(
+            '%s #%d: ',
+            MyParcelBE::getModule()
+                ->l('Order', 'AdminGlobal'),
+            $orderId
+        );
         $this->addError($error, $prefix);
     }
 
