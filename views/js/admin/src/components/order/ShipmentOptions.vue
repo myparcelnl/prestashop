@@ -61,7 +61,7 @@
 
 <script lang="ts">
 import { ContextKey, ShipmentOptionsContext } from '@/data/global/context';
-import { computed, defineComponent, ref, watch, watchEffect } from '@vue/composition-api';
+import { computed, defineComponent, watchEffect } from '@vue/composition-api';
 import DigitalStampWeightSelectFormGroup from '@/components/order/DigitalStampWeightSelectFormGroup.vue';
 import FormGroup from '@/components/common/form/FormGroup.vue';
 import InsuranceSelectFormGroup from '@/components/order/InsuranceSelectFormGroup.vue';
@@ -82,13 +82,13 @@ const KEYS_TO_SAVE: (keyof ShipmentOptionsContext)[] = [
   'labelOptions',
 ];
 
-const CONSIGNMENT_SHIPMENT_OPTIONS_KEYS = [
+const CONSIGNMENT_SHIPMENT_OPTIONS_KEYS: (keyof Consignment)[] = [
   'canHaveOnlyRecipient',
   'canHaveAgeCheck',
   'canHaveReturn',
   'canHaveSignature',
   'canHaveInsurance',
-] as (keyof Consignment)[];
+];
 
 export default defineComponent({
   name: 'ShipmentOptions',
@@ -114,11 +114,7 @@ export default defineComponent({
     });
 
     const canHaveShipmentOptions = computed(() => {
-      const anyShipmentOptionIsSet = CONSIGNMENT_SHIPMENT_OPTIONS_KEYS.some((property) => {
-        return Boolean(contextData.value.consignment[property]);
-      });
-
-      return contextData.value.consignment && anyShipmentOptionIsSet;
+      return CONSIGNMENT_SHIPMENT_OPTIONS_KEYS.some((property) => Boolean(contextData.value?.consignment[property]));
     });
 
     const showShipmentOptions = computed(() => {
