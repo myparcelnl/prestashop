@@ -18,11 +18,11 @@ class LabelOptionsResolver
      * Map of array key to array of 0: config entry and 1: AbstractShipmentOptionsAdapter method.
      */
     private const SHIPMENT_OPTIONS_MAP = [
-        'only_to_recipient'  => [Constant::ONLY_RECIPIENT_CONFIGURATION_NAME, 'hasOnlyRecipient',],
-        'signature'          => [Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME, 'hasSignature',],
-        'age_check'          => [Constant::AGE_CHECK_CONFIGURATION_NAME],
-        'insurance'          => [Constant::INSURANCE_CONFIGURATION_NAME, 'getInsurance'],
-        'return_undelivered' => [Constant::RETURN_PACKAGE_CONFIGURATION_NAME],
+        'only_recipient' => [Constant::ONLY_RECIPIENT_CONFIGURATION_NAME, 'hasOnlyRecipient',],
+        'signature'      => [Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME, 'hasSignature',],
+        'age_check'      => [Constant::AGE_CHECK_CONFIGURATION_NAME],
+        'insurance'      => [Constant::INSURANCE_CONFIGURATION_NAME, 'getInsurance'],
+        'return'         => [Constant::RETURN_PACKAGE_CONFIGURATION_NAME],
     ];
 
     /**
@@ -46,7 +46,7 @@ class LabelOptionsResolver
      */
     public function getLabelOptions(Order $order): array
     {
-        $deliveryOptions = DeliveryOptions::getFromOrder($order->getId());
+        $deliveryOptions = DeliveryOptions::getFromOrder($order);
 
         return array_merge(
             $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
@@ -55,6 +55,33 @@ class LabelOptionsResolver
                 'package_format' => $this->getPackageFormat($order, $deliveryOptions),
             ]
         );
+    }
+
+    /**
+     * @param \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    public function getDeliveryOptions(Order $order): array
+    {
+        $deliveryOptions = DeliveryOptions::getFromOrder($order);
+        $shipmentOptions = $this->getShipmentOptions(
+            $deliveryOptions,
+            $order->getProducts(),
+            $order->getIdCarrier()
+        );
+
+        if (isset($shipmentOptions['insurance'])) {
+            $shipmentOptions['insurance'] = false === $shipmentOptions['insurance'] ? 0 : 500;
+        }
+
+        return [
+            'shipmentOptions' => $shipmentOptions,
+            'package_type'    => $this->getPackageType($order, $deliveryOptions),
+            'package_format'  => $this->getPackageFormat($order, $deliveryOptions),
+        ];
     }
 
     /**

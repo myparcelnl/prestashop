@@ -53,10 +53,10 @@ interface ShipmentOptions {
 interface LabelOptions {
   age_check: boolean;
   insurance: boolean;
-  only_to_recipient: boolean;
+  only_recipient: boolean;
   package_format: string;
   package_type: number;
-  return_undelivered: boolean;
+  return: boolean;
   signature: boolean;
 }
 
