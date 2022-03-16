@@ -12,18 +12,16 @@
         max="10" />
     </FormGroup>
 
-    <PackageTypeSelectFormGroup v-model="contextData.deliveryOptions.packageType" />
+    <PackageTypeSelectFormGroup v-model="packageType" />
     <PackageFormatSelectFormGroup
       v-if="contextData.consignment && contextData.consignment.canHaveLargeFormat"
       v-model="contextData.labelOptions.package_format" />
     <DigitalStampWeightSelectFormGroup
-      v-if="contextData.deliveryOptions.packageType === 'digital_stamp'"
+      v-if="packageType === 'digital_stamp'"
       v-model="contextData.extraOptions.digitalStampWeight"
       :calculated-weight="contextData.orderWeight || 0" />
 
-    <div
-      v-if="canHaveShipmentOptions"
-      v-show="showShipmentOptions">
+    <div v-if="canHaveShipmentOptions">
       <FormGroup label="shipment_options_title">
         <PsCheckbox
           v-if="contextData.consignment.canHaveOnlyRecipient"
@@ -61,7 +59,7 @@
 
 <script lang="ts">
 import { ContextKey, ShipmentOptionsContext } from '@/data/global/context';
-import { computed, defineComponent, watchEffect } from '@vue/composition-api';
+import { computed, defineComponent, ref, watch, watchEffect } from '@vue/composition-api';
 import DigitalStampWeightSelectFormGroup from '@/components/order/DigitalStampWeightSelectFormGroup.vue';
 import FormGroup from '@/components/common/form/FormGroup.vue';
 import InsuranceSelectFormGroup from '@/components/order/InsuranceSelectFormGroup.vue';
@@ -73,6 +71,7 @@ import PsInput from '@/components/common/form/PsInput.vue';
 import { contextProps } from '@/composables/props/contextProps';
 import { deliveryOptionsEventBus } from '@/data/eventBus/DeliveryOptionsEventBus';
 import { orderActionsEventBus } from '@/data/eventBus/OrderActionsEventBus';
+import { shipmentOptionsContextEventBus } from '@/data/eventBus/ShipmentOptionsContextEventBus';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
 
 const KEYS_TO_SAVE: (keyof ShipmentOptionsContext)[] = [
@@ -109,6 +108,8 @@ export default defineComponent({
 
   setup: (props) => {
     const contextData = useGlobalContext(ContextKey.SHIPMENT_OPTIONS, props.context as ShipmentOptionsContext);
+    const packageType = ref(contextData.value.deliveryOptions.packageType);
+
     const shipmentOptions = computed(() => {
       return contextData.value.deliveryOptions?.shipmentOptions ?? {};
     });
@@ -117,8 +118,18 @@ export default defineComponent({
       return CONSIGNMENT_SHIPMENT_OPTIONS_KEYS.some((property) => Boolean(contextData.value?.consignment[property]));
     });
 
-    const showShipmentOptions = computed(() => {
-      return contextData.value.deliveryOptions.packageType === 'package';
+    watch([packageType], async([oldPackageType], [newPackageType]) => {
+      if (oldPackageType === newPackageType || !contextData.value.orderId) {
+        return;
+      }
+
+      contextData.value.deliveryOptions.packageType = packageType.value;
+      const response = await shipmentOptionsContextEventBus.refresh(
+        contextData.value.orderId,
+        contextData.value.deliveryOptions,
+      );
+
+      contextData.value = response?.data?.context;
     });
 
     /**
@@ -134,7 +145,7 @@ export default defineComponent({
     });
 
     return {
-      showShipmentOptions,
+      packageType,
       contextData,
       shipmentOptions,
       canHaveShipmentOptions,

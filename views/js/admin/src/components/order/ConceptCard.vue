@@ -43,6 +43,7 @@
 
 <script lang="ts">
 import { EmitterRequestData, EventName } from '@/data/eventBus/EventBus';
+import { defineComponent, ref } from '@vue/composition-api';
 import DeliveryMomentSelector from '@/components/order/DeliveryMomentSelector.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import { OrderAction } from '@/data/global/actions';
@@ -50,10 +51,11 @@ import PsButton from '@/components/common/PsButton.vue';
 import PsCard from '@/components/common/PsCard.vue';
 import ShipmentOptions from '@/components/order/ShipmentOptions.vue';
 import ShippingAddress from '@/components/order/ShippingAddress.vue';
-import { defineComponent } from '@vue/composition-api';
 import { deliveryOptionsEventBus } from '@/data/eventBus/DeliveryOptionsEventBus';
 import { executeOrderAction } from '@/services/actions/executeOrderAction';
 import { orderActionsEventBus } from '@/data/eventBus/OrderActionsEventBus';
+import { shipmentOptionsContextEventBus } from '@/data/eventBus/ShipmentOptionsContextEventBus';
+import { useEventBusLoadingState } from '@/composables/useEventBusLoadingState';
 
 export default defineComponent({
   name: 'ConceptCard',
@@ -66,30 +68,24 @@ export default defineComponent({
     ShippingAddress,
   },
 
-  data() {
+  setup: () => {
     return {
-      loading: false,
+      ...useEventBusLoadingState(
+        deliveryOptionsEventBus,
+        orderActionsEventBus,
+        shipmentOptionsContextEventBus,
+      ),
+
+      saveDeliveryOptions: async(): Promise<void> => {
+        await deliveryOptionsEventBus.saveConfiguration();
+      },
+
+      exportOrder: async(print: boolean = false): Promise<void> => {
+        const action = print ? OrderAction.EXPORT_PRINT : OrderAction.EXPORT;
+
+        await executeOrderAction(action);
+      },
     };
-  },
-
-  created() {
-    deliveryOptionsEventBus.on(EventName.BUSY, this.setLoading);
-    orderActionsEventBus.on(EventName.BUSY, this.setLoading);
-  },
-
-  methods: {
-    setLoading(data: EmitterRequestData<boolean>): void {
-      this.loading = data.response;
-    },
-
-    async saveDeliveryOptions(): Promise<void> {
-      await deliveryOptionsEventBus.saveConfiguration();
-    },
-
-    async exportOrder(print: boolean = false): Promise<void> {
-      const action = print ? OrderAction.EXPORT_PRINT : OrderAction.EXPORT;
-      await executeOrderAction(action);
-    },
   },
 });
 </script>

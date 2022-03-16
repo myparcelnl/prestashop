@@ -23,14 +23,13 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from '@vue/composition-api';
-import { EventName } from '@/data/eventBus/EventBus';
 import { LabelAction } from '@/data/global/actions';
 import LoaderOverlay from '@/components/common/LoaderOverlay.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import ShipmentLabel from '@/components/order/ShipmentLabel.vue';
 import { deliveryOptionsEventBus } from '@/data/eventBus/DeliveryOptionsEventBus';
 import { executeLabelAction } from '@/services/actions/executeLabelAction';
-import { useLoading } from '@/composables/useLoading';
+import { useEventBusLoadingState } from '@/composables/useEventBusLoadingState';
 
 export default defineComponent({
   name: 'LabelCard',
@@ -43,15 +42,12 @@ export default defineComponent({
   },
 
   setup: () => {
-    const { loading, setLoading } = useLoading();
-    deliveryOptionsEventBus.on(EventName.BUSY, ({ response: busy }) => setLoading(busy));
-
     const execute = async(action: LabelAction, label: ShipmentLabel): Promise<void> => {
       await executeLabelAction(action, Number(label.id_label));
     };
 
     return {
-      loading,
+      ...useEventBusLoadingState(deliveryOptionsEventBus),
       print: async(label: ShipmentLabel): Promise<void> => execute(LabelAction.PRINT, label),
       refresh: async(label: ShipmentLabel): Promise<void> => execute(LabelAction.REFRESH, label),
     };

@@ -92,6 +92,10 @@ export default defineComponent({
       default: null,
     },
 
+    loading: {
+      type: Boolean,
+    },
+
     ...contextProps,
   },
 

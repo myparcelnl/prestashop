@@ -25,7 +25,6 @@
 <script lang="ts">
 import { defineComponent, ref } from '@vue/composition-api';
 import { deleteAction, printAction, refreshAction } from '@/data/dropdownActions';
-import { EventName } from '@/data/eventBus/EventBus';
 import { LabelAction } from '@/data/global/actions';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import PsCard from '@/components/common/PsCard.vue';
@@ -33,7 +32,7 @@ import PsDropdownButton from '@/components/common/PsDropdownButton.vue';
 import ShipmentLabels from '@/components/order/ShipmentLabels.vue';
 import { executeLabelAction } from '@/services/actions/executeLabelAction';
 import { labelActionsEventBus } from '@/data/eventBus/LabelActionsEventBus';
-import { useLoading } from '@/composables/useLoading';
+import { useEventBusLoadingState } from '@/composables/useEventBusLoadingState';
 
 export default defineComponent({
   name: 'ShipmentsCard',
@@ -45,12 +44,10 @@ export default defineComponent({
   },
 
   setup: () => {
-    const { loading, setLoading } = useLoading();
-    labelActionsEventBus.on(EventName.BUSY, ({ response: busy }) => setLoading(busy));
     const selectedLabels = ref<number[]>([]);
 
     return {
-      loading,
+      ...useEventBusLoadingState(labelActionsEventBus),
       selectedLabels,
       bulkActionDropdownItems: [
         refreshAction,
