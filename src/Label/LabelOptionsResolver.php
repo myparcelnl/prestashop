@@ -9,6 +9,7 @@ use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Support\Arr;
 
@@ -68,21 +69,75 @@ class LabelOptionsResolver
     public function getDeliveryOptions(Order $order): array
     {
         $deliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
+        $packageType     = $this->getPackageType($order, $deliveryOptions);
         $shipmentOptions = $this->getShipmentOptions(
             $deliveryOptions,
             $order->getProducts(),
             $order->getIdCarrier()
         );
 
-        if (isset($shipmentOptions['insurance'])) {
-            $shipmentOptions['insurance'] = false === $shipmentOptions['insurance'] ? 0 : 500;
+        if (isset($shipmentOptions['insurance']) && $deliveryOptions) {
+            $shipmentOptions['insurance'] = true === $shipmentOptions['insurance']
+                ? $this->getInsurance($deliveryOptions, $packageType, $order)
+                : 0;
         }
 
         return [
             'shipmentOptions' => $shipmentOptions,
-            'package_type'    => $this->getPackageType($order, $deliveryOptions),
+            'package_type'    => $packageType,
             'package_format'  => $this->getPackageFormat($order, $deliveryOptions),
         ];
+    }
+
+    /**
+     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param int                                                                        $packageType
+     * @param \Gett\MyparcelBE\Model\Core\Order                                          $order
+     *
+     * @return int the amount in euro for which the package should be insured
+     */
+    public function getInsurance(AbstractDeliveryOptionsAdapter $deliveryOptions, int $packageType, Order $order): int
+    {
+        $grandTotal  = $order->getTotalProductsWithTaxes();
+        $psCarrierId = $order->getIdCarrier();
+
+        try {
+            $fromPrice   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_FROM_PRICE);
+            $maxAmount   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT);
+            $consignment = ConsignmentFactory::createByCarrierId($deliveryOptions->getCarrierId());
+            $consignment->setPackageType($packageType);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+
+        if ($grandTotal < $fromPrice || ! $consignment->canHaveShipmentOption('insurance')) {
+            return 0;
+        }
+
+        if ($deliveryOptions->getShipmentOptions()) {
+            $insuredAmount = $deliveryOptions->getShipmentOptions()->getInsurance();
+        }
+        $insuredAmount = min($insuredAmount ?? $grandTotal, $maxAmount);
+
+        return $this->intHigherThanOrHighest($insuredAmount, $consignment->getInsurancePossibilities());
+    }
+
+    /**
+     * @param int   $threshold
+     * @param array $allowedValues this must be an indexed array with values sorted from low to high
+     *
+     * @return int lowest allowed value that is higher than or equal to threshold, or the highest allowed value
+     */
+    private function intHigherThanOrHighest(int $threshold, array $allowedValues): int
+    {
+        foreach ($allowedValues as $allowedValue) {
+            if ($allowedValue < $threshold) {
+                continue;
+            }
+            return $allowedValue;
+        }
+
+        return Arr::last($allowedValues);
     }
 
     /**
