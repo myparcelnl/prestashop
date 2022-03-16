@@ -24,12 +24,12 @@ export function onNewLabels(response: ActionResponse<typeof modifyLabelActions[n
     case LabelAction.REFRESH:
     case OrderAction.EXPORT:
     case OrderAction.EXPORT_PRINT:
-      const labelContext = useGlobalContext(ContextKey.SHIPMENT_LABELS, {
-        labels: response.data.shipmentLabels,
-        orderId: Number(response.data.shipmentLabels?.[0]?.id_order),
-      });
-
       response.data.shipmentLabels.forEach((newLabel) => {
+        const labelContext = useGlobalContext(ContextKey.SHIPMENT_LABELS, {
+          orderId: Number(newLabel?.id_order),
+          labels: [],
+        });
+
         newLabel.refreshed_at = new Date().toISOString();
 
         const existing = findLabelIndex(labelContext, newLabel.id_label);
