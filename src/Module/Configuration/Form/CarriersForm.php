@@ -14,6 +14,8 @@ use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Link;
 use MyParcelBE;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 
 class CarriersForm extends AbstractForm
@@ -590,8 +592,8 @@ SQL
         $deliveryTabFields = [];
         $returnTabFields = [];
         if (! $isNew) {
-            $deliveryTabFields = $this->getExtraTabFields($carrier);
-            $returnTabFields   = $this->getExtraTabFields($carrier, 'return');
+            $deliveryTabFields = $this->getExtraTabFields($carrier, $currency);
+            $returnTabFields   = $this->getExtraTabFields($carrier, $currency, 'return');
         }
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
@@ -1015,7 +1017,7 @@ SQL
      * @return array
      * @throws \Exception
      */
-    private function getExtraTabFields(Carrier $carrier, string $prefix = ''): array
+    private function getExtraTabFields(Carrier $carrier, Currency $currency, string $prefix = ''): array
     {
         $fields      = [];
         $countryIso  = $this->module->getModuleCountry();
@@ -1182,8 +1184,43 @@ SQL
                         'label' => $this->module->l('No', 'carriers'),
                     ],
                 ],
-                'label' => $this->module->l('Package with insurance', 'carriers'),
+                'label' => $this->module->l('Always insure package', 'carriers'),
                 'name' => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
+            ];
+            try {
+                $c = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
+                $c->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+                $insurancePossibilities = array_merge([0], $c->getInsurancePossibilities());
+            } catch (\Throwable $e) {
+                $insurancePossibilities = [0];
+            }
+            $fields[] = [
+                'tab'              => $tabId,
+                'type'             => 'text',
+                'label'            => $this->module->l('Insure from price', 'carriers'),
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_FROM_PRICE,
+                'suffix'           => $currency->getSign(),
+                'class'            => 'col-lg-2',
+            ];
+            $fields[] = [
+                'tab'              => $tabId,
+                'type'             => 'select',
+                'label'            => $this->module->l('Max insured amount', 'carriers'),
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT,
+                'options'          => [
+                    'query' => array_map(
+                        static function ($value) use ($currency) {
+                            return [
+                                'value' => $value,
+                                'label' => $currency->getSign() . ' ' . $value,
+                            ];
+                        },
+                        $insurancePossibilities
+                    ),
+                    'id'    => 'value',
+                    'name'  => 'label',
+                ],
+                'class'            => 'col-lg-2',
             ];
         }
 

@@ -15,7 +15,6 @@ class Constant
     public const ITEM_DESCRIPTION_MAX_LENGTH  = 50;
     public const ORDER_DESCRIPTION_MAX_LENGTH = 45;
 
-
     public const API_KEY_CONFIGURATION_NAME                = 'MYPARCELBE_API_KEY';
     public const API_LOGGING_CONFIGURATION_NAME            = 'MYPARCELBE_API_LOGGING';
     public const PACKAGE_TYPE_CONFIGURATION_NAME           = 'MYPARCELBE_PACKAGE_TYPE';
@@ -25,6 +24,8 @@ class Constant
     public const RETURN_PACKAGE_CONFIGURATION_NAME         = 'MYPARCELBE_RETURN_PACKAGE';
     public const SIGNATURE_REQUIRED_CONFIGURATION_NAME     = 'MYPARCELBE_SIGNATURE_REQUIRED';
     public const INSURANCE_CONFIGURATION_NAME              = 'MYPARCELBE_INSURANCE';
+    public const INSURANCE_CONFIGURATION_FROM_PRICE        = 'MYPARCELBE_INSURANCE_FROM_PRICE';
+    public const INSURANCE_CONFIGURATION_MAX_AMOUNT        = 'MYPARCELBE_INSURANCE_MAX_AMOUNT';
     public const CUSTOMS_FORM_CONFIGURATION_NAME           = 'MYPARCELBE_CUSTOMS_FORM';
     public const CUSTOMS_FORM_CONFIGURATION_OPTION_ADD     = 'Add';
     public const CUSTOMS_FORM_CONFIGURATION_OPTION_SKIP    = 'Skip';
@@ -132,6 +133,8 @@ class Constant
         self::RETURN_PACKAGE_CONFIGURATION_NAME,
         self::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
         self::INSURANCE_CONFIGURATION_NAME,
+        self::INSURANCE_CONFIGURATION_FROM_PRICE,
+        self::INSURANCE_CONFIGURATION_MAX_AMOUNT,
         self::ONLY_RECIPIENT_CONFIGURATION_NAME,
         'return_' . self::PACKAGE_TYPE_CONFIGURATION_NAME,
         'return_' . self::ONLY_RECIPIENT_CONFIGURATION_NAME,
@@ -140,6 +143,8 @@ class Constant
         'return_' . self::RETURN_PACKAGE_CONFIGURATION_NAME,
         'return_' . self::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
         'return_' . self::INSURANCE_CONFIGURATION_NAME,
+        'return_' . self::INSURANCE_CONFIGURATION_FROM_PRICE,
+        'return_' . self::INSURANCE_CONFIGURATION_MAX_AMOUNT,
         'return_label_description',
     ];
     public const WEEK_DAYS                                              = [
