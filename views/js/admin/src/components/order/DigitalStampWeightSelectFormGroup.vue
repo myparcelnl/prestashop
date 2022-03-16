@@ -29,6 +29,7 @@ export default defineComponent({
 
   props: {
     ...disabledProps,
+    // eslint-disable-next-line vue/no-unused-properties
     value: props.value,
     calculatedWeight: {
       type: Number,

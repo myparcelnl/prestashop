@@ -1,7 +1,5 @@
 <template>
-  <div
-    v-bind="$attrs"
-    class="form-group row">
+  <div class="form-group row">
     <label class="col-sm-4 control-label">
       <slot name="label">
         {{ $filters.translate(label) }}

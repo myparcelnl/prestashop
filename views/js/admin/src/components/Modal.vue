@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { ModalCallbackProps, useModalContext } from '@/composables/context/useModalContext';
-import { PropType, computed, defineComponent, ref } from '@vue/composition-api';
+import { PropType, computed, defineComponent, ref, watch } from '@vue/composition-api';
 import LoaderOverlay from '@/components/common/LoaderOverlay.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import PsButton from '@/components/common/PsButton.vue';
@@ -92,7 +92,7 @@ export default defineComponent({
       default: null,
     },
 
-    loading: {
+    forceLoading: {
       type: Boolean,
     },
 
@@ -108,6 +108,11 @@ export default defineComponent({
     }
 
     const { additionalContext, ...modalContext } = useModalContext(modalId, props.onSave, props.onLeave);
+
+    watch(() => props.forceLoading, (loading) => {
+      modalContext.setLoading(loading);
+    });
+
     return {
       ...modalContext,
       contextData: computed(() => {

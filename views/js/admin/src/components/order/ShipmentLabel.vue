@@ -66,6 +66,7 @@ export default defineComponent({
   model,
 
   props: {
+    // eslint-disable-next-line vue/no-unused-properties
     checked: props.checked,
     shipmentLabel: {
       type: Object as PropType<ShipmentLabel>,

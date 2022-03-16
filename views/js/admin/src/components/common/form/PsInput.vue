@@ -2,8 +2,7 @@
   <input
     v-model="mutableValue"
     class="form-control"
-    :class="{ disabled }"
-    v-bind="$attrs">
+    :class="{ disabled }">
 </template>
 
 <script lang="ts">
@@ -17,6 +16,7 @@ export default defineComponent({
   name: 'PsInput',
   model,
   props: {
+    // eslint-disable-next-line vue/no-unused-properties
     value: props.value,
     ...disabledProps,
   },

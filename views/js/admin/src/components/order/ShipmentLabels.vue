@@ -55,9 +55,9 @@ import PsTable from '@/components/common/table/PsTable.vue';
 import PsTableCol from '@/components/common/table/PsTableCol.vue';
 import PsTableRow from '@/components/common/table/PsTableRow.vue';
 import ShipmentLabel from '@/components/order/ShipmentLabel.vue';
+import { labelActionsEventBus } from '@/data/eventBus/LabelActionsEventBus';
 import { orderActionsEventBus } from '@/data/eventBus/OrderActionsEventBus';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
-import { labelActionsEventBus } from '@/data/eventBus/LabelActionsEventBus';
 
 export default defineComponent({
   name: 'ShipmentLabels',
@@ -81,7 +81,7 @@ export default defineComponent({
       },
       set(rows: string[]): void {
         mutableSelectedRows.value = rows;
-        ctx.emit('select', rows);
+        ctx.emit('select', rows.map(Number));
       },
     });
 

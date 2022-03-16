@@ -14,9 +14,10 @@ export interface ModalCallbackProps {
 type UseModalContext = (modalId: Ref<string>, onSave: null | ModalCallback, onLeave: null | ModalCallback) => {
   additionalContext: Ref<AnyContext | null>;
   loading: Ref<boolean>;
-  onButtonClick: (type: string) => Promise<void>;
-  shown: Ref<boolean>;
   modalData: Ref;
+  onButtonClick: (type: string) => Promise<void>;
+  setLoading: (state: boolean) => void;
+  shown: Ref<boolean>;
 };
 
 export const useModalContext: UseModalContext = (modalId, onSave, onLeave) => {
@@ -61,8 +62,9 @@ export const useModalContext: UseModalContext = (modalId, onSave, onLeave) => {
   return {
     additionalContext,
     loading,
-    onButtonClick,
-    shown,
     modalData,
+    onButtonClick,
+    setLoading,
+    shown,
   };
 };

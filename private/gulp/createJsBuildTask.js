@@ -3,7 +3,6 @@ const {jsFiles} = require('./variables');
 /**
  * @param {import('gulp').Gulp} gulp
  * @param {Object} plugins
- * @param {string} moduleName
  * @returns {Function}
  */
 function createJsBuildTask(gulp, plugins) {

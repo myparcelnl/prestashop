@@ -4,7 +4,7 @@
     title="shipment_options_title"
     save-label="export"
     :on-save="exportOrder"
-    :loading="loading">
+    :force-loading="loading">
     <template #default="data">
       <ShipmentOptions v-bind="data" />
     </template>

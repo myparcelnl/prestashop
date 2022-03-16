@@ -24,6 +24,7 @@ export default defineComponent({
   name: 'PsRadio',
   model,
   props: {
+    // eslint-disable-next-line vue/no-unused-properties
     checked: props.checked,
     value: props.value,
     ...disabledProps,

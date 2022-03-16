@@ -16,6 +16,7 @@ interface SelectOption<Value = string | number> {
  * Define the custom properties added to window.
  */
 declare interface Window {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   MyParcel: Record<string, (...args?: any) => Promise<any>>;
   MyParcelActions: {
     adminUrl: string;

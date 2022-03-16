@@ -4,7 +4,10 @@ import { executeAdminAction } from '@/services/actions/executeAdminAction';
 import { labelActionsEventBus } from '@/data/eventBus/LabelActionsEventBus';
 import { toArray } from '@/utils/toArray';
 
-type ExecuteLabelAction = (action: LabelAction, labelId: number | number[], modalData?: ModalData) => Promise<void | SuccessResponse>;
+type ExecuteLabelAction = (
+  action: LabelAction,
+  labelId: number | number[],
+  modalData?: ModalData) => Promise<void | SuccessResponse>;
 
 export const executeLabelAction: ExecuteLabelAction = async(action, labelIdOrIds, modalData?) => {
   const parameters: RequestParameters = {

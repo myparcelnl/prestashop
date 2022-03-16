@@ -42,8 +42,6 @@
 </template>
 
 <script lang="ts">
-import { EmitterRequestData, EventName } from '@/data/eventBus/EventBus';
-import { defineComponent, ref } from '@vue/composition-api';
 import DeliveryMomentSelector from '@/components/order/DeliveryMomentSelector.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import { OrderAction } from '@/data/global/actions';
@@ -51,6 +49,7 @@ import PsButton from '@/components/common/PsButton.vue';
 import PsCard from '@/components/common/PsCard.vue';
 import ShipmentOptions from '@/components/order/ShipmentOptions.vue';
 import ShippingAddress from '@/components/order/ShippingAddress.vue';
+import { defineComponent } from '@vue/composition-api';
 import { deliveryOptionsEventBus } from '@/data/eventBus/DeliveryOptionsEventBus';
 import { executeOrderAction } from '@/services/actions/executeOrderAction';
 import { orderActionsEventBus } from '@/data/eventBus/OrderActionsEventBus';

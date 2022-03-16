@@ -5,7 +5,7 @@
       {{ $filters.translate('order_labels_header') }}
     </template>
     <template #default>
-      <ShipmentLabels @select="(value) => selectedLabels = value" />
+      <ShipmentLabels @select="setSelectedLabels" />
     </template>
     <template #footer>
       <PsDropdownButton
@@ -49,6 +49,11 @@ export default defineComponent({
     return {
       ...useEventBusLoadingState(labelActionsEventBus),
       selectedLabels,
+
+      setSelectedLabels(labels: number[]): void {
+        selectedLabels.value = labels;
+      },
+
       bulkActionDropdownItems: [
         refreshAction,
         printAction,

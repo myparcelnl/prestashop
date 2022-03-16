@@ -30,6 +30,7 @@ type EventBusRequest = (
 export class EventBus {
   private data: RequestData;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private emitter: Emitter<Record<EventName, any>> = mitt();
 
   public get: EventBusRequest = async(url, parameters = {}, requestOptions = {}) => {
@@ -45,6 +46,7 @@ export class EventBus {
   }
 
   public once<T extends EventName>(event: T, callback: EventCallback<T>): void {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const newCallback: EventCallback<T> = (args) => {
       callback(args);

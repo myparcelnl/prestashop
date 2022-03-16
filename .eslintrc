@@ -4,15 +4,22 @@
     {
       "files": [
         "./*.js",
-        "./private/**/*"
+        "./private/**/*.js"
+      ],
+      "env": {
+        "node": true
+      }
+    },
+    {
+      "files": [
+        "./views/js/**/*.js"
       ],
       "globals": {
         "prestashop": true,
         "$": true
       },
       "env": {
-        "node": true,
-        "browser": false,
+        "browser": true,
         "jquery": true
       },
       "rules": {

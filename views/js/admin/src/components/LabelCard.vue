@@ -4,6 +4,7 @@
     <div class="align-items-center d-flex text-nowrap">
       <a
         target="_blank"
+        rel="noopener noreferrer"
         :href="label.track_link"
         v-text="label.barcode" />
       <a

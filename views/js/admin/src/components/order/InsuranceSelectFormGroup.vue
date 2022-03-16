@@ -23,6 +23,7 @@ export default defineComponent({
   components: { SelectFormGroup },
   model,
   props: {
+    // eslint-disable-next-line vue/no-unused-properties
     value: props.value,
     ...contextProps,
     ...disabledProps,

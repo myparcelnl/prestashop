@@ -11,6 +11,6 @@ export class ActionsEventBus extends EventBus {
       throw new Error('Property "url" must be defined.');
     }
 
-    return await this.post(this.url, { action, ...parameters }) as ActionResponse<typeof action>;
+    return await this.post(this.url, { action, ...parameters }) as ActionResponse;
   };
 }

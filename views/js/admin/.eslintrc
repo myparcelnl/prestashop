@@ -1,6 +1,9 @@
 {
   "root": true,
-  "extends": "@myparcel/eslint-config",
+  "extends": "@myparcel/eslint-config/preset-es6",
+  "parserOptions": {
+    "requireConfigFile": false
+  },
   "env": {
     "node": true,
     "jquery": true
@@ -14,12 +17,39 @@
       "extends": "@myparcel/eslint-config/preset-vue-typescript",
       "rules": {
         "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/no-magic-numbers": [
+          "warn",
+          {
+            "ignoreEnums": true,
+            "ignoreNumericLiteralTypes": true,
+            "ignoreReadonlyClassProperties": true,
+            "ignore": [
+              -1,
+              0,
+              1,
+              10,
+              100,
+              1000
+            ]
+          }
+        ],
         "@typescript-eslint/no-type-alias": "off",
         "@typescript-eslint/no-unnecessary-type-assertion": "off",
         "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/unified-signatures": "off",
         "no-void": "off",
         "vue/require-direct-export": "off",
-        "vue/require-explicit-emits": "off"
+        "vue/require-explicit-emits": "off",
+        "vue/no-bare-strings-in-template": [
+          "warn",
+          {
+            "attributes": {
+              "modal": [
+                "title"
+              ]
+            }
+          }
+        ]
       }
     }
   ]
