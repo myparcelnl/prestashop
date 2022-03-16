@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Controllers\Admin;
 
 use Exception;
+use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderGridAdapter;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\AdminPanelRenderService;
 use Gett\MyparcelBE\Module\Tools\Tools;
@@ -35,6 +36,7 @@ class AdminMyParcelOrderController extends AbstractAdminController
      * @param  bool $print
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     * @noinspection PhpUnused
      */
     public function export(bool $print = false): Response
     {
@@ -66,6 +68,7 @@ class AdminMyParcelOrderController extends AbstractAdminController
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
+     * @noinspection PhpUnused
      */
     public function exportPrint(): Response
     {
@@ -74,16 +77,21 @@ class AdminMyParcelOrderController extends AbstractAdminController
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
+     * @noinspection PhpUnused
      */
     public function getShipmentOptionsContext(): Response
     {
         $orderId = Tools::getValue('orderId', null);
 
         try {
-            $order         = $orderId ? new Order($orderId) : null;
-            $renderService = AdminPanelRenderService::getInstance();
+            $order                 = $orderId ? new Order($orderId) : null;
+            $renderService         = AdminPanelRenderService::getInstance();
+            $presetDeliveryOptions = Tools::getValue('shipmentOptions')
+                ? new DeliveryOptionsFromOrderGridAdapter(Tools::getAllValues())
+                : null;
+
             $this->setResponse([
-                'context' => $renderService->getShipmentOptionsContext($order),
+                'context' => $renderService->getShipmentOptionsContext($order, $presetDeliveryOptions),
             ]);
         } catch (Exception $e) {
             $this->addError($e);
@@ -109,6 +117,7 @@ class AdminMyParcelOrderController extends AbstractAdminController
      * @param  array $labelIds
      *
      * @return array
+     * @noinspection PhpUnused
      */
     public function printLabels(array $labelIds): array
     {
@@ -123,6 +132,7 @@ class AdminMyParcelOrderController extends AbstractAdminController
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
+     * @noinspection PhpUnused
      */
     public function refreshLabels(): Response
     {
@@ -140,11 +150,12 @@ class AdminMyParcelOrderController extends AbstractAdminController
     }
 
     /**
-     * Called by "Save" button in MyParcel settings on single order view.
+     * Called by "Save" button in MyParcel settings on single order view and delivery options edit modal.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @noinspection PhpUnused
      */
     public function saveDeliveryOptions(): Response
     {

@@ -16,6 +16,7 @@ use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
@@ -322,8 +323,9 @@ class AdminOrderService extends AbstractService
      */
     public function updateDeliveryOptions(Order $order, array $values): AbstractDeliveryOptionsAdapter
     {
-        $deliveryOptions = DeliveryOptionsMerger::create(
-            DeliveryOptions::getFromOrder($order->getId()),
+        $orderDeliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
+        $deliveryOptions      = DeliveryOptionsMerger::create(
+            $orderDeliveryOptions,
             new DeliveryOptionsFromFormAdapter($values)
         );
 

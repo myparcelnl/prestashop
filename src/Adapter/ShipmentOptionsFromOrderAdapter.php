@@ -6,9 +6,9 @@ namespace Gett\MyparcelBE\Adapter;
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
 
-class ShipmentOptionsFromAdapter extends AbstractShipmentOptionsAdapter
+class ShipmentOptionsFromOrderAdapter extends AbstractShipmentOptionsAdapter
 {
-    const DEFAULT_INSURANCE = 0;
+    private const DEFAULT_INSURANCE = 0;
 
     /**
      * @param array $inputData

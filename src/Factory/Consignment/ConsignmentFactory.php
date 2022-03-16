@@ -8,7 +8,6 @@ use DateInterval;
 use DateTime;
 use Exception;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\OrderLogger;
@@ -151,7 +150,6 @@ class ConsignmentFactory
 
     /**
      * @return int
-     * @throws \PrestaShopDatabaseException
      */
     private function getPackageType(): int
     {
@@ -159,13 +157,7 @@ class ConsignmentFactory
             return AbstractConsignment::PACKAGE_TYPE_PACKAGE;
         }
 
-        $packageType = $this->getLegacyPackageType() ?? (new PackageTypeCalculator())->getOrderPackageType($this->orderObject);
-
-        if (! isset($this->carrierSettings['delivery']['packageType'][(int) $packageType])) {
-            $packageType = AbstractConsignment::PACKAGE_TYPE_PACKAGE; // TODO: for NL the DPD and Bpost don't allow any.
-        }
-
-        return (int) $packageType;
+        return AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP[$this->deliveryOptions->getPackageType()];
     }
 
     /**

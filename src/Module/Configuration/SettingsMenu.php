@@ -11,6 +11,7 @@ use Gett\MyparcelBE\Module\Configuration\Form\CustomsForm;
 use Gett\MyparcelBE\Module\Configuration\Form\GeneralForm;
 use Gett\MyparcelBE\Module\Configuration\Form\LabelForm;
 use Gett\MyparcelBE\Module\Configuration\Form\OrderForm;
+use Gett\MyparcelBE\Module\Tools\Tools as ToolsAlias;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Collection;
 use Tools;
@@ -46,7 +47,7 @@ class SettingsMenu
                 return [
                     'short'  => $this->module->l($menuItem->getTitle(), 'configure'),
                     'desc'   => $this->module->l($menuItem->getDescription(), 'configure'),
-                    'href'   => $this->module->appendQueryToUrl($this->module->baseUrl, ['menu' => $index]),
+                    'href'   => ToolsAlias::appendQuery($this->module->baseUrl, ['menu' => $index]),
                     'active' => (int) Tools::getValue('menu') === $index,
                     'icon'   => sprintf('icon-%s', $menuItem->getIcon()),
                 ];

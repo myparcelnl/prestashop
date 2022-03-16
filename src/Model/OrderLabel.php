@@ -4,9 +4,11 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Logger\OrderLogger;
+use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
@@ -151,9 +153,9 @@ class OrderLabel extends ObjectModel
             return;
         }
 
-        $order_label = self::findByLabelId($shipmentId);
-        $order       = new Order($order_label->id_order);
-        if (! Validate::isLoadedObject($order_label) || ! Validate::isLoadedObject($order)) {
+        $orderLabel = self::findByLabelId($shipmentId);
+        $order      = new Order($orderLabel->id_order);
+        if (! Validate::isLoadedObject($orderLabel) || ! Validate::isLoadedObject($order)) {
             return;
         }
 
@@ -163,28 +165,30 @@ class OrderLabel extends ObjectModel
         }
 
         $address         = new Address($order->id_address_delivery);
-        $deliveryOptions = DeliveryOptions::getFromOrder($order);
+        $deliveryOptions = OrderSettingsFactory::create($order)
+            ->getDeliveryOptions();
 
         if (! $deliveryOptions) {
             throw new Exception('Delivery options are missing');
         }
 
         /** @deprecated use $deliveryOptions */
-        $oldDeliveryOptions = DeliveryOptions::queryByOrder($order);
+
+        $oldDeliveryOptions =         OrderSettingsFactory::create($order)->getDeliveryOptions();
         $oldDeliveryOptions = \Gett\MyparcelBE\Module\Tools\Tools::arrayToObject($oldDeliveryOptions);
 
-        $orderIso           = Language::getIsoById($order->id_lang);
-        $templateVars       = [
+        $orderIso     = Language::getIsoById($order->id_lang);
+        $templateVars = [
             '{firstname}'       => $address->firstname,
             '{lastname}'        => $address->lastname,
-            '{shipping_number}' => $order_label->barcode,
-            '{followup}'        => $order_label->track_link,
+            '{shipping_number}' => $orderLabel->barcode,
+            '{followup}'        => $orderLabel->track_link,
             '{order_name}'      => $order->getUniqReference(),
             '{order_id}'        => $order->id,
             '{utc_offset}'      => date('P'),
         ];
 
-        $trackTraceInfo = self::getTrackTraceInfo($order_label);
+        $trackTraceInfo = self::getTrackTraceInfo($orderLabel);
 
         $templateVars['{delivery_street}']   = $trackTraceInfo['recipient']['street'];
         $templateVars['{delivery_number}']   = $trackTraceInfo['recipient']['street_additional_info'] . ' ' . $trackTraceInfo['recipient']['number'];
@@ -192,7 +196,8 @@ class OrderLabel extends ObjectModel
         $templateVars['{delivery_city}']     = $trackTraceInfo['recipient']['city'];
         $templateVars['{delivery_cc}']       = $trackTraceInfo['recipient']['cc'];
 
-        $deliveryDate     = $trackTraceInfo['delivery_moment']['start']['date'] ?? $trackTraceInfo['options']['delivery_date'] ?? $deliveryOptions->getDate();
+        $deliveryDate     = $trackTraceInfo['delivery_moment']['start']['date'] ?? $trackTraceInfo['options']['delivery_date'] ?? $deliveryOptions->getDate(
+            );
         $deliveryDateFrom = $trackTraceInfo['delivery_moment']['start']['date'] ?? $deliveryOptions->getDate();
         $deliveryDateTo   = $trackTraceInfo['delivery_moment']['end']['date'] ?? $deliveryOptions->getDate();
         $monthNumber      = (int) date('n', strtotime($deliveryDate));
@@ -239,7 +244,9 @@ class OrderLabel extends ObjectModel
                 if (false !== strpos($dayFrom, '-')) {
                     [$dayFrom] = explode('-', $dayFrom);
                 }
-                $dayTo = $oldDeliveryOptions->opening_hours->{$day}[count($oldDeliveryOptions->opening_hours->{$day}) - 1];
+                $dayTo = $oldDeliveryOptions->opening_hours->{$day}[count(
+                    $oldDeliveryOptions->opening_hours->{$day}
+                ) - 1];
                 if (false !== strpos($dayTo, '-')) {
                     [, $dayTo] = array_pad(explode('-', $dayTo), 2, '');
                 }

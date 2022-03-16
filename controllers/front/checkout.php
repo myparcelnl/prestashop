@@ -3,8 +3,7 @@
 declare(strict_types=1);
 
 use Gett\MyparcelBE\Service\CarrierService;
-use Gett\MyparcelBE\Service\DeliverySettingsProvider;
-use MyParcelNL\Sdk\src\Support\Arr;
+use Gett\MyparcelBE\Service\DeliveryOptionsConfigProvider;
 
 class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
 {
@@ -38,7 +37,7 @@ class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
             }, $carriers);
         }
 
-        $params = (new DeliverySettingsProvider($this->context, $carriers))->get($addressId ? (int) $addressId : null);
+        $params = (new DeliveryOptionsConfigProvider($this->context, $carriers))->get($addressId ? (int) $addressId : null);
 
         echo json_encode(['data' => $params]);
         return true;

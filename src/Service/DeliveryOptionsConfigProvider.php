@@ -18,7 +18,7 @@ use Order;
 use Tools;
 use Validate;
 
-class DeliverySettingsProvider extends AbstractProvider
+class DeliveryOptionsConfigProvider extends AbstractProvider
 {
     /**
      * @var int[]

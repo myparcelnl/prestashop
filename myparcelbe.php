@@ -1,5 +1,7 @@
 <?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
+use Gett\MyparcelBE\Module\Tools\Tools;
+
 if (! defined('_PS_VERSION_')) {
     exit;
 }
@@ -105,6 +107,11 @@ class MyParcelBE extends CarrierModule
     /** @var string */
     protected $baseUrlWithoutToken;
 
+    /**
+     * @var \Gett\MyparcelBE\Module\Module
+     */
+    private $moduleController;
+
     public function __construct()
     {
         $this->name          = self::MODULE_NAME;
@@ -115,11 +122,11 @@ class MyParcelBE extends CarrierModule
         $this->bootstrap     = true;
 
         parent::__construct();
+        $this->moduleController = (new \Gett\MyparcelBE\Module\Module($this, $this->context));
 
         if (! empty(Context::getContext()->employee->id)) {
-            $this->baseUrlWithoutToken = $this->getAdminLink(
-                'AdminModules',
-                false,
+            $this->baseUrlWithoutToken = Tools::appendQuery(
+                $this->context->link->getAdminLink('AdminModules', false),
                 [
                     'configure'   => $this->name,
                     'tab_module'  => $this->tab,
@@ -127,9 +134,8 @@ class MyParcelBE extends CarrierModule
                 ]
             );
 
-            $this->baseUrl             = $this->getAdminLink(
-                'AdminModules',
-                true,
+            $this->baseUrl = Tools::appendQuery(
+                $this->context->link->getAdminLink('AdminModules'),
                 [
                     'configure'   => $this->name,
                     'tab_module'  => $this->tab,
@@ -145,100 +151,24 @@ class MyParcelBE extends CarrierModule
         $this->registerHook('displayAdminOrderMain');
     }
 
-    public function getAdminLink(string $controller, bool $withToken = true, array $params = [])
-    {
-        $url = parse_url($this->context->link->getAdminLink($controller, $withToken));
-        $url['query'] = isset($url['query']) ? $url['query'] : '';
-        parse_str($url['query'], $query);
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
-            $url['query'] = http_build_query($query + $params, PHP_QUERY_RFC1738);
-        } else {
-            $url['query'] = http_build_query($query + $params);
-        }
-
-        return $this->mypa_stringify_url($url);
-    }
-
     /**
-     * @return string
-     */
-    public function getContent(): string
-    {
-        $configuration = new \Gett\MyparcelBE\Module\Configuration\SettingsMenu($this);
-
-        $this->context->smarty->assign([
-            'menutabs' => $configuration->initNavigation(),
-            'ajaxUrl'  => $this->baseUrlWithoutToken,
-        ]);
-
-        $this->context->smarty->assign('module_dir', $this->_path);
-        $output = $this->display(__FILE__, 'views/templates/admin/navbar.tpl');
-
-        return $output . $configuration->renderMenu(Tools::getValue('menu'));
-    }
-
-    /**
-     * @param $cart
-     * @param $shipping_cost
+     * @param  \Cart $cart
+     * @param  \int  $shippingCost
      *
      * @return float|int
      * @throws \PrestaShopDatabaseException
      */
-    public function getOrderShippingCost($cart, $shipping_cost)
+    public function getOrderShippingCost($cart, $shippingCost)
     {
-        if ($this->id_carrier != $cart->id_carrier) {
-            return $shipping_cost;
-        }
-        if (!empty($this->context->controller->requestOriginalShippingCost)) {
-            return $shipping_cost;
-        }
-
-        $myParcelCost = 0;
-        $deliverySettings = Tools::getValue('myparcel-delivery-options', false);
-
-        if ($deliverySettings) {
-            $deliverySettings = json_decode($deliverySettings, true);
-        } else {
-            $deliverySettings = \Gett\MyparcelBE\DeliveryOptions\DeliveryOptions::queryByCart((int) $cart->id);
-        }
-
-        if (empty($deliverySettings)) {
-            return $shipping_cost;
-        }
-
-        $isPickup = (isset($deliverySettings['isPickup'])) ? $deliverySettings['isPickup'] : false;
-        if ($isPickup) {
-            $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                $cart->id_carrier,
-                'pricePickup'
-            );
-        } else {
-            $deliveryType = (isset($deliverySettings['deliveryType'])) ? $deliverySettings['deliveryType'] : 'standard';
-            if ($deliveryType !== 'standard') {
-                $priceHourInterval = 'price' . ucfirst($deliveryType) . 'Delivery';
-                $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                    $cart->id_carrier,
-                    $priceHourInterval
-                );
-            }
-            if (!empty($deliverySettings['shipmentOptions']['only_recipient'])) {
-                $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                    $cart->id_carrier,
-                    'priceOnlyRecipient'
-                );
-            }
-            if (!empty($deliverySettings['shipmentOptions']['signature'])) {
-                $myParcelCost += (float) \Gett\MyparcelBE\Service\CarrierConfigurationProvider::get(
-                    $cart->id_carrier,
-                    'priceSignature'
-                );
-            }
-        }
-
-        return $shipping_cost + $myParcelCost;
+        return $this->moduleController->getOrderShippingCost($cart, $shippingCost);
     }
 
-    public function getOrderShippingCostExternal($params)
+    /**
+     * @param \Cart $params
+     *
+     * @return bool
+     */
+    public function getOrderShippingCostExternal($params): bool
     {
         return true;
     }
@@ -262,31 +192,26 @@ class MyParcelBE extends CarrierModule
         return (new \Gett\MyparcelBE\Module\Uninstaller())->uninstall() && parent::uninstall();
     }
 
-    public function appendQueryToUrl($urlString, $query = [])
-    {
-        $url = parse_url($urlString);
-        $url['query'] = isset($url['query']) ? $url['query'] : '';
-        parse_str($url['query'], $oldQuery);
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
-            $url['query'] = http_build_query($oldQuery + $query, PHP_QUERY_RFC1738);
-        } else {
-            $url['query'] = http_build_query($oldQuery + $query);
-        }
-
-        return $this->mypa_stringify_url($url);
-    }
-
-    public function getModuleCountry()
+    /**
+     * @return string
+     */
+    public function getModuleCountry(): string
     {
         return (strpos($this->name, 'be') !== false) ? 'BE' : 'NL';
     }
 
-    public function isNL()
+    /**
+     * @return bool
+     */
+    public function isNL(): bool
     {
         return $this->getModuleCountry() === 'NL';
     }
 
-    public function isBE()
+    /**
+     * @return bool
+     */
+    public function isBE(): bool
     {
         return $this->getModuleCountry() === 'BE';
     }
@@ -317,34 +242,19 @@ class MyParcelBE extends CarrierModule
         return $composerData['version'];
     }
 
-    private function mypa_stringify_url($parsedUrl)
-    {
-        $scheme = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'] . '://' : '';
-        $host = isset($parsedUrl['host']) ? $parsedUrl['host'] : '';
-        $port = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
-        $user = isset($parsedUrl['user']) ? $parsedUrl['user'] : '';
-        $pass = isset($parsedUrl['pass']) ? ':' . $parsedUrl['pass'] : '';
-        $pass = ($user || $pass) ? "{$pass}@" : '';
-        $path = isset($parsedUrl['path']) ? $parsedUrl['path'] : '';
-        $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
-        $fragment = isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : '';
-
-        return "{$scheme}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
-    }
-
     public function getShippingOptions($id_carrier, $address)
     {
         $carrier = new Carrier($id_carrier);
 
         $taxRate = ($carrier->getTaxesRate($address) / 100) + 1;
 
-        $includeTax = !Product::getTaxCalculationMethod((int) $this->context->cart->id_customer)
-                && (int) Configuration::get('PS_TAX');
-        $displayTaxLabel = (Configuration::get('PS_TAX') && !Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
+        $includeTax      = ! Product::getTaxCalculationMethod((int) $this->context->cart->id_customer)
+            && (int) Configuration::get('PS_TAX');
+        $displayTaxLabel = (Configuration::get('PS_TAX') && ! Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
 
         return [
-            'tax_rate' => ($includeTax) ? $taxRate : 1,
-            'include_tax' => $includeTax,
+            'tax_rate'          => ($includeTax) ? $taxRate : 1,
+            'include_tax'       => $includeTax,
             'display_tax_label' => $displayTaxLabel,
         ];
     }

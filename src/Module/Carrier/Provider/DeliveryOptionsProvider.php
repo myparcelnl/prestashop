@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use DateTime;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
 
 class DeliveryOptionsProvider
@@ -28,7 +28,7 @@ class DeliveryOptionsProvider
      */
     public function provide(int $orderId): array
     {
-        $deliveryOptions = DeliveryOptions::getFromOrder($orderId);
+        $deliveryOptions = OrderSettingsFactory::create($orderId)->getDeliveryOptions();
 
         if (! $deliveryOptions) {
             $deliveryOptions = new DeliveryOptionsV3Adapter();

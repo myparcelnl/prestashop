@@ -5,7 +5,7 @@ namespace Gett\MyparcelBE\Label;
 use Gett\MyparcelBE\Carrier\PackageFormatCalculator;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
@@ -46,12 +46,13 @@ class LabelOptionsResolver
      */
     public function getLabelOptions(Order $order): array
     {
-        $deliveryOptions = DeliveryOptions::getFromOrder($order);
+        $deliveryOptions = OrderSettingsFactory::create($order)
+            ->getDeliveryOptions();
 
         return array_merge(
             $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
             [
-                'package_type'   => $this->getPackageType($order, $deliveryOptions),
+                'package_type' => $this->getPackageType($order, $deliveryOptions),
                 'package_format' => $this->getPackageFormat($order, $deliveryOptions),
             ]
         );

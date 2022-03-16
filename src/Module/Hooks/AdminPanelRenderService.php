@@ -8,9 +8,11 @@ use Closure;
 use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
+use Gett\MyparcelBE\Entity\Cache;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
-use Gett\MyparcelBE\Label\LabelOptionsResolver;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator;
@@ -19,8 +21,8 @@ use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
 use Gett\MyparcelBE\Provider\OrderLabelProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\LabelOptionsService;
-use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\WeightService;
+use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Address;
@@ -85,13 +87,18 @@ class AdminPanelRenderService extends RenderService
     }
 
     /**
-     * @param  null|\Gett\MyparcelBE\Model\Core\Order $order
+     * @param  null|\Gett\MyparcelBE\Model\Core\Order                                          $order
+     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $presetDeliveryOptions
      *
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      * @throws \Exception
      */
-    public function getShipmentOptionsContext(?Order $order = null): array
-    {
+    public function getShipmentOptionsContext(
+        ?Order                          $order = null,
+        ?AbstractDeliveryOptionsAdapter $presetDeliveryOptions = null
+    ): array {
         $context = [
             'id'              => self::ID_SHIPMENT_OPTIONS,
             'deliveryAddress' => null,
@@ -108,22 +115,18 @@ class AdminPanelRenderService extends RenderService
         ];
 
         if ($order) {
-            $extraOptions = DeliverySettings::getExtraOptionsFromOrder($order);
+            $orderSettings = OrderSettingsFactory::create($order);
 
             $context['orderId']      = $order->getId();
-            $context['orderWeight']  = (new OrderTotalWeight())->convertWeightToGrams($order->getTotalWeight());
-            $context['extraOptions'] = [
-                'digitalStampWeight' => $extraOptions->getDigitalStampWeight() ??
-                    WeightService::convertToDigitalStampWeight($context['orderWeight']),
-                'labelAmount'        => $extraOptions->getLabelAmount(),
-            ];
-            $context['labelOptions'] = (new LabelOptionsResolver())->getLabelOptions($order);
+            $context['orderWeight']  = $orderSettings->getOrderWeight();
+            $context['extraOptions'] = $orderSettings->getExtraOptions()->toArray();
+            $context['labelOptions'] = $orderSettings->getLabelOptions();
 
             $carrierOptionsCalculator            = $this->getCarrierOptionsCalculator($order);
             $context['options']['packageType']   = $carrierOptionsCalculator->getAvailablePackageTypeNames();
             $context['options']['packageFormat'] = $carrierOptionsCalculator->getAvailablePackageFormats();
 
-            $context = array_merge($context, $this->getDeliveryOptionsContext($order));
+            $context = array_merge($context, $this->getDeliveryOptionsContext($order, $presetDeliveryOptions));
         }
 
         return $context;
@@ -191,14 +194,18 @@ class AdminPanelRenderService extends RenderService
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
-     * @param  array                             $map
+     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  array                                                                           $map
+     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $presetDeliveryOptions
      *
      * @return array
      */
-    protected function getConsignmentOptions(Order $order, array $map): array
-    {
-        $consignment = $this->createConsignmentForOrder($order);
+    protected function getConsignmentOptions(
+        Order                           $order,
+        array                           $map,
+        ?AbstractDeliveryOptionsAdapter $presetDeliveryOptions = null
+    ): array {
+        $consignment = $this->createConsignmentForOrder($order, $presetDeliveryOptions);
 
         if (! $consignment) {
             return [];
@@ -217,36 +224,52 @@ class AdminPanelRenderService extends RenderService
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $presetDeliveryOptions
      *
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      * @throws \Exception
      */
-    protected function getDeliveryOptionsContext(Order $order): array
+    protected function getDeliveryOptionsContext(
+        Order                           $order,
+        ?AbstractDeliveryOptionsAdapter $presetDeliveryOptions = null
+    ): array
     {
         $deliveryOptionsProvider = new DeliveryOptionsProvider();
-        $deliveryOptions         = DeliverySettings::getDeliveryOptionsFromOrder($order);
+        $orderSettings           = OrderSettingsFactory::create($order);
+        $deliveryOptions         = DeliveryOptionsMerger::create(
+            $orderSettings->getDeliveryOptions(),
+            $presetDeliveryOptions
+        );
 
         return [
-            'consignment'                => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_MAP),
-            'deliveryOptions'            => $deliveryOptions->toArray(),
+            'consignment'                => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_MAP, $deliveryOptions),
+            'deliveryOptions'            => $deliveryOptions ? $deliveryOptions->toArray() : [],
             'deliveryOptionsDateChanged' => $deliveryOptionsProvider->provideWarningDisplay($order->getId()),
         ];
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $presetDeliveryOptions
      *
      * @return null|\MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment
      */
-    private function createConsignmentForOrder(Order $order): ?AbstractConsignment
-    {
+    private function createConsignmentForOrder(
+        Order                           $order,
+        ?AbstractDeliveryOptionsAdapter $presetDeliveryOptions = null
+    ): ?AbstractConsignment {
         $consignment = null;
 
         try {
-            $deliveryOptions = DeliverySettings::getDeliveryOptionsFromOrder($order);
-            $consignment     = (new ConsignmentFactory([]))
-                ->fromOrder($order, $deliveryOptions)
+            $consignment = (new ConsignmentFactory([]))
+                ->fromOrder(
+                    $order,
+                    $presetDeliveryOptions ?? OrderSettingsFactory::create($order)
+                        ->getDeliveryOptions()
+                )
                 ->first();
         } catch (Exception $e) {
             OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
