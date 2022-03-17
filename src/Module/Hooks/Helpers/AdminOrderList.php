@@ -80,7 +80,6 @@ class AdminOrderList extends AbstractAdminOrder
             'currencySign'   => $this->context->currency->getSign(),
             'dateFormatFull' => $this->context->language->date_format_full,
             'dateFormatLite' => $this->context->language->date_format_lite,
-            'countries'      => Country::getCountries($this->context->language->id),
         ];
     }
 
