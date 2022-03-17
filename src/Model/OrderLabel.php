@@ -2,7 +2,6 @@
 
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
@@ -174,8 +173,12 @@ class OrderLabel extends ObjectModel
 
         /** @deprecated use $deliveryOptions */
 
-        $oldDeliveryOptions =         OrderSettingsFactory::create($order)->getDeliveryOptions();
-        $oldDeliveryOptions = \Gett\MyparcelBE\Module\Tools\Tools::arrayToObject($oldDeliveryOptions);
+        $oldDeliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
+        $oldDeliveryOptions = \Gett\MyparcelBE\Module\Tools\Tools::arrayToObject(
+            $oldDeliveryOptions
+                ? $oldDeliveryOptions->toArray()
+                : []
+        );
 
         $orderIso     = Language::getIsoById($order->id_lang);
         $templateVars = [
