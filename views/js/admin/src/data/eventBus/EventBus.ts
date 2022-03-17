@@ -93,7 +93,6 @@ export class EventBus {
     const data = { requestOptions, url, parameters };
 
     this.emit(EventName.BUSY, { response: true, ...data });
-    console.log(url, parameters, requestOptions);
     const response = await doRequest(url, parameters, requestOptions);
     this.emit(EventName.BUSY, { response: false, ...data });
 
@@ -102,7 +101,6 @@ export class EventBus {
     }
 
     if (isOfType<SuccessResponse>(response, 'data')) {
-      console.log('clear data');
       this.clear();
       this.emit(EventName.RESPONSE, { response, ...data });
       return response;
