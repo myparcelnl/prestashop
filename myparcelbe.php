@@ -1,4 +1,8 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+
+declare(strict_types=1);
 
 use Gett\MyparcelBE\Module\Tools\Tools;
 
@@ -23,20 +27,6 @@ class MyParcelBE extends CarrierModule
     public const MODULE_NAME = 'myparcelbe';
 
     public $baseUrl;
-    public $id_carrier;
-
-    /**
-     * @var class-string<\Gett\MyparcelBE\Database\Migration>[]
-     */
-    public $migrations = [
-        \Gett\MyparcelBE\Database\CreateProductConfigurationTableMigration::class,
-        \Gett\MyparcelBE\Database\CreateCarrierConfigurationTableMigration::class,
-        \Gett\MyparcelBE\Database\CreateOrderLabelTableMigration::class,
-        \Gett\MyparcelBE\Database\CreateDeliverySettingTableMigration::class,
-    ];
-
-    public $carrierStandardShippingCost = [];
-    public $cartCarrierStandardShippingCost = null;
 
     public $configItems = [
         \Gett\MyparcelBE\Constant::POSTNL_CONFIGURATION_NAME,
@@ -80,7 +70,7 @@ class MyParcelBE extends CarrierModule
         \Gett\MyparcelBE\Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME,
     ];
 
-    public $hooks = [
+    public $hooks       = [
         'displayAdminProductsExtra',
         'displayBackOfficeHeader',
         'actionProductUpdate',
@@ -102,6 +92,16 @@ class MyParcelBE extends CarrierModule
         'displayInvoice',
         'displayAdminAfterHeader',
         'actionValidateOrder',
+    ];
+
+    /**
+     * @var class-string<\Gett\MyparcelBE\Database\Migration>[]
+     */
+    public $migrations = [
+        \Gett\MyparcelBE\Database\CreateProductConfigurationTableMigration::class,
+        \Gett\MyparcelBE\Database\CreateCarrierConfigurationTableMigration::class,
+        \Gett\MyparcelBE\Database\CreateOrderLabelTableMigration::class,
+        \Gett\MyparcelBE\Database\CreateDeliverySettingTableMigration::class,
     ];
 
     /** @var string */
@@ -152,6 +152,49 @@ class MyParcelBE extends CarrierModule
     }
 
     /**
+     * @return string
+     */
+    public function getContent(): string
+    {
+        $configuration = new \Gett\MyparcelBE\Module\Configuration\SettingsMenu($this);
+
+        $this->context->smarty->assign([
+            'menutabs' => $configuration->initNavigation(),
+            'ajaxUrl'  => $this->baseUrlWithoutToken,
+        ]);
+
+        $this->context->smarty->assign('module_dir', $this->_path);
+        $output = $this->display(__FILE__, 'views/templates/admin/navbar.tpl');
+
+        return $output . $configuration->renderMenu((int) Tools::getValue('menu') ?: 0);
+    }
+
+    /**
+     * @return self
+     */
+    public static function getModule(): self
+    {
+        /**
+         * @var self|false $module
+         */
+        $module = Module::getInstanceByName(self::MODULE_NAME);
+
+        if (! $module) {
+            throw new \PrestaShopBundle\Exception\InvalidModuleException('Failed to get module instance');
+        }
+
+        return $module;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModuleCountry(): string
+    {
+        return 'NL';
+    }
+
+    /**
      * @param  \Cart $cart
      * @param  \int  $shippingCost
      *
@@ -164,13 +207,30 @@ class MyParcelBE extends CarrierModule
     }
 
     /**
-     * @param \Cart $params
+     * @param  \Cart $params
      *
      * @return bool
      */
     public function getOrderShippingCostExternal($params): bool
     {
         return true;
+    }
+
+    public function getShippingOptions($id_carrier, $address)
+    {
+        $carrier = new Carrier($id_carrier);
+
+        $taxRate = ($carrier->getTaxesRate($address) / 100) + 1;
+
+        $includeTax      = ! Product::getTaxCalculationMethod((int) $this->context->cart->id_customer)
+            && (int) Configuration::get('PS_TAX');
+        $displayTaxLabel = (Configuration::get('PS_TAX') && ! Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
+
+        return [
+            'tax_rate'          => ($includeTax) ? $taxRate : 1,
+            'include_tax'       => $includeTax,
+            'display_tax_label' => $displayTaxLabel,
+        ];
     }
 
     /**
@@ -181,6 +241,22 @@ class MyParcelBE extends CarrierModule
     public function install(): bool
     {
         return parent::install() && (new \Gett\MyparcelBE\Module\Installer())->install();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBE(): bool
+    {
+        return $this->getModuleCountry() === 'BE';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNL(): bool
+    {
+        return $this->getModuleCountry() === 'NL';
     }
 
     /**
@@ -240,39 +316,5 @@ class MyParcelBE extends CarrierModule
         $composerData = json_decode(file_get_contents($filename), true);
 
         return $composerData['version'];
-    }
-
-    public function getShippingOptions($id_carrier, $address)
-    {
-        $carrier = new Carrier($id_carrier);
-
-        $taxRate = ($carrier->getTaxesRate($address) / 100) + 1;
-
-        $includeTax      = ! Product::getTaxCalculationMethod((int) $this->context->cart->id_customer)
-            && (int) Configuration::get('PS_TAX');
-        $displayTaxLabel = (Configuration::get('PS_TAX') && ! Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
-
-        return [
-            'tax_rate'          => ($includeTax) ? $taxRate : 1,
-            'include_tax'       => $includeTax,
-            'display_tax_label' => $displayTaxLabel,
-        ];
-    }
-
-    /**
-     * @return self
-     */
-    public static function getModule(): self
-    {
-        /**
-         * @var self|false $module
-         */
-        $module = Module::getInstanceByName(self::MODULE_NAME);
-
-        if (! $module) {
-            throw new \PrestaShopBundle\Exception\InvalidModuleException('Failed to get module instance');
-        }
-
-        return $module;
     }
 }

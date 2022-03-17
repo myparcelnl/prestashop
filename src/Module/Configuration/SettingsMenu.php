@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Module\Configuration;
 
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Module\Configuration\Form\ApiForm;
 use Gett\MyparcelBE\Module\Configuration\Form\CarriersForm;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
@@ -66,10 +67,8 @@ class SettingsMenu
         $menuItem = $this->getMenuData()[$formId];
         $class    = $menuItem->getForm();
 
-        /** @var \Gett\MyparcelBE\Module\Configuration\Form\AbstractForm */
-        $form = new $class($this->module);
-
-        return $form->render();
+        FileLogger::addLog('Rendering' . $class);
+        return (new $class($this->module))->render();
     }
 
     /**
