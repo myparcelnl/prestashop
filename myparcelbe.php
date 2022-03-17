@@ -104,13 +104,10 @@ class MyParcelBE extends CarrierModule
         \Gett\MyparcelBE\Database\CreateDeliverySettingTableMigration::class,
     ];
 
-    /** @var string */
-    protected $baseUrlWithoutToken;
-
     /**
-     * @var \Gett\MyparcelBE\Module\Module
+     * @var \Gett\MyparcelBE\Module\ModuleService
      */
-    private $moduleController;
+    private $moduleService;
 
     public function __construct()
     {
@@ -122,26 +119,11 @@ class MyParcelBE extends CarrierModule
         $this->bootstrap     = true;
 
         parent::__construct();
-        $this->moduleController = (new \Gett\MyparcelBE\Module\Module($this, $this->context));
+        $this->moduleService = (new \Gett\MyparcelBE\Module\ModuleService($this, $this->context));
 
         if (! empty(Context::getContext()->employee->id)) {
-            $this->baseUrlWithoutToken = Tools::appendQuery(
-                $this->context->link->getAdminLink('AdminModules', false),
-                [
-                    'configure'   => $this->name,
-                    'tab_module'  => $this->tab,
-                    'module_name' => $this->name,
-                ]
-            );
-
-            $this->baseUrl = Tools::appendQuery(
-                $this->context->link->getAdminLink('AdminModules'),
-                [
-                    'configure'   => $this->name,
-                    'tab_module'  => $this->tab,
-                    'module_name' => $this->name,
-                ]
-            );
+            $this->baseUrlWithoutToken = $this->getBaseUrl(true);
+            $this->baseUrl             = $this->getBaseUrl();
         }
 
         $this->displayName = $this->l('MyParcelBE');
@@ -152,21 +134,36 @@ class MyParcelBE extends CarrierModule
     }
 
     /**
+     * @param  bool $withoutToken
+     *
+     * @return string
+     */
+    public function getBaseUrl(bool $withoutToken = false): string
+    {
+        if (empty(Context::getContext()->employee->id)) {
+            \Gett\MyparcelBE\Logger\FileLogger::addLog(
+                'Unauthenticated user tried getting base url',
+                FileLogger::WARNING
+            );
+            throw new RuntimeException('Not authenticated');
+        }
+
+        return Tools::appendQuery(
+            $this->context->link->getAdminLink('AdminModules', ! $withoutToken),
+            [
+                'configure'   => $this->name,
+                'tab_module'  => $this->tab,
+                'module_name' => $this->name,
+            ]
+        );
+    }
+
+    /**
      * @return string
      */
     public function getContent(): string
     {
-        $configuration = new \Gett\MyparcelBE\Module\Configuration\SettingsMenu($this);
-
-        $this->context->smarty->assign([
-            'menutabs' => $configuration->initNavigation(),
-            'ajaxUrl'  => $this->baseUrlWithoutToken,
-        ]);
-
-        $this->context->smarty->assign('module_dir', $this->_path);
-        $output = $this->display(__FILE__, 'views/templates/admin/navbar.tpl');
-
-        return $output . $configuration->renderMenu((int) Tools::getValue('menu') ?: 0);
+        return $this->moduleService->getContent($this);
     }
 
     /**
@@ -191,7 +188,7 @@ class MyParcelBE extends CarrierModule
      */
     public function getModuleCountry(): string
     {
-        return 'NL';
+        return (strpos($this->name, 'be') !== false) ? 'BE' : 'NL';
     }
 
     /**
@@ -203,7 +200,7 @@ class MyParcelBE extends CarrierModule
      */
     public function getOrderShippingCost($cart, $shippingCost)
     {
-        return $this->moduleController->getOrderShippingCost($cart, $shippingCost);
+        return $this->moduleService->getOrderShippingCost($cart, $shippingCost);
     }
 
     /**

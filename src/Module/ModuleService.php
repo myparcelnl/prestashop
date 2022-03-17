@@ -6,12 +6,13 @@ namespace Gett\MyparcelBE\Module;
 
 use Context;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\Module\Configuration\SettingsMenu;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 
-class Module
+class ModuleService
 {
     /**
      * @var \Context
@@ -27,6 +28,26 @@ class Module
     {
         $this->module  = $module;
         $this->context = $context;
+    }
+
+    /**
+     * @param  MyParcelBE $instance
+     *
+     * @return string
+     */
+    public function getContent(MyParcelBE $instance): string
+    {
+        $configuration = new SettingsMenu($instance);
+
+        $this->context->smarty->assign([
+            'menutabs' => $configuration->initNavigation(),
+            'ajaxUrl'  => $this->module->getBaseUrl(true),
+        ]);
+
+        $this->context->smarty->assign('module_dir', $this->module->getPathUri());
+        $output = $instance->display(__FILE__, 'views/templates/admin/navbar.tpl');
+
+        return $output . $configuration->renderMenu((int) Tools::getValue('menu') ?: 0);
     }
 
     /**
