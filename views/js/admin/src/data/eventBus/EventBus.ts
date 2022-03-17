@@ -33,10 +33,20 @@ export class EventBus {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private emitter: Emitter<Record<EventName, any>> = mitt();
 
+  /**
+   * Delete all stored data.
+   */
+  public clear(): void {
+    this.data = null;
+  }
+
   public get: EventBusRequest = async(url, parameters = {}, requestOptions = {}) => {
     return this.doRequest(url, parameters, { method: 'GET', ...requestOptions });
   };
 
+  /**
+   * Retrieve stored data.
+   */
   public getData(): RequestData {
     return this.data;
   }
@@ -68,6 +78,9 @@ export class EventBus {
     });
   };
 
+  /**
+   * Update stored data.
+   */
   public update(data: null | Record<string, unknown>): void {
     this.data = data;
   }
@@ -80,6 +93,7 @@ export class EventBus {
     const data = { requestOptions, url, parameters };
 
     this.emit(EventName.BUSY, { response: true, ...data });
+    console.log(url, parameters, requestOptions);
     const response = await doRequest(url, parameters, requestOptions);
     this.emit(EventName.BUSY, { response: false, ...data });
 
@@ -88,6 +102,8 @@ export class EventBus {
     }
 
     if (isOfType<SuccessResponse>(response, 'data')) {
+      console.log('clear data');
+      this.clear();
       this.emit(EventName.RESPONSE, { response, ...data });
       return response;
     }
