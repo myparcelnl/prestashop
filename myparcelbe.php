@@ -266,30 +266,6 @@ class MyParcelBE extends CarrierModule
     }
 
     /**
-     * @return string
-     */
-    public function getModuleCountry(): string
-    {
-        return (strpos($this->name, 'be') !== false) ? 'BE' : 'NL';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isNL(): bool
-    {
-        return $this->getModuleCountry() === 'NL';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBE(): bool
-    {
-        return $this->getModuleCountry() === 'BE';
-    }
-
-    /**
      * @param  class-string $class
      *
      * @return bool
