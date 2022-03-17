@@ -12,15 +12,18 @@
 </template>
 
 <script lang="ts">
-import Modal from '@/components/Modal.vue';
+import Modal from '@/components/modals/Modal.vue';
 import { OrderAction } from '@/data/global/actions';
-import ShipmentOptions from '@/components/order/ShipmentOptions.vue';
+import ShipmentOptions from '@/components/forms/ShipmentOptionsForm.vue';
 import { ShipmentOptionsContext } from '@/data/global/context';
 import { defineComponent } from '@vue/composition-api';
 import { executeOrderAction } from '@/services/actions/executeOrderAction';
 import { shipmentOptionsContextEventBus } from '@/data/eventBus/ShipmentOptionsContextEventBus';
 import { useEventBusLoadingState } from '@/composables/useEventBusLoadingState';
 
+/**
+ * Shipment options modal. Opened by clicking the "Create" button in the "Labels" column in the orders list.
+ */
 export default defineComponent({
   name: 'ShipmentOptionsModal',
   components: {

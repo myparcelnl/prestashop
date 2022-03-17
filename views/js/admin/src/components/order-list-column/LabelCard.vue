@@ -27,7 +27,7 @@ import { PropType, defineComponent } from '@vue/composition-api';
 import { LabelAction } from '@/data/global/actions';
 import LoaderOverlay from '@/components/common/LoaderOverlay.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
-import ShipmentLabel from '@/components/order/ShipmentLabel.vue';
+import ShipmentLabel from '@/components/order-card/ShipmentLabel.vue';
 import { deliveryOptionsEventBus } from '@/data/eventBus/DeliveryOptionsEventBus';
 import { executeLabelAction } from '@/services/actions/executeLabelAction';
 import { useEventBusLoadingState } from '@/composables/useEventBusLoadingState';

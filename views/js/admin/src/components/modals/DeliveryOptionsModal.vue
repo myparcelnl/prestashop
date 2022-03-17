@@ -11,14 +11,17 @@
 
 <script lang="ts">
 import { ContextKey } from '@/data/global/context';
-import DeliveryOptions from '@/components/order/DeliveryOptions.vue';
-import Modal from '@/components/Modal.vue';
+import DeliveryOptions from '@/components/order-card/DeliveryOptions.vue';
+import Modal from '@/components/modals/Modal.vue';
 import { ModalCallback } from '@/composables/context/useModalContext';
 import { defineComponent } from '@vue/composition-api';
 import { deliveryOptionsEventBus } from '@/data/eventBus/DeliveryOptionsEventBus';
 import { shipmentOptionsContextEventBus } from '@/data/eventBus/ShipmentOptionsContextEventBus';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
 
+/**
+ * Modal used in the single order view to edit delivery options for the order.
+ */
 export default defineComponent({
   name: 'DeliveryOptionsModal',
   components: {

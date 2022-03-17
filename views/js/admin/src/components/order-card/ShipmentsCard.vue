@@ -29,7 +29,7 @@ import { LabelAction } from '@/data/global/actions';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import PsCard from '@/components/common/PsCard.vue';
 import PsDropdownButton from '@/components/common/PsDropdownButton.vue';
-import ShipmentLabels from '@/components/order/ShipmentLabels.vue';
+import ShipmentLabels from '@/components/order-card/ShipmentLabels.vue';
 import { executeLabelAction } from '@/services/actions/executeLabelAction';
 import { labelActionsEventBus } from '@/data/eventBus/LabelActionsEventBus';
 import { useEventBusLoadingState } from '@/composables/useEventBusLoadingState';

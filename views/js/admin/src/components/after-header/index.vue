@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import HeaderAlerts from '@/components/HeaderAlerts.vue';
+import HeaderAlerts from '@/components/after-header/HeaderAlerts.vue';
 import Modals from '@/components/modals/Modals.vue';
 import { defineComponent } from '@vue/composition-api';
 

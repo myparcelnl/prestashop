@@ -32,13 +32,13 @@
 import { UnwrapRef, defineComponent, reactive, ref, watchEffect } from '@vue/composition-api';
 import { formatOptions, outputOptions, positionOptions, positions } from '@/data/printOptions';
 import { ContextKey } from '@/data/global/context';
-import FormGroup from './common/form/FormGroup.vue';
-import PsCheckbox from './common/form/PsCheckbox.vue';
+import FormGroup from '@/components/common/form/FormGroup.vue';
+import PsCheckbox from '@/components/common/form/PsCheckbox.vue';
 import PsRadio from '@/components/common/form/PsRadio.vue';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
 
 export default defineComponent({
-  name: 'PrintOptions',
+  name: 'PrintOptionsForm',
   components: { PsRadio, PsCheckbox, FormGroup },
 
   setup: () => {

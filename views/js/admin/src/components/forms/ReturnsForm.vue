@@ -31,12 +31,12 @@
 <script lang="ts">
 import { PropType, defineComponent, reactive, ref } from '@vue/composition-api';
 import { ContextKey } from '@/data/global/context';
-import FormGroup from './common/form/FormGroup.vue';
-import InsuranceSelectFormGroup from '@/components/order/InsuranceSelectFormGroup.vue';
-import PackageFormatSelectFormGroup from '@/components/order/PackageFormatSelectFormGroup.vue';
-import PackageTypeSelectFormGroup from '@/components/order/PackageTypeSelectFormGroup.vue';
+import FormGroup from '@/components/common/form/FormGroup.vue';
+import InsuranceSelectFormGroup from '@/components/common/form/InsuranceSelectFormGroup.vue';
+import PackageFormatSelectFormGroup from '@/components/common/form/PackageFormatSelectFormGroup.vue';
+import PackageTypeSelectFormGroup from '@/components/common/form/PackageTypeSelectFormGroup.vue';
 import PsCheckbox from '@/components/common/form/PsCheckbox.vue';
-import PsInput from './common/form/PsInput.vue';
+import PsInput from '@/components/common/form/PsInput.vue';
 import { translate } from '@/filters/translate';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
 

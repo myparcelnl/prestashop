@@ -33,13 +33,18 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from '@vue/composition-api';
 import { ContextKey } from '@/data/global/context';
-import LabelCard from '@/components/LabelCard.vue';
+import LabelCard from '@/components/order-list-column/LabelCard.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import { OrderAction } from '@/data/global/actions';
 import PsButton from '@/components/common/PsButton.vue';
 import { executeOrderAction } from '@/services/actions/executeOrderAction';
 import { useGlobalInstanceContext } from '@/composables/context/useGlobalInstanceContext';
 
+/**
+ * The "Labels" column in the orders list.
+ *
+ * @see /admin1/index.php/sell/orders
+ */
 export default defineComponent({
   name: 'OrderListColumn',
   components: {

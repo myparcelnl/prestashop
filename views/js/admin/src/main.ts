@@ -1,4 +1,4 @@
-import './directives';
+import '@/directives';
 import Vue from 'vue';
 import VueCompositionAPI from '@vue/composition-api';
 import { attachBulkActionHandlers } from '@/services/bulk-actions/attachBulkActionHandlers';
@@ -9,11 +9,10 @@ Vue.use(VueCompositionAPI);
 window.Vue = window.Vue ?? Vue;
 
 window.MyParcel = {
-  renderAfterHeader: render('views/AfterHeader'),
-  renderLoadingPage: render('views/LoadingPage'),
-  renderOrderGridCard: render('views/OrderGridCard'),
-  renderOrderListColumn: render('views/OrderListColumn'),
-  renderProductSettings: render('views/ProductSettings'),
+  renderAfterHeader: render('components/after-header'),
+  renderLoadingPage: render('components/loading-page'),
+  renderOrderCard: render('components/order-card'),
+  renderOrderListColumn: render('components/order-list-column'),
 };
 
 void jQuery.ready.then(attachBulkActionHandlers);

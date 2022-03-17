@@ -1,7 +1,9 @@
 <template>
   <PsCard>
     <template #header>
-      MyParcel
+      <h3
+        class="card-header-title"
+        v-text="'MyParcel'" />
     </template>
 
     <template #default>
@@ -12,13 +14,18 @@
 </template>
 
 <script lang="ts">
-import ConceptCard from '@/components/order/ConceptCard.vue';
+import ConceptCard from '@/components/order-card/ConceptCard.vue';
 import PsCard from '@/components/common/PsCard.vue';
-import ShipmentsCard from '@/components/order/ShipmentsCard.vue';
+import ShipmentsCard from '@/components/order-card/ShipmentsCard.vue';
 import { defineComponent } from '@vue/composition-api';
 
+/**
+ * The "MyParcel" card in the single order view.
+ *
+ * @see /admin1/index.php/sell/orders/:orderId/view
+ */
 export default defineComponent({
-  name: 'OrderGridCard',
+  name: 'OrderCard',
   components: {
     ConceptCard,
     PsCard,

@@ -10,7 +10,7 @@
     <template #default>
       <div class="row">
         <div class="col-sm-12 col-xl-6">
-          <ShipmentOptions />
+          <ShipmentOptionsForm />
         </div>
         <div class="col-sm-12 col-xl-6">
           <ShippingAddress />
@@ -42,13 +42,13 @@
 </template>
 
 <script lang="ts">
-import DeliveryMomentSelector from '@/components/order/DeliveryMomentSelector.vue';
+import DeliveryMomentSelector from '@/components/order-card/DeliveryMomentSelector.vue';
 import MaterialIcon from '@/components/common/MaterialIcon.vue';
 import { OrderAction } from '@/data/global/actions';
 import PsButton from '@/components/common/PsButton.vue';
 import PsCard from '@/components/common/PsCard.vue';
-import ShipmentOptions from '@/components/order/ShipmentOptions.vue';
-import ShippingAddress from '@/components/order/ShippingAddress.vue';
+import ShipmentOptionsForm from '@/components/forms/ShipmentOptionsForm.vue';
+import ShippingAddress from '@/components/order-card/ShippingAddress.vue';
 import { defineComponent } from '@vue/composition-api';
 import { deliveryOptionsEventBus } from '@/data/eventBus/DeliveryOptionsEventBus';
 import { executeOrderAction } from '@/services/actions/executeOrderAction';
@@ -63,7 +63,7 @@ export default defineComponent({
     MaterialIcon,
     PsButton,
     PsCard,
-    ShipmentOptions,
+    ShipmentOptionsForm,
     ShippingAddress,
   },
 

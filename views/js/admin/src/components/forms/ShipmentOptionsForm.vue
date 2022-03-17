@@ -60,11 +60,11 @@
 <script lang="ts">
 import { ContextKey, ShipmentOptionsContext } from '@/data/global/context';
 import { computed, defineComponent, ref, watch, watchEffect } from '@vue/composition-api';
-import DigitalStampWeightSelectFormGroup from '@/components/order/DigitalStampWeightSelectFormGroup.vue';
+import DigitalStampWeightSelectFormGroup from '@/components/common/form/DigitalStampWeightSelectFormGroup.vue';
 import FormGroup from '@/components/common/form/FormGroup.vue';
-import InsuranceSelectFormGroup from '@/components/order/InsuranceSelectFormGroup.vue';
-import PackageFormatSelectFormGroup from '@/components/order/PackageFormatSelectFormGroup.vue';
-import PackageTypeSelectFormGroup from '@/components/order/PackageTypeSelectFormGroup.vue';
+import InsuranceSelectFormGroup from '@/components/common/form/InsuranceSelectFormGroup.vue';
+import PackageFormatSelectFormGroup from '@/components/common/form/PackageFormatSelectFormGroup.vue';
+import PackageTypeSelectFormGroup from '@/components/common/form/PackageTypeSelectFormGroup.vue';
 import PsAlert from '@/components/common/PsAlert.vue';
 import PsCheckbox from '@/components/common/form/PsCheckbox.vue';
 import PsInput from '@/components/common/form/PsInput.vue';
@@ -90,7 +90,7 @@ const CONSIGNMENT_SHIPMENT_OPTIONS_KEYS: (keyof Consignment)[] = [
 ];
 
 export default defineComponent({
-  name: 'ShipmentOptions',
+  name: 'ShipmentOptionsForm',
   components: {
     DigitalStampWeightSelectFormGroup,
     FormGroup,

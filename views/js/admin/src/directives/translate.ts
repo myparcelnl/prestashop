@@ -1,5 +1,5 @@
 import { DirectiveFunction } from 'vue';
-import { translate as translateFilter } from '../filters/translate';
+import { translate as translateFilter } from '@/filters/translate';
 
 /**
  * Translate binding.

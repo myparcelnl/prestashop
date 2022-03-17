@@ -33,6 +33,5 @@ export default defineComponent({
       showShipmentOptionsModal: true,
     };
   },
-
 });
 </script>

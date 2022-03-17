@@ -184,7 +184,7 @@ class AdminPanelRenderService extends RenderService
      */
     public function renderOrderSettings(Order $order): string
     {
-        return $this->renderWithContext('renderOrderGridCard', [
+        return $this->renderWithContext('renderOrderCard', [
                 self::ID_RETURNS_FORM     => $this->getReturnsContext($order),
                 self::ID_SHIPMENT_LABELS  => $this->getShipmentLabelsContext($order),
                 self::ID_SHIPMENT_OPTIONS => $this->getShipmentOptionsContext($order),
