@@ -9,6 +9,6 @@ class AdminMyParcelBEController extends ModuleAdminController
 {
     public function init()
     {
-        Tools::redirectAdmin($this->module->baseUrl);
+        Tools::redirectAdmin($this->module->getBaseUrl());
     }
 }
