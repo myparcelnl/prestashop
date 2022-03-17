@@ -163,7 +163,7 @@ class MyParcelBE extends CarrierModule
      */
     public function getContent(): string
     {
-        return $this->moduleService->getContent($this);
+        return $this->moduleService->getContent();
     }
 
     /**

@@ -31,13 +31,11 @@ class ModuleService
     }
 
     /**
-     * @param  MyParcelBE $instance
-     *
      * @return string
      */
-    public function getContent(MyParcelBE $instance): string
+    public function getContent(): string
     {
-        $configuration = new SettingsMenu($instance);
+        $configuration = new SettingsMenu($this->module);
 
         $this->context->smarty->assign([
             'menutabs' => $configuration->initNavigation(),
@@ -45,7 +43,7 @@ class ModuleService
         ]);
 
         $this->context->smarty->assign('module_dir', $this->module->getPathUri());
-        $output = $instance->display(__FILE__, 'views/templates/admin/navbar.tpl');
+        $output = $this->module->display($this->module->getLocalPath(), 'views/templates/admin/navbar.tpl');
 
         return $output . $configuration->renderMenu((int) Tools::getValue('menu') ?: 0);
     }
