@@ -7,17 +7,18 @@ module.exports = {
     config.plugins.delete('preload');
     config.plugins.delete('prefetch');
   },
-  configureWebpack: {
-    devtool: 'sourcemap',
-    output: {
-      filename: '[name].js',
-      chunkFilename: 'chunks/[name].js',
-    },
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, 'src'),
-      },
-    },
+  configureWebpack: (config) => {
+    if (process.env.NODE_ENV === 'development') {
+      config.devtool = 'eval-source-map';
+      config.output.devtoolModuleFilenameTemplate = (info) => info.resourcePath.match(/^\.\/\S*?\.vue$/)
+        ? `webpack-generated:///${info.resourcePath}?${info.hash}`
+        : `webpack-yourCode:///${info.resourcePath}`;
+      config.output.devtoolFallbackModuleFilenameTemplate = 'webpack:///[resource-path]?[hash]';
+    }
+
+    config.output.filename = '[name].js';
+    config.output.chunkFilename = 'chunks/[name].js';
+    config.resolve.alias['@'] = path.resolve(__dirname, 'src');
   },
   css: {
     extract: false,
