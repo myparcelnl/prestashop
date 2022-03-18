@@ -1258,8 +1258,9 @@ SQL
                         'label' => $this->module->l('No', 'carriers'),
                     ],
                 ],
-                'label' => $this->module->l('Package with insurance', 'carriers'),
-                'name' => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
+                'label' => $this->module->l('Always insure package', 'carriers'),
+                'name'  => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
+                'desc'  => $this->module->l('Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.', 'carriers'),
             ];
         }
 
