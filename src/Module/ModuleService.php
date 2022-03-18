@@ -60,7 +60,7 @@ class ModuleService
     {
         $carrierId = (int) $cart->id_carrier;
 
-        if ((int) $this->module->id_carrier !== $carrierId || ! empty($this->context->controller->requestOriginalShippingCost)) {
+        if ($this->module->id_carrier !== $carrierId || ! empty($this->context->controller->requestOriginalShippingCost)) {
             return $shippingCost;
         }
 

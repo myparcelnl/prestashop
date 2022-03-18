@@ -10,11 +10,12 @@ use Context;
 use Country;
 use DateTime;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
-use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use Order;
+use RuntimeException;
 use Tools;
 use Validate;
 
@@ -168,7 +169,13 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
         $carrierSettings = [];
 
         foreach ($this->carriers as $carrierName) {
-            $psCarrier             = $this->getPsCarrier($carrierName);
+            $psCarrier = $this->getPsCarrier($carrierName);
+
+            if (! $psCarrier->id) {
+                FileLogger::addLog("Carrier $carrierName not found ", FileLogger::ERROR);
+                throw new RuntimeException("Carrier $carrierName not found ");
+            }
+
             $shippingOptions       = $this->module->getShippingOptions($psCarrier->id, $address);
             $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
             $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);

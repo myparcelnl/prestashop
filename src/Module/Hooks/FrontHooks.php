@@ -5,7 +5,7 @@ namespace Gett\MyparcelBE\Module\Hooks;
 use Address;
 use Currency;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\DeliverySettings\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Media;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use OrderControllerCore;

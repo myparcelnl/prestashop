@@ -52,7 +52,7 @@ class LabelOptionsResolver
         return array_merge(
             $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
             [
-                'package_type' => $this->getPackageType($order, $deliveryOptions),
+                'package_type'   => $this->getPackageType($order, $deliveryOptions),
                 'package_format' => $this->getPackageFormat($order, $deliveryOptions),
             ]
         );
@@ -67,7 +67,7 @@ class LabelOptionsResolver
      */
     public function getDeliveryOptions(Order $order): array
     {
-        $deliveryOptions = DeliveryOptions::getFromOrder($order);
+        $deliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
         $shipmentOptions = $this->getShipmentOptions(
             $deliveryOptions,
             $order->getProducts(),

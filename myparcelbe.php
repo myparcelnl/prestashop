@@ -28,6 +28,11 @@ class MyParcelBE extends CarrierModule
 
     public $baseUrl;
 
+    /**
+     * @var int
+     */
+    public $id_carrier;
+
     public $configItems = [
         \Gett\MyparcelBE\Constant::POSTNL_CONFIGURATION_NAME,
         \Gett\MyparcelBE\Constant::BPOST_CONFIGURATION_NAME,

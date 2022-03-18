@@ -8,6 +8,7 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
@@ -192,18 +193,25 @@ trait LegacyOrderPageHooks
             return '';
         }
 
-        $deliverySettings = DeliveryOptions::queryByCart($row['id_cart']);
+        $deliveryOptions = DeliveryOptions::getFromCart($row['id_cart']);
+
+        if (! $deliveryOptions) {
+            return '';
+        }
+
+        $deliveryOptionsArray = $deliveryOptions->toArray();
 
         try {
-            if (empty($deliverySettings['date'])) {
+            if (empty($deliveryOptionsArray['date'])) {
                 return '';
             }
-            $date = new \DateTime($deliverySettings['date']);
+            $date = new \DateTime($deliveryOptionsArray['date']);
             $dateFormatted = $date->format($this->context->language->date_format_lite);
             if (!empty($dateFormatted)) {
                 $id = sprintf('[%s] %s', $dateFormatted, $row['carrier_name']);
             }
         } catch (\Exception $exception) {
+            FileLogger::addLog($exception);
         }
 
         return $id;
