@@ -9,7 +9,9 @@ trait DisplayBackOfficeHeader
     public function hookDisplayBackOfficeHeader(): void
     {
         $this->context->controller->addCSS($this->_path . 'views/css/myparceladmin.css');
-        $this->context->controller->addJS($this->_path . 'views/dist/js/admin/myparcelbo.js');
+
+        $this->context->controller->addJS($this->_path . 'views/dist/js/admin/app.js');
+        $this->context->controller->addJS($this->_path . 'views/dist/js/admin/chunks/chunk-vendors.js');
     }
 
     public function hookDisplayAdminAfterHeader(): string
@@ -18,7 +20,7 @@ trait DisplayBackOfficeHeader
         if (!$this->isSymfonyContext() || $this->context->controller->php_self != 'AdminOrders') {
             return '';
         }
-        $adminOrderList = new AdminOrderList($this);
+        $adminOrderList = new AdminOrderList();
 
         return $adminOrderList->getAdminAfterHeader();
     }

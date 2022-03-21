@@ -278,10 +278,70 @@ label[for="myparcel-delivery-options__deliveryMoment--standard"] .myparcel-deliv
 
 	}
 	.mypa-extra-delivery-options-padding-top {
-		padding: 15px 0px 10px 0px;
+		padding: 15px 0 10px 0;
 	}
 
 	.mypa-pickup-location-details-location, .mypa-pickup-location-details-phone, .mypa-pickup-location-details-city, .mypa-pickup-location-details-time {
 		width: 90%;
 	}
+}
+
+.mypa__loader-overlay {
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 999;
+}
+
+/* fade transition */
+.mypa__fade-enter-active, .mypa__fade-leave-active {
+  transition: opacity .5s;
+}
+
+.mypa__fade-enter, .mypa__fade-leave-to {
+  opacity: 0;
+}
+
+/* table transition */
+.mypa__table tr {
+  background-color: white;
+  width: 100%;
+  border-top: 1px solid #bbcdd2;
+}
+
+.mypa__table tr,
+.mypa__table tr td,
+.mypa__table .mypa__table-move {
+  transition: transform 0.3s, opacity 0.3s, background 0.9s;
+}
+
+.mypa__table .mypa__table-enter td,
+.mypa__table .mypa__table-leave-to td {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.mypa__table .mypa__table-leave-active {
+  background-color: var(--danger);
+}
+
+.mypa__table .mypa__table-leave-active ~ .mypa__table-move {
+  transition-delay: 1s;
+}
+
+.mypa__table .mypa__table-enter-active {
+  transition: background 1s;
+  background-color: #abd292;
+}
+
+/** fade transition */
+.mypa__fade-enter-active,
+.mypa__fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.mypa__fade-enter-from,
+.mypa__fade-leave-to {
+  opacity: 0;
 }

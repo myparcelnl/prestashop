@@ -9,7 +9,6 @@ use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Entity\OrderStatusUpdateInterface;
 use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use OrderLabel;
 
@@ -73,7 +72,7 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
             try {
                 OrderLabel::sendShippedNotification($this->shipmentId);
             } catch (Exception $e) {
-                Logger::addLog($e->getMessage(), true);
+                ApiLogger::addLog($e, ApiLogger::ERROR);
             }
         }
     }

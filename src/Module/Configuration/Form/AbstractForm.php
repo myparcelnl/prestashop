@@ -15,10 +15,10 @@ use Validate;
 
 abstract class AbstractForm
 {
+    protected const FIELD_TYPE_CHECKBOX = 'checkbox';
     protected const FIELD_TYPE_SELECT   = 'select';
     protected const FIELD_TYPE_SWITCH   = 'switch';
     protected const FIELD_TYPE_TEXT     = 'text';
-    protected const FIELD_TYPE_CHECKBOX = 'checkbox';
 
     /** @var \MyParcelBE */
     protected $module;
@@ -113,14 +113,9 @@ abstract class AbstractForm
     abstract protected function getFields(): array;
 
     /**
-     * TODO: MY-29719 make abstract when refactoring forms further.
-     *
      * @return string
      */
-    protected function getNamespace(): string
-    {
-        return '';
-    }
+    abstract protected function getNamespace(): string;
 
     /**
      * @param  array $field
@@ -214,8 +209,10 @@ abstract class AbstractForm
                 null,
                 $field['default'] ?? null
             );
-            if ($name == Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME) {
+
+            if ($name === Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME) {
                 $temp = explode(',', $values[$name]);
+
                 foreach ($temp as $value) {
                     $values[Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME . '_' . $value] = 1;
                 }

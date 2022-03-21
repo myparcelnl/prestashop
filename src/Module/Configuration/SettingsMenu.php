@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Module\Configuration;
 
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Module\Configuration\Form\ApiForm;
 use Gett\MyparcelBE\Module\Configuration\Form\CarriersForm;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
@@ -11,7 +12,7 @@ use Gett\MyparcelBE\Module\Configuration\Form\CustomsForm;
 use Gett\MyparcelBE\Module\Configuration\Form\GeneralForm;
 use Gett\MyparcelBE\Module\Configuration\Form\LabelForm;
 use Gett\MyparcelBE\Module\Configuration\Form\OrderForm;
-use Module;
+use Gett\MyparcelBE\Module\Tools\Tools as ToolsAlias;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Collection;
 use Tools;
@@ -47,7 +48,7 @@ class SettingsMenu
                 return [
                     'short'  => $this->module->l($menuItem->getTitle(), 'configure'),
                     'desc'   => $this->module->l($menuItem->getDescription(), 'configure'),
-                    'href'   => $this->module->appendQueryToUrl($this->module->baseUrl, ['menu' => $index]),
+                    'href'   => ToolsAlias::appendQuery($this->module->baseUrl, ['menu' => $index]),
                     'active' => (int) Tools::getValue('menu') === $index,
                     'icon'   => sprintf('icon-%s', $menuItem->getIcon()),
                 ];
@@ -66,10 +67,8 @@ class SettingsMenu
         $menuItem = $this->getMenuData()[$formId];
         $class    = $menuItem->getForm();
 
-        /** @var \Gett\MyparcelBE\Module\Configuration\Form\AbstractForm */
-        $form = new $class($this->module);
-
-        return $form->render();
+        FileLogger::addLog('Rendering' . $class);
+        return (new $class($this->module))->render();
     }
 
     /**

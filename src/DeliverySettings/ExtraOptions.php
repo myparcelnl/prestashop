@@ -24,7 +24,7 @@ class ExtraOptions
     /**
      * ExtraOptions constructor.
      *
-     * @param array $extraOptions
+     * @param array{labelAmount: int, digitalStampWeight: int} $extraOptions
      */
     public function __construct(array $extraOptions = [])
     {

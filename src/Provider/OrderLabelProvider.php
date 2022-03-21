@@ -8,23 +8,26 @@ use OrderLabel;
 
 class OrderLabelProvider
 {
-    protected $module;
-
-    public function __construct($module)
+    /**
+     * @param  int   $orderId
+     * @param  array $labelIds
+     *
+     * @return null|array|bool|\mysqli_result|\PDOStatement|resource
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     * @throws \Exception
+     */
+    public function provideLabels(int $orderId, array $labelIds = [])
     {
-        $this->module = $module;
-    }
+        $labels                  = OrderLabel::getOrderLabels($orderId, $labelIds);
+        $order                   = new Order($orderId);
+        $carrierSettingsProvider = new CarrierSettingsProvider();
+        $carrierSettings         = $carrierSettingsProvider->provide($order->id_carrier);
 
-    public function provideLabels(int $order_id, array $label_ids = [])
-    {
-        $labels = OrderLabel::getOrderLabels($order_id, $label_ids);
-        $order = new Order($order_id);
-        $carrierSettingsProvider = new CarrierSettingsProvider($this->module);
-        $carrierSettings = $carrierSettingsProvider->provide($order->id_carrier);
-        if (!empty($labels)) {
+        if (! empty($labels)) {
             foreach ($labels as &$label) {
                 $label['ALLOW_DELIVERY_FORM'] = $carrierSettings['delivery']['ALLOW_FORM'];
-                $label['ALLOW_RETURN_FORM'] = $carrierSettings['return']['ALLOW_FORM'];
+                $label['ALLOW_RETURN_FORM']   = $carrierSettings['return']['ALLOW_FORM'];
             }
         }
 

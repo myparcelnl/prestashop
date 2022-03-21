@@ -1,87 +1,87 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Service\Consignment;
 
 use Configuration;
-use Context;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\Logger;
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Service\LabelOptionsService;
+use Gett\MyparcelBE\Timer;
 use Tools;
 
 class Download
 {
     /**
-     * @var string
-     */
-    private $api_key;
-
-    /**
-     * @var array
-     */
-    private $request;
-
-    /**
-     * @var \Configuration
-     */
-    private $configuration;
-
-    /**
-     * @param  string         $apiKey
-     * @param  array          $request
-     * @param  \Configuration $configuration
-     */
-    public function __construct(string $apiKey, array $request, Configuration $configuration)
-    {
-        $this->api_key       = $apiKey;
-        $this->request       = $request;
-        $this->configuration = $configuration;
-    }
-
-    /**
      * @param  array $labelIds
      *
-     * @return void
+     * @return null|string
      * @throws \Exception
      */
-    public function downloadLabel(array $labelIds): void
+    public function downloadLabel(array $labelIds): ?string
     {
-        $platformService = PlatformServiceFactory::create();
+        ApiLogger::addLog(sprintf('Downloading labels %s', implode(', ', $labelIds)));
+        $timer = new Timer();
 
-        try {
-            $collection = ConsignmentCollection::findMany($labelIds, $this->api_key);
+        $apiKey     = Configuration::get(Constant::API_KEY_CONFIGURATION_NAME);
+        $collection = ConsignmentCollection::findMany($labelIds, $apiKey);
 
-            if (! empty($collection->getConsignments())) {
-                $collection->setPdfOfLabels($this->fetchPositions());
-                $isPdf = is_string($collection->getLabelPdf());
-
-                if ($isPdf) {
-                    $collection->downloadPdfOfLabels(
-                        'true' === $this->configuration::get(
-                            Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
-                            false
-                        )
-                    );
-                }
-                Logger::addLog($collection->toJson());
-                if (! $isPdf) {
-                    Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminOrders'));
-                }
-            } else {
-                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminOrders'));
-            }
-        } catch (\Exception $e) {
-            Logger::addLog($e->getMessage(), true, true);
+        if ($collection->isEmpty()) {
+            ApiLogger::addLog('Collection is empty', ApiLogger::WARNING);
+            return null;
         }
+
+        $positions = $this->getPositions();
+
+        if ($this->isDownload()) {
+            $response = $collection
+                ->setLinkOfLabels($positions)
+                ->getLinkOfLabels();
+        } else {
+            $response = $collection
+                ->setPdfOfLabels($positions)
+                ->getLabelPdf();
+        }
+
+        ApiLogger::addLog(
+            sprintf(
+                'Finished downloading labels as %s in %d ms',
+                $this->isDownload() ? 'link' : 'PDF',
+                $timer->getTimeTaken()
+            )
+        );
+
+        return $response;
     }
 
-    private function fetchPositions()
+    /**
+     * @return array|null
+     */
+    private function getPositions(): ?array
     {
-        if ($this->request['format'] == 'a6') {
-            return false;
+        $service     = LabelOptionsService::getInstance();
+        $labelFormat = Tools::getValue('labelFormat') ?: $service->getLabelFormat();
+
+        if (LabelOptionsService::LABEL_FORMAT_A6 === $labelFormat) {
+            return null;
         }
 
-        return $this->request['position'];
+        $position = Tools::getValue('labelPosition');
+
+        return $position ? explode(',', $position) : $service->getLabelPosition();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isDownload(): bool
+    {
+        $output = Tools::getValue('labelOutput')
+            ?: LabelOptionsService::getInstance()
+                ->getLabelOutput();
+
+        return LabelOptionsService::LABEL_OUTPUT_DOWNLOAD === $output;
     }
 }

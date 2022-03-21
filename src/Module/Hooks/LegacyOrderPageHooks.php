@@ -8,6 +8,7 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
@@ -23,7 +24,7 @@ trait LegacyOrderPageHooks
     public function hookDisplayAdminListBefore()
     {
         if ($this->context->controller instanceof \AdminOrdersController) {
-            $adminOrderList = new AdminOrderList($this);
+            $adminOrderList = new AdminOrderList();
 
             return $adminOrderList->getAdminAfterHeader();
         }
@@ -118,7 +119,7 @@ trait LegacyOrderPageHooks
         $consignment = ConsignmentFactory::createFromCarrier($carrier);
 
         $this->context->smarty->assign([
-            'label_options'         => $labelOptionsResolver->getLabelOptions($order),
+            'label_options'         => $labelOptionsResolver->getLabelOptionsJson($order),
             'allowSetOnlyRecipient' => $consignment->canHaveShipmentOption(
                 AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
             ),
@@ -130,11 +131,13 @@ trait LegacyOrderPageHooks
         return $this->display($this->name, 'views/templates/admin/icon-concept.tpl');
     }
 
-    public function hookActionAdminControllerSetMedia()
+    /**
+     * @throws \Exception
+     */
+    public function hookActionAdminControllerSetMedia(): void
     {
-        if ($this->context->controller instanceof \AdminOrdersController
-            || $this->context->controller->php_self == 'AdminOrders') {
-            $adminOrder = new AdminOrderList($this);
+        if ('AdminOrders' === $this->context->controller->php_self || is_a($this->context->controller, '\AdminOrdersController')) {
+            $adminOrder = new AdminOrderList();
             $adminOrder->setHeaderContent();
         }
     }
@@ -168,7 +171,7 @@ trait LegacyOrderPageHooks
         if (!Validate::isLoadedObject($order)) {
             return '';
         }
-        $adminOrderView = new AdminOrderView($this, (int) $params['id_order'], $this->context);
+        $adminOrderView = new AdminOrderView((int) $params['id_order']);
 
         return $adminOrderView->display();
     }
@@ -190,18 +193,25 @@ trait LegacyOrderPageHooks
             return '';
         }
 
-        $deliverySettings = DeliveryOptions::queryByCart($row['id_cart']);
+        $deliveryOptions = DeliveryOptions::getFromCart($row['id_cart']);
+
+        if (! $deliveryOptions) {
+            return '';
+        }
+
+        $deliveryOptionsArray = $deliveryOptions->toArray();
 
         try {
-            if (empty($deliverySettings['date'])) {
+            if (empty($deliveryOptionsArray['date'])) {
                 return '';
             }
-            $date = new \DateTime($deliverySettings['date']);
+            $date = new \DateTime($deliveryOptionsArray['date']);
             $dateFormatted = $date->format($this->context->language->date_format_lite);
             if (!empty($dateFormatted)) {
                 $id = sprintf('[%s] %s', $dateFormatted, $row['carrier_name']);
             }
         } catch (\Exception $exception) {
+            FileLogger::addLog($exception);
         }
 
         return $id;

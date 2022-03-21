@@ -11,8 +11,6 @@ class OrderForm extends AbstractForm
     public const SEND_NOTIFICATION_AFTER_FIRST_SCAN = 'first_scan';
     public const SEND_NOTIFICATION_AFTER_PRINTED    = 'printed';
 
-    protected $icon = 'cog';
-
     protected function getLegend(): string
     {
         return $this->module->l('Order Settings', 'orderform');
@@ -132,5 +130,10 @@ class OrderForm extends AbstractForm
                 ],
             ],
         ];
+    }
+
+    protected function getNamespace(): string
+    {
+        return 'orderform';
     }
 }

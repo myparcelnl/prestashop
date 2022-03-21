@@ -11,9 +11,9 @@ function caseSensitiveMatcher(input, output) {
 
       if (inputChar === inputChar.toUpperCase()) {
         return outputChar.toUpperCase();
-      } else {
-        return outputChar.toLowerCase();
       }
+
+      return outputChar.toLowerCase();
     })
     .join('');
 }

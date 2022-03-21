@@ -7,7 +7,6 @@ namespace Gett\MyparcelBE\Service;
 use Carrier;
 use Configuration;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\Logger;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
@@ -72,7 +71,9 @@ class CarrierService
             ->where(CarrierConfigurationProvider::COLUMN_VALUE, $carrierClass->getName())
             ->first();
 
-        return $matchingCarrier['id_carrier'] ? (int) $matchingCarrier['id_carrier'] : null;
+        return $matchingCarrier['id_carrier'] ?? null
+                ? (int) $matchingCarrier['id_carrier']
+                : null;
     }
 
     /**

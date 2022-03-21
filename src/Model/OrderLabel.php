@@ -2,16 +2,18 @@
 
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\Logger;
-use Gett\MyparcelBE\Service\MyparcelStatusProvider;
+use Gett\MyparcelBE\Logger\OrderLogger;
+use Gett\MyparcelBE\Model\Core\Order;
+use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
+use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Collection;
 
 /**
@@ -70,7 +72,7 @@ class OrderLabel extends ObjectModel
     /**
      * {@inheritdoc}
      */
-    public static $definition = [
+    public static  $definition = [
         'table'     => Table::TABLE_ORDER_LABEL,
         'primary'   => 'id_order_label',
         'multilang' => false,
@@ -87,6 +89,8 @@ class OrderLabel extends ObjectModel
         ],
     ];
 
+    private static $cache=[];
+
     /**
      * @param  int $shipmentId
      * @param  int $shipmentStatus
@@ -102,23 +106,39 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  int $shipmentId
+     * @param  int $labelId
      *
      * @return \OrderLabel
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
-    public static function findByLabelId(int $shipmentId): OrderLabel
+    public static function findByLabelId(int $labelId): OrderLabel
     {
-        $table = Table::withPrefix(self::$definition['table']);
-        $id    = Db::getInstance()
-            ->getValue(
-                <<<SQL
-SELECT id_order_label FROM $table where id_label = $shipmentId
-SQL
-            );
+        $orderLabels = self::findByLabelIds([$labelId]);
+        return $orderLabels[0];
+    }
 
-        return new OrderLabel($id);
+    /**
+     * @param  array $labelIds
+     *
+     * @return \OrderLabel[]
+     */
+    public static function findByLabelIds(array $labelIds): array
+    {
+        $orderLabels = [];
+        $fetchFromDb = [];
+
+        foreach ($labelIds as $labelId) {
+            if (array_key_exists($labelId, self::$cache)) {
+                $orderLabels[] = self::$cache[$labelId];
+                continue;
+            }
+            $fetchFromDb[] = $labelId;
+        }
+
+        if (! empty($fetchFromDb)) {
+            array_push($orderLabels, ...self::getLabelsFromDb($fetchFromDb));
+        }
+
+        return $orderLabels;
     }
 
     /**
@@ -132,9 +152,9 @@ SQL
             return;
         }
 
-        $order_label = self::findByLabelId($shipmentId);
-        $order       = new Order($order_label->id_order);
-        if (! Validate::isLoadedObject($order_label) || ! Validate::isLoadedObject($order)) {
+        $orderLabel = self::findByLabelId($shipmentId);
+        $order      = new Order($orderLabel->id_order);
+        if (! Validate::isLoadedObject($orderLabel) || ! Validate::isLoadedObject($order)) {
             return;
         }
 
@@ -144,28 +164,34 @@ SQL
         }
 
         $address         = new Address($order->id_address_delivery);
-        $deliveryOptions = DeliveryOptions::getFromOrder($order);
+        $deliveryOptions = OrderSettingsFactory::create($order)
+            ->getDeliveryOptions();
 
         if (! $deliveryOptions) {
             throw new Exception('Delivery options are missing');
         }
 
         /** @deprecated use $deliveryOptions */
-        $oldDeliveryOptions = DeliveryOptions::queryByOrder($order);
-        $oldDeliveryOptions = \Gett\MyparcelBE\Module\Tools\Tools::arrayToObject($oldDeliveryOptions);
 
-        $orderIso           = Language::getIsoById($order->id_lang);
-        $templateVars       = [
+        $oldDeliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
+        $oldDeliveryOptions = \Gett\MyparcelBE\Module\Tools\Tools::arrayToObject(
+            $oldDeliveryOptions
+                ? $oldDeliveryOptions->toArray()
+                : []
+        );
+
+        $orderIso     = Language::getIsoById($order->id_lang);
+        $templateVars = [
             '{firstname}'       => $address->firstname,
             '{lastname}'        => $address->lastname,
-            '{shipping_number}' => $order_label->barcode,
-            '{followup}'        => $order_label->track_link,
+            '{shipping_number}' => $orderLabel->barcode,
+            '{followup}'        => $orderLabel->track_link,
             '{order_name}'      => $order->getUniqReference(),
             '{order_id}'        => $order->id,
             '{utc_offset}'      => date('P'),
         ];
 
-        $trackTraceInfo = self::getTrackTraceInfo($order_label);
+        $trackTraceInfo = self::getTrackTraceInfo($orderLabel);
 
         $templateVars['{delivery_street}']   = $trackTraceInfo['recipient']['street'];
         $templateVars['{delivery_number}']   = $trackTraceInfo['recipient']['street_additional_info'] . ' ' . $trackTraceInfo['recipient']['number'];
@@ -173,7 +199,8 @@ SQL
         $templateVars['{delivery_city}']     = $trackTraceInfo['recipient']['city'];
         $templateVars['{delivery_cc}']       = $trackTraceInfo['recipient']['cc'];
 
-        $deliveryDate     = $trackTraceInfo['delivery_moment']['start']['date'] ?? $trackTraceInfo['options']['delivery_date'] ?? $deliveryOptions->getDate();
+        $deliveryDate     = $trackTraceInfo['delivery_moment']['start']['date'] ?? $trackTraceInfo['options']['delivery_date'] ?? $deliveryOptions->getDate(
+            );
         $deliveryDateFrom = $trackTraceInfo['delivery_moment']['start']['date'] ?? $deliveryOptions->getDate();
         $deliveryDateTo   = $trackTraceInfo['delivery_moment']['end']['date'] ?? $deliveryOptions->getDate();
         $monthNumber      = (int) date('n', strtotime($deliveryDate));
@@ -220,7 +247,9 @@ SQL
                 if (false !== strpos($dayFrom, '-')) {
                     [$dayFrom] = explode('-', $dayFrom);
                 }
-                $dayTo = $oldDeliveryOptions->opening_hours->{$day}[count($oldDeliveryOptions->opening_hours->{$day}) - 1];
+                $dayTo = $oldDeliveryOptions->opening_hours->{$day}[count(
+                    $oldDeliveryOptions->opening_hours->{$day}
+                ) - 1];
                 if (false !== strpos($dayTo, '-')) {
                     [, $dayTo] = array_pad(explode('-', $dayTo), 2, '');
                 }
@@ -285,35 +314,35 @@ SQL
      * @param  int $shipmentId
      * @param  int $newOrderStatus
      *
+     * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public static function setOrderStatus(int $shipmentId, int $newOrderStatus): void
+    public static function setOrderStatus(int $shipmentId, int $newOrderStatus): bool
     {
         $orderLabel     = self::findByLabelId($shipmentId);
         $order          = new Order($orderLabel->id_order);
         $oldOrderStatus = $order->getCurrentState();
 
         if (! self::validateSetOrderStatus($orderLabel, $order, $newOrderStatus)) {
-            return;
+            return false;
         }
 
         $order->setCurrentState($newOrderStatus);
         $order->save();
-        ApiLogger::addLog(
-            sprintf(
-                'Order %d status changed from %d to %d',
-                $orderLabel->id_order,
-                $oldOrderStatus,
-                $newOrderStatus
-            )
-        );
+
+        OrderLogger::addLog([
+            'message' => sprintf('Status changed from %d to %d', $oldOrderStatus, $newOrderStatus),
+            'order'   => $order,
+        ]);
+
+        return true;
     }
 
     /**
      * @param  array $orderIds
      *
-     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     * @return array
      * @throws \PrestaShopDatabaseException
      */
     public static function getDataForLabelsCreate(array $orderIds)
@@ -367,23 +396,25 @@ SQL
     }
 
     /**
-     * @param  array $orders_id
+     * @param  array $orderIds
      *
-     * @return array
+     * @return int[]
      */
-    public static function getOrdersLabels(array $orders_id): array
+    public static function getOrdersLabels(array $orderIds): array
     {
         $qb = new DbQuery();
         $qb->select('ol.id_label');
         $qb->from(Table::TABLE_ORDER_LABEL, 'ol');
-        $qb->where('ol.id_order IN (' . implode(',', $orders_id) . ') ');
+        $qb->where('ol.id_order IN (' . implode(',', $orderIds) . ') ');
 
-        $return = [];
-        foreach (Db::getInstance()->executeS($qb) as $item) {
-            $return[] = $item['id_label'];
+        try {
+            $resource = Db::getInstance()->executeS($qb);
+        } catch (Exception $e) {
+            ApiLogger::addLog($e);
+            return [];
         }
 
-        return $return;
+        return array_map('intval', Arr::pluck($resource, 'id_label'));
     }
 
     /**
@@ -441,32 +472,29 @@ SQL
 
     /**
      * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
-     * @param  \Gett\MyparcelBE\Service\MyparcelStatusProvider           $status_provider
      *
-     * @return int
+     * @return null|array
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public static function createFromConsignment(
-        AbstractConsignment $consignment,
-        MyparcelStatusProvider $status_provider
-    ): int {
-        $orderLabel = new self();
-        $orderLabel->id_label = $consignment->getConsignmentId();
-        $orderLabel->id_order = $consignment->getReferenceId();
-        $orderLabel->barcode = $consignment->getBarcode();
-        $orderLabel->track_link = $consignment->getBarcodeUrl(
-            $consignment->getBarcode(),
-            $consignment->getPostalCode(),
-            $consignment->getCountry()
-        );
-        $orderLabel->new_order_state = $consignment->getStatus();
-        $orderLabel->status = $status_provider->getStatus($consignment->getStatus());
+    public static function createFromConsignment(AbstractConsignment $consignment): ?array
+    {
+        $orderLabel = self::create($consignment);
         if ($orderLabel->add()) {
-            return (int) $orderLabel->id_label;
+            return [
+                'id_order'        => $orderLabel->id_order,
+                'id_label'        => $orderLabel->id_label,
+                'status'          => $orderLabel->status,
+                'new_order_state' => $orderLabel->new_order_state,
+                'barcode'         => $orderLabel->barcode,
+                'track_link'      => $orderLabel->track_link,
+                'date_add'        => $orderLabel->date_add,
+                'date_upd'        => $orderLabel->date_upd,
+                'payment_url'     => $orderLabel->payment_url,
+            ];
         }
 
-        return 0;
+        return null;
     }
 
     /**
@@ -485,17 +513,15 @@ SQL
     }
 
     /**
-     * @param  int|string $orderId
-     * @param  string     $tracktrace
+     * @param  \Order $order
+     * @param  string $barcode
      *
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public static function updateOrderTrackingNumber($orderId, string $tracktrace): bool
+    public static function updateOrderTrackingNumber(Order $order, string $barcode): bool
     {
-        $order = new Order((int) $orderId);
-
         if (! Validate::isLoadedObject($order)) {
             return false;
         }
@@ -503,19 +529,78 @@ SQL
         $orderCarrierId = $order->getIdOrderCarrier();
         $orderCarrier   = new OrderCarrier($orderCarrierId);
 
-        if (! Validate::isTrackingNumber($tracktrace)) {
+        if (! Validate::isTrackingNumber($barcode)) {
             return false;
         }
 
-        $order->shipping_number = $tracktrace;
+        $order->shipping_number = $barcode;
         $order->update();
 
         if (Validate::isLoadedObject($orderCarrier)) {
-            $orderCarrier->tracking_number = pSQL($tracktrace);
+            OrderLogger::addLog([
+                'message' => "Updating tracking number to $barcode",
+                'order'   => $order,
+            ]);
+            $orderCarrier->tracking_number = pSQL($barcode);
             return $orderCarrier->update();
         }
 
         return false;
+    }
+
+    /**
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @return \OrderLabel
+     */
+    protected static function create(AbstractConsignment $consignment): OrderLabel
+    {
+        $orderLabel                  = new self();
+        $orderLabel->id_label        = $consignment->getConsignmentId();
+        $orderLabel->id_order        = $consignment->getReferenceIdentifier();
+        $orderLabel->barcode         = $consignment->getBarcode();
+        $orderLabel->track_link      = $consignment->getBarcodeUrl(
+            $consignment->getBarcode(),
+            $consignment->getPostalCode(),
+            $consignment->getCountry()
+        );
+        $orderLabel->new_order_state = $consignment->getStatus();
+        $orderLabel->status          = MyParcelStatusProvider::getInstance()->getStatus($consignment->getStatus());
+
+        return $orderLabel;
+    }
+
+    /**
+     * @param  array $labelIds
+     *
+     * @return array
+     */
+    protected static function getLabelsFromDb(array $labelIds): array
+    {
+        $idsString = sprintf("(\"%s\")", implode('","', $labelIds));
+        $table     = Table::withPrefix(self::$definition['table']);
+        $rows      = [];
+
+        try {
+            $rows = Db::getInstance()
+                ->executeS(
+                    <<<SQL
+SELECT id_order_label FROM $table where id_label in $idsString
+SQL
+                );
+        } catch (Exception $e) {
+            ApiLogger::addLog($e, ApiLogger::ERROR);
+        }
+
+        return (new Collection(Arr::pluck($rows, 'id_order_label')))
+            ->mapInto(__CLASS__)
+            ->filter(function ($orderLabel) {
+                return Validate::isLoadedObject($orderLabel);
+            })
+            ->each(function (OrderLabel $orderLabel) {
+                self::$cache[$orderLabel->id_label] = $orderLabel;
+            })
+            ->toArray();
     }
 
     /**
@@ -573,7 +658,7 @@ SQL
                 true
             );
         } catch (ApiException $e) {
-            Logger::addLog($e->getMessage(), true);
+            ApiLogger::addLog($e, ApiLogger::ERROR);
         }
 
         return $trackTraceInfo['data']['tracktraces'][0] ?? null;
@@ -595,12 +680,18 @@ SQL
         }
 
         if (self::orderStatusShouldBeIgnored($order)) {
-            ApiLogger::addLog('Current order status is ignored.');
+            OrderLogger::addLog([
+                'message' => 'Current order status is ignored.',
+                'order'   => $order,
+            ]);
             return false;
         }
 
         if (self::orderHistoryContainsStatus($order, $newOrderStatus)) {
-            ApiLogger::addLog('New order status is already present in order history.');
+            OrderLogger::addLog([
+                'message' => "$orderLabel->id_label] New order status '$newOrderStatus' is already present in order history.",
+                'order'   => $order,
+            ]);
             return false;
         }
 

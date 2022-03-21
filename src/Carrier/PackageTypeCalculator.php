@@ -14,26 +14,42 @@ use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 class PackageTypeCalculator extends AbstractPackageCalculator
 {
     /**
-     * @param  mixed $packageType
+     * @param  null|string|int $packageType
      *
-     * @return string
-     * @throws \Exception
+     * @return null|string
      */
     public function convertToName($packageType): ?string
     {
         $packageTypeName = $packageType;
 
         if (is_numeric($packageType)) {
-            $map = array_flip(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP);
+            $packageType = (int) $packageType;
+            $map         = array_flip(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP);
 
-            if (! in_array((int) $packageType, $map, true)) {
+            if (! array_key_exists($packageType, $map)) {
                 return null;
             }
 
             $packageTypeName = $map[$packageType];
+        } elseif (! array_key_exists($packageType, AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP)) {
+            $packageTypeName = null;
         }
 
         return $packageTypeName;
+    }
+
+    /**
+     * @param  null|int|string $packageType
+     *
+     * @return int
+     */
+    public function convertToId($packageType): int
+    {
+        $packageTypeName = $this->convertToName($packageType);
+
+        return $packageTypeName
+            ? AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP[$packageTypeName]
+            : AbstractConsignment::PACKAGE_TYPE_PACKAGE;
     }
 
     /**

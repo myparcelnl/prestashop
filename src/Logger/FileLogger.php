@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Logger;
 
+use Exception;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -15,8 +16,8 @@ class FileLogger extends PrestaShopFileLogger
     use HasInstance;
 
     /**
-     * @param  mixed $message
-     * @param  int   $level
+     * @param  \Exception|array|string $message
+     * @param  int                     $level
      *
      * @return void
      */
@@ -24,6 +25,72 @@ class FileLogger extends PrestaShopFileLogger
         $message,
         int $level = AbstractLogger::DEBUG
     ): void {
+        $string = self::createMessage($message, $level);
+
+        self::getLogger()
+            ->log($string, $level);
+    }
+
+    /**
+     * @param  \Exception|array|string $message
+     *
+     * @return string
+     */
+    public static function getOutput($message): string
+    {
+        $output = $message;
+
+        if (is_a($message, Exception::class)) {
+            $output = $message->getMessage();
+        } elseif (! is_string($message)) {
+            $output = (string) json_encode($message, JSON_PRETTY_PRINT);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param  \Exception|array|string $message
+     *
+     * @return string
+     */
+    public static function getSource($message): string
+    {
+        if ($message instanceof Exception) {
+            $file = $message->getFile();
+            $line = $message->getLine();
+        } else {
+            $caller = self::getCaller();
+            $file   = $caller['file'];
+            $line   = $caller['line'];
+        }
+
+        return sprintf('%s:%s', $file, $line);
+    }
+
+    /**
+     * @param  \Exception|array|string $message
+     * @param  int                     $level
+     *
+     * @return void
+     */
+    protected static function createMessage($message, int $level): string
+    {
+        $output = self::getOutput($message);
+        $source = self::getSource($message);
+
+        if ($level > self::DEBUG) {
+            return "$output ($source)";
+        }
+
+        return $output;
+    }
+
+    /**
+     * @return \Gett\MyparcelBE\Logger\FileLogger
+     */
+    protected static function getLogger(): FileLogger
+    {
         $logger = self::getInstance(AbstractLogger::DEBUG);
         $logger->setFilename(
             sprintf(
@@ -32,27 +99,7 @@ class FileLogger extends PrestaShopFileLogger
                 MyParcelBE::MODULE_NAME
             )
         );
-
-        $string = self::createMessage($message);
-
-        $logger->log($string, $level);
-    }
-
-    /**
-     * @param  mixed $message
-     *
-     * @return void
-     */
-    private static function createMessage($message): string
-    {
-        $caller = self::getCaller();
-        $string = sprintf('%s:%s', $caller['file'], $caller['line']);
-
-        if (is_string($message)) {
-            return (string) $message;
-        }
-
-        return $string . '] ' . json_encode($message, JSON_PRETTY_PRINT);
+        return $logger;
     }
 
     /**
