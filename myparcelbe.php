@@ -277,6 +277,8 @@ class MyParcelBE extends CarrierModule
      */
     public function upgrade(string $class): bool
     {
+        Tools::clearCache();
+
         /** @var \Gett\MyparcelBE\Module\Upgrade\AbstractUpgrade $upgrade */
         $upgrade = new $class($this);
 
