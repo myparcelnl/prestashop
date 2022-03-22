@@ -30,6 +30,8 @@ jobs:
           fetch-depth: 0
 
       - uses: myparcelnl/actions/composer-install@v1
+        with:
+          php-version: '7.4'
 
       - uses: myparcelnl/actions/yarn-install@v1
 

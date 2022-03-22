@@ -1,6 +1,7 @@
 {
   "name": "@myparcel/prestashop-module",
   "version": "1.4.1",
+  "private": true,
   "scripts": {
     "cypress:open": "cypress open",
     "watch": "gulp watch",
@@ -42,5 +43,8 @@
   },
   "browserslist": [
     "defaults"
+  ],
+  "workspaces": [
+    "views/js/admin"
   ]
 }

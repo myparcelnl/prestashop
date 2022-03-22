@@ -11,7 +11,7 @@ const ci = require('ci-info');
 function createComposerTask(gulp, plugins, moduleName) {
   return (callback) => {
     const cwd = path.resolve(`dist/${moduleName}`);
-    let command = `docker run --rm --volume ${cwd}:/app composer:2.2.6 update --no-dev`;
+    let command = `docker compose exec -w /tmp/modules/${moduleName} web composer update --no-dev`;
 
     if (ci.isCI) {
       command = 'composer update --no-dev';
