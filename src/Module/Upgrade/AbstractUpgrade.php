@@ -8,8 +8,6 @@ defined('_PS_VERSION_') or die();
 
 use Exception;
 use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Module\Installer;
-use Gett\MyparcelBE\Module\Uninstaller;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
@@ -19,14 +17,14 @@ abstract class AbstractUpgrade
     use HasInstance;
 
     /**
-     * @var \Gett\MyparcelBE\Service\Platform\AbstractPlatformService
-     */
-    protected $platformService;
-
-    /**
      * @var \PrestaShop\PrestaShop\Adapter\Entity\Db
      */
     protected $db;
+
+    /**
+     * @var \Gett\MyparcelBE\Service\Platform\AbstractPlatformService
+     */
+    protected $platformService;
 
     /**
      * @throws \Exception
@@ -50,7 +48,9 @@ abstract class AbstractUpgrade
     final public function execute(): bool
     {
         try {
+            ApiLogger::addLog(sprintf('Attempting to execute upgrade %s', static::class), ApiLogger::INFO);
             $this->upgrade();
+            ApiLogger::addLog(sprintf('Successfully executed upgrade %s', static::class), ApiLogger::INFO);
         } catch (Exception $e) {
             ApiLogger::addLog($e, ApiLogger::ERROR);
             return false;
