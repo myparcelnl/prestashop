@@ -8,7 +8,7 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use MyParcelNL\Sdk\src\Support\Collection;
 
-class Upgrade1_5_0 extends AbstractUpgrade
+class Upgrade1_6_0 extends AbstractUpgrade
 {
     private $carrierConfigurationTable;
 
