@@ -37,7 +37,7 @@ export default defineComponent({
       // Refresh global shipment options context
       if (contextData.value.orderId) {
         const response = await shipmentOptionsContextEventBus.refresh(contextData.value.orderId);
-        contextData.value = response?.data?.context;
+        contextData.value = response?.context;
       }
     };
 

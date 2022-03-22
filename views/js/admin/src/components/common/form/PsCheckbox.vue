@@ -1,7 +1,7 @@
 <template>
   <div class="md-checkbox">
     <label>
-      <slot>{{ $filters.translate(label) }}</slot>
+      {{ label }}
       <input
         v-model="mutableValue"
         type="checkbox"

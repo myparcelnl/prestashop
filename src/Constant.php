@@ -2,6 +2,7 @@
 
 namespace Gett\MyparcelBE;
 
+use Gett\MyparcelBE\Module\Hooks\ModuleSettingsRenderService;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
@@ -35,6 +36,10 @@ class Constant
     public const DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME = 'MYPARCELBE_DEFAULT_CUSTOMS_ORIGIN';
     public const INSURANCE_CONFIGURATION_NONE              = 0;
     public const DEFAULT_INSURANCE_POSSIBILITIES           = [self::INSURANCE_CONFIGURATION_NONE];
+
+    public const ADD_CARRIER_NAME        = 'carrierName';
+    public const ADD_CARRIER_TYPE        = 'carrierType';
+    public const ADD_CARRIER_PS_CARRIERS = 'psCarriers';
 
     public const SINGLE_LABEL_CREATION_OPTIONS                          = [
         'packageType'       => self::PACKAGE_TYPE_CONFIGURATION_NAME,
@@ -101,54 +106,6 @@ class Constant
     // Field used in <platform>_carrier_configuration to link myparcel carrier to prestashop carrier.
     public const CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE = 'carrierType';
 
-    public const CARRIER_CONFIGURATION_FIELDS                           = [
-        self::CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE,
-        'dropOffDays',
-        self::CUTOFF_EXCEPTIONS,
-        'mondayCutoffTime',
-        'tuesdayCutoffTime',
-        'wednesdayCutoffTime',
-        'thursdayCutoffTime',
-        'fridayCutoffTime',
-        'saturdayCutoffTime',
-        'sundayCutoffTime',
-        'deliveryDaysWindow',
-        'dropOffDelay',
-        'allowMondayDelivery',
-        'priceMondayDelivery',
-        'saturdayCutoffTime',
-        'allowMorningDelivery',
-        'priceMorningDelivery',
-        'allowEveningDelivery',
-        'priceEveningDelivery',
-        'allowSaturdayDelivery',
-        'priceSaturdayDelivery',
-        'allowSignature',
-        'priceSignature',
-        'allowOnlyRecipient',
-        'priceOnlyRecipient',
-        'allowPickupPoints',
-        'pricePickup',
-        self::PACKAGE_TYPE_CONFIGURATION_NAME,
-        self::PACKAGE_FORMAT_CONFIGURATION_NAME,
-        self::AGE_CHECK_CONFIGURATION_NAME,
-        self::RETURN_PACKAGE_CONFIGURATION_NAME,
-        self::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
-        self::INSURANCE_CONFIGURATION_NAME,
-        self::INSURANCE_CONFIGURATION_FROM_PRICE,
-        self::INSURANCE_CONFIGURATION_MAX_AMOUNT,
-        self::ONLY_RECIPIENT_CONFIGURATION_NAME,
-        'return_' . self::PACKAGE_TYPE_CONFIGURATION_NAME,
-        'return_' . self::ONLY_RECIPIENT_CONFIGURATION_NAME,
-        'return_' . self::AGE_CHECK_CONFIGURATION_NAME,
-        'return_' . self::PACKAGE_FORMAT_CONFIGURATION_NAME,
-        'return_' . self::RETURN_PACKAGE_CONFIGURATION_NAME,
-        'return_' . self::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
-        'return_' . self::INSURANCE_CONFIGURATION_NAME,
-        'return_' . self::INSURANCE_CONFIGURATION_FROM_PRICE,
-        'return_' . self::INSURANCE_CONFIGURATION_MAX_AMOUNT,
-        'return_label_description',
-    ];
     public const WEEK_DAYS                                              = [
         1 => 'monday',
         2 => 'tuesday',
@@ -186,10 +143,12 @@ class Constant
     /** @deprecated use CarrierDPD::NAME */
     public const DPD_CARRIER_NAME = CarrierDPD::NAME;
 
-    public const EXCLUSIVE_FIELDS_NL                                    = [
+    public const EXCLUSIVE_FIELDS_NL = [
         self::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME,
         self::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
     ];
+
+    public const EXCLUSIVE_FIELDS_BE = [];
 
     public const CARRIER_EXCLUSIVE              = [
         'POSTNL' => [

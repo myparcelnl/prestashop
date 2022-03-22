@@ -3,7 +3,7 @@ import mitt, { Emitter } from 'mitt';
 import { isOfType } from '@/utils/type-guard/isOfType';
 
 export enum EventName {
-  BUSY = 'BUSY',
+  BUSY = 'busy',
   ERROR = 'error',
   RESPONSE = 'response',
 }
@@ -15,11 +15,13 @@ export interface EmitterRequestData<T> {
   url: string;
 }
 
-type EventCallback<T> =
-  T extends EventName.BUSY ? (data: EmitterRequestData<boolean>) => void :
-    T extends EventName.ERROR ? (data: EmitterRequestData<ErrorResponse>) => void :
-      T extends EventName.RESPONSE ? (data: EmitterRequestData<SuccessResponse>) => void :
-        (...args: unknown[]) => void;
+export type EventCallbackData<EN extends EventName> =
+  EN extends EventName.BUSY ? boolean :
+    EN extends EventName.ERROR ? ErrorResponse :
+      EN extends EventName.RESPONSE ? SuccessResponse :
+        unknown;
+
+export type EventCallback<EN extends EventName> = (data: EmitterRequestData<EventCallbackData<EN>>) => void;
 
 type EventBusRequest = (
   url: string,
@@ -56,8 +58,6 @@ export class EventBus {
   }
 
   public once<T extends EventName>(event: T, callback: EventCallback<T>): void {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     const newCallback: EventCallback<T> = (args) => {
       callback(args);
       this.off(event, newCallback);
@@ -98,13 +98,12 @@ export class EventBus {
 
     if (isOfType<ErrorResponse>(response, 'errors')) {
       this.emit(EventName.ERROR, { response, ...data });
+      return;
     }
 
-    if (isOfType<SuccessResponse>(response, 'data')) {
-      this.clear();
-      this.emit(EventName.RESPONSE, { response, ...data });
-      return response;
-    }
+    this.clear();
+    this.emit(EventName.RESPONSE, { response, ...data });
+    return response;
   };
 
   protected emit(event: EventName, data: EmitterRequestData<SuccessResponse | ErrorResponse | boolean>): void {
@@ -112,7 +111,7 @@ export class EventBus {
   }
 
   private getRequestData(data: JQuery.AjaxSettings['data']): JQuery.AjaxSettings['data'] {
-    let newData = null;
+    let newData = data;
 
     if (this.data) {
       newData = typeof data === 'string'

@@ -10,6 +10,18 @@ myparcelbe_order:
   defaults:
     _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::index'
 
+myparcelbe_module_settings:
+  path: myparcelbe/module_settings
+  methods: [ GET, POST ]
+  defaults:
+    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelModuleSettingsController::index'
+
+myparcelbe_button_action:
+  path: myparcelbe/button_action
+  methods: [ GET, POST ]
+  defaults:
+    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelButtonActionsController::index'
+
 myparcelbe_loading:
   path: myparcelbe/loading
   methods: [ GET ]

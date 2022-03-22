@@ -12,7 +12,7 @@ export function onNewLabels(response: ActionResponse<typeof modifyLabelActions[n
     case LabelAction.DELETE:
       const globalLabelContext = useGlobalContext(ContextKey.SHIPMENT_LABELS);
 
-      response.data.labelIds.forEach((labelId) => {
+      response.labelIds.forEach((labelId) => {
         const index = findLabelIndex(globalLabelContext, labelId);
 
         if (index !== -1) {
@@ -24,7 +24,7 @@ export function onNewLabels(response: ActionResponse<typeof modifyLabelActions[n
     case LabelAction.REFRESH:
     case OrderAction.EXPORT:
     case OrderAction.EXPORT_PRINT:
-      response.data.shipmentLabels.forEach((newLabel) => {
+      response.shipmentLabels.forEach((newLabel) => {
         const labelContext = useGlobalContext(ContextKey.SHIPMENT_LABELS, {
           orderId: Number(newLabel?.id_order),
           labels: [],

@@ -15,7 +15,7 @@ class DeliveryOptionsConfigEventBus extends EventBus {
     return await this.doRequest(window.MyParcelActions.deliveryOptionsUrl, {
       carrier,
       addressId: getContext(ContextKey.SHIPPING_ADDRESS).addressId,
-    }) as SuccessResponse;
+    }) as SuccessResponse<MyParcelDeliveryOptions.Configuration>;
   }
 
   /**

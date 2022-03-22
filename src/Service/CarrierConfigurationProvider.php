@@ -3,6 +3,8 @@
 namespace Gett\MyparcelBE\Service;
 
 use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\Entity\Cache;
+use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Collection;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
@@ -44,6 +46,27 @@ class CarrierConfigurationProvider
         return static::$configuration;
     }
 
+    public static function getPsCarriers(): array
+    {
+        return Cache::remember('ps_carriers', function () {
+            $table      = Table::withPrefix('carrier');
+            $moduleName = MyParcelBE::getModule()->name;
+            $carriers   = Db::getInstance()
+                ->executeS(
+                    <<<SQL
+SELECT *
+FROM $table
+WHERE external_module_name = '{$moduleName}'
+         AND deleted = 0 
+         ORDER BY position
+         LIMIT 0, 50
+SQL
+                );
+            return $carriers;
+        });
+    }
+
+
     /**
      * @param  int    $carrierId
      * @param  string $name
@@ -63,17 +86,35 @@ class CarrierConfigurationProvider
     }
 
     /**
-     * @param  int    $carrierId
-     * @param  string $name
-     * @param  string $value
+     * @param int    $carrierId
+     * @param string $name
+     * @param string $value
+     *
+     * @return bool may return true even when nothing is updated, so verify this yourself if necessary
      */
-    public static function updateValue(int $carrierId, string $name, string $value): void
+    public static function updateValue(int $carrierId, string $name, string $value): bool
     {
-        Db::getInstance()
+        return Db::getInstance()
             ->update(
                 self::$table,
                 ['value' => pSQL($value)],
                 sprintf('%s = %d AND %s = "%s"', self::COLUMN_ID_CARRIER, $carrierId, self::COLUMN_NAME, pSQL($name))
             );
+    }
+
+    public static function upsertValue(int $carrierId, string $name, string $value): bool
+    {
+        if (false !== self::get($carrierId,$name,false)) {
+            return self::updateValue($carrierId, $name, $value);
+        }
+
+        $insert[] = [
+            'id_carrier' => $carrierId,
+            'name'       => pSQL($name),
+            'value'      => pSQL($value),
+        ];
+
+        return Db::getInstance()
+            ->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
     }
 }

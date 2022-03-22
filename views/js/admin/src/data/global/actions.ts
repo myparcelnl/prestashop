@@ -1,6 +1,8 @@
 /* eslint-disable max-len,vue/max-len */
 
-export type AdminAction = LabelAction | OrderAction;
+export type ButtonAction = string;
+
+export type AdminAction = LabelAction | OrderAction | string;
 
 export enum LabelAction {
   CREATE_RETURN_LABEL = 'createReturnLabel',

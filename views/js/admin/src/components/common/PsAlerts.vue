@@ -11,15 +11,15 @@
 </template>
 
 <script lang="ts">
+import { PropType, defineComponent } from '@vue/composition-api';
 import PsAlert from '@/components/common/PsAlert.vue';
-import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
   name: 'PsAlerts',
   components: { PsAlert },
   props: {
     alerts: {
-      type: Array,
+      type: Array as PropType<AlertData[]>,
       default: (): AlertData[] => [],
     },
   },

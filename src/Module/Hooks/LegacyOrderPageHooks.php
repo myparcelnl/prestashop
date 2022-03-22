@@ -136,10 +136,8 @@ trait LegacyOrderPageHooks
      */
     public function hookActionAdminControllerSetMedia(): void
     {
-        if ('AdminOrders' === $this->context->controller->php_self || is_a($this->context->controller, '\AdminOrdersController')) {
-            $adminOrder = new AdminOrderList();
-            $adminOrder->setHeaderContent();
-        }
+        $adminOrder = new AdminOrderList();
+        $adminOrder->setHeaderContent();
     }
 
     public function searchMyParcelCarrier($idCarrier)

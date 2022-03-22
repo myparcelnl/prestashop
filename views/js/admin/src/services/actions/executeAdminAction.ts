@@ -1,8 +1,10 @@
 import { ActionResponse, AdminAction, LabelAction, modifyLabelActions, printActions } from '@/data/global/actions';
 import { ActionsEventBus } from '@/data/eventBus/ActionsEventBus';
+import { ButtonActionsEventBus } from '@/data/eventBus/ButtonActionsEventBus';
 import { ContextKey } from '@/data/global/context';
 import { ModalData } from '@/composables/context/useModalContext';
 import { isInArray } from '@/utils/type-guard/isInArray';
+import { onButtonAction } from '@/services/actions/onButtonAction';
 import { onNewLabels } from '@/services/actions/onNewLabels';
 import { onPrintLabels } from '@/services/actions/onPrintLabels';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
@@ -18,7 +20,7 @@ export async function executeAdminAction(
   action: AdminAction,
   parameters: RequestParameters = {},
   modalData: ModalData = null,
-): Promise<void | SuccessResponse> {
+): Promise<void | SuccessResponse & ActionResponse> {
   const callbacks: ((res: ActionResponse) => void)[] = [];
   const requestParameters: RequestParameters = { action, ...parameters };
 
@@ -40,11 +42,15 @@ export async function executeAdminAction(
       await usePdfWindow().open();
     }
 
-    callbacks.push(onPrintLabels as ((res: ActionResponse) => void));
+    callbacks.push(onPrintLabels);
   }
 
   if (isInArray(action, modifyLabelActions)) {
-    callbacks.push(onNewLabels as ((res: ActionResponse) => void));
+    callbacks.push(onNewLabels);
+  }
+
+  if (isInArray(action, modifyLabelActions)) {
+    callbacks.push(onNewLabels);
   }
 
   const response = await eventBus.doAction(action, requestParameters);

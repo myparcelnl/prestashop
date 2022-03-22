@@ -4,6 +4,7 @@
     <PrintOptionsModal v-if="showPrintModal" />
     <ReturnsFormModal v-if="showReturnsFormModal" />
     <ShipmentOptionsModal v-if="showShipmentOptionsModal" />
+    <AddCarrierModal v-if="showAddCarrierModal" />
   </div>
 </template>
 
@@ -11,10 +12,12 @@
 import { ContextKey } from '@/data/global/context';
 import { defineComponent } from '@vue/composition-api';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
+import AddCarrierModal from '@/components/modals/AddCarrierModal.vue';
 
 export default defineComponent({
   name: 'Modals',
   components: {
+    AddCarrierModal,
     /* eslint-disable @typescript-eslint/naming-convention */
     DeliveryOptionsModal: async() => import('@/components/modals/DeliveryOptionsModal.vue'),
     PrintOptionsModal: async() => import('@/components/modals/PrintOptionsModal.vue'),
@@ -27,6 +30,7 @@ export default defineComponent({
     const printContext = useGlobalContext(ContextKey.PRINT_OPTIONS);
 
     return {
+      showAddCarrierModal: true,
       showDeliveryOptionsModal: true,
       showPrintModal: printContext.value.promptForLabelPosition,
       showReturnsFormModal: true,

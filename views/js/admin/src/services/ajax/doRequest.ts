@@ -1,9 +1,8 @@
-import { createErrorResponse } from '@/services/ajax/createErrorResponse';
 import { createRequestUrl } from '@/services/ajax/createRequestUrl';
 import { executeAjax } from '@/services/ajax/executeAjax';
 import { isOfType } from '@/utils/type-guard/isOfType';
 
-export type DoRequest<Response = string | SuccessResponse | ErrorResponse> = (
+export type DoRequest<Response = SuccessResponse | ErrorResponse> = (
   url: string,
   parameters: RequestParameters,
   requestOptions?: JQuery.AjaxSettings | null,
@@ -21,12 +20,12 @@ export const doRequest: DoRequest = async(url, parameters, requestOptions) => {
     ...requestOptions ?? {},
   });
 
-  if (isOfType<AjaxErrorResponse>(response, 'errors')) {
-    return createErrorResponse(response);
+  if (isOfType<ErrorResponse>(response, 'errors')) {
+    return response;
   }
 
   return {
+    ...response,
     action: parameters.action,
-    data: response.data,
-  } as SuccessResponse;
+  };
 };

@@ -2,7 +2,8 @@
   <div class="card">
     <div
       v-if="$slots.header"
-      class="card-header">
+      class="card-header"
+      @click="$emit('click-header')">
       <slot name="header" />
     </div>
     <div class="card-body">
@@ -30,5 +31,7 @@ export default defineComponent({
       type: Boolean,
     },
   },
+
+  emits: ['click-header'],
 });
 </script>

@@ -3,7 +3,7 @@
 
 <script id="{{ id }}-script">
 (() => {
-  var context = JSON.parse('{{ context | json_encode | raw }}');
+  var context = JSON.parse(`{{ context | json_encode | raw }}`);
   window.MyParcelContext = window.MyParcelContext || {};
 
   for (var i in context) {

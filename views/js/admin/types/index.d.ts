@@ -7,7 +7,7 @@ interface DropdownButtonItem {
   icon?: string;
 }
 
-interface SelectOption<Value = string | number> {
+interface SelectOption<Value = string | number | boolean> {
   label: string;
   value: Value;
 }
@@ -21,9 +21,11 @@ declare interface Window {
   MyParcelActions: {
     adminUrl: string;
     deliveryOptionsUrl: string;
+    pathButtonAction: string;
     pathLabel: string;
     pathLoading: string;
     pathOrder: string;
+    pathModuleSettings: string;
   };
   MyParcelTranslations: Record<string, string>;
   MyParcelConfiguration: MyParcelConfiguration;

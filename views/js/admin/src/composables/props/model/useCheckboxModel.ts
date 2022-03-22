@@ -1,6 +1,7 @@
 import { PropType } from '@vue/composition-api';
 import { useCheckboxVModel } from '@/composables/form/useCheckboxVModel';
 import { useModel } from '@/composables/props/model/useModel';
+import { useVModel } from '@/composables/form/useVModel';
 
 export const useCheckboxModel: ComposableComponentWithSetup<ReturnType<typeof useCheckboxVModel>> = () => ({
   ...useModel('change', 'checked'),
@@ -15,4 +16,15 @@ export const useCheckboxModel: ComposableComponentWithSetup<ReturnType<typeof us
     },
   },
   setup: useCheckboxVModel,
+});
+
+export const useMultipleCheckboxModel: ComposableComponentWithSetup<ReturnType<typeof useCheckboxVModel>> = () => ({
+  ...useModel('change', 'value'),
+  props: {
+    value: {
+      type: Array as PropType<string[]>,
+      default: null,
+    },
+  },
+  setup: (props: ReturnType<typeof useModel>['props'], ctx) => useVModel(props.value, ctx, 'change'),
 });

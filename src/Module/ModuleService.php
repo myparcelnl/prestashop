@@ -6,7 +6,7 @@ namespace Gett\MyparcelBE\Module;
 
 use Context;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\Module\Configuration\SettingsMenu;
+use Gett\MyparcelBE\Module\Hooks\ModuleSettingsRenderService;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use MyParcelBE;
@@ -32,20 +32,23 @@ class ModuleService
 
     /**
      * @return string
+     * @throws \Exception
      */
     public function getContent(): string
     {
-        $configuration = new SettingsMenu($this->module);
+        return ModuleSettingsRenderService::getInstance()->renderModuleSettings();
 
-        $this->context->smarty->assign([
-            'menutabs' => $configuration->initNavigation(),
-            'ajaxUrl'  => $this->module->getBaseUrl(true),
-        ]);
-
-        $this->context->smarty->assign('module_dir', $this->module->getPathUri());
-        $output = $this->module->display($this->module->getLocalPath(), 'views/templates/admin/navbar.tpl');
-
-        return $output . $configuration->renderMenu((int) Tools::getValue('menu') ?: 0);
+//        $configuration = new SettingsMenu($this->module);
+//
+//        $this->context->smarty->assign([
+//            'menutabs' => $configuration->initNavigation(),
+//            'ajaxUrl'  => $this->module->getBaseUrl(true),
+//        ]);
+//
+//        $this->context->smarty->assign('module_dir', $this->module->getPathUri());
+//        $output = $this->module->display($this->module->getLocalPath(), 'views/templates/admin/navbar.tpl');
+//
+//        return $output . $configuration->renderMenu((int) Tools::getValue('menu') ?: 0);
     }
 
     /**

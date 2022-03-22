@@ -51,6 +51,10 @@
           }
         ]
       }
+    },
+    {
+      "files": "./**/*.spec.*",
+      "extends": "@myparcel/eslint-config/plugin-jest"
     }
   ]
 }

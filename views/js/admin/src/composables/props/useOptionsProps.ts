@@ -2,8 +2,8 @@ import { PropType } from 'vue';
 
 interface OptionsProp<Type = SelectOption> {
   options: {
-    default: () => never[];
     type: () => PropType<Type[]>;
+    default: () => never[];
   };
 }
 

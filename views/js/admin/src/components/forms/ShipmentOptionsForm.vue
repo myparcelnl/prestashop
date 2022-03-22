@@ -129,7 +129,7 @@ export default defineComponent({
         contextData.value.deliveryOptions,
       );
 
-      contextData.value = response?.data?.context;
+      contextData.value = response?.context;
     });
 
     /**

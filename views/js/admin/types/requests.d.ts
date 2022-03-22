@@ -1,28 +1,25 @@
 type RequestParameters<T = Record<string, undefined | null | string | number | (string | number)[]>> = T;
 type RequestData = Record<string, string | RequestData>;
 
-interface ErrorResponse {
-  errors: { message: string }[];
+interface ResponseMessage {
+  message: string;
 }
 
-type SuccessResponse<Data = AjaxSuccessResponse['data']> = AjaxSuccessResponse<Data>;
+interface SuccessResponseWithMessages {
+  messages: ResponseMessage[];
+}
 
-interface ActionSuccessResponse<
+type ActionSuccessResponse<
   Action extends string,
-  Data = AjaxSuccessResponse['data'],
-> extends AjaxSuccessResponse<Data> {
+  Data = SuccessResponse,
+> = Data & {
   action: Action;
+};
+
+interface ErrorResponse {
+  errors: ResponseMessage[];
 }
 
-type RequestResponse = SuccessResponse | void;
+type SuccessResponse<D = unknown> = D & Partial<SuccessResponseWithMessages>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface AjaxSuccessResponse<Data = any> {
-  data: Data;
-}
-
-interface AjaxErrorResponse {
-  errors: string[];
-}
-
-type AjaxResponse = AjaxSuccessResponse | AjaxErrorResponse;
+type RequestResponse<D = unknown> = SuccessResponse<D> | void;

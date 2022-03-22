@@ -62,12 +62,22 @@ class AdminOrderList extends AbstractAdminOrder
      */
     private function getActions(): array
     {
+        $adminBaseLink = $this->context->link->getAdminBaseLink();
+
         return [
-            'adminUrl'           => $this->context->link->getAdminBaseLink(),
+            'adminUrl'           => $adminBaseLink,
             'deliveryOptionsUrl' => $this->context->link->getModuleLink($this->module->name, 'checkout'),
-            'pathLabel'          => ControllerService::generateUri(ControllerService::LABEL),
-            'pathLoading'        => ControllerService::generateUri(ControllerService::LOADING),
-            'pathOrder'          => ControllerService::generateUri(ControllerService::ORDER),
+            'pathButtonAction'   => ControllerService::createActionPath(
+                $adminBaseLink,
+                ControllerService::BUTTON_ACTION
+            ),
+            'pathLabel'          => ControllerService::createActionPath($adminBaseLink, ControllerService::LABEL),
+            'pathLoading'        => ControllerService::createActionPath($adminBaseLink, ControllerService::LOADING),
+            'pathOrder'          => ControllerService::createActionPath($adminBaseLink, ControllerService::ORDER),
+            'pathModuleSettings' => ControllerService::createActionPath(
+                $adminBaseLink,
+                ControllerService::MODULE_SETTINGS
+            ),
         ];
     }
 

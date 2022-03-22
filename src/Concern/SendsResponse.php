@@ -64,7 +64,7 @@ trait SendsResponse
         $json = ['data' => $data];
 
         if ($this->hasErrors()) {
-            $json = ['errors' => $this->getErrors()];
+            $json['data'] = ['errors' => $this->getErrors()];
             $response->setStatusCode(400);
         }
 

@@ -10,19 +10,14 @@
     "sourceMap": true,
     "baseUrl": ".",
     "lib": [
-      "DOM",
-      "ESNext",
+      "esnext",
       "dom"
     ],
     "paths": {
       "@/*": [
         "src/*"
       ]
-    },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ]
+    }
   },
   "include": [
     "./**/*.js",

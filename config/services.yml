@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    public: true
+    autowire: true
+    autoconfigure: true
+
+  myparcelbe.module_settings_service:
+    class: Gett\MyparcelBE\Service\ModuleSettingsService

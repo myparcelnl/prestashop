@@ -59,7 +59,22 @@ class RenderService
     {
         return array_merge([
             'errors' => $this->getErrors(),
-        ], $context);
+        ], $this->makeSafeForOutput($context));
+    }
+
+    protected function makeSafeForOutput(array $context): array
+    {
+        $str = json_encode($context);
+        $str = str_replace('\\', '\\\\', $str);
+        $str = str_replace('\\\"', '', $str);
+        $str = preg_replace("/\r|\n/", '', $str);
+        $context = json_decode($str, true);
+        if (null === $context) {
+            echo '<textarea>' . $str . '</textarea>'; // TODO encoding bugfixing to be removed
+            die();
+        }
+        return $context;
+        //json_decode(str_replace("\n", '', str_replace('\\', '\\\\', json_encode($context))), true))
     }
 
     /**

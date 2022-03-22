@@ -41,7 +41,7 @@ export const useDeliveryOptions: UseDeliveryOptions = (listener) => {
     document.addEventListener(Events.UPDATED_DELIVERY_OPTIONS, listenerWrapper);
     await loadScript();
     document.dispatchEvent(new CustomEvent(Events.UPDATE_DELIVERY_OPTIONS, {
-      detail: { ...configuration.data, selector: '.myparcel-delivery-options' },
+      detail: { ...configuration, selector: '.myparcel-delivery-options' },
     }));
   }
 

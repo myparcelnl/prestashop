@@ -1,38 +1,36 @@
-import { ComputedRef, computed, ref } from '@vue/composition-api';
 import { EventBus, EventName } from '@/data/eventBus/EventBus';
-import { convertErrorToAlertData } from '@/services/convertErrorToAlertData';
-import { scrollToElement } from '@/utils/scrollToElement';
+import { Ref, ref } from '@vue/composition-api';
+import { createMessagesCallback } from '@/composables/createMessagesCallback';
 import { toArray } from '@/utils/toArray';
 
 interface Composed {
-  alerts: ComputedRef<AlertData[]>;
+  alerts: Ref<AlertData[]>;
+  clear: () => void;
 }
 
-type UseEventBusAlerts = (eventBus: EventBus | EventBus[], errorElementSelector?: string) => Composed;
+type UseEventBusAlerts = (eventBus?: EventBus | EventBus[], errorElementSelector?: string) => Composed;
 
-export const useEventBusAlerts: UseEventBusAlerts = (eventBuses, errorElementSelector) => {
-  const localRef = ref<AlertData[]>([]);
+let alerts: Ref<AlertData[]>;
 
-  const alerts: ComputedRef<AlertData[]> = computed<AlertData[]>(() => {
-    eventBuses = toArray<EventBus>(eventBuses);
-    eventBuses.forEach((eventBus) => {
-      eventBus.on(EventName.BUSY, ({ response: busy }) => {
-        if (busy) {
-          localRef.value = [];
-        }
-      });
+export const useEventBusAlerts: UseEventBusAlerts = (eventBuses = [], errorElementSelector = undefined) => {
+  alerts ??= ref<AlertData[]>([]);
 
-      eventBus.on(EventName.ERROR, (data) => {
-        localRef.value = convertErrorToAlertData(data);
-
-        if (errorElementSelector) {
-          scrollToElement(errorElementSelector);
-        }
-      });
+  eventBuses = toArray<EventBus>(eventBuses);
+  eventBuses.forEach((eventBus) => {
+    eventBus.on(EventName.BUSY, ({ response: busy }) => {
+      if (busy) {
+        alerts.value = [];
+      }
     });
 
-    return localRef.value;
+    eventBus.on(EventName.ERROR, createMessagesCallback<EventName.ERROR>(alerts, 'danger', errorElementSelector));
+    eventBus.on(EventName.RESPONSE, createMessagesCallback<EventName.RESPONSE>(alerts, 'success', errorElementSelector));
   });
 
-  return { alerts };
+  return {
+    alerts,
+    clear: (): void => {
+      alerts.value = [];
+    },
+  };
 };

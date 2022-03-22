@@ -8,6 +8,7 @@ use Context;
 use Db;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\Module\Hooks\Helpers\ModuleSettings;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Group;
 use Language;
@@ -168,8 +169,8 @@ class Installer
                 Configuration::updateValue($configuration['configuration_name'], $carrier->id);
 
                 $insert = [];
-                foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $item) {
-                    $insert[] = ['id_carrier' => $carrier->id, 'name' => $item, 'value' => ''];
+                foreach (ModuleSettings::CARRIER_CONFIGURATION_FIELDS as $name => $type) {
+                    $insert[] = ['id_carrier' => $carrier->id, 'name' => $name, 'value' => ''];
                 }
 
                 Db::getInstance()

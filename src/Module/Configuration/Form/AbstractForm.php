@@ -233,7 +233,7 @@ abstract class AbstractForm
         return $this->update();
     }
 
-    private function form(): array
+    public function form(): array
     {
         $form = [
             'form' => [
