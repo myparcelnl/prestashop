@@ -8,7 +8,8 @@ use Db;
 use DbQuery;
 use Gett\MyparcelBE\Constant;
 use MyParcelBE;
-use Tab;
+use MyParcelNL\Sdk\src\Support\Arr;
+use PrestaShop\PrestaShop\Adapter\Entity\Tab;
 
 class Uninstaller
 {
@@ -56,27 +57,34 @@ class Uninstaller
     }
 
     /**
-     * @throws \PrestaShopException
+     * @return bool
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function uninstallTabs(): bool
     {
         $status = true;
-        $tabs   = Installer::getAdminTabsDefinition();
+        $query  = new DbQuery();
+        $query->select('id_tab');
+        $query->from('tab');
+        $query->where(sprintf("module = '%s'", MyParcelBE::MODULE_NAME));
+        $ids = Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->executeS($query);
 
-        foreach ($tabs as $adminTab) {
-            $tabId = (int) Tab::getIdFromClassName($adminTab['class_name']);
-
-            if ($tabId) {
-                $tab    = new Tab($tabId);
-                $status &= $tab->delete();
-            }
+        foreach (Arr::pluck($ids, 'id_tab') as $tabId) {
+            $tab    = new Tab($tabId);
+            $status &= $tab->delete();
         }
 
         return $status;
     }
 
-    private function removeCarriers()
+    /**
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    private function removeCarriers(): bool
     {
         $result = true;
         $carrierListConfig = [

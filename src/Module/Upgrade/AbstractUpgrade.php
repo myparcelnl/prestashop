@@ -8,6 +8,8 @@ defined('_PS_VERSION_') or die();
 
 use Exception;
 use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Module\Installer;
+use Gett\MyparcelBE\Module\Uninstaller;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
