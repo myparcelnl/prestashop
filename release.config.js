@@ -1,5 +1,5 @@
 const baseConfig = require('@myparcel/semantic-release-config');
-const {addExecPlugin, addGitHubPlugin, addGitPlugin, addBackmergePlugin} = require(
+const {addExecPlugin, addGitHubPlugin, addGitPlugin} = require(
   '@myparcel/semantic-release-config/src/plugins',
 );
 
@@ -17,6 +17,5 @@ module.exports = {
       prepareCmd: 'node ./private/updateVersion.js ${nextRelease.version} && npm run build',
     }),
     addGitPlugin(),
-    addBackmergePlugin(),
   ],
 };

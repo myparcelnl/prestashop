@@ -1,4 +1,4 @@
-name: Build and publish
+name: 'Build and publish'
 
 on:
   push:
@@ -21,7 +21,7 @@ on:
 
 jobs:
   release:
-    name: Build and publish 🚀
+    name: 'Build and publish 🚀'
     runs-on: ubuntu-latest
     steps:
       # Checkout repository
@@ -36,8 +36,15 @@ jobs:
       - uses: myparcelnl/actions/yarn-install@v1
 
       # Run release tasks
-      - name: Release
+      - name: 'Release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
+
+      - name: 'Trigger develop rebase'
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GH_REPO_TOKEN }}
+          event-type: rebase
+          client-payload: '{ "source": "main", "target": "develop" }'
