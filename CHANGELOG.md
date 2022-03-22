@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/myparcelnl/prestashop/compare/v1.4.1...v1.5.0) (2022-03-22)
+
+
+### :bug: Bug Fixes
+
+* **delivery-options:** fix not showing after switching shipping method ([#113](https://github.com/myparcelnl/prestashop/issues/113)) ([45590a9](https://github.com/myparcelnl/prestashop/commit/45590a9df8fb8d7b5db12b1b0f379946dcc8523f)), closes [#105](https://github.com/myparcelnl/prestashop/issues/105)
+* **delivery-options:** no pickup when not chosen ([#118](https://github.com/myparcelnl/prestashop/issues/118)) ([ac86052](https://github.com/myparcelnl/prestashop/commit/ac860528cdab590ad490abd9ceb250a6b46c4221))
+* fix error retrieving delivery settings ([#109](https://github.com/myparcelnl/prestashop/issues/109)) ([a28c116](https://github.com/myparcelnl/prestashop/commit/a28c11626563a0526b24bfaa671a971ba2a8d433))
+
+
+### :sparkles: New Features
+
+* improve entire admin backoffice ([#104](https://github.com/myparcelnl/prestashop/issues/104)) ([167a1d3](https://github.com/myparcelnl/prestashop/commit/167a1d36e503fcb71d1a4c8d5fb6e659319116f1))
+
 ### [1.4.1](https://github.com/myparcelnl/prestashop/compare/v1.4.0...v1.4.1) (2021-12-21)
 
 

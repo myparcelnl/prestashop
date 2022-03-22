@@ -1,6 +1,6 @@
 {
   "name": "@myparcel/prestashop-module",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "private": true,
   "scripts": {
     "cypress:open": "cypress open",
