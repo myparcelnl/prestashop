@@ -48,9 +48,9 @@ abstract class AbstractUpgrade
     final public function execute(): bool
     {
         try {
-            ApiLogger::addLog(sprintf('Attempting to execute upgrade %s', static::class), ApiLogger::INFO);
+            ApiLogger::addLog(sprintf('%s] Attempting to execute upgrade', static::class), ApiLogger::INFO);
             $this->upgrade();
-            ApiLogger::addLog(sprintf('Successfully executed upgrade %s', static::class), ApiLogger::INFO);
+            ApiLogger::addLog(sprintf('%s] Successfully executed upgrade', static::class), ApiLogger::INFO);
         } catch (Exception $e) {
             ApiLogger::addLog($e, ApiLogger::ERROR);
             return false;

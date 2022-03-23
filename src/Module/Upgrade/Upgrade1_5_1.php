@@ -6,6 +6,7 @@ namespace Gett\MyparcelBE\Module\Upgrade;
 
 use Gett\MyparcelBE\Module\Installer;
 use Gett\MyparcelBE\Module\Uninstaller;
+use PrestaShop\PrestaShop\Adapter\Entity\Tools;
 
 class Upgrade1_5_1 extends AbstractUpgrade
 {
@@ -16,7 +17,16 @@ class Upgrade1_5_1 extends AbstractUpgrade
      */
     public function upgrade(): void
     {
+        $this->clearSymfonyCache();
         $this->reinstallTabs();
+    }
+
+    /**
+     * @return void
+     */
+    private function clearSymfonyCache(): void
+    {
+        Tools::clearSf2Cache();
     }
 
     /**
