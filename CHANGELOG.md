@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.5.1](https://github.com/myparcelnl/prestashop/compare/v1.5.0...v1.5.1) (2022-03-24)
+
+
+### :bug: Bug Fixes
+
+* symfony route error on upgrading to 1.5.0 ([#131](https://github.com/myparcelnl/prestashop/issues/131)) ([28602ca](https://github.com/myparcelnl/prestashop/commit/28602ca776cdc5e47fbe06839021b8b501feea93)), closes [#129](https://github.com/myparcelnl/prestashop/issues/129)
+
 ## [1.5.0](https://github.com/myparcelnl/prestashop/compare/v1.4.1...v1.5.0) (2022-03-22)
 
 
