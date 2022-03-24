@@ -42,12 +42,12 @@ SQL;
                 : 0;
 
             $optionName = Constant::INSURANCE_CONFIGURATION_FROM_PRICE;
-            if (!$this->optionExists($carrierId, $optionName)) {
+            if (! $this->optionExists($carrierId, $optionName)) {
                 $this->addOption($carrierId, $optionName, '0');
             }
 
             $optionName = Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT;
-            if (!$this->optionExists($carrierId, $optionName)) {
+            if (! $this->optionExists($carrierId, $optionName)) {
                 $this->addOption($carrierId, $optionName, (string) $maxAmount);
             }
         }
