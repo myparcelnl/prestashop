@@ -65,9 +65,7 @@ SQL;
         $query   = <<<SQL
 SELECT DISTINCT id_carrier, name, value FROM $this->carrierConfigurationTable WHERE id_carrier = $carrierId AND name = '$optionName'
 SQL;
-        $records = new Collection($this->db->executeS($query));
-
-        return !(0 === Count($records));
+        return (new Collection($this->db->executeS($query)))->isNotEmpty();
     }
 
     /**

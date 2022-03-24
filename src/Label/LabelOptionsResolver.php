@@ -124,20 +124,15 @@ class LabelOptionsResolver
 
     /**
      * @param int   $threshold
-     * @param array $allowedValues this must be an indexed array with values sorted from low to high
+     * @param array $values this must be an indexed array with values sorted from low to high
      *
      * @return int lowest allowed value that is higher than or equal to threshold, or the highest allowed value
      */
-    private function intHigherThanOrHighest(int $threshold, array $allowedValues): int
+    private function intHigherThanOrHighest(int $threshold, array $values): int
     {
-        foreach ($allowedValues as $allowedValue) {
-            if ($allowedValue < $threshold) {
-                continue;
-            }
-            return $allowedValue;
-        }
-
-        return Arr::last($allowedValues);
+        return Arr::first($values, static function (int $value, int $index) use ($values, $threshold) {
+            return $value >= $threshold || $index === count($values) - 1;
+        });
     }
 
     /**
