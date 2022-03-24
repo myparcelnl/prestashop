@@ -37,14 +37,14 @@ jobs:
           echo ::set-output name=source::${SOURCE}
           echo ::set-output name=target::${TARGET}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 0
 
       - name: 'Set up git credentials'
         uses: oleksiyrudenko/gha-git-credentials@v2-latest
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_REPO_TOKEN }}
 
       - name: 'Rebase and push'
         if: steps.prepare.outputs.source && steps.prepare.outputs.target
