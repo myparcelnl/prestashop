@@ -37,7 +37,7 @@ jobs:
           echo ::set-output name=source::${SOURCE}
           echo ::set-output name=target::${TARGET}
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 

@@ -1,0 +1,18 @@
+name: 'Rebase develop'
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: 'Rebase develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Trigger develop rebase'
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GH_REPO_TOKEN }}
+          event-type: rebase
+          client-payload: '{ "source": "main", "target": "develop" }'
