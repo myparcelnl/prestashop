@@ -17,14 +17,14 @@ abstract class AbstractUpgrade
     use HasInstance;
 
     /**
-     * @var \Gett\MyparcelBE\Service\Platform\AbstractPlatformService
-     */
-    protected $platformService;
-
-    /**
      * @var \PrestaShop\PrestaShop\Adapter\Entity\Db
      */
     protected $db;
+
+    /**
+     * @var \Gett\MyparcelBE\Service\Platform\AbstractPlatformService
+     */
+    protected $platformService;
 
     /**
      * @throws \Exception
@@ -48,7 +48,9 @@ abstract class AbstractUpgrade
     final public function execute(): bool
     {
         try {
+            ApiLogger::addLog(sprintf('%s] Attempting to execute upgrade', static::class), ApiLogger::INFO);
             $this->upgrade();
+            ApiLogger::addLog(sprintf('%s] Successfully executed upgrade', static::class), ApiLogger::INFO);
         } catch (Exception $e) {
             ApiLogger::addLog($e, ApiLogger::ERROR);
             return false;

@@ -8,12 +8,17 @@ use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Model\Webhook\Subscription;
+use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\WebhookService;
-use Tools;
 
 class ApiForm extends AbstractForm
 {
+    private const BUTTON_CLEAR_CACHE = 'clearCache';
+    private const BUTTON_RESET_HOOK  = 'resetHook';
+    private const BUTTON_DELETE_HOOK = 'deleteHook';
+
     protected function getNamespace(): string
     {
         return 'apiform';
@@ -25,12 +30,16 @@ class ApiForm extends AbstractForm
     public function getButtons(): array
     {
         $buttons = [
-            'reset' => [
+            'reset'       => [
                 'title' => $this->module->l('Create webhook', 'apiform'),
-                'name'  => 'resetHook',
+                'name'  => self::BUTTON_RESET_HOOK,
                 'type'  => 'submit',
-                'class' => 'btn btn-default pull-left',
                 'icon'  => 'process-icon-reset',
+            ],
+            'clear-cache' => [
+                'title' => $this->module->l('Clear cache', 'apiform'),
+                'name'  => self::BUTTON_CLEAR_CACHE,
+                'type'  => 'submit',
             ],
         ];
 
@@ -38,7 +47,7 @@ class ApiForm extends AbstractForm
             $buttons['reset']['title'] = $this->module->l('Refresh Webhook', 'apiform');
             $buttons['delete']         = [
                 'title' => $this->module->l('Delete Webhook', 'apiform'),
-                'name'  => 'deleteHook',
+                'name'  => self::BUTTON_DELETE_HOOK,
                 'type'  => 'submit',
                 'class' => 'btn btn-default pull-left',
                 'icon'  => 'process-icon-delete',
@@ -96,19 +105,23 @@ class ApiForm extends AbstractForm
     protected function update(): string
     {
         $parent        = parent::update();
-        $apiKeyChanged = Tools::getValue(Constant::API_KEY_CONFIGURATION_NAME) !== Configuration::get(
-            Constant::API_KEY_CONFIGURATION_NAME
-        );
+        $apiKeyChanged = Tools::getValue(Constant::API_KEY_CONFIGURATION_NAME)
+            !== Configuration::get(Constant::API_KEY_CONFIGURATION_NAME);
 
         try {
-            if ($apiKeyChanged || Tools::isSubmit('resetHook')) {
+            if (Tools::isSubmit(self::BUTTON_CLEAR_CACHE)) {
+                $this->clearCache();
+            }
+
+            if ($apiKeyChanged || Tools::isSubmit(self::BUTTON_RESET_HOOK)) {
                 $this->refreshWebhook();
             }
 
-            if (Tools::isSubmit('deleteHook')) {
+            if (Tools::isSubmit(self::BUTTON_DELETE_HOOK)) {
                 $this->deleteWebhook();
             }
         } catch (Exception $e) {
+            ApiLogger::addLog($e);
             return $this->module->displayError($e->getMessage());
         }
 
@@ -166,5 +179,14 @@ class ApiForm extends AbstractForm
             Configuration::updateValue(Constant::WEBHOOK_HASH_CONFIGURATION_NAME, $hash);
             ApiLogger::addLog("New webhook subscription ($subscriptionId) created. URL: $webhookUrl", ApiLogger::INFO);
         }
+    }
+
+    /**
+     * @return void
+     */
+    private function clearCache(): void
+    {
+        Tools::clearAllCache();
+        FileLogger::addLog('Cache cleared', FileLogger::INFO);
     }
 }
