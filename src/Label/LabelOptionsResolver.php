@@ -11,6 +11,7 @@ use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
 class LabelOptionsResolver
@@ -76,8 +77,9 @@ class LabelOptionsResolver
             $order->getIdCarrier()
         );
 
-        if (isset($shipmentOptions['insurance']) && $deliveryOptions) {
-            $shipmentOptions['insurance'] = true === $shipmentOptions['insurance']
+        if (isset($shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]) && $deliveryOptions) {
+            $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE] = true
+            === $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]
                 ? $this->getInsurance($deliveryOptions, $packageType, $order)
                 : 0;
         }
@@ -110,7 +112,7 @@ class LabelOptionsResolver
             return 0;
         }
 
-        if ($grandTotal < $fromPrice || ! $consignment->canHaveShipmentOption('insurance')) {
+        if ($grandTotal < $fromPrice || ! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_INSURANCE)) {
             return 0;
         }
 

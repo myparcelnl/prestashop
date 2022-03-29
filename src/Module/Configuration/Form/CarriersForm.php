@@ -257,7 +257,7 @@ class CarriersForm extends AbstractForm
 
             if (stripos($field, 'price') === 0) {
                 $price = $updatedValue = Tools::normalizeFloat($updatedValue);
-                if (!empty($price) && ! Validate::isFloat($price)) {
+                if (! empty($price) && ! Validate::isFloat($price)) {
                     switch ($field) {
                         case 'priceMondayDelivery':
                             $label = $this->module->l('Delivery Monday price', 'carriers');
@@ -1261,6 +1261,41 @@ SQL
                 'label' => $this->module->l('Always insure package', 'carriers'),
                 'name'  => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
                 'desc'  => $this->module->l('Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.', 'carriers'),
+            ];
+            try {
+                $c = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
+                $c->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+                $insurancePossibilities = array_merge([0], $c->getInsurancePossibilities());
+            } catch (\Throwable $e) {
+                $insurancePossibilities = [0];
+            }
+            $fields[] = [
+                'tab'              => $tabId,
+                'type'             => 'text',
+                'label'            => $this->module->l('Insure from price', 'carriers'),
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_FROM_PRICE,
+                'suffix'           => $currency->getSign(),
+                'class'            => 'col-lg-2',
+            ];
+            $fields[] = [
+                'tab'              => $tabId,
+                'type'             => 'select',
+                'label'            => $this->module->l('Max insured amount', 'carriers'),
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT,
+                'options'          => [
+                    'query' => array_map(
+                        static function ($value) use ($currency) {
+                            return [
+                                'value' => $value,
+                                'label' => $currency->getSign() . ' ' . $value,
+                            ];
+                        },
+                        $insurancePossibilities
+                    ),
+                    'id'    => 'value',
+                    'name'  => 'label',
+                ],
+                'class'            => 'col-lg-2',
             ];
         }
 
