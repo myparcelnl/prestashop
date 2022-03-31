@@ -78,8 +78,8 @@ class LabelOptionsResolver
         );
 
         if (isset($shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]) && $deliveryOptions) {
-            $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE] = true
-            === $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]
+            $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE] =
+                true === $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]
                 ? $this->getInsurance($deliveryOptions, $packageType, $order)
                 : 0;
         }

@@ -19,9 +19,11 @@ use HelperList;
 use Language;
 use Link;
 use MyParcelBE;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 use PrestaShopDatabaseException;
 use PrestaShopException;
@@ -635,8 +637,8 @@ SQL
         $returnTabFields   = [];
 
         if (! $isNew) {
-            $deliveryTabFields = $this->getExtraTabFields($carrier);
-            $returnTabFields   = $this->getExtraTabFields($carrier, 'return');
+            $deliveryTabFields = $this->getExtraTabFields($carrier, $currency);
+            $returnTabFields   = $this->getExtraTabFields($carrier, $currency, 'return');
         }
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
@@ -1085,13 +1087,14 @@ SQL
     }
 
     /**
-     * @param  \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
-     * @param  string                                        $prefix
+     * @param \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
+     * @param \Currency                                     $currency
+     * @param string                                        $prefix
      *
      * @return array
      * @throws \Exception
      */
-    private function getExtraTabFields(Carrier $carrier, string $prefix = ''): array
+    private function getExtraTabFields(Carrier $carrier, Currency $currency, string $prefix = ''): array
     {
         $fields      = [];
         $countryIso  = $this->module->getModuleCountry();
@@ -1263,11 +1266,14 @@ SQL
                 'desc'  => $this->module->l('Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.', 'carriers'),
             ];
             try {
-                $c = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
-                $c->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
-                $insurancePossibilities = array_merge([0], $c->getInsurancePossibilities());
+                $consignment = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
+                $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+                $insurancePossibilities = array_merge(
+                    [Constant::DEFAULT_INSURANCE_MAX_AMOUNT],
+                    $consignment->getInsurancePossibilities()
+                );
             } catch (\Throwable $e) {
-                $insurancePossibilities = [0];
+                $insurancePossibilities = [Constant::DEFAULT_INSURANCE_MAX_AMOUNT];
             }
             $fields[] = [
                 'tab'              => $tabId,
