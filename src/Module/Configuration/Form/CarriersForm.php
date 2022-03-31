@@ -1269,11 +1269,11 @@ SQL
                 $consignment = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
                 $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
                 $insurancePossibilities = array_merge(
-                    [Constant::DEFAULT_INSURANCE_MAX_AMOUNT],
+                    Constant::DEFAULT_INSURANCE_POSSIBILITIES,
                     $consignment->getInsurancePossibilities()
                 );
             } catch (\Throwable $e) {
-                $insurancePossibilities = [Constant::DEFAULT_INSURANCE_MAX_AMOUNT];
+                $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
             }
             $fields[] = [
                 'tab'              => $tabId,
