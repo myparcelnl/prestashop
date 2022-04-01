@@ -121,20 +121,25 @@ class LabelOptionsResolver
         }
         $insuredAmount = min($insuredAmount ?? $grandTotal, $maxAmount);
 
-        return $this->intHigherThanOrHighest($insuredAmount, $consignment->getInsurancePossibilities());
+        return $this->getHighestAllowedValue($insuredAmount, $consignment->getInsurancePossibilities());
     }
 
     /**
      * @param int   $threshold
-     * @param array $values this must be an indexed array with values sorted from low to high
+     * @param array $allowedValues this must be an indexed array with values sorted from low to high
      *
      * @return int lowest allowed value that is higher than or equal to threshold, or the highest allowed value
      */
-    private function intHigherThanOrHighest(int $threshold, array $values): int
+    private function getHighestAllowedValue(int $threshold, array $allowedValues): int
     {
-        return Arr::first($values, static function (int $value, int $index) use ($values, $threshold) {
-            return $value >= $threshold || $index === count($values) - 1;
-        });
+        foreach ($allowedValues as $allowedValue) {
+            if ($allowedValue < $threshold) {
+                continue;
+            }
+            return $allowedValue;
+        }
+
+        return Arr::last($allowedValues);
     }
 
     /**
