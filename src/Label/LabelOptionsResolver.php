@@ -100,7 +100,6 @@ class LabelOptionsResolver
      */
     public function getInsurance(AbstractDeliveryOptionsAdapter $deliveryOptions, int $packageType, Order $order): int
     {
-        $grandTotal  = $order->getTotalProductsWithTaxes();
         $psCarrierId = $order->getIdCarrier();
 
         try {
@@ -109,11 +108,13 @@ class LabelOptionsResolver
             $consignment = ConsignmentFactory::createByCarrierId($deliveryOptions->getCarrierId());
             $consignment->setPackageType($packageType);
         } catch (\Throwable $e) {
-            return 0;
+            return Constant::INSURANCE_CONFIGURATION_NONE;
         }
 
+        $grandTotal = $order->getTotalProductsWithTaxes();
+
         if ($grandTotal < $fromPrice || ! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_INSURANCE)) {
-            return 0;
+            return Constant::INSURANCE_CONFIGURATION_NONE;
         }
 
         if ($deliveryOptions->getShipmentOptions()) {

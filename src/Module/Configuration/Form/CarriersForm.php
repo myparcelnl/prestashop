@@ -20,6 +20,7 @@ use Language;
 use Link;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
@@ -1265,16 +1266,9 @@ SQL
                 'name'  => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
                 'desc'  => $this->module->l('Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.', 'carriers'),
             ];
-            try {
-                $consignment = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
-                $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
-                $insurancePossibilities = array_merge(
-                    Constant::DEFAULT_INSURANCE_POSSIBILITIES,
-                    $consignment->getInsurancePossibilities()
-                );
-            } catch (\Throwable $e) {
-                $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
-            }
+
+            $insurancePossibilities = $this->getInsurancePossibilities($myParcelCarrier);
+
             $fields[] = [
                 'tab'              => $tabId,
                 'type'             => 'text',
@@ -1354,5 +1348,24 @@ SQL
         } else {
             $this->updateConfigurationFields($carrier->id);
         }
+    }
+
+    /**
+     * @param \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
+     *
+     * @return int[]
+     */
+    private function getInsurancePossibilities(AbstractCarrier $myParcelCarrier): array {
+        try {
+            $consignment = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
+            $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+            $insurancePossibilities = array_merge(
+                Constant::DEFAULT_INSURANCE_POSSIBILITIES,
+                $consignment->getInsurancePossibilities()
+            );
+        } catch (\Throwable $e) {
+            $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
+        }
+        return $insurancePossibilities;
     }
 }
