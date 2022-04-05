@@ -1355,7 +1355,8 @@ SQL
      *
      * @return int[]
      */
-    private function getInsurancePossibilities(AbstractCarrier $myParcelCarrier): array {
+    private function getInsurancePossibilities(AbstractCarrier $myParcelCarrier): array
+    {
         try {
             $consignment = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
             $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
