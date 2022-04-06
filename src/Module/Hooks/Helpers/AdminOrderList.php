@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Module\Hooks\Helpers;
 
-use Country;
 use Gett\MyparcelBE\Module\Hooks\AdminPanelRenderService;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use Gett\MyparcelBE\Service\ControllerService;
 use Media;
-use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Arr;
 
 class AdminOrderList extends AbstractAdminOrder
@@ -80,6 +78,7 @@ class AdminOrderList extends AbstractAdminOrder
             'currencySign'   => $this->context->currency->getSign(),
             'dateFormatFull' => $this->context->language->date_format_full,
             'dateFormatLite' => $this->context->language->date_format_lite,
+            'modulePathUri'  => $this->module->getPathUri(),
         ];
     }
 
