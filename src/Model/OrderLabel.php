@@ -6,6 +6,7 @@ use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\MyParcelStatusProvider;
