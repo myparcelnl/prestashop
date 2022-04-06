@@ -195,7 +195,6 @@ class ConsignmentFactory
     private function getFormattedLabelDescription(): string
     {
         $labelDescription = $this->getLabelParams(
-            $this->orderData,
             Configuration::get(Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME)
         );
 
@@ -207,18 +206,18 @@ class ConsignmentFactory
     }
 
     /**
-     * @param                                                                                  $order
+     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
      *
      * @return void
      * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      * @throws \Exception
      */
-    private function setOrderData($order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
+    private function setOrderData(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
     {
         $this->orderObject       = $order;
-        $this->orderData         = OrderLabel::getDataForLabelsCreate([$order->getId()])[0];
+        $orderData               = OrderLabel::getDataForLabelsCreate([$order->getId()])[0];
+        $this->orderData         = $orderData;
         $carrierSettingsProvider = new CarrierSettingsProvider();
         $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
 
@@ -464,15 +463,14 @@ class ConsignmentFactory
     }
 
     /**
-     * @param array  $order
      * @param string $labelParams
      *
      * @return string
      */
-    private function getLabelParams(array $order, string $labelParams): string
+    private function getLabelParams(string $labelParams): string
     {
         if (empty(trim($labelParams))) {
-            return $order['id_order'];
+            return (string) $this->orderObject->getId();
         }
 
         $pattern = '/\{[a-zA-Z_]+\.[a-zA-Z_]+}/m';
@@ -500,7 +498,7 @@ class ConsignmentFactory
         }
 
         if (empty($keys)) {
-            return $order['id_order'];
+            return (string) $this->orderObject->getId();
         }
 
         foreach ($keys as $index => $key) {
@@ -508,7 +506,7 @@ class ConsignmentFactory
                 unset($keys[$index]);
             }
 
-            $labelParams = str_replace($index, $order[$key], $labelParams);
+            $labelParams = str_replace($index, $this->orderData[$key], $labelParams);
         }
 
         return trim($labelParams);
