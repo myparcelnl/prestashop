@@ -6,7 +6,6 @@ use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\MyParcelStatusProvider;
@@ -341,21 +340,25 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  array $orderIds
+     * @param  int $orderId
      *
      * @return array
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
-    public static function getDataForLabelsCreate(array $orderIds): array
+    public static function getDataForLabelsCreate(int $orderId): array
     {
-        $qb = new DbQuery();
-        $qb->select(
-            'orders.id_order,
+        return \Gett\MyparcelBE\Entity\Cache::remember(
+            "data_labels_create_$orderId",
+            static function () use ($orderId) {
+                $qb = new DbQuery();
+                $qb->select(
+                    'orders.id_order,
                     orders.id_order AS id,
                     orders.reference,
                     country.iso_code,
                     state.name AS state_name,
-                    CONCAT(address.firstname, " ",address.lastname) AS person,
+                    CONCAT(address.firstname, " ", address.lastname) AS person,
                     CONCAT(address.address1, " ", address.address2) AS full_street,
                     address.postcode,
                     address.city,
@@ -368,28 +371,35 @@ class OrderLabel extends ObjectModel
                     orders.invoice_number,
                     orders.shipping_number
                     '
+                );
+
+                $qb->from('orders', 'orders');
+                $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
+                $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
+                $qb->leftJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
+                $qb->leftJoin('state', 'state', 'state.id_state = address.id_state');
+                $qb->leftJoin(
+                    Table::TABLE_DELIVERY_SETTINGS,
+                    'delivery_settings',
+                    'orders.id_cart = delivery_settings.id_cart'
+                );
+
+                $qb->where("id_order = $orderId");
+
+                $result = Db::getInstance()
+                    ->executeS($qb);
+
+                if (! $result) {
+                    OrderLogger::addLog([
+                        'message' => 'Order data not found',
+                        'order'   => $orderId,
+                        'query'   => $qb->build(),
+                    ], OrderLogger::WARNING);
+                }
+
+                return $result ?: [];
+            }
         );
-
-        $qb->from('orders', 'orders');
-        $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
-        $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
-        $qb->innerJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
-        $qb->leftJoin('state', 'state', 'state.id_state = address.id_state');
-        $qb->leftJoin(
-            Table::TABLE_DELIVERY_SETTINGS,
-            'delivery_settings',
-            'orders.id_cart = delivery_settings.id_cart'
-        );
-
-        $qb->where(sprintf('id_order IN (%s)', implode(',', $orderIds)));
-
-        $result = Db::getInstance()->executeS($qb);
-
-        if (! $result) {
-            FileLogger::addLog(sprintf('Order data not found for order(s) %s', implode(', ', $orderIds)), FileLogger::WARNING);
-        }
-
-        return $result ?: [];
     }
 
     /**
