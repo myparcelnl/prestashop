@@ -216,8 +216,7 @@ class ConsignmentFactory
     private function setOrderData(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
     {
         $this->orderObject       = $order;
-        $orderData               = OrderLabel::getDataForLabelsCreate([$order->getId()])[0];
-        $this->orderData         = $orderData;
+        $this->orderData         = OrderLabel::getDataForLabelsCreate([$order->getId()])[0];
         $carrierSettingsProvider = new CarrierSettingsProvider();
         $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
 
