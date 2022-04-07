@@ -34,7 +34,7 @@ class Constant
     public const CUSTOMS_ORIGIN_CONFIGURATION_NAME         = 'MYPARCELBE_CUSTOMS_ORIGIN';
     public const DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME = 'MYPARCELBE_DEFAULT_CUSTOMS_ORIGIN';
     public const INSURANCE_CONFIGURATION_NONE              = 0;
-    public const DEFAULT_INSURANCE_POSSIBILITIES           = [0];
+    public const DEFAULT_INSURANCE_POSSIBILITIES           = [self::INSURANCE_CONFIGURATION_NONE];
 
     public const SINGLE_LABEL_CREATION_OPTIONS                          = [
         'packageType'       => self::PACKAGE_TYPE_CONFIGURATION_NAME,
