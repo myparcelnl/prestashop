@@ -59,15 +59,14 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param \Gett\MyparcelBE\Model\Core\Order $order
+     * @param \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|null $deliveryOptions
      *
      * @return array
      * @throws \PrestaShopDatabaseException
-     * @throws \Exception
      */
-    public function getDeliveryOptions(Order $order): array
+    public function getDeliveryOptions(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): array
     {
-        $deliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
         $shipmentOptions = $this->getShipmentOptions(
             $deliveryOptions,
             $order->getProducts(),
