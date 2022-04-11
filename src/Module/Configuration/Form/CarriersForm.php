@@ -19,9 +19,12 @@ use HelperList;
 use Language;
 use Link;
 use MyParcelBE;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierDPD;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 use PrestaShopDatabaseException;
 use PrestaShopException;
@@ -257,7 +260,7 @@ class CarriersForm extends AbstractForm
 
             if (stripos($field, 'price') === 0) {
                 $price = $updatedValue = Tools::normalizeFloat($updatedValue);
-                if (!empty($price) && ! Validate::isFloat($price)) {
+                if (! empty($price) && ! Validate::isFloat($price)) {
                     switch ($field) {
                         case 'priceMondayDelivery':
                             $label = $this->module->l('Delivery Monday price', 'carriers');
@@ -635,8 +638,8 @@ SQL
         $returnTabFields   = [];
 
         if (! $isNew) {
-            $deliveryTabFields = $this->getExtraTabFields($carrier);
-            $returnTabFields   = $this->getExtraTabFields($carrier, 'return');
+            $deliveryTabFields = $this->getExtraTabFields($carrier, $currency);
+            $returnTabFields   = $this->getExtraTabFields($carrier, $currency, 'return');
         }
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
@@ -1085,13 +1088,14 @@ SQL
     }
 
     /**
-     * @param  \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
-     * @param  string                                        $prefix
+     * @param \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
+     * @param \Currency                                     $currency
+     * @param string                                        $prefix
      *
      * @return array
      * @throws \Exception
      */
-    private function getExtraTabFields(Carrier $carrier, string $prefix = ''): array
+    private function getExtraTabFields(Carrier $carrier, Currency $currency, string $prefix = ''): array
     {
         $fields      = [];
         $countryIso  = $this->module->getModuleCountry();
@@ -1258,8 +1262,40 @@ SQL
                         'label' => $this->module->l('No', 'carriers'),
                     ],
                 ],
-                'label' => $this->module->l('Package with insurance', 'carriers'),
-                'name' => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
+                'label' => $this->module->l('Always insure package', 'carriers'),
+                'name'  => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
+                'desc'  => $this->module->l('Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.', 'carriers'),
+            ];
+
+            $insurancePossibilities = $this->getInsurancePossibilities($myParcelCarrier);
+
+            $fields[] = [
+                'tab'              => $tabId,
+                'type'             => 'text',
+                'label'            => $this->module->l('Insure from price', 'carriers'),
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_FROM_PRICE,
+                'suffix'           => $currency->getSign(),
+                'class'            => 'col-lg-2',
+            ];
+            $fields[] = [
+                'tab'              => $tabId,
+                'type'             => 'select',
+                'label'            => $this->module->l('Max insured amount', 'carriers'),
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT,
+                'options'          => [
+                    'query' => array_map(
+                        static function ($value) use ($currency) {
+                            return [
+                                'value' => $value,
+                                'label' => $currency->getSign() . ' ' . $value,
+                            ];
+                        },
+                        $insurancePossibilities
+                    ),
+                    'id'    => 'value',
+                    'name'  => 'label',
+                ],
+                'class'            => 'col-lg-2',
             ];
         }
 
@@ -1312,5 +1348,25 @@ SQL
         } else {
             $this->updateConfigurationFields($carrier->id);
         }
+    }
+
+    /**
+     * @param \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
+     *
+     * @return int[]
+     */
+    private function getInsurancePossibilities(AbstractCarrier $myParcelCarrier): array
+    {
+        try {
+            $consignment = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
+            $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
+            $insurancePossibilities = array_merge(
+                Constant::DEFAULT_INSURANCE_POSSIBILITIES,
+                $consignment->getInsurancePossibilities()
+            );
+        } catch (\Throwable $e) {
+            $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
+        }
+        return $insurancePossibilities;
     }
 }

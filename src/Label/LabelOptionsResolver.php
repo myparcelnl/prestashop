@@ -9,7 +9,9 @@ use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
 class LabelOptionsResolver
@@ -67,21 +69,77 @@ class LabelOptionsResolver
      */
     public function getDeliveryOptions(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): array
     {
+        $packageType     = $this->getPackageType($order, $deliveryOptions);
         $shipmentOptions = $this->getShipmentOptions(
             $deliveryOptions,
             $order->getProducts(),
             $order->getIdCarrier()
         );
 
-        if (isset($shipmentOptions['insurance'])) {
-            $shipmentOptions['insurance'] = false === $shipmentOptions['insurance'] ? 0 : 500;
+        if (isset($shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]) && $deliveryOptions) {
+            $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE] =
+                true === $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]
+                ? $this->getInsurance($deliveryOptions, $packageType, $order)
+                : 0;
         }
 
         return [
             'shipmentOptions' => $shipmentOptions,
-            'package_type'    => $this->getPackageType($order, $deliveryOptions),
+            'package_type'    => $packageType,
             'package_format'  => $this->getPackageFormat($order, $deliveryOptions),
         ];
+    }
+
+    /**
+     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param int                                                                        $packageType
+     * @param \Gett\MyparcelBE\Model\Core\Order                                          $order
+     *
+     * @return int the amount in euro for which the package should be insured
+     */
+    public function getInsurance(AbstractDeliveryOptionsAdapter $deliveryOptions, int $packageType, Order $order): int
+    {
+        $psCarrierId = $order->getIdCarrier();
+
+        try {
+            $fromPrice   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_FROM_PRICE);
+            $maxAmount   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT);
+            $consignment = ConsignmentFactory::createByCarrierId($deliveryOptions->getCarrierId());
+            $consignment->setPackageType($packageType);
+        } catch (\Throwable $e) {
+            return Constant::INSURANCE_CONFIGURATION_NONE;
+        }
+
+        $grandTotal = $order->getTotalProductsWithTaxes();
+
+        if ($grandTotal < $fromPrice || ! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_INSURANCE)) {
+            return Constant::INSURANCE_CONFIGURATION_NONE;
+        }
+
+        if ($deliveryOptions->getShipmentOptions()) {
+            $insuredAmount = $deliveryOptions->getShipmentOptions()->getInsurance();
+        }
+        $insuredAmount = min($insuredAmount ?? $grandTotal, $maxAmount);
+
+        return $this->getHighestAllowedValue($insuredAmount, $consignment->getInsurancePossibilities());
+    }
+
+    /**
+     * @param int   $threshold
+     * @param array $allowedValues this must be an indexed array with values sorted from low to high
+     *
+     * @return int lowest allowed value that is higher than or equal to threshold, or the highest allowed value
+     */
+    private function getHighestAllowedValue(int $threshold, array $allowedValues): int
+    {
+        foreach ($allowedValues as $allowedValue) {
+            if ($allowedValue < $threshold) {
+                continue;
+            }
+            return $allowedValue;
+        }
+
+        return Arr::last($allowedValues);
     }
 
     /**
