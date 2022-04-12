@@ -69,7 +69,6 @@ class LabelOptionsResolver
      */
     public function getDeliveryOptions(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): array
     {
-        $deliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
         $packageType     = $this->getPackageType($order, $deliveryOptions);
         $shipmentOptions = $this->getShipmentOptions(
             $deliveryOptions,
