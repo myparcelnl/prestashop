@@ -7,6 +7,7 @@ use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
+use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
@@ -35,17 +36,19 @@ trait OrderHooks
             $packageTypeId = Constant::PACKAGE_TYPE_PACKAGE;
         }
 
-        $packageType = Constant::PACKAGE_TYPES[$packageTypeId] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
-        $carrierId       = $order->getIdOrderCarrier();
-        $deliveryOptions = new DeliveryOptionsV3Adapter([
+        $packageType      = Constant::PACKAGE_TYPES[$packageTypeId] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+        $carrierId        = $order->getIdOrderCarrier();
+        $deliveryOptions  = new DeliveryOptionsV3Adapter([
             'carrier'     => (new CarrierName())->get($carrierId),
             'date'        => (new OrderDeliveryDate())->get($carrierId),
             'packageType' => $packageType,
         ]);
+        $optionsFromOrder = OrderSettingsFactory::create($order)->getDeliveryOptions();
 
         $deliveryOptions = DeliveryOptionsMerger::create(
             $deliveryOptions,
-            (new LabelOptionsResolver())->getDeliveryOptions($order)
+            (new LabelOptionsResolver())->getDeliveryOptions($order, $optionsFromOrder),
+            $optionsFromOrder
         );
 
         try {
