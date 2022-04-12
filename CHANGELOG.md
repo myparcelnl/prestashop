@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.5.2](https://github.com/myparcelnl/prestashop/compare/v1.5.1...v1.5.2) (2022-04-12)
+
+
+### :bug: Bug Fixes
+
+* retain pickup point during checkout ([#136](https://github.com/myparcelnl/prestashop/issues/136)) ([9c620e8](https://github.com/myparcelnl/prestashop/commit/9c620e84d4292a680ddd243380943ad6a8da5c26))
+
 ### [1.5.1](https://github.com/myparcelnl/prestashop/compare/v1.5.0...v1.5.1) (2022-03-24)
 
 
