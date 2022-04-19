@@ -197,7 +197,7 @@ class ConsignmentFactory
         $labelDescription = $this->getLabelDescription();
 
         if (strlen($labelDescription) > Constant::ORDER_DESCRIPTION_MAX_LENGTH) {
-            return substr($labelDescription, 0, 42) . '...';
+            return substr($labelDescription, 0, Constant::ORDER_DESCRIPTION_MAX_LENGTH - 3) . '...';
         }
 
         return $labelDescription;
