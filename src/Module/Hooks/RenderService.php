@@ -8,6 +8,7 @@ use Gett\MyparcelBE\Concern\HasErrors;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use MyParcelBE;
 use PrestaShop\PrestaShop\Adapter\Entity\Context;
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 class RenderService
 {
@@ -38,7 +39,7 @@ class RenderService
     {
         $this->module  = MyParcelBE::getModule();
         $this->context = $context ?? Context::getContext();
-        $this->twig    = $this->module->get('twig');
+        $this->twig    = SymfonyContainer::getInstance()->get('twig');
     }
 
     /**
