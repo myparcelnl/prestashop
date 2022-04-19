@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Module\Hooks\Helpers;
 
-use Country;
 use Gett\MyparcelBE\Module\Hooks\AdminPanelRenderService;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use Gett\MyparcelBE\Service\ControllerService;
 use Media;
-use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Arr;
 
 class AdminOrderList extends AbstractAdminOrder
@@ -55,6 +53,27 @@ class AdminOrderList extends AbstractAdminOrder
     }
 
     /**
+     * Fixes route urls for sites that are hosted in a subfolder instead of the root. In the frontend, we create urls
+     * to routers like this: <adminUrl> + <path>. In the case of a site hosted at the root, the parts are "site.com/"
+     * and "<adminFolder>/path/to/controller". This will work when concatenated, but when the site is in a folder we
+     * get this: "site.com/<subfolder>/" + "<subfolder>/<adminFolder>/path/to/controller". A more robust fix would
+     * be to use absolute urls, but PrestaShop made it impossible in their router to generate these. So now we just
+     * remove one of the subfolder paths.
+     *
+     * @param  string $route
+     *
+     * @return string
+     */
+    private function createActionPath(string $route): string
+    {
+        $adminBaseLink = $this->context->link->getAdminBaseLink();
+        $baseUrlParts  = parse_url($adminBaseLink);
+        $routePath     = ControllerService::generateUri($route);
+
+        return str_replace($baseUrlParts['path'], '/', $routePath);
+    }
+
+    /**
      * Actions for doing requests from the admin backoffice.
      *
      * @return array
@@ -65,9 +84,9 @@ class AdminOrderList extends AbstractAdminOrder
         return [
             'adminUrl'           => $this->context->link->getAdminBaseLink(),
             'deliveryOptionsUrl' => $this->context->link->getModuleLink($this->module->name, 'checkout'),
-            'pathLabel'          => ControllerService::generateUri(ControllerService::LABEL),
-            'pathLoading'        => ControllerService::generateUri(ControllerService::LOADING),
-            'pathOrder'          => ControllerService::generateUri(ControllerService::ORDER),
+            'pathLabel'          => $this->createActionPath(ControllerService::LABEL),
+            'pathLoading'        => $this->createActionPath(ControllerService::LOADING),
+            'pathOrder'          => $this->createActionPath(ControllerService::ORDER),
         ];
     }
 
@@ -80,6 +99,7 @@ class AdminOrderList extends AbstractAdminOrder
             'currencySign'   => $this->context->currency->getSign(),
             'dateFormatFull' => $this->context->language->date_format_full,
             'dateFormatLite' => $this->context->language->date_format_lite,
+            'modulePathUri'  => $this->module->getPathUri(),
         ];
     }
 

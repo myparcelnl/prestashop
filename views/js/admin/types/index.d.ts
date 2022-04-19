@@ -33,6 +33,13 @@ interface MyParcelConfiguration {
   currencySign: string;
   dateFormatFull: DateFormatKey;
   dateFormatLite: DateFormatKey;
+
+  /**
+   * The path from server root to the module. Used to have webpack resolve paths in @/publicPath.ts.
+   *
+   * @example <PrestaShop instance path>/modules/myparcelbe/
+   */
+  modulePathUri: string;
 }
 
 type DateFormat = 'full' | 'lite';

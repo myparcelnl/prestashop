@@ -10,9 +10,11 @@ module.exports = {
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'development') {
       config.devtool = 'eval-source-map';
-      config.output.devtoolModuleFilenameTemplate = (info) => info.resourcePath.match(/^\.\/\S*?\.vue$/)
-        ? `webpack-generated:///${info.resourcePath}?${info.hash}`
-        : `webpack-yourCode:///${info.resourcePath}`;
+      config.output.devtoolModuleFilenameTemplate = (info) => {
+        return info.resourcePath.match(/^\.\/\S*?\.vue$/)
+          ? `webpack-generated:///${info.resourcePath}?${info.hash}`
+          : `webpack-yourCode:///${info.resourcePath}`;
+      };
       config.output.devtoolFallbackModuleFilenameTemplate = 'webpack:///[resource-path]?[hash]';
     }
 
@@ -29,5 +31,4 @@ module.exports = {
   // Output: /<module>/views/dist/js/admin
   outputDir: path.resolve(__dirname, '..', '..', 'dist', 'js', 'admin'),
   assetsDir: '',
-  publicPath: '/modules/myparcelbe/views/dist/js/admin',
 };
