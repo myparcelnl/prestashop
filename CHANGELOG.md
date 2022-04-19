@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.5.3](https://github.com/myparcelnl/prestashop/compare/v1.5.2...v1.5.3) (2022-04-19)
+
+
+### :bug: Bug Fixes
+
+* error when performing search with no results ([#139](https://github.com/myparcelnl/prestashop/issues/139)) ([e7ac29d](https://github.com/myparcelnl/prestashop/commit/e7ac29db1a599db3c7ede8fb7befdb7be09dc9eb))
+* fatal error due to nonexistent listener ([#141](https://github.com/myparcelnl/prestashop/issues/141)) ([7aca74d](https://github.com/myparcelnl/prestashop/commit/7aca74da87fd92224a99953903bb27734a693b90))
+* fix insurance settings ([#128](https://github.com/myparcelnl/prestashop/issues/128)) ([0de46ae](https://github.com/myparcelnl/prestashop/commit/0de46ae54dee13702f51aeacaf342a609ad2193f))
+* only send status change email if status actually changed ([#124](https://github.com/myparcelnl/prestashop/issues/124)) ([cb06ff1](https://github.com/myparcelnl/prestashop/commit/cb06ff1f2453e671503f3a3cf0681bc855ea29b5))
+* resolve scripts to paths based on site url ([#134](https://github.com/myparcelnl/prestashop/issues/134)) ([a102ea3](https://github.com/myparcelnl/prestashop/commit/a102ea3771db43b46aae60345a6afe2a88b6bfa5))
+
 ### [1.5.2](https://github.com/myparcelnl/prestashop/compare/v1.5.1...v1.5.2) (2022-04-12)
 
 
