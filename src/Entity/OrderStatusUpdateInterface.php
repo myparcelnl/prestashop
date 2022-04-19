@@ -12,7 +12,8 @@ interface OrderStatusUpdateInterface
     public function getOrderStatusSetting(): string;
 
     /**
-     * Logic that should be run when this update is applied.
+     * Logic that should be run when this update is applied. Returns success
+     * status as boolean.
      */
-    public function onExecute(): void;
+    public function onExecute(): bool;
 }

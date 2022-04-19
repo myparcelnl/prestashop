@@ -39,10 +39,11 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
     }
 
     /**
-     * @throws \PrestaShopException
+     * @return bool
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
-    public function onExecute(): void
+    public function onExecute(): bool
     {
         $newOrderStatus = $this->getNewOrderStatus();
 
@@ -54,10 +55,11 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
                     $this->getOrderStatusSetting()
                 )
             );
-            return;
+
+            return false;
         }
 
-        OrderLabel::setOrderStatus($this->shipmentId, $newOrderStatus);
+        return OrderLabel::setOrderStatus($this->shipmentId, $newOrderStatus);
     }
 
     /**

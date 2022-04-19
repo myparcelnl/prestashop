@@ -22,9 +22,13 @@ class ShippedOrderStatusUpdate extends AbstractOrderStatusUpdate
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public function onExecute(): void
+    public function onExecute(): bool
     {
-        parent::onExecute();
+        if (! parent::onExecute()) {
+            return false;
+        }
+
         $this->sendEmail(OrderForm::SEND_NOTIFICATION_AFTER_FIRST_SCAN);
+        return true;
     }
 }
