@@ -104,7 +104,7 @@ class ConsignmentFactory
 
         $this->validateWeight($distributedWeight);
 
-        for ($i = 0; $i < $labelAmount; ++$i) {
+        for ($i = 0; $i < $labelAmount; $i++) {
             $collection->addConsignment($consignment);
         }
 
