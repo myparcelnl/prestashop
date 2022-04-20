@@ -30,7 +30,8 @@ use Tools;
 
 class ConsignmentFactory
 {
-    private const FORMAT_TIMESTAMP = 'Y-m-d H:i:s';
+    private const MAX_COLLO_WEIGHT_GRAMS = 30000;
+    private const FORMAT_TIMESTAMP       = 'Y-m-d H:i:s';
 
     /**
      * @var array|array[]
@@ -95,10 +96,15 @@ class ConsignmentFactory
         $this->setOrderData($order, $deliveryOptions);
         $this->createConsignment();
 
-        $collection  = new ConsignmentCollection();
-        $consignment = $this->initConsignment();
+        $collection        = new ConsignmentCollection();
+        $consignment       = $this->initConsignment();
+        $labelAmount       = $this->request['extraOptions']['labelAmount'] ?? 1;
+        $distributedWeight = $consignment->getTotalWeight() / $labelAmount;
+        $consignment->setTotalWeight($distributedWeight);
 
-        for ($i = 0; $i < ($this->request['extraOptions']['labelAmount'] ?? 1); ++$i) {
+        $this->validateWeight($distributedWeight);
+
+        for ($i = 0; $i < $labelAmount; ++$i) {
             $collection->addConsignment($consignment);
         }
 
@@ -524,6 +530,23 @@ class ConsignmentFactory
             && AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP === $this->consignment->getPackageType()
         ) {
             $this->consignment->setTotalWeight($this->request['digitalStampWeight']);
+        }
+    }
+
+    /**
+     * @param int $weight
+     * @throws \Exception
+     */
+    private function validateWeight(int $weight): void
+    {
+        if (self::MAX_COLLO_WEIGHT_GRAMS < $weight) {
+            throw new Exception(
+                sprintf(
+                    'Order has not been exported to the MyParcel Backoffice. Shipment contains a weight of %s grams, maximum allowed is %s. Change package type or add more labels to distribute weight.',
+                    $weight,
+                    self::MAX_COLLO_WEIGHT_GRAMS
+                )
+            );
         }
     }
 }
