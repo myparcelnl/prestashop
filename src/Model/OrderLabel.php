@@ -12,6 +12,7 @@ use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
+use MyParcelNL\Sdk\src\Exception\MissingFieldException;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Collection;
@@ -399,8 +400,8 @@ class OrderLabel extends ObjectModel
                 }
 
                 if (! $result[0]['email']) {
-                    throw new \MyParcelNL\Sdk\src\Exception\MissingFieldException(
-                        'Customer not found for order ' . $orderId
+                    throw new MissingFieldException(
+                        sprintf('Customer not found for order %s', $orderId)
                     );
                 }
 
