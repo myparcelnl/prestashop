@@ -399,7 +399,7 @@ class OrderLabel extends ObjectModel
                     ], OrderLogger::WARNING);
                 }
 
-                if (! $result[0]['email']) {
+                if (! ($result[0]['email'] ?? false)) {
                     throw new MissingFieldException(
                         sprintf('Customer not found for order %s', $orderId)
                     );
