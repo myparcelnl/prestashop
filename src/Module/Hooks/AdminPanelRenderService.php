@@ -271,9 +271,9 @@ class AdminPanelRenderService extends RenderService
                         ->getDeliveryOptions()
                 )
                 ->first();
-        } catch (Exception $e) {
-            OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
-            $this->addOrderError($e, $order);
+        } catch (\Throwable $e) {
+            OrderLogger::addLog(['message' => $e->getMessage(), 'order' => $order], OrderLogger::ERROR);
+            $this->addOrderError($e->getMessage(), $order);
         }
 
         return $consignment;
