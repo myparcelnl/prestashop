@@ -340,11 +340,12 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  int $orderId
+     * @param int $orderId
      *
      * @return array
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
     public static function getDataForLabelsCreate(int $orderId): array
     {
@@ -391,13 +392,19 @@ class OrderLabel extends ObjectModel
 
                 if (! $result) {
                     OrderLogger::addLog([
-                        'message' => 'Order data not found',
+                        'message' => 'Order data not complete',
                         'order'   => $orderId,
                         'query'   => $qb->build(),
                     ], OrderLogger::WARNING);
                 }
 
-                return $result ?: [];
+                if (! $result[0]['email']) {
+                    throw new \MyParcelNL\Sdk\src\Exception\MissingFieldException(
+                        'Customer not found for order ' . $orderId
+                    );
+                }
+
+                return $result[0];
             }
         );
     }
