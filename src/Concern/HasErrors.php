@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Concern;
 
-use Exception;
 use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use InvalidArgumentException;
 use MyParcelBE;
+use Throwable;
 
 trait HasErrors
 {
@@ -18,7 +18,7 @@ trait HasErrors
     private $errors = [];
 
     /**
-     * @param  string|\Exception $error
+     * @param  string|\Throwable $error
      * @param  string            $prefix
      *
      * @return void
@@ -27,7 +27,7 @@ trait HasErrors
     {
         $exceptionMessage = null;
 
-        if ($error instanceof Exception) {
+        if ($error instanceof Throwable) {
             $exceptionMessage = $prefix . $error->getMessage();
 
             if (_PS_MODE_DEV_) {

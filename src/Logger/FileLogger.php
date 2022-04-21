@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Logger;
 
-use Exception;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Adapter\Entity\AbstractLogger;
 use PrestaShop\PrestaShop\Adapter\Entity\FileLogger as PrestaShopFileLogger;
+use Throwable;
 
 class FileLogger extends PrestaShopFileLogger
 {
     use HasInstance;
 
     /**
-     * @param  \Exception|array|string $message
+     * @param  \Throwable|array|string $message
      * @param  int                     $level
      *
      * @return void
@@ -32,7 +32,7 @@ class FileLogger extends PrestaShopFileLogger
     }
 
     /**
-     * @param  \Exception|array|string $message
+     * @param  \Throwable|array|string $message
      *
      * @return string
      */
@@ -40,7 +40,7 @@ class FileLogger extends PrestaShopFileLogger
     {
         $output = $message;
 
-        if (is_a($message, Exception::class)) {
+        if ($message instanceof Throwable) {
             $output = $message->getMessage();
         } elseif (! is_string($message)) {
             $output = (string) json_encode($message, JSON_PRETTY_PRINT);
@@ -50,13 +50,13 @@ class FileLogger extends PrestaShopFileLogger
     }
 
     /**
-     * @param  \Exception|array|string $message
+     * @param  \Throwable|array|string $message
      *
      * @return string
      */
     public static function getSource($message): string
     {
-        if ($message instanceof Exception) {
+        if ($message instanceof Throwable) {
             $file = $message->getFile();
             $line = $message->getLine();
         } else {
@@ -69,7 +69,7 @@ class FileLogger extends PrestaShopFileLogger
     }
 
     /**
-     * @param  \Exception|array|string $message
+     * @param  \Throwable|array|string $message
      * @param  int                     $level
      *
      * @return void

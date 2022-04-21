@@ -11,7 +11,7 @@ use Order;
 class OrderLogger extends FileLogger
 {
     /**
-     * @param  array{message: \Exception|array|string, order: \Gett\MyparcelBE\Model\Core\Order|int} $message
+     * @param  array{message: \Throwable|array|string, order: \Gett\MyparcelBE\Model\Core\Order|int} $message
      * @param  int                                                                                   $level
      */
     public static function addLog(

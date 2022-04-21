@@ -13,7 +13,7 @@ use Gett\MyparcelBE\Constant;
 class ApiLogger extends FileLogger
 {
     /**
-     * @param  \Exception|array|string $message
+     * @param  \Throwable|array|string $message
      * @param  int                     $level
      */
     public static function addLog(
