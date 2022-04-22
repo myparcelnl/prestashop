@@ -28,6 +28,7 @@ use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Address;
 use PrestaShop\PrestaShop\Adapter\Entity\AddressFormat;
 use PrestaShop\PrestaShop\Adapter\Entity\Customer;
+use Throwable;
 
 class AdminPanelRenderService extends RenderService
 {
@@ -271,7 +272,7 @@ class AdminPanelRenderService extends RenderService
                         ->getDeliveryOptions()
                 )
                 ->first();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
             $this->addOrderError($e, $order);
         }

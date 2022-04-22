@@ -340,20 +340,25 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  array $orderIds
+     * @param  int $orderId
      *
      * @return array
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
-    public static function getDataForLabelsCreate(array $orderIds)
+    public static function getDataForLabelsCreate(int $orderId): array
     {
-        $qb = new DbQuery();
-        $qb->select('orders.id_order,
+        return \Gett\MyparcelBE\Entity\Cache::remember(
+            "data_labels_create_$orderId",
+            static function () use ($orderId) {
+                $qb = new DbQuery();
+                $qb->select(
+                    'orders.id_order,
                     orders.id_order AS id,
                     orders.reference,
                     country.iso_code,
                     state.name AS state_name,
-                    CONCAT(address.firstname, " ",address.lastname) AS person,
+                    CONCAT(address.firstname, " ", address.lastname) AS person,
                     CONCAT(address.address1, " ", address.address2) AS full_street,
                     address.postcode,
                     address.city,
@@ -365,34 +370,36 @@ class OrderLabel extends ObjectModel
                     address.id_country,
                     orders.invoice_number,
                     orders.shipping_number
-                    ');
+                    '
+                );
 
-        $qb->from('orders', 'orders');
-        $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
-        $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
-        $qb->innerJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
-        $qb->leftJoin('state', 'state', 'state.id_state = address.id_state');
-        $qb->leftJoin(Table::TABLE_DELIVERY_SETTINGS, 'delivery_settings', 'orders.id_cart = delivery_settings.id_cart');
+                $qb->from('orders', 'orders');
+                $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
+                $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
+                $qb->leftJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
+                $qb->leftJoin('state', 'state', 'state.id_state = address.id_state');
+                $qb->leftJoin(
+                    Table::TABLE_DELIVERY_SETTINGS,
+                    'delivery_settings',
+                    'orders.id_cart = delivery_settings.id_cart'
+                );
 
-        $qb->where('id_order IN (' . implode(',', $orderIds) . ') ');
+                $qb->where("id_order = $orderId");
 
-        return Db::getInstance()->executeS($qb);
-    }
+                $result = Db::getInstance()
+                    ->executeS($qb);
 
-    /**
-     * @param  int $id_order
-     *
-     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
-     * @throws \PrestaShopDatabaseException
-     */
-    public static function getOrderProducts(int $id_order)
-    {
-        $qb = new DbQuery();
-        $qb->select('od.product_id');
-        $qb->from('order_detail', 'od');
-        $qb->where('od.id_order = "' . $id_order . '" ');
+                if (! $result) {
+                    OrderLogger::addLog([
+                        'message' => 'Order data not found',
+                        'order'   => $orderId,
+                        'query'   => $qb->build(),
+                    ], OrderLogger::WARNING);
+                }
 
-        return Db::getInstance()->executeS($qb);
+                return $result ?: [];
+            }
+        );
     }
 
     /**
@@ -418,23 +425,25 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  int   $order_id
-     * @param  array $label_ids
+     * @param  int   $orderId
+     * @param  array $labelIds
      *
-     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     * @return array
      * @throws \PrestaShopDatabaseException
      */
-    public static function getOrderLabels(int $order_id, array $label_ids = [])
+    public static function getOrderLabels(int $orderId, array $labelIds = []): array
     {
         $sql = new DbQuery();
         $sql->select('*');
         $sql->from(Table::TABLE_ORDER_LABEL);
-        $sql->where('id_order = ' . (int) $order_id);
-        if (!empty($label_ids)) {
-            $sql->where('id_label IN(' . implode(',', $label_ids) . ')');
+        $sql->where("id_order = $orderId");
+
+        if (! empty($labelIds)) {
+            $sql->where(sprintf('id_label IN (%s)', implode(',', $labelIds)));
         }
 
-        return Db::getInstance()->executeS($sql);
+        return Db::getInstance()
+            ->executeS($sql) ?: [];
     }
 
     /**
