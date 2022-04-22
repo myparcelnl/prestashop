@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.5.4](https://github.com/myparcelnl/prestashop/compare/v1.5.3...v1.5.4) (2022-04-22)
+
+
+### :bug: Bug Fixes
+
+* fix type errors caused by unsuccessful queries ([#135](https://github.com/myparcelnl/prestashop/issues/135)) ([5d45762](https://github.com/myparcelnl/prestashop/commit/5d457624eb7840588f79830dce017c7d3b694940))
+
 ### [1.5.3](https://github.com/myparcelnl/prestashop/compare/v1.5.2...v1.5.3) (2022-04-19)
 
 
