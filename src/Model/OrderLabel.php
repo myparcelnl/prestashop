@@ -12,6 +12,7 @@ use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
+use MyParcelNL\Sdk\src\Exception\MissingFieldException;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Collection;
@@ -340,11 +341,12 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  int $orderId
+     * @param int $orderId
      *
      * @return array
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
     public static function getDataForLabelsCreate(int $orderId): array
     {
@@ -391,13 +393,19 @@ class OrderLabel extends ObjectModel
 
                 if (! $result) {
                     OrderLogger::addLog([
-                        'message' => 'Order data not found',
+                        'message' => 'Order data not complete',
                         'order'   => $orderId,
                         'query'   => $qb->build(),
                     ], OrderLogger::WARNING);
                 }
 
-                return $result ?: [];
+                if (! ($result[0]['email'] ?? false)) {
+                    throw new MissingFieldException(
+                        sprintf('Customer not found for order %s', $orderId)
+                    );
+                }
+
+                return $result[0];
             }
         );
     }
