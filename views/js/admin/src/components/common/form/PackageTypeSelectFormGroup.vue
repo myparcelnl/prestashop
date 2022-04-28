@@ -26,11 +26,9 @@ export default defineComponent({
   },
 
   setup: (props, ctx) => {
-    const contextData = useGlobalContext(ContextKey.SHIPMENT_OPTIONS);
-
     return {
       ...setup(props, ctx),
-      options: contextData.value.options.packageType,
+      options: ctx.attrs.options,
     };
   },
 });
