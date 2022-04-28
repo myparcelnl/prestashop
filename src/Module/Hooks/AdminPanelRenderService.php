@@ -25,6 +25,7 @@ use Gett\MyparcelBE\Service\WeightService;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
+use OrderLabel;
 use PrestaShop\PrestaShop\Adapter\Entity\Address;
 use PrestaShop\PrestaShop\Adapter\Entity\AddressFormat;
 use PrestaShop\PrestaShop\Adapter\Entity\Customer;
@@ -272,6 +273,10 @@ class AdminPanelRenderService extends RenderService
                         ->getDeliveryOptions()
                 )
                 ->first();
+
+            if ($consignment->getCountry() !== $this->module->getModuleCountry()) {
+                $consignment = null;
+            }
         } catch (Throwable $e) {
             OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
             $this->addOrderError($e, $order);
