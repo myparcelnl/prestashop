@@ -140,10 +140,6 @@ class CheckoutForm extends AbstractForm
                 'name'  => self::CONFIGURATION_FROM,
             ],
             [
-                'label' => 'Free title',
-                'name'  => self::CONFIGURATION_FREE,
-            ],
-            [
                 'label' => 'Discount title',
                 'name'  => self::CONFIGURATION_DISCOUNT,
             ],
