@@ -2,15 +2,25 @@
   "name": "@myparcel/prestashop-module",
   "version": "1.5.4",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/myparcelnl/prestashop.git"
+  },
+  "workspaces": [
+    "views/js/admin"
+  ],
   "scripts": {
-    "cypress:open": "cypress open",
-    "watch": "gulp watch",
-    "watch:js": "gulp watch:js",
     "build": "gulp build",
     "build:dev": "gulp build:dev",
-    "zip": "gulp",
-    "preinstall": "npx -q only-allow yarn"
+    "cypress:open": "cypress open",
+    "preinstall": "npx -q only-allow yarn",
+    "watch": "gulp watch",
+    "watch:js": "gulp watch:js",
+    "zip": "gulp"
   },
+  "browserslist": [
+    "defaults"
+  ],
   "dependencies": {
     "@myparcel/delivery-options": "^4.3.1"
   },
@@ -41,10 +51,5 @@
   "optionalDependencies": {
     "@myparcel/eslint-config": "^3.4.2"
   },
-  "browserslist": [
-    "defaults"
-  ],
-  "workspaces": [
-    "views/js/admin"
-  ]
+  "license": "MIT"
 }
