@@ -1297,6 +1297,28 @@ SQL
                 ],
                 'class'            => 'col-lg-2',
             ];
+
+            if (AbstractConsignment::CC_NL === $this->module->getModuleCountry()) {
+                $fields[] = [
+                    'tab'     => $tabId,
+                    'type'    => 'switch',
+                    'is_bool' => true,
+                    'values'  => [
+                        [
+                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_on',
+                            'value' => 1,
+                            'label' => $this->module->l('Yes', 'carriers'),
+                        ],
+                        [
+                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_off',
+                            'value' => 0,
+                            'label' => $this->module->l('No', 'carriers'),
+                        ],
+                    ],
+                    'label'   => $this->module->l('Insure towards Belgium', 'carriers'),
+                    'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM,
+                ];
+            }
         }
 
         return $fields;
