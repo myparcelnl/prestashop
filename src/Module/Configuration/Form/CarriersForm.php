@@ -1298,7 +1298,7 @@ SQL
                 'class'            => 'col-lg-2',
             ];
 
-            if (! $prefix && AbstractConsignment::CC_NL === $this->module->getModuleCountry()) {
+            if (! $prefix && $this->module->isNL()) {
                 $fields[] = [
                     'tab'     => $tabId,
                     'type'    => 'switch',
@@ -1317,6 +1317,7 @@ SQL
                     ],
                     'label'   => $this->module->l('Insure towards Belgium', 'carriers'),
                     'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM,
+                    'desc'  => $this->module->l('When this setting is "on", packages from NL to BE will be insured for a maximum of € 500.', 'carriers'),
                 ];
             }
         }

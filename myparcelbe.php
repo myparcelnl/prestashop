@@ -193,7 +193,6 @@ class MyParcelBE extends CarrierModule
      */
     public function getModuleCountry(): string
     {
-        return 'NL'; //TODO JOERI
         return (strpos($this->name, 'be') !== false) ? 'BE' : 'NL';
     }
 
