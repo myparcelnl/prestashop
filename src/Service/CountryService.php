@@ -42,7 +42,7 @@ class CountryService
     public static function isPostNLShipmentFromNLToBE(AbstractConsignment $consignment): bool
     {
         return AbstractConsignment::CC_BE === $consignment->getCountry()
-            && AbstractConsignment::CC_NL === MyParcelBE::getModule()->getModuleCountry()
+            && MyParcelBE::getModule()->isNL()
             && CarrierPostNL::NAME === $consignment->getCarrierName();
     }
 }
