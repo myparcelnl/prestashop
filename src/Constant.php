@@ -15,7 +15,7 @@ class Constant
     public const ITEM_DESCRIPTION_MAX_LENGTH  = 50;
     public const ORDER_DESCRIPTION_MAX_LENGTH = 45;
 
-    public const API_KEY_CONFIGURATION_NAME                = 'MYPARCELBE_API_KEY';
+    public const API_KEY_CONFIGURATION_NAME                = 'MYPARCELNL_API_KEY'; // TODO JOERI
     public const API_LOGGING_CONFIGURATION_NAME            = 'MYPARCELBE_API_LOGGING';
     public const PACKAGE_TYPE_CONFIGURATION_NAME           = 'MYPARCELBE_PACKAGE_TYPE';
     public const ONLY_RECIPIENT_CONFIGURATION_NAME         = 'MYPARCELBE_RECIPIENT_ONLY';
@@ -99,6 +99,8 @@ class Constant
     public const LABEL_POSITION_CONFIGURATION_NAME             = 'MYPARCELBE_LABEL_POSITION';
     public const LABEL_PROMPT_POSITION_CONFIGURATION_NAME      = 'MYPARCELBE_LABEL_PROMPT_POSITION';
     public const LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME = 'MYPARCELBE_LABEL_CREATED_ORDER_STATUS';
+
+    public const CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY = ['extraOptions' => ['labelAmount' => 100]];
 
     // Field used in <platform>_carrier_configuration to link myparcel carrier to prestashop carrier.
     public const CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE = 'carrierType';

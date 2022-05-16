@@ -6,11 +6,9 @@ namespace Gett\MyparcelBE\Module\Hooks;
 
 use Closure;
 use Configuration;
-use Country;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
-use Gett\MyparcelBE\Entity\Cache;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Logger\OrderLogger;
@@ -20,10 +18,10 @@ use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
 use Gett\MyparcelBE\Provider\OrderLabelProvider;
 use Gett\MyparcelBE\Service\CarrierService;
+use Gett\MyparcelBE\Service\CountryService;
 use Gett\MyparcelBE\Service\LabelOptionsService;
 use Gett\MyparcelBE\Service\WeightService;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Address;
@@ -127,7 +125,7 @@ class AdminPanelRenderService extends RenderService
             $carrierOptionsCalculator            = $this->getCarrierOptionsCalculator($order);
             $context['options']['packageType']   = $carrierOptionsCalculator->getAvailablePackageTypeNames();
             $context['options']['packageFormat'] = $carrierOptionsCalculator->getAvailablePackageFormats();
-            if ($this->getShippingCountryIso2($order) !== $this->module->getModuleCountry()) {
+            if (CountryService::getShippingCountryIso2($order) !== $this->module->getModuleCountry()) {
                 $context['options']['packageType'] = [
                     [
                         'value' => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
@@ -221,7 +219,7 @@ class AdminPanelRenderService extends RenderService
             return [];
         }
 
-        if ($this->isPostNLShipmentFromNLToBE($consignment)) {
+        if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
             return [
                 'canHaveInsurance' => true,
                 'insuranceOptions' => [Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT],
@@ -269,9 +267,6 @@ class AdminPanelRenderService extends RenderService
     }
 
     /**
-     * This consignment is only for checking and displaying shipment options.
-     * To prevent weight errors we supply a label count of 100.
-     *
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $presetDeliveryOptions
      *
@@ -284,7 +279,7 @@ class AdminPanelRenderService extends RenderService
         $consignment = null;
 
         try {
-            $consignment = (new ConsignmentFactory(['extraOptions' => ['labelAmount' => 1000]]))
+            $consignment = (new ConsignmentFactory(Constant::CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY))
                 ->fromOrder(
                     $order,
                     $presetDeliveryOptions ?? OrderSettingsFactory::create($order)
@@ -292,7 +287,7 @@ class AdminPanelRenderService extends RenderService
                 )
                 ->first();
 
-            if (! $this->isPostNLShipmentFromNLToBE($consignment)
+            if (! CountryService::isPostNLShipmentFromNLToBE($consignment)
                 && $consignment->getCountry() !== $this->module->getModuleCountry()) {
                 $consignment = null;
             }
@@ -374,36 +369,5 @@ class AdminPanelRenderService extends RenderService
                 ),
             ],
         ];
-    }
-
-    /**
-     * @param \Gett\MyparcelBE\Model\Core\Order $order
-     *
-     * @return string
-     */
-    private function getShippingCountryIso2(Order $order): ?string
-    {
-        try {
-            $countryId = (new Address($order->id_address_delivery))->id_country;
-        } catch(Throwable $e) {
-            return null;
-        }
-
-        return Cache::remember(
-            'myparcelbe_country_iso2_' . $countryId, static function () use ($countryId) {
-            return Country::getIsoById($countryId);
-        });
-    }
-
-    /**
-     * @param \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
-     *
-     * @return bool
-     */
-    private function isPostNLShipmentFromNLToBE(AbstractConsignment $consignment): bool
-    {
-        return AbstractConsignment::CC_BE === $consignment->getCountry()
-            && AbstractConsignment::CC_NL === $this->module->getModuleCountry()
-            && CarrierPostNL::NAME === $consignment->getCarrierName();
     }
 }

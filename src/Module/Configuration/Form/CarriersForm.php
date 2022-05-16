@@ -1298,7 +1298,7 @@ SQL
                 'class'            => 'col-lg-2',
             ];
 
-            if (AbstractConsignment::CC_NL === $this->module->getModuleCountry()) {
+            if (! $prefix && AbstractConsignment::CC_NL === $this->module->getModuleCountry()) {
                 $fields[] = [
                     'tab'     => $tabId,
                     'type'    => 'switch',
