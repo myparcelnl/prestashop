@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.5.5](https://github.com/myparcelnl/prestashop/compare/v1.5.4...v1.5.5) (2022-05-17)
+
+
+### :bug: Bug Fixes
+
+* fix error on exporting labels ([#154](https://github.com/myparcelnl/prestashop/issues/154)) ([d4bb21c](https://github.com/myparcelnl/prestashop/commit/d4bb21c678ee1a2cee21a3ec2db484203d1b8596)), closes [#151](https://github.com/myparcelnl/prestashop/issues/151)
+
 ### [1.5.4](https://github.com/myparcelnl/prestashop/compare/v1.5.3...v1.5.4) (2022-04-22)
 
 
