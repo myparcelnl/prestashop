@@ -316,8 +316,8 @@ class AdminOrderService extends AbstractService
     private function setLabelOptionsInsurance(array $postValues): array
     {
         try {
-            $hasInsurance                            = ('0'
-                !== $postValues['deliveryOptions']['shipmentOptions']['insurance']);
+            $hasInsurance                            =
+                ('0' !== $postValues['deliveryOptions']['shipmentOptions']['insurance']);
             $postValues['labelOptions']['insurance'] = $hasInsurance;
         } catch (\Throwable $e) {
             /**
