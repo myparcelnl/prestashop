@@ -182,7 +182,7 @@ class AdminOrderService extends AbstractService
     public function exportOrder(int $orderId): ConsignmentCollection
     {
         OrderLogger::addLog(['message' => 'Starting export', 'order' => $orderId]);
-        $postValues      = Tools::getAllValues();
+        $postValues      = $this->setLabelOptionsInsurance(Tools::getAllValues());
         $order           = $this->getOrder($orderId);
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
@@ -311,6 +311,21 @@ class AdminOrderService extends AbstractService
         }
 
         return $orderLabels;
+    }
+
+    private function setLabelOptionsInsurance(array $postValues): array
+    {
+        try {
+            $hasInsurance                            =
+                ('0' !== $postValues['deliveryOptions']['shipmentOptions']['insurance']);
+            $postValues['labelOptions']['insurance'] = $hasInsurance;
+        } catch (\Throwable $e) {
+            /**
+             * When one or both fields are not present, there is no need to adjust any of them.
+             */
+        }
+
+        return $postValues;
     }
 
     /**

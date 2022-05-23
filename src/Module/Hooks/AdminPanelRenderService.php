@@ -6,11 +6,9 @@ namespace Gett\MyparcelBE\Module\Hooks;
 
 use Closure;
 use Configuration;
-use Exception;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
-use Gett\MyparcelBE\Entity\Cache;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Logger\OrderLogger;
@@ -20,6 +18,7 @@ use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
 use Gett\MyparcelBE\Provider\OrderLabelProvider;
 use Gett\MyparcelBE\Service\CarrierService;
+use Gett\MyparcelBE\Service\CountryService;
 use Gett\MyparcelBE\Service\LabelOptionsService;
 use Gett\MyparcelBE\Service\WeightService;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
@@ -126,6 +125,14 @@ class AdminPanelRenderService extends RenderService
             $carrierOptionsCalculator            = $this->getCarrierOptionsCalculator($order);
             $context['options']['packageType']   = $carrierOptionsCalculator->getAvailablePackageTypeNames();
             $context['options']['packageFormat'] = $carrierOptionsCalculator->getAvailablePackageFormats();
+            if (CountryService::getShippingCountryIso2($order) !== $this->module->getModuleCountry()) {
+                $context['options']['packageType'] = [
+                    [
+                        'value' => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
+                        'label' => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
+                    ],
+                ];
+            }
 
             $context = array_merge($context, $this->getDeliveryOptionsContext($order, $presetDeliveryOptions));
         }
@@ -212,6 +219,13 @@ class AdminPanelRenderService extends RenderService
             return [];
         }
 
+        if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
+            return [
+                'canHaveInsurance' => true,
+                'insuranceOptions' => [Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT],
+            ];
+        }
+
         $isStandardDelivery = $consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_STANDARD;
         $consignmentOptions = [
             'insuranceOptions' => $consignment->getInsurancePossibilities(),
@@ -265,13 +279,18 @@ class AdminPanelRenderService extends RenderService
         $consignment = null;
 
         try {
-            $consignment = (new ConsignmentFactory([]))
+            $consignment = (new ConsignmentFactory(Constant::CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY))
                 ->fromOrder(
                     $order,
                     $presetDeliveryOptions ?? OrderSettingsFactory::create($order)
                         ->getDeliveryOptions()
                 )
                 ->first();
+
+            if (! CountryService::isPostNLShipmentFromNLToBE($consignment)
+                && $consignment->getCountry() !== $this->module->getModuleCountry()) {
+                $consignment = null;
+            }
         } catch (Throwable $e) {
             OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
             $this->addOrderError($e, $order);
@@ -281,7 +300,7 @@ class AdminPanelRenderService extends RenderService
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param \Gett\MyparcelBE\Model\Core\Order $order
      *
      * @return \Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator
      * @throws \Exception

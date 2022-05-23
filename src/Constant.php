@@ -26,6 +26,7 @@ class Constant
     public const INSURANCE_CONFIGURATION_NAME              = 'MYPARCELBE_INSURANCE';
     public const INSURANCE_CONFIGURATION_FROM_PRICE        = 'MYPARCELBE_INSURANCE_FROM_PRICE';
     public const INSURANCE_CONFIGURATION_MAX_AMOUNT        = 'MYPARCELBE_INSURANCE_MAX_AMOUNT';
+    public const INSURANCE_CONFIGURATION_BELGIUM           = 'MYPARCELBE_INSURANCE_BELGIUM';
     public const CUSTOMS_FORM_CONFIGURATION_NAME           = 'MYPARCELBE_CUSTOMS_FORM';
     public const CUSTOMS_FORM_CONFIGURATION_OPTION_ADD     = 'Add';
     public const CUSTOMS_FORM_CONFIGURATION_OPTION_SKIP    = 'Skip';
@@ -35,6 +36,7 @@ class Constant
     public const DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME = 'MYPARCELBE_DEFAULT_CUSTOMS_ORIGIN';
     public const INSURANCE_CONFIGURATION_NONE              = 0;
     public const DEFAULT_INSURANCE_POSSIBILITIES           = [self::INSURANCE_CONFIGURATION_NONE];
+    public const INSURANCE_CONFIGURATION_BELGIUM_AMOUNT    = 500;
 
     public const SINGLE_LABEL_CREATION_OPTIONS                          = [
         'packageType'       => self::PACKAGE_TYPE_CONFIGURATION_NAME,
@@ -98,6 +100,8 @@ class Constant
     public const LABEL_PROMPT_POSITION_CONFIGURATION_NAME      = 'MYPARCELBE_LABEL_PROMPT_POSITION';
     public const LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME = 'MYPARCELBE_LABEL_CREATED_ORDER_STATUS';
 
+    public const CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY = ['extraOptions' => ['labelAmount' => 100]];
+
     // Field used in <platform>_carrier_configuration to link myparcel carrier to prestashop carrier.
     public const CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE = 'carrierType';
 
@@ -137,6 +141,7 @@ class Constant
         self::INSURANCE_CONFIGURATION_NAME,
         self::INSURANCE_CONFIGURATION_FROM_PRICE,
         self::INSURANCE_CONFIGURATION_MAX_AMOUNT,
+        self::INSURANCE_CONFIGURATION_BELGIUM,
         self::ONLY_RECIPIENT_CONFIGURATION_NAME,
         'return_' . self::PACKAGE_TYPE_CONFIGURATION_NAME,
         'return_' . self::ONLY_RECIPIENT_CONFIGURATION_NAME,

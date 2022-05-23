@@ -18,6 +18,7 @@ class Upgrade1_6_0 extends AbstractUpgrade
     public function upgrade(): void
     {
         $this->addInsuranceOptionsForCarriers();
+        $this->addInsuranceBelgiumForCarriers();
     }
 
     /**
@@ -41,15 +42,52 @@ SQL;
                 ? 500
                 : 0;
 
-            $optionName = Constant::INSURANCE_CONFIGURATION_FROM_PRICE;
-            if (! $this->optionExists($carrierId, $optionName)) {
-                $this->addOption($carrierId, $optionName, '0');
-            }
+            $this->insertOption($carrierId, Constant::INSURANCE_CONFIGURATION_FROM_PRICE, '0');
+            $this->insertOption($carrierId, 'return_' . Constant::INSURANCE_CONFIGURATION_FROM_PRICE, '0');
 
-            $optionName = Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT;
-            if (! $this->optionExists($carrierId, $optionName)) {
-                $this->addOption($carrierId, $optionName, (string) $maxAmount);
-            }
+            $this->insertOption($carrierId, Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT, (string) $maxAmount);
+            $this->insertOption($carrierId, 'return_' . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT, (string) $maxAmount);
+        }
+    }
+
+    /**
+     * For all carriers in PrestaShop adds the 'insurance Belgium' setting and sets it to true.
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     */
+    private function addInsuranceBelgiumForCarriers(): void
+    {
+        $this->carrierConfigurationTable = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+        $configName                      = Constant::INSURANCE_CONFIGURATION_BELGIUM;
+
+        $query   = <<<SQL
+SELECT DISTINCT id_carrier FROM $this->carrierConfigurationTable
+SQL;
+        $records = new Collection($this->db->executeS($query));
+
+        foreach ($records as $record) {
+            $carrierId = (int) $record['id_carrier'];
+
+            $this->insertOption($carrierId, $configName, '1');
+            $this->insertOption($carrierId, 'return_' . $configName, '1');
+        }
+    }
+
+    /**
+     * Inserts option with $optionValue for carrier if it does not exist yet. Leaves the current option value otherwise.
+     *
+     * @param int    $carrierId
+     * @param string $optionName
+     * @param string $optionValue
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     */
+    private function insertOption(int $carrierId, string $optionName, string $optionValue): void
+    {
+        if (! $this->optionExists($carrierId, $optionName)) {
+            $this->addOption($carrierId, $optionName, $optionValue);
         }
     }
 

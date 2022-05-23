@@ -117,7 +117,7 @@ class OrderSettings
     public function getOrderWeight(): int
     {
         if (! $this->orderWeight) {
-            $this->orderWeight = (new OrderTotalWeight())->convertWeightToGrams($this->order->getTotalWeight());
+            $this->orderWeight = WeightService::convertWeightToGrams($this->order->getTotalWeight());
         }
 
         return $this->orderWeight;

@@ -5,11 +5,12 @@ namespace Gett\MyparcelBE\Label;
 use Gett\MyparcelBE\Carrier\PackageFormatCalculator;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use Gett\MyparcelBE\Service\CountryService;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
-use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -76,11 +77,15 @@ class LabelOptionsResolver
             $order->getIdCarrier()
         );
 
-        if (isset($shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]) && $deliveryOptions) {
-            $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE] =
-                true === $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE]
-                ? $this->getInsurance($deliveryOptions, $packageType, $order)
-                : 0;
+        if ($deliveryOptions
+            && isset($shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE])
+            && is_bool($shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE])
+        ) {
+            $shipmentOptions[AbstractConsignment::SHIPMENT_OPTION_INSURANCE] = $this->getInsurance(
+                $deliveryOptions,
+                $packageType,
+                $order
+            );
         }
 
         return [
@@ -104,10 +109,25 @@ class LabelOptionsResolver
         try {
             $fromPrice   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_FROM_PRICE);
             $maxAmount   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT);
-            $consignment = ConsignmentFactory::createByCarrierId($deliveryOptions->getCarrierId());
+            $consignment = (new ConsignmentFactory(Constant::CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY))
+                ->fromOrder(
+                    $order,
+                    OrderSettingsFactory::create($order)->getDeliveryOptions()
+                )
+                ->first();
             $consignment->setPackageType($packageType);
         } catch (\Throwable $e) {
             return Constant::INSURANCE_CONFIGURATION_NONE;
+        }
+
+        if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
+            try {
+                if (CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_BELGIUM)) {
+                    return Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT;
+                }
+            } catch (\Throwable $e) {
+                return Constant::INSURANCE_CONFIGURATION_NONE;
+            }
         }
 
         $grandTotal = $order->getTotalProductsWithTaxes();
