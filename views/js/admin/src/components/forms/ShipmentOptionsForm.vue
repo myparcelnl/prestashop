@@ -12,7 +12,9 @@
         max="10" />
     </FormGroup>
 
-    <PackageTypeSelectFormGroup v-model="packageType" />
+    <PackageTypeSelectFormGroup
+      v-model="packageType"
+      :options="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
       v-if="contextData.consignment && contextData.consignment.canHaveLargeFormat"
       v-model="contextData.labelOptions.package_format" />
