@@ -517,10 +517,10 @@ class ConsignmentFactory
     private function setTotalWeight(): void
     {
         if (
-            isset($this->request['digitalStampWeight'])
+            isset($this->request['extraOptions']['digitalStampWeight'])
             && AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP === $this->consignment->getPackageType()
         ) {
-            $this->consignment->setTotalWeight($this->request['digitalStampWeight']);
+            $this->consignment->setTotalWeight($this->request['extraOptions']['digitalStampWeight']);
         }
     }
 }
