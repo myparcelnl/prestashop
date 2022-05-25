@@ -48,7 +48,7 @@ trait LegacyOrderPageHooks
         $params['select'] .= ', ' . $prefix . '.`name` AS carrier_name';
 
         $params['join'] .= '
-            LEFT JOIN ' . Table::withPrefix('carrier') . $prefix . ' ON (a.id_carrier = ' . $prefix . '.id_carrier)';
+            LEFT JOIN ' . Table::withPrefix('carrier') . ' AS '  . $prefix . ' ON (a.id_carrier = ' . $prefix . '.id_carrier)';
 
         $params['fields']['myparcel_void_0'] = [
             'title' => $this->l('Delivery date', 'legacyorderpagehooks'),
