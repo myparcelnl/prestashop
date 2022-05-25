@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\OrderSettings;
 
+use Configuration;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromDefaultExportSettingsAdapter;
 use Gett\MyparcelBE\DeliveryOptions\DefaultExportSettingsRepository;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
@@ -11,8 +12,7 @@ use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
-use Gett\MyparcelBE\Service\WeightService;
+use MyParcelNL\Pdk\Service\WeightService;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
 class OrderSettings
@@ -83,7 +83,7 @@ class OrderSettings
                 'labelAmount'        => $extraOptions->getLabelAmount(),
                 'digitalStampWeight' =>
                     $extraOptions->getDigitalStampWeight()
-                    ?? WeightService::convertToDigitalStampWeight($this->getOrderWeight()),
+                    ?? WeightService::convertToDigitalStamp($this->getOrderWeight()),
             ]);
         }
 
@@ -117,7 +117,7 @@ class OrderSettings
     public function getOrderWeight(): int
     {
         if (! $this->orderWeight) {
-            $this->orderWeight = WeightService::convertWeightToGrams($this->order->getTotalWeight());
+            $this->orderWeight = WeightService::convertToGrams($this->order->getTotalWeight(), strtolower(Configuration::get('PS_WEIGHT_UNIT')));
         }
 
         return $this->orderWeight;

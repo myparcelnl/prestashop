@@ -20,7 +20,7 @@ use Gett\MyparcelBE\Provider\OrderLabelProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\CountryService;
 use Gett\MyparcelBE\Service\LabelOptionsService;
-use Gett\MyparcelBE\Service\WeightService;
+use MyParcelNL\Pdk\Service\WeightService;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;

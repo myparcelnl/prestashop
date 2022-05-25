@@ -20,7 +20,7 @@ use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\CountryService;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
-use Gett\MyparcelBE\Service\WeightService;
+use MyParcelNL\Pdk\Service\WeightService;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
@@ -169,7 +169,7 @@ class ConsignmentFactory
             ->setDeliveryDate($this->getDeliveryDate())
             ->setDeliveryType($this->getDeliveryType())
             ->setLabelDescription($this->getFormattedLabelDescription())
-            ->setTotalWeight(WeightService::convertWeightToGrams($floatWeight));
+            ->setTotalWeight(WeightService::convertToGrams($floatWeight, Configuration::get('PS_WEIGHT_UNIT')));
     }
 
     /**
@@ -382,7 +382,7 @@ class ConsignmentFactory
                 continue;
             }
 
-            $weight      = WeightService::convertWeightToGrams($product['product_weight']);
+            $weight      = WeightService::convertToGrams($product['product_weight'], Configuration::get('PS_WEIGHT_UNIT'));
             $description = $product['product_name'];
             $itemValue   = Tools::ps_round($product['unit_price_tax_incl'] * 100);
 
