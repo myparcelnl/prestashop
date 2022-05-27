@@ -139,7 +139,7 @@ class LabelOptionsResolver
         if ($deliveryOptions->getShipmentOptions()) {
             $insuredAmount = $deliveryOptions->getShipmentOptions()->getInsurance();
         }
-        $insuredAmount = min($insuredAmount ?? $grandTotal, $maxAmount);
+        $insuredAmount = min($insuredAmount ?? $grandTotal, $maxAmount ?? Constant::INSURANCE_CONFIGURATION_NONE);
 
         return $this->getHighestAllowedValue($insuredAmount, $consignment->getInsurancePossibilities());
     }
