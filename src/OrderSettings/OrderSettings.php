@@ -12,7 +12,7 @@ use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
-use MyParcelNL\Pdk\Service\WeightService;
+use Gett\MyparcelBE\Service\WeightService;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
 class OrderSettings
@@ -117,7 +117,7 @@ class OrderSettings
     public function getOrderWeight(): int
     {
         if (! $this->orderWeight) {
-            $this->orderWeight = WeightService::convertToGrams($this->order->getTotalWeight(), strtolower(Configuration::get('PS_WEIGHT_UNIT')));
+            $this->orderWeight = WeightService::convertToGrams($this->order->getTotalWeight());
         }
 
         return $this->orderWeight;
