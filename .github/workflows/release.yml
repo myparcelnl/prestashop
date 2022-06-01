@@ -1,23 +1,9 @@
-name: 'Build and publish'
+name: 'Build and publish 🚀'
 
 on:
   push:
     branches:
       - main
-    paths:
-      - config/**/*
-      - controllers/**/*
-      - mails/**/*
-      - src/**/*
-      - upgrade/**/*
-      - views/**/*
-      - .babelrc
-      - composer.json
-      - composer.lock
-      - index.php
-      - myparcelbe.php
-      - package.json
-      - yarn.lock
 
   workflow_dispatch: ~
 
@@ -26,23 +12,37 @@ jobs:
     name: 'Build and publish 🚀'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: myparcelnl/actions/composer-install@v1
+      - uses: myparcelnl/actions/composer-install@v2
         with:
           php-version: '7.4'
 
-      - uses: myparcelnl/actions/yarn-install@v1
+      - uses: myparcelnl/actions/yarn-install@v2
 
-      - uses: myparcelnl/actions/semantic-release@v1
+      - uses: myparcelnl/actions/semantic-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GH_REPO_TOKEN }}
 
-      - uses: peter-evans/repository-dispatch@v1
+  rebase:
+    uses: myparcelnl/prestashop/.github/workflows/rebase.yml@main
+    needs: release
+    if: always()
+    secrets: inherit
+    with:
+      base: 'main'
+      target: 'develop'
+
+  rebase-prs:
+    name: 'Rebase pull requests onto develop'
+    needs: rebase
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: peter-evans/rebase@v2
         with:
-          token: ${{ secrets.GH_REPO_TOKEN }}
-          event-type: rebase
-          client-payload: '{ "source": "main", "target": "develop" }'
+          base: develop
+          exclude-drafts: true
+          exclude-labels: 'hotfix'

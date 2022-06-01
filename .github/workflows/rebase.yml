@@ -1,55 +1,34 @@
 name: 'Rebase'
 
 on:
-  repository_dispatch:
-    types: [ rebase ]
+  workflow_call:
+    inputs:
+      base:
+        type: string
+        required: false
+        default: 'main'
+
+      target:
+        type: string
+        required: false
+        default: 'develop'
 
   workflow_dispatch:
     inputs:
-      source:
-        type: choice
-        description: 'Source'
-        default: 'develop'
-        required: false
-        options:
-          - main
-          - develop
       target:
-        type: choice
-        description: 'Target'
-        default: 'main'
-        required: false
-        options:
-          - main
-          - develop
+        type: string
+        description: 'Target branch'
+        default: 'develop'
+        required: true
+
+  repository_dispatch:
+    types: [ rebase-command ]
 
 jobs:
-  release:
-    name: 'Rebase branches'
-    runs-on: ubuntu-latest
-
+  rebase:
+    runs-on: ubuntu-20.04
     steps:
-      - name: 'Prepare'
-        id: prepare
-        run: |
-          SOURCE=$(echo ${{ github.event.client_payload.source }}${{ github.event.inputs.source }})
-          TARGET=$(echo ${{ github.event.client_payload.target }}${{ github.event.inputs.target }})
-          echo ::set-output name=source::${SOURCE}
-          echo ::set-output name=target::${TARGET}
-
-      - uses: actions/checkout@v2
+      - uses: myparcelnl/actions/rebase@v2
         with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: 'Set up git credentials'
-        uses: oleksiyrudenko/gha-git-credentials@v2-latest
-        with:
-          token: ${{ secrets.GH_REPO_TOKEN }}
-
-      - name: 'Rebase and push'
-        if: steps.prepare.outputs.source && steps.prepare.outputs.target
-        run: |
-          git checkout "${{ steps.prepare.outputs.target }}"
-          git rebase "origin/${{ steps.prepare.outputs.source }}"
-          git push
+          target: ${{ github.event.client_payload.target || github.event.inputs.target || inputs.target }}
+          base: ${{ github.event.client_payload.base || github.event.inputs.base || inputs.base }}
