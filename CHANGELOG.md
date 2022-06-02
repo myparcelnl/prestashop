@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/myparcelnl/prestashop/compare/v1.5.5...v1.6.0) (2022-06-02)
+
+
+### :bug: Bug Fixes
+
+* accomodate deleted customer ([#147](https://github.com/myparcelnl/prestashop/issues/147)) ([e3338ef](https://github.com/myparcelnl/prestashop/commit/e3338efa677c754c34046ff28bf0984b5dc4b298)), closes [#143](https://github.com/myparcelnl/prestashop/issues/143)
+* digital stamp range weight ignored ([#155](https://github.com/myparcelnl/prestashop/issues/155)) ([b7edbee](https://github.com/myparcelnl/prestashop/commit/b7edbee9be137bf446d2638aaa722989276565ae))
+
+
+### :sparkles: New Features
+
+* add translations for delivery options ([#152](https://github.com/myparcelnl/prestashop/issues/152)) ([debffe3](https://github.com/myparcelnl/prestashop/commit/debffe33aea213e28a979104b7b5d0feeb97831c))
+* allow insurance from nl to be ([#150](https://github.com/myparcelnl/prestashop/issues/150)) ([b9334bc](https://github.com/myparcelnl/prestashop/commit/b9334bcc1b251a4be7a3bf4d6eca25478930eaf2))
+* distribute weight over multiple labels ([#145](https://github.com/myparcelnl/prestashop/issues/145)) ([90902b6](https://github.com/myparcelnl/prestashop/commit/90902b629bbfebbe9f569a2ae619ed58f4635f6e))
+
 ### [1.5.5](https://github.com/myparcelnl/prestashop/compare/v1.5.4...v1.5.5) (2022-05-17)
 
 
