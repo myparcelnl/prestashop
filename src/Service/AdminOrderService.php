@@ -183,8 +183,8 @@ class AdminOrderService extends AbstractService
     public function exportOrder(int $orderId): ConsignmentCollection
     {
         OrderLogger::addLog(['message' => 'Starting export', 'order' => $orderId]);
-        $postValues = $this->setLabelOptionsInsurance(Tools::getAllValues());
-        $order      = $this->getOrder($orderId);
+        $postValues      = $this->setLabelOptionsInsurance(Tools::getAllValues());
+        $order           = $this->getOrder($orderId);
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
         $consignment     = $collection->first();
@@ -227,16 +227,16 @@ class AdminOrderService extends AbstractService
         foreach ($collection as $consignment) {
             $orderLabel = OrderLabel::createFromConsignment($consignment);
 
+            if (! $orderLabel) {
+                continue;
+            }
+
             if ($consignment->isPartOfMultiCollo()) {
                 $orderLabels[] = $orderLabel;
                 return $orderLabels;
             }
 
             $orderLabels[] = $orderLabel;
-
-            if (! $orderLabel) {
-                continue;
-            }
         }
 
         return $orderLabels;

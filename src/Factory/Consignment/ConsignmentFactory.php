@@ -111,16 +111,16 @@ class ConsignmentFactory
         if ($extraOptions->getLabelAmount() > 1) {
             $countryService = new CountryService();
             $orderIso       = $countryService->getShippingCountryIso2($order);
-            $carrierInfo    = CarrierService::getMyParcelCarrier($order->getIdCarrier())
-                ->getName();
+            $carrierName    = CarrierService::getMyParcelCarrier($order->getIdCarrier())->getName();
 
-            if (CarrierPostNL::NAME === $carrierInfo && AbstractConsignment::CC_NL === $orderIso) {
+            if (CarrierPostNL::NAME === $carrierName && AbstractConsignment::CC_NL === $orderIso) {
                 $collection->addMultiCollo($consignment, $labelAmount);
             } else {
                 for ($i = 0; $i < $extraOptions->getLabelAmount(); $i++) {
                     $collection->addConsignment($consignment);
                 }
             }
+
             return $collection;
         }
 
