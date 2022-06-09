@@ -27,6 +27,7 @@ use Gett\MyparcelBE\Timer;
 use InvalidArgumentException;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -182,8 +183,10 @@ class AdminOrderService extends AbstractService
     public function exportOrder(int $orderId): ConsignmentCollection
     {
         OrderLogger::addLog(['message' => 'Starting export', 'order' => $orderId]);
-        $postValues      = $this->setLabelOptionsInsurance(Tools::getAllValues());
-        $order           = $this->getOrder($orderId);
+        $postValues = $this->setLabelOptionsInsurance(Tools::getAllValues());
+        $order      = $this->getOrder($orderId);
+        $address    = new Address($order->id_address_delivery);
+        $carrierInfo = CarrierService::getMyParcelCarrier($order->getIdCarrier())->getName();
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
         $consignment     = $collection->first();
@@ -223,14 +226,19 @@ class AdminOrderService extends AbstractService
     public function getOrderLabels(ConsignmentCollection $collection): array
     {
         $orderLabels = [];
-
         foreach ($collection as $consignment) {
             $orderLabel = OrderLabel::createFromConsignment($consignment);
-            if (! $orderLabel) {
-                continue;
+
+            if ($consignment->isPartOfMultiCollo()) {
+                $orderLabels[] = $orderLabel;
+                return $orderLabels;
             }
 
             $orderLabels[] = $orderLabel;
+
+            if (! $orderLabel) {
+                continue;
+            }
         }
 
         return $orderLabels;
