@@ -185,8 +185,6 @@ class AdminOrderService extends AbstractService
         OrderLogger::addLog(['message' => 'Starting export', 'order' => $orderId]);
         $postValues = $this->setLabelOptionsInsurance(Tools::getAllValues());
         $order      = $this->getOrder($orderId);
-        $address    = new Address($order->id_address_delivery);
-        $carrierInfo = CarrierService::getMyParcelCarrier($order->getIdCarrier())->getName();
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
         $consignment     = $collection->first();
