@@ -238,11 +238,6 @@ class ConsignmentFactory
     {
         $this->orderObject = $order;
         $this->orderData   = OrderLabel::getDataForLabelsCreate($order->getId());
-
-        if (array_key_exists("[0]", $this->orderData)) {
-            $this->orderData = $this->orderData[0];
-        }
-
         $carrierSettingsProvider = new CarrierSettingsProvider();
         $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
 
