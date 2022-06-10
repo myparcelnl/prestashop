@@ -11,11 +11,13 @@ use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
+use Gett\MyparcelBE\Service\CountryService;
 use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Gett\MyparcelBE\Service\WeightService;
@@ -24,6 +26,7 @@ use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as SdkConsignmentFactory;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use OrderLabel;
@@ -97,16 +100,31 @@ class ConsignmentFactory
         $this->setOrderData($order, $deliveryOptions);
         $this->createConsignment();
 
-        $collection        = new ConsignmentCollection();
-        $consignment       = $this->initConsignment();
-        $labelAmount       = $this->request['extraOptions']['labelAmount'] ?? 1;
+        $collection   = new ConsignmentCollection();
+        $extraOptions = new ExtraOptions();
+        $consignment  = $this->initConsignment();
+        $labelAmount  = $this->request['extraOptions']['labelAmount'] ?? 1;
+        $extraOptions->setLabelAmount($labelAmount);
         $distributedWeight = $consignment->getTotalWeight() / $labelAmount;
         $consignment->setTotalWeight($distributedWeight);
 
-        for ($i = 0; $i < $labelAmount; $i++) {
-            $collection->addConsignment($consignment);
+        if ($extraOptions->getLabelAmount() > 1) {
+            $countryService = new CountryService();
+            $orderIso       = $countryService->getShippingCountryIso2($order);
+            $carrierName    = CarrierService::getMyParcelCarrier($order->getIdCarrier())->getName();
+
+            if (CarrierPostNL::NAME === $carrierName && AbstractConsignment::CC_NL === $orderIso) {
+                $collection->addMultiCollo($consignment, $labelAmount);
+            } else {
+                for ($i = 0; $i < $extraOptions->getLabelAmount(); $i++) {
+                    $collection->addConsignment($consignment);
+                }
+            }
+
+            return $collection;
         }
 
+        $collection->addConsignment($consignment);
         return $collection;
     }
 
@@ -218,8 +236,8 @@ class ConsignmentFactory
      */
     private function setOrderData(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
     {
-        $this->orderObject       = $order;
-        $this->orderData         = OrderLabel::getDataForLabelsCreate($order->getId())[0];
+        $this->orderObject = $order;
+        $this->orderData   = OrderLabel::getDataForLabelsCreate($order->getId());
         $carrierSettingsProvider = new CarrierSettingsProvider();
         $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
 
