@@ -27,6 +27,7 @@ use Gett\MyparcelBE\Timer;
 use InvalidArgumentException;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -223,11 +224,16 @@ class AdminOrderService extends AbstractService
     public function getOrderLabels(ConsignmentCollection $collection): array
     {
         $orderLabels = [];
-
         foreach ($collection as $consignment) {
             $orderLabel = OrderLabel::createFromConsignment($consignment);
+
             if (! $orderLabel) {
                 continue;
+            }
+
+            if ($consignment->isPartOfMultiCollo()) {
+                $orderLabels[] = $orderLabel;
+                return $orderLabels;
             }
 
             $orderLabels[] = $orderLabel;
