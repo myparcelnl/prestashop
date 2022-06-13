@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.6.1](https://github.com/myparcelnl/prestashop/compare/v1.6.0...v1.6.1) (2022-06-13)
+
+
+### :bug: Bug Fixes
+
+* allow checkout with insurance for all carriers ([#159](https://github.com/myparcelnl/prestashop/issues/159)) ([c617db4](https://github.com/myparcelnl/prestashop/commit/c617db4e989e0e8cb7c80feb7c6b1edf8c8e7fbb))
+* show ordergrid with left joined carrier table ([#157](https://github.com/myparcelnl/prestashop/issues/157)) ([c641ec6](https://github.com/myparcelnl/prestashop/commit/c641ec6eb4bdb9dbdeab6106ba13728821d70ae9))
+
 ## [1.6.0](https://github.com/myparcelnl/prestashop/compare/v1.5.5...v1.6.0) (2022-06-02)
 
 
