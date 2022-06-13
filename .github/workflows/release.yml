@@ -24,8 +24,8 @@ jobs:
       - uses: myparcelnl/actions/yarn-install@v2
 
       - uses: myparcelnl/actions/semantic-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_REPO_TOKEN }}
+        with:
+          token: ${{ secrets.GH_REPO_TOKEN }}
 
   rebase:
     uses: myparcelnl/prestashop/.github/workflows/rebase.yml@main
@@ -43,6 +43,7 @@ jobs:
     steps:
       - uses: peter-evans/rebase@v2
         with:
+          token: ${{ secrets.GH_REPO_TOKEN }}
           base: develop
           exclude-drafts: true
           exclude-labels: 'hotfix'
