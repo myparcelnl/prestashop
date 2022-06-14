@@ -83,7 +83,7 @@ class OrderSettings
                 'labelAmount'        => $extraOptions->getLabelAmount(),
                 'digitalStampWeight' =>
                     $extraOptions->getDigitalStampWeight()
-                    ?? WeightService::convertToDigitalStamp($this->getOrderWeight()),
+                    ?? WeightService::convertToDigitalStamp(min($this->getOrderWeight(), 2000)),
             ]);
         }
 
