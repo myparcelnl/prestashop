@@ -20,7 +20,7 @@ class LabelForm extends AbstractForm
                 'name' => Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME,
                 'placeholder' => '{order.id} {order.reference}',
                 'desc' => [
-                    $this->module->l('The maximum length is '. Constant::ORDER_DESCRIPTION_MAX_LENGTH .' characters. You can add the following variables to the description', 'labelform'),
+                    $this->module->l('You can add the following variables to the description', 'labelform'),
                     '<ul class="label-description-variables">'
                         . '<li>'
                             . '<code>{order.id}</code>'
