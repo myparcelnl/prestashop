@@ -109,7 +109,15 @@ class ConsignmentFactory
         $consignment->setTotalWeight($distributedWeight);
 
         if ($extraOptions->getLabelAmount() > 1) {
-            if ($consignment->canHaveExtraOption(AbstractConsignment::EXTRA_OPTION_MULTI_COLLO)) {
+            $countryService = new CountryService();
+            $orderIso       = $countryService->getShippingCountryIso2($order);
+            $carrierName    = CarrierService::getMyParcelCarrier($order->getIdCarrier())->getName();
+
+            if (
+                CarrierPostNL::NAME === $carrierName
+                && AbstractConsignment::CC_NL === $orderIso
+                && MyParcelBE::getModule()->isNL()
+            ) {
                 $collection->addMultiCollo($consignment, $labelAmount);
             } else {
                 for ($i = 0; $i < $extraOptions->getLabelAmount(); $i++) {
