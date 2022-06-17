@@ -169,7 +169,7 @@ class ConsignmentFactory
             ->setDeliveryDate($this->getDeliveryDate())
             ->setDeliveryType($this->getDeliveryType())
             ->setLabelDescription($this->getFormattedLabelDescription())
-            ->setTotalWeight(WeightService::convertWeightToGrams($floatWeight));
+            ->setTotalWeight(WeightService::convertToGrams($floatWeight));
     }
 
     /**
@@ -382,7 +382,7 @@ class ConsignmentFactory
                 continue;
             }
 
-            $weight      = WeightService::convertWeightToGrams($product['product_weight']);
+            $weight      = WeightService::convertToGrams($product['product_weight']);
             $description = $product['product_name'];
             $itemValue   = Tools::ps_round($product['unit_price_tax_incl'] * 100);
 
