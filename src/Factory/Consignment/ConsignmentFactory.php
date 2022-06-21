@@ -283,6 +283,14 @@ class ConsignmentFactory
     }
 
     /**
+     * @return bool
+     */
+    public function getProcessInstantlyConfiguration(): bool
+    {
+        return Configuration::get(Constant::PROCESS_SHIPMENT_INSTANTLY);
+    }
+
+    /**
      * @return string
      */
     private function getPhoneConfiguration(): string

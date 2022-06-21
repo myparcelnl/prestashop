@@ -56,7 +56,13 @@ class AdminOrderService extends AbstractService
     ): ConsignmentCollection {
         $factory    = new ConsignmentFactory($postValues);
         $collection = $factory->fromOrder($order, $deliveryOptions);
-        $collection->setLinkOfLabels();
+
+        if (ConsignmentFactory::getProcessInstantlyConfiguration()) {
+            $collection->setLinkOfLabels();
+        } else {
+            $collection = $collection
+                ->createConcepts();
+        }
 
         OrderLogger::addLog([
             'message' => "Creating consignments: {$collection->toJson()}",
@@ -188,7 +194,10 @@ class AdminOrderService extends AbstractService
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
         $consignment     = $collection->first();
-        OrderLabel::updateOrderTrackingNumber($order, $consignment->getBarcode());
+
+        if (ConsignmentFactory::getProcessInstantlyConfiguration()) {
+            OrderLabel::updateOrderTrackingNumber($order, $consignment->getBarcode());
+        }
 
         return $collection;
     }
@@ -302,22 +311,41 @@ class AdminOrderService extends AbstractService
         $orderLabels = [];
 
         foreach ($collection as $consignment) {
-            $orderLabel         = OrderLabel::findByLabelId($consignment->getConsignmentId());
-            $orderLabel->status = MyParcelStatusProvider::getInstance()
-                ->getStatus($consignment->getStatus());
-            $orderLabel->save();
-            $orderLabels[] = $orderLabel;
-
-            OrderLogger::addLog(
-                [
-                    'order'   => $orderLabel->id_order,
-                    'message' => "Refreshed label $orderLabel->id_label",
-                ]
-            );
+            $orderLabels[] = $this->addToOrderLabels($consignment);
         }
 
         return $orderLabels;
     }
+
+    /**
+     * @param $consignment
+     *
+     * @return \OrderLabel
+     * @throws \PrestaShopException
+     */
+    private function addToOrderLabels($consignment): object
+    {
+        $orderLabel             = OrderLabel::findByLabelId($consignment->getConsignmentId());
+        $orderLabel->barcode    = $consignment->getBarcode();
+        $orderLabel->status     = MyParcelStatusProvider::getInstance()
+            ->getStatus($consignment->getStatus());
+        $orderLabel->track_link = $consignment->getBarcodeUrl(
+            $consignment->getBarcode(),
+            $consignment->getPostalCode(),
+            $consignment->getCountry()
+        );
+        $orderLabel->save();
+
+        OrderLogger::addLog(
+            [
+                'order'   => $orderLabel->id_order,
+                'message' => "Refreshed label $orderLabel->id_label",
+            ]
+        );
+
+        return $orderLabel;
+    }
+
 
     private function setLabelOptionsInsurance(array $postValues): array
     {
