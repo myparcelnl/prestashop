@@ -32,6 +32,11 @@ class GeneralForm extends AbstractForm
                 'label'    => $this->module->l('Use second address field in checkout as street number', $this->getNamespace()),
                 'name'     => Constant::USE_ADDRESS2_AS_STREET_NUMBER_CONFIGURATION_NAME,
             ],
+            Constant::PROCESS_SHIPMENT_INSTANTLY => [
+                'type'     => self::FIELD_TYPE_SWITCH,
+                'label'    => $this->module->l('Process shipments instantly', $this->getNamespace()),
+                'name'     => Constant::PROCESS_SHIPMENT_INSTANTLY,
+            ],
             Constant::DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME => [
                 'type'    => self::FIELD_TYPE_SELECT,
                 'label'   => $this->module->l('Show prices as', $this->getNamespace()),
