@@ -13,6 +13,9 @@ class LabelForm extends AbstractForm
 
     protected function getFields(): array
     {
+        $translate = $this->module->l('The maximum length is %d characters. You can add the following variables to the description');
+        $labelDescription = sprintf($translate, Constant::ORDER_DESCRIPTION_MAX_LENGTH);
+
         return [
             Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME => [
                 'type' => self::FIELD_TYPE_TEXT,
@@ -20,7 +23,7 @@ class LabelForm extends AbstractForm
                 'name' => Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME,
                 'placeholder' => '{order.id} {order.reference}',
                 'desc' => [
-                    $this->module->l('You can add the following variables to the description', 'labelform'),
+                    $this->module->l($labelDescription, 'labelform'),
                     '<ul class="label-description-variables">'
                         . '<li>'
                             . '<code>{order.id}</code>'
