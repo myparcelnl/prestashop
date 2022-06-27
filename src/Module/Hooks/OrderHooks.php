@@ -47,7 +47,8 @@ trait OrderHooks
 
         $deliveryOptions = DeliveryOptionsMerger::create(
             $deliveryOptions,
-            (new LabelOptionsResolver())->getDeliveryOptions($order, $optionsFromOrder)
+            (new LabelOptionsResolver())->getDeliveryOptions($order, $optionsFromOrder),
+            $optionsFromOrder
         );
 
         try {
