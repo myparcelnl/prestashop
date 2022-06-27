@@ -130,6 +130,10 @@ class LabelOptionsResolver
             }
         }
 
+        if (! CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_NAME)) {
+            return Constant::INSURANCE_CONFIGURATION_NONE;
+        }
+
         $grandTotal = $order->getTotalProductsWithTaxes();
 
         if ($grandTotal < $fromPrice || ! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_INSURANCE)) {
@@ -139,7 +143,8 @@ class LabelOptionsResolver
         if ($deliveryOptions->getShipmentOptions()) {
             $insuredAmount = $deliveryOptions->getShipmentOptions()->getInsurance();
         }
-        $insuredAmount = min($insuredAmount ?? $grandTotal, $maxAmount ?? Constant::INSURANCE_CONFIGURATION_NONE);
+
+        $insuredAmount = (int) min($insuredAmount ?? $grandTotal, $maxAmount ?? Constant::INSURANCE_CONFIGURATION_NONE);
 
         return $this->getHighestAllowedValue($insuredAmount, $consignment->getInsurancePossibilities());
     }
