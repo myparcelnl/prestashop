@@ -9,7 +9,7 @@
         v-text="label.barcode" />
       <a
         class="btn btn-link"
-        @click="() => print(label)">
+        @click="() => print(label) & refresh(label)">
         <MaterialIcon icon="print" />
       </a>
       <a

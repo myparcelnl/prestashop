@@ -576,11 +576,15 @@ class OrderLabel extends ObjectModel
         $orderLabel->id_label        = $consignment->getConsignmentId();
         $orderLabel->id_order        = $consignment->getReferenceIdentifier();
         $orderLabel->barcode         = $consignment->getBarcode();
-        $orderLabel->track_link      = $consignment->getBarcodeUrl(
-            $consignment->getBarcode(),
-            $consignment->getPostalCode(),
-            $consignment->getCountry()
-        );
+
+        if (\Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory::getProcessInstantlyConfiguration()) {
+            $orderLabel->track_link = $consignment->getBarcodeUrl(
+                $consignment->getBarcode(),
+                $consignment->getPostalCode(),
+                $consignment->getCountry()
+            );
+        }
+
         $orderLabel->new_order_state = $consignment->getStatus();
         $orderLabel->status          = MyParcelStatusProvider::getInstance()->getStatus($consignment->getStatus());
 
