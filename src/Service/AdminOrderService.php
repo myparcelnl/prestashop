@@ -93,8 +93,8 @@ class AdminOrderService extends AbstractService
         $customer        = new Customer($order->id_customer);
         $platformService = PlatformServiceFactory::create();
 
-        $carrierId   = CarrierService::getMyParcelCarrier($order->getIdCarrier());
-        $consignment = ($platformService->generateConsignment($carrierId))
+        $carrier     = CarrierService::getMyParcelCarrier($order->getIdCarrier());
+        $consignment = ($platformService->generateConsignment($carrier))
             ->setReferenceIdentifier((string) $order->getId())
             ->setCountry(Country::getIsoById($address->id_country))
             ->setPerson($postValues['label_name'] ?? ($address->firstname . ' ' . $address->lastname))
@@ -102,7 +102,7 @@ class AdminOrderService extends AbstractService
             ->setPostalCode($address->postcode)
             ->setCity($address->city)
             ->setEmail($postValues['label_email'] ?? $customer->email)
-            ->setContents(1)
+            ->setContents(5)
             ->setPackageType(
                 isset($postValues['packageType']) ? (int) $postValues['packageType']
                     : AbstractConsignment::DEFAULT_PACKAGE_TYPE
@@ -112,36 +112,6 @@ class AdminOrderService extends AbstractService
 
         if (isset($postValues['packageFormat'])) {
             $consignment->setLargeFormat(Constant::PACKAGE_FORMAT_LARGE === (int) $postValues['packageFormat']);
-        }
-
-        if (isset($postValues['onlyRecipient'])) {
-            $consignment->setOnlyRecipient(true);
-        }
-
-        if (isset($postValues['signatureRequired'])) {
-            $consignment->setSignature(true);
-        }
-
-        if (isset($postValues['returnUndelivered'])) {
-            $consignment->setReturn(true);
-        }
-
-        if (isset($postValues['ageCheck'])) {
-            $consignment->setAgeCheck(true);
-        }
-
-        if (isset($postValues['insurance'])) {
-            $insuranceValue = $postValues['returnInsuranceAmount'] ?? 0;
-
-            if (Str::contains($insuranceValue, 'amount')) {
-                $insuranceValue = (int) str_replace('amount', '', $insuranceValue);
-            }
-
-            if (-1 === (int) $insuranceValue) {
-                $insuranceValue = $postValues['insurance-amount-custom-value'] ?? 0;
-            }
-
-            $consignment->setInsurance((int) $insuranceValue * 100);
         }
 
         $collection = (new ConsignmentCollection())
