@@ -117,6 +117,7 @@ class ConsignmentFactory
                 CarrierPostNL::NAME === $carrierName
                 && AbstractConsignment::CC_NL === $orderIso
                 && MyParcelBE::getModule()->isNL()
+                && AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()
             ) {
                 $collection->addMultiCollo($consignment, $labelAmount);
             } else {
