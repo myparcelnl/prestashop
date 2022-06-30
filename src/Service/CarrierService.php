@@ -62,6 +62,7 @@ class CarrierService
      * @return null|int
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
+     * @deprecated this cannot work reliably, since you can link a MyParcel carrier to several Prestashop carriers
      */
     public static function getPrestaShopCarrierId($myParcelCarrier): ?int
     {
@@ -74,17 +75,6 @@ class CarrierService
         return $matchingCarrier['id_carrier'] ?? null
                 ? (int) $matchingCarrier['id_carrier']
                 : null;
-    }
-
-    /**
-     * @param  string|int|class-string|\MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
-     *
-     * @return \Carrier
-     * @throws \PrestaShopDatabaseException
-     */
-    public static function getPrestashopCarrier($myParcelCarrier): Carrier
-    {
-        return new Carrier(self::getPrestaShopCarrierId($myParcelCarrier));
     }
 
     /**

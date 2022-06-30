@@ -22,7 +22,6 @@
    */
   function createOrMoveDeliveryOptionsForm($wrapper) {
     const $form = getDeliveryOptionsFormHandle();
-
     if ($form) {
       // Move the form to the new delivery option
       $form.hide();
@@ -121,6 +120,9 @@
         async: false,
         success: function(data) {
           deliveryOptionsConfigStore[carrierId] = data;
+
+          window.MyParcelConfig = deliveryOptionsConfigStore[carrierId].data;
+          updateDeliveryOptions();
         },
       });
     }
