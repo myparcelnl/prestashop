@@ -34,7 +34,7 @@ class GeneralForm extends AbstractForm
             ],
             Constant::PROCESS_SHIPMENT_INSTANTLY => [
                 'type'     => self::FIELD_TYPE_SWITCH,
-                'label'    => $this->module->l('Process shipments instantly', $this->getNamespace()),
+                'label'    => $this->module->l('Turn on concept shipment before exporting', $this->getNamespace()),
                 'name'     => Constant::PROCESS_SHIPMENT_INSTANTLY,
             ],
             Constant::DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME => [

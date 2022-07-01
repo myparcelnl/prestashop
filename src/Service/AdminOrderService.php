@@ -57,7 +57,7 @@ class AdminOrderService extends AbstractService
         $factory    = new ConsignmentFactory($postValues);
         $collection = $factory->fromOrder($order, $deliveryOptions);
 
-        if (ConsignmentFactory::isProcessInstantlyConfiguration()) {
+        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
             $collection->setLinkOfLabels();
         } else {
             $collection = $collection->createConcepts();
@@ -194,7 +194,7 @@ class AdminOrderService extends AbstractService
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
         $consignment     = $collection->first();
 
-        if (ConsignmentFactory::isProcessInstantlyConfiguration()) {
+        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
             OrderLabel::updateOrderTrackingNumber($order, $consignment->getBarcode());
         }
 
