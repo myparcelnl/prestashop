@@ -285,7 +285,7 @@ class ConsignmentFactory
     /**
      * @return bool
      */
-    public function getProcessInstantlyConfiguration(): bool
+    public function isProcessInstantlyConfiguration(): bool
     {
         return Configuration::get(Constant::PROCESS_SHIPMENT_INSTANTLY);
     }

@@ -577,7 +577,7 @@ class OrderLabel extends ObjectModel
         $orderLabel->id_order        = $consignment->getReferenceIdentifier();
         $orderLabel->barcode         = $consignment->getBarcode();
 
-        if (\Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory::getProcessInstantlyConfiguration()) {
+        if (\Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory::isProcessInstantlyConfiguration()) {
             $orderLabel->track_link = $consignment->getBarcodeUrl(
                 $consignment->getBarcode(),
                 $consignment->getPostalCode(),

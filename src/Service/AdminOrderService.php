@@ -57,15 +57,14 @@ class AdminOrderService extends AbstractService
         $factory    = new ConsignmentFactory($postValues);
         $collection = $factory->fromOrder($order, $deliveryOptions);
 
-        if (ConsignmentFactory::getProcessInstantlyConfiguration()) {
+        if (ConsignmentFactory::isProcessInstantlyConfiguration()) {
             $collection->setLinkOfLabels();
         } else {
-            $collection = $collection
-                ->createConcepts();
+            $collection = $collection->createConcepts();
         }
 
         OrderLogger::addLog([
-            'message' => "Creating consignments: {$collection->toJson()}",
+            'message' => sprintf('Creating consignments: %s', $collection->toJson()),
             'order'   => $order,
         ]);
 
@@ -195,7 +194,7 @@ class AdminOrderService extends AbstractService
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
         $consignment     = $collection->first();
 
-        if (ConsignmentFactory::getProcessInstantlyConfiguration()) {
+        if (ConsignmentFactory::isProcessInstantlyConfiguration()) {
             OrderLabel::updateOrderTrackingNumber($order, $consignment->getBarcode());
         }
 
