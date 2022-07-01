@@ -285,9 +285,9 @@ class ConsignmentFactory
     /**
      * @return bool
      */
-    public function isConceptFirstConfiguration(): bool
+    public static function isConceptFirstConfiguration(): bool
     {
-        return Configuration::get(Constant::PROCESS_SHIPMENT_INSTANTLY);
+        return Configuration::get(Constant::CONCEPT_FIRST);
     }
 
     /**
