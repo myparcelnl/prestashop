@@ -159,8 +159,9 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
         $psCarrier = new Carrier($this->psCarrierId);
 
         if (! $psCarrier->id) {
-            FileLogger::addLog("Carrier {$this->psCarrierId} not found ", FileLogger::ERROR);
-            throw new RuntimeException("Carrier {$this->psCarrierId} not found ");
+            $errorMessage = sprintf('Carrier %s not found.', $this->psCarrierId);
+            FileLogger::addLog($errorMessage, FileLogger::ERROR);
+            throw new RuntimeException($errorMessage);
         }
 
         $carrierName           = CarrierService::getMyParcelCarrier((int) $psCarrier->id)->getName();
