@@ -399,15 +399,37 @@ class OrderLabel extends ObjectModel
                     ], OrderLogger::WARNING);
                 }
 
-                if (! ($result[0]['email'] ?? false)) {
+                $emptyFields = self::requiredValues(reset($result), Constant::REQUIRED_LABEL_KEYS);
+                if ($emptyFields) {
                     throw new MissingFieldException(
-                        sprintf('Customer not found for order %s', $orderId)
+                        sprintf(
+                            'Customer information in the following fields are missing: %s',
+                            implode(', ', $emptyFields)
+                        )
                     );
                 }
 
                 return $result[0];
             }
         );
+    }
+
+    /**
+     * @param $array
+     * @param $requiredKeys
+     *
+     * @return array
+     */
+    public static function requiredValues($array, $requiredKeys): array
+    {
+        $emptyValues = [];
+        array_filter($array, static function ($value, $key) use ($requiredKeys, &$emptyValues) {
+            if (empty($value) && in_array($key, $requiredKeys, true)) {
+                $emptyValues[] = $key;
+            }
+        }, ARRAY_FILTER_USE_BOTH);
+
+        return $emptyValues;
     }
 
     /**

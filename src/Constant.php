@@ -356,4 +356,16 @@ class Constant
         0 => 'zondag',
     ];
     public const MAIL_FALLBACK_LANGUAGE = 'en';
+    public const REQUIRED_LABEL_KEYS = [
+        'person',
+        'iso_code',
+        'full_street',
+        'postcode',
+        'city',
+        'email',
+        'delivery_settings',
+        'id_carrier',
+        'id_country',
+        'reference',
+    ];
 }
