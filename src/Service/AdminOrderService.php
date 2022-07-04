@@ -56,7 +56,7 @@ class AdminOrderService extends AbstractService
     ): ConsignmentCollection {
         $factory        = new ConsignmentFactory($postValues);
         $collection     = $factory->fromOrder($order, $deliveryOptions);
-        $typeTextForLog = $this->checkConceptConfiguration($collection);
+        $typeTextForLog = $this->exportLabelOrCreateConcept($collection);
 
         OrderLogger::addLog([
             'message' => sprintf('Creating %s: %s', $typeTextForLog, $collection->toJson()),
@@ -77,7 +77,7 @@ class AdminOrderService extends AbstractService
      *
      * @return string
      */
-    private function checkConceptConfiguration($collection): string
+    private function exportLabelOrCreateConcept($collection): string
     {
         if (! ConsignmentFactory::isConceptFirstConfiguration()) {
             $collection->setLinkOfLabels();
