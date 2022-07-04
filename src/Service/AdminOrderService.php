@@ -54,9 +54,8 @@ class AdminOrderService extends AbstractService
         Order                          $order,
         AbstractDeliveryOptionsAdapter $deliveryOptions = null
     ): ConsignmentCollection {
-        $factory    = new ConsignmentFactory($postValues);
-        $collection = $factory->fromOrder($order, $deliveryOptions);
-
+        $factory        = new ConsignmentFactory($postValues);
+        $collection     = $factory->fromOrder($order, $deliveryOptions);
         $typeTextForLog = $this->checkConceptConfiguration($collection);
 
         OrderLogger::addLog([
@@ -80,7 +79,7 @@ class AdminOrderService extends AbstractService
      */
     private function checkConceptConfiguration($collection): string
     {
-        if(! ConsignmentFactory::isConceptFirstConfiguration()) {
+        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
             $collection->setLinkOfLabels();
             return 'consignments';
         }
