@@ -56,10 +56,15 @@ class AdminOrderService extends AbstractService
     ): ConsignmentCollection {
         $factory        = new ConsignmentFactory($postValues);
         $collection     = $factory->fromOrder($order, $deliveryOptions);
-        $typeTextForLog = $this->exportLabelOrCreateConcept($collection);
+
+        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
+            $collection->setLinkOfLabels();
+        } else {
+            $collection->createConcepts();
+        }
 
         OrderLogger::addLog([
-            'message' => sprintf('Creating %s: %s', $typeTextForLog, $collection->toJson()),
+            'message' => sprintf('Creating consignments: %s', $collection->toJson()),
             'order'   => $order,
         ]);
 
@@ -70,22 +75,6 @@ class AdminOrderService extends AbstractService
         }
 
         return $collection;
-    }
-
-    /**
-     * @param $collection
-     *
-     * @return string
-     */
-    private function exportLabelOrCreateConcept($collection): string
-    {
-        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
-            $collection->setLinkOfLabels();
-            return 'consignments';
-        }
-
-        $collection->createConcepts();
-        return 'concepts';
     }
 
     /**
@@ -321,20 +310,21 @@ class AdminOrderService extends AbstractService
         $orderLabels = [];
 
         foreach ($collection as $consignment) {
-            $orderLabels[] = $this->addToOrderLabels($consignment);
+            $orderLabels[] = $this->consignmentToOrderLabel($consignment);
         }
 
         return $orderLabels;
     }
 
     /**
-     * @param $consignment
+     * @param  object $consignment
      *
-     * @return \OrderLabel
+     * @return object $orderLabel
      * @throws \PrestaShopException
      */
-    private function addToOrderLabels($consignment): object
+    private function consignmentToOrderLabel(object $consignment): object
     {
+
         $orderLabel             = OrderLabel::findByLabelId($consignment->getConsignmentId());
         $orderLabel->barcode    = $consignment->getBarcode();
         $orderLabel->status     = MyParcelStatusProvider::getInstance()
@@ -346,14 +336,17 @@ class AdminOrderService extends AbstractService
         );
         $orderLabel->save();
 
+        $order = new Order((int) $orderLabel->id_order);
+
         OrderLogger::addLog(
             [
-                'order'   => $orderLabel->id_order,
+                'order'   => $order,
                 'message' => "Refreshed label $orderLabel->id_label",
             ]
         );
 
         return $orderLabel;
+
     }
 
 
