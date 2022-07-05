@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\DeliveryOptionsConfigProvider;
 
 class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
@@ -23,21 +22,10 @@ class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
     {
         $postValues = Tools::getAllValues();
 
-        $carriers  = [];
-        $carrier   = $postValues['carrier'] ?? $postValues['carrierId'] ?? $postValues['carrier_id'] ?? null;
-        $addressId = $postValues['addressId'] ?? $postValues['address_id'] ?? null;
+        $psCarrierId = $postValues['carrier'] ?? $postValues['carrierId'] ?? $postValues['carrier_id'] ?? null;
+        $addressId   = $postValues['addressId'] ?? $postValues['address_id'] ?? null;
 
-        if ($carrier) {
-            $carriers = [$carrier];
-        }
-
-        if (! empty($carriers)) {
-            $carriers = array_map(static function (string $psCarrierId) {
-                return CarrierService::getMyParcelCarrier((int) $psCarrierId)->getName();
-            }, $carriers);
-        }
-
-        $params = (new DeliveryOptionsConfigProvider($this->context, $carriers))->get($addressId ? (int) $addressId : null);
+        $params = (new DeliveryOptionsConfigProvider($this->context, $psCarrierId))->get($addressId ? (int) $addressId : null);
 
         echo json_encode(['data' => $params]);
         return true;

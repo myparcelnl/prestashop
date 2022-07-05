@@ -22,9 +22,9 @@ use Validate;
 class DeliveryOptionsConfigProvider extends AbstractProvider
 {
     /**
-     * @var int[]
+     * @var string
      */
-    private $carriers;
+    private $psCarrierId;
 
     /**
      * @var int
@@ -32,15 +32,15 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
     private $idOrder;
 
     /**
-     * @param  \Context|null $context
-     * @param  array         $carriers
+     * @param \Context|null $context
+     * @param string|null   $psCarrierId
      *
      * @throws \Exception
      */
-    public function __construct(Context $context = null, array $carriers = [])
+    public function __construct(Context $context = null, string $psCarrierId = null)
     {
         parent::__construct($context);
-        $this->carriers  = empty($carriers) ? $this->getPlatformCarrierNames() : $carriers;
+        $this->psCarrierId = $psCarrierId;
     }
 
     /**
@@ -145,22 +145,6 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
     }
 
     /**
-     * @return array
-     * @throws \Exception
-     */
-    protected function getPlatformCarrierNames(): array
-    {
-        $platformService = PlatformServiceFactory::create();
-
-        return array_map(
-            static function (string $carrierClass) {
-                return $carrierClass::NAME;
-            },
-            $platformService->getCarriers()
-        );
-    }
-
-    /**
      * @param  \Address $address
      * @param  bool     $showPriceSurcharge
      *
@@ -172,27 +156,25 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
     {
         $carrierSettings = [];
 
-        foreach ($this->carriers as $carrierName) {
-            $psCarrier = $this->getPsCarrier($carrierName);
+        $psCarrier = new Carrier($this->psCarrierId);
 
-            if (! $psCarrier->id) {
-                FileLogger::addLog("Carrier $carrierName not found ", FileLogger::ERROR);
-                throw new RuntimeException("Carrier $carrierName not found ");
-            }
-
-            $shippingOptions       = $this->module->getShippingOptions($psCarrier->id, $address);
-            $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
-            $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
-
-            $carrierSettings[$carrierName] = array_merge(
-                $this->getCarrierSettings($psCarrier->id, $shippingOptions),
-                $this->getDropOffSettings($psCarrier->id),
-                [
-                    'allowDeliveryOptions'  => true,
-                    'priceStandardDelivery' => $priceStandardDelivery,
-                ]
-            );
+        if (! $psCarrier->id) {
+            $errorMessage = sprintf('Carrier %s not found.', $this->psCarrierId);
+            FileLogger::addLog($errorMessage, FileLogger::ERROR);
+            throw new RuntimeException($errorMessage);
         }
+
+        $carrierName           = CarrierService::getMyParcelCarrier((int) $psCarrier->id)->getName();
+        $shippingOptions       = $this->module->getShippingOptions($psCarrier->id, $address);
+        $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
+        $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
+
+        $carrierSettings[$carrierName] = array_merge($this->getCarrierSettings($psCarrier->id, $shippingOptions), $this->getDropOffSettings($psCarrier->id),
+            [
+                'allowDeliveryOptions'  => true,
+                'priceStandardDelivery' => $priceStandardDelivery,
+            ]
+        );
 
         return $carrierSettings;
     }
@@ -282,19 +264,6 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
     {
         $price = CarrierConfigurationProvider::get($carrierId, $name) ?: 0;
         return Tools::ps_round($price * $taxRate, 2);
-    }
-
-    /**
-     * @param  string $carrierName
-     *
-     * @return \Carrier
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
-     */
-    private function getPsCarrier(string $carrierName): Carrier
-    {
-        $myParcelCarrier = CarrierFactory::createFromName($carrierName);
-        return CarrierService::getPrestashopCarrier($myParcelCarrier);
     }
 
     private function initCart(): void
