@@ -22,7 +22,7 @@ use Validate;
 class DeliveryOptionsConfigProvider extends AbstractProvider
 {
     /**
-     * @var int[]
+     * @var string
      */
     private $psCarrierId;
 
