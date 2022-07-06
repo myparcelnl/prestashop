@@ -48,12 +48,22 @@ export default defineComponent({
 
   setup: (props) => {
     const contextData = useGlobalContext(ContextKey.RETURNS_FORM);
+    const packageTypePackage: SelectOption = {
+      label: 'Package',
+      value: 'package',
+    };
+    const packageTypeMailbox: SelectOption = {
+      label: 'Mailbox',
+      value: 'mailbox',
+    };
+    const packageFormatNormal = 1;
+    const packageFormatLarge = 2;
     const label = { barcode: props.modalData.barcode };
 
     return {
       contextData,
-      packageTypeOptions: ['package', 'mailbox'],
-      packageFormatOptions: [1, 2],
+      packageTypeOptions: [packageTypePackage, packageTypeMailbox],
+      packageFormatOptions: [packageFormatNormal, packageFormatLarge],
       packageType: ref(),
       packageFormat: ref(),
       customLabel: ref<string>(`${translate('return_prefix')} ${label.barcode}`),

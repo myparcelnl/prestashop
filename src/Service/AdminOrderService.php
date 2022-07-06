@@ -116,7 +116,6 @@ class AdminOrderService extends AbstractService
 
         $collection = (new ConsignmentCollection())
             ->addConsignment($consignment)
-            ->setPdfOfLabels()
             ->generateReturnConsignments(true);
 
         OrderLogger::addLog(['message' => 'Creating return shipments: ' . $collection->toJson(), 'order' => $order]);
@@ -125,12 +124,6 @@ class AdminOrderService extends AbstractService
         $orderLabel             = new OrderLabel();
         $orderLabel->id_label   = $consignment->getConsignmentId();
         $orderLabel->id_order   = $consignment->getReferenceId();
-        $orderLabel->barcode    = $consignment->getBarcode();
-        $orderLabel->track_link = $consignment->getBarcodeUrl(
-            $consignment->getBarcode(),
-            $consignment->getPostalCode(),
-            $consignment->getCountry()
-        );
 
         $orderLabel->new_order_state = $consignment->getStatus();
         $orderLabel->status          = MyParcelStatusProvider::getInstance()
