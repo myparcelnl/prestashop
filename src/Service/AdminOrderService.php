@@ -54,13 +54,13 @@ class AdminOrderService extends AbstractService
         Order                          $order,
         AbstractDeliveryOptionsAdapter $deliveryOptions = null
     ): ConsignmentCollection {
-        $factory        = new ConsignmentFactory($postValues);
-        $collection     = $factory->fromOrder($order, $deliveryOptions);
+        $factory    = new ConsignmentFactory($postValues);
+        $collection = $factory->fromOrder($order, $deliveryOptions);
 
-        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
-            $collection->setLinkOfLabels();
-        } else {
+        if (ConsignmentFactory::isConceptFirstConfiguration()) {
             $collection->createConcepts();
+        } else {
+            $collection->setLinkOfLabels();
         }
 
         OrderLogger::addLog([
@@ -324,7 +324,6 @@ class AdminOrderService extends AbstractService
      */
     private function consignmentToOrderLabel(object $consignment): object
     {
-
         $orderLabel             = OrderLabel::findByLabelId($consignment->getConsignmentId());
         $orderLabel->barcode    = $consignment->getBarcode();
         $orderLabel->status     = MyParcelStatusProvider::getInstance()
@@ -346,7 +345,6 @@ class AdminOrderService extends AbstractService
         );
 
         return $orderLabel;
-
     }
 
 
