@@ -13,6 +13,7 @@ use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
 use MyParcelNL\Sdk\src\Exception\MissingFieldException;
+use MyParcelNL\Sdk\src\Helper\Utils;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Collection;
@@ -399,7 +400,7 @@ class OrderLabel extends ObjectModel
                     ], OrderLogger::WARNING);
                 }
 
-                $emptyFields = self::requiredValues(reset($result), Constant::REQUIRED_LABEL_KEYS);
+                $emptyFields = Utils::getKeysWithoutValue(reset($result), Constant::REQUIRED_LABEL_KEYS);
                 if ($emptyFields) {
                     throw new MissingFieldException(
                         sprintf(
@@ -412,24 +413,6 @@ class OrderLabel extends ObjectModel
                 return $result[0];
             }
         );
-    }
-
-    /**
-     * @param $array
-     * @param $requiredKeys
-     *
-     * @return array
-     */
-    public static function requiredValues($array, $requiredKeys): array
-    {
-        $emptyValues = [];
-        array_filter($array, static function ($value, $key) use ($requiredKeys, &$emptyValues) {
-            if (empty($value) && in_array($key, $requiredKeys, true)) {
-                $emptyValues[] = $key;
-            }
-        }, ARRAY_FILTER_USE_BOTH);
-
-        return $emptyValues;
     }
 
     /**
