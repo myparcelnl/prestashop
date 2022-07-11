@@ -53,8 +53,9 @@ export interface ShipmentLabelsContext {
 }
 
 export interface ReturnsFormContext {
-  name: string;
-  email: string;
+  labelDescription: string;
+  packageType: PackageType;
+  largeFormat: number;
 }
 
 export interface PrintOptionsContext {

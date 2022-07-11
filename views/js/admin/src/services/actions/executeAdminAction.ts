@@ -1,4 +1,11 @@
-import { ActionResponse, AdminAction, LabelAction, modifyLabelActions, printActions } from '@/data/global/actions';
+import {
+  ActionResponse,
+  AdminAction,
+  OrderAction,
+  modifyLabelActions,
+  printActions,
+  LabelAction,
+} from '@/data/global/actions';
 import { ActionsEventBus } from '@/data/eventBus/ActionsEventBus';
 import { ContextKey } from '@/data/global/context';
 import { ModalData } from '@/composables/context/useModalContext';
@@ -22,10 +29,35 @@ export async function executeAdminAction(
   const callbacks: ((res: ActionResponse) => void)[] = [];
   const requestParameters: RequestParameters = { action, ...parameters };
 
-  if (LabelAction.CREATE_RETURN_LABEL === action && !await waitForReturnsFormModalClose(modalData)) {
-    return;
+  if (OrderAction.CREATE_RETURN_LABEL === action) {
+    if (printActions.includes(action)) {
+      if (!await waitForReturnsFormModalClose(modalData)) {
+        return;
+      }
+      console.log('Hallo');
+
+      const printOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
+      requestParameters.labelDescription = printOptionsContext.value.labelDescription;
+      requestParameters.packageType = printOptionsContext.value.packageType;
+      requestParameters.largeFormat = printOptionsContext.value.largeFormat;
+
+      callbacks.push(onPrintLabels as ((res: ActionResponse) => void));
+    }
+
+    const response = await eventBus.doAction(action, requestParameters);
+
+    if (!response || !callbacks.length) {
+      return response;
+    }
+
+    callbacks.forEach((callback) => {
+      callback(response);
+    });
+
+    return response;
   }
 
+  // @ts-ignore
   if (isInArray(action, printActions)) {
     if (!await waitForPrintModalClose(modalData)) {
       return;

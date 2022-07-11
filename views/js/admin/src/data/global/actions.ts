@@ -3,7 +3,6 @@
 export type AdminAction = LabelAction | OrderAction;
 
 export enum LabelAction {
-  CREATE_RETURN_LABEL = 'createReturnLabel',
   DELETE = 'delete',
   PRINT = 'print',
   REFRESH = 'refresh',
@@ -16,6 +15,7 @@ export enum OrderAction {
   PRINT = 'print',
   REFRESH_LABELS = 'refreshLabels',
   SAVE_DELIVERY_OPTIONS = 'saveDeliveryOptions',
+  CREATE_RETURN_LABEL = 'createReturnLabel',
 }
 
 interface LabelIdsData {
@@ -40,12 +40,14 @@ export type ActionResponse<CK = AdminAction> =
           CK extends OrderAction.PRINT ? ActionSuccessResponse<CK, PrintData> :
             CK extends LabelAction.REFRESH ? ActionSuccessResponse<CK, ShipmentLabelsData> :
               CK extends OrderAction.REFRESH_LABELS ? ActionSuccessResponse<CK, ShipmentLabelsData> :
-                never;
+                CK extends OrderAction.CREATE_RETURN_LABEL ? ActionSuccessResponse<CK, ShipmentLabelsData> :
+                  never;
 
 export const printActions = [
   LabelAction.PRINT,
   OrderAction.EXPORT_PRINT,
   OrderAction.PRINT,
+  OrderAction.CREATE_RETURN_LABEL,
 ] as const;
 
 export const modifyLabelActions = [

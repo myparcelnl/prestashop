@@ -7,6 +7,7 @@
     </PsTableCol>
     <PsTableCol>
       <a
+        v-if="shipmentLabel.barcode"
         class="text-nowrap"
         :href="shipmentLabel.track_link"
         target="_blank"
@@ -15,6 +16,10 @@
         <MaterialIcon
           icon="open_in_new"
           class="font-16" />
+      </a>
+      <a
+        v-else>
+        Return shipment
       </a>
     </PsTableCol>
 
@@ -49,6 +54,7 @@ import PsTableCol from '@/components/common/table/PsTableCol.vue';
 import PsTableRow from '@/components/common/table/PsTableRow.vue';
 import { executeLabelAction } from '@/services/actions/executeLabelAction';
 import { useCheckboxModel } from '@/composables/props/model/useCheckboxModel';
+import shipmentLabel from '@/components/order-card/ShipmentLabel.vue';
 
 const { model, props, setup } = useCheckboxModel();
 
@@ -82,14 +88,19 @@ export default defineComponent({
       await executeLabelAction(action, Number(props.shipmentLabel.id_label), props.shipmentLabel);
     }
 
+    const rowDropdownItems = [
+      refreshAction,
+      deleteAction,
+    ];
+
+    if (props.shipmentLabel.barcode) {
+      rowDropdownItems.unshift(returnAction);
+    }
+
     return {
       ...setup(props, ctx),
       doLabelAction,
-      rowDropdownItems: [
-        refreshAction,
-        returnAction,
-        deleteAction,
-      ],
+      rowDropdownItems,
     };
   },
 });

@@ -1,17 +1,11 @@
 <template>
   <div>
-    <FormGroup label="customer_name">
-      <PsInput v-model="contextData.name" />
-    </FormGroup>
-    <FormGroup label="customer_email">
-      <PsInput v-model="contextData.email" />
-    </FormGroup>
     <FormGroup label="custom_label">
-      <PsInput v-model="customLabel" />
+      <PsInput v-model="labelDescriptionText" />
     </FormGroup>
     <PackageTypeSelectFormGroup
       v-if="packageTypeOptions.length"
-      v-model="packageType"
+      v-model="packageTypeString"
       :options="packageTypeOptions" />
     <PackageFormatSelectFormGroup
       v-if="packageFormatOptions.length"
@@ -21,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, ref } from '@vue/composition-api';
+import { PropType, defineComponent, ref, watchEffect } from '@vue/composition-api';
 import { ContextKey } from '@/data/global/context';
 import FormGroup from '@/components/common/form/FormGroup.vue';
 import PackageFormatSelectFormGroup from '@/components/common/form/PackageFormatSelectFormGroup.vue';
@@ -48,6 +42,13 @@ export default defineComponent({
 
   setup: (props) => {
     const contextData = useGlobalContext(ContextKey.RETURNS_FORM);
+    const { largeFormat, packageType } = contextData.value;
+    const label = { barcode: props.modalData.barcode };
+
+    const labelDescriptionText = ref<string>(`${translate('return_prefix')} ${label.barcode}`);
+    const packageTypeString = ref<PackageType>(packageType);
+    const packageFormat = ref<number>(largeFormat);
+
     const packageTypePackage: SelectOption = {
       label: 'Package',
       value: 'package',
@@ -58,15 +59,19 @@ export default defineComponent({
     };
     const packageFormatNormal = 1;
     const packageFormatLarge = 2;
-    const label = { barcode: props.modalData.barcode };
+
+    watchEffect(() => {
+      contextData.value.labelDescription = labelDescriptionText.value;
+      contextData.value.packageType = packageTypeString.value;
+      contextData.value.largeFormat = packageFormat.value;
+    });
 
     return {
-      contextData,
+      labelDescriptionText,
+      packageTypeString,
+      packageFormat,
       packageTypeOptions: [packageTypePackage, packageTypeMailbox],
       packageFormatOptions: [packageFormatNormal, packageFormatLarge],
-      packageType: ref(),
-      packageFormat: ref(),
-      customLabel: ref<string>(`${translate('return_prefix')} ${label.barcode}`),
     };
   },
 });
