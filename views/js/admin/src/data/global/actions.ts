@@ -2,6 +2,9 @@
 
 export type AdminAction = LabelAction | OrderAction;
 
+/**
+ * @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelLabelController
+ */
 export enum LabelAction {
   CREATE_RETURN_LABEL = 'createReturnLabel',
   DELETE = 'delete',
@@ -9,6 +12,9 @@ export enum LabelAction {
   REFRESH = 'refresh',
 }
 
+/**
+ * @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController
+ */
 export enum OrderAction {
   EXPORT = 'export',
   EXPORT_PRINT = 'exportPrint',
@@ -51,6 +57,7 @@ export const printActions = [
 export const modifyLabelActions = [
   LabelAction.DELETE,
   LabelAction.REFRESH,
+  LabelAction.PRINT,
   OrderAction.EXPORT,
   OrderAction.EXPORT_PRINT,
   OrderAction.REFRESH_LABELS,

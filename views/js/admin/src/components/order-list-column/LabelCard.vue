@@ -9,7 +9,7 @@
         v-text="label.barcode" />
       <a
         class="btn btn-link"
-        @click="() => printAndRefresh(label)">
+        @click="() => print(label)">
         <MaterialIcon icon="print" />
       </a>
       <a
@@ -51,10 +51,6 @@ export default defineComponent({
       ...useEventBusLoadingState(deliveryOptionsEventBus),
       print: async(label: ShipmentLabel): Promise<void> => execute(LabelAction.PRINT, label),
       refresh: async(label: ShipmentLabel): Promise<void> => execute(LabelAction.REFRESH, label),
-      printAndRefresh: async(label: ShipmentLabel): Promise<void> => {
-        await execute(LabelAction.PRINT, label);
-        await execute(LabelAction.REFRESH, label);
-      },
     };
   },
 });
