@@ -34,7 +34,6 @@ export async function executeAdminAction(
       if (!await waitForReturnsFormModalClose(modalData)) {
         return;
       }
-      console.log('Hallo');
 
       const printOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
       requestParameters.labelDescription = printOptionsContext.value.labelDescription;
