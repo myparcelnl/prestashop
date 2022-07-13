@@ -30,30 +30,14 @@ export async function executeAdminAction(
   const requestParameters: RequestParameters = { action, ...parameters };
 
   if (OrderAction.CREATE_RETURN_LABEL === action) {
-    if (modifyLabelActions.includes(action)) {
-      if (!await waitForReturnsFormModalClose(modalData)) {
-        return;
-      }
-
-      const printOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
-      requestParameters.labelDescription = printOptionsContext.value.labelDescription;
-      requestParameters.packageType = printOptionsContext.value.packageType;
-      requestParameters.largeFormat = printOptionsContext.value.largeFormat;
-
-      callbacks.push(onNewLabels as ((res: ActionResponse) => void));
+    if (!await waitForReturnsFormModalClose(modalData)) {
+      return;
     }
 
-    const response = await eventBus.doAction(action, requestParameters);
-
-    if (!response || !callbacks.length) {
-      return response;
-    }
-
-    callbacks.forEach((callback) => {
-      callback(response);
-    });
-
-    return response;
+    const printOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
+    requestParameters.labelDescription = printOptionsContext.value.labelDescription;
+    requestParameters.packageType = printOptionsContext.value.packageType;
+    requestParameters.largeFormat = printOptionsContext.value.largeFormat;
   }
 
   if (isInArray(action, printActions)) {
