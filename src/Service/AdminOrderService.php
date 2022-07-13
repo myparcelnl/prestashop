@@ -54,9 +54,8 @@ class AdminOrderService extends AbstractService
         Order                          $order,
         AbstractDeliveryOptionsAdapter $deliveryOptions = null
     ): ConsignmentCollection {
-        $factory    = new ConsignmentFactory($postValues);
-        $collection = $factory->fromOrder($order, $deliveryOptions);
-
+        $factory      = new ConsignmentFactory($postValues);
+        $collection   = $factory->fromOrder($order, $deliveryOptions);
         $conceptFirst = ConsignmentFactory::isConceptFirstConfiguration();
 
         $conceptFirst
