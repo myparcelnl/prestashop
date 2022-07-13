@@ -57,12 +57,18 @@ class AdminOrderService extends AbstractService
         $factory    = new ConsignmentFactory($postValues);
         $collection = $factory->fromOrder($order, $deliveryOptions);
 
-        ConsignmentFactory::isConceptFirstConfiguration()
+        $conceptFirst = ConsignmentFactory::isConceptFirstConfiguration();
+
+        $conceptFirst
             ? $collection->createConcepts()
             : $collection->setLinkOfLabels();
 
         OrderLogger::addLog([
-            'message' => sprintf('Creating consignments: %s', $collection->toJson()),
+            'message' => sprintf(
+                'Creating %s: %s',
+                $conceptFirst ? 'concepts' : 'labels',
+                $collection->toJson()
+            ),
             'order'   => $order,
         ]);
 
