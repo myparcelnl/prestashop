@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { ActionResponse, LabelAction, OrderAction, modifyLabelActions } from '@/data/global/actions';
+import { ActionResponse, LabelAction, modifyLabelActions, OrderAction } from '@/data/global/actions';
 import { ContextKey } from '@/data/global/context';
 import { findLabelIndex } from '@/utils/findLabelIndex';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
@@ -23,8 +23,10 @@ export function onNewLabels(response: ActionResponse<typeof modifyLabelActions[n
 
     case LabelAction.REFRESH:
     case OrderAction.EXPORT:
+    case OrderAction.CREATE_RETURN_LABEL:
     case OrderAction.EXPORT_PRINT:
-      response.data.shipmentLabels.forEach((newLabel) => {
+      const shipmentLabels = response.data.shipmentLabels ?? response.data;
+      shipmentLabels.forEach((newLabel) => {
         const labelContext = useGlobalContext(ContextKey.SHIPMENT_LABELS, {
           orderId: Number(newLabel?.id_order),
           labels: [],

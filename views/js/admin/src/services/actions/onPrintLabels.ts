@@ -7,7 +7,6 @@ import { openPdfInNewWindow } from '@/services/openPdfInNewWindow';
  *  base64 encoded binary data and display/open accordingly.
  */
 export function onPrintLabels(response: ActionResponse<typeof printActions[number]>): void {
-  // @ts-ignore
   const { pdf } = response.data;
 
   if (pdf.startsWith('http')) {

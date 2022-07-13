@@ -30,7 +30,7 @@ export async function executeAdminAction(
   const requestParameters: RequestParameters = { action, ...parameters };
 
   if (OrderAction.CREATE_RETURN_LABEL === action) {
-    if (printActions.includes(action)) {
+    if (modifyLabelActions.includes(action)) {
       if (!await waitForReturnsFormModalClose(modalData)) {
         return;
       }
@@ -40,7 +40,7 @@ export async function executeAdminAction(
       requestParameters.packageType = printOptionsContext.value.packageType;
       requestParameters.largeFormat = printOptionsContext.value.largeFormat;
 
-      callbacks.push(onPrintLabels as ((res: ActionResponse) => void));
+      callbacks.push(onNewLabels as ((res: ActionResponse) => void));
     }
 
     const response = await eventBus.doAction(action, requestParameters);
@@ -56,7 +56,6 @@ export async function executeAdminAction(
     return response;
   }
 
-  // @ts-ignore
   if (isInArray(action, printActions)) {
     if (!await waitForPrintModalClose(modalData)) {
       return;
@@ -74,6 +73,7 @@ export async function executeAdminAction(
     callbacks.push(onPrintLabels as ((res: ActionResponse) => void));
   }
 
+  // @ts-ignore
   if (isInArray(action, modifyLabelActions)) {
     callbacks.push(onNewLabels as ((res: ActionResponse) => void));
   }

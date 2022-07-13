@@ -47,7 +47,6 @@ export const printActions = [
   LabelAction.PRINT,
   OrderAction.EXPORT_PRINT,
   OrderAction.PRINT,
-  OrderAction.CREATE_RETURN_LABEL,
 ] as const;
 
 export const modifyLabelActions = [
@@ -56,4 +55,5 @@ export const modifyLabelActions = [
   OrderAction.EXPORT,
   OrderAction.EXPORT_PRINT,
   OrderAction.REFRESH_LABELS,
+  OrderAction.CREATE_RETURN_LABEL,
 ] as const;
