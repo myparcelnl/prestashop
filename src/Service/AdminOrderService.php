@@ -57,11 +57,9 @@ class AdminOrderService extends AbstractService
         $factory    = new ConsignmentFactory($postValues);
         $collection = $factory->fromOrder($order, $deliveryOptions);
 
-        if (ConsignmentFactory::isConceptFirstConfiguration()) {
-            $collection->createConcepts();
-        } else {
-            $collection->setLinkOfLabels();
-        }
+        ConsignmentFactory::isConceptFirstConfiguration()
+            ? $collection->createConcepts()
+            : $collection->setLinkOfLabels();
 
         OrderLogger::addLog([
             'message' => sprintf('Creating consignments: %s', $collection->toJson()),
@@ -317,12 +315,13 @@ class AdminOrderService extends AbstractService
     }
 
     /**
-     * @param  object $consignment
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
      *
-     * @return object $orderLabel
+     * @return \OrderLabel
+     * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    private function consignmentToOrderLabel(object $consignment): object
+    private function consignmentToOrderLabel(AbstractConsignment $consignment): OrderLabel
     {
         $orderLabel             = OrderLabel::findByLabelId($consignment->getConsignmentId());
         $orderLabel->barcode    = $consignment->getBarcode();
