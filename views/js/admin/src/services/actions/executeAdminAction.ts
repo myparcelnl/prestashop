@@ -34,10 +34,10 @@ export async function executeAdminAction(
       return;
     }
 
-    const printOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
-    requestParameters.labelDescription = printOptionsContext.value.labelDescription;
-    requestParameters.packageType = printOptionsContext.value.packageType;
-    requestParameters.largeFormat = printOptionsContext.value.largeFormat;
+    const returnOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
+    requestParameters.labelDescription = returnOptionsContext.value.labelDescription;
+    requestParameters.packageType = returnOptionsContext.value.packageType;
+    requestParameters.largeFormat = returnOptionsContext.value.largeFormat;
   }
 
   if (isInArray(action, printActions)) {

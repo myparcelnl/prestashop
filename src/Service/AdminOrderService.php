@@ -37,8 +37,6 @@ use Validate;
 
 class AdminOrderService extends AbstractService
 {
-    private const STATUS_UNKNOWN = 99;
-
     /**
      * @param  array                                                                           $postValues
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
