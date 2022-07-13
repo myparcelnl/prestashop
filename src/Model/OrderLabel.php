@@ -401,10 +401,11 @@ class OrderLabel extends ObjectModel
                 }
 
                 $emptyFields = Utils::getKeysWithoutValue(reset($result), Constant::REQUIRED_LABEL_KEYS);
+
                 if ($emptyFields) {
                     throw new MissingFieldException(
                         sprintf(
-                            'Customer information in the following fields are missing: %s',
+                            'The following fields are missing but required: %s',
                             implode(', ', $emptyFields)
                         )
                     );
