@@ -13,6 +13,7 @@ use Gett\MyparcelBE\Service\Tracktrace;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
 use MyParcelNL\Sdk\src\Exception\MissingFieldException;
+use MyParcelNL\Sdk\src\Helper\Utils;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Collection;
@@ -399,9 +400,14 @@ class OrderLabel extends ObjectModel
                     ], OrderLogger::WARNING);
                 }
 
-                if (! ($result[0]['email'] ?? false)) {
+                $emptyFields = Utils::getKeysWithoutValue(reset($result), Constant::REQUIRED_LABEL_KEYS);
+
+                if ($emptyFields) {
                     throw new MissingFieldException(
-                        sprintf('Customer not found for order %s', $orderId)
+                        sprintf(
+                            'The following fields are missing but required: %s',
+                            implode(', ', $emptyFields)
+                        )
                     );
                 }
 
