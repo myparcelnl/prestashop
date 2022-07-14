@@ -54,12 +54,20 @@ class AdminOrderService extends AbstractService
         Order                          $order,
         AbstractDeliveryOptionsAdapter $deliveryOptions = null
     ): ConsignmentCollection {
-        $factory    = new ConsignmentFactory($postValues);
-        $collection = $factory->fromOrder($order, $deliveryOptions);
-        $collection->setLinkOfLabels();
+        $factory      = new ConsignmentFactory($postValues);
+        $collection   = $factory->fromOrder($order, $deliveryOptions);
+        $conceptFirst = ConsignmentFactory::isConceptFirstConfiguration();
+
+        $conceptFirst
+            ? $collection->createConcepts()
+            : $collection->setLinkOfLabels();
 
         OrderLogger::addLog([
-            'message' => "Creating consignments: {$collection->toJson()}",
+            'message' => sprintf(
+                'Creating %s: %s',
+                $conceptFirst ? 'concepts' : 'labels',
+                $collection->toJson()
+            ),
             'order'   => $order,
         ]);
 
@@ -188,7 +196,10 @@ class AdminOrderService extends AbstractService
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
         $collection      = $this->createConsignments($postValues, $order, $deliveryOptions);
         $consignment     = $collection->first();
-        OrderLabel::updateOrderTrackingNumber($order, $consignment->getBarcode());
+
+        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
+            OrderLabel::updateOrderTrackingNumber($order, $consignment->getBarcode());
+        }
 
         return $collection;
     }
@@ -302,22 +313,44 @@ class AdminOrderService extends AbstractService
         $orderLabels = [];
 
         foreach ($collection as $consignment) {
-            $orderLabel         = OrderLabel::findByLabelId($consignment->getConsignmentId());
-            $orderLabel->status = MyParcelStatusProvider::getInstance()
-                ->getStatus($consignment->getStatus());
-            $orderLabel->save();
-            $orderLabels[] = $orderLabel;
-
-            OrderLogger::addLog(
-                [
-                    'order'   => $orderLabel->id_order,
-                    'message' => "Refreshed label $orderLabel->id_label",
-                ]
-            );
+            $orderLabels[] = $this->consignmentToOrderLabel($consignment);
         }
 
         return $orderLabels;
     }
+
+    /**
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @return \OrderLabel
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    private function consignmentToOrderLabel(AbstractConsignment $consignment): OrderLabel
+    {
+        $orderLabel             = OrderLabel::findByLabelId($consignment->getConsignmentId());
+        $orderLabel->barcode    = $consignment->getBarcode();
+        $orderLabel->status     = MyParcelStatusProvider::getInstance()
+            ->getStatus($consignment->getStatus());
+        $orderLabel->track_link = $consignment->getBarcodeUrl(
+            $consignment->getBarcode(),
+            $consignment->getPostalCode(),
+            $consignment->getCountry()
+        );
+        $orderLabel->save();
+
+        $order = new Order((int) $orderLabel->id_order);
+
+        OrderLogger::addLog(
+            [
+                'order'   => $order,
+                'message' => "Refreshed label $orderLabel->id_label",
+            ]
+        );
+
+        return $orderLabel;
+    }
+
 
     private function setLabelOptionsInsurance(array $postValues): array
     {

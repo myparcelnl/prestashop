@@ -288,6 +288,14 @@ class ConsignmentFactory
     }
 
     /**
+     * @return bool
+     */
+    public static function isConceptFirstConfiguration(): bool
+    {
+        return Configuration::get(Constant::CONCEPT_FIRST);
+    }
+
+    /**
      * @return string
      */
     private function getPhoneConfiguration(): string

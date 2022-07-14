@@ -5,6 +5,7 @@ use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
+use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
@@ -582,11 +583,15 @@ class OrderLabel extends ObjectModel
         $orderLabel->id_label        = $consignment->getConsignmentId();
         $orderLabel->id_order        = $consignment->getReferenceIdentifier();
         $orderLabel->barcode         = $consignment->getBarcode();
-        $orderLabel->track_link      = $consignment->getBarcodeUrl(
-            $consignment->getBarcode(),
-            $consignment->getPostalCode(),
-            $consignment->getCountry()
-        );
+
+        if (! ConsignmentFactory::isConceptFirstConfiguration()) {
+            $orderLabel->track_link = $consignment->getBarcodeUrl(
+                $consignment->getBarcode(),
+                $consignment->getPostalCode(),
+                $consignment->getCountry()
+            );
+        }
+
         $orderLabel->new_order_state = $consignment->getStatus();
         $orderLabel->status          = MyParcelStatusProvider::getInstance()->getStatus($consignment->getStatus());
 
