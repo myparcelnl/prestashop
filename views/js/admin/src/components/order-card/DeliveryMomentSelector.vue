@@ -5,7 +5,7 @@
     data-toggle="modal"
     data-target="#deliveryOptions"
     :click-context="{ orderId: contextData.orderId }">
-    {{ contextData.deliveryOptions.carrier }} | {{ $filters.formatDate(contextData.deliveryOptions.date) }}
+    {{ contextData.deliveryOptions.carrierName }} | {{ $filters.formatDate(contextData.deliveryOptions.date) }}
   </PsButton>
 </template>
 
