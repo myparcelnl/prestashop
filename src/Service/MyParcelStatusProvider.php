@@ -37,7 +37,7 @@ class MyParcelStatusProvider
     private function getStatuses(): array
     {
         return [
-            1  => $this->module->l('ending - concept', 'myparcelstatusprovider'),
+            1  => $this->module->l('pending - concept', 'myparcelstatusprovider'),
             2  => $this->module->l('pending - registered', 'myparcelstatusprovider'),
             3  => $this->module->l('enroute - handed to carrier', 'myparcelstatusprovider'),
             4  => $this->module->l('enroute - sorting', 'myparcelstatusprovider'),

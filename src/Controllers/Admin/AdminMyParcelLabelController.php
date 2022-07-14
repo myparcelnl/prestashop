@@ -80,7 +80,7 @@ class AdminMyParcelLabelController extends AbstractAdminController
 
         [$response, $errors] = $this->service->printLabels($labelIds);
 
-        $this->setResponse($response);
+        $this->setResponse($response + $this->refreshLabels());
         $this->addErrors($errors);
 
         return $this->sendResponse();
@@ -91,14 +91,24 @@ class AdminMyParcelLabelController extends AbstractAdminController
      */
     public function refresh(): Response
     {
+        $this->setResponse($this->refreshLabels());
+
+        return $this->sendResponse();
+    }
+
+    /**
+     * @return array
+     */
+    private function refreshLabels(): array
+    {
+        $labels = [];
+
         try {
-            $this->setResponse([
-                'shipmentLabels' => $this->service->refreshLabels($this->service->getPostedOrderLabelIds()),
-            ]);
+            $labels = $this->service->refreshLabels($this->service->getPostedOrderLabelIds());
         } catch (Exception $e) {
             $this->addError($e);
         }
 
-        return $this->sendResponse();
+        return ['shipmentLabels' => $labels];
     }
 }
