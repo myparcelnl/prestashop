@@ -31,8 +31,7 @@ interface Consignment {
 }
 
 interface DeliveryOptions {
-  carrier: null | number;
-  carrierName: null | string;
+  carrier: null | string;
   date: null | string;
   deliveryType: null | string;
   isPickup: null | boolean;
