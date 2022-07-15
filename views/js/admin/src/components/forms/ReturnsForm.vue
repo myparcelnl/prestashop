@@ -49,8 +49,6 @@ export default defineComponent({
     const packageTypeId = ref<PackageType>(packageType);
     const packageFormat = ref<number>(largeFormat);
 
-    console.log(packageTypeId);
-
     watchEffect(() => {
       contextData.value.labelDescription = labelDescriptionText.value;
       contextData.value.packageType = packageTypeId.value;
@@ -60,7 +58,6 @@ export default defineComponent({
     return {
       labelDescriptionText,
       packageTypeId,
-      packageType: ref(),
       packageFormat,
       contextData,
     };

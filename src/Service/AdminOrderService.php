@@ -35,6 +35,7 @@ use Validate;
 class AdminOrderService extends AbstractService
 {
     private const PACKAGE_FORMAT_LARGE = 2;
+
     /**
      * @param  array                                                                           $postValues
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
