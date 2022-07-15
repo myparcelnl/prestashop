@@ -154,9 +154,17 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
      */
     private function generateCarrierSettings(Address $address, bool $showPriceSurcharge): array
     {
-        $carrierSettings = [];
+        if (! is_numeric($this->psCarrierId)) {
+            $matchingCarrier = CarrierConfigurationProvider::all()
+                ->where(CarrierConfigurationProvider::COLUMN_NAME, Constant::CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE)
+                ->where(CarrierConfigurationProvider::COLUMN_VALUE, $this->psCarrierId)
+                ->first();
 
-        $psCarrier = new Carrier($this->psCarrierId);
+            $this->psCarrierId = (int) $matchingCarrier['id_carrier'];
+        }
+
+        $carrierSettings = [];
+        $psCarrier       = new Carrier($this->psCarrierId);
 
         if (! $psCarrier->id) {
             $errorMessage = sprintf('Carrier %s not found.', $this->psCarrierId);
