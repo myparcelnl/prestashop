@@ -10,10 +10,10 @@ class DeliveryOptionsConfigEventBus extends EventBus {
    * Retrieve current order's delivery options from PrestaShop.
    */
   public async getConfiguration(
-    carrier: string | null,
+    psCarrierId: number | null,
   ): Promise<SuccessResponse<MyParcelDeliveryOptions.Configuration>> {
     return await this.doRequest(window.MyParcelActions.deliveryOptionsUrl, {
-      carrier,
+      carrier: psCarrierId,
       addressId: getContext(ContextKey.SHIPPING_ADDRESS).addressId,
     }) as SuccessResponse;
   }

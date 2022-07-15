@@ -155,8 +155,7 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
     private function generateCarrierSettings(Address $address, bool $showPriceSurcharge): array
     {
         $carrierSettings = [];
-
-        $psCarrier = new Carrier($this->psCarrierId);
+        $psCarrier       = new Carrier($this->psCarrierId);
 
         if (! $psCarrier->id) {
             $errorMessage = sprintf('Carrier %s not found.', $this->psCarrierId);

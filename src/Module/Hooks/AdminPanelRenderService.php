@@ -135,6 +135,8 @@ class AdminPanelRenderService extends RenderService
             }
 
             $context = array_merge($context, $this->getDeliveryOptionsContext($order, $presetDeliveryOptions));
+
+            $context['psCarrierId'] = $order->getIdCarrier();
         }
 
         return $context;
