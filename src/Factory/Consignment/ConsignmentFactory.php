@@ -439,9 +439,9 @@ class ConsignmentFactory
         $tomorrow->setTime(0, 0);
         $oldDate->setTime(0, 0);
 
-        do {
+        if ($deliveryDateObject < $tomorrow || '0' === $deliveryDateObject->format('w')) {
             $deliveryDateObject->add(new DateInterval('P1D'));
-        } while ($deliveryDateObject < $tomorrow || '0' === $deliveryDateObject->format('w'));
+        }
 
         return $deliveryDateObject->format(self::FORMAT_TIMESTAMP);
     }
