@@ -4,13 +4,13 @@
       <PsInput v-model="labelDescriptionText" />
     </FormGroup>
     <PackageTypeSelectFormGroup
-      v-if="packageTypeOptions.length"
-      v-model="packageTypeString"
-      :options="packageTypeOptions" />
+      v-if="contextData.options.packageType.length"
+      v-model="packageTypeId"
+      :options="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
-      v-if="packageFormatOptions.length"
+      v-if="contextData.options.packageFormat.length"
       v-model="packageFormat"
-      :options="packageFormatOptions" />
+      :options="contextData.options.packageFormat" />
   </div>
 </template>
 
@@ -46,32 +46,23 @@ export default defineComponent({
     const label = { barcode: props.modalData.barcode };
 
     const labelDescriptionText = ref<string>(`${translate('return_prefix')} ${label.barcode}`);
-    const packageTypeString = ref<PackageType>(packageType);
+    const packageTypeId = ref<PackageType>(packageType);
     const packageFormat = ref<number>(largeFormat);
 
-    const packageTypePackage: SelectOption = {
-      label: 'Package',
-      value: 'package',
-    };
-    const packageTypeMailbox: SelectOption = {
-      label: 'Mailbox',
-      value: 'mailbox',
-    };
-    const packageFormatNormal = 1;
-    const packageFormatLarge = 2;
+    console.log(packageTypeId);
 
     watchEffect(() => {
       contextData.value.labelDescription = labelDescriptionText.value;
-      contextData.value.packageType = packageTypeString.value;
+      contextData.value.packageType = packageTypeId.value;
       contextData.value.largeFormat = packageFormat.value;
     });
 
     return {
       labelDescriptionText,
-      packageTypeString,
+      packageTypeId,
+      packageType: ref(),
       packageFormat,
-      packageTypeOptions: [packageTypePackage, packageTypeMailbox],
-      packageFormatOptions: [packageFormatNormal, packageFormatLarge],
+      contextData,
     };
   },
 });

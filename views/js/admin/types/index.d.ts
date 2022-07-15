@@ -54,4 +54,4 @@ interface AlertData {
 type LabelFormat = 'a4' | 'a6';
 type LabelOutput = 'open' | 'download';
 type LabelPosition = '1' | '2' | '3' | '4';
-type PackageType = 'mailbox' | 'package' | 'digital_stamp' | 'letter';
+type PackageType = '1' | '2' | '3' | '4';

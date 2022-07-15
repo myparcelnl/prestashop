@@ -56,6 +56,7 @@ export interface ReturnsFormContext {
   labelDescription: string;
   packageType: PackageType;
   largeFormat: number;
+  options: Record<'packageFormat' | 'packageType', SelectOption[]>;
 }
 
 export interface PrintOptionsContext {

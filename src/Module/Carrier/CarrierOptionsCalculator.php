@@ -89,12 +89,14 @@ class CarrierOptionsCalculator
      *
      * @return array
      */
-    public function getAvailablePackageTypeNames(string $prefix = null): array
+    public function getAvailablePackageTypeNames(bool $idToName = true, string $prefix = null): array
     {
         $calculator = new PackageTypeCalculator();
 
-        return array_map(static function (array $option) use ($calculator) {
-            $option['value'] = $calculator->convertToName($option['value']);
+        return array_map(static function (array $option) use ($idToName, $calculator) {
+            if ($idToName) {
+                $option['value'] = $calculator->convertToName($option['value']);
+            }
 
             return $option;
         }, $this->getAvailablePackageTypes($prefix));

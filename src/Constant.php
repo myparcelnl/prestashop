@@ -281,7 +281,7 @@ class Constant
             'ALLOW_RETURN_FORM'                                     => ['BE' => true, 'NL' => false],
             'return_' . self::PACKAGE_TYPE_CONFIGURATION_NAME       => [
                 'BE' => [1 => true],
-                'NL' => false,
+                'NL' => [1 => true, 2 => true],
             ],
             'return_' . self::ONLY_RECIPIENT_CONFIGURATION_NAME     => ['BE' => false, 'NL' => false],
             'return_' . self::PACKAGE_FORMAT_CONFIGURATION_NAME     => ['BE' => [1 => true], 'NL' => false],

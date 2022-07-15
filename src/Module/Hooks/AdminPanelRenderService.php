@@ -360,7 +360,7 @@ class AdminPanelRenderService extends RenderService
             'consignment' => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP),
             'options'     => [
                 'packageType'   => Arr::where(
-                    $carrierOptionsCalculator->getAvailablePackageTypeNames(),
+                    $carrierOptionsCalculator->getAvailablePackageTypeNames(false),
                     $filter('packageType')
                 ),
                 'packageFormat' => Arr::where(
