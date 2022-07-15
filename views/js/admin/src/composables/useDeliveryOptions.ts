@@ -34,8 +34,7 @@ export const useDeliveryOptions: UseDeliveryOptions = (listener) => {
    * @returns {Promise<void>}
    */
   async function initialize(): Promise<void> {
-    const { carrier } = contextData.value.deliveryOptions;
-    const configuration = await deliveryOptionsEventBus.getConfiguration(carrier);
+    const configuration = await deliveryOptionsEventBus.getConfiguration(contextData.value.psCarrierId);
     htmlContent.value = '<div class="myparcel-delivery-options" />';
 
     document.addEventListener(Events.UPDATED_DELIVERY_OPTIONS, listenerWrapper);

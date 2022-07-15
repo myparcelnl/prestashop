@@ -37,6 +37,7 @@ export interface ShipmentOptionsContext {
   options: Record<'digitalStampWeight' | 'packageFormat' | 'packageType', SelectOption[]>;
   orderId: number | null;
   orderWeight: number;
+  psCarrierId: number | null;
 }
 
 /**
