@@ -27,10 +27,8 @@ use Gett\MyparcelBE\Timer;
 use InvalidArgumentException;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
-use MyParcelNL\Sdk\src\Support\Str;
 use OrderLabel;
 use Validate;
 
@@ -100,76 +98,37 @@ class AdminOrderService extends AbstractService
         $address         = new Address($order->id_address_delivery);
         $customer        = new Customer($order->id_customer);
         $platformService = PlatformServiceFactory::create();
+        $carrier         = CarrierService::getMyParcelCarrier($order->getIdCarrier());
+        $postValues      = Tools::getAllValues();
+        $packageType     = ((int) $postValues['packageType']) ?: AbstractConsignment::DEFAULT_PACKAGE_TYPE;
+        $largeFormat     = Constant::PACKAGE_FORMAT_LARGE === ((int) $postValues['largeFormat']);
 
-        $carrierId   = CarrierService::getMyParcelCarrier($order->getIdCarrier());
-        $consignment = ($platformService->generateConsignment($carrierId))
+        $consignment = ($platformService->generateConsignment($carrier))
+            ->setConsignmentId((int) $orderLabel->id_label)
             ->setReferenceIdentifier((string) $order->getId())
             ->setCountry(Country::getIsoById($address->id_country))
-            ->setPerson($postValues['label_name'] ?? ($address->firstname . ' ' . $address->lastname))
+            ->setPerson(sprintf('%s %s', $address->firstname, $address->lastname))
             ->setFullStreet($address->address1)
             ->setPostalCode($address->postcode)
             ->setCity($address->city)
-            ->setEmail($postValues['label_email'] ?? $customer->email)
-            ->setContents(1)
-            ->setPackageType(
-                isset($postValues['packageType']) ? (int) $postValues['packageType']
-                    : AbstractConsignment::DEFAULT_PACKAGE_TYPE
-            )
+            ->setEmail($customer->email)
+            ->setContents(5)
+            ->setPackageType($packageType)
+
             // This may be overridden
-            ->setLabelDescription($postValues['label_description'] ?? $orderLabel->barcode);
-
-        if (isset($postValues['packageFormat'])) {
-            $consignment->setLargeFormat(Constant::PACKAGE_FORMAT_LARGE === (int) $postValues['packageFormat']);
-        }
-
-        if (isset($postValues['onlyRecipient'])) {
-            $consignment->setOnlyRecipient(true);
-        }
-
-        if (isset($postValues['signatureRequired'])) {
-            $consignment->setSignature(true);
-        }
-
-        if (isset($postValues['returnUndelivered'])) {
-            $consignment->setReturn(true);
-        }
-
-        if (isset($postValues['ageCheck'])) {
-            $consignment->setAgeCheck(true);
-        }
-
-        if (isset($postValues['insurance'])) {
-            $insuranceValue = $postValues['returnInsuranceAmount'] ?? 0;
-
-            if (Str::contains($insuranceValue, 'amount')) {
-                $insuranceValue = (int) str_replace('amount', '', $insuranceValue);
-            }
-
-            if (-1 === (int) $insuranceValue) {
-                $insuranceValue = $postValues['insurance-amount-custom-value'] ?? 0;
-            }
-
-            $consignment->setInsurance((int) $insuranceValue * 100);
-        }
+            ->setLabelDescription($postValues['labelDescription'] ?? $orderLabel->barcode)
+            ->setLargeFormat($largeFormat);
 
         $collection = (new ConsignmentCollection())
             ->addConsignment($consignment)
-            ->setPdfOfLabels()
             ->generateReturnConsignments(true);
 
         OrderLogger::addLog(['message' => 'Creating return shipments: ' . $collection->toJson(), 'order' => $order]);
 
-        $consignment            = $collection->first();
-        $orderLabel             = new OrderLabel();
-        $orderLabel->id_label   = $consignment->getConsignmentId();
-        $orderLabel->id_order   = $consignment->getReferenceId();
-        $orderLabel->barcode    = $consignment->getBarcode();
-        $orderLabel->track_link = $consignment->getBarcodeUrl(
-            $consignment->getBarcode(),
-            $consignment->getPostalCode(),
-            $consignment->getCountry()
-        );
-
+        $consignment                 = $collection->where('status', '!=', null)->first();
+        $orderLabel                  = new OrderLabel();
+        $orderLabel->id_label        = $consignment->getConsignmentId();
+        $orderLabel->id_order        = $consignment->getReferenceId();
         $orderLabel->new_order_state = $consignment->getStatus();
         $orderLabel->status          = MyParcelStatusProvider::getInstance()
             ->getStatus($consignment->getStatus());

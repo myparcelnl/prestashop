@@ -94,7 +94,9 @@ class CarrierOptionsCalculator
         $calculator = new PackageTypeCalculator();
 
         return array_map(static function (array $option) use ($calculator) {
-            $option['value'] = $calculator->convertToName($option['value']);
+            if (! is_numeric($option['value'])) {
+                $option['value'] = $calculator->convertToName($option['value']);
+            }
 
             return $option;
         }, $this->getAvailablePackageTypes($prefix));

@@ -1,4 +1,4 @@
-import { LabelAction } from '@/data/global/actions';
+import { LabelAction, OrderAction } from '@/data/global/actions';
 
 export const deleteAction: DropdownButtonItem = {
   label: 'action_delete',
@@ -15,7 +15,7 @@ export const refreshAction: DropdownButtonItem = {
 
 export const returnAction: DropdownButtonItem = {
   label: 'action_create_return_label',
-  action: LabelAction.CREATE_RETURN_LABEL,
+  action: OrderAction.CREATE_RETURN_LABEL,
   icon: 'reply',
 };
 
