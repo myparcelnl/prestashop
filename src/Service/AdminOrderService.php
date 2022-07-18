@@ -34,8 +34,6 @@ use Validate;
 
 class AdminOrderService extends AbstractService
 {
-    private const PACKAGE_FORMAT_LARGE = 2;
-
     /**
      * @param  array                                                                           $postValues
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
@@ -94,8 +92,8 @@ class AdminOrderService extends AbstractService
         $platformService = PlatformServiceFactory::create();
         $carrier         = CarrierService::getMyParcelCarrier($order->getIdCarrier());
         $postValues      = Tools::getAllValues();
-        $packageType     = (int) $postValues['packageType'] ?: AbstractConsignment::DEFAULT_PACKAGE_TYPE;
-        $largeFormat     = (int) $postValues['largeFormat'] === self::PACKAGE_FORMAT_LARGE;
+        $packageType     = ((int) $postValues['packageType']) ?: AbstractConsignment::DEFAULT_PACKAGE_TYPE;
+        $largeFormat     = Constant::PACKAGE_FORMAT_LARGE === ((int) $postValues['largeFormat']);
 
         $consignment = ($platformService->generateConsignment($carrier))
             ->setConsignmentId((int) $orderLabel->id_label)
