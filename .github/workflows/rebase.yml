@@ -32,4 +32,4 @@ jobs:
         with:
           token: ${{ secrets.GH_REPO_TOKEN }}
           target: ${{ github.event.client_payload.target || github.event.inputs.target || inputs.target }}
-          base: ${{ github.event.client_payload.base || github.event.inputs.base || inputs.base }}
+          base: ${{ github.event.client_payload.base || github.event.inputs.base || inputs.base || github.ref }}
