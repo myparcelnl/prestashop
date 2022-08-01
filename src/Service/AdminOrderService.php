@@ -275,8 +275,10 @@ class AdminOrderService extends AbstractService
             try {
                 $orderLabels[] = $this->consignmentToOrderLabel($consignment);
             } catch (Throwable $exception) {
-                // When the consignment is multicollo it can't create a label for linked consignments
-                // but here is no identifier to check on all isPartOfMultiCollo are on true even the first consignment
+                /*
+                 * Throws error when looping through multicollo shipments, because subsequent consignments don't have
+                 * an associated OrderLabel. Suppressed like this until it's solved in the pdk.
+                 */
             }
         }
 
