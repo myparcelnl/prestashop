@@ -31,6 +31,7 @@ use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
 use Validate;
+use Throwable;
 
 class AdminOrderService extends AbstractService
 {
@@ -273,7 +274,9 @@ class AdminOrderService extends AbstractService
         foreach ($collection as $consignment) {
             try {
                 $orderLabels[] = $this->consignmentToOrderLabel($consignment);
-            } catch (\Exception $exception) {
+            } catch (Throwable $exception) {
+                // When the consignment is multicollo it can't create a label for linked consignments
+                // but here is no identifier to check on all isPartOfMultiCollo are on true even the first consignment
             }
         }
 
