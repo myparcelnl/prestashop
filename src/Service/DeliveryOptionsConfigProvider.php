@@ -9,11 +9,11 @@ use Configuration;
 use Context;
 use Country;
 use DateTime;
+use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
-use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use Order;
 use RuntimeException;
 use Tools;
@@ -22,18 +22,18 @@ use Validate;
 class DeliveryOptionsConfigProvider extends AbstractProvider
 {
     /**
-     * @var string
-     */
-    private $psCarrierId;
-
-    /**
      * @var int
      */
     private $idOrder;
 
     /**
-     * @param \Context|null $context
-     * @param string|null   $psCarrierId
+     * @var string
+     */
+    private $psCarrierId;
+
+    /**
+     * @param  \Context|null $context
+     * @param  string|null   $psCarrierId
      *
      * @throws \Exception
      */
@@ -66,6 +66,7 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
         return [
             'config'  => [
                 'platform'           => ($this->module->isBE() ? 'belgie' : 'myparcel'),
+                'packageType'        => $this->calculatePackageType(),
                 'carrierSettings'    => $this->generateCarrierSettings($address, $showPriceSurcharge),
                 'showPriceSurcharge' => $showPriceSurcharge,
             ],
@@ -139,9 +140,27 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
             'retry'                     => $getConfigurationString(CheckoutForm::CONFIGURATION_RETRY),
             'saturdayDeliveryTitle'     => $getConfigurationString(CheckoutForm::CONFIGURATION_SATURDAY_DELIVERY_TITLE),
             'signatureTitle'            => $getConfigurationString(CheckoutForm::CONFIGURATION_SIGNATURE_TITLE),
-            'wrongNumberPostalCode'     => $getConfigurationString(CheckoutForm::CONFIGURATION_WRONG_NUMBER_POSTAL_CODE),
+            'wrongNumberPostalCode'     => $getConfigurationString(
+                CheckoutForm::CONFIGURATION_WRONG_NUMBER_POSTAL_CODE
+            ),
             'wrongPostalCodeCity'       => $getConfigurationString(CheckoutForm::CONFIGURATION_WRONG_POSTAL_CODE_CITY),
         ];
+    }
+
+    /**
+     * @return string
+     * @throws \PrestaShopDatabaseException
+     */
+    private function calculatePackageType(): string
+    {
+        $packageTypes = (new PackageTypeCalculator())->getProductsPackageTypes($this->context->cart);
+        $packageType  = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME;
+
+        if (1 === count($packageTypes) && $packageTypes[0] !== AbstractConsignment::PACKAGE_TYPE_LETTER) {
+            $packageType = array_flip(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP)[$packageTypes[0]];
+        }
+
+        return $packageType;
     }
 
     /**
@@ -163,12 +182,14 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
             throw new RuntimeException($errorMessage);
         }
 
-        $carrierName           = CarrierService::getMyParcelCarrier((int) $psCarrier->id)->getName();
+        $carrierName           = CarrierService::getMyParcelCarrier((int) $psCarrier->id)
+            ->getName();
         $shippingOptions       = $this->module->getShippingOptions($psCarrier->id, $address);
         $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
         $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
 
-        $carrierSettings[$carrierName] = array_merge($this->getCarrierSettings($psCarrier->id, $shippingOptions), $this->getDropOffSettings($psCarrier->id),
+        $carrierSettings[$carrierName] = array_merge(
+            $this->getCarrierSettings($psCarrier->id, $shippingOptions), $this->getDropOffSettings($psCarrier->id),
             [
                 'allowDeliveryOptions'  => true,
                 'priceStandardDelivery' => $priceStandardDelivery,

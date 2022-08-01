@@ -13,8 +13,8 @@
     </FormGroup>
 
     <PackageTypeSelectFormGroup
-      v-model="typesId"
-      :options="contextData.options.packageType" />
+      v-model="packageTypeId"
+      :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
       v-if="contextData.consignment && contextData.consignment.canHaveLargeFormat"
       v-model="contextData.labelOptions.package_format" />
@@ -91,8 +91,6 @@ const CONSIGNMENT_SHIPMENT_OPTIONS_KEYS: (keyof Consignment)[] = [
   'canHaveInsurance',
 ];
 
-let typesId = 0;
-
 export default defineComponent({
   name: 'ShipmentOptionsForm',
   components: {
@@ -148,17 +146,13 @@ export default defineComponent({
       orderActionsEventBus.update(values);
     });
 
-    const deliveryOptionPackageType = contextData.value.deliveryOptions.packageType;
-    const types = contextData.value.options.packageType;
-    types.forEach((packetItem) => {
-      const labelText = packetItem.label.toLowerCase();
-      if (labelText.includes(deliveryOptionPackageType as string)) {
-        typesId = packetItem.value as number;
-      }
+    const packageTypeId = computed(() => {
+      return contextData.value.options.packageType
+        .find((packageType) => packageType.name === contextData.value.deliveryOptions.packageType)?.id;
     });
 
     return {
-      typesId,
+      packageTypeId,
       packageType,
       contextData,
       shipmentOptions,

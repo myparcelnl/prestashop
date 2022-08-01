@@ -6,7 +6,7 @@
     <PackageTypeSelectFormGroup
       v-if="contextData.options.packageType.length"
       v-model="packageTypeId"
-      :options="contextData.options.packageType" />
+      :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
       v-if="contextData.options.packageFormat.length"
       v-model="packageFormat"

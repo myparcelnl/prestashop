@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from '@vue/composition-api';
+import { PropType, computed, defineComponent } from '@vue/composition-api';
 import SelectFormGroup from '@/components/common/form/SelectFormGroup.vue';
 import { disabledProps } from '@/composables/props/disabledProps';
 import { useSelectModel } from '@/composables/props/model/useSelectModel';
@@ -22,8 +22,8 @@ export default defineComponent({
     ...props,
     ...disabledProps,
 
-    options: {
-      type: Array as PropType<SelectOption[]>,
+    packageTypes: {
+      type: Array as PropType<PackageType[]>,
       required: true,
     },
   },
@@ -31,6 +31,17 @@ export default defineComponent({
   setup: (props, ctx) => {
     return {
       ...setup(props, ctx),
+
+      options: computed(() => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return props.packageTypes.map((packageType) => {
+          return {
+            label: packageType.human,
+            value: packageType.id,
+          };
+        });
+      }),
     };
   },
 });

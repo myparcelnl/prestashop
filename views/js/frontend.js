@@ -4,6 +4,12 @@
  * @member {jQuery} $
  */
 
+['myparcel_update_config','myparcel_update_delivery_options','myparcel_updated_address','myparcel_updated_delivery_options','myparcel_disable_delivery_options','myparcel_show_delivery_options','myparcel_hide_delivery_options','myparcel_render_delivery_options'].forEach((event)=> {
+  document.addEventListener(event, (e) => {
+    console.log(event, e.detail);
+  })
+});
+
 (() => {
   /**
    * Whether the listeners have been initialized.

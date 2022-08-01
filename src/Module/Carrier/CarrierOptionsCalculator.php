@@ -9,25 +9,36 @@ use Gett\MyparcelBE\Constant;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
+use MyParcelNL\Sdk\src\Support\Arr;
 
 class CarrierOptionsCalculator
 {
-    public const PACKAGE_FORMAT_OPTIONS     = [
+    public const PACKAGE_FORMAT_OPTIONS = [
         Constant::PACKAGE_FORMAT_NORMAL    => 'Normal',
         Constant::PACKAGE_FORMAT_LARGE     => 'Large',
         Constant::PACKAGE_FORMAT_AUTOMATIC => 'Automatic',
     ];
-    public const PACKAGE_TYPE_OPTIONS       = [
-        AbstractConsignment::PACKAGE_TYPE_PACKAGE       => 'Parcel',
-        AbstractConsignment::PACKAGE_TYPE_MAILBOX       => 'Mailbox package',
-        AbstractConsignment::PACKAGE_TYPE_LETTER        => 'Letter',
-        AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP => 'Digital stamp',
-    ];
-    public const PACKAGE_TYPE_NAMES_OPTIONS = [
-        AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME       => 'Parcel',
-        AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME       => 'Mailbox package',
-        AbstractConsignment::PACKAGE_TYPE_LETTER_NAME        => 'Letter',
-        AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME => 'Digital stamp',
+    public const PACKAGE_TYPE_OPTIONS   = [
+        [
+            'id'    => AbstractConsignment::PACKAGE_TYPE_PACKAGE,
+            'name'  => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
+            'human' => 'Parcel',
+        ],
+        [
+            'id'    => AbstractConsignment::PACKAGE_TYPE_MAILBOX,
+            'name'  => AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME,
+            'human' => 'Mailbox package',
+        ],
+        [
+            'id'    => AbstractConsignment::PACKAGE_TYPE_LETTER,
+            'name'  => AbstractConsignment::PACKAGE_TYPE_LETTER_NAME,
+            'human' => 'Letter',
+        ],
+        [
+            'id'    => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP,
+            'name'  => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
+            'human' => 'Digital stamp',
+        ],
     ];
 
     /**
@@ -81,25 +92,14 @@ class CarrierOptionsCalculator
      */
     public function getAvailablePackageTypes(string $prefix = null): array
     {
-        return $this->getAvailable(self::PACKAGE_TYPE_OPTIONS, $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME);
-    }
-
-    /**
-     * @param  null|string $prefix
-     *
-     * @return array
-     */
-    public function getAvailablePackageTypeNames(string $prefix = null): array
-    {
-        $calculator = new PackageTypeCalculator();
-
-        return array_map(static function (array $option) use ($calculator) {
-            if (! is_numeric($option['value'])) {
-                $option['value'] = $calculator->convertToName($option['value']);
-            }
-
-            return $option;
-        }, $this->getAvailablePackageTypes($prefix));
+        return array_filter(self::PACKAGE_TYPE_OPTIONS, function (array $packageType) use ($prefix) {
+            return $this->exclusiveField->isAvailable(
+                $this->country,
+                $this->carrier->getName(),
+                $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
+                $packageType['id']
+            );
+        });
     }
 
     /**
