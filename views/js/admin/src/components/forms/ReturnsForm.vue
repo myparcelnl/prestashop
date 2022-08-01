@@ -4,7 +4,6 @@
       <PsInput v-model="labelDescriptionText" />
     </FormGroup>
     <PackageTypeSelectFormGroup
-      v-if="contextData.options.packageType.length"
       v-model="packageTypeId"
       :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
