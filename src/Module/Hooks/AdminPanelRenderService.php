@@ -364,7 +364,7 @@ class AdminPanelRenderService extends RenderService
                 'packageType'   => array_filter(
                     $carrierOptionsCalculator->getAvailablePackageTypes(),
                     static function ($item) use ($filter) {
-                        return $filter('packageType')(['value'=> $item['id']]);
+                        return $filter('packageType')(['value' => $item['id']]);
                     }
                 ),
                 'packageFormat' => Arr::where(
