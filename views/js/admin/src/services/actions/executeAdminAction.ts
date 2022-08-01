@@ -1,11 +1,4 @@
-import {
-  ActionResponse,
-  AdminAction,
-  OrderAction,
-  modifyLabelActions,
-  printActions,
-  LabelAction,
-} from '@/data/global/actions';
+import { ActionResponse, AdminAction, OrderAction, modifyLabelActions, printActions } from '@/data/global/actions';
 import { ActionsEventBus } from '@/data/eventBus/ActionsEventBus';
 import { ContextKey } from '@/data/global/context';
 import { ModalData } from '@/composables/context/useModalContext';
@@ -36,7 +29,7 @@ export async function executeAdminAction(
 
     const returnOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
     requestParameters.labelDescription = returnOptionsContext.value.labelDescription;
-    requestParameters.packageType = returnOptionsContext.value.packageType;
+    requestParameters.packageType = returnOptionsContext.value.packageType.id;
     requestParameters.largeFormat = returnOptionsContext.value.largeFormat;
   }
 
@@ -57,7 +50,6 @@ export async function executeAdminAction(
     callbacks.push(onPrintLabels as ((res: ActionResponse) => void));
   }
 
-  // @ts-ignore
   if (isInArray(action, modifyLabelActions)) {
     callbacks.push(onNewLabels as ((res: ActionResponse) => void));
   }

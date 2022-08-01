@@ -1124,8 +1124,8 @@ SQL
             'name'    => $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
             'options' => [
                 'query' => $carrierOptionsCalculator->getAvailablePackageTypes($prefix),
-                'id'    => 'value',
-                'name'  => 'label',
+                'id'    => 'id',
+                'name'  => 'human',
             ],
         ];
 

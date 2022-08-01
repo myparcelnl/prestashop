@@ -100,14 +100,7 @@ class PackageTypeCalculator extends AbstractPackageCalculator
             return false; // no delivery options
         }
 
-        // 3. Total weight is above 2 Kg, regardless of package types, order is considered parcel
-        $weight = $cart->getTotalWeight();
-        if ($weight >= Constant::PACKAGE_TYPE_WEIGHT_LIMIT) {
-            return true; // delivery options
-        }
-
-        // 4. Products of type letter, digital stamp, mailbox package AND total weight is less than 2 Kg
-        return false; // no delivery options
+        return true;
     }
 
     /**
@@ -210,7 +203,7 @@ class PackageTypeCalculator extends AbstractPackageCalculator
      * @return array
      * @throws \PrestaShopDatabaseException
      */
-    private function getProductsPackageTypes(Cart $cart): array
+    public function getProductsPackageTypes(Cart $cart): array
     {
         $products = $cart->getProducts();
 

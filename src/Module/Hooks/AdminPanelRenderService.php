@@ -123,7 +123,7 @@ class AdminPanelRenderService extends RenderService
             $context['labelOptions'] = $orderSettings->getLabelOptions();
 
             $carrierOptionsCalculator            = $this->getCarrierOptionsCalculator($order);
-            $context['options']['packageType']   = $carrierOptionsCalculator->getAvailablePackageTypeNames();
+            $context['options']['packageType']   = $carrierOptionsCalculator->getAvailablePackageTypes();
             $context['options']['packageFormat'] = $carrierOptionsCalculator->getAvailablePackageFormats();
             if (CountryService::getShippingCountryIso2($order) !== $this->module->getModuleCountry()) {
                 $context['options']['packageType'] = [
@@ -361,9 +361,11 @@ class AdminPanelRenderService extends RenderService
             'email'       => (new Customer($order->id_customer))->email,
             'consignment' => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP),
             'options'     => [
-                'packageType'   => Arr::where(
-                    $carrierOptionsCalculator->getAvailablePackageTypeNames(),
-                    $filter('packageType')
+                'packageType'   => array_filter(
+                    $carrierOptionsCalculator->getAvailablePackageTypes(),
+                    static function ($item) use ($filter) {
+                        return $filter('packageType')(['value' => $item['id']]);
+                    }
                 ),
                 'packageFormat' => Arr::where(
                     $carrierOptionsCalculator->getAvailablePackageFormats(),

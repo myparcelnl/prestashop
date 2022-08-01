@@ -34,7 +34,11 @@ export interface ShipmentOptionsContext {
   deliveryOptionsDateChanged: boolean;
   extraOptions: ExtraOptions;
   labelOptions: LabelOptions;
-  options: Record<'digitalStampWeight' | 'packageFormat' | 'packageType', SelectOption[]>;
+  options: {
+    digitalStampWeight: SelectOption[];
+    packageType: PackageType[];
+    packageFormat: SelectOption[];
+  };
   orderId: number | null;
   orderWeight: number;
   psCarrierId: number | null;
@@ -57,7 +61,7 @@ export interface ReturnsFormContext {
   labelDescription: string;
   packageType: PackageType;
   largeFormat: number;
-  options: Record<'packageFormat' | 'packageType', SelectOption[]>;
+  options: ShipmentOptionsContext['options'];
 }
 
 export interface PrintOptionsContext {
