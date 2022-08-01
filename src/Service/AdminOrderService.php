@@ -261,7 +261,6 @@ class AdminOrderService extends AbstractService
      * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
-     * @throws \PrestaShopException
      */
     public function refreshLabels(array $labelIds): array
     {
@@ -272,7 +271,10 @@ class AdminOrderService extends AbstractService
         $orderLabels = [];
 
         foreach ($collection as $consignment) {
-            $orderLabels[] = $this->consignmentToOrderLabel($consignment);
+            try {
+                $orderLabels[] = $this->consignmentToOrderLabel($consignment);
+            } catch (\Exception $exception) {
+            }
         }
 
         return $orderLabels;
