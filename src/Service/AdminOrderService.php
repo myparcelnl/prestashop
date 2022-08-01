@@ -31,6 +31,7 @@ use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
 use Validate;
+use Throwable;
 
 class AdminOrderService extends AbstractService
 {
@@ -261,7 +262,6 @@ class AdminOrderService extends AbstractService
      * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
-     * @throws \PrestaShopException
      */
     public function refreshLabels(array $labelIds): array
     {
@@ -272,7 +272,14 @@ class AdminOrderService extends AbstractService
         $orderLabels = [];
 
         foreach ($collection as $consignment) {
-            $orderLabels[] = $this->consignmentToOrderLabel($consignment);
+            try {
+                $orderLabels[] = $this->consignmentToOrderLabel($consignment);
+            } catch (Throwable $exception) {
+                /*
+                 * Throws error when looping through multicollo shipments, because subsequent consignments don't have
+                 * an associated OrderLabel. Suppressed like this until it's solved in the pdk.
+                 */
+            }
         }
 
         return $orderLabels;
