@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Factory;
 
 use Gett\MyparcelBE\Entity\Cache;

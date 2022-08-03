@@ -6,28 +6,33 @@ namespace Gett\MyparcelBE\Adapter;
 
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\ShipmentOptionsV3Adapter;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Support\Collection;
 
-class DeliveryOptionsFromDefaultExportSettingsAdapter extends AbstractDeliveryOptionsAdapter
+class DeliveryOptionsFromDefaultExportSettingsAdapter extends DeliveryOptions
 {
     /**
      * @param  \MyParcelNL\Sdk\src\Support\Collection $data
-     *
-     * @throws \Exception
      */
     public function __construct(Collection $data)
     {
-        $packageType           = $this->intOrNull($data, Constant::PACKAGE_TYPE_CONFIGURATION_NAME);
-        $this->packageType     = $packageType ? (new PackageTypeCalculator())->convertToName($packageType) : null;
-        $this->shipmentOptions = new ShipmentOptionsV3Adapter([
-            'age_check'      => $this->boolOrNull($data, Constant::AGE_CHECK_CONFIGURATION_NAME),
-            'insurance'      => $this->intOrNull($data, Constant::INSURANCE_CONFIGURATION_NAME),
-            'large_format'   => $this->getLargeFormat($data),
-            'only_recipient' => $this->boolOrNull($data, Constant::ONLY_RECIPIENT_CONFIGURATION_NAME),
-            'return'         => $this->boolOrNull($data, Constant::RETURN_PACKAGE_CONFIGURATION_NAME),
-            'signature'      => $this->boolOrNull($data, Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME),
+        $packageType = $this->intOrNull($data, Constant::PACKAGE_TYPE_CONFIGURATION_NAME);
+
+        parent::__construct([
+            'carrier'         => null,
+            'date'            => null,
+            'deliveryType'    => null,
+            'packageType'     => $packageType ? (new PackageTypeCalculator())->convertToName($packageType) : null,
+            'pickupLocation'  => null,
+            'shipmentOptions' => [
+                'ageCheck'      => $this->boolOrNull($data, Constant::AGE_CHECK_CONFIGURATION_NAME),
+                'insurance'     => $this->intOrNull($data, Constant::INSURANCE_CONFIGURATION_NAME),
+                'largeFormat'   => $this->getLargeFormat($data),
+                'onlyRecipient' => $this->boolOrNull($data, Constant::ONLY_RECIPIENT_CONFIGURATION_NAME),
+                'return'        => $this->boolOrNull($data, Constant::RETURN_PACKAGE_CONFIGURATION_NAME),
+                'signature'     => $this->boolOrNull($data, Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME),
+
+            ],
         ]);
     }
 

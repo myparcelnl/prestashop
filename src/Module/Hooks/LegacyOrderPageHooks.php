@@ -1,43 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Module\Hooks;
 
 use Configuration;
+use DateTime;
 use Dispatcher;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsManager;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
-use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\CarrierService;
+use MyParcelBE;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
+use Throwable;
 use Validate;
 
 trait LegacyOrderPageHooks
 {
     protected $carrierList = [];
 
-    public function hookDisplayAdminListBefore()
-    {
-        if ($this->context->controller instanceof \AdminOrdersController) {
-            $adminOrderList = new AdminOrderList();
-
-            return $adminOrderList->getAdminAfterHeader();
-        }
-
-        return '';
-    }
-
     public function hookActionAdminOrdersListingFieldsModifier(&$params)
     {
-        if (!isset($params['select'])) {
+        if (! isset($params['select'])) {
             $params['select'] = '';
         }
-        if (!isset($params['join'])) {
+        if (! isset($params['join'])) {
             $params['join'] = '';
         }
         $prefix = 'car' . $this->id;
@@ -48,132 +42,73 @@ trait LegacyOrderPageHooks
         $params['select'] .= ', ' . $prefix . '.`name` AS carrier_name';
 
         $params['join'] .= '
-            LEFT JOIN ' . Table::withPrefix('carrier') . ' AS ' . $prefix . ' ON (a.id_carrier = ' . $prefix . '.id_carrier)';
+            LEFT JOIN ' . Table::withPrefix(
+                'carrier'
+            ) . ' AS ' . $prefix . ' ON (a.id_carrier = ' . $prefix . '.id_carrier)';
 
         $params['fields']['myparcel_void_0'] = [
-            'title' => $this->l('Delivery date', 'legacyorderpagehooks'),
-            'callback' => 'printMyParcelDeliveryInfo',
-            'search' => false,
-            'orderby' => false,
+            'title'           => $this->l('Delivery date', 'legacyorderpagehooks'),
+            'callback'        => 'printMyParcelDeliveryInfo',
+            'search'          => false,
+            'orderby'         => false,
             'callback_object' => $this,
         ];
 
         $params['fields']['myparcel_void_1'] = [
-            'title' => $this->l('Labels', 'legacyorderpagehooks'),
-            'class' => 'pointer-myparcel-labels text-center',
-            'callback' => 'printMyParcelLabel',
-            'search' => false,
-            'orderby' => false,
-            'remove_onclick' => true,
+            'title'           => $this->l('Labels', 'legacyorderpagehooks'),
+            'class'           => 'pointer-myparcel-labels text-center',
+            'callback'        => 'printMyParcelLabel',
+            'search'          => false,
+            'orderby'         => false,
+            'remove_onclick'  => true,
             'callback_object' => $this,
         ];
 
         $params['fields']['myparcel_void_2'] = [
-            'title' => '',
-            'class' => 'text-nowrap',
-            'callback' => 'printMyParcelIcon',
-            'search' => false,
-            'orderby' => false,
-            'remove_onclick' => true,
+            'title'           => '',
+            'class'           => 'text-nowrap',
+            'callback'        => 'printMyParcelIcon',
+            'search'          => false,
+            'orderby'         => false,
+            'remove_onclick'  => true,
             'callback_object' => $this,
         ];
     }
 
-    public function printMyParcelLabel($id, $params)
+    /**
+     * Before the order list
+     *
+     * @return string
+     */
+    public function hookDisplayAdminListBefore(): string
     {
-        if (!$this->searchMyParcelCarrier((int) $params['id_carrier'])) {
-            return '';
-        }
-        $sql = new \DbQuery();
-        $sql->select('*');
-        $sql->from(Table::TABLE_ORDER_LABEL);
-        $sql->where('id_order = "' . pSQL($params['id_order']) . '" ');
-        $result = \Db::getInstance()->executeS($sql);
-        $link = $this->context->link;
-
-        $this->context->smarty->assign([
-            'labels' => $result,
-            'link' => $link,
-            'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
-        ]);
-
-        return $this->display($this->name, 'views/templates/admin/icon-labels.tpl');
+        return '';
     }
 
     /**
-     * @param $id
-     * @param $params
-     *
-     * @return mixed
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public function printMyParcelIcon($id, $params)
-    {
-        $psCarrierId = (int) $params['id_carrier'];
-        $carrier     = CarrierService::getMyParcelCarrier($psCarrierId);
-
-        $labelOptionsResolver = new LabelOptionsResolver();
-        $order                = new Order((int) $params['id_order']);
-
-        $consignment = ConsignmentFactory::createFromCarrier($carrier);
-
-        $this->context->smarty->assign([
-            'label_options'         => $labelOptionsResolver->getLabelOptionsJson($order),
-            'allowSetOnlyRecipient' => $consignment->canHaveShipmentOption(
-                AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
-            ),
-            'allowSetSignature'     => $consignment->canHaveShipmentOption(
-                AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
-            ),
-        ]);
-
-        return $this->display($this->name, 'views/templates/admin/icon-concept.tpl');
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function hookActionAdminControllerSetMedia(): void
-    {
-        if ('AdminOrders' === $this->context->controller->php_self || is_a($this->context->controller, '\AdminOrdersController')) {
-            $adminOrder = new AdminOrderList();
-            $adminOrder->setHeaderContent();
-        }
-    }
-
-    public function searchMyParcelCarrier($idCarrier)
-    {
-        $carrier = $this->carrierList[$idCarrier] ?? new \Carrier($idCarrier);
-        if (empty($this->carrierList[$idCarrier])) {
-            $this->carrierList[$idCarrier] = $carrier->id_reference;
-        }
-
-        return in_array($this->carrierList[$idCarrier], [
-            Configuration::get(Constant::DPD_CONFIGURATION_NAME),
-            Configuration::get(Constant::BPOST_CONFIGURATION_NAME),
-            Configuration::get(Constant::POSTNL_CONFIGURATION_NAME),
-        ]);
-    }
-
     public function hookDisplayInvoice($params): string
     {
         if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
             return '';
         }
-        $idOrder = (int) $params['id_order'];
-        $controller = Dispatcher::getInstance()->getController();
+        $idOrder    = (int) $params['id_order'];
+        $controller = Dispatcher::getInstance()
+            ->getController();
 
         if (empty($idOrder) || $controller !== 'AdminOrders') {
             return '';
         }
+
         $order = new Order($idOrder);
-        if (!Validate::isLoadedObject($order)) {
+
+        if (! Validate::isLoadedObject($order)) {
             return '';
         }
-        $adminOrderView = new AdminOrderView((int) $params['id_order']);
 
-        return $adminOrderView->display();
+        return (new AdminOrderView((int) $params['id_order']))->display();
     }
 
     /**
@@ -193,7 +128,7 @@ trait LegacyOrderPageHooks
             return '';
         }
 
-        $deliveryOptions = DeliveryOptions::getFromCart($row['id_cart']);
+        $deliveryOptions = DeliveryOptionsManager::getFromCart($row['id_cart']);
 
         if (! $deliveryOptions) {
             return '';
@@ -205,15 +140,95 @@ trait LegacyOrderPageHooks
             if (empty($deliveryOptionsArray['date'])) {
                 return '';
             }
-            $date = new \DateTime($deliveryOptionsArray['date']);
+
+            $date          = new DateTime($deliveryOptionsArray['date']);
             $dateFormatted = $date->format($this->context->language->date_format_lite);
-            if (!empty($dateFormatted)) {
+
+            if (! empty($dateFormatted)) {
                 $id = sprintf('[%s] %s', $dateFormatted, $row['carrier_name']);
             }
-        } catch (\Exception $exception) {
-            FileLogger::addLog($exception);
+        } catch (Throwable $exception) {
+            OrderLogger::debug($exception->getMessage(), compact('exception'));
         }
 
         return $id;
+    }
+
+    //    /**
+    //     * @throws \Exception
+    //     */
+    //    public function hookActionAdminControllerSetMedia(): void
+    //    {
+    //        if ('AdminOrders' === $this->context->controller->php_self || is_a($this->context->controller, '\AdminOrdersController')) {
+    //            $adminOrder = new AdminOrderList();
+    //            $adminOrder->setHeaderContent();
+    //        }
+    //    }
+
+    /**
+     * @param $id
+     * @param $params
+     *
+     * @return mixed
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function printMyParcelIcon($id, $params)
+    {
+        $psCarrierId = (int) $params['id_carrier'];
+        $carrier     = CarrierService::getMyParcelCarrier($psCarrierId);
+
+        $labelOptionsResolver = Pdk::get(LabelOptionsResolver::class);
+        $order                = new Order((int) $params['id_order']);
+
+        $consignment = ConsignmentFactory::createFromCarrier($carrier);
+
+        $this->context->smarty->assign([
+            'label_options'         => $labelOptionsResolver->getLabelOptionsJson($order),
+            'allowSetOnlyRecipient' => $consignment->canHaveShipmentOption(
+                AbstractConsignment::SHIPMENT_OPTION_ONLY_RECIPIENT
+            ),
+            'allowSetSignature'     => $consignment->canHaveShipmentOption(
+                AbstractConsignment::SHIPMENT_OPTION_SIGNATURE
+            ),
+        ]);
+
+        return $this->display($this->name, 'views/templates/admin/icon-concept.tpl');
+    }
+
+    public function printMyParcelLabel($id, $params)
+    {
+        if (! $this->searchMyParcelCarrier((int) $params['id_carrier'])) {
+            return '';
+        }
+        $sql = new \DbQuery();
+        $sql->select('*');
+        $sql->from(Table::TABLE_ORDER_LABEL);
+        $sql->where('id_order = "' . pSQL($params['id_order']) . '" ');
+        $result = \Db::getInstance()
+            ->executeS($sql);
+        $link   = $this->context->link;
+
+        $this->context->smarty->assign([
+            'labels'                 => $result,
+            'link'                   => $link,
+            'promptForLabelPosition' => Configuration::get(Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME),
+        ]);
+
+        return $this->display($this->name, 'views/templates/admin/icon-labels.tpl');
+    }
+
+    public function searchMyParcelCarrier($idCarrier)
+    {
+        $carrier = $this->carrierList[$idCarrier] ?? new \Carrier($idCarrier);
+        if (empty($this->carrierList[$idCarrier])) {
+            $this->carrierList[$idCarrier] = $carrier->id_reference;
+        }
+
+        return in_array($this->carrierList[$idCarrier], [
+            Configuration::get(Constant::DPD_CONFIGURATION_NAME),
+            Configuration::get(Constant::BPOST_CONFIGURATION_NAME),
+            Configuration::get(Constant::POSTNL_CONFIGURATION_NAME),
+        ]);
     }
 }

@@ -1,19 +1,50 @@
-import '@/publicPath';
-import '@/directives';
-import Vue from 'vue';
-import VueCompositionAPI from '@vue/composition-api';
-import { attachBulkActionHandlers } from '@/services/bulk-actions/attachBulkActionHandlers';
-import { render } from '@/services/render';
+import * as COMPONENTS from '@myparcel/pdk-frontend-components';
+import {
+  ModalKey,
+  createPdkFrontend,
+  useModalStore,
+} from '@myparcel/pdk-frontend';
+import PsAlert from '@/components/pdk/PsAlert.vue';
+import PsButton from '@/components/pdk/PsButton.vue';
+import PsCard from '@/components/pdk/PsCard.vue';
+import PsCheckbox from '@/components/pdk/PsCheckbox.vue';
+import PsDropdownButton from '@/components/pdk/PsDropdownButton.vue';
+import PsDropdownButtonItem from '@/components/pdk/PsDropdownButtonItem.vue';
+import PsInput from '@/components/pdk/PsInput.vue';
+import PsRadio from '@/components/pdk/PsRadio.vue';
+import PsSelect from '@/components/pdk/PsSelect.vue';
 
-Vue.use(VueCompositionAPI);
+createPdkFrontend({
+  components: {
+    PdkAccordion: COMPONENTS.DefaultPdkAccordion,
+    PdkAlert: PsAlert,
+    PdkButton: PsButton,
+    PdkCard: PsCard,
+    PdkCheckbox: PsCheckbox,
+    PdkDropdownButton: PsDropdownButton,
+    PdkDropdownButtonItem: PsDropdownButtonItem,
+    PdkFormGroup: COMPONENTS.DefaultPdkFormGroup,
+    PdkInput: PsInput,
+    PdkModal: COMPONENTS.DefaultPdkModal,
+    PdkMultiCheckbox: COMPONENTS.DefaultPdkMultiCheckbox,
+    PdkRadio: PsRadio,
+    PdkSelect: PsSelect,
+    PdkTable: COMPONENTS.DefaultPdkTable,
+    PdkTableCol: COMPONENTS.DefaultPdkTableCol,
+    PdkTableRow: COMPONENTS.DefaultPdkTableRow,
+  },
 
-window.Vue = window.Vue ?? Vue;
+  onCreateStore: () => {
+    const modalStore = useModalStore();
 
-window.MyParcel = {
-  renderAfterHeader: render('components/after-header'),
-  renderLoadingPage: render('components/loading-page'),
-  renderOrderCard: render('components/order-card'),
-  renderOrderListColumn: render('components/order-list-column'),
-};
+    modalStore.$patch({
+      onOpen: (modal: ModalKey) => {
+        jQuery('#' + modal).modal('show');
+      },
 
-void jQuery.ready.then(attachBulkActionHandlers);
+      onClose: (modal: ModalKey) => {
+        jQuery('#' + modal).modal('hide');
+      },
+    });
+  },
+});

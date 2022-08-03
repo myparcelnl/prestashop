@@ -12,33 +12,47 @@ use Exception;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromFormAdapter;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
 use Gett\MyparcelBE\Module\Tools\Tools;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\Consignment\Download;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use Gett\MyparcelBE\Timer;
 use InvalidArgumentException;
 use MyParcelBE;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
-use Validate;
 use Throwable;
+use Validate;
 
 class AdminOrderService extends AbstractService
 {
     /**
+     * @var \MyParcelNL\Pdk\Base\Service\CountryService
+     */
+    private $countryService;
+
+    /**
+     * @param  \MyParcelBE                             $module
+     * @param  \MyParcelNL\Pdk\Base\Service\CountryService $countryService
+     */
+    public function __construct(MyParcelBE $module, CountryService $countryService)
+    {
+        parent::__construct($module);
+        $this->countryService = $countryService;
+    }
+
+    /**
      * @param  array                                                                           $postValues
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
-     * @param  \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|null $deliveryOptions
+     * @param  \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions|null $deliveryOptions
      *
      * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
      * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
@@ -51,7 +65,7 @@ class AdminOrderService extends AbstractService
     public function createConsignments(
         array                          $postValues,
         Order                          $order,
-        AbstractDeliveryOptionsAdapter $deliveryOptions = null
+        DeliveryOptions $deliveryOptions = null
     ): ConsignmentCollection {
         $factory      = new ConsignmentFactory($postValues);
         $collection   = $factory->fromOrder($order, $deliveryOptions);
@@ -61,18 +75,15 @@ class AdminOrderService extends AbstractService
             ? $collection->createConcepts()
             : $collection->setLinkOfLabels();
 
-        OrderLogger::addLog([
-            'message' => sprintf(
-                'Creating %s: %s',
-                $conceptFirst ? 'concepts' : 'labels',
-                $collection->toJson()
-            ),
-            'order'   => $order,
-        ]);
+        OrderLogger::debug(
+            sprintf('Creating %s', $conceptFirst ? 'concepts' : 'labels'),
+            [
+                'order' => $order,
+                'collection' => $collection->toArray(),
+            ]
+        );
 
-        if (($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0)
-            && MyParcelBE::getModule()
-                ->isNL()) {
+        if (($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0) && ModuleService::isNL()) {
             $collection->generateReturnConsignments(true);
         }
 
@@ -124,7 +135,13 @@ class AdminOrderService extends AbstractService
             ->addConsignment($consignment)
             ->generateReturnConsignments(true);
 
-        OrderLogger::addLog(['message' => 'Creating return shipments: ' . $collection->toJson(), 'order' => $order]);
+        OrderLogger::debug(
+            'Creating return shipments',
+            [
+                'order' => $order,
+                'collection' => $collection->toArray(),
+            ]
+        );
 
         $consignment                 = $collection->where('status', '!=', null)->first();
         $orderLabel                  = new OrderLabel();
@@ -150,7 +167,7 @@ class AdminOrderService extends AbstractService
      */
     public function exportOrder(int $orderId): ConsignmentCollection
     {
-        OrderLogger::addLog(['message' => 'Starting export', 'order' => $orderId]);
+        OrderLogger::debug('Starting export', ['order' => $orderId]);
         $postValues      = $this->setLabelOptionsInsurance(Tools::getAllValues());
         $order           = $this->getOrder($orderId);
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
@@ -202,12 +219,11 @@ class AdminOrderService extends AbstractService
                 continue;
             }
 
+            $orderLabels[] = $orderLabel;
+
             if ($consignment->isPartOfMultiCollo()) {
-                $orderLabels[] = $orderLabel;
                 return $orderLabels;
             }
-
-            $orderLabels[] = $orderLabel;
         }
 
         return $orderLabels;
@@ -246,10 +262,9 @@ class AdminOrderService extends AbstractService
 
         try {
             $response = $this->downloadLabels($labelIds);
-        } catch (Exception $e) {
-            ApiLogger::addLog('Error printing labels: ' . implode(', ', $labelIds));
-            ApiLogger::addLog($e);
-            $errors[] = $e;
+        } catch (Throwable $exception) {
+            DefaultLogger::debug('Error while printing labels', compact('exception', 'labelIds'));
+            $errors[] = $exception;
         }
 
         return [$response, $errors];
@@ -307,10 +322,11 @@ class AdminOrderService extends AbstractService
 
         $order = new Order((int) $orderLabel->id_order);
 
-        OrderLogger::addLog(
+        OrderLogger::debug(
+            'Refreshed label',
             [
-                'order'   => $order,
-                'message' => "Refreshed label $orderLabel->id_label",
+                'order' => $order,
+                'orderLabel' => $orderLabel->id_label,
             ]
         );
 
@@ -324,7 +340,7 @@ class AdminOrderService extends AbstractService
             $hasInsurance                            =
                 ('0' !== $postValues['deliveryOptions']['shipmentOptions']['insurance']);
             $postValues['labelOptions']['insurance'] = $hasInsurance;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             /**
              * When one or both fields are not present, there is no need to adjust any of them.
              */
@@ -337,17 +353,19 @@ class AdminOrderService extends AbstractService
      * @param  \Gett\MyparcelBE\Model\Core\Order $order
      * @param  array                             $values
      *
-     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @return \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
      */
-    public function updateDeliveryOptions(Order $order, array $values): AbstractDeliveryOptionsAdapter
+    public function updateDeliveryOptions(Order $order, array $values): DeliveryOptions
     {
-        $orderDeliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
-        $deliveryOptions      = DeliveryOptionsMerger::create(
+        $orderDeliveryOptions = OrderSettingsFactory::create($order)
+            ->getDeliveryOptions();
+
+        $deliveryOptions = \MyParcelNL\Pdk\Shipment\Service\DeliveryOptionsMerger::create([
             $orderDeliveryOptions,
-            new DeliveryOptionsFromFormAdapter($values)
-        );
+            (new DeliveryOptionsFromFormAdapter($values)),
+        ]);
 
         if (isset($values['extraOptions'])) {
             $extraOptionsArray = (new ExtraOptions($values['extraOptions']))->toArray();
@@ -364,16 +382,19 @@ class AdminOrderService extends AbstractService
      */
     public function updateOrderLabelStatusesAfterPrint(array $labelIds): array
     {
-        $status = (int) $this->configuration->get(Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME);
+        $status = (int) Configuration::get(Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME);
 
         foreach ($labelIds as $labelId) {
             try {
                 $timer = new Timer();
                 OrderLabel::updateStatus($labelId, $status);
-                ApiLogger::addLog("Updating status for $labelId took {$timer->getTimeTaken()}ms");
-            } catch (Exception $e) {
-                $errors[] = $e;
-                ApiLogger::addLog($e, ApiLogger::ERROR);
+                DefaultLogger::debug(
+                    'Updated status for label',
+                    ['labelId' => $labelId, 'timeTaken' => $timer->getTimeTaken()]
+                );
+            } catch (Exception $exception) {
+                $errors[] = $exception;
+                DefaultLogger::error($exception->getMessage(), compact('exception'));
             }
         }
 

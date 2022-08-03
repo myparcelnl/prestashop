@@ -6,41 +6,34 @@ namespace Gett\MyparcelBE\Adapter;
 
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\PickupLocationV3Adapter;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\ShipmentOptionsV3Adapter;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Pdk\Shipment\Model\RetailLocation;
 
-class DeliveryOptionsFromFormAdapter extends AbstractDeliveryOptionsAdapter
+class DeliveryOptionsFromFormAdapter extends DeliveryOptions
 {
-    /**
-     * Only set the fields that can be updated from the\ form.
-     *
-     * @param  array $data
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $data = [])
+    public function __construct(?array $data = null)
     {
         $deliveryOptions = $data['deliveryOptions'] ?? [];
-        foreach ($deliveryOptions as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $shipmentOptions = $deliveryOptions['shipmentOptions'] ?? [];
 
-        $this->packageType = (new PackageTypeCalculator())->convertToName($deliveryOptions['packageType'] ?? null);
+        parent::__construct([
+            'carrier'         => $data['carrier'],
+            'date'            => $data['date'],
+            'deliveryType'    => $data['deliveryType'],
+            'packageType'     => (new PackageTypeCalculator())->convertToName($deliveryOptions['packageType'] ?? null),
+            'pickupLocation'  => $this->isPickup()
+                ? new RetailLocation($deliveryOptions['pickupLocation'] ?? [])
+                : null,
+            'shipmentOptions' => [
+                'insurance'     => $this->getInsurance($shipmentOptions),
+                'largeFormat'   => $this->isLargeFormat($data['labelOptions'] ?? []),
+                'ageCheck'      => $this->isEnabled($shipmentOptions['age_check'] ?? null),
+                'onlyRecipient' => $this->isEnabled($shipmentOptions['only_recipient'] ?? null),
+                'return'        => $this->isEnabled($shipmentOptions['return'] ?? null),
+                'signature'     => $this->isEnabled($shipmentOptions['signature'] ?? null),
 
-        $shipmentOptions       = $deliveryOptions['shipmentOptions'] ?? [];
-        $this->shipmentOptions = new ShipmentOptionsV3Adapter([
-            'insurance'      => $this->getInsurance($shipmentOptions),
-            'large_format'   => $this->isLargeFormat($data['labelOptions'] ?? []),
-            'age_check'      => $this->isEnabled($shipmentOptions['age_check'] ?? null),
-            'only_recipient' => $this->isEnabled($shipmentOptions['only_recipient'] ?? null),
-            'return'         => $this->isEnabled($shipmentOptions['return'] ?? null),
-            'signature'      => $this->isEnabled($shipmentOptions['signature'] ?? null),
+            ],
         ]);
-
-        $this->pickupLocation = $this->isPickup()
-            ? new PickupLocationV3Adapter($deliveryOptions['pickupLocation'] ?? [])
-            : null;
     }
 
     /**

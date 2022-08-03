@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Module\Hooks;
 
 use Address;
 use Currency;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsManager;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
 use Media;
-use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Sdk\src\Support\Arr;
 use OrderControllerCore;
 use Tools;
 use Validate;
@@ -15,11 +19,14 @@ use Validate;
 trait FrontHooks
 {
     /**
+     * Run on choosing shipping method in checkout.
+     *
      * @param  array $params
      *
      * @return void
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
+     * @noinspection PhpUnused
      */
     public function hookActionCarrierProcess(array $params): void
     {
@@ -29,19 +36,18 @@ trait FrontHooks
             return;
         }
 
-        /**
-         * @var \PrestaShop\PrestaShop\Adapter\Entity\Cart $cart
-         */
-        $cart = $params['cart'];
-
-        $optionsArray    = json_decode($options, true);
-        $deliveryOptions = DeliveryOptionsAdapterFactory::create($optionsArray);
-
         $action    = Tools::getValue('action');
         $carrierId = Tools::getValue('delivery_option');
 
         if (('selectDeliveryOption' === $action && ! empty($carrierId)) || Tools::isSubmit('confirmDeliveryOption')) {
-            DeliveryOptions::save($cart->id, $deliveryOptions->toArray());
+            /** @var \PrestaShop\PrestaShop\Adapter\Entity\Cart $cart */
+            $cart = $params['cart'];
+
+            $optionsArray    = json_decode($options, true);
+            $deliveryOptions = new DeliveryOptions();
+            $deliveryOptions->fill(Arr::only($optionsArray, array_keys($deliveryOptions->getAttributes())));
+
+            DeliveryOptionsManager::save($cart->id, $deliveryOptions);
         }
     }
 
@@ -71,13 +77,13 @@ trait FrontHooks
             'shipping_cost'         => $this->getShippingCost($params['carrier'], $address),
             'carrier'               => $params['carrier'],
             'enableDeliveryOptions' => (new PackageTypeCalculator())
-                ->deliveryOptionsAllowed($this->context->cart, $this->getModuleCountry()),
+                ->deliveryOptionsAllowed($this->context->cart, ModuleService::getModuleCountry()),
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier.tpl');
     }
 
-    public function hookHeader(): void
+    public function hookDisplayHeader(): void
     {
         if (! $this->context->controller instanceof OrderControllerCore) {
             return;

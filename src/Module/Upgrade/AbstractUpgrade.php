@@ -7,9 +7,9 @@ namespace Gett\MyparcelBE\Module\Upgrade;
 defined('_PS_VERSION_') or die();
 
 use Exception;
-use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Service\Concern\HasInstance;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 
 abstract class AbstractUpgrade
@@ -47,12 +47,14 @@ abstract class AbstractUpgrade
      */
     final public function execute(): bool
     {
+        $upgradeClass = static::class;
+
         try {
-            ApiLogger::addLog(sprintf('%s] Attempting to execute upgrade', static::class), ApiLogger::INFO);
+            DefaultLogger::debug('Attempting to execute upgrade', compact('upgradeClass'));
             $this->upgrade();
-            ApiLogger::addLog(sprintf('%s] Successfully executed upgrade', static::class), ApiLogger::INFO);
-        } catch (Exception $e) {
-            ApiLogger::addLog($e, ApiLogger::ERROR);
+            DefaultLogger::debug('Successfully executed upgrade', compact('upgradeClass'));
+        } catch (Exception $exception) {
+            DefaultLogger::error($exception->getMessage(), compact('exception', 'upgradeClass'));
             return false;
         }
 

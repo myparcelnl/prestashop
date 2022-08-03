@@ -12,6 +12,8 @@ views/dist/
 # OS files
 .DS_Store
 
+yarn-error.log
+
 # Yarn
 .pnp.*
 .yarn/*

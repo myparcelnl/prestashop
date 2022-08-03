@@ -364,7 +364,7 @@ class Constant
         'postcode',
         'city',
         'email',
-        'delivery_settings',
+//        'delivery_settings',
         'id_carrier',
         'id_country',
         'reference',

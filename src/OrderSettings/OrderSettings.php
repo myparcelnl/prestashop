@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\OrderSettings;
 
-use Configuration;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromDefaultExportSettingsAdapter;
 use Gett\MyparcelBE\DeliveryOptions\DefaultExportSettingsRepository;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\WeightService;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Pdk\Shipment\Service\DeliveryOptionsMerger;
 
 class OrderSettings
 {
     /**
-     * @var null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @var null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions
      */
     private $deliveryOptions;
 
@@ -43,22 +43,26 @@ class OrderSettings
     private $orderWeight;
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \Gett\MyparcelBE\Model\Core\Order                   $order
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      */
-    public function __construct(Order $order)
+    public function __construct(Order $order, DeliveryOptions $deliveryOptions = null)
     {
-        $this->order = $order;
+        $this->order           = $order;
+        $this->deliveryOptions = $deliveryOptions;
     }
 
     /**
-     * @return null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @return null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
      */
-    public function getDeliveryOptions(): ?AbstractDeliveryOptionsAdapter
+    public function getDeliveryOptions(): ?DeliveryOptions
     {
         if (! $this->deliveryOptions) {
-            $defaultExportSettings = DefaultExportSettingsRepository::getInstance()
+            /** @var \Gett\MyparcelBE\DeliveryOptions\DefaultExportSettingsRepository $repository */
+            $repository            = Pdk::get(DefaultExportSettingsRepository::class);
+            $defaultExportSettings = $repository
                 ->getByCarrier($this->order->getIdCarrier());
 
             $defaults  = new DeliveryOptionsFromDefaultExportSettingsAdapter($defaultExportSettings);
@@ -66,7 +70,7 @@ class OrderSettings
                 $this->order->getIdCart()
             );
 
-            $this->deliveryOptions = DeliveryOptionsMerger::create($defaults, $fromOrder);;
+            $this->deliveryOptions = DeliveryOptionsMerger::create([$defaults, $fromOrder]);
         }
 
         return $this->deliveryOptions;
@@ -74,6 +78,7 @@ class OrderSettings
 
     /**
      * @return \Gett\MyparcelBE\DeliverySettings\ExtraOptions
+     * @throws \MyParcelNL\Sdk\src\Exception\ValidationException
      */
     public function getExtraOptions(): ExtraOptions
     {
@@ -82,8 +87,8 @@ class OrderSettings
             $this->extraOptions = new ExtraOptions([
                 'labelAmount'        => $extraOptions->getLabelAmount(),
                 'digitalStampWeight' =>
-                    $extraOptions->getDigitalStampWeight()
-                    ?? WeightService::convertToDigitalStamp(min($this->getOrderWeight(), 2000)),
+                        $extraOptions->getDigitalStampWeight()
+                        ?? WeightService::convertToDigitalStamp(min($this->getOrderWeight(), 2000)),
             ]);
         }
 
@@ -92,12 +97,14 @@ class OrderSettings
 
     /**
      * @return array
-     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
      */
     public function getLabelOptions(): array
     {
         if (! $this->labelOptions) {
-            $this->labelOptions = (new LabelOptionsResolver())->getLabelOptions($this->order);
+            /** @var \Gett\MyparcelBE\Label\LabelOptionsResolver $labelOptionsResolver */
+            $labelOptionsResolver = Pdk::get(LabelOptionsResolver::class);
+            $this->labelOptions   = $labelOptionsResolver->getLabelOptions($this->order);
         }
 
         return $this->labelOptions;

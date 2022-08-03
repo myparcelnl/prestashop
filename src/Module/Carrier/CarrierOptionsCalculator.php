@@ -6,10 +6,10 @@ namespace Gett\MyparcelBE\Module\Carrier;
 
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Support\Arr;
 
 class CarrierOptionsCalculator
 {
@@ -71,7 +71,7 @@ class CarrierOptionsCalculator
     {
         $this->module         = MyParcelBE::getModule();
         $this->carrier        = CarrierFactory::create($myParcelCarrier);
-        $this->country        = $country ?? $this->module->getModuleCountry();
+        $this->country        = $country ?? ModuleService::getModuleCountry();
         $this->exclusiveField = new ExclusiveField();
     }
 
@@ -83,6 +83,22 @@ class CarrierOptionsCalculator
     public function getAvailablePackageFormats(?string $prefix = null): array
     {
         return $this->getAvailable(self::PACKAGE_FORMAT_OPTIONS, $prefix . Constant::PACKAGE_FORMAT_CONFIGURATION_NAME);
+    }
+
+    /**
+     * @param  null|string $prefix
+     *
+     * @return array
+     */
+    public function getAvailablePackageTypeNames(string $prefix = null): array
+    {
+        $calculator = new PackageTypeCalculator();
+
+        return array_map(static function (array $option) use ($calculator) {
+            $option['value'] = $calculator->convertToName($option['value']);
+
+            return $option;
+        }, $this->getAvailablePackageTypes($prefix));
     }
 
     /**

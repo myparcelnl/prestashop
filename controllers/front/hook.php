@@ -1,11 +1,11 @@
-<?php
+<?php /** @noinspection AutoloadingIssuesInspection,PhpUnused */
 
 declare(strict_types=1);
 
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Model\Webhook\WebhookException;
 use Gett\MyparcelBE\Model\Webhook\WebhookPayloadFactory;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,7 +28,10 @@ class MyParcelBEHookModuleFrontController extends FrontController
 
         $this->processWebhook();
 
-        Response::create()->setStatusCode(204)->send();
+        Response::create()
+            ->setStatusCode(204)
+            ->send();
+
         die(0);
     }
 
@@ -53,17 +56,17 @@ class MyParcelBEHookModuleFrontController extends FrontController
         $hookData = $data['data']['hooks'] ?? null;
 
         if (! is_array($hookData)) {
-            ApiLogger::addLog('Invalid data format', ApiLogger::WARNING);
+            DefaultLogger::warning('Incoming webhook data is invalid', compact('data'));
             $this->sendResponse(400, 'Invalid data format');
         }
 
-        ApiLogger::addLog('Incoming webhook: ' . json_encode($hookData));
+        DefaultLogger::debug('Incoming webhook', compact('hookData'));
 
         foreach ($hookData as $webhook) {
             try {
                 $webhook = WebhookPayloadFactory::create($webhook);
-            } catch (WebhookException $e) {
-                ApiLogger::addLog($e, ApiLogger::WARNING);
+            } catch (WebhookException $exception) {
+                DefaultLogger::warning($exception->getMessage(), compact('exception'));
                 continue;
             }
 
@@ -95,7 +98,7 @@ class MyParcelBEHookModuleFrontController extends FrontController
         $hash = $_REQUEST['hash'] ?? null;
 
         if (! $hash || $hash !== Configuration::get(Constant::WEBHOOK_HASH_CONFIGURATION_NAME)) {
-            ApiLogger::addLog('Invalid webhook hash used: ' . $hash);
+            DefaultLogger::notice('Invalid webhook hash passed', compact('hash'));
             return false;
         }
 

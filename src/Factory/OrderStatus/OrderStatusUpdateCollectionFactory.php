@@ -10,7 +10,6 @@ use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Entity\OrderStatus\DeliveredOrderStatusUpdate;
 use Gett\MyparcelBE\Entity\OrderStatus\PrintedOrderStatusUpdate;
 use Gett\MyparcelBE\Entity\OrderStatus\ShippedOrderStatusUpdate;
-use MyParcelBE;
 
 class OrderStatusUpdateCollectionFactory
 {
@@ -31,10 +30,9 @@ class OrderStatusUpdateCollectionFactory
         $updates = new OrderStatusUpdateCollection();
 
         if (self::SHIPMENT_STATUS_PRINTED_STAMP === $shipmentStatus) {
-            $module = MyParcelBE::getModule();
             $updates->push(new PrintedOrderStatusUpdate($shipmentId));
 
-            if ($module->isNL() && Configuration::get(Constant::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME)) {
+            if (Configuration::get(Constant::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME)) {
                 $updates->push(new ShippedOrderStatusUpdate($shipmentId));
             }
 

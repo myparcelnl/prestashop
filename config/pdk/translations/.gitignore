@@ -1,0 +1,4 @@
+# Run yarn translations:import if this directory is empty.
+
+# Translations should never be committed.
+./*

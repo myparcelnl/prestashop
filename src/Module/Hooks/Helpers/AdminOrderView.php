@@ -6,7 +6,6 @@ namespace Gett\MyparcelBE\Module\Hooks\Helpers;
 
 use Exception;
 use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Hooks\AdminPanelRenderService;
 use Gett\MyparcelBE\Provider\OrderLabelProvider;
 use Validate;
 
@@ -47,7 +46,8 @@ class AdminOrderView extends AbstractAdminOrder
             return '';
         }
 
-        return (new AdminPanelRenderService())->renderOrderSettings($order);
+        return 'admin order view';
+        //        return \Pdk::renderOrderSettings($order);
     }
 
     /**
@@ -66,7 +66,8 @@ class AdminOrderView extends AbstractAdminOrder
     public function getWeight(): float
     {
         try {
-            return $this->getOrder()->getTotalWeight();
+            return $this->getOrder()
+                ->getTotalWeight();
         } catch (Exception $exception) {
             return 0;
         }

@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Service;
 
 use Configuration;
-use MyParcelNL\Pdk\Base\Service\WeightService as PdkWeightService;
 
-class WeightService extends PdkWeightService
+class WeightService extends \MyParcelNL\Pdk\Base\Service\WeightService
 {
     /**
-     * @param int|float $weight
-     * @param string    $unit leave empty, prestashop configured weight unit will be used
+     * @param  int|float $weight
+     * @param  string    $unit leave empty, prestashop configured weight unit will be used
      *
      * @return int
      */

@@ -2,6 +2,7 @@
 
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\Pdk\Base\Service\CountryService;
 
 /**
  * @throws \PrestaShopDatabaseException
@@ -11,6 +12,9 @@ function upgrade_module_1_1_2(MyParcelBE $module): bool
     $carrier              = Table::withPrefix('carrier');
     $carrierConfiguration = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
     $moduleName           = $module::MODULE_NAME;
+
+    /** @var \MyParcelNL\Pdk\Base\Service\CountryService $countryService */
+    $countryService = $module->get(CountryService::class);
 
     $query = <<<SQL
 SELECT carrier.* FROM $carrier AS carrier
@@ -28,7 +32,7 @@ SQL;
         } elseif (strpos($record['name'], 'DPD')) {
             $carrierType = Constant::DPD_CARRIER_NAME;
         } else {
-            $carrierType = $module->isNL()
+            $carrierType = $countryService->isNL()
                 ? Constant::POSTNL_CARRIER_NAME
                 : Constant::BPOST_CARRIER_NAME;
         }

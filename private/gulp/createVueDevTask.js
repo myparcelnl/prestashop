@@ -8,7 +8,7 @@ const {execute} = require('../execute');
  */
 function createVueDevTask() {
   return (callback) => {
-    execute('npm run serve', {cwd: adminAppDir}, callback);
+    execute('yarn dev', {cwd: adminAppDir}, callback);
   };
 }
 

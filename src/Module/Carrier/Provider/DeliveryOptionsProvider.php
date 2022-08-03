@@ -6,7 +6,7 @@ namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use DateTime;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 
 class DeliveryOptionsProvider
 {

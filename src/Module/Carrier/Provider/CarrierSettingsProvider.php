@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Module\Carrier\Provider;
 
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
 use Gett\MyparcelBE\Service\CarrierService;
-use MyParcelBE;
 
 class CarrierSettingsProvider
 {
@@ -20,7 +20,7 @@ class CarrierSettingsProvider
     {
         $carrier = CarrierService::getMyParcelCarrier($carrierId);
 
-        $countryIso      = MyParcelBE::getModule()->getModuleCountry();
+        $countryIso      = ModuleService::getModuleCountry();
         $carrierSettings = Constant::CARRIER_EXCLUSIVE[strtoupper($carrier->getName())];
 
         $carrierLabelSettings = [

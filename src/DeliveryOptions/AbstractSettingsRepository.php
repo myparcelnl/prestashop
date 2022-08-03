@@ -6,19 +6,18 @@ namespace Gett\MyparcelBE\DeliveryOptions;
 
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Entity\Cache;
-use Gett\MyparcelBE\Service\Concern\HasInstance;
 use MyParcelNL\Sdk\src\Support\Collection;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
-use RuntimeException;
 
+/**
+ * @deprecated
+ */
 abstract class AbstractSettingsRepository
 {
-    use HasInstance;
-
     /**
-     * @var string
+     * @throws \Exception
      */
-    protected static $table;
+    abstract protected function getTable(): string;
 
     /**
      * @return \MyParcelNL\Sdk\src\Support\Collection
@@ -48,17 +47,5 @@ abstract class AbstractSettingsRepository
 SELECT *
 FROM $table
 SQL;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function getTable(): string
-    {
-        if (! static::$table) {
-            throw new RuntimeException('Static property $table must be set');
-        }
-
-        return static::$table;
     }
 }

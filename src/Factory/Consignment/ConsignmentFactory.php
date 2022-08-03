@@ -11,19 +11,20 @@ use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
+use MyParcelNL\Pdk\Base\Service\CountryService;
 use Gett\MyparcelBE\Service\CountryService;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Gett\MyparcelBE\Service\WeightService;
 use MyParcelBE;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as SdkConsignmentFactory;
-use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
@@ -31,10 +32,13 @@ use MyParcelNL\Pdk\Shipment\Service\DeliveryDateService;
 use OrderLabel;
 use Tools;
 
+/**
+ * @deprecated
+ */
 class ConsignmentFactory
 {
     private const MAX_COLLO_WEIGHT_GRAMS = 30000;
-    private const FORMAT_TIMESTAMP       = 'Y-m-d H:i:s';
+    public const FORMAT_TIMESTAMP        = 'Y-m-d H:i:s';
 
     /**
      * @var array|array[]
@@ -42,7 +46,12 @@ class ConsignmentFactory
     private $carrierSettings;
 
     /**
-     * @var AbstractDeliveryOptionsAdapter
+     * @var \MyParcelNL\Pdk\Base\Service\CountryService
+     */
+    private $countryService;
+
+    /**
+     * @var DeliveryOptions
      */
     private $deliveryOptions;
 
@@ -84,7 +93,7 @@ class ConsignmentFactory
 
     /**
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
-     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *
      * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
@@ -94,7 +103,7 @@ class ConsignmentFactory
      */
     public function fromOrder(
         Order                          $order,
-        AbstractDeliveryOptionsAdapter $deliveryOptions = null
+        DeliveryOptions $deliveryOptions = null
     ): ConsignmentCollection {
         $this->setOrderData($order, $deliveryOptions);
         $this->createConsignment();
@@ -108,14 +117,14 @@ class ConsignmentFactory
         $consignment->setTotalWeight($distributedWeight);
 
         if ($extraOptions->getLabelAmount() > 1) {
-            $countryService = new CountryService();
+            $countryService = Pdk::get(CountryService::class);
             $orderIso       = $countryService->getShippingCountryIso2($order);
             $carrierName    = CarrierService::getMyParcelCarrier($order->getIdCarrier())->getName();
 
             if (
                 CarrierPostNL::NAME === $carrierName
                 && AbstractConsignment::CC_NL === $orderIso
-                && MyParcelBE::getModule()->isNL()
+                && $countryService->isNL()
                 && AbstractConsignment::PACKAGE_TYPE_PACKAGE === $consignment->getPackageType()
             ) {
                 $collection->addMultiCollo($consignment, $labelAmount);
@@ -133,14 +142,6 @@ class ConsignmentFactory
     }
 
     /**
-     * @return null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter
-     */
-    private function getShipmentOptions(): ?AbstractShipmentOptionsAdapter
-    {
-        return $this->deliveryOptions->getShipmentOptions();
-    }
-
-    /**
      * @return void
      * @throws \Exception
      */
@@ -150,9 +151,10 @@ class ConsignmentFactory
 
         try {
             // Create new instance from known json
-            $this->deliveryOptions = DeliveryOptionsAdapterFactory::create((array) $deliveryOptionsData);
-        } catch (BadMethodCallException $e) {
-            OrderLogger::addLog(['message' => $e, 'order' => $this->orderObject->getId()], OrderLogger::INFO);
+            $this->deliveryOptions = new DeliveryOptions((array) $deliveryOptionsData);
+        } catch (BadMethodCallException $exception) {
+            $order = $this->orderObject->getId();
+            OrderLogger::info($exception->getMessage(), compact('exception', 'order'));
 
             // Create new instance from unknown json data
             $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();
@@ -200,12 +202,14 @@ class ConsignmentFactory
 
     /**
      * @return int
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     private function getDeliveryType(): int
     {
         $deliveryType = $this->deliveryOptions->getDeliveryTypeId() ?? $this->consignment->getDeliveryType();
 
-        if ($this->module->isBE()) {
+        if (ModuleService::isBE()) {
             return $deliveryType < AbstractConsignment::DELIVERY_TYPE_PICKUP
                 ? AbstractConsignment::DELIVERY_TYPE_STANDARD
                 : AbstractConsignment::DELIVERY_TYPE_PICKUP;
@@ -232,13 +236,13 @@ class ConsignmentFactory
 
     /**
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
-     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *
      * @return void
      * @throws \PrestaShopDatabaseException
      * @throws \Exception
      */
-    private function setOrderData(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
+    private function setOrderData(Order $order, ?DeliveryOptions $deliveryOptions): void
     {
         $this->orderObject = $order;
         $this->orderData   = OrderLabel::getDataForLabelsCreate($order->getId());
@@ -277,7 +281,7 @@ class ConsignmentFactory
      */
     private function getEmailConfiguration(): string
     {
-        if ($this->module->isBE()) {
+        if (ModuleService::isBE()) {
             return $this->orderData['email'];
         }
 
@@ -311,7 +315,7 @@ class ConsignmentFactory
      */
     private function setShipmentOptions(): void
     {
-        $shipmentOptions = $this->getShipmentOptions();
+        $shipmentOptions = $this->deliveryOptions->getShipmentOptions();
 
         $this->consignment
             ->setOnlyRecipient($shipmentOptions && true === $shipmentOptions->hasOnlyRecipient())
@@ -330,7 +334,7 @@ class ConsignmentFactory
     private function hasSignature(): bool
     {
         $canHaveSignature = $this->consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE);
-        $isHomeCountry    = $this->consignment->getCountry() === $this->module->getModuleCountry();
+        $isHomeCountry    = $this->consignment->getCountry() === ModuleService::getModuleCountry();
         $shipmentOptions  = $this->deliveryOptions->getShipmentOptions();
 
         $hasSignature = $shipmentOptions

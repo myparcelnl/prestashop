@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Label;
 
 use Gett\MyparcelBE\Carrier\PackageFormatCalculator;
@@ -9,11 +11,12 @@ use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
-use Gett\MyparcelBE\Service\CountryService;
+use MyParcelNL\Pdk\Base\Service\CountryService;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
+use Throwable;
 
 class LabelOptionsResolver
 {
@@ -29,15 +32,13 @@ class LabelOptionsResolver
     ];
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
-     *
-     * @return false|string
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
+     * @var \MyParcelNL\Pdk\Base\Service\CountryService
      */
-    public function getLabelOptionsJson(Order $order)
+    private $countryService;
+
+    public function __construct(CountryService $countryService)
     {
-        return json_encode($this->getLabelOptions($order));
+        $this->countryService = $countryService;
     }
 
     /**
@@ -63,12 +64,12 @@ class LabelOptionsResolver
 
     /**
      * @param \Gett\MyparcelBE\Model\Core\Order                                               $order
-     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|null $deliveryOptions
+     * @param \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions|null $deliveryOptions
      *
      * @return array
      * @throws \PrestaShopDatabaseException
      */
-    public function getDeliveryOptions(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): array
+    public function getDeliveryOptions(Order $order, ?DeliveryOptions $deliveryOptions): array
     {
         $packageType     = $this->getPackageType($order, $deliveryOptions);
         $shipmentOptions = $this->getShipmentOptions(
@@ -96,13 +97,13 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      * @param int                                                                        $packageType
      * @param \Gett\MyparcelBE\Model\Core\Order                                          $order
      *
      * @return int the amount in euro for which the package should be insured
      */
-    public function getInsurance(AbstractDeliveryOptionsAdapter $deliveryOptions, int $packageType, Order $order): int
+    public function getInsurance(DeliveryOptions $deliveryOptions, int $packageType, Order $order): int
     {
         $psCarrierId = $order->getIdCarrier();
 
@@ -116,16 +117,16 @@ class LabelOptionsResolver
                 )
                 ->first();
             $consignment->setPackageType($packageType);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return Constant::INSURANCE_CONFIGURATION_NONE;
         }
 
-        if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
+        if ($this->countryService->isPostNLShipmentFromNLToBE($consignment)) {
             try {
                 if (CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_BELGIUM)) {
                     return Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT;
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 return Constant::INSURANCE_CONFIGURATION_NONE;
             }
         }
@@ -175,9 +176,9 @@ class LabelOptionsResolver
      */
     private function anyProductHasSetting(array $products, string $setting): bool
     {
-        $product = Arr::first($products, function (array $product) use ($setting) {
+        $product = Arr::first($products, static function (array $product) use ($setting) {
             return ProductConfigurationProvider::get(
-                $product['product_id'],
+                (int) $product['product_id'],
                 $setting,
                 false
             );
@@ -188,12 +189,12 @@ class LabelOptionsResolver
 
     /**
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
-     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *
      * @return int
      * @throws \PrestaShopDatabaseException
      */
-    private function getPackageFormat(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): int
+    private function getPackageFormat(Order $order, ?DeliveryOptions $deliveryOptions): int
     {
         $shipmentOptions = $deliveryOptions ? $deliveryOptions->getShipmentOptions() : null;
         $largeFormat     = null;
@@ -207,13 +208,13 @@ class LabelOptionsResolver
 
     /**
      * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
-     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *v
      *
      * @return int
      * @throws \PrestaShopDatabaseException
      */
-    private function getPackageType(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): int
+    private function getPackageType(Order $order, ?DeliveryOptions $deliveryOptions): int
     {
         $packageType = $deliveryOptions && $deliveryOptions->getPackageType()
             ? $deliveryOptions->getPackageTypeId()
@@ -222,13 +223,13 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      * @param  null|string                                                                     $shipmentOptionsMethod
      *
      * @return bool
      */
     private function getShipmentOption(
-        ?AbstractDeliveryOptionsAdapter $deliveryOptions,
+        ?DeliveryOptions $deliveryOptions,
         ?string                         $shipmentOptionsMethod = null
     ): bool {
         return $shipmentOptionsMethod
@@ -240,7 +241,7 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param  null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      * @param  array                                                                           $products
      * @param  int                                                                             $carrierId
      *
@@ -248,7 +249,7 @@ class LabelOptionsResolver
      * @throws \PrestaShopDatabaseException
      */
     private function getShipmentOptions(
-        ?AbstractDeliveryOptionsAdapter $deliveryOptions,
+        ?DeliveryOptions $deliveryOptions,
         array                           $products,
         int                             $carrierId
     ): array {
@@ -277,6 +278,6 @@ class LabelOptionsResolver
      */
     private function isSetByDefault(int $psCarrierId, string $setting): bool
     {
-        return CarrierConfigurationProvider::get($psCarrierId, $setting, false);
+        return (bool) CarrierConfigurationProvider::get($psCarrierId, $setting, false);
     }
 }

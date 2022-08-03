@@ -7,11 +7,12 @@
     "format": "vendor/bin/php-cs-fixer fix ."
   },
   "require": {
-    "php": ">=7.2.0",
-    "myparcelnl/pdk": ">=1.19.0"
+    "myparcelnl/pdk": "*",
+    "php": ">=7.2.0"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.0"
+    "myparcelnl/devtools": "^1.0",
+    "pestphp/pest": "^1.21"
   },
   "autoload": {
     "psr-4": {
@@ -21,10 +22,24 @@
       "myparcelbe.php",
       "src/Model/OrderLabel.php"
     ],
-    "exclude-from-classmap": []
+    "exclude-from-classmap": [ ]
   },
-  "config": {
-    "preferred-install": "dist",
-    "prepend-autoloader": false
+  "autoload-dev": {
+    "psr-4": {
+      "Gett\\MyparcelBE\\Tests\\": "tests"
+    },
+    "config": {
+      "preferred-install": "dist",
+      "prepend-autoloader": false,
+      "allow-plugins": {
+        "pestphp/pest-plugin": true
+      }
+    },
+    "repositories": [
+      {
+        "type": "path",
+        "url": "/Users/edie/Sites/myparcel/pdk"
+      }
+    ]
   }
 }

@@ -1,17 +1,8 @@
-myparcelbe_label:
-  path: myparcelbe/label
+myparcelbe:
+  path: myparcelbe
+
+myparcelbe_pdk:
+  path: myparcelbe/pdk
   methods: [ GET, POST ]
   defaults:
-    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelLabelController::index'
-
-myparcelbe_order:
-  path: myparcelbe/order
-  methods: [ GET, POST ]
-  defaults:
-    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::index'
-
-myparcelbe_loading:
-  path: myparcelbe/loading
-  methods: [ GET ]
-  defaults:
-    _controller: 'Gett\MyparcelBE\Controllers\Admin\LoadingController::index'
+    _controller: 'Gett\MyparcelBE\Pdk\Controller\AdminMyParcelPdkController::index'

@@ -8,23 +8,25 @@ use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 class ControllerService
 {
-    public const LABEL   = 'myparcelbe_label';
-    public const LOADING = 'myparcelbe_loading';
-    public const ORDER   = 'myparcelbe_order';
+    public const BASE = 'myparcelbe';
+    public const PDK  = 'myparcelbe_pdk';
 
     /**
      * @param  string $route
      *
      * @return null|string
      */
-    public static function generateUri(string $route): ?string
+    public function generateUri(string $route): ?string
     {
         $container = SymfonyContainer::getInstance();
+
         if (! $container) {
             return null;
         }
 
+        /** @var \PrestaShopBundle\Service\Routing\Router $router */
         $router = $container->get('router');
+
         if (! $router) {
             return null;
         }

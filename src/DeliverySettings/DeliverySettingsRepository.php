@@ -7,9 +7,8 @@ namespace Gett\MyparcelBE\DeliverySettings;
 use Exception;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Entity\Cache;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
-use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
@@ -18,9 +17,9 @@ class DeliverySettingsRepository
     /**
      * @param  int $cartId
      *
-     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @return \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions
      */
-    public static function getDeliveryOptionsByCartId(int $cartId): ?AbstractDeliveryOptionsAdapter
+    public static function getDeliveryOptionsByCartId(int $cartId): ?DeliveryOptions
     {
         return self::getByCartId($cartId)['deliveryOptions'];
     }
@@ -54,7 +53,7 @@ class DeliverySettingsRepository
      * @param  int $cartId
      *
      * @return array{
-     *     delivery_options: \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter,
+     *     delivery_options: \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions,
      *     extraOptions: \Gett\MyparcelBE\DeliverySettings\ExtraOptions
      * }
      */
@@ -64,31 +63,33 @@ class DeliverySettingsRepository
             $query = self::getSelectQuery();
             $query->where("id_cart = $cartId");
 
-            $row = self::executeQuery($query);
+            $row             = self::executeQuery($query);
+            $deliveryOptions = new DeliveryOptions();
 
             if (! $row) {
                 return [
-                    'deliveryOptions' => new DeliveryOptionsV3Adapter(),
+                    'deliveryOptions' => $deliveryOptions,
                     'extraOptions'    => new ExtraOptions(),
                 ];
             }
 
             try {
-                $deliveryOptions = DeliveryOptionsAdapterFactory::create(
-                    json_decode($row['delivery_settings'], true) ?? []
-                );
+                $deliveryOptionsData = json_decode($row['delivery_settings'], true);
+                $array               = Arr::only($deliveryOptionsData, array_keys($deliveryOptions->getAttributes()));
+
+                $deliveryOptions->fill($array);
             } catch (Exception $e) {
-                $deliveryOptions = new DeliveryOptionsV3Adapter();
+                // Nothing
             }
 
-            $array['deliveryOptions'] = $deliveryOptions;
-
             $extraOptions = [];
+
             if (! empty($row['extra_options'])) {
                 $extraOptions = json_decode($row['extra_options'], true);
             }
 
-            $array['extraOptions'] = new ExtraOptions($extraOptions);
+            $array['deliveryOptions'] = $deliveryOptions;
+            $array['extraOptions']    = new ExtraOptions($extraOptions);
 
             return $array;
         });

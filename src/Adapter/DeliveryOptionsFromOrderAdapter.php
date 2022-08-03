@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Adapter;
 
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 
-class DeliveryOptionsFromOrderAdapter extends AbstractDeliveryOptionsAdapter
+class DeliveryOptionsFromOrderAdapter extends DeliveryOptions
 {
     /**
      * @param  array $data

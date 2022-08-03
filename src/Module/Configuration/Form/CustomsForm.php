@@ -5,6 +5,7 @@ namespace Gett\MyparcelBE\Module\Configuration\Form;
 use Context;
 use Country;
 use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
 
 class CustomsForm extends AbstractForm
 {
@@ -52,7 +53,7 @@ class CustomsForm extends AbstractForm
                     'id'    => 'iso_code',
                     'name'  => 'name',
                 ],
-                'default_value' => $this->module->getModuleCountry(),
+                'default_value' => ModuleService::getModuleCountry(),
             ],
         ];
     }

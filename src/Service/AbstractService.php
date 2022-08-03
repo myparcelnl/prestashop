@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Service;
 
 use MyParcelBE;
-use PrestaShop\PrestaShop\Adapter\Configuration;
 
 /**
  * Service to use with controllers.
@@ -13,21 +12,15 @@ use PrestaShop\PrestaShop\Adapter\Configuration;
 abstract class AbstractService
 {
     /**
-     * @var \PrestaShop\PrestaShop\Adapter\Configuration
-     */
-    protected $configuration;
-
-    /**
      * @var \MyParcelBE
      */
     protected $module;
 
     /**
-     * @param  \PrestaShop\PrestaShop\Adapter\Configuration $configuration
+     * @param  \MyParcelBE $module
      */
-    public function __construct(Configuration $configuration)
+    public function __construct(MyParcelBE $module)
     {
-        $this->configuration = $configuration;
-        $this->module        = MyParcelBE::getModule();
+        $this->module = $module;
     }
 }

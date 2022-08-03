@@ -10,6 +10,8 @@ use Db;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator;
+use Gett\MyparcelBE\Module\Facade\ModuleService as ModuleServiceAlias;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
 use Gett\MyparcelBE\Service\CarrierService;
@@ -18,7 +20,6 @@ use HelperForm;
 use HelperList;
 use Language;
 use Link;
-use MyParcelBE;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierBpost;
@@ -36,17 +37,6 @@ use Zone;
 
 class CarriersForm extends AbstractForm
 {
-    /**
-     * @var \Context
-     */
-    private $context;
-
-    public function __construct(MyParcelBE $module)
-    {
-        parent::__construct($module);
-        $this->context = Context::getContext();
-    }
-
     /**
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
@@ -364,7 +354,7 @@ class CarriersForm extends AbstractForm
         }
 
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
-        $countryIso  = $this->module->getModuleCountry();
+        $countryIso  = ModuleService::getModuleCountry();
         $tabs        = [];
 
         if ($this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_STANDARD_FORM')) {
@@ -650,7 +640,7 @@ SQL
      */
     private function getCarrierType(): array
     {
-        if ($this->module->isBE()) {
+        if (ModuleService::isBE()) {
             return [
                 ['name' => CarrierBpost::HUMAN, 'configuration_name' => CarrierBpost::NAME],
                 ['name' => CarrierDPD::HUMAN, 'configuration_name' => CarrierDPD::NAME],
@@ -673,7 +663,7 @@ SQL
     {
         $fields      = [];
         $carrierType = $this->exclusiveField->getCarrierType($carrier);
-        $countryIso  = $this->module->getModuleCountry();
+        $countryIso  = ModuleService::getModuleCountry();
 
         if (! $this->exclusiveField->isAvailable($countryIso, $carrierType, 'ALLOW_STANDARD_FORM')) {
             return $fields;
@@ -1098,7 +1088,7 @@ SQL
     private function getExtraTabFields(Carrier $carrier, Currency $currency, string $prefix = ''): array
     {
         $fields      = [];
-        $countryIso  = $this->module->getModuleCountry();
+        $countryIso  = ModuleService::getModuleCountry();
         $tabName     = 'ALLOW_DELIVERY_FORM';
         $tabId       = 'delivery';
 
@@ -1298,7 +1288,7 @@ SQL
                 'class'            => 'col-lg-2',
             ];
 
-            if (! $prefix && $this->module->isNL()) {
+            if (! $prefix && ModuleServiceAlias::isNL()) {
                 $fields[] = [
                     'tab'     => $tabId,
                     'type'    => 'switch',
@@ -1337,7 +1327,7 @@ SQL
 
         $image = 'postnl.jpg';
 
-        if ($this->module->isBE()) {
+        if (ModuleService::isBE()) {
             $image = 'dpd.jpg';
             if ($carrierType == CarrierBpost::NAME) {
                 $image = 'bpost.jpg';

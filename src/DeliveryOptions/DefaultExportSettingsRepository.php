@@ -7,13 +7,11 @@ namespace Gett\MyparcelBE\DeliveryOptions;
 use Gett\MyparcelBE\Database\Table;
 use MyParcelNL\Sdk\src\Support\Collection;
 
+/**
+ * @deprecated
+ */
 class DefaultExportSettingsRepository extends AbstractSettingsRepository
 {
-    /**
-     * @var string
-     */
-    protected static $table = Table::TABLE_CARRIER_CONFIGURATION;
-
     /**
      * @param  int|string $psCarrierId
      *
@@ -29,5 +27,13 @@ class DefaultExportSettingsRepository extends AbstractSettingsRepository
                 }
                 return false;
             });
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTable(): string
+    {
+        return Table::TABLE_CARRIER_CONFIGURATION;
     }
 }

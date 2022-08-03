@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Module\Hooks;
 
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
+use Gett\MyparcelBE\Module\Facade\ModuleService;
 use PrestaShop\PrestaShop\Adapter\Entity\Configuration;
 use PrestaShop\PrestaShop\Adapter\Entity\Context;
 use PrestaShop\PrestaShop\Adapter\Entity\Country;
@@ -59,7 +62,7 @@ trait DisplayAdminProductsExtra
                 'CUSTOMS_CODE'       => Constant::CUSTOMS_CODE_CONFIGURATION_NAME,
                 'CUSTOMS_ORIGIN'     => Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME,
                 'countries'          => Country::getCountries(Context::getContext()->language->id),
-                'isBE'               => $this->isBE(),
+                'isBE'               => ModuleService::isBE(),
             ]
         );
 

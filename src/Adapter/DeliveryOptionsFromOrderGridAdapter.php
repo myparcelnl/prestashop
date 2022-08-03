@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Adapter;
 
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 
-class DeliveryOptionsFromOrderGridAdapter extends DeliveryOptionsV3Adapter
+class DeliveryOptionsFromOrderGridAdapter extends DeliveryOptions
 {
     public function __construct(array $data = [])
     {

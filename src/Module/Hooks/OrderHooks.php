@@ -1,20 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gett\MyparcelBE\Module\Hooks;
 
 use Exception;
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
+use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsManager;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Label\LabelOptionsResolver;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Service\CarrierName;
-use Gett\MyparcelBE\Service\Order\OrderDeliveryDate;
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
-use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
+use Gett\MyparcelBE\Pdk\Order\Repository\PdkOrderRepository;
+use MyParcelNL\Pdk\Facade\Pdk;
 
 trait OrderHooks
 {
@@ -23,38 +19,27 @@ trait OrderHooks
      *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Exception
      */
     public function hookActionValidateOrder(array $params): void
     {
         $order = new Order($params['order']->id);
 
-        $packageTypeCalculator = new PackageTypeCalculator();
-
-        $packageTypeId = $packageTypeCalculator->getOrderPackageType($order);
-
-        if (! $packageTypeId) {
-            $packageTypeId = Constant::PACKAGE_TYPE_PACKAGE;
-        }
-
-        $packageType      = Constant::PACKAGE_TYPES[$packageTypeId] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
-        $carrierId        = $order->getIdOrderCarrier();
-        $deliveryOptions  = new DeliveryOptionsV3Adapter([
-            'carrier'     => (new CarrierName())->get($carrierId),
-            'date'        => (new OrderDeliveryDate())->get($carrierId),
-            'packageType' => $packageType,
-        ]);
-        $optionsFromOrder = OrderSettingsFactory::create($order)->getDeliveryOptions();
-
-        $deliveryOptions = DeliveryOptionsMerger::create(
-            $deliveryOptions,
-            $optionsFromOrder,
-            (new LabelOptionsResolver())->getDeliveryOptions($order, $optionsFromOrder)
-        );
-
         try {
-            DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
-        } catch (Exception $e) {
-            OrderLogger::addLog(['message' => $e, 'order' => $order,], OrderLogger::ERROR);
+            $deliveryOptions = OrderSettingsFactory::create($order)
+                ->getDeliveryOptions();
+
+            /** @var \Gett\MyparcelBE\Pdk\Order\Repository\PdkOrderRepository $repository */
+            $repository = Pdk::get(PdkOrderRepository::class);
+            $pdkOrder   = $repository->get($params['order']);
+
+            $pdkOrder->deliveryOptions = $deliveryOptions;
+
+            $repository->update($pdkOrder);
+
+            DeliveryOptionsManager::save($order->getIdCart(), $deliveryOptions);
+        } catch (Exception $exception) {
+            OrderLogger::error($exception->getMessage(), compact('exception', 'order'));
         }
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\DeliveryOptions;
 
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Collection;
@@ -16,12 +16,12 @@ class DeliveryOptionsMerger
     ];
 
     /**
-     * @param  \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|array ...$deliveryOptionsAdapters
+     * @param  \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions|array ...$deliveryOptionsAdapters
      *
-     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     * @return \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions
      * @throws \Exception
      */
-    public static function create(...$deliveryOptionsAdapters): AbstractDeliveryOptionsAdapter
+    public static function create(...$deliveryOptionsAdapters): DeliveryOptions
     {
         $adapters = (new Collection($deliveryOptionsAdapters))
             ->filter()
@@ -31,6 +31,6 @@ class DeliveryOptionsMerger
             })
             ->toArrayWithoutNull();
 
-        return DeliveryOptionsAdapterFactory::create(array_merge(self::DEFAULT_VALUES, ...$adapters));
+        return new DeliveryOptions(array_merge(self::DEFAULT_VALUES, ...$adapters));
     }
 }

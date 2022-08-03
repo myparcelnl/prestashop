@@ -4,23 +4,33 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Adapter;
 
-use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
+use MyParcelNL\Pdk\Shipment\Model\ShipmentOptions;
 
-class ShipmentOptionsFromOrderGridAdapter extends AbstractShipmentOptionsAdapter
+class ShipmentOptionsFromOrderGridAdapter extends ShipmentOptions
 {
-    private const DEFAULT_INSURANCE = 0;
+    public function __construct(?array $data = null)
+    {
+        $options = $data ?? [];
+
+        parent::__construct([
+            'ageCheck'         => $this->boolOrNull($options['age_check']),
+            'insurance'        => $options['insurance'],
+            'labelDescription' => null,
+            'largeFormat'      => $this->boolOrNull($options['large_format']),
+            'onlyRecipient'    => $this->boolOrNull($options['only_recipient']),
+            'return'           => $this->boolOrNull($options['return']),
+            'sameDayDelivery'  => null,
+            'signature'        => $this->boolOrNull($options['signature']),
+        ]);
+    }
 
     /**
-     * @param  array $inputData
+     * @param $key
+     *
+     * @return null|bool
      */
-    public function __construct(array $inputData)
+    private function boolOrNull($key): ?bool
     {
-        $options              = $inputData ?? [];
-        $this->signature      = $options['signature'] === 'true' ?? false;
-        $this->only_recipient = ($options['only_recipient'] === 'true' ?? false);
-        $this->large_format   = ($options['large_format'] === 'true' ?? false);
-        $this->age_check      = ($options['age_check'] === 'true' ?? false);
-        $this->return         = ($options['return'] === 'true' ?? false);
-        $this->insurance      = (int) ($options['insurance'] ?? self::DEFAULT_INSURANCE);
+        return $key ? (bool) $key : null;
     }
 }

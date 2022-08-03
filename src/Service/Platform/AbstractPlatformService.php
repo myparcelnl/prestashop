@@ -14,6 +14,9 @@ use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use PrestaShop\PrestaShop\Adapter\Entity\Configuration;
 
+/**
+ * @deprecated
+ */
 abstract class AbstractPlatformService
 {
     use HasInstance;

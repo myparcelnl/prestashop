@@ -8,7 +8,6 @@ use Configuration;
 use Context;
 use Gett\MyparcelBE\Constant;
 use MyParcelBE;
-use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 abstract class AbstractAdminOrder extends AbstractController
