@@ -12,13 +12,12 @@ use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\CountryService;
-use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Gett\MyparcelBE\Service\WeightService;
 use MyParcelBE;
@@ -152,8 +151,9 @@ class ConsignmentFactory
         try {
             // Create new instance from known json
             $this->deliveryOptions = DeliveryOptionsAdapterFactory::create((array) $deliveryOptionsData);
-        } catch (BadMethodCallException $e) {
-            OrderLogger::addLog(['message' => $e, 'order' => $this->orderObject->getId()], OrderLogger::INFO);
+        } catch (BadMethodCallException $exception) {
+            $order = $this->orderObject->getId();
+            OrderLogger::info($exception->getMessage(), compact('exception', 'order'));
 
             // Create new instance from unknown json data
             $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();

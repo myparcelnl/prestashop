@@ -11,7 +11,10 @@ use PrestaShop\PrestaShop\Adapter\Entity\AbstractLogger;
 use PrestaShop\PrestaShop\Adapter\Entity\FileLogger as PrestaShopFileLogger;
 use Throwable;
 
-class FileLogger extends PrestaShopFileLogger
+/**
+ * @deprecated
+ */
+class DeprecatedFileLogger extends PrestaShopFileLogger
 {
     use HasInstance;
 
@@ -87,9 +90,9 @@ class FileLogger extends PrestaShopFileLogger
     }
 
     /**
-     * @return \Gett\MyparcelBE\Logger\FileLogger
+     * @return \Gett\MyparcelBE\Logger\DeprecatedFileLogger
      */
-    protected static function getLogger(): FileLogger
+    protected static function getLogger(): DeprecatedFileLogger
     {
         $logger = self::getInstance(AbstractLogger::DEBUG);
         $logger->setFilename(

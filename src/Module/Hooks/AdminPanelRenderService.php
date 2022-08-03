@@ -8,14 +8,13 @@ use Closure;
 use Configuration;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
-use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator;
 use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Module\Carrier\Provider\DeliveryOptionsProvider;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Provider\OrderLabelProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\CountryService;
@@ -293,9 +292,9 @@ class AdminPanelRenderService extends RenderService
                 && $consignment->getCountry() !== $this->module->getModuleCountry()) {
                 $consignment = null;
             }
-        } catch (Throwable $e) {
-            OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
-            $this->addOrderError($e, $order);
+        } catch (Throwable $exception) {
+            OrderLogger::error($exception->getMessage(), compact('exception', 'order'));
+            $this->addOrderError($exception, $order);
         }
 
         return $consignment;

@@ -9,8 +9,8 @@ use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\CarrierName;
 use Gett\MyparcelBE\Service\Order\OrderDeliveryDate;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\DeliveryOptionsV3Adapter;
@@ -53,8 +53,8 @@ trait OrderHooks
 
         try {
             DeliveryOptions::save($order->getIdCart(), $deliveryOptions->toArray());
-        } catch (Exception $e) {
-            OrderLogger::addLog(['message' => $e, 'order' => $order,], OrderLogger::ERROR);
+        } catch (Exception $exception) {
+            OrderLogger::error($exception->getMessage(), compact('exception', 'order'));
         }
     }
 }

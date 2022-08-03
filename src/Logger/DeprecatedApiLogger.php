@@ -9,8 +9,10 @@ use Gett\MyparcelBE\Constant;
 
 /**
  * Only logs data if API Logging is enabled in the MyParcel settings.
+ *
+ * @deprecated
  */
-class ApiLogger extends FileLogger
+class DeprecatedApiLogger extends DeprecatedFileLogger
 {
     /**
      * @param  \Throwable|array|string $message

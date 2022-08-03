@@ -3,18 +3,20 @@
 namespace Gett\MyparcelBE\Module\Hooks;
 
 use Configuration;
+use DateTime;
 use Dispatcher;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
-use Gett\MyparcelBE\Logger\FileLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderList;
 use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\CarrierService;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
+use Throwable;
 use Validate;
 
 trait LegacyOrderPageHooks
@@ -205,13 +207,15 @@ trait LegacyOrderPageHooks
             if (empty($deliveryOptionsArray['date'])) {
                 return '';
             }
-            $date = new \DateTime($deliveryOptionsArray['date']);
+
+            $date          = new DateTime($deliveryOptionsArray['date']);
             $dateFormatted = $date->format($this->context->language->date_format_lite);
-            if (!empty($dateFormatted)) {
+
+            if (! empty($dateFormatted)) {
                 $id = sprintf('[%s] %s', $dateFormatted, $row['carrier_name']);
             }
-        } catch (\Exception $exception) {
-            FileLogger::addLog($exception);
+        } catch (Throwable $exception) {
+            OrderLogger::debug($exception->getMessage(), compact('exception'));
         }
 
         return $id;

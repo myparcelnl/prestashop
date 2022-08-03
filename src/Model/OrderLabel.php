@@ -1,19 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
-use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\MyParcelStatusProvider;
 use Gett\MyparcelBE\Service\Tracktrace;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
-use MyParcelNL\Sdk\src\Exception\MissingFieldException;
 use MyParcelNL\Sdk\src\Helper\Utils;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -23,7 +24,6 @@ use MyParcelNL\Sdk\src\Support\Collection;
  * Not namespaced because PrestaShop 1.6 does not support namespaced ObjectModels.
  *
  * @see          https://devdocs.prestashop.com/1.7/modules/core-updates/1.6/
- * @noinspection PhpIllegalPsrClassPathInspection
  */
 class OrderLabel extends ObjectModel
 {
@@ -334,21 +334,20 @@ class OrderLabel extends ObjectModel
         $order->setCurrentState($newOrderStatus);
         $order->save();
 
-        OrderLogger::addLog([
-            'message' => sprintf('Status changed from %d to %d', $oldOrderStatus, $newOrderStatus),
-            'order'   => $order,
-        ]);
+        OrderLogger::debug(
+            sprintf('Status changed from %d to %d', $oldOrderStatus, $newOrderStatus),
+            ['order' => $order]
+        );
 
         return true;
     }
 
     /**
-     * @param int $orderId
+     * @param  int $orderId
      *
      * @return array
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
     public static function getDataForLabelsCreate(int $orderId): array
     {
@@ -394,21 +393,23 @@ class OrderLabel extends ObjectModel
                     ->executeS($qb);
 
                 if (! $result) {
-                    OrderLogger::addLog([
-                        'message' => 'Order data not complete',
-                        'order'   => $orderId,
-                        'query'   => $qb->build(),
-                    ], OrderLogger::WARNING);
+                    OrderLogger::warning(
+                        'Order data is incomplete',
+                        [
+                            'order' => $orderId,
+                            'query' => $qb->build(),
+                        ]
+                    );
                 }
 
-                $emptyFields = Utils::getKeysWithoutValue(reset($result), Constant::REQUIRED_LABEL_KEYS);
+                $result[0] = array_merge(['delivery_settings' => []], $result[0]);
 
-                if ($emptyFields) {
-                    throw new MissingFieldException(
-                        sprintf(
-                            'The following fields are missing but required: %s',
-                            implode(', ', $emptyFields)
-                        )
+                $emptyFields = Utils::getKeysWithoutValue($result[0], Constant::REQUIRED_LABEL_KEYS);
+
+                if (!empty($emptyFields)) {
+                    OrderLogger::error(
+                        'One or more required fields are missing',
+                        ['order' => $orderId, 'missingFields' => $emptyFields,]
                     );
                 }
 
@@ -431,8 +432,8 @@ class OrderLabel extends ObjectModel
 
         try {
             $resource = Db::getInstance()->executeS($qb);
-        } catch (Exception $e) {
-            ApiLogger::addLog($e);
+        } catch (Exception $exception) {
+            DefaultLogger::debug($exception->getMessage(), compact('exception'));
             return [];
         }
 
@@ -462,12 +463,12 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  int $id_order
+     * @param  int $orderId
      *
      * @return array|\mysqli_result|\PDOStatement|resource
      * @throws \PrestaShopDatabaseException
      */
-    public static function getCustomsOrderProducts(int $id_order)
+    public static function getCustomsOrderProducts(int $orderId)
     {
         // allow a non-existent myparcel customs setting if the default is 'Add'
         $default    = Configuration::get(Constant::CUSTOMS_FORM_CONFIGURATION_NAME);
@@ -480,18 +481,17 @@ class OrderLabel extends ObjectModel
         $dbQuery->from('order_detail', 'od');
         $dbQuery->leftJoin(Table::TABLE_PRODUCT_CONFIGURATION, 'pc', 'od.product_id = pc.id_product');
         $dbQuery->where(
-            'od.id_order = '
-            . $id_order
-            . ' AND ((pc.name = "'
-            . Constant::CUSTOMS_FORM_CONFIGURATION_NAME
-            . '" AND pc.value = "'
-            . Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD
-            . '")'
-            . $defaultSql
-            . ')'
+            sprintf(
+                "od.id_order = %d AND ((pc.name = \"%s\" AND pc.value = \"%s\")%s)",
+                $orderId,
+                Constant::CUSTOMS_FORM_CONFIGURATION_NAME,
+                Constant::CUSTOMS_FORM_CONFIGURATION_OPTION_ADD,
+                $defaultSql
+            )
         );
 
-        return Db::getInstance()->executeS($dbQuery) ?? [];
+        return Db::getInstance()
+            ->executeS($dbQuery) ?? [];
     }
 
     /**
@@ -537,8 +537,8 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  \Order $order
-     * @param  string $barcode
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  string                            $barcode
      *
      * @return bool
      * @throws \PrestaShopDatabaseException
@@ -561,10 +561,13 @@ class OrderLabel extends ObjectModel
         $order->update();
 
         if (Validate::isLoadedObject($orderCarrier)) {
-            OrderLogger::addLog([
-                'message' => "Updating tracking number to $barcode",
-                'order'   => $order,
-            ]);
+            OrderLogger::debug(
+                'Updating tracking number',
+                [
+                    'barcode' => $barcode,
+                    'order'   => $order,
+                ]
+            );
             $orderCarrier->tracking_number = pSQL($barcode);
             return $orderCarrier->update();
         }
@@ -616,8 +619,8 @@ class OrderLabel extends ObjectModel
 SELECT id_order_label FROM $table where id_label in $idsString
 SQL
                 );
-        } catch (Exception $e) {
-            ApiLogger::addLog($e, ApiLogger::ERROR);
+        } catch (Exception $exception) {
+            DefaultLogger::error($exception->getMessage(), compact('exception'));
         }
 
         return (new Collection(Arr::pluck($rows, 'id_order_label')))
@@ -674,6 +677,7 @@ SQL
      * @param  \OrderLabel $orderLabel
      *
      * @return array|null
+     * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
     protected static function getTrackTraceInfo(OrderLabel $orderLabel): ?array
@@ -685,17 +689,17 @@ SQL
                 $orderLabel->id_label,
                 true
             );
-        } catch (ApiException $e) {
-            ApiLogger::addLog($e, ApiLogger::ERROR);
+        } catch (ApiException $exception) {
+            DefaultLogger::error($exception->getMessage(), compact('exception'));
         }
 
         return $trackTraceInfo['data']['tracktraces'][0] ?? null;
     }
 
     /**
-     * @param  \OrderLabel $orderLabel
-     * @param  \Order                             $order
-     * @param  int                                $newOrderStatus
+     * @param  \OrderLabel                       $orderLabel
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  int                               $newOrderStatus
      *
      * @return bool
      * @throws \PrestaShopDatabaseException
@@ -703,23 +707,30 @@ SQL
     protected static function validateSetOrderStatus(OrderLabel $orderLabel, Order $order, int $newOrderStatus): bool
     {
         if (! Validate::isLoadedObject($orderLabel) || ! Validate::isLoadedObject($order)) {
-            ApiLogger::addLog('No order found for given shipment id.', ApiLogger::ERROR);
+            DefaultLogger::error('No order found for given shipment id');
             return false;
         }
 
         if (self::orderStatusShouldBeIgnored($order)) {
-            OrderLogger::addLog([
-                'message' => 'Current order status is ignored.',
-                'order'   => $order,
-            ]);
+            OrderLogger::debug(
+                'Current order status is ignored.',
+                [
+                    'order'              => $order,
+                    'currentOrderStatus' => $order->getCurrentState(),
+                ]
+            );
             return false;
         }
 
         if (self::orderHistoryContainsStatus($order, $newOrderStatus)) {
-            OrderLogger::addLog([
-                'message' => "$orderLabel->id_label] New order status '$newOrderStatus' is already present in order history.",
-                'order'   => $order,
-            ]);
+            OrderLogger::debug(
+                "New order status is already present in order history.",
+                [
+                    'order'          => $order,
+                    'newOrderStatus' => $newOrderStatus,
+                    'orderLabel'     => $orderLabel->id_label,
+                ]
+            );
             return false;
         }
 
@@ -755,7 +766,7 @@ SQL
     }
 
     /**
-     * @param  \Order $order
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
      *
      * @return bool
      */

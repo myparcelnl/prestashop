@@ -17,21 +17,21 @@ use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
 use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\OrderLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Module\Tools\Tools;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use Gett\MyparcelBE\Service\Consignment\Download;
 use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
 use Gett\MyparcelBE\Timer;
 use InvalidArgumentException;
 use MyParcelBE;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
-use Validate;
 use Throwable;
+use Validate;
 
 class AdminOrderService extends AbstractService
 {
@@ -61,14 +61,13 @@ class AdminOrderService extends AbstractService
             ? $collection->createConcepts()
             : $collection->setLinkOfLabels();
 
-        OrderLogger::addLog([
-            'message' => sprintf(
-                'Creating %s: %s',
-                $conceptFirst ? 'concepts' : 'labels',
-                $collection->toJson()
-            ),
-            'order'   => $order,
-        ]);
+        OrderLogger::debug(
+            sprintf('Creating %s', $conceptFirst ? 'concepts' : 'labels'),
+            [
+                'order' => $order,
+                'collection' => $collection->toArray(),
+            ]
+        );
 
         if (($postValues[Constant::RETURN_PACKAGE_CONFIGURATION_NAME] ?? 0)
             && MyParcelBE::getModule()
@@ -124,7 +123,13 @@ class AdminOrderService extends AbstractService
             ->addConsignment($consignment)
             ->generateReturnConsignments(true);
 
-        OrderLogger::addLog(['message' => 'Creating return shipments: ' . $collection->toJson(), 'order' => $order]);
+        OrderLogger::debug(
+            'Creating return shipments',
+            [
+                'order' => $order,
+                'collection' => $collection->toArray(),
+            ]
+        );
 
         $consignment                 = $collection->where('status', '!=', null)->first();
         $orderLabel                  = new OrderLabel();
@@ -150,7 +155,7 @@ class AdminOrderService extends AbstractService
      */
     public function exportOrder(int $orderId): ConsignmentCollection
     {
-        OrderLogger::addLog(['message' => 'Starting export', 'order' => $orderId]);
+        OrderLogger::debug('Starting export', ['order' => $orderId]);
         $postValues      = $this->setLabelOptionsInsurance(Tools::getAllValues());
         $order           = $this->getOrder($orderId);
         $deliveryOptions = $this->updateDeliveryOptions($order, $postValues);
@@ -246,10 +251,9 @@ class AdminOrderService extends AbstractService
 
         try {
             $response = $this->downloadLabels($labelIds);
-        } catch (Exception $e) {
-            ApiLogger::addLog('Error printing labels: ' . implode(', ', $labelIds));
-            ApiLogger::addLog($e);
-            $errors[] = $e;
+        } catch (Throwable $exception) {
+            DefaultLogger::debug('Error while printing labels', compact('exception', 'labelIds'));
+            $errors[] = $exception;
         }
 
         return [$response, $errors];
@@ -307,10 +311,11 @@ class AdminOrderService extends AbstractService
 
         $order = new Order((int) $orderLabel->id_order);
 
-        OrderLogger::addLog(
+        OrderLogger::debug(
+            'Refreshed label',
             [
-                'order'   => $order,
-                'message' => "Refreshed label $orderLabel->id_label",
+                'order' => $order,
+                'orderLabel' => $orderLabel->id_label,
             ]
         );
 
@@ -370,10 +375,13 @@ class AdminOrderService extends AbstractService
             try {
                 $timer = new Timer();
                 OrderLabel::updateStatus($labelId, $status);
-                ApiLogger::addLog("Updating status for $labelId took {$timer->getTimeTaken()}ms");
-            } catch (Exception $e) {
-                $errors[] = $e;
-                ApiLogger::addLog($e, ApiLogger::ERROR);
+                DefaultLogger::debug(
+                    'Updated status for label',
+                    ['labelId' => $labelId, 'timeTaken' => $timer->getTimeTaken()]
+                );
+            } catch (Exception $exception) {
+                $errors[] = $exception;
+                DefaultLogger::error($exception->getMessage(), compact('exception'));
             }
         }
 

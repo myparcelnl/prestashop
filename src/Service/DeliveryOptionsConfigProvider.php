@@ -11,8 +11,9 @@ use Country;
 use DateTime;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\FileLogger;
+use Gett\MyparcelBE\Logger\DeprecatedFileLogger;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
+use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use Order;
 use RuntimeException;
@@ -177,9 +178,8 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
         $psCarrier       = new Carrier($this->psCarrierId);
 
         if (! $psCarrier->id) {
-            $errorMessage = sprintf('Carrier %s not found.', $this->psCarrierId);
-            FileLogger::addLog($errorMessage, FileLogger::ERROR);
-            throw new RuntimeException($errorMessage);
+            OrderLogger::error('PsCarrier not found.', ['psCarrierId' => $this->psCarrierId]);
+            throw new RuntimeException("PsCarrier $this->psCarrierId not found.");
         }
 
         $carrierName           = CarrierService::getMyParcelCarrier((int) $psCarrier->id)

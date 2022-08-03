@@ -7,9 +7,10 @@ namespace Gett\MyparcelBE\Service\Consignment;
 use Configuration;
 use Gett\MyparcelBE\Collection\ConsignmentCollection;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\ApiLogger;
+use Gett\MyparcelBE\Logger\DeprecatedApiLogger;
 use Gett\MyparcelBE\Service\LabelOptionsService;
 use Gett\MyparcelBE\Timer;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use Tools;
 
 class Download
@@ -22,14 +23,14 @@ class Download
      */
     public function downloadLabel(array $labelIds): ?string
     {
-        ApiLogger::addLog(sprintf('Downloading labels %s', implode(', ', $labelIds)));
+        DefaultLogger::debug('Downloading labels', ['labelIds' => $labelIds]);
         $timer = new Timer();
 
         $apiKey     = Configuration::get(Constant::API_KEY_CONFIGURATION_NAME);
         $collection = ConsignmentCollection::findMany($labelIds, $apiKey);
 
         if ($collection->isEmpty()) {
-            ApiLogger::addLog('Collection is empty', ApiLogger::WARNING);
+            DefaultLogger::warning('ConsignmentCollection is empty', ['labelIds' => $labelIds]);
             return null;
         }
 
@@ -45,12 +46,12 @@ class Download
                 ->getLabelPdf();
         }
 
-        ApiLogger::addLog(
-            sprintf(
-                'Finished downloading labels as %s in %d ms',
-                $this->isDownload() ? 'link' : 'PDF',
-                $timer->getTimeTaken()
-            )
+        DefaultLogger::debug(
+            'Finished downloading labels',
+            [
+                'format'    => $this->isDownload() ? 'link' : 'pdf',
+                'timeTaken' => $timer->getTimeTaken(),
+            ]
         );
 
         return $response;

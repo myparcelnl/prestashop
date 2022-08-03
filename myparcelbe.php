@@ -1,10 +1,10 @@
-<?php
-
-/** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php /** @noinspection AutoloadingIssuesInspection,PhpFullyQualifiedNameUsageInspection */
 
 declare(strict_types=1);
 
+use Gett\MyparcelBE\Boot;
 use Gett\MyparcelBE\Module\Tools\Tools;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 
 if (! defined('_PS_VERSION_')) {
     exit;
@@ -114,6 +114,9 @@ class MyParcelBE extends CarrierModule
      */
     private $moduleService;
 
+    /**
+     * @throws \Throwable
+     */
     public function __construct()
     {
         $this->name          = self::MODULE_NAME;
@@ -124,6 +127,8 @@ class MyParcelBE extends CarrierModule
         $this->bootstrap     = true;
 
         parent::__construct();
+        $this->setupPdk();
+
         $this->moduleService = (new \Gett\MyparcelBE\Module\ModuleService($this, $this->context));
 
         if (! empty(Context::getContext()->employee->id)) {
@@ -139,6 +144,18 @@ class MyParcelBE extends CarrierModule
     }
 
     /**
+     * @return void
+     */
+    public function setupPdk(): void
+    {
+        try {
+            Boot::setupPdk();
+        } catch (Throwable $e) {
+            PrestaShopLogger::addLog(sprintf('MyParcel PDK failed to instantiate: %s', $e->getMessage()), PrestaShopLogger::LOG_SEVERITY_LEVEL_MAJOR);
+        }
+    }
+
+    /**
      * @param  bool $withoutToken
      *
      * @return string
@@ -146,10 +163,7 @@ class MyParcelBE extends CarrierModule
     public function getBaseUrl(bool $withoutToken = false): string
     {
         if (empty(Context::getContext()->employee->id)) {
-            \Gett\MyparcelBE\Logger\FileLogger::addLog(
-                'Unauthenticated user tried getting base url',
-                FileLogger::WARNING
-            );
+            DefaultLogger::warning('Unauthenticated user tried getting base url');
             throw new RuntimeException('Not authenticated');
         }
 

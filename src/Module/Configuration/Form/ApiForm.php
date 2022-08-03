@@ -7,11 +7,11 @@ namespace Gett\MyparcelBE\Module\Configuration\Form;
 use Configuration;
 use Exception;
 use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Logger\FileLogger;
+use Gett\MyparcelBE\Logger\DeprecatedFileLogger;
 use Gett\MyparcelBE\Model\Webhook\Subscription;
 use Gett\MyparcelBE\Module\Tools\Tools;
 use Gett\MyparcelBE\Service\WebhookService;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 
 class ApiForm extends AbstractForm
 {
@@ -120,9 +120,9 @@ class ApiForm extends AbstractForm
             if (Tools::isSubmit(self::BUTTON_DELETE_HOOK)) {
                 $this->deleteWebhook();
             }
-        } catch (Exception $e) {
-            ApiLogger::addLog($e);
-            return $this->module->displayError($e->getMessage());
+        } catch (Exception $exception) {
+            DefaultLogger::debug($exception->getMessage(), compact('exception'));
+            return $this->module->displayError($exception->getMessage());
         }
 
         return $parent;
@@ -142,7 +142,7 @@ class ApiForm extends AbstractForm
         if ($response) {
             Configuration::updateValue(Constant::WEBHOOK_ID_CONFIGURATION_NAME, null);
             Configuration::updateValue(Constant::WEBHOOK_HASH_CONFIGURATION_NAME, null);
-            ApiLogger::addLog("Webhook subscription ($subscriptionId) deleted.", ApiLogger::INFO);
+            DefaultLogger::debug('Webhook subscription deleted', compact('subscriptionId'));
         }
     }
 
@@ -177,7 +177,7 @@ class ApiForm extends AbstractForm
         if ($subscriptionId) {
             Configuration::updateValue(Constant::WEBHOOK_ID_CONFIGURATION_NAME, $subscriptionId);
             Configuration::updateValue(Constant::WEBHOOK_HASH_CONFIGURATION_NAME, $hash);
-            ApiLogger::addLog("New webhook subscription ($subscriptionId) created. URL: $webhookUrl", ApiLogger::INFO);
+            DefaultLogger::debug('New webhook subscription created', compact('subscriptionId', 'webhookUrl'));
         }
     }
 
@@ -187,6 +187,6 @@ class ApiForm extends AbstractForm
     private function clearCache(): void
     {
         Tools::clearAllCache();
-        FileLogger::addLog('Cache cleared', FileLogger::INFO);
+        DefaultLogger::info('Cache cleared');
     }
 }

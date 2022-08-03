@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Concern;
 
-use Gett\MyparcelBE\Logger\ApiLogger;
 use Gett\MyparcelBE\Model\Core\Order;
 use InvalidArgumentException;
 use MyParcelBE;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use Throwable;
 
 trait HasErrors
@@ -34,7 +34,7 @@ trait HasErrors
                 $exceptionMessage .= sprintf(' (Thrown at %s:%s)', $error->getFile(), $error->getLine());
             }
 
-            ApiLogger::addLog($error, ApiLogger::DEBUG);
+            DefaultLogger::debug($error->getMessage(), ['exception' => $error]);
         }
 
         if (is_string($error)) {

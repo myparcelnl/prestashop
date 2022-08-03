@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Module\Configuration;
 
-use Gett\MyparcelBE\Logger\FileLogger;
+use Gett\MyparcelBE\Logger\DeprecatedFileLogger;
 use Gett\MyparcelBE\Module\Configuration\Form\ApiForm;
 use Gett\MyparcelBE\Module\Configuration\Form\CarriersForm;
 use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
@@ -14,6 +14,7 @@ use Gett\MyparcelBE\Module\Configuration\Form\LabelForm;
 use Gett\MyparcelBE\Module\Configuration\Form\OrderForm;
 use Gett\MyparcelBE\Module\Tools\Tools as ToolsAlias;
 use MyParcelBE;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Sdk\src\Support\Collection;
 use Tools;
 
@@ -63,11 +64,11 @@ class SettingsMenu
      */
     public function renderMenu(int $formId): string
     {
-        /** @var \Gett\MyparcelBE\Module\Configuration\SettingsMenuItem */
+        /** @var \Gett\MyparcelBE\Module\Configuration\SettingsMenuItem $menuItem */
         $menuItem = $this->getMenuData()[$formId];
         $class    = $menuItem->getForm();
 
-        FileLogger::addLog('Rendering' . $class);
+        DefaultLogger::debug('Rendering menu', compact('class'));
         return (new $class($this->module))->render();
     }
 
