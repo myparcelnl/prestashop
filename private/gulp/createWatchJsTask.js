@@ -8,16 +8,10 @@ const {jsFiles} = require('./variables');
  */
 function createWatchJsTask(gulp) {
   const watch = () => {
-    gulp.watch(jsFiles, null, gulp.series('views:clean', 'admin:build', 'js:copy', 'copy:delivery-options'));
+    gulp.watch(jsFiles, null, gulp.series('build:js'));
   };
 
-  return gulp.series(
-    'build:dev',
-    gulp.parallel(
-      'admin:dev',
-      watch,
-    ),
-  );
+  return gulp.series('build:dev', gulp.parallel('admin:dev', watch));
 }
 
 module.exports = {createWatchJsTask};

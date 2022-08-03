@@ -1,35 +1,33 @@
 <?php
 
-namespace Gett\MyparcelBE\Database;
+declare(strict_types=1);
 
-class CreateCarrierConfigurationTableMigration implements Migration
+namespace MyParcelNL\PrestaShop\Database;
+
+class CreateCarrierConfigurationTableMigration extends AbstractMigration
 {
-    public static function up(): bool
+    public function down(): bool
     {
-        $sql = <<<'SQL'
-                CREATE TABLE IF NOT EXISTS `{PREFIX}myparcelbe_carrier_configuration` (
-  `id_configuration` int(11) NOT NULL AUTO_INCREMENT,
-  `id_carrier` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`id_configuration`)
-) ENGINE={ENGINE} DEFAULT CHARSET=utf8
-SQL;
-
-        return \Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->execute(str_replace(['{PREFIX}', '{ENGINE}'], [_DB_PREFIX_, _MYSQL_ENGINE_], $sql))
-        ;
+        $table = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+        return $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
-    public static function down(): bool
+    public function up(): bool
     {
-        $sql =
-            <<<'SQL'
-                DROP TABLE IF EXISTS {PREFIX}myparcelbe_carrier_configuration;
+        $table = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+        $sql   = <<<SQL
+            CREATE TABLE IF NOT EXISTS `$table` (
+                `id`               INT AUTO_INCREMENT                                             NOT NULL,
+                `id_carrier`       INT                                                            NOT NULL,
+                `id_configuration` INT                                                            NOT NULL,
+                `created`          DATETIME DEFAULT CURRENT_TIMESTAMP                             NOT NULL,
+                `updated`          DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                UNIQUE INDEX UNIQ_B515571199A4586C (`id_carrier`), 
+                UNIQUE INDEX UNIQ_B51557111BCA74B2 (`id_configuration`),
+                PRIMARY KEY (`id`)
+            ) ENGINE={ENGINE} DEFAULT CHARSET=utf8;
 SQL;
 
-        return \Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->execute(str_replace(['{PREFIX}', '{ENGINE}'], [_DB_PREFIX_, _MYSQL_ENGINE_], $sql))
-        ;
+        return $this->execute($sql);
     }
 }

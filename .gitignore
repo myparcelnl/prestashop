@@ -1,6 +1,15 @@
 # PrestaShop
 config*.xml
 
+docker-compose.override.yml
+
+*.cache
+.eslintcache
+*.log
+*.log.*
+*.tgz
+*.zip
+
 # 3rdParty
 dist/
 node_modules/
@@ -9,8 +18,13 @@ views/dist/
 .php_cs.cache
 .php-cs-fixer.cache
 
+**/lib
+**/dist
+
 # OS files
 .DS_Store
+
+yarn-error.log
 
 # Yarn
 .pnp.*

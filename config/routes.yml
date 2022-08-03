@@ -1,17 +1,17 @@
-myparcelbe_label:
-  path: myparcelbe/label
-  methods: [ GET, POST ]
+##
+# Route for the admin page
+##
+myparcelnl:
+  path: myparcelnl
+  methods: [GET]
   defaults:
-    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelLabelController::index'
+    _controller: 'MyParcelNL\PrestaShop\Controller\AdminController::index'
 
-myparcelbe_order:
-  path: myparcelbe/order
-  methods: [ GET, POST ]
+##
+# The controller that executes all PDK actions
+##
+myparcelnl_pdk:
+  path: myparcelnl/pdk
+  methods: [ GET, POST, PUT, DELETE ]
   defaults:
-    _controller: 'Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::index'
-
-myparcelbe_loading:
-  path: myparcelbe/loading
-  methods: [ GET ]
-  defaults:
-    _controller: 'Gett\MyparcelBE\Controllers\Admin\LoadingController::index'
+    _controller: 'MyParcelNL\PrestaShop\Pdk\Controller\AdminMyParcelPdkController::index'

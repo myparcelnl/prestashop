@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Entity\OrderStatus;
+namespace MyParcelNL\PrestaShop\Entity\OrderStatus;
 
 use Configuration;
 use Exception;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Entity\OrderStatusUpdateInterface;
-use Gett\MyparcelBE\Logger\ApiLogger;
-use Gett\MyparcelBE\Module\Tools\Tools;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use OrderLabel;
 
 abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
@@ -48,12 +47,12 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
         $newOrderStatus = $this->getNewOrderStatus();
 
         if (! $newOrderStatus) {
-            ApiLogger::addLog(
-                sprintf(
-                    "Order status for %d won't be updated because setting %s is not set.",
-                    $this->shipmentId,
-                    $this->getOrderStatusSetting()
-                )
+            DefaultLogger::debug(
+                'Order status won\'t be updated because setting is not set.',
+                [
+                    'shipmentId' => $this->shipmentId,
+                    'setting'    => $this->getOrderStatusSetting(),
+                ]
             );
 
             return false;
@@ -73,8 +72,8 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
         if ($sendAfterFirstScan && $this->sendMail) {
             try {
                 OrderLabel::sendShippedNotification($this->shipmentId);
-            } catch (Exception $e) {
-                ApiLogger::addLog($e, ApiLogger::ERROR);
+            } catch (Exception $exception) {
+                DefaultLogger::error($exception->getMessage(), compact('exception'));
             }
         }
     }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Upgrade;
+namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\Sdk\src\Support\Collection;
 
 class Upgrade1_6_0 extends AbstractUpgrade

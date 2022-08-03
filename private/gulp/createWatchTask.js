@@ -6,7 +6,7 @@ const {sourceFiles, jsFiles} = require('./variables');
  */
 function createWatchTask(gulp) {
   const watch = () => {
-    gulp.watch(jsFiles, null, gulp.series('views:clean', 'admin:build', 'js:copy', 'copy:delivery-options', 'copy'));
+    gulp.watch(jsFiles, null, gulp.series('build:js', 'copy'));
 
     // When files are modified, just transfer them.
     gulp.watch(sourceFiles, {events: ['change']}, gulp.series('transfer'));
@@ -15,13 +15,7 @@ function createWatchTask(gulp) {
     gulp.watch(sourceFiles, {events: ['add', 'unlink']}, gulp.series('build'));
   };
 
-  return gulp.series(
-    'build:dev',
-    gulp.parallel(
-      'admin:dev',
-      watch,
-    ),
-  );
+  return gulp.series('build:dev', gulp.parallel('admin:dev', watch));
 }
 
 module.exports = {createWatchTask};

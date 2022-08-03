@@ -1,32 +1,4 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "lib": [
-      "DOM",
-      "ESNext",
-      "dom"
-    ],
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ]
-  },
-  "include": [
-    "./**/*.js",
-    "./**/*.ts",
-    "./**/*.vue"
-  ]
+  "extends": "../tsconfig.json",
+  "include": ["./src/**/*", "!./src/__test__/**"]
 }

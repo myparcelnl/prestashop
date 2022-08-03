@@ -1,79 +1,49 @@
-const {createBuildTask} = require('./private/gulp/createBuildTask');
 const {createCleanTask} = require('./private/gulp/createCleanTask');
-const {createComposerTask} = require('./private/gulp/createComposerTask');
-const {createCopyDeliveryOptionsTask} = require('./private/gulp/createCopyDeliveryOptionsTask');
 const {createCopyTask} = require('./private/gulp/createCopyTask');
-const {createDefaultTask} = require('./private/gulp/createDefaultTask');
-const {createDevBuildTask} = require('./private/gulp/createDevBuildTask');
-const {createJsBuildTask} = require('./private/gulp/createJsBuildTask');
-const {createJsCopyTask} = require('./private/gulp/createJsCopyTask');
-const {createTasksForAllModules} = require('./private/gulp/createTasksForAllModules');
-const {createTransferTask} = require('./private/gulp/createTransferTask');
+const {createWorkspaceRunTask} = require('./private/gulp/createWorkspaceRunTask');
 const {createTransformTask} = require('./private/gulp/createTransformTask');
-const {createViewsCleanTask} = require('./private/gulp/createViewsCleanTask');
-const {createVueBuildTask} = require('./private/gulp/createVueBuildTask');
-const {createVueDevTask} = require('./private/gulp/createVueDevTask');
-const {createVueInstallTask} = require('./private/gulp/createVueInstallTask');
-const {createWatchJsTask} = require('./private/gulp/createWatchJsTask');
-const {createWatchTask} = require('./private/gulp/createWatchTask');
 const {createZipTask} = require('./private/gulp/createZipTask');
 const gulp = require('gulp');
 const {modules} = require('./private/gulp/variables');
-const plugins = require('gulp-load-plugins')();
-
-/**
- * Run babel on the javascript files.
- */
-gulp.task('js:build', createJsBuildTask(gulp, plugins));
-
-/**
- * Copy the js to dist without doing any processing on it.
- */
-gulp.task('js:copy', createJsCopyTask(gulp));
-
-/**
- * Copy delivery options into module.
- */
-gulp.task('copy:delivery-options', createCopyDeliveryOptionsTask(gulp));
 
 /**
  * Clean the /dist folder.
  */
-gulp.task('clean', createCleanTask(gulp, plugins));
+gulp.task('clean', createCleanTask('dist/*'));
 
-/**
- * Clean the /views/dist folder.
- */
-gulp.task('views:clean', createViewsCleanTask(gulp, plugins));
-
-/**
- * Admin vue app tasks.
- */
-gulp.task('admin:install', createVueInstallTask());
-gulp.task('admin:build', createVueBuildTask());
-gulp.task('admin:dev', createVueDevTask());
+gulp.task('build:js', createWorkspaceRunTask('build'));
+gulp.task('build:js:dev', createWorkspaceRunTask('build:dev'));
 
 modules.forEach((moduleName) => {
-  gulp.task(`copy:${moduleName}`, createCopyTask(gulp, plugins, moduleName));
-  gulp.task(`transform:${moduleName}`, createTransformTask(gulp, plugins, moduleName));
-  gulp.task(`transfer:${moduleName}`, createTransferTask(gulp, plugins, moduleName));
-  gulp.task(`composer:install:${moduleName}`, createComposerTask(gulp, plugins, moduleName));
-  gulp.task(`build:${moduleName}`, createBuildTask(gulp, plugins, moduleName));
-  gulp.task(`zip:${moduleName}`, createZipTask(gulp, plugins, moduleName));
+  gulp.task(`copy:${moduleName}`, createCopyTask(moduleName));
+  gulp.task(`copy:js:${moduleName}`, createCopyTask(moduleName));
+  gulp.task(`transform:${moduleName}`, createTransformTask(moduleName));
+  gulp.task(
+    `build:${moduleName}`,
+    gulp.series(`copy:${moduleName}`, `copy:js:${moduleName}`, `transform:${moduleName}`),
+  );
+  gulp.task(`zip:${moduleName}`, createZipTask(moduleName));
 });
 
-createTasksForAllModules(gulp, 'build');
-createTasksForAllModules(gulp, 'transform');
-createTasksForAllModules(gulp, 'copy');
-createTasksForAllModules(gulp, 'transfer');
-createTasksForAllModules(gulp, 'composer:install');
-createTasksForAllModules(gulp, 'zip');
+['build', 'copy', 'transform', 'zip'].forEach((task) => {
+  gulp.task(task, gulp.parallel(...modules.map((moduleName) => `${task}:${moduleName}`)));
+});
 
-const defaultTask = createDefaultTask(gulp);
+const defaultTask = gulp.series(
+  'clean',
+  'build:js',
+  gulp.parallel(...modules.map((moduleName) => gulp.series(`build:${moduleName}`, `zip:${moduleName}`))),
+);
 
 gulp.task('build', defaultTask);
-gulp.task('build:dev', createDevBuildTask(gulp));
-gulp.task('watch', createWatchTask(gulp));
-gulp.task('watch:js', createWatchJsTask(gulp));
+
+gulp.task(
+  'build:dev',
+  gulp.series(
+    'clean',
+    'build:js:dev',
+    gulp.parallel(...modules.map((moduleName) => gulp.series(`build:${moduleName}`, `zip:${moduleName}`))),
+  ),
+);
 
 exports.default = defaultTask;

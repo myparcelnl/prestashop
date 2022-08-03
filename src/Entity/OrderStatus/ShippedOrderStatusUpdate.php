@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Entity\OrderStatus;
+namespace MyParcelNL\PrestaShop\Entity\OrderStatus;
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Configuration\Form\OrderForm;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\OrderForm;
 
 class ShippedOrderStatusUpdate extends AbstractOrderStatusUpdate
 {

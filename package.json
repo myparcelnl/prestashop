@@ -1,53 +1,76 @@
 {
   "name": "@myparcel/prestashop-module",
-  "version": "1.8.1",
+  "version": "2.0.0",
   "private": true,
   "repository": "github:myparcelnl/prestashop",
   "license": "MIT",
   "workspaces": [
-    "views/js/admin"
+    "views/js/*"
   ],
   "scripts": {
-    "build": "gulp build",
-    "build:dev": "gulp build:dev",
+    "build:js": "gulp build:js",
+    "build:js:dev": "gulp build:js:dev",
+    "compile:dev": "gulp build:dev",
+    "composer:update": "docker compose run --rm php composer update --ignore-platform-reqs --no-dev",
     "cypress:open": "cypress open",
-    "preinstall": "npx -q only-allow yarn",
+    "docker:build": "docker compose run --rm node yarn && yarn build",
+    "prepare": "is-ci || husky install",
+    "translations:import": "npx -q @edielemoine/google-docs-importer --documentId 1TPE7gwG2GXtX7vlKIaskwMy0Xr4o_ir-lsedWB86xyc -o config/pdk/translations",
     "watch": "gulp watch",
     "watch:js": "gulp watch:js",
     "zip": "gulp"
   },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint --fix",
+    "*.{md,html,json,html.twig}": "prettier --write",
+    "package.json": "npx -q sort-package-json"
+  },
   "browserslist": [
     "defaults"
   ],
-  "dependencies": {
-    "@myparcel/delivery-options": "^4.3.1"
-  },
+  "prettier": "@myparcel/prettier-config",
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@babel/preset-env": "^7.15.6",
-    "@myparcel/semantic-release-config": "^1.2.3",
-    "@types/bootstrap": "^5.1.6",
-    "@types/gulp": "^4.0.9",
+    "@edielemoine/google-docs-importer": "^1.0.2",
+    "@myparcel-eslint/eslint-config-esnext": "^1.2.0",
+    "@myparcel-eslint/eslint-config-node": "^1.2.0",
+    "@myparcel-eslint/eslint-config-prettier": "^1.2.0",
+    "@myparcel-eslint/eslint-config-prettier-typescript": "^1.2.0",
+    "@myparcel-eslint/eslint-config-prettier-typescript-vue": "^1.2.0",
+    "@myparcel/prettier-config": "^1.1.0",
+    "@myparcel/semantic-release-config": "^4.2.3",
+    "@types/bootstrap": "^5.2.6",
+    "@types/gulp": "^4.0.10",
     "@types/gulp-rename": "^2.0.1",
-    "@types/gulp-tap": "^1.0.0",
+    "@types/gulp-tap": "^1.0.1",
     "@types/gulp-zip": "^4.0.2",
-    "babel-loader": "^8.2.2",
-    "babelify": "^10.0.0",
-    "browserify": "^17.0.0",
-    "ci-info": "^3.3.0",
+    "@types/node": "^18.13.0",
+    "eslint": "^8.34.0",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
-    "gulp-load-plugins": "^2.0.7",
     "gulp-rename": "^2.0.0",
-    "gulp-replace": "^1.1.3",
-    "gulp-sourcemaps": "^3.0.0",
     "gulp-tap": "^2.0.0",
-    "gulp-uglify": "^3.0.2",
     "gulp-zip": "^5.1.0",
+    "husky": "^8.0.3",
+    "is-ci": "^3.0.1",
+    "lint-staged": "^13.1.2",
+    "prettier": "^2.8.4",
     "vinyl-buffer": "^1.0.1"
   },
-  "optionalDependencies": {
-    "@myparcel/eslint-config": "^3.4.2"
-  },
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "yarn@3.3.0",
+  "resolutions": {
+    "@myparcel/pdk-component-tests": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-component-tests",
+    "@myparcel/pdk-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-components",
+    "@myparcel/pdk-frontend": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-frontend",
+    "@myparcel/pdk-preset-bootstrap4": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-preset-bootstrap4",
+    "@myparcel-pdk/common": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/common",
+    "@myparcel-pdk/frontend-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/frontend/components",
+    "@myparcel-pdk/frontend-core": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/frontend/core",
+    "@myparcel-pdk/frontend": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin",
+    "@myparcel-pdk/admin-component-tests": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin-component-tests",
+    "@myparcel-pdk/admin-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin-components",
+    "@myparcel-pdk/admin-preset-bootstrap4": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin-preset-bootstrap4",
+    "@myparcel-pdk/checkout": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/checkout",
+    "@myparcel-pdk/frontend-delivery-options": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/frontend/delivery-options",
+    "@myparcel-pdk/admin": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin"
+  }
 }

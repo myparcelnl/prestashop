@@ -26,8 +26,7 @@ const sourceFiles = [
   '!views/js',
   '!dist/**/*',
   'composer.json',
-  'index.php',
-  'myparcelbe.php',
+  'myparcelnl.php',
 ];
 
 /**
@@ -35,35 +34,21 @@ const sourceFiles = [
  *
  * @type {string[]}
  */
-const jsFiles = [
-  'views/js/**/*.js',
-  '!./views/js/admin/**/*',
-  '!**/node_modules/**/*',
-];
+const jsFiles = ['views/js/**/*.*', '!**/node_modules/**/*', '!**/lib/**/*'];
 
 /**
  * Files that should be copied without modifying contents or filenames.
  *
  * @type {string[]}
  */
-const copyFiles = [
-  'views/dist/**/*',
-  'composer.lock',
-  'logo.png',
-  'package.json',
-  'yarn.lock',
-];
+const copyFiles = ['views/js/*/lib/**/*', 'composer.lock', 'logo.png', 'package.json', 'yarn.lock'];
 
 /**
  * Files that should be excluded from the final zip file.
  *
  * @type {string[]}
  */
-const excludeFiles = [
-  'composer.lock',
-  'package.json',
-  'yarn.lock',
-];
+const excludeFiles = ['composer.lock', 'package.json', 'yarn.lock'];
 
 const adminAppDir = 'views/js/admin';
 

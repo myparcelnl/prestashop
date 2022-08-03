@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Upgrade;
+namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
-use Gett\MyparcelBE\Module\Installer;
-use Gett\MyparcelBE\Module\Uninstaller;
+use MyParcelNL\PrestaShop\Module\Installer;
+use MyParcelNL\PrestaShop\Module\Uninstaller;
 use PrestaShop\PrestaShop\Adapter\Entity\Tools;
 
 class Upgrade1_5_1 extends AbstractUpgrade
