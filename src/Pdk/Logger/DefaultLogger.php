@@ -182,13 +182,19 @@ class DefaultLogger extends AbstractLogger
      */
     private function getSource(array $context): string
     {
-        if (isset($context['exception']) && $context['exception'] instanceof Throwable) {
+        $throwable = $context['exception'];
+
+        if ($throwable instanceof Throwable) {
             if (_PS_MODE_DEV_) {
-                return "\nStack trace: " . $context['exception']->getTraceAsString();
+                return sprintf(
+                    "\nMessage: %s\nStack trace: %s",
+                    $throwable->getMessage(),
+                    $throwable->getTraceAsString()
+                );
             }
 
-            $file = $context['exception']->getFile();
-            $line = $context['exception']->getLine();
+            $file = $throwable->getFile();
+            $line = $throwable->getLine();
         } else {
             $caller = $this->getCaller();
             $file   = $caller['file'];
