@@ -19,12 +19,4 @@ class Boot
 
         return PdkFactory::create($config);
     }
-
-    /**
-     * @return bool
-     */
-    public static function useDevJs(): bool
-    {
-        return _PS_MODE_DEV_ && @curl_init('http://localhost:9420') !== false;
-    }
 }

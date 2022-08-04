@@ -41,13 +41,25 @@ class DefaultLogger extends AbstractLogger
     {
         $directory = $this->getLogDirectory();
 
+        $this->createLogDirectory($directory);
+    }
+
+    /**
+     * @param  string $directory
+     *
+     * @return void
+     */
+    public function createLogDirectory(string $directory): void
+    {
         if (! is_dir($directory) && ! mkdir($directory) && ! is_dir($directory)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $directory));
         }
 
         if (_PS_MODE_DEV_) {
             foreach (self::LOG_LEVELS as $level) {
-                file_put_contents($this->getLogFilename($level), '');
+                // Create all log files in advance on dev for easier tail usage
+                $handle = fopen($this->getLogFilename($level), 'wb');
+                fclose($handle);
             }
         }
     }
