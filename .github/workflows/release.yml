@@ -29,14 +29,13 @@ jobs:
 
   rebase:
     name: 'Rebase develop onto main'
-    uses: myparcelnl/prestashop/.github/workflows/rebase.yml@main
+    uses: ./.github/workflows/rebase.yml@main
     secrets: inherit
     needs: release
     if: always()
     with:
       base: 'main'
       target: 'develop'
-      force: true
 
   rebase-prs:
     name: 'Rebase pull requests onto develop'
