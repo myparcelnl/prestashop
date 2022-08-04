@@ -724,7 +724,7 @@ SQL
 
         if (self::orderHistoryContainsStatus($order, $newOrderStatus)) {
             OrderLogger::debug(
-                "New order status is already present in order history.",
+                'New order status is already present in order history.',
                 [
                     'order'          => $order,
                     'newOrderStatus' => $newOrderStatus,
