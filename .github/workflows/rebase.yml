@@ -31,5 +31,6 @@ jobs:
       - uses: myparcelnl/actions/rebase@v2
         with:
           token: ${{ secrets.GH_REPO_TOKEN }}
+          base: ${{ github.event.client_payload.base || github.event.inputs.base || inputs.base || github.ref || github.ref_name }}
           target: ${{ github.event.client_payload.target || github.event.inputs.target || inputs.target }}
-          base: ${{ github.event.client_payload.base || github.event.inputs.base || inputs.base || github.ref }}
+          force: ${{ inputs.force }}

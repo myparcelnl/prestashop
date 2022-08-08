@@ -28,10 +28,11 @@ jobs:
           token: ${{ secrets.GH_REPO_TOKEN }}
 
   rebase:
-    uses: myparcelnl/prestashop/.github/workflows/rebase.yml@main
+    name: 'Rebase develop onto main'
+    uses: ./.github/workflows/rebase.yml
+    secrets: inherit
     needs: release
     if: always()
-    secrets: inherit
     with:
       base: 'main'
       target: 'develop'
