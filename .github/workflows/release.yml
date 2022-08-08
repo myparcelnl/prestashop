@@ -29,7 +29,7 @@ jobs:
 
   rebase:
     name: 'Rebase develop onto main'
-    uses: ./.github/workflows/rebase.yml@main
+    uses: ./.github/workflows/rebase.yml
     secrets: inherit
     needs: release
     if: always()
