@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.0](https://github.com/myparcelnl/prestashop/compare/v1.6.3...v1.7.0) (2022-08-08)
+
+
+### :sparkles: New Features
+
+* add real multicollo ([#165](https://github.com/myparcelnl/prestashop/issues/165)) ([1d4243e](https://github.com/myparcelnl/prestashop/commit/1d4243e051c08257e64ddb844f0704bad2873398))
+* option concept shipments ([#174](https://github.com/myparcelnl/prestashop/issues/174)) ([d3fe89e](https://github.com/myparcelnl/prestashop/commit/d3fe89e3c66ff0d82f68ee5cc85a0788b8e6bbe4))
+
+
+### :bug: Bug Fixes
+
+* allow deliveryoptions changing in admin orderview ([#181](https://github.com/myparcelnl/prestashop/issues/181)) ([1d0d9ae](https://github.com/myparcelnl/prestashop/commit/1d0d9ae0d90ef704e2236de60c551d6ea2a16e6f))
+* check countries before adding multicollo ([#166](https://github.com/myparcelnl/prestashop/issues/166)) ([d9405fd](https://github.com/myparcelnl/prestashop/commit/d9405fd209ade232774e85ab80d4688c0ab90804))
+* checkout uses specifically set myparcelconfig ([#175](https://github.com/myparcelnl/prestashop/issues/175)) ([9783276](https://github.com/myparcelnl/prestashop/commit/9783276be5236f831b5899b0f2aa0ef73c752d0a))
+* correct package type at label create form ([#182](https://github.com/myparcelnl/prestashop/issues/182)) ([e124ca9](https://github.com/myparcelnl/prestashop/commit/e124ca9f4be96c3f80e9e7292577c1cf1444b50f))
+* empty variables abstractconsignment ([#178](https://github.com/myparcelnl/prestashop/issues/178)) ([2ed5dbe](https://github.com/myparcelnl/prestashop/commit/2ed5dbe32f59baee570710cb32bcb42f9f207447))
+* fix exporting return shipments ([#176](https://github.com/myparcelnl/prestashop/issues/176)) ([70513e7](https://github.com/myparcelnl/prestashop/commit/70513e776de92f558b13d1f5a6d8308a97f693a2))
+* fix multicollo label refresh ([#183](https://github.com/myparcelnl/prestashop/issues/183)) ([44fac82](https://github.com/myparcelnl/prestashop/commit/44fac829881f86a7c772c62a5766223d04e2fc2d))
+* fix type error on ordering ([#169](https://github.com/myparcelnl/prestashop/issues/169)) ([7b33545](https://github.com/myparcelnl/prestashop/commit/7b33545d411b417d1c359d79ce62163e7b3cfb08))
+
 ### [1.6.3](https://github.com/myparcelnl/prestashop/compare/v1.6.2...v1.6.3) (2022-07-15)
 
 
