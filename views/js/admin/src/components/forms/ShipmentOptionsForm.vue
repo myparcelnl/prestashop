@@ -13,7 +13,7 @@
     </FormGroup>
 
     <PackageTypeSelectFormGroup
-      v-model="packageTypeId"
+      v-model="packageType"
       :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
       v-if="contextData.consignment && contextData.consignment.canHaveLargeFormat"
