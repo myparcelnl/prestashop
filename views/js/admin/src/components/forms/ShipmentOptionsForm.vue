@@ -13,7 +13,7 @@
     </FormGroup>
 
     <PackageTypeSelectFormGroup
-      v-model="packageTypeId"
+      v-model="packageType"
       :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
       v-if="contextData.consignment && contextData.consignment.canHaveLargeFormat"
@@ -146,13 +146,7 @@ export default defineComponent({
       orderActionsEventBus.update(values);
     });
 
-    const packageTypeId = computed(() => {
-      return contextData.value.options.packageType
-        .find((packageType) => packageType.name === contextData.value.deliveryOptions.packageType)?.id;
-    });
-
     return {
-      packageTypeId,
       packageType,
       contextData,
       shipmentOptions,
