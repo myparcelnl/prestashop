@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gett\MyparcelBE\Service;
 
 use Configuration;
-use MyParcelNL\Pdk\Service\WeightService as PdkWeightService;
+use MyParcelNL\Pdk\Base\Service\WeightService as PdkWeightService;
 
 class WeightService extends PdkWeightService
 {
