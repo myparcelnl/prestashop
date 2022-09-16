@@ -4,7 +4,6 @@ namespace Gett\MyparcelBE\Factory\Consignment;
 
 use BadMethodCallException;
 use Configuration;
-use DateInterval;
 use DateTime;
 use Exception;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
@@ -18,7 +17,6 @@ use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
 use Gett\MyparcelBE\Service\CarrierService;
 use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
 use Gett\MyparcelBE\Service\CountryService;
-use Gett\MyparcelBE\Service\Order\OrderTotalWeight;
 use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use Gett\MyparcelBE\Service\WeightService;
 use MyParcelBE;
@@ -29,6 +27,7 @@ use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
+use MyParcelNL\Pdk\Shipment\Service\DeliveryDateService;
 use OrderLabel;
 use Tools;
 
@@ -196,7 +195,7 @@ class ConsignmentFactory
             return null;
         }
 
-        return $this->fixPastDeliveryDate($date);
+        return (DeliveryDateService::fixPastDeliveryDate($date))->format(self::FORMAT_TIMESTAMP);
     }
 
     /**
@@ -449,32 +448,6 @@ class ConsignmentFactory
     {
         $carrier           = CarrierService::getMyParcelCarrier($this->orderObject->getIdCarrier());
         $this->consignment = SdkConsignmentFactory::createByCarrierId($carrier->getId());
-    }
-
-    /**
-     * @param  string $deliveryDate
-     *
-     * @return string
-     */
-    private function fixPastDeliveryDate(string $deliveryDate): string
-    {
-        $tomorrow = new DateTime('tomorrow');
-
-        try {
-            $deliveryDateObject = new DateTime($deliveryDate);
-        } catch (Exception $e) {
-            return $tomorrow->format(self::FORMAT_TIMESTAMP);
-        }
-
-        $oldDate = clone $deliveryDateObject;
-        $tomorrow->setTime(0, 0);
-        $oldDate->setTime(0, 0);
-
-        if ($deliveryDateObject < $tomorrow || '0' === $deliveryDateObject->format('w')) {
-            $deliveryDateObject->add(new DateInterval('P1D'));
-        }
-
-        return $deliveryDateObject->format(self::FORMAT_TIMESTAMP);
     }
 
     /**
