@@ -15,6 +15,12 @@ on:
 
   workflow_dispatch:
     inputs:
+      base:
+        type: string
+        description: 'Base branch'
+        default: 'main'
+        required: true
+
       target:
         type: string
         description: 'Target branch'
