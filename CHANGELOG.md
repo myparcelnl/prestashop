@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.7.1](https://github.com/myparcelnl/prestashop/compare/v1.7.0...v1.7.1) (2022-11-10)
+
+
+### :bug: Bug Fixes
+
+* allow export with older delivery date ([#189](https://github.com/myparcelnl/prestashop/issues/189)) ([de4692b](https://github.com/myparcelnl/prestashop/commit/de4692b9fdc55c431edd672424e36f13595aa1b1))
+* correct package type at export ([#187](https://github.com/myparcelnl/prestashop/issues/187)) ([5bede86](https://github.com/myparcelnl/prestashop/commit/5bede867f137cccb8a677929dcc30dc911c6ffc5))
+* fix package type selection ([#197](https://github.com/myparcelnl/prestashop/issues/197)) ([0bdba0c](https://github.com/myparcelnl/prestashop/commit/0bdba0c83db19728231c71314784c235619d1c89)), closes [#186](https://github.com/myparcelnl/prestashop/issues/186)
+* update barcode after printing ([#198](https://github.com/myparcelnl/prestashop/issues/198)) ([b60f464](https://github.com/myparcelnl/prestashop/commit/b60f464fc9ee5578bc92888e32528a2de86378b9))
+
 ## [1.7.0](https://github.com/myparcelnl/prestashop/compare/v1.6.3...v1.7.0) (2022-08-08)
 
 
