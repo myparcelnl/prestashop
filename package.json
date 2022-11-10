@@ -2,10 +2,8 @@
   "name": "@myparcel/prestashop-module",
   "version": "1.7.1",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/myparcelnl/prestashop.git"
-  },
+  "repository": "github:myparcelnl/prestashop",
+  "license": "MIT",
   "workspaces": [
     "views/js/admin"
   ],
@@ -50,6 +48,5 @@
   },
   "optionalDependencies": {
     "@myparcel/eslint-config": "^3.4.2"
-  },
-  "license": "MIT"
+  }
 }
