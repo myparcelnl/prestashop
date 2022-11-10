@@ -38,7 +38,7 @@ export default defineComponent({
         return props.packageTypes.map((packageType) => {
           return {
             label: packageType.human,
-            value: packageType.id,
+            value: packageType.name,
           };
         });
       }),
