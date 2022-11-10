@@ -42,7 +42,7 @@ export type ActionResponse<CK = AdminAction> =
   CK extends LabelAction.DELETE ? ActionSuccessResponse<CK, LabelIdsData> :
     CK extends OrderAction.EXPORT ? ActionSuccessResponse<CK, ShipmentLabelsData> :
       CK extends OrderAction.EXPORT_PRINT ? ActionSuccessResponse<CK, ShipmentLabelsData & PrintData> :
-        CK extends LabelAction.PRINT ? ActionSuccessResponse<CK, PrintData> :
+        CK extends LabelAction.PRINT ? ActionSuccessResponse<CK, ShipmentLabelsData & PrintData> :
           CK extends OrderAction.PRINT ? ActionSuccessResponse<CK, PrintData> :
             CK extends LabelAction.REFRESH ? ActionSuccessResponse<CK, ShipmentLabelsData> :
               CK extends OrderAction.REFRESH_LABELS ? ActionSuccessResponse<CK, ShipmentLabelsData> :
