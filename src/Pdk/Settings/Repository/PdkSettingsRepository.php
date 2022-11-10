@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Settings\Repository;
+namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
-use Gett\MyparcelBE\Constant;
+use MyParcelNL\PrestaShop\Constant;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Pdk\Settings\Model\CustomsSettings;

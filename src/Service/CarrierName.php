@@ -1,10 +1,10 @@
 <?php
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier;
 use Configuration;
-use Gett\MyparcelBE\Constant;
+use MyParcelNL\PrestaShop\Constant;
 use Validate;
 
 class CarrierName

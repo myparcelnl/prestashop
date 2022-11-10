@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Entity;
+namespace MyParcelNL\PrestaShop\Entity;
 
 use Cache as PsCache;
-use MyParcelBE;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 
 class Cache
@@ -47,6 +47,6 @@ class Cache
      */
     private static function getKey(string $key): string
     {
-        return MyParcelBE::MODULE_NAME . '_' . $key;
+        return MyParcelNL::MODULE_NAME . '_' . $key;
     }
 }

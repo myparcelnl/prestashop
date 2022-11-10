@@ -1,9 +1,6 @@
-import * as COMPONENTS from '@myparcel/pdk-frontend-components';
-import {
-  ModalKey,
-  createPdkFrontend,
-  useModalStore,
-} from '@myparcel/pdk-frontend';
+import './assets/css/myparceladmin.css';
+import * as COMPONENTS from '@myparcel-pdk/frontend-components';
+import {ModalKey, createPdkFrontend, useModalStore} from '@myparcel/pdk-frontend';
 import PsAlert from '@/components/pdk/PsAlert.vue';
 import PsButton from '@/components/pdk/PsButton.vue';
 import PsCard from '@/components/pdk/PsCard.vue';
@@ -24,6 +21,7 @@ createPdkFrontend({
     PdkDropdownButton: PsDropdownButton,
     PdkDropdownButtonItem: PsDropdownButtonItem,
     PdkFormGroup: COMPONENTS.DefaultPdkFormGroup,
+    PdkIcon: COMPONENTS.DefaultPdkIcon,
     PdkInput: PsInput,
     PdkModal: COMPONENTS.DefaultPdkModal,
     PdkMultiCheckbox: COMPONENTS.DefaultPdkMultiCheckbox,
@@ -39,11 +37,11 @@ createPdkFrontend({
 
     modalStore.$patch({
       onOpen: (modal: ModalKey) => {
-        jQuery('#' + modal).modal('show');
+        jQuery(`#${modal}`).modal('show');
       },
 
       onClose: (modal: ModalKey) => {
-        jQuery('#' + modal).modal('hide');
+        jQuery(`#${modal}`).modal('hide');
       },
     });
   },

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Configuration\Form;
+namespace MyParcelNL\PrestaShop\Module\Configuration\Form;
 
 use AdminController;
 use Configuration;
 use Context;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Carrier\ExclusiveField;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use HelperForm;
 use Module;
-use MyParcelBE;
+use MyParcelNL;
 use MyParcelNL\Pdk\Base\Service\CountryService;
 use PrestaShop\PrestaShop\Adapter\Entity\Carrier;
 use Tools;
@@ -56,16 +56,16 @@ abstract class AbstractForm
     protected $legend;
 
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     protected $module;
 
     /**
-     * @param  \MyParcelBE                                 $module
+     * @param  \MyParcelNL                                 $module
      * @param  \Context                                    $context
      * @param  \MyParcelNL\Pdk\Base\Service\CountryService $countryService
      */
-    public function __construct(MyParcelBE $module, Context $context, CountryService $countryService)
+    public function __construct(MyParcelNL $module, Context $context, CountryService $countryService)
     {
         $this->module         = $module;
         $this->context        = $context;

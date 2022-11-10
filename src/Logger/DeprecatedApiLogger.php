@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Logger;
+namespace MyParcelNL\PrestaShop\Logger;
 
 use Configuration;
-use Gett\MyparcelBE\Constant;
+use MyParcelNL\PrestaShop\Constant;
 
 /**
  * Only logs data if API Logging is enabled in the MyParcel settings.

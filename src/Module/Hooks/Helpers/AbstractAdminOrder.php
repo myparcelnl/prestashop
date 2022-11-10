@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks\Helpers;
+namespace MyParcelNL\PrestaShop\Module\Hooks\Helpers;
 
 use Configuration;
 use Context;
-use Gett\MyparcelBE\Constant;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 abstract class AbstractAdminOrder extends AbstractController
@@ -18,7 +18,7 @@ abstract class AbstractAdminOrder extends AbstractController
     protected $context;
 
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     protected $module;
 
@@ -28,7 +28,7 @@ abstract class AbstractAdminOrder extends AbstractController
     public function __construct()
     {
 //        parent::__construct();
-        $this->module  = MyParcelBE::getModule();
+        $this->module  = MyParcelNL::getModule();
         $this->context = Context::getContext();
     }
 

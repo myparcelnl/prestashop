@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace MyParcelNL\PrestaShop\Module\Configuration;
 
-use Gett\MyparcelBE\Module\Configuration\Form\AbstractForm;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\AbstractForm;
 use MyParcelNL\Sdk\src\Model\BaseModel;
 
 class SettingsMenuItem extends BaseModel

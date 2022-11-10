@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Factory\OrderStatus;
+namespace MyParcelNL\PrestaShop\Factory\OrderStatus;
 
 use Configuration;
-use Gett\MyparcelBE\Collection\OrderStatusUpdateCollection;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Entity\OrderStatus\DeliveredOrderStatusUpdate;
-use Gett\MyparcelBE\Entity\OrderStatus\PrintedOrderStatusUpdate;
-use Gett\MyparcelBE\Entity\OrderStatus\ShippedOrderStatusUpdate;
+use MyParcelNL\PrestaShop\Collection\OrderStatusUpdateCollection;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Entity\OrderStatus\DeliveredOrderStatusUpdate;
+use MyParcelNL\PrestaShop\Entity\OrderStatus\PrintedOrderStatusUpdate;
+use MyParcelNL\PrestaShop\Entity\OrderStatus\ShippedOrderStatusUpdate;
 
 class OrderStatusUpdateCollectionFactory
 {
@@ -22,7 +22,7 @@ class OrderStatusUpdateCollectionFactory
      * @param  int $shipmentId
      * @param  int $shipmentStatus
      *
-     * @return \Gett\MyparcelBE\Collection\OrderStatusUpdateCollection
+     * @return \MyParcelNL\PrestaShop\Collection\OrderStatusUpdateCollection
      * @throws \Exception
      */
     public static function create(int $shipmentId, int $shipmentStatus): OrderStatusUpdateCollection

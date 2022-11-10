@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Adapter;
+namespace MyParcelNL\PrestaShop\Adapter;
 
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
+use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 
 class DeliveryOptionsFromOrderAdapter extends DeliveryOptions

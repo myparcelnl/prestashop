@@ -1,10 +1,10 @@
 <?php
 
-namespace Gett\MyparcelBE\Carrier;
+namespace MyParcelNL\PrestaShop\Carrier;
 
 use Db;
 use DbQuery;
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Database\Table;
 
 abstract class AbstractPackageCalculator
 {

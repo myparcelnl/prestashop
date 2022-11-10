@@ -1,8 +1,8 @@
 <?php
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\Sdk\src\Support\Collection;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;

@@ -1,20 +1,20 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration\Form;
+namespace MyParcelNL\PrestaShop\Module\Configuration\Form;
 
 use AdminController;
 use Configuration;
 use Context;
 use Currency;
 use Db;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator;
-use Gett\MyparcelBE\Module\Facade\ModuleService as ModuleServiceAlias;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use Gett\MyparcelBE\Module\Tools\Tools;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
-use Gett\MyparcelBE\Service\CarrierService;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Module\Carrier\CarrierOptionsCalculator;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService as ModuleServiceAlias;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
+use MyParcelNL\PrestaShop\Service\CarrierService;
 use Group;
 use HelperForm;
 use HelperList;

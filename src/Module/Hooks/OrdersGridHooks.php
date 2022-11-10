@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use Configuration;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Grid\Action\Bulk\IconBulkAction;
-use Gett\MyparcelBE\Grid\Column\LabelsColumn;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Grid\Action\Bulk\IconBulkAction;
+use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\Pdk\Facade\LanguageService;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 
@@ -89,22 +89,22 @@ trait OrdersGridHooks
     private function getBulkActionsMap(): array
     {
         return [
-            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::print */
+            /** @see \MyParcelNL\PrestaShop\Controllers\Admin\AdminMyParcelOrderController::print */
             'print'         => [
                 'icon'  => 'cloud_download',
                 'label' => 'action_print',
             ],
-            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::refreshLabels */
+            /** @see \MyParcelNL\PrestaShop\Controllers\Admin\AdminMyParcelOrderController::refreshLabels */
             'refresh' => [
                 'icon'  => 'refresh',
                 'label' => 'action_refresh',
             ],
-            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::export */
+            /** @see \MyParcelNL\PrestaShop\Controllers\Admin\AdminMyParcelOrderController::export */
             'export'        => [
                 'icon'  => 'add',
                 'label' => 'action_export',
             ],
-            /** @see \Gett\MyparcelBE\Controllers\Admin\AdminMyParcelOrderController::exportPrint */
+            /** @see \MyParcelNL\PrestaShop\Controllers\Admin\AdminMyParcelOrderController::exportPrint */
             'exportPrint'   => [
                 'icon'  => 'print',
                 'label' => 'action_export_and_print',

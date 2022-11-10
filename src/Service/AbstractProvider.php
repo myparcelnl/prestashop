@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Context;
-use MyParcelBE;
+use MyParcelNL;
 
 abstract class AbstractProvider
 {
@@ -15,7 +15,7 @@ abstract class AbstractProvider
     protected $context;
 
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     protected $module;
 
@@ -24,7 +24,7 @@ abstract class AbstractProvider
      */
     public function __construct(Context $context = null)
     {
-        $this->module  = MyParcelBE::getModule();
+        $this->module  = MyParcelNL::getModule();
         $this->context = $context ?? Context::getContext();
     }
 }

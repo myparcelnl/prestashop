@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Collection;
+namespace MyParcelNL\PrestaShop\Collection;
 
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\PrestaShop\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 
 /**

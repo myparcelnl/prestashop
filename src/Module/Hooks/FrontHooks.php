@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use Address;
-use Currency;
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsManager;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
 use Media;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
+use MyParcelNL\PrestaShop\DeliveryOptions\DeliveryOptionsManager;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderControllerCore;
 use Tools;
@@ -111,6 +110,7 @@ trait FrontHooks
         Address $address
     ) {
         $translator = $this->context->getTranslator();
+        $locale     = $this->context->getCurrentLocale();
 
         $shippingOptions = $this->getShippingOptions($carrier['id'], $address);
         $includeTax      = $shippingOptions['include_tax'];
@@ -121,18 +121,15 @@ trait FrontHooks
             :
             $carrier['price_without_tax'];
 
-        $shipping_cost = Tools::displayPrice(
-            $cost,
-            Currency::getCurrencyInstance((int) $this->context->cart->id_currency)
-        );
+        $shippingCost = $locale->formatPrice($cost, $this->context->cart->id_currency);
 
         if ($shippingOptions['display_tax_label']) {
-            $shipping_cost = $translator->trans(
+            $shippingCost = $translator->trans(
                 $includeTax ? '%price% tax incl.' : '%price% tax excl.',
-                ['%price%' => $shipping_cost],
+                ['%price%' => $shippingCost],
                 'Shop.Theme.Checkout'
             );
         }
-        return $shipping_cost;
+        return $shippingCost;
     }
 }

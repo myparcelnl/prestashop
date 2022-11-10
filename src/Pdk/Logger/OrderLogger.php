@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Logger;
+namespace MyParcelNL\PrestaShop\Pdk\Logger;
 
 use InvalidArgumentException;
 use Order;

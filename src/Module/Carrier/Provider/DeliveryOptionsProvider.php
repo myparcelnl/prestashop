@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Carrier\Provider;
+namespace MyParcelNL\PrestaShop\Module\Carrier\Provider;
 
 use DateTime;
-use Gett\MyparcelBE\Factory\OrderSettingsFactory;
+use MyParcelNL\PrestaShop\Factory\OrderSettingsFactory;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 
 class DeliveryOptionsProvider

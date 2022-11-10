@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Api\Adapter;
+namespace MyParcelNL\PrestaShop\Pdk\Api\Adapter;
 
 use GuzzleHttp\Client;
 use MyParcelNL\Pdk\Api\Adapter\ClientAdapterInterface;

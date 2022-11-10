@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Tools;
+namespace MyParcelNL\PrestaShop\Module\Tools;
 
 use Tools as ToolsPresta;
 

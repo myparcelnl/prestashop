@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import {PdkNotification, toArray} from '@myparcel/pdk-frontend';
-import {PropType, computed, defineComponent} from 'vue';
+import {computed, defineComponent, PropType} from 'vue';
 
 export default defineComponent({
   name: 'PsAlert',
@@ -35,7 +35,9 @@ export default defineComponent({
 
   setup: (props) => {
     return {
-      contentArray: computed(() => toArray(props.notification.content)),
+      contentArray: computed(() => {
+        return toArray(props.notification.content);
+      }),
     };
   },
 });

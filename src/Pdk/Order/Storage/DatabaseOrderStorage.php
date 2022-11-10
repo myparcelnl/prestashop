@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Order\Storage;
+namespace MyParcelNL\PrestaShop\Pdk\Order\Storage;
 
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\Pdk\Plugin\Model\PdkOrder;
 use MyParcelNL\Pdk\Storage\AbstractStorage;
 use MyParcelNL\Sdk\src\Support\Arr;

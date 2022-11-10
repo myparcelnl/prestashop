@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Entity\OrderStatus;
+namespace MyParcelNL\PrestaShop\Entity\OrderStatus;
 
 use Configuration;
 use Exception;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Entity\OrderStatusUpdateInterface;
-use Gett\MyparcelBE\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Entity\OrderStatusUpdateInterface;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use OrderLabel;
 

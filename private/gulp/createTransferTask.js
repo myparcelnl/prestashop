@@ -5,10 +5,7 @@
  * @returns {Function}
  */
 function createTransferTask(gulp, plugins, moduleName) {
-  return gulp.series(
-    `copy:${moduleName}`,
-    `transform:${moduleName}`,
-  );
+  return gulp.series(`copy:${moduleName}`, `transform:${moduleName}`);
 }
 
 module.exports = {createTransferTask};

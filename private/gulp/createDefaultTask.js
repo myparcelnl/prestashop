@@ -8,13 +8,13 @@ function createDefaultTask(gulp) {
   return gulp.series(
     'clean',
     'js:build',
-    'admin:build',
-    'copy:delivery-options',
-    gulp.parallel(
-      ...modules.map((moduleName) => gulp.series(
-        `build:${moduleName}`,
+    // 'admin:build',
+    // 'copy:delivery-options',
+    ...modules.map((moduleName) =>
+      gulp.series(
+        // `build:${moduleName}`,
         `zip:${moduleName}`,
-      )),
+      ),
     ),
   );
 }

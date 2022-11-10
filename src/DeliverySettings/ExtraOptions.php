@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\DeliverySettings;
+namespace MyParcelNL\PrestaShop\DeliverySettings;
 
 class ExtraOptions
 {

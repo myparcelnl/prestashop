@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Database;
+namespace MyParcelNL\PrestaShop\Database;
 
 class CreateProductConfigurationTableMigration implements Migration
 {

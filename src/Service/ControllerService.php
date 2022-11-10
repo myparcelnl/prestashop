@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 class ControllerService
 {
-    public const BASE = 'myparcelbe';
-    public const PDK  = 'myparcelbe_pdk';
+    public const BASE = 'myparcelnl';
+    public const PDK  = 'myparcelnl_pdk';
 
     /**
      * @param  string $route

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Upgrade;
+namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 
@@ -138,7 +138,7 @@ EOF
     {
         $query = new \DbQuery();
         $query->select('*');
-        $query->from('myparcelbe_delivery_settings');
+        $query->from('myparcelnl_delivery_settings');
 
         $oldValues = $this->db->executeS($query);
         $newValues = [];
@@ -175,7 +175,7 @@ EOF
         $query = new \DbQuery();
         $query->select('*');
         $query->from('configuration');
-        $query->where('name LIKE "myparcelbe_%"');
+        $query->where('name LIKE "myparcelnl_%"');
 
         $oldValues = $this->db->executeS($query);
         $newValues = [];
@@ -186,33 +186,33 @@ EOF
         DefaultLogger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
 
         $config = [
-            'MYPARCELBE_API_KEY'                             => 'general.apiKey',
-            'MYPARCELBE_API_LOGGING'                         => 'general.apiLogging',
-            'MYPARCELBE_BPOST'                               => '',
-            'MYPARCELBE_AGE_CHECK'                           => '',
-            'MYPARCELBE_CONCEPT_FIRST'                       => '',
-            'MYPARCELBE_CUSTOMS_CODE'                        => '',
-            'MYPARCELBE_CUSTOMS_FORM'                        => '',
-            'MYPARCELBE_CUSTOMS_ORIGIN'                      => '',
-            'MYPARCELBE_DEFAULT_CUSTOMS_CODE'                => '',
-            'MYPARCELBE_DEFAULT_CUSTOMS_ORIGIN'              => '',
-            'MYPARCELBE_DELIVERED_ORDER_STATUS'              => '',
-            'MYPARCELBE_DELIVERY_OPTIONS_PRICE_FORMAT'       => '',
-            'MYPARCELBE_DPD'                                 => '',
-            'MYPARCELBE_IGNORE_ORDER_STATUS'                 => '',
-            'MYPARCELBE_INSURANCE'                           => '',
-            'MYPARCELBE_INSURANCE_BELGIUM'                   => '',
-            'MYPARCELBE_INSURANCE_FROM_PRICE'                => '',
-            'MYPARCELBE_INSURANCE_MAX_AMOUNT'                => '',
-            'MYPARCELBE_LABEL_CREATED_ORDER_STATUS'          => '',
-            'MYPARCELBE_LABEL_DESCRIPTION'                   => '',
-            'MYPARCELBE_LABEL_OPEN_DOWNLOAD'                 => '',
-            'MYPARCELBE_LABEL_POSITION'                      => '',
-            'MYPARCELBE_LABEL_PROMPT_POSITION'               => '',
-            'MYPARCELBE_LABEL_SCANNED_ORDER_STATUS'          => '',
-            'MYPARCELBE_LABEL_SIZE'                          => '',
-            'MYPARCELBE_ORDER_NOTIFICATION_AFTER'            => '',
-            'MYPARCELBE_PACKAGE_FORMAT'                      => '',
+            'MYPARCELNL_API_KEY'                             => 'general.apiKey',
+            'MYPARCELNL_API_LOGGING'                         => 'general.apiLogging',
+            'MYPARCELNL_BPOST'                               => '',
+            'MYPARCELNL_AGE_CHECK'                           => '',
+            'MYPARCELNL_CONCEPT_FIRST'                       => '',
+            'MYPARCELNL_CUSTOMS_CODE'                        => '',
+            'MYPARCELNL_CUSTOMS_FORM'                        => '',
+            'MYPARCELNL_CUSTOMS_ORIGIN'                      => '',
+            'MYPARCELNL_DEFAULT_CUSTOMS_CODE'                => '',
+            'MYPARCELNL_DEFAULT_CUSTOMS_ORIGIN'              => '',
+            'MYPARCELNL_DELIVERED_ORDER_STATUS'              => '',
+            'MYPARCELNL_DELIVERY_OPTIONS_PRICE_FORMAT'       => '',
+            'MYPARCELNL_DPD'                                 => '',
+            'MYPARCELNL_IGNORE_ORDER_STATUS'                 => '',
+            'MYPARCELNL_INSURANCE'                           => '',
+            'MYPARCELNL_INSURANCE_BELGIUM'                   => '',
+            'MYPARCELNL_INSURANCE_FROM_PRICE'                => '',
+            'MYPARCELNL_INSURANCE_MAX_AMOUNT'                => '',
+            'MYPARCELNL_LABEL_CREATED_ORDER_STATUS'          => '',
+            'MYPARCELNL_LABEL_DESCRIPTION'                   => '',
+            'MYPARCELNL_LABEL_OPEN_DOWNLOAD'                 => '',
+            'MYPARCELNL_LABEL_POSITION'                      => '',
+            'MYPARCELNL_LABEL_PROMPT_POSITION'               => '',
+            'MYPARCELNL_LABEL_SCANNED_ORDER_STATUS'          => '',
+            'MYPARCELNL_LABEL_SIZE'                          => '',
+            'MYPARCELNL_ORDER_NOTIFICATION_AFTER'            => '',
+            'MYPARCELNL_PACKAGE_FORMAT'                      => '',
             'MYPARCELBE_PACKAGE_TYPE'                        => '',
             'MYPARCELBE_POSTNL'                              => '',
             'MYPARCELBE_RECIPIENT_ONLY'                      => '',

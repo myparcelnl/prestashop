@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Module\Hooks;
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use PrestaShop\PrestaShop\Adapter\Entity\Configuration;
 use PrestaShop\PrestaShop\Adapter\Entity\Context;
 use PrestaShop\PrestaShop\Adapter\Entity\Country;

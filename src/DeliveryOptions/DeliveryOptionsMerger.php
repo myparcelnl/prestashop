@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\DeliveryOptions;
+namespace MyParcelNL\PrestaShop\DeliveryOptions;
 
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;

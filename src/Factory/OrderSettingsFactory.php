@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Factory;
+namespace MyParcelNL\PrestaShop\Factory;
 
-use Gett\MyparcelBE\Entity\Cache;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\OrderSettings\OrderSettings;
+use MyParcelNL\PrestaShop\Entity\Cache;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\OrderSettings\OrderSettings;
 
 class OrderSettingsFactory
 {
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order|int|string $orderOrId
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order|int|string $orderOrId
      *
-     * @return \Gett\MyparcelBE\OrderSettings\OrderSettings
+     * @return \MyParcelNL\PrestaShop\OrderSettings\OrderSettings
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -21,7 +21,7 @@ class OrderSettingsFactory
     {
         $order = $orderOrId instanceof Order ? $orderOrId : OrderFactory::create($orderOrId);
 
-        return Cache::remember("myparcelbe_order_settings_{$order->getId()}", static function () use ($order) {
+        return Cache::remember("myparcelnl_order_settings_{$order->getId()}", static function () use ($order) {
             return new OrderSettings($order);
         });
     }

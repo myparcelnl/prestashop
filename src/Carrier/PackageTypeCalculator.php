@@ -1,14 +1,14 @@
 <?php
 
-namespace Gett\MyparcelBE\Carrier;
+namespace MyParcelNL\PrestaShop\Carrier;
 
 use Carrier;
 use Cart;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Carrier\ExclusiveField;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
-use Gett\MyparcelBE\Service\ProductConfigurationProvider;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Module\Carrier\ExclusiveField;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
+use MyParcelNL\PrestaShop\Service\ProductConfigurationProvider;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 
 class PackageTypeCalculator extends AbstractPackageCalculator
@@ -104,7 +104,7 @@ class PackageTypeCalculator extends AbstractPackageCalculator
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      *
      * @return int
      * @throws \PrestaShopDatabaseException
@@ -152,7 +152,7 @@ class PackageTypeCalculator extends AbstractPackageCalculator
         $result        = $this->getOrderProductsConfiguration($id_order);
         $package_types = [];
         foreach ($result as $item) {
-            if ('MYPARCELBE_PACKAGE_TYPE' === $item['name'] && $item['value']) {
+            if ('MYPARCELNL_PACKAGE_TYPE' === $item['name'] && $item['value']) {
                 $package_types[$item['id_product']] = (int) $item['value'];
             }
         }

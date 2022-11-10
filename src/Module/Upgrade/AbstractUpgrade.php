@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Upgrade;
+namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
 defined('_PS_VERSION_') or die();
 
 use Exception;
-use Gett\MyparcelBE\Service\Concern\HasInstance;
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
+use MyParcelNL\PrestaShop\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 
@@ -22,7 +22,7 @@ abstract class AbstractUpgrade
     protected $db;
 
     /**
-     * @var \Gett\MyparcelBE\Service\Platform\AbstractPlatformService
+     * @var \MyParcelNL\PrestaShop\Service\Platform\AbstractPlatformService
      */
     protected $platformService;
 

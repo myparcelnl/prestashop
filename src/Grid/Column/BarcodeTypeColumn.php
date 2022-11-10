@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Grid\Column;
+namespace MyParcelNL\PrestaShop\Grid\Column;
 
 use PrestaShop\PrestaShop\Core\Grid\Column\AbstractColumn;
 

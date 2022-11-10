@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service\Platform;
+namespace MyParcelNL\PrestaShop\Service\Platform;
 
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 

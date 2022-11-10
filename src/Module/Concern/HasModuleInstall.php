@@ -2,23 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Concern;
+namespace MyParcelNL\PrestaShop\Module\Concern;
 
 use Carrier;
 use Configuration;
 use Context;
 use Db;
 use DbQuery;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Module\Carrier\CarrierInstaller;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
-use MyParcelNL\Pdk\Base\Service\CountryService;
 use Group;
 use Language;
 use MyParcelNL\Pdk\Carrier\Model\CarrierOptions;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
 use MyParcelNL\Sdk\src\Support\Arr;
 use RangePrice;
 use RangeWeight;
@@ -266,13 +264,13 @@ trait HasModuleInstall
         $languages = [];
 
         foreach (Language::getLanguages() as $lang) {
-            $languages['AdminMyParcelBE'][$lang['id_lang']] = 'MyParcelBE';
+            $languages['AdminMyParcelNL'][$lang['id_lang']] = 'MyParcelBE';
         }
 
         return [
             [
-                'class_name'   => 'AdminMyParcelBE',
-                'name'         => $languages['AdminMyParcelBE'],
+                'class_name'   => 'AdminMyParcelNL',
+                'name'         => $languages['AdminMyParcelNL'],
                 'parent_class' => 'AdminParentShipping',
             ],
         ];

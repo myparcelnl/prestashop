@@ -5,10 +5,7 @@
  * @returns {Function}
  */
 function createBuildTask(gulp, plugins, moduleName) {
-  return gulp.series(
-    `transfer:${moduleName}`,
-    `composer:update:${moduleName}`,
-  );
+  return gulp.series(`transfer:${moduleName}`, `composer:update:${moduleName}`);
 }
 
 module.exports = {createBuildTask};

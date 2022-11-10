@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
-use Gett\MyparcelBE\Service\Concern\HasInstance;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
+use MyParcelNL;
 
 class MyParcelStatusProvider
 {
     use HasInstance;
 
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     private $module;
 
     public function __construct()
     {
-        $this->module = MyParcelBE::getModule();
+        $this->module = MyParcelNL::getModule();
     }
 
     /**

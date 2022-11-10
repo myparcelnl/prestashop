@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Module\Hooks;
 
-use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
-use Gett\MyparcelBE\Pdk\Order\Repository\PdkOrderRepository;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\RenderService;
@@ -76,7 +76,7 @@ trait HasPdkRenderHooks
     public function hookDisplayAdminOrderMain(array $params): string
     {
         try {
-            /** @var \Gett\MyparcelBE\Pdk\Order\Repository\PdkOrderRepository $repository */
+            /** @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository $repository */
             $repository = Pdk::get(PdkOrderRepository::class);
             $order      = $repository->get($params['id_order']);
 

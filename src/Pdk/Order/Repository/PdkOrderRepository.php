@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Order\Repository;
+namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
 use Configuration;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Pdk\Order\Storage\DatabaseOrderStorage;
-use Gett\MyparcelBE\Service\ProductConfigurationProvider;
-use Gett\MyparcelBE\Service\WeightService;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Pdk\Order\Storage\DatabaseOrderStorage;
+use MyParcelNL\PrestaShop\Service\ProductConfigurationProvider;
+use MyParcelNL\PrestaShop\Service\WeightService;
 use MyParcelNL\Pdk\Api\Service\ApiServiceInterface;
 use MyParcelNL\Pdk\Base\Service\CountryService;
 use MyParcelNL\Pdk\Base\Support\Collection;
@@ -32,7 +32,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     private $countryService;
 
     /**
-     * @param  \Gett\MyparcelBE\Pdk\Order\Storage\DatabaseOrderStorage $storage
+     * @param  \MyParcelNL\PrestaShop\Pdk\Order\Storage\DatabaseOrderStorage $storage
      * @param  \MyParcelNL\Pdk\Api\Service\ApiServiceInterface         $api
      * @param  \MyParcelNL\Pdk\Base\Service\CountryService             $countryService
      */

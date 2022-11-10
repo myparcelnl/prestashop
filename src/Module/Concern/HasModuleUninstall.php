@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Concern;
+namespace MyParcelNL\PrestaShop\Module\Concern;
 
 use Carrier;
 use Configuration;
 use Db;
 use DbQuery;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Tab;
@@ -153,7 +153,7 @@ trait HasModuleUninstall
         $query = new DbQuery();
         $query->select('id_tab');
         $query->from('tab');
-        $query->where(sprintf("module = '%s'", MyParcelBE::MODULE_NAME));
+        $query->where(sprintf("module = '%s'", MyParcelNL::MODULE_NAME));
         $ids = Db::getInstance(_PS_USE_SQL_SLAVE_)
             ->executeS($query);
 

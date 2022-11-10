@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Model;
+namespace MyParcelNL\PrestaShop\Model;
 
 class MyParcelRequest extends \MyParcelNL\Sdk\src\Model\MyParcelRequest
 {

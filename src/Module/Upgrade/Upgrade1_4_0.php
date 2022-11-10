@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Upgrade;
+namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
 use Db;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
-use Gett\MyparcelBE\Service\CarrierService;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\CheckoutForm;
+use MyParcelNL\PrestaShop\Service\CarrierService;
 use MyParcelNL\Sdk\src\Support\Collection;
 
 class Upgrade1_4_0 extends AbstractUpgrade

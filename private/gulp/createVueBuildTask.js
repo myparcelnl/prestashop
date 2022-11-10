@@ -8,7 +8,7 @@ const {execute} = require('../execute');
  */
 function createVueBuildTask() {
   return (callback) => {
-    execute('pnpm run build-only', {cwd: adminAppDir}, callback);
+    execute('yarn build-only', {cwd: adminAppDir}, callback);
   };
 }
 

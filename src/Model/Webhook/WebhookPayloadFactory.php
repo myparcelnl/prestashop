@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Model\Webhook;
+namespace MyParcelNL\PrestaShop\Model\Webhook;
 
 class WebhookPayloadFactory
 {
     /**
      * @param  array $payload
      *
-     * @return \Gett\MyparcelBE\Model\Webhook\AbstractWebhookPayload
-     * @throws \Gett\MyparcelBE\Model\Webhook\WebhookException
+     * @return \MyParcelNL\PrestaShop\Model\Webhook\AbstractWebhookPayload
+     * @throws \MyParcelNL\PrestaShop\Model\Webhook\WebhookException
      */
     public static function create(array $payload): AbstractWebhookPayload
     {
@@ -33,7 +33,7 @@ class WebhookPayloadFactory
     }
 
     /**
-     * @throws \Gett\MyparcelBE\Model\Webhook\WebhookException
+     * @throws \MyParcelNL\PrestaShop\Model\Webhook\WebhookException
      */
     private static function throwException(): void
     {

@@ -1,13 +1,13 @@
 <?php
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\Pdk\Base\Service\CountryService;
 
 /**
  * @throws \PrestaShopDatabaseException
  */
-function upgrade_module_1_1_2(MyParcelBE $module): bool
+function upgrade_module_1_1_2(MyParcelNL $module): bool
 {
     $carrier              = Table::withPrefix('carrier');
     $carrierConfiguration = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);

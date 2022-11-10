@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier;
 use Configuration;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use Validate;

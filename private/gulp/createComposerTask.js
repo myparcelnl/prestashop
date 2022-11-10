@@ -1,6 +1,6 @@
 const {execute} = require('../execute');
 const path = require('path');
-const ci = require('ci-info');
+const isCi = require('is-ci');
 
 /**
  * @param {import('gulp').Gulp} gulp
@@ -11,11 +11,7 @@ const ci = require('ci-info');
 function createComposerTask(gulp, plugins, moduleName) {
   return (callback) => {
     const cwd = path.resolve(`dist/${moduleName}`);
-    let command = `docker compose run --rm -it -v ${cwd}:/var/www/html web composer update --no-dev`;
-
-    if (ci.isCI) {
-      command = 'composer update --no-dev';
-    }
+    const command = `composer update --no-dev`;
 
     execute(command, {cwd}, callback);
   };

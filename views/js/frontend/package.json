@@ -1,0 +1,11 @@
+{
+  "name": "@myparcel/prestashop-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsup src/index.ts --dts --sourcemap -d lib"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.5.14",
+    "tsup": "^6.4.0"
+  }
+}

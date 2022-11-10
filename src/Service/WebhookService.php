@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Curl\Curl;
 use Exception;
-use Gett\MyparcelBE\Model\MyParcelRequest as Request;
-use Gett\MyparcelBE\Model\Webhook\Subscription;
-use Gett\MyparcelBE\Service\Concern\HasApiKey;
+use MyParcelNL\PrestaShop\Model\MyParcelRequest as Request;
+use MyParcelNL\PrestaShop\Model\Webhook\Subscription;
+use MyParcelNL\PrestaShop\Service\Concern\HasApiKey;
 use MyParcelNL\Sdk\src\Model\MyParcelRequest;
 
 class WebhookService extends AbstractEndpoint
@@ -16,7 +16,7 @@ class WebhookService extends AbstractEndpoint
     use HasApiKey;
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Webhook\Subscription $subscription
+     * @param  \MyParcelNL\PrestaShop\Model\Webhook\Subscription $subscription
      *
      * @return mixed|null
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException

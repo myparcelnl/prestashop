@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\DeliveryOptions;
+namespace MyParcelNL\PrestaShop\DeliveryOptions;
 
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Entity\Cache;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Entity\Cache;
 use MyParcelNL\Sdk\src\Support\Collection;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 

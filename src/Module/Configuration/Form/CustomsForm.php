@@ -1,11 +1,11 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration\Form;
+namespace MyParcelNL\PrestaShop\Module\Configuration\Form;
 
 use Context;
 use Country;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 
 class CustomsForm extends AbstractForm
 {

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks\Helpers;
+namespace MyParcelNL\PrestaShop\Module\Hooks\Helpers;
 
 use Exception;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Provider\OrderLabelProvider;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Provider\OrderLabelProvider;
 use Validate;
 
 class AdminOrderView extends AbstractAdminOrder
 {
     /**
-     * @var \Gett\MyparcelBE\Model\Core\Order
+     * @var \MyParcelNL\PrestaShop\Model\Core\Order
      */
     private $order;
 

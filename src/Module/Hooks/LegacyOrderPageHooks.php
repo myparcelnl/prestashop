@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use Configuration;
 use DateTime;
 use Dispatcher;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsManager;
-use Gett\MyparcelBE\Label\LabelOptionsResolver;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Hooks\Helpers\AdminOrderView;
-use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
-use Gett\MyparcelBE\Service\CarrierService;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\DeliveryOptions\DeliveryOptionsManager;
+use MyParcelNL\PrestaShop\Label\LabelOptionsResolver;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Module\Hooks\Helpers\AdminOrderView;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Service\CarrierService;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;

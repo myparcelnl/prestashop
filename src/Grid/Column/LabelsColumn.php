@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Grid\Column;
+namespace MyParcelNL\PrestaShop\Grid\Column;
 
 use PrestaShop\PrestaShop\Core\Grid\Column\AbstractColumn;
 use Symfony\Component\OptionsResolver\OptionsResolver;

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * @property \MyParcelBE $module
+ * @property \MyParcelNL $module
  */
 class AdminMyParcelBEController extends ModuleAdminController
 {

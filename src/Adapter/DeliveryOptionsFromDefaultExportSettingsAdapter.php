@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Adapter;
+namespace MyParcelNL\PrestaShop\Adapter;
 
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\Constant;
+use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
+use MyParcelNL\PrestaShop\Constant;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Support\Collection;
 

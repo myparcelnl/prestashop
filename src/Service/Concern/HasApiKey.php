@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service\Concern;
+namespace MyParcelNL\PrestaShop\Service\Concern;
 
 trait HasApiKey
 {

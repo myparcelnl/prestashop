@@ -1,11 +1,11 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Carrier;
+namespace MyParcelNL\PrestaShop\Module\Carrier;
 
 use Carrier;
 use Configuration;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
 
 class ExclusiveField
 {

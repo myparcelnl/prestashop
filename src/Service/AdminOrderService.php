@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Address;
 use Configuration;
 use Country;
 use Customer;
 use Exception;
-use Gett\MyparcelBE\Adapter\DeliveryOptionsFromFormAdapter;
-use Gett\MyparcelBE\Collection\ConsignmentCollection;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
-use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
-use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use Gett\MyparcelBE\Module\Tools\Tools;
-use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
-use Gett\MyparcelBE\Service\Consignment\Download;
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
-use Gett\MyparcelBE\Timer;
+use MyParcelNL\PrestaShop\Adapter\DeliveryOptionsFromFormAdapter;
+use MyParcelNL\PrestaShop\Collection\ConsignmentCollection;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\DeliverySettings\ExtraOptions;
+use MyParcelNL\PrestaShop\Factory\Consignment\ConsignmentFactory;
+use MyParcelNL\PrestaShop\Factory\OrderSettingsFactory;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Service\Consignment\Download;
+use MyParcelNL\PrestaShop\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\PrestaShop\Timer;
 use InvalidArgumentException;
-use MyParcelBE;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
@@ -40,10 +40,10 @@ class AdminOrderService extends AbstractService
     private $countryService;
 
     /**
-     * @param  \MyParcelBE                             $module
+     * @param  \MyParcelNL                                 $module
      * @param  \MyParcelNL\Pdk\Base\Service\CountryService $countryService
      */
-    public function __construct(MyParcelBE $module, CountryService $countryService)
+    public function __construct(MyParcelNL $module, CountryService $countryService)
     {
         parent::__construct($module);
         $this->countryService = $countryService;
@@ -51,10 +51,10 @@ class AdminOrderService extends AbstractService
 
     /**
      * @param  array                                                                           $postValues
-     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
      * @param  \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions|null $deliveryOptions
      *
-     * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
+     * @return \MyParcelNL\PrestaShop\Collection\ConsignmentCollection
      * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
@@ -158,7 +158,7 @@ class AdminOrderService extends AbstractService
     /**
      * @param  int $orderId
      *
-     * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
+     * @return \MyParcelNL\PrestaShop\Collection\ConsignmentCollection
      * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
@@ -184,7 +184,7 @@ class AdminOrderService extends AbstractService
     /**
      * @param  mixed $orderId
      *
-     * @return \Gett\MyparcelBE\Model\Core\Order
+     * @return \MyParcelNL\PrestaShop\Model\Core\Order
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -203,7 +203,7 @@ class AdminOrderService extends AbstractService
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Collection\ConsignmentCollection $collection
+     * @param  \MyParcelNL\PrestaShop\Collection\ConsignmentCollection $collection
      *
      * @return array[]
      * @throws \PrestaShopDatabaseException
@@ -350,7 +350,7 @@ class AdminOrderService extends AbstractService
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      * @param  array                             $values
      *
      * @return \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions

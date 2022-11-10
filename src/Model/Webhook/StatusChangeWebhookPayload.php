@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Model\Webhook;
+namespace MyParcelNL\PrestaShop\Model\Webhook;
 
 use OrderLabel;
 

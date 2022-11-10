@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Pdk\Api\Adapter\Guzzle5ClientAdapter;
-use Gett\MyparcelBE\Pdk\Config\PsEndpointActions;
-use Gett\MyparcelBE\Pdk\Logger\PdkLogger;
-use Gett\MyparcelBE\Pdk\Order\Repository\PdkOrderRepository;
-use Gett\MyparcelBE\Pdk\Service\LanguageService;
-use Gett\MyparcelBE\Pdk\Settings\Repository\PdkSettingsRepository;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle5ClientAdapter;
+use MyParcelNL\PrestaShop\Pdk\Config\PsEndpointActions;
+use MyParcelNL\PrestaShop\Pdk\Logger\PdkLogger;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
+use MyParcelNL\PrestaShop\Pdk\Service\LanguageService;
+use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use MyParcelNL\Pdk\Api\Adapter\ClientAdapterInterface;
 use MyParcelNL\Pdk\Api\Service\ApiServiceInterface;
 use MyParcelNL\Pdk\Api\Service\MyParcelApiService;
@@ -22,7 +22,7 @@ use function DI\autowire;
 use function DI\value;
 
 return [
-    'platform' => MyParcelBE::MODULE_NAME,
+    'platform' => MyParcelNL::MODULE_NAME,
     'mode'     => value(_PS_MODE_DEV_ ? Pdk::MODE_DEVELOPMENT : Pdk::MODE_PRODUCTION),
 
     ApiServiceInterface::class => autowire(MyParcelApiService::class)->constructor(

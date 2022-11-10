@@ -8,12 +8,18 @@
   },
   "license": "MIT",
   "workspaces": [
-    "views/js/admin"
+    "views/js/*"
   ],
   "scripts": {
-    "build": "gulp build",
-    "build:dev": "gulp build:dev",
+    "compile": "",
+    "docker": "docker compose run --rm node sh -c 'yarn && yarn build' && yarn composer:update",
+    "composer:update": "docker compose run --rm php composer update --ignore-platform-reqs --no-dev",
+    "docker:build": "docker compose run --rm node yarn && yarn build",
+    "build": "build:js",
+    "build:js": "yarn workspaces foreach --exclude . run build",
+    "compile:dev": "gulp build:dev",
     "cypress:open": "cypress open",
+    "prepare": "is-ci || husky install",
     "translations:import": "npx -q @edielemoine/google-docs-importer --documentId 1TPE7gwG2GXtX7vlKIaskwMy0Xr4o_ir-lsedWB86xyc -o config/pdk/translations",
     "watch": "gulp watch",
     "watch:js": "gulp watch:js",
@@ -26,17 +32,34 @@
   "browserslist": [
     "defaults"
   ],
-  "dependencies": {
-    "@myparcel/delivery-options": "^5.2.2"
+  "prettier": "@myparcel/prettier-config",
+  "resolutions": {
+    "@myparcel-pdk/build-vite": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/build/vite",
+    "@myparcel-pdk/common": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/common",
+    "@myparcel-pdk/frontend-actions": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/actions",
+    "@myparcel-pdk/frontend-component-tests": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/component-tests",
+    "@myparcel-pdk/frontend-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/components",
+    "@myparcel-pdk/frontend-context": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/context",
+    "@myparcel-pdk/frontend-modal": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/modal",
+    "@myparcel-pdk/frontend-sdk": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/sdk",
+    "@myparcel-pdk/frontend-shared": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/shared",
+    "@myparcel-vfb/build-tsup": "portal:/Users/edie/Sites/vue-form-builder/packages/build/tsup",
+    "@myparcel-vfb/build-vite": "portal:/Users/edie/Sites/vue-form-builder/packages/build/vite",
+    "@myparcel-vfb/hook-manager": "portal:/Users/edie/Sites/vue-form-builder/packages/hook-manager",
+    "@myparcel-vfb/utils": "portal:/Users/edie/Sites/vue-form-builder/packages/utils",
+    "@myparcel/pdk-frontend": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/core",
+    "@myparcel/vue-form-builder": "portal:/Users/edie/Sites/vue-form-builder/packages/core"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
     "@babel/preset-env": "^7.20.2",
     "@edielemoine/google-docs-importer": "^1.0.2",
     "@myparcel-eslint/eslint-config-esnext": "^1.0.0-alpha.2",
+    "@myparcel-eslint/eslint-config-node": "^1.0.0-alpha.2",
     "@myparcel-eslint/eslint-config-prettier": "^1.0.0-alpha.2",
     "@myparcel-eslint/eslint-config-prettier-typescript": "^1.0.0-alpha.1",
     "@myparcel-eslint/eslint-config-prettier-typescript-vue": "^1.0.0-alpha.1",
+    "@myparcel/prettier-config": "^1.1.0",
     "@myparcel/semantic-release-config": "^4.0.0",
     "@types/bootstrap": "^5.2.5",
     "@types/gulp": "^4.0.9",
@@ -47,8 +70,6 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
-    "ci-info": "^3.5.0",
-    "eslint": "^8.27.0",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-load-plugins": "^2.0.8",
@@ -58,24 +79,9 @@
     "gulp-tap": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "gulp-zip": "^5.1.0",
-    "prettier": "^2.7.1",
+    "husky": "^8.0.2",
+    "is-ci": "^3.0.1",
+    "lint-staged": "^13.0.3",
     "vinyl-buffer": "^1.0.1"
-  },
-  "resolutions": {
-    "@myparcel-pdk/build-vite": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/build/vite",
-    "@myparcel-pdk/common": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/common",
-    "@myparcel-pdk/frontend-actions": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/actions",
-    "@myparcel-pdk/frontend-component-tests": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/component-tests",
-    "@myparcel-pdk/frontend-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/components",
-    "@myparcel-pdk/frontend-context": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/context",
-    "@myparcel/pdk-frontend": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/core",
-    "@myparcel-pdk/frontend-modal": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/modal",
-    "@myparcel-pdk/frontend-sdk": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/sdk",
-    "@myparcel-pdk/frontend-shared": "portal:/Users/edie/Sites/myparcel/pdk-frontend/packages/frontend/shared",
-    "@myparcel-vfb/build-tsup": "portal:/Users/edie/Sites/vue-form-builder/packages/build/tsup",
-    "@myparcel-vfb/build-vite": "portal:/Users/edie/Sites/vue-form-builder/packages/build/vite",
-    "@myparcel/vue-form-builder": "portal:/Users/edie/Sites/vue-form-builder/packages/core",
-    "@myparcel-vfb/hook-manager": "portal:/Users/edie/Sites/vue-form-builder/packages/hook-manager",
-    "@myparcel-vfb/utils": "portal:/Users/edie/Sites/vue-form-builder/packages/utils"
   }
 }

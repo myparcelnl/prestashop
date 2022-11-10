@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Logger;
+namespace MyParcelNL\PrestaShop\Logger;
 
-use Gett\MyparcelBE\Service\Concern\HasInstance;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
+use MyParcelNL;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Adapter\Entity\AbstractLogger;
 use PrestaShop\PrestaShop\Adapter\Entity\FileLogger as PrestaShopFileLogger;
@@ -90,7 +90,7 @@ class DeprecatedFileLogger extends PrestaShopFileLogger
     }
 
     /**
-     * @return \Gett\MyparcelBE\Logger\DeprecatedFileLogger
+     * @return \MyParcelNL\PrestaShop\Logger\DeprecatedFileLogger
      */
     protected static function getLogger(): DeprecatedFileLogger
     {
@@ -99,7 +99,7 @@ class DeprecatedFileLogger extends PrestaShopFileLogger
             sprintf(
                 '%s/var/logs/%s.log',
                 _PS_ROOT_DIR_,
-                MyParcelBE::MODULE_NAME
+                MyParcelNL::MODULE_NAME
             )
         );
         return $logger;

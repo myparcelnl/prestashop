@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ]
+  },
+  "references": [
+    {
+      "path": "../admin/tsconfig.json"
+    },
+    {
+      "path": "../frontend/tsconfig.json"
+    }
+  ]
+}

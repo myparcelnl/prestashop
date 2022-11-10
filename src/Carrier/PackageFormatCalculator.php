@@ -1,15 +1,15 @@
 <?php
 
-namespace Gett\MyparcelBE\Carrier;
+namespace MyParcelNL\PrestaShop\Carrier;
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
 
 class PackageFormatCalculator extends AbstractPackageCalculator
 {
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      *
      * @return int
      * @throws \PrestaShopDatabaseException
@@ -36,7 +36,7 @@ class PackageFormatCalculator extends AbstractPackageCalculator
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      *
      * @return array
      */

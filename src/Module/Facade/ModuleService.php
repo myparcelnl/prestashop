@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Facade;
+namespace MyParcelNL\PrestaShop\Module\Facade;
 
 use MyParcelNL\Pdk\Base\Facade;
 
@@ -14,12 +14,12 @@ use MyParcelNL\Pdk\Base\Facade;
  * @method static getMigrations(): array
  * @method static getModuleCountry(): string
  * @method static getOrderShippingCost($cart, $shippingCost)
- * @implements \Gett\MyparcelBE\Module\Service\ModuleService
+ * @implements \MyParcelNL\PrestaShop\Module\Service\ModuleService
  */
 class ModuleService extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Gett\MyparcelBE\Module\Service\ModuleService::class;
+        return \MyParcelNL\PrestaShop\Module\Service\ModuleService::class;
     }
 }

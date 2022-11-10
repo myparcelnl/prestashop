@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Config;
+namespace MyParcelNL\PrestaShop\Pdk\Config;
 
 use Context;
-use Gett\MyparcelBE\Service\ControllerService;
+use MyParcelNL\PrestaShop\Service\ControllerService;
 use MyParcelNL\Pdk\Plugin\Action\PdkEndpointActions;
 
 class PsEndpointActions extends PdkEndpointActions
@@ -16,12 +16,12 @@ class PsEndpointActions extends PdkEndpointActions
     private $context;
 
     /**
-     * @var \Gett\MyparcelBE\Service\ControllerService
+     * @var \MyParcelNL\PrestaShop\Service\ControllerService
      */
     private $controllerService;
 
     /**
-     * @param  \Gett\MyparcelBE\Service\ControllerService $controllerService
+     * @param  \MyParcelNL\PrestaShop\Service\ControllerService $controllerService
      */
     public function __construct(ControllerService $controllerService)
     {

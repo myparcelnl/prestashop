@@ -1,10 +1,10 @@
 <?php
 
-namespace Gett\MyparcelBE\Service\Order;
+namespace MyParcelNL\PrestaShop\Service\Order;
 
 use DateTime;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
 
 class OrderDeliveryDate
 {

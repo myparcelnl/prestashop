@@ -1,27 +1,37 @@
-/**
- * @member {string} window.myparcel_delivery_options_url
- * @member {Object} window.prestashop
- * @member {jQuery} $
- */
+declare global {
+  interface Window {
+    MyParcelConfig: MyParcelDeliveryOptions.Configuration;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    myparcel_delivery_options_url: string;
+    prestashop: {
+      on: (name: string, callback: (event: Event) => void) => void;
+    };
+  }
+}
+
+import {MyParcel, MyParcelDeliveryOptions} from '@myparcel/delivery-options';
 
 (() => {
   /**
    * Whether the listeners have been initialized.
-   *
-   * @type {boolean}
    */
   let initialized = false;
 
   /**
    * @type {{}}
    */
-  const deliveryOptionsConfigStore = {};
+  const deliveryOptionsConfigStore: Partial<
+    Record<
+      MyParcel.CarrierID,
+      {
+        data: MyParcelDeliveryOptions.Configuration;
+      }
+    >
+  > = {};
 
-  /**
-   * @param {jQuery} $wrapper
-   */
-  function createOrMoveDeliveryOptionsForm($wrapper) {
+  function createOrMoveDeliveryOptionsForm($wrapper: JQuery): void {
     const $form = getDeliveryOptionsFormHandle();
+
     if ($form) {
       // Move the form to the new delivery option
       $form.hide();
@@ -37,12 +47,7 @@
     }
   }
 
-  /**
-   * @param {string} selector
-   *
-   * @returns {jQuery|null}
-   */
-  function getElement(selector) {
+  function getElement(selector: string): JQuery | null {
     const element = $(selector);
     return element.length ? element : null;
   }
@@ -58,8 +63,8 @@
 
     const $checkoutDeliverStep = $('#checkout-delivery-step');
 
-    const isOnDeliverStep = $checkoutDeliverStep.hasClass('js-current-step')
-      || $checkoutDeliverStep.hasClass('-current');
+    const isOnDeliverStep =
+      $checkoutDeliverStep.hasClass('js-current-step') || $checkoutDeliverStep.hasClass('-current');
 
     if (isOnDeliverStep) {
       $input.trigger('change');
@@ -77,7 +82,7 @@
   /**
    * @returns {jQuery}
    */
-  function getInput() {
+  function getInput(): JQuery {
     let $input = $('#mypa-input');
 
     if (!$input.length) {
@@ -85,7 +90,7 @@
 
       const $wrapper = getDeliveryOptionsFormHandle();
 
-      if ($wrapper.length) {
+      if ($wrapper) {
         $wrapper.append($input);
       }
     }
@@ -93,47 +98,41 @@
     return $input;
   }
 
-  /**
-   * @returns {jQuery|null}
-   */
-  function getDeliveryOptionsFormHandle() {
+  function getDeliveryOptionsFormHandle(): JQuery | null {
     return getElement('#myparcel-form-handle');
   }
 
-  /**
-   * @returns {boolean}
-   */
-  function hasUnRenderedDeliveryOptions() {
+  function hasUnRenderedDeliveryOptions(): boolean {
     return Boolean(getElement('#myparcel-delivery-options'));
   }
 
   /**
    * @param {string} carrierId
    */
-  function updateConfig(carrierId) {
+  function updateConfig(carrierId: MyParcel.CarrierID) {
     const hasCarrierConfig = deliveryOptionsConfigStore.hasOwnProperty(carrierId);
 
     if (!hasCarrierConfig) {
-      $.ajax({
+      void $.ajax({
         url: `${window.myparcel_delivery_options_url}?carrier_id=${carrierId}`,
         dataType: 'json',
         async: false,
-        success: function(data) {
+        success: function (data) {
           deliveryOptionsConfigStore[carrierId] = data;
 
-          window.MyParcelConfig = deliveryOptionsConfigStore[carrierId].data;
+          window.MyParcelConfig = deliveryOptionsConfigStore[carrierId]?.data ?? window.MyParcelConfig;
           updateDeliveryOptions();
         },
       });
     }
 
-    window.MyParcelConfig = deliveryOptionsConfigStore[carrierId].data;
+    window.MyParcelConfig = deliveryOptionsConfigStore[carrierId]?.data ?? window.MyParcelConfig;
   }
 
   /**
    * @param {jQuery} $deliveryOptionsRow
    */
-  function initializeMyParcelForm($deliveryOptionsRow) {
+  function initializeMyParcelForm($deliveryOptionsRow: JQuery) {
     if (!$deliveryOptionsRow || !$deliveryOptionsRow.length || !$deliveryOptionsRow.find('input:checked')) {
       return;
     }
@@ -177,15 +176,13 @@
 
     initializeMyParcelForm(getDeliveryOptionsRow());
 
-    document.addEventListener(
-      'myparcel_updated_delivery_options',
-      (event) => {
-        getDeliveryOptionsFormHandle().slideDown();
-        if (event.detail) {
-          updateInput(event.detail);
-        }
-      },
-    );
+    document.addEventListener('myparcel_updated_delivery_options', (event) => {
+      getDeliveryOptionsFormHandle().slideDown();
+
+      if (event.detail) {
+        updateInput(event.detail);
+      }
+    });
   }
 
   document.addEventListener('DOMContentLoaded', () => {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 class OrderLabelStatusChange
 {

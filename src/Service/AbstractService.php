@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
-use MyParcelBE;
+use MyParcelNL;
 
 /**
  * Service to use with controllers.
@@ -12,14 +12,14 @@ use MyParcelBE;
 abstract class AbstractService
 {
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     protected $module;
 
     /**
-     * @param  \MyParcelBE $module
+     * @param  \MyParcelNL $module
      */
-    public function __construct(MyParcelBE $module)
+    public function __construct(MyParcelNL $module)
     {
         $this->module = $module;
     }

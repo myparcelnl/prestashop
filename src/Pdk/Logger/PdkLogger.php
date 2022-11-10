@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Logger;
+namespace MyParcelNL\PrestaShop\Pdk\Logger;
 
 use FileLogger;
-use MyParcelBE;
+use MyParcelNL;
 use MyParcelNL\Pdk\Logger\AbstractLogger;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -127,7 +127,7 @@ class PdkLogger extends AbstractLogger
 
     private function getLogDirectory(): string
     {
-        return sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, MyParcelBE::MODULE_NAME);
+        return sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, MyParcelNL::MODULE_NAME);
     }
 
     /**

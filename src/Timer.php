@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE;
+namespace MyParcelNL\PrestaShop;
 
 class Timer
 {

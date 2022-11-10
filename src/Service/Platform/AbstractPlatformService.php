@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service\Platform;
+namespace MyParcelNL\PrestaShop\Service\Platform;
 
 use Exception;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Service\Concern\HasInstance;
-use MyParcelBE;
+use MyParcelNL;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
@@ -25,7 +25,7 @@ abstract class AbstractPlatformService
      * If getDefaultCarrier is not overridden, the first entry in this list is considered the default carrier.
      *
      * @return class-string[]
-     * @see \Gett\MyparcelBE\Service\Platform\AbstractPlatformService::getDefaultCarrier()
+     * @see \MyParcelNL\PrestaShop\Service\Platform\AbstractPlatformService::getDefaultCarrier()
      */
     abstract public function getCarriers(): array;
 
@@ -68,7 +68,7 @@ abstract class AbstractPlatformService
     public function getUserAgents(): array
     {
         return [
-            'MyParcelBE-PrestaShop' => MyParcelBE::getModule()->version,
+            'MyParcelNL-PrestaShop' => MyParcelNL::getModule()->version,
             'PrestaShop'            => _PS_VERSION_,
         ];
     }

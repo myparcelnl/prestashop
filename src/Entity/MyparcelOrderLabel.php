@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Entity;
+namespace MyParcelNL\PrestaShop\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

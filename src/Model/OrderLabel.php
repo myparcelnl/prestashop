@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Entity\OrderStatus\AbstractOrderStatusUpdate;
-use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
-use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Upgrade\Upgrade2_0_0;
-use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
-use Gett\MyparcelBE\Service\MyParcelStatusProvider;
-use Gett\MyparcelBE\Service\Tracktrace;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Entity\OrderStatus\AbstractOrderStatusUpdate;
+use MyParcelNL\PrestaShop\Factory\Consignment\ConsignmentFactory;
+use MyParcelNL\PrestaShop\Factory\OrderSettingsFactory;
+use MyParcelNL\PrestaShop\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Service\MyParcelStatusProvider;
+use MyParcelNL\PrestaShop\Service\Tracktrace;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Sdk\src\Exception\ApiException;
 use MyParcelNL\Sdk\src\Helper\Utils;
@@ -202,7 +202,7 @@ class OrderLabel extends ObjectModel
             throw new InvalidArgumentException('Order id is missing');
         }
 
-        return \Gett\MyparcelBE\Entity\Cache::remember(
+        return \MyParcelNL\PrestaShop\Entity\Cache::remember(
             "data_labels_create_$orderId",
             static function () use ($orderId) {
                 $qb = new DbQuery();
@@ -369,7 +369,7 @@ class OrderLabel extends ObjectModel
 
         $oldDeliveryOptions = OrderSettingsFactory::create($order)
             ->getDeliveryOptions();
-        $oldDeliveryOptions = \Gett\MyparcelBE\Module\Tools\Tools::arrayToObject(
+        $oldDeliveryOptions = \MyParcelNL\PrestaShop\Module\Tools\Tools::arrayToObject(
             $oldDeliveryOptions
                 ? $oldDeliveryOptions->toArray()
                 : []
@@ -451,7 +451,7 @@ class OrderLabel extends ObjectModel
                 if ($dayFrom) {
                     $dayFull = "$dayFrom - $dayTo";
                 } else {
-                    $dayFull = Translate::getModuleTranslation('myparcelbe', 'Closed', 'myparcelbe');
+                    $dayFull = Translate::getModuleTranslation('myparcelnl', 'Closed', 'myparcelnl');
                 }
                 $templateVars["{opening_hours_{$day}_from}"] = $dayFrom;
                 $templateVars["{opening_hours_{$day}_to}"]   = $dayTo;
@@ -535,7 +535,7 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      * @param  string                            $barcode
      *
      * @return bool
@@ -655,8 +655,8 @@ SQL
      */
     protected static function getMailDir(string $mailIso, string $mailType): ?string
     {
-        $themeDir  = sprintf('%smodules/%s/mails/', _PS_THEME_DIR_, MyParcelBE::MODULE_NAME);
-        $moduleDir = sprintf('%s%s/mails/', _PS_MODULE_DIR_, MyParcelBE::MODULE_NAME);
+        $themeDir  = sprintf('%smodules/%s/mails/', _PS_THEME_DIR_, MyParcelNL::MODULE_NAME);
+        $moduleDir = sprintf('%s%s/mails/', _PS_MODULE_DIR_, MyParcelNL::MODULE_NAME);
         $dirs      = new Collection([$themeDir, $moduleDir]);
         $languages = new Collection([$mailIso, Constant::MAIL_FALLBACK_LANGUAGE]);
 
@@ -711,7 +711,7 @@ SQL
 
     /**
      * @param  \OrderLabel                       $orderLabel
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      * @param  int                               $newOrderStatus
      *
      * @return bool
@@ -779,7 +779,7 @@ SQL
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      *
      * @return bool
      */

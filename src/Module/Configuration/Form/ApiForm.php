@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Configuration\Form;
+namespace MyParcelNL\PrestaShop\Module\Configuration\Form;
 
 use Configuration;
 use Exception;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Model\Webhook\Subscription;
-use Gett\MyparcelBE\Module\Tools\Tools;
-use Gett\MyparcelBE\Service\WebhookService;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Model\Webhook\Subscription;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Service\WebhookService;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 
 class ApiForm extends AbstractForm
@@ -146,7 +146,7 @@ class ApiForm extends AbstractForm
     }
 
     /**
-     * @return \Gett\MyparcelBE\Service\WebhookService
+     * @return \MyParcelNL\PrestaShop\Service\WebhookService
      */
     private function initializeWebhookService(): WebhookService
     {

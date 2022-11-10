@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use Exception;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsManager;
-use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
-use Gett\MyparcelBE\Pdk\Order\Repository\PdkOrderRepository;
+use MyParcelNL\PrestaShop\DeliveryOptions\DeliveryOptionsManager;
+use MyParcelNL\PrestaShop\Factory\OrderSettingsFactory;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\Pdk\Facade\Pdk;
 
 trait OrderHooks
@@ -29,7 +29,7 @@ trait OrderHooks
             $deliveryOptions = OrderSettingsFactory::create($order)
                 ->getDeliveryOptions();
 
-            /** @var \Gett\MyparcelBE\Pdk\Order\Repository\PdkOrderRepository $repository */
+            /** @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository $repository */
             $repository = Pdk::get(PdkOrderRepository::class);
             $pdkOrder   = $repository->get($params['order']);
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Gett\MyparcelBE\Provider;
+namespace MyParcelNL\PrestaShop\Provider;
 
-use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
+use MyParcelNL\PrestaShop\Module\Carrier\Provider\CarrierSettingsProvider;
 use Order;
 use OrderLabel;
 

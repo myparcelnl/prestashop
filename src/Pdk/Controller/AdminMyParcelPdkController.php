@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Controller;
+namespace MyParcelNL\PrestaShop\Pdk\Controller;
 
-use Gett\MyparcelBE\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use MyParcelNL\Pdk\Base\PdkEndpoint;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
- * @property \MyParcelBE $module
+ * @property \MyParcelNL $module
  * @noinspection PhpUnused
  */
 class AdminMyParcelPdkController extends FrameworkBundleAdminController
@@ -23,7 +23,7 @@ class AdminMyParcelPdkController extends FrameworkBundleAdminController
         parent::__construct();
 
         // Trigger PDK setup
-        \MyParcelBE::getModule();
+        \MyParcelNL::getModule();
     }
 
     /**

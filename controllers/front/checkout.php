@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Gett\MyparcelBE\Service\DeliveryOptionsConfigProvider;
+use MyParcelNL\PrestaShop\Service\DeliveryOptionsConfigProvider;
 
 class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
 {

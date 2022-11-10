@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Facade;
+namespace MyParcelNL\PrestaShop\Pdk\Facade;
 
 use MyParcelNL\Pdk\Base\Facade;
 
@@ -16,7 +16,7 @@ use MyParcelNL\Pdk\Base\Facade;
  * @method static void info($message, array $context = [])
  * @method static void notice($message, array $context = [])
  * @method static void warning($message, array $context = [])
- * @implements \Gett\MyparcelBE\Pdk\Logger\OrderLogger
+ * @implements \MyParcelNL\PrestaShop\Pdk\Logger\OrderLogger
  */
 class OrderLogger extends Facade
 {

@@ -1,12 +1,18 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Hooks;
+declare(strict_types=1);
+
+namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use Db;
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Database\Table;
 
 trait CarrierHooks
 {
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
     public function hookActionCarrierUpdate(array $params): void
     {
         $oldCarrierId = (int) $params['id_carrier'];

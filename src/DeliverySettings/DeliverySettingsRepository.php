@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\DeliverySettings;
+namespace MyParcelNL\PrestaShop\DeliverySettings;
 
 use Exception;
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\Entity\Cache;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Entity\Cache;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
@@ -27,7 +27,7 @@ class DeliverySettingsRepository
     /**
      * @param  int $cartId
      *
-     * @return \Gett\MyparcelBE\DeliverySettings\ExtraOptions
+     * @return \MyParcelNL\PrestaShop\DeliverySettings\ExtraOptions
      */
     public static function getExtraOptionsByCartId(int $cartId): ExtraOptions
     {
@@ -54,7 +54,7 @@ class DeliverySettingsRepository
      *
      * @return array{
      *     delivery_options: \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions,
-     *     extraOptions: \Gett\MyparcelBE\DeliverySettings\ExtraOptions
+     *     extraOptions: \MyParcelNL\PrestaShop\DeliverySettings\ExtraOptions
      * }
      */
     private static function getByCartId(int $cartId): array

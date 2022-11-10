@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Carrier\Provider;
+namespace MyParcelNL\PrestaShop\Module\Carrier\Provider;
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use Gett\MyparcelBE\Service\CarrierService;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Service\CarrierService;
 
 class CarrierSettingsProvider
 {

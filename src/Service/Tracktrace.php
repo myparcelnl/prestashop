@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
-use Gett\MyparcelBE\Model\MyParcelRequest as Request;
-use Gett\MyparcelBE\Service\Concern\HasApiKey;
+use MyParcelNL\PrestaShop\Model\MyParcelRequest as Request;
+use MyParcelNL\PrestaShop\Service\Concern\HasApiKey;
 use MyParcelNL\Sdk\src\Model\MyParcelRequest;
 
 class Tracktrace extends AbstractEndpoint

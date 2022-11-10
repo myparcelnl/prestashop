@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Configuration;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Service\Concern\HasInstance;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
 
 class LabelOptionsService
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Address;
 use Carrier;
@@ -9,12 +9,12 @@ use Configuration;
 use Context;
 use Country;
 use DateTime;
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\DeprecatedFileLogger;
-use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Logger\DeprecatedFileLogger;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\CheckoutForm;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use Order;
 use RuntimeException;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Order\Repository;
+namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
 use Db;
 use DbQuery;
-use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\DefaultLogger;

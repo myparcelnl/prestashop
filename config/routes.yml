@@ -1,8 +1,8 @@
-myparcelbe:
-  path: myparcelbe
+myparcelnl:
+  path: myparcelnl
 
-myparcelbe_pdk:
-  path: myparcelbe/pdk
+myparcelnl_pdk:
+  path: myparcelnl/pdk
   methods: [ GET, POST ]
   defaults:
-    _controller: 'Gett\MyparcelBE\Pdk\Controller\AdminMyParcelPdkController::index'
+    _controller: 'MyParcelNL\PrestaShop\Pdk\Controller\AdminMyParcelPdkController::index'

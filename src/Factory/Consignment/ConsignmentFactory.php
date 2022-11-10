@@ -1,27 +1,27 @@
 <?php
 
-namespace Gett\MyparcelBE\Factory\Consignment;
+namespace MyParcelNL\PrestaShop\Factory\Consignment;
 
 use BadMethodCallException;
 use Configuration;
 use DateTime;
 use Exception;
-use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\Collection\ConsignmentCollection;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Module\Carrier\Provider\CarrierSettingsProvider;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use Gett\MyparcelBE\Pdk\Facade\OrderLogger;
-use Gett\MyparcelBE\Service\CarrierService;
-use Gett\MyparcelBE\Service\Consignment\ConsignmentNormalizer;
+use MyParcelNL\PrestaShop\Adapter\DeliveryOptionsFromOrderAdapter;
+use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
+use MyParcelNL\PrestaShop\Collection\ConsignmentCollection;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\DeliverySettings\ExtraOptions;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Module\Carrier\Provider\CarrierSettingsProvider;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Service\CarrierService;
+use MyParcelNL\PrestaShop\Service\Consignment\ConsignmentNormalizer;
 use MyParcelNL\Pdk\Base\Service\CountryService;
-use Gett\MyparcelBE\Service\CountryService;
-use Gett\MyparcelBE\Service\ProductConfigurationProvider;
-use Gett\MyparcelBE\Service\WeightService;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Service\CountryService;
+use MyParcelNL\PrestaShop\Service\ProductConfigurationProvider;
+use MyParcelNL\PrestaShop\Service\WeightService;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as SdkConsignmentFactory;
@@ -56,7 +56,7 @@ class ConsignmentFactory
     private $deliveryOptions;
 
     /**
-     * @var \Gett\MyparcelBE\Model\Core\Order
+     * @var \MyParcelNL\PrestaShop\Model\Core\Order
      */
     private $orderObject;
 
@@ -66,7 +66,7 @@ class ConsignmentFactory
     private $request;
 
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     private $module;
 
@@ -88,14 +88,14 @@ class ConsignmentFactory
     public function __construct(array $request)
     {
         $this->request = $request;
-        $this->module  = MyParcelBE::getModule();
+        $this->module  = MyParcelNL::getModule();
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *
-     * @return \Gett\MyparcelBE\Collection\ConsignmentCollection
+     * @return \MyParcelNL\PrestaShop\Collection\ConsignmentCollection
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
@@ -235,7 +235,7 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *
      * @return void

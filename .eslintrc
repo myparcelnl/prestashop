@@ -1,40 +1,53 @@
 {
-  "extends": "@myparcel/eslint-config/preset-es6",
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "extends": [
+    "@myparcel-eslint/eslint-config-esnext",
+    "@myparcel-eslint/eslint-config-prettier"
+  ],
+  "rules": {
+    "class-methods-use-this": "off"
+  },
   "overrides": [
     {
       "files": [
-        "./*.js",
-        "./private/**/*.js"
+        "./**/*.vue"
       ],
-      "env": {
-        "node": true
-      }
+      "extends": "@myparcel-eslint/eslint-config-prettier-typescript-vue"
     },
     {
       "files": [
-        "./views/js/**/*.js"
+        "./**/*.spec.*",
+        "./**/*.test.*",
+        "./**/__tests__/**"
       ],
-      "globals": {
-        "prestashop": true,
-        "$": true
-      },
-      "env": {
-        "browser": true,
-        "jquery": true
-      },
       "rules": {
+        "@typescript-eslint/no-magic-numbers": "off",
         "max-len": "off",
-        "no-magic-numbers": "off",
-        "no-console": "off"
+        "max-lines-per-function": "off"
       }
     },
     {
       "files": [
-        "./release.config.js"
+        "./**/*.ts",
+        "./**/*.tsx"
       ],
+      "extends": "@myparcel-eslint/eslint-config-prettier-typescript",
       "rules": {
-        "no-template-curly-in-string": "off"
+        "@typescript-eslint/explicit-function-return-type": "off"
       }
+    },
+    {
+      "files": [
+        "./**/*.js",
+        "./**/*.cjs",
+        "./**/*.ts",
+        "./**/*.mjs"
+      ],
+      "extends": "@myparcel-eslint/eslint-config-node"
     }
   ]
 }

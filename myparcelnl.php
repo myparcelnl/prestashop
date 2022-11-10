@@ -3,23 +3,23 @@
 
 declare(strict_types=1);
 
-use Gett\MyparcelBE\Boot;
-use Gett\MyparcelBE\Database\CreateCarrierConfigurationTableMigration;
-use Gett\MyparcelBE\Database\CreateDeliverySettingTableMigration;
-use Gett\MyparcelBE\Database\CreateOrderLabelTableMigration;
-use Gett\MyparcelBE\Database\CreateProductConfigurationTableMigration;
-use Gett\MyparcelBE\Module\Concern\HasModuleInstall;
-use Gett\MyparcelBE\Module\Concern\HasModuleUninstall;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use Gett\MyparcelBE\Module\Hooks\CarrierHooks;
-use Gett\MyparcelBE\Module\Hooks\DisplayAdminProductsExtra;
-use Gett\MyparcelBE\Module\Hooks\DisplayBackOfficeHeader;
-use Gett\MyparcelBE\Module\Hooks\FrontHooks;
-use Gett\MyparcelBE\Module\Hooks\HasPdkRenderHooks;
-use Gett\MyparcelBE\Module\Hooks\LegacyOrderPageHooks;
-use Gett\MyparcelBE\Module\Hooks\OrderHooks;
-use Gett\MyparcelBE\Module\Hooks\OrdersGridHooks;
-use Gett\MyparcelBE\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Boot;
+use MyParcelNL\PrestaShop\Database\CreateCarrierConfigurationTableMigration;
+use MyParcelNL\PrestaShop\Database\CreateDeliverySettingTableMigration;
+use MyParcelNL\PrestaShop\Database\CreateOrderLabelTableMigration;
+use MyParcelNL\PrestaShop\Database\CreateProductConfigurationTableMigration;
+use MyParcelNL\PrestaShop\Module\Concern\HasModuleInstall;
+use MyParcelNL\PrestaShop\Module\Concern\HasModuleUninstall;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Module\Hooks\CarrierHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\DisplayAdminProductsExtra;
+use MyParcelNL\PrestaShop\Module\Hooks\DisplayBackOfficeHeader;
+use MyParcelNL\PrestaShop\Module\Hooks\FrontHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\LegacyOrderPageHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\OrderHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\OrdersGridHooks;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use PrestaShopBundle\Exception\InvalidModuleException;
 
@@ -27,7 +27,7 @@ defined('_PS_VERSION_') or exit();
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-class MyParcelBE extends CarrierModule
+class MyParcelNL extends CarrierModule
 {
     use CarrierHooks;
     use DisplayAdminProductsExtra;
@@ -42,7 +42,7 @@ class MyParcelBE extends CarrierModule
 
     use HasPdkRenderHooks;
 
-    public const MODULE_NAME = 'myparcelbe';
+    public const MODULE_NAME = 'myparcelnl';
 
     public $baseUrl;
 
@@ -52,7 +52,7 @@ class MyParcelBE extends CarrierModule
     public $id_carrier;
 
     /**
-     * @var class-string<\Gett\MyparcelBE\Database\Migration>[]
+     * @var class-string<\MyParcelNL\PrestaShop\Database\Migration>[]
      */
     public $migrations = [
         CreateProductConfigurationTableMigration::class,
@@ -81,7 +81,7 @@ class MyParcelBE extends CarrierModule
             $this->baseUrl = $this->getBaseUrl();
         }
 
-        $this->displayName = $this->l('MyParcelBE');
+        $this->displayName = $this->l('Myparcelnl');
         $this->description = $this->l('PrestaShop module which integrates with MyParcel NL');
     }
 
@@ -201,7 +201,7 @@ class MyParcelBE extends CarrierModule
      */
     public function upgrade(string $class): bool
     {
-        /** @var \Gett\MyparcelBE\Module\Upgrade\AbstractUpgrade $upgrade */
+        /** @var \MyParcelNL\PrestaShop\Module\Upgrade\AbstractUpgrade $upgrade */
         $upgrade = new $class($this);
 
         return $upgrade->execute();

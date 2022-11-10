@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\DeliveryOptions;
+namespace MyParcelNL\PrestaShop\DeliveryOptions;
 
-use Gett\MyparcelBE\Database\Table;
-use Gett\MyparcelBE\DeliverySettings\DeliverySettingsRepository;
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\DeliverySettings\DeliverySettingsRepository;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 

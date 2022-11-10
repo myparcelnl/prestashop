@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Configuration\Form;
+namespace MyParcelNL\PrestaShop\Module\Configuration\Form;
 
-use Gett\MyparcelBE\Constant;
+use MyParcelNL\PrestaShop\Constant;
 
 class GeneralForm extends AbstractForm
 {

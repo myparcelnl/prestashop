@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service\Consignment;
+namespace MyParcelNL\PrestaShop\Service\Consignment;
 
 use Configuration;
-use Gett\MyparcelBE\Collection\ConsignmentCollection;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Logger\DeprecatedApiLogger;
-use Gett\MyparcelBE\Service\LabelOptionsService;
-use Gett\MyparcelBE\Timer;
+use MyParcelNL\PrestaShop\Collection\ConsignmentCollection;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Logger\DeprecatedApiLogger;
+use MyParcelNL\PrestaShop\Service\LabelOptionsService;
+use MyParcelNL\PrestaShop\Timer;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use Tools;
 

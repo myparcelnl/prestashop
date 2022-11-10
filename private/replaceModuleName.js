@@ -1,3 +1,6 @@
+/* eslint-disable no-useless-escape */
+// noinspection RegExpUnnecessaryNonCapturingGroup
+
 /**
  * @param {string} input
  * @param {string} output
@@ -19,6 +22,8 @@ function caseSensitiveMatcher(input, output) {
 }
 
 /**
+ * Replaces all occurrences of a string with another string, case-sensitive
+ *
  * @param {string} input
  * @param {string} search
  * @param {string} replace
@@ -30,7 +35,9 @@ function replaceCaseSensitive(input, search, replace) {
   let output = input;
 
   if (res?.[0]) {
-    output = input.replace(new RegExp(search, 'igm'), (search) => caseSensitiveMatcher(search, replace));
+    const regExp = new RegExp(`${search}(?!\(?:Pdk|Sdk|DevTools))`, 'igm');
+
+    output = input.replace(regExp, (search) => caseSensitiveMatcher(search, replace));
   }
 
   return output;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Pdk\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Service;
 
 use Context;
-use MyParcelBE;
+use MyParcelNL;
 use MyParcelNL\Pdk\Language\Service\AbstractLanguageService;
 
 class LanguageService extends AbstractLanguageService
@@ -18,7 +18,7 @@ class LanguageService extends AbstractLanguageService
     public function getFilePath(?string $language = null): string
     {
         $language   = $language ?? $this->getLanguage();
-        $modulePath = MyParcelBE::getModule()
+        $modulePath = MyParcelNL::getModule()
             ->getLocalPath();
 
         return sprintf("%sconfig/pdk/translations/%s.json", $modulePath, $language);
@@ -40,7 +40,7 @@ class LanguageService extends AbstractLanguageService
      */
     public function translate(string $key, ?string $language = null): string
     {
-        return MyParcelBE::getModule()
+        return MyParcelNL::getModule()
             ->l($key);
     }
 }

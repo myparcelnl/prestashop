@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Model\Core;
+namespace MyParcelNL\PrestaShop\Model\Core;
 
 /**
  * Overridden core Order class to allow circumventing some bugs when doing strict typing.

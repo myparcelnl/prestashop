@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
-use Gett\MyparcelBE\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\PrestaShop\Service\Platform\PlatformServiceFactory;
 use MyParcelNL\Sdk\src\Model\MyParcelRequest;
 
 class AbstractEndpoint

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE;
+namespace MyParcelNL\PrestaShop;
 
 use MyParcelNL\Pdk\Base\Factory\PdkFactory;
 use MyParcelNL\Pdk\Base\Pdk;
@@ -23,7 +23,7 @@ class Boot
      * @return void
      * @throws \Throwable
      */
-    public static function setupPdk(\MyParcelBE $module): ?Pdk
+    public static function setupPdk(\MyParcelNL $module): ?Pdk
     {
         if (! self::$initialized) {
             self::$initialized = true;

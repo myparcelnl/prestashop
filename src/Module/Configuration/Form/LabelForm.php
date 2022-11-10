@@ -1,8 +1,8 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration\Form;
+namespace MyParcelNL\PrestaShop\Module\Configuration\Form;
 
-use Gett\MyparcelBE\Constant;
+use MyParcelNL\PrestaShop\Constant;
 
 class LabelForm extends AbstractForm
 {

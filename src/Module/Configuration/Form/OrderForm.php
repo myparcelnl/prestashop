@@ -1,9 +1,9 @@
 <?php
 
-namespace Gett\MyparcelBE\Module\Configuration\Form;
+namespace MyParcelNL\PrestaShop\Module\Configuration\Form;
 
 use Context;
-use Gett\MyparcelBE\Constant;
+use MyParcelNL\PrestaShop\Constant;
 use OrderState;
 
 class OrderForm extends AbstractForm

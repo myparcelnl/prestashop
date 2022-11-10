@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Configuration;
+namespace MyParcelNL\PrestaShop\Module\Configuration;
 
-use Gett\MyparcelBE\Module\Configuration\Form\ApiForm;
-use Gett\MyparcelBE\Module\Configuration\Form\CarriersForm;
-use Gett\MyparcelBE\Module\Configuration\Form\CheckoutForm;
-use Gett\MyparcelBE\Module\Configuration\Form\CustomsForm;
-use Gett\MyparcelBE\Module\Configuration\Form\GeneralForm;
-use Gett\MyparcelBE\Module\Configuration\Form\LabelForm;
-use Gett\MyparcelBE\Module\Configuration\Form\OrderForm;
-use Gett\MyparcelBE\Module\Tools\Tools as ToolsAlias;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\ApiForm;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\CarriersForm;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\CheckoutForm;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\CustomsForm;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\GeneralForm;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\LabelForm;
+use MyParcelNL\PrestaShop\Module\Configuration\Form\OrderForm;
+use MyParcelNL\PrestaShop\Module\Tools\Tools as ToolsAlias;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Sdk\src\Support\Collection;
@@ -28,13 +28,13 @@ class SettingsMenu
     private const MENU_LABEL_SETTINGS_NAME    = 'label_settings';
     private const MENU_ORDER_SETTINGS_NAME    = 'order_settings';
 
-    /** @var \MyParcelBE */
+    /** @var \MyParcelNL */
     private $module;
 
     /**
-     * @param  \MyParcelBE $module
+     * @param  \MyParcelNL $module
      */
-    public function __construct(MyParcelBE $module)
+    public function __construct(MyParcelNL $module)
     {
         $this->module = $module;
     }
@@ -64,7 +64,7 @@ class SettingsMenu
      */
     public function renderMenu(int $formId): string
     {
-        /** @var \Gett\MyparcelBE\Module\Configuration\SettingsMenuItem $menuItem */
+        /** @var \MyParcelNL\PrestaShop\Module\Configuration\SettingsMenuItem $menuItem */
         $menuItem = $this->getMenuData()[$formId];
         $class    = $menuItem->getForm();
 
@@ -77,7 +77,7 @@ class SettingsMenu
      */
 
     /**
-     * @return \MyParcelNL\Sdk\src\Support\Collection|\Gett\MyparcelBE\Module\Configuration\SettingsMenuItem[]
+     * @return \MyParcelNL\Sdk\src\Support\Collection|\MyParcelNL\PrestaShop\Module\Configuration\SettingsMenuItem[]
      */
     private function getMenuData(): Collection
     {

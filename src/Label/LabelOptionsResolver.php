@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Label;
+namespace MyParcelNL\PrestaShop\Label;
 
-use Gett\MyparcelBE\Carrier\PackageFormatCalculator;
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
-use Gett\MyparcelBE\Factory\OrderSettingsFactory;
-use Gett\MyparcelBE\Model\Core\Order;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
+use MyParcelNL\PrestaShop\Carrier\PackageFormatCalculator;
+use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Factory\Consignment\ConsignmentFactory;
+use MyParcelNL\PrestaShop\Factory\OrderSettingsFactory;
+use MyParcelNL\PrestaShop\Model\Core\Order;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
 use MyParcelNL\Pdk\Base\Service\CountryService;
-use Gett\MyparcelBE\Service\ProductConfigurationProvider;
+use MyParcelNL\PrestaShop\Service\ProductConfigurationProvider;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -42,7 +42,7 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
      *
      * @return array
      * @throws \PrestaShopDatabaseException
@@ -63,7 +63,7 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
      * @param \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions|null $deliveryOptions
      *
      * @return array
@@ -99,7 +99,7 @@ class LabelOptionsResolver
     /**
      * @param \MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      * @param int                                                                        $packageType
-     * @param \Gett\MyparcelBE\Model\Core\Order                                          $order
+     * @param \MyParcelNL\PrestaShop\Model\Core\Order                                          $order
      *
      * @return int the amount in euro for which the package should be insured
      */
@@ -188,7 +188,7 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *
      * @return int
@@ -207,7 +207,7 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
      * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *v
      *

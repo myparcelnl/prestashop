@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Carrier;
+namespace MyParcelNL\PrestaShop\Module\Carrier;
 
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Module\Facade\ModuleService;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
+use MyParcelNL;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 
@@ -52,12 +52,12 @@ class CarrierOptionsCalculator
     private $country;
 
     /**
-     * @var \Gett\MyparcelBE\Module\Carrier\ExclusiveField
+     * @var \MyParcelNL\PrestaShop\Module\Carrier\ExclusiveField
      */
     private $exclusiveField;
 
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     private $module;
 
@@ -69,7 +69,7 @@ class CarrierOptionsCalculator
      */
     public function __construct($myParcelCarrier, ?string $country = null)
     {
-        $this->module         = MyParcelBE::getModule();
+        $this->module         = MyParcelNL::getModule();
         $this->carrier        = CarrierFactory::create($myParcelCarrier);
         $this->country        = $country ?? ModuleService::getModuleCountry();
         $this->exclusiveField = new ExclusiveField();

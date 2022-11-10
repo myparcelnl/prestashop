@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Grid\Action\Bulk;
+namespace MyParcelNL\PrestaShop\Grid\Action\Bulk;
 
 use PrestaShop\PrestaShop\Core\Grid\Action\Bulk\AbstractBulkAction;
 use Symfony\Component\OptionsResolver\OptionsResolver;

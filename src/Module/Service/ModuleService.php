@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Service;
+namespace MyParcelNL\PrestaShop\Module\Service;
 
 use Cart;
 use Context;
-use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsManager;
-use Gett\MyparcelBE\Module\Configuration\SettingsMenu;
-use Gett\MyparcelBE\Module\Tools\Tools;
-use Gett\MyparcelBE\Service\CarrierConfigurationProvider;
-use MyParcelBE;
+use MyParcelNL\PrestaShop\DeliveryOptions\DeliveryOptionsManager;
+use MyParcelNL\PrestaShop\Module\Configuration\SettingsMenu;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
+use MyParcelNL;
 use MyParcelNL\Pdk\Base\Data\CountryCodes;
 use MyParcelNL\Pdk\Base\Service\CountryService;
 use MyParcelNL\Pdk\Base\Support\Collection;
@@ -27,14 +27,14 @@ class ModuleService
     private $context;
 
     /**
-     * @var \MyParcelBE
+     * @var \MyParcelNL
      */
     private $module;
 
     /**
-     * @param  \MyParcelBE $module
+     * @param  \MyParcelNL $module
      */
-    public function __construct(MyParcelBE $module)
+    public function __construct(MyParcelNL $module)
     {
         $this->module  = $module;
         $this->context = Context::getContext();
@@ -63,7 +63,7 @@ class ModuleService
      */
     public function getHooks(): array
     {
-        $reflectionClass = new ReflectionClass(MyParcelBE::class);
+        $reflectionClass = new ReflectionClass(MyParcelNL::class);
 
         $hooks = (new Collection($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC)))
             ->filter(function (ReflectionMethod $method) {

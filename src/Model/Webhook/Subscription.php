@@ -1,6 +1,6 @@
 <?php
 
-namespace Gett\MyparcelBE\Model\Webhook;
+namespace MyParcelNL\PrestaShop\Model\Webhook;
 
 use Exception;
 use MyParcelNL\Sdk\src\Support\Str;

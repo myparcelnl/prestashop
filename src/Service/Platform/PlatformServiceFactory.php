@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Service\Platform;
+namespace MyParcelNL\PrestaShop\Service\Platform;
 
-use Gett\MyparcelBE\Module\Facade\ModuleService;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 
 /**
  * @deprecated
@@ -12,7 +12,7 @@ use Gett\MyparcelBE\Module\Facade\ModuleService;
 class PlatformServiceFactory
 {
     /**
-     * @return \Gett\MyparcelBE\Service\Platform\AbstractPlatformService
+     * @return \MyParcelNL\PrestaShop\Service\Platform\AbstractPlatformService
      * @throws \PrestaShopBundle\Exception\InvalidModuleException
      * @throws \Exception
      */

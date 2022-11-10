@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Factory;
+namespace MyParcelNL\PrestaShop\Factory;
 
-use Gett\MyparcelBE\Entity\Cache;
-use Gett\MyparcelBE\Model\Core\Order;
+use MyParcelNL\PrestaShop\Entity\Cache;
+use MyParcelNL\PrestaShop\Model\Core\Order;
 
 class OrderFactory
 {
@@ -17,7 +17,7 @@ class OrderFactory
      */
     public static function create($orderId): Order
     {
-        return Cache::remember("myparcelbe_order_$orderId", static function () use ($orderId) {
+        return Cache::remember("myparcelnl_order_$orderId", static function () use ($orderId) {
             return new Order($orderId);
         });
     }

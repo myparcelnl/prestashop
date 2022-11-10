@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Model\Webhook\WebhookException;
-use Gett\MyparcelBE\Model\Webhook\WebhookPayloadFactory;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Model\Webhook\WebhookException;
+use MyParcelNL\PrestaShop\Model\Webhook\WebhookPayloadFactory;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +22,7 @@ class MyParcelBEHookModuleFrontController extends FrontController
      */
     public function initContent()
     {
-        if (! Module::isEnabled(MyParcelBE::MODULE_NAME)) {
+        if (! Module::isEnabled(MyParcelNL::MODULE_NAME)) {
             $this->sendResponse(400, 'Module is not enabled');
         }
 
