@@ -101,7 +101,8 @@ class Constant
     public const LABEL_PROMPT_POSITION_CONFIGURATION_NAME      = 'MYPARCELBE_LABEL_PROMPT_POSITION';
     public const LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME = 'MYPARCELBE_LABEL_CREATED_ORDER_STATUS';
 
-    public const CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY = ['extraOptions' => ['labelAmount' => 100]];
+    public const LABEL_CHECK_ONLY                          = 'labelCheckOnly';
+    public const CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY = [self::LABEL_CHECK_ONLY => true];
 
     // Field used in <platform>_carrier_configuration to link myparcel carrier to prestashop carrier.
     public const CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE = 'carrierType';

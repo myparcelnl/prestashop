@@ -343,16 +343,17 @@ class OrderLabel extends ObjectModel
     }
 
     /**
-     * @param int $orderId
+     * @param  int   $orderId
+     * @param  array $requiredKeys
      *
      * @return array
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
-    public static function getDataForLabelsCreate(int $orderId): array
+    public static function getDataForLabelsCreate(int $orderId, array $requiredKeys): array
     {
-        return \Gett\MyparcelBE\Entity\Cache::remember(
+        $labelData = \Gett\MyparcelBE\Entity\Cache::remember(
             "data_labels_create_$orderId",
             static function () use ($orderId) {
                 $qb = new DbQuery();
@@ -401,20 +402,22 @@ class OrderLabel extends ObjectModel
                     ], OrderLogger::WARNING);
                 }
 
-                $emptyFields = Utils::getKeysWithoutValue(reset($result), Constant::REQUIRED_LABEL_KEYS);
-
-                if ($emptyFields) {
-                    throw new MissingFieldException(
-                        sprintf(
-                            'The following fields are missing but required: %s',
-                            implode(', ', $emptyFields)
-                        )
-                    );
-                }
-
                 return $result[0];
             }
         );
+
+        $emptyFields = Utils::getKeysWithoutValue($labelData, $requiredKeys);
+
+        if ($emptyFields) {
+            throw new MissingFieldException(
+                sprintf(
+                    'The following fields are missing but required: %s',
+                    implode(', ', $emptyFields)
+                )
+            );
+        }
+
+        return $labelData;
     }
 
     /**
