@@ -65,9 +65,9 @@ class Constant
     public const PACKAGE_TYPE_DIGITAL_STAMP                             = 4;
     public const PACKAGE_TYPES                                          = [
         self::PACKAGE_TYPE_PACKAGE       => 'package',
-        self::PACKAGE_TYPE_MAILBOX       => 'mailbox package',
+        self::PACKAGE_TYPE_MAILBOX       => 'mailbox',
         self::PACKAGE_TYPE_LETTER        => 'letter',
-        self::PACKAGE_TYPE_DIGITAL_STAMP => 'digital stamp',
+        self::PACKAGE_TYPE_DIGITAL_STAMP => 'digital_stamp',
     ];
     public const PACKAGE_TYPES_LEGACY_NAMES_IDS_MAP = [
         'mailbox package'                                    => AbstractConsignment::PACKAGE_TYPE_MAILBOX,
