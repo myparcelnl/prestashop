@@ -245,7 +245,7 @@ class ConsignmentFactory
     private function setOrderData(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
     {
         $this->orderObject = $order;
-        $requiredKeys      = $this->request[Constant::LABEL_CHECK_ONLY] ?? false ? [] : Constant::REQUIRED_LABEL_KEYS;
+        $requiredKeys      = ($this->request[Constant::LABEL_CHECK_ONLY] ?? false) ? [] : Constant::REQUIRED_LABEL_KEYS;
         $this->orderData   = OrderLabel::getDataForLabelsCreate($order->getId(), $requiredKeys);
 
         $carrierSettingsProvider = new CarrierSettingsProvider();
