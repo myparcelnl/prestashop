@@ -107,7 +107,7 @@ class ConsignmentFactory
         $distributedWeight = $consignment->getTotalWeight() / $labelAmount;
         $consignment->setTotalWeight($distributedWeight);
 
-        if (isset($this->request[Constant::LABEL_CHECK_ONLY]) && $this->request[Constant::LABEL_CHECK_ONLY]) {
+        if ($this->request[Constant::LABEL_CHECK_ONLY] ?? false) && $this->request[Constant::LABEL_CHECK_ONLY]) {
             $consignment->setTotalWeight(1);
         }
 
