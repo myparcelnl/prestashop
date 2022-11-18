@@ -29,8 +29,8 @@ export async function executeAdminAction(
 
     const returnOptionsContext = useGlobalContext(ContextKey.RETURNS_FORM);
     requestParameters.labelDescription = returnOptionsContext.value.labelDescription;
-    requestParameters.packageType = returnOptionsContext.value.packageType.id;
-    requestParameters.largeFormat = returnOptionsContext.value.largeFormat;
+    requestParameters.packageType = returnOptionsContext.value.packageType;
+    requestParameters.packageFormat = returnOptionsContext.value.packageFormat;
   }
 
   if (isInArray(action, printActions)) {

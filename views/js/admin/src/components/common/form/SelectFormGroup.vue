@@ -13,9 +13,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, toRefs } from '@vue/composition-api';
 import FormGroup from '@/components/common/form/FormGroup.vue';
 import PsSelect from '@/components/common/form/PsSelect.vue';
-import { defineComponent } from '@vue/composition-api';
 import { disabledProps } from '@/composables/props/disabledProps';
 import { labelProps } from '@/composables/props/labelProps';
 import { useOptionsProps } from '@/composables/props/useOptionsProps';
@@ -34,6 +34,17 @@ export default defineComponent({
     ...useOptionsProps(),
   },
 
-  setup,
+  setup: (props, ctx) => {
+    const data = setup(props, ctx);
+    const propRefs = toRefs(props);
+
+    if (!data.mutableValue.value && propRefs.options.value.length) {
+      data.mutableValue.value = propRefs.options.value[0].value;
+    }
+
+    return {
+      ...data,
+    };
+  },
 });
 </script>

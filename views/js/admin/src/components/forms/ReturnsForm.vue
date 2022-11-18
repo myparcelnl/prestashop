@@ -1,14 +1,14 @@
 <template>
   <div>
     <FormGroup label="custom_label">
-      <PsInput v-model="labelDescriptionText" />
+      <PsInput v-model="labelDescriptionRef" />
     </FormGroup>
     <PackageTypeSelectFormGroup
-      v-model="packageTypeId"
+      v-model="packageTypeRef"
       :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
       v-if="contextData.options.packageFormat.length"
-      v-model="packageFormat"
+      v-model="packageFormatRef"
       :options="contextData.options.packageFormat" />
   </div>
 </template>
@@ -41,23 +41,24 @@ export default defineComponent({
 
   setup: (props) => {
     const contextData = useGlobalContext(ContextKey.RETURNS_FORM);
-    const { largeFormat, packageType } = contextData.value;
+    const { packageFormat, packageType } = contextData.value;
     const label = { barcode: props.modalData.barcode };
 
-    const labelDescriptionText = ref<string>(`${translate('return_prefix')} ${label.barcode}`);
-    const packageTypeId = ref<PackageType>(packageType);
-    const packageFormat = ref<number>(largeFormat);
+    const labelDescriptionRef = ref<string>(`${translate('return_prefix')} ${label.barcode}`);
+
+    const packageTypeRef = ref<PackageType>(packageType);
+    const packageFormatRef = ref<number>(packageFormat);
 
     watchEffect(() => {
-      contextData.value.labelDescription = labelDescriptionText.value;
-      contextData.value.packageType = packageTypeId.value;
-      contextData.value.largeFormat = packageFormat.value;
+      contextData.value.labelDescription = labelDescriptionRef.value;
+      contextData.value.packageType = packageTypeRef.value;
+      contextData.value.packageFormat = packageFormatRef.value;
     });
 
     return {
-      labelDescriptionText,
-      packageTypeId,
-      packageFormat,
+      labelDescriptionRef,
+      packageTypeRef,
+      packageFormatRef,
       contextData,
     };
   },
