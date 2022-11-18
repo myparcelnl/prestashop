@@ -126,7 +126,6 @@ class AdminOrderService extends AbstractService
 
         OrderLogger::addLog(['message' => 'Creating return shipments: ' . $collection->toJson(), 'order' => $order]);
 
-        //$consignment                 = $collection->where('status', '!=', null)->first();
         $consignment                 = $collection->last();
         $orderLabel                  = new OrderLabel();
         $orderLabel->id_label        = $consignment->getConsignmentId();

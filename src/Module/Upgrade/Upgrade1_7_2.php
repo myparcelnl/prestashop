@@ -19,6 +19,7 @@ ALTER TABLE $orderLabelTable ADD COLUMN is_return tinyint;
 SQL;
             $this->db->execute($query);
         } catch (\Throwable $e) {
+            // ignore error when column already exists
         }
     }
 }
