@@ -30,7 +30,7 @@ class OrderLabelProvider
                     $label['is_return'] = true;
                     continue;
                 }
-                $label['is_return'] = false;
+                $label['is_return']           = false;
                 $label['ALLOW_DELIVERY_FORM'] = $carrierSettings['delivery']['ALLOW_FORM'];
                 $label['ALLOW_RETURN_FORM']   = $carrierSettings['return']['ALLOW_FORM'];
             }
