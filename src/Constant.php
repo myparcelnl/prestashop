@@ -59,11 +59,16 @@ class Constant
     ];
     public const CUTOFF_EXCEPTIONS                                      = 'cutoff_exceptions';
 
-    public const PACKAGE_TYPE_PACKAGE                                   = 1;
-    public const PACKAGE_TYPE_MAILBOX                                   = 2;
-    public const PACKAGE_TYPE_LETTER                                    = 3;
-    public const PACKAGE_TYPE_DIGITAL_STAMP                             = 4;
-    public const PACKAGE_TYPES                                          = AbstractConsignment::PACKAGE_TYPES_IDS;
+    public const PACKAGE_TYPE_PACKAGE                                   = AbstractConsignment::PACKAGE_TYPE_PACKAGE;
+    public const PACKAGE_TYPE_MAILBOX                                   = AbstractConsignment::PACKAGE_TYPE_MAILBOX;
+    public const PACKAGE_TYPE_LETTER                                    = AbstractConsignment::PACKAGE_TYPE_LETTER;
+    public const PACKAGE_TYPE_DIGITAL_STAMP                             = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP;
+    public const PACKAGE_TYPES                                          = [
+        AbstractConsignment::PACKAGE_TYPE_PACKAGE       => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
+        AbstractConsignment::PACKAGE_TYPE_MAILBOX       => AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME,
+        AbstractConsignment::PACKAGE_TYPE_LETTER        => AbstractConsignment::PACKAGE_TYPE_LETTER_NAME,
+        AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
+    ];
 
     public const PACKAGE_TYPE_WEIGHT_LIMIT                              = 2; // Kg
 
