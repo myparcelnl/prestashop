@@ -26,7 +26,7 @@ class OrderLabelProvider
 
         if (! empty($labels)) {
             foreach ($labels as &$label) {
-                if ("1" === $label['is_return']) {
+                if ('1' === $label['is_return']) {
                     $label['is_return'] = true;
                     continue;
                 }
