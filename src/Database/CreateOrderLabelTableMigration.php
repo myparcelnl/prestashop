@@ -16,6 +16,7 @@ class CreateOrderLabelTableMigration implements Migration
           `track_link` varchar(255) DEFAULT NULL,
           `payment_url` varchar(255) DEFAULT NULL,
           `id_label` bigint(20) NOT NULL,
+          `is_return` tinyint(1),
           `date_add` datetime NOT NULL,
           `date_upd` datetime NOT NULL,
           PRIMARY KEY (`id_order_label`),
