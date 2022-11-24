@@ -1,6 +1,9 @@
 <template>
   <div class="card p-1">
     <label v-text="label.status" />
+    <span
+      v-if="label.is_return"
+      title="Return shipment"> - return</span>
     <div class="align-items-center d-flex text-nowrap">
       <a
         target="_blank"

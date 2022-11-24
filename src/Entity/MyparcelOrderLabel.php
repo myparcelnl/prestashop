@@ -72,7 +72,7 @@ class MyparcelOrderLabel
      *
      * @ORM\Column(name="is_return", type="tinyint")
      */
-    private $is_return;
+    private $isReturn;
 
     public function getIdLabel(): int
     {
@@ -172,12 +172,12 @@ class MyparcelOrderLabel
 
     public function getIsReturn(): int
     {
-        return $this->is_return;
+        return $this->isReturn;
     }
 
-    public function setIsReturn(int $is_return): MyparcelOrderLabel
+    public function setIsReturn(int $isReturn): MyparcelOrderLabel
     {
-        $this->is_return = $is_return;
+        $this->isReturn = $isReturn;
 
         return $this;
     }
