@@ -13,6 +13,7 @@ interface ShipmentLabel {
   payment_url: string | null;
   status: string;
   track_link: string;
+  is_return: boolean;
 
   /**
    * Additional field added by the frontend to be able to keep track of when labels were last refreshed.

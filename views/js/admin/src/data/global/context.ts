@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { PackageFormat } from '@/data/global/definitions';
+
 export enum ContextKey {
   RETURNS_FORM = 'returnsForm',
   SHIPMENT_LABELS = 'shipmentLabels',
@@ -59,8 +61,8 @@ export interface ShipmentLabelsContext {
 
 export interface ReturnsFormContext {
   labelDescription: string;
-  packageType: PackageType;
-  largeFormat: number;
+  packageType: PackageType['name'];
+  packageFormat: PackageFormat;
   options: ShipmentOptionsContext['options'];
 }
 

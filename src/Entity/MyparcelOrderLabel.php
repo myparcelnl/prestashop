@@ -67,6 +67,13 @@ class MyparcelOrderLabel
      */
     private $id_label;
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="is_return", type="tinyint")
+     */
+    private $isReturn;
+
     public function getIdLabel(): int
     {
         return $this->id_label;
@@ -159,6 +166,18 @@ class MyparcelOrderLabel
     public function setPaymentUrl(string $payment_url): MyparcelOrderLabel
     {
         $this->payment_url = $payment_url;
+
+        return $this;
+    }
+
+    public function getIsReturn(): int
+    {
+        return $this->isReturn;
+    }
+
+    public function setIsReturn(int $isReturn): MyparcelOrderLabel
+    {
+        $this->isReturn = $isReturn;
 
         return $this;
     }

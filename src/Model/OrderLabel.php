@@ -33,6 +33,11 @@ class OrderLabel extends ObjectModel
     public $id_order;
 
     /**
+     * @var bool
+     */
+    public $is_return = false;
+
+    /**
      * @var mixed
      */
     public $status;
@@ -89,6 +94,7 @@ class OrderLabel extends ObjectModel
             'id_label'        => ['type' => self::TYPE_STRING],
             'date_add'        => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
             'date_upd'        => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
+            'is_return'       => ['type' => self::TYPE_BOOL],
         ],
     ];
 
@@ -515,6 +521,7 @@ class OrderLabel extends ObjectModel
                 'date_add'        => $orderLabel->date_add,
                 'date_upd'        => $orderLabel->date_upd,
                 'payment_url'     => $orderLabel->payment_url,
+                'is_return'       => $orderLabel->is_return,
             ];
         }
 
@@ -626,6 +633,7 @@ SQL
                 return Validate::isLoadedObject($orderLabel);
             })
             ->each(function (OrderLabel $orderLabel) {
+                $orderLabel->is_return = '1' === $orderLabel->is_return;
                 self::$cache[$orderLabel->id_label] = $orderLabel;
             })
             ->toArray();

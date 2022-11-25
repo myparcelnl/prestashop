@@ -101,8 +101,8 @@ class AdminOrderService extends AbstractService
         $platformService = PlatformServiceFactory::create();
         $carrier         = CarrierService::getMyParcelCarrier($order->getIdCarrier());
         $postValues      = Tools::getAllValues();
-        $packageType     = ((int) $postValues['packageType']) ?: AbstractConsignment::DEFAULT_PACKAGE_TYPE;
-        $largeFormat     = Constant::PACKAGE_FORMAT_LARGE === ((int) $postValues['largeFormat']);
+        $packageType     = ($postValues['packageType']) ?: AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+        $largeFormat     = Constant::PACKAGE_FORMAT_LARGE === ((int) $postValues['packageFormat']);
 
         $consignment = ($platformService->generateConsignment($carrier))
             ->setConsignmentId((int) $orderLabel->id_label)
@@ -114,7 +114,7 @@ class AdminOrderService extends AbstractService
             ->setCity($address->city)
             ->setEmail($customer->email)
             ->setContents(5)
-            ->setPackageType($packageType)
+            ->setPackageType(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP[$packageType] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE )
 
             // This may be overridden
             ->setLabelDescription($postValues['labelDescription'] ?? $orderLabel->barcode)
@@ -126,13 +126,14 @@ class AdminOrderService extends AbstractService
 
         OrderLogger::addLog(['message' => 'Creating return shipments: ' . $collection->toJson(), 'order' => $order]);
 
-        $consignment                 = $collection->where('status', '!=', null)->first();
+        $consignment                 = $collection->last();
         $orderLabel                  = new OrderLabel();
         $orderLabel->id_label        = $consignment->getConsignmentId();
         $orderLabel->id_order        = $consignment->getReferenceId();
         $orderLabel->new_order_state = $consignment->getStatus();
         $orderLabel->status          = MyParcelStatusProvider::getInstance()
             ->getStatus($consignment->getStatus());
+        $orderLabel->is_return       = true;
         $orderLabel->add();
 
         return $orderLabel;

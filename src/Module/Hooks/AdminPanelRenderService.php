@@ -8,7 +8,6 @@ use Closure;
 use Configuration;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
-use Gett\MyparcelBE\DeliverySettings\DeliverySettings;
 use Gett\MyparcelBE\Factory\Consignment\ConsignmentFactory;
 use Gett\MyparcelBE\Factory\OrderSettingsFactory;
 use Gett\MyparcelBE\Logger\OrderLogger;

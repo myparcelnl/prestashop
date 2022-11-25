@@ -16,10 +16,16 @@
         <MaterialIcon
           icon="open_in_new"
           class="font-16" />
+        <span
+          v-if="shipmentLabel.is_return"
+          title="Return shipment">R</span>
+      </a>
+      <a v-else-if="shipmentLabel.is_return">
+        Return shipment
       </a>
       <a
         v-else>
-        Return shipment
+        -
       </a>
     </PsTableCol>
 
@@ -54,7 +60,6 @@ import PsTableCol from '@/components/common/table/PsTableCol.vue';
 import PsTableRow from '@/components/common/table/PsTableRow.vue';
 import { executeLabelAction } from '@/services/actions/executeLabelAction';
 import { useCheckboxModel } from '@/composables/props/model/useCheckboxModel';
-import shipmentLabel from '@/components/order-card/ShipmentLabel.vue';
 
 const { model, props, setup } = useCheckboxModel();
 
@@ -93,7 +98,7 @@ export default defineComponent({
       deleteAction,
     ];
 
-    if (props.shipmentLabel.barcode) {
+    if (props.shipmentLabel.barcode && !props.shipmentLabel.is_return) {
       rowDropdownItems.unshift(returnAction);
     }
 
