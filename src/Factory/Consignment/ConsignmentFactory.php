@@ -107,6 +107,10 @@ class ConsignmentFactory
         $distributedWeight = $consignment->getTotalWeight() / $labelAmount;
         $consignment->setTotalWeight($distributedWeight);
 
+        if (($this->request[Constant::LABEL_CHECK_ONLY] ?? false) && $this->request[Constant::LABEL_CHECK_ONLY]) {
+            $consignment->setTotalWeight(1);
+        }
+
         if ($extraOptions->getLabelAmount() > 1) {
             $countryService = new CountryService();
             $orderIso       = $countryService->getShippingCountryIso2($order);
@@ -241,7 +245,9 @@ class ConsignmentFactory
     private function setOrderData(Order $order, ?AbstractDeliveryOptionsAdapter $deliveryOptions): void
     {
         $this->orderObject = $order;
-        $this->orderData   = OrderLabel::getDataForLabelsCreate($order->getId());
+        $requiredKeys      = ($this->request[Constant::LABEL_CHECK_ONLY] ?? false) ? [] : Constant::REQUIRED_LABEL_KEYS;
+        $this->orderData   = OrderLabel::getDataForLabelsCreate($order->getId(), $requiredKeys);
+
         $carrierSettingsProvider = new CarrierSettingsProvider();
         $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
 
