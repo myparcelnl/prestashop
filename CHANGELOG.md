@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.7.2](https://github.com/myparcelnl/prestashop/compare/v1.7.1...v1.7.2) (2022-12-06)
+
+
+### :bug: Bug Fixes
+
+* **modal:** show package options ([#200](https://github.com/myparcelnl/prestashop/issues/200)) ([b376131](https://github.com/myparcelnl/prestashop/commit/b37613151a3c81604965cf092b66e4ce7d78d254))
+* **shipments:** distinguish return labels correctly ([#201](https://github.com/myparcelnl/prestashop/issues/201)) ([917df89](https://github.com/myparcelnl/prestashop/commit/917df892ec4ec486f8e280e0a58668362fce1dd4))
+
 ### [1.7.1](https://github.com/myparcelnl/prestashop/compare/v1.7.0...v1.7.1) (2022-11-10)
 
 
