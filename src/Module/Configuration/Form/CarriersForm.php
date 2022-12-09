@@ -1302,7 +1302,7 @@ SQL
                 'tab'              => $tabId,
                 'type'             => 'select',
                 'label'            => $this->module->l('Max insured amount EU', 'carriers'),
-                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT,
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_EU,
                 'options'          => [
                     'query' => array_map(
                         static function ($value) use ($currency) {

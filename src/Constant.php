@@ -14,7 +14,6 @@ class Constant
      */
     public const ITEM_DESCRIPTION_MAX_LENGTH  = 50;
     public const ORDER_DESCRIPTION_MAX_LENGTH = 45;
-
     public const API_KEY_CONFIGURATION_NAME                = 'MYPARCELBE_API_KEY';
     public const API_LOGGING_CONFIGURATION_NAME            = 'MYPARCELBE_API_LOGGING';
     public const PACKAGE_TYPE_CONFIGURATION_NAME           = 'MYPARCELBE_PACKAGE_TYPE';
@@ -26,6 +25,7 @@ class Constant
     public const INSURANCE_CONFIGURATION_NAME              = 'MYPARCELBE_INSURANCE';
     public const INSURANCE_CONFIGURATION_FROM_PRICE        = 'MYPARCELBE_INSURANCE_FROM_PRICE';
     public const INSURANCE_CONFIGURATION_MAX_AMOUNT        = 'MYPARCELBE_INSURANCE_MAX_AMOUNT';
+    public const INSURANCE_CONFIGURATION_MAX_AMOUNT_EU     = 'MYPARCELBE_INSURANCE_MAX_AMOUNT_EU';
     public const INSURANCE_CONFIGURATION_BELGIUM           = 'MYPARCELBE_INSURANCE_BELGIUM';
     public const CUSTOMS_FORM_CONFIGURATION_NAME           = 'MYPARCELBE_CUSTOMS_FORM';
     public const CUSTOMS_FORM_CONFIGURATION_OPTION_ADD     = 'Add';
@@ -37,8 +37,7 @@ class Constant
     public const INSURANCE_CONFIGURATION_NONE              = 0;
     public const DEFAULT_INSURANCE_POSSIBILITIES           = [self::INSURANCE_CONFIGURATION_NONE];
     public const INSURANCE_CONFIGURATION_BELGIUM_AMOUNT    = 500;
-
-    public const SINGLE_LABEL_CREATION_OPTIONS                          = [
+    public const SINGLE_LABEL_CREATION_OPTIONS = [
         'packageType'       => self::PACKAGE_TYPE_CONFIGURATION_NAME,
         'packageFormat'     => self::PACKAGE_FORMAT_CONFIGURATION_NAME,
         'onlyRecipient'     => self::ONLY_RECIPIENT_CONFIGURATION_NAME,
@@ -47,7 +46,7 @@ class Constant
         'signatureRequired' => self::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
         'insurance'         => self::INSURANCE_CONFIGURATION_NAME,
     ];
-    public const SINGLE_LABEL_RETURN_OPTIONS                            = [
+    public const SINGLE_LABEL_RETURN_OPTIONS   = [
         'packageType'       => 'return_' . self::PACKAGE_TYPE_CONFIGURATION_NAME,
         'packageFormat'     => 'return_' . self::PACKAGE_FORMAT_CONFIGURATION_NAME,
         'onlyRecipient'     => 'return_' . self::ONLY_RECIPIENT_CONFIGURATION_NAME,
@@ -57,49 +56,40 @@ class Constant
         'insurance'         => 'return_' . self::INSURANCE_CONFIGURATION_NAME,
         'labelDescription'  => 'return_label_description',
     ];
-    public const CUTOFF_EXCEPTIONS                                      = 'cutoff_exceptions';
-
-    public const PACKAGE_TYPE_PACKAGE                                   = AbstractConsignment::PACKAGE_TYPE_PACKAGE;
-    public const PACKAGE_TYPE_MAILBOX                                   = AbstractConsignment::PACKAGE_TYPE_MAILBOX;
-    public const PACKAGE_TYPE_LETTER                                    = AbstractConsignment::PACKAGE_TYPE_LETTER;
-    public const PACKAGE_TYPE_DIGITAL_STAMP                             = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP;
-    public const PACKAGE_TYPES                                          = [
+    public const CUTOFF_EXCEPTIONS             = 'cutoff_exceptions';
+    public const PACKAGE_TYPE_PACKAGE       = AbstractConsignment::PACKAGE_TYPE_PACKAGE;
+    public const PACKAGE_TYPE_MAILBOX       = AbstractConsignment::PACKAGE_TYPE_MAILBOX;
+    public const PACKAGE_TYPE_LETTER        = AbstractConsignment::PACKAGE_TYPE_LETTER;
+    public const PACKAGE_TYPE_DIGITAL_STAMP = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP;
+    public const PACKAGE_TYPES              = [
         AbstractConsignment::PACKAGE_TYPE_PACKAGE       => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
         AbstractConsignment::PACKAGE_TYPE_MAILBOX       => AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME,
         AbstractConsignment::PACKAGE_TYPE_LETTER        => AbstractConsignment::PACKAGE_TYPE_LETTER_NAME,
         AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
     ];
-
-    public const PACKAGE_TYPE_WEIGHT_LIMIT                              = 2; // Kg
-
+    public const PACKAGE_TYPE_WEIGHT_LIMIT = 2; // Kg
     public const PACKAGE_FORMAT_NORMAL    = 1;
     public const PACKAGE_FORMAT_LARGE     = 2;
     public const PACKAGE_FORMAT_AUTOMATIC = 3;
-
-    public const PACKAGE_FORMAT_LARGE_INDEX                             = 2;
-    public const SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME                = 'MYPARCELBE_SHARE_CUSTOMER_EMAIL';
-    public const SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME                = 'MYPARCELBE_SHARE_CUSTOMER_PHONE';
-    public const USE_ADDRESS2_AS_STREET_NUMBER_CONFIGURATION_NAME       = 'MYPARCELBE_USE_ADDRESS2_AS_STREET_NUMBER';
-    public const CONCEPT_FIRST                                          = 'MYPARCELBE_CONCEPT_FIRST';
-
+    public const PACKAGE_FORMAT_LARGE_INDEX                       = 2;
+    public const SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME          = 'MYPARCELBE_SHARE_CUSTOMER_EMAIL';
+    public const SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME          = 'MYPARCELBE_SHARE_CUSTOMER_PHONE';
+    public const USE_ADDRESS2_AS_STREET_NUMBER_CONFIGURATION_NAME = 'MYPARCELBE_USE_ADDRESS2_AS_STREET_NUMBER';
+    public const CONCEPT_FIRST                                    = 'MYPARCELBE_CONCEPT_FIRST';
     public const DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME = 'MYPARCELBE_DELIVERY_OPTIONS_PRICE_FORMAT';
     public const DELIVERY_OPTIONS_PRICE_FORMAT_TOTAL_PRICE        = 'total_price';
     public const DELIVERY_OPTIONS_PRICE_FORMAT_SURCHARGE          = 'surcharge';
-
     public const LABEL_DESCRIPTION_CONFIGURATION_NAME          = 'MYPARCELBE_LABEL_DESCRIPTION';
     public const LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME        = 'MYPARCELBE_LABEL_OPEN_DOWNLOAD';
     public const LABEL_SIZE_CONFIGURATION_NAME                 = 'MYPARCELBE_LABEL_SIZE';
     public const LABEL_POSITION_CONFIGURATION_NAME             = 'MYPARCELBE_LABEL_POSITION';
     public const LABEL_PROMPT_POSITION_CONFIGURATION_NAME      = 'MYPARCELBE_LABEL_PROMPT_POSITION';
     public const LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME = 'MYPARCELBE_LABEL_CREATED_ORDER_STATUS';
-
     public const LABEL_CHECK_ONLY                          = 'labelCheckOnly';
     public const CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY = [self::LABEL_CHECK_ONLY => true];
-
     // Field used in <platform>_carrier_configuration to link myparcel carrier to prestashop carrier.
     public const CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE = 'carrierType';
-
-    public const CARRIER_CONFIGURATION_FIELDS                           = [
+    public const CARRIER_CONFIGURATION_FIELDS = [
         self::CARRIER_CONFIGURATION_FIELD_CARRIER_TYPE,
         'dropOffDays',
         self::CUTOFF_EXCEPTIONS,
@@ -148,7 +138,7 @@ class Constant
         'return_' . self::INSURANCE_CONFIGURATION_MAX_AMOUNT,
         'return_label_description',
     ];
-    public const WEEK_DAYS                                              = [
+    public const WEEK_DAYS                    = [
         1 => 'monday',
         2 => 'tuesday',
         3 => 'wednesday',
@@ -157,9 +147,7 @@ class Constant
         6 => 'saturday',
         7 => 'sunday',
     ];
-
-    public const DEFAULT_CUTOFF_TIME                                    = '17:00';
-
+    public const DEFAULT_CUTOFF_TIME = '17:00';
     public const STATUS_CHANGE_MAIL_CONFIGURATION_NAME                  = 'MYPARCELBE_STATUS_CHANGE_MAIL';
     public const SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME = 'MYPARCELBE_SENT_ORDER_STATE_FOR_DIGITAL_STAMPS';
     public const LABEL_SCANNED_ORDER_STATUS_CONFIGURATION_NAME          = 'MYPARCELBE_LABEL_SCANNED_ORDER_STATUS';
@@ -171,26 +159,22 @@ class Constant
     public const POSTNL_CONFIGURATION_NAME                              = 'MYPARCELBE_POSTNL';
     public const BPOST_CONFIGURATION_NAME                               = 'MYPARCELBE_BPOST';
     public const DPD_CONFIGURATION_NAME                                 = 'MYPARCELBE_DPD';
-
     public const CARRIER_CONFIGURATION_MAP = [
         CarrierPostNL::class => Constant::POSTNL_CONFIGURATION_NAME,
         CarrierBpost::class  => Constant::BPOST_CONFIGURATION_NAME,
         CarrierDPD::class    => Constant::DPD_CONFIGURATION_NAME,
     ];
-
     /** @deprecated use CarrierPostNL::NAME */
     public const POSTNL_CARRIER_NAME = CarrierPostNL::NAME;
     /** @deprecated use CarrierBpost::NAME */
     public const BPOST_CARRIER_NAME = CarrierBpost::NAME;
     /** @deprecated use CarrierDPD::NAME */
     public const DPD_CARRIER_NAME = CarrierDPD::NAME;
-
-    public const EXCLUSIVE_FIELDS_NL                                    = [
+    public const EXCLUSIVE_FIELDS_NL = [
         self::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME,
         self::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
     ];
-
-    public const CARRIER_EXCLUSIVE              = [
+    public const CARRIER_EXCLUSIVE      = [
         'POSTNL' => [
             'ALLOW_STANDARD_FORM'                                   => ['BE' => true, 'NL' => true],
             'dropOffDays'                                           => ['BE' => true, 'NL' => true],
@@ -214,7 +198,7 @@ class Constant
                 'NL' => [1 => true, 2 => true, 3 => true, 4 => true],
             ],
             self::ONLY_RECIPIENT_CONFIGURATION_NAME                 => ['BE' => true, 'NL' => true],
-            self::PACKAGE_FORMAT_CONFIGURATION_NAME => [
+            self::PACKAGE_FORMAT_CONFIGURATION_NAME                 => [
                 'BE' => [
                     self::PACKAGE_FORMAT_NORMAL    => true,
                     self::PACKAGE_FORMAT_LARGE     => true,
@@ -326,7 +310,7 @@ class Constant
             'return_' . self::RETURN_PACKAGE_CONFIGURATION_NAME     => ['BE' => false, 'NL' => false],
         ],
     ];
-    public const NL_MONTHS = [
+    public const NL_MONTHS              = [
         1  => 'januari',
         2  => 'februari',
         3  => 'maart',
@@ -340,7 +324,7 @@ class Constant
         11 => 'november',
         12 => 'december',
     ];
-    public const NL_DAYS = [
+    public const NL_DAYS                = [
         1 => 'maandag',
         2 => 'dinsdag',
         3 => 'woensdag',
