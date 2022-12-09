@@ -1406,7 +1406,7 @@ SQL
             $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
             $insurancePossibilities = array_merge(
                 Constant::DEFAULT_INSURANCE_POSSIBILITIES,
-                $consignment->getInsurancePossibilities($consignment->counry)
+                $consignment->getInsurancePossibilities($consignment->country)
             );
         } catch (\Throwable $e) {
             $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
