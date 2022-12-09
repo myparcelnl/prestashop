@@ -217,22 +217,23 @@ class AdminPanelRenderService extends RenderService
         array                           $map,
         ?AbstractDeliveryOptionsAdapter $presetDeliveryOptions = null
     ): array {
-        $consignment = $this->createConsignmentForOrder($order, $presetDeliveryOptions);
+        $consignment        = $this->createConsignmentForOrder($order, $presetDeliveryOptions);
+        $consignmentOptions = [
+            'canHaveInsurance' => true,
+        ];
 
         if (! $consignment) {
             return [];
         }
 
         if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
-            return [
-                'canHaveInsurance' => true,
+            return $consignmentOptions + [
                 'insuranceOptions' => [Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT],
             ];
         }
 
         $isStandardDelivery = $consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_STANDARD;
-        $consignmentOptions = [
-            'canHaveInsurance' => true,
+        $consignmentOptions += [
             'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),
         ];
 
