@@ -223,13 +223,6 @@ class AdminPanelRenderService extends RenderService
             return [];
         }
 
-        if(CountryService::isPostNLToEU($consignment)) {
-            return [
-                'canHaveInsurance' => true,
-                'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),
-            ];
-        }
-
         if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
             return [
                 'canHaveInsurance' => true,
@@ -239,8 +232,13 @@ class AdminPanelRenderService extends RenderService
 
         $isStandardDelivery = $consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_STANDARD;
         $consignmentOptions = [
+            'canHaveInsurance' => true,
             'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),
         ];
+
+        if (CountryService::isPostNLToEU($consignment)) {
+            return $consignmentOptions;
+        }
 
         foreach ($map as $key => $consignmentOption) {
             $consignmentOptions[$key] = $isStandardDelivery && $consignment->canHaveShipmentOption($consignmentOption);
