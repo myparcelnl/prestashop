@@ -66,7 +66,7 @@ class OrderSettings
                 $this->order->getIdCart()
             );
 
-            $this->deliveryOptions = DeliveryOptionsMerger::create($defaults, $fromOrder);;
+            $this->deliveryOptions = DeliveryOptionsMerger::create($defaults, $fromOrder);
         }
 
         return $this->deliveryOptions;

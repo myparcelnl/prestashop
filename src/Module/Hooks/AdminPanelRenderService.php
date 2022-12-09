@@ -223,6 +223,13 @@ class AdminPanelRenderService extends RenderService
             return [];
         }
 
+        if(CountryService::isPostNLToEU($consignment)) {
+            return [
+                'canHaveInsurance' => true,
+                'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),
+            ];
+        }
+
         if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
             return [
                 'canHaveInsurance' => true,
@@ -232,7 +239,7 @@ class AdminPanelRenderService extends RenderService
 
         $isStandardDelivery = $consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_STANDARD;
         $consignmentOptions = [
-            'insuranceOptions' => $consignment->getInsurancePossibilities(),
+            'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),
         ];
 
         foreach ($map as $key => $consignmentOption) {
@@ -294,10 +301,10 @@ class AdminPanelRenderService extends RenderService
                 )
                 ->first();
 
-            if (! CountryService::isPostNLShipmentFromNLToBE($consignment)
-                && $consignment->getCountry() !== $this->module->getModuleCountry()) {
-                $consignment = null;
-            }
+//            if (! CountryService::isPostNLShipmentFromNLToBE($consignment)
+//                && $consignment->getCountry() !== $this->module->getModuleCountry()) {
+//                $consignment = null;
+//            }
         } catch (Throwable $e) {
             OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
             $this->addOrderError($e, $order);

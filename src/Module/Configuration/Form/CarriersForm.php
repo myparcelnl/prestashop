@@ -1298,6 +1298,27 @@ SQL
                 'class'            => 'col-lg-2',
             ];
 
+            $fields[] = [
+                'tab'              => $tabId,
+                'type'             => 'select',
+                'label'            => $this->module->l('Max insured amount EU', 'carriers'),
+                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT,
+                'options'          => [
+                    'query' => array_map(
+                        static function ($value) use ($currency) {
+                            return [
+                                'value' => $value,
+                                'label' => $currency->getSign() . ' ' . $value,
+                            ];
+                        },
+                        $insurancePossibilities
+                    ),
+                    'id'    => 'value',
+                    'name'  => 'label',
+                ],
+                'class'            => 'col-lg-2',
+            ];
+
             if (! $prefix && $this->module->isNL()) {
                 $fields[] = [
                     'tab'     => $tabId,
@@ -1385,7 +1406,7 @@ SQL
             $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
             $insurancePossibilities = array_merge(
                 Constant::DEFAULT_INSURANCE_POSSIBILITIES,
-                $consignment->getInsurancePossibilities()
+                $consignment->getInsurancePossibilities($consignment->counry)
             );
         } catch (\Throwable $e) {
             $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
