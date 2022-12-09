@@ -300,10 +300,6 @@ class AdminPanelRenderService extends RenderService
                 )
                 ->first();
 
-//            if (! CountryService::isPostNLShipmentFromNLToBE($consignment)
-//                && $consignment->getCountry() !== $this->module->getModuleCountry()) {
-//                $consignment = null;
-//            }
         } catch (Throwable $e) {
             OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
             $this->addOrderError($e, $order);
