@@ -21,11 +21,11 @@ import { labelProps } from '@/composables/props/labelProps';
 import { useOptionsProps } from '@/composables/props/useOptionsProps';
 import { useSelectModel } from '@/composables/props/model/useSelectModel';
 
-const { model, props, setup } = useSelectModel();
+const {model, props, setup} = useSelectModel();
 
 export default defineComponent({
   name: 'SelectFormGroup',
-  components: { FormGroup, PsSelect },
+  components: {FormGroup, PsSelect},
   model,
   props: {
     ...props,
@@ -38,9 +38,10 @@ export default defineComponent({
     const data = setup(props, ctx);
     const propRefs = toRefs(props);
 
-    if (!data.mutableValue.value && propRefs.options.value.length) {
-      data.mutableValue.value = propRefs.options.value[0].value;
-    }
+    console.log(propRefs);
+    // if (!data.mutableValue.value && propRefs.options.value.length) {
+    //   data.mutableValue.value = propRefs.options.value[0].value;
+    // }
 
     return {
       ...data,
