@@ -7,7 +7,7 @@
       v-model="packageTypeRef"
       :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
-      v-if="showPackageFormat"
+      v-if="packageTypeRef === 'package'"
       v-model="packageFormatRef"
       :options="contextData.options.packageFormat" />
   </div>
@@ -43,21 +43,14 @@ export default defineComponent({
     const contextData = useGlobalContext(ContextKey.RETURNS_FORM);
     const {packageFormat, packageType} = contextData.value;
     const label = {barcode: props.modalData.barcode};
-
     const labelDescriptionRef = ref<string>(`${translate('return_prefix')} ${label.barcode}`);
 
-    const packageTypeRef = ref<PackageType>({id: '1', name: packageType, human: 'pakkettype'});
+    const packageTypeRef = ref<PackageType['name']>(packageType);
     const packageFormatRef = ref<number>(packageFormat);
-    const showPackageFormat = packageType === 'package';
-
-    console.log(packageType);
-    console.log(packageTypeRef);
-    console.log(packageFormat);
-    console.log(packageFormatRef);
 
     watchEffect(() => {
       contextData.value.labelDescription = labelDescriptionRef.value;
-      contextData.value.packageType = packageTypeRef.value.name;
+      contextData.value.packageType = packageTypeRef.value;
       contextData.value.packageFormat = packageFormatRef.value;
     });
 
@@ -66,7 +59,6 @@ export default defineComponent({
       packageTypeRef,
       packageFormatRef,
       contextData,
-      showPackageFormat,
     };
   },
 });

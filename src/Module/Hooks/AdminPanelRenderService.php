@@ -118,7 +118,8 @@ class AdminPanelRenderService extends RenderService
 
             $context['orderId']      = $order->getId();
             $context['orderWeight']  = $orderSettings->getOrderWeight();
-            $context['extraOptions'] = $orderSettings->getExtraOptions()->toArray();
+            $context['extraOptions'] = $orderSettings->getExtraOptions()
+                ->toArray();
             $context['labelOptions'] = $orderSettings->getLabelOptions();
 
             $carrierOptionsCalculator            = $this->getCarrierOptionsCalculator($order);
@@ -193,7 +194,9 @@ class AdminPanelRenderService extends RenderService
      */
     public function renderOrderSettings(Order $order): string
     {
-        return $this->renderWithContext('renderOrderCard', [
+        return $this->renderWithContext(
+            'renderOrderCard',
+            [
                 self::ID_RETURNS_FORM     => $this->getReturnsContext($order),
                 self::ID_SHIPMENT_LABELS  => $this->getShipmentLabelsContext($order),
                 self::ID_SHIPMENT_OPTIONS => $this->getShipmentOptionsContext($order),
@@ -251,8 +254,7 @@ class AdminPanelRenderService extends RenderService
     protected function getDeliveryOptionsContext(
         Order                           $order,
         ?AbstractDeliveryOptionsAdapter $presetDeliveryOptions = null
-    ): array
-    {
+    ): array {
         $deliveryOptionsProvider = new DeliveryOptionsProvider();
         $orderSettings           = OrderSettingsFactory::create($order);
         $deliveryOptions         = DeliveryOptionsMerger::create(
@@ -261,7 +263,11 @@ class AdminPanelRenderService extends RenderService
         );
 
         return [
-            'consignment'                => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_MAP, $deliveryOptions),
+            'consignment'                => $this->getConsignmentOptions(
+                $order,
+                self::CONSIGNMENT_OPTIONS_MAP,
+                $deliveryOptions
+            ),
             'deliveryOptions'            => $deliveryOptions ? $deliveryOptions->toArray() : [],
             'deliveryOptionsDateChanged' => $deliveryOptionsProvider->provideWarningDisplay($order->getId()),
         ];
@@ -284,7 +290,7 @@ class AdminPanelRenderService extends RenderService
                 ->fromOrder(
                     $order,
                     $presetDeliveryOptions ?? OrderSettingsFactory::create($order)
-                        ->getDeliveryOptions()
+                    ->getDeliveryOptions()
                 )
                 ->first();
 
@@ -301,7 +307,7 @@ class AdminPanelRenderService extends RenderService
     }
 
     /**
-     * @param \Gett\MyparcelBE\Model\Core\Order $order
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
      *
      * @return \Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator
      * @throws \Exception
@@ -353,9 +359,10 @@ class AdminPanelRenderService extends RenderService
     {
         $address                  = (new Address($order->id_address_delivery));
         $carrierOptionsCalculator = $this->getCarrierOptionsCalculator($order);
+        $orderSettings            = OrderSettingsFactory::create($order);
+        $deliveryOptions          = $orderSettings->getDeliveryOptions();
         $filter                   = $this->getCarrierSettingsFilter($order);
-
-        return [
+        $var1                     = [
             'name'        => $address->firstname . ' ' . $address->lastname,
             'email'       => (new Customer($order->id_customer))->email,
             'consignment' => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP),
@@ -371,6 +378,28 @@ class AdminPanelRenderService extends RenderService
                     $filter('packageFormat')
                 ),
             ],
+            //            'packageType' =>
+        ];
+
+        return [
+            'name'          => $address->firstname . ' ' . $address->lastname,
+            'email'         => (new Customer($order->id_customer))->email,
+            'consignment'   => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP),
+            'options'       => [
+                'packageType'   => array_filter(
+                    $carrierOptionsCalculator->getAvailablePackageTypes(),
+                    static function ($item) use ($filter) {
+                        return $filter('packageType')(['value' => $item['id']]);
+                    }
+                ),
+                'packageFormat' => Arr::where(
+                    $carrierOptionsCalculator->getAvailablePackageFormats(),
+                    $filter('packageFormat')
+                ),
+            ],
+            'packageType'   => $deliveryOptions->getPackageType(),
+            'packageFormat' => $deliveryOptions->getShipmentOptions()
+                ->hasLargeFormat(),
         ];
     }
 }

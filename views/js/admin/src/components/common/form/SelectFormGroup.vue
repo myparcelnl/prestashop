@@ -38,10 +38,13 @@ export default defineComponent({
     const data = setup(props, ctx);
     const propRefs = toRefs(props);
 
-    console.log(propRefs);
-    // if (!data.mutableValue.value && propRefs.options.value.length) {
-    //   data.mutableValue.value = propRefs.options.value[0].value;
-    // }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    if (!data.mutableValue.value && propRefs.options.value.length) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      data.mutableValue.value = propRefs.options.value[0].value;
+    }
 
     return {
       ...data,
