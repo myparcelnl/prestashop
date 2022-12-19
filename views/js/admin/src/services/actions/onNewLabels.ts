@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { ActionResponse, LabelAction, OrderAction, modifyLabelActions } from '@/data/global/actions';
+import { ActionResponse, LabelAction, modifyLabelActions, OrderAction } from '@/data/global/actions';
 import { ContextKey } from '@/data/global/context';
 import { findLabelIndex } from '@/utils/findLabelIndex';
 import { useGlobalContext } from '@/composables/context/useGlobalContext';
@@ -21,8 +21,8 @@ export function onNewLabels(response: ActionResponse<typeof modifyLabelActions[n
       });
       break;
 
-    case LabelAction.PRINT:
     case LabelAction.REFRESH:
+    case LabelAction.PRINT:
     case OrderAction.EXPORT:
     case OrderAction.CREATE_RETURN_LABEL:
     case OrderAction.EXPORT_PRINT:
