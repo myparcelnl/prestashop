@@ -362,24 +362,6 @@ class AdminPanelRenderService extends RenderService
         $orderSettings            = OrderSettingsFactory::create($order);
         $deliveryOptions          = $orderSettings->getDeliveryOptions();
         $filter                   = $this->getCarrierSettingsFilter($order);
-        $var1                     = [
-            'name'        => $address->firstname . ' ' . $address->lastname,
-            'email'       => (new Customer($order->id_customer))->email,
-            'consignment' => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP),
-            'options'     => [
-                'packageType'   => array_filter(
-                    $carrierOptionsCalculator->getAvailablePackageTypes(),
-                    static function ($item) use ($filter) {
-                        return $filter('packageType')(['value' => $item['id']]);
-                    }
-                ),
-                'packageFormat' => Arr::where(
-                    $carrierOptionsCalculator->getAvailablePackageFormats(),
-                    $filter('packageFormat')
-                ),
-            ],
-            //            'packageType' =>
-        ];
 
         return [
             'name'          => $address->firstname . ' ' . $address->lastname,
