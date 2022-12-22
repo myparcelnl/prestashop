@@ -21,10 +21,10 @@ export function onNewLabels(response: ActionResponse<typeof modifyLabelActions[n
       });
       break;
 
-    case LabelAction.REFRESH:
     case LabelAction.PRINT:
-    case OrderAction.EXPORT:
+    case LabelAction.REFRESH:
     case OrderAction.CREATE_RETURN_LABEL:
+    case OrderAction.EXPORT:
     case OrderAction.EXPORT_PRINT:
       const shipmentLabels = response.data.shipmentLabels ?? response.data;
       shipmentLabels.forEach((newLabel) => {
