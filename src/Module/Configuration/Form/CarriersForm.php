@@ -1267,7 +1267,7 @@ SQL
                 'desc'  => $this->module->l('Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.', 'carriers'),
             ];
 
-            $insurancePossibilities = $this->getInsurancePossibilities($myParcelCarrier);
+            $insurancePossibilities = $this->getInsurancePossibilities($myParcelCarrier, 'NL');
 
             $fields[] = [
                 'tab'              => $tabId,
@@ -1277,6 +1277,7 @@ SQL
                 'suffix'           => $currency->getSign(),
                 'class'            => 'col-lg-2',
             ];
+
             $fields[] = [
                 'tab'              => $tabId,
                 'type'             => 'select',
@@ -1298,12 +1299,13 @@ SQL
                 'class'            => 'col-lg-2',
             ];
 
-            $fields[] = [
-                'tab'              => $tabId,
-                'type'             => 'select',
-                'label'            => $this->module->l('Max insured amount EU', 'carriers'),
-                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_EU,
-                'options'          => [
+            $insurancePossibilitiesEU = $this->getInsurancePossibilities($myParcelCarrier, 'EU');
+            $fields[]                  = [
+                'tab'     => $tabId,
+                'type'    => 'select',
+                'label'   => $this->module->l('Max insured amount EU', 'carriers'),
+                'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_EU,
+                'options' => [
                     'query' => array_map(
                         static function ($value) use ($currency) {
                             return [
@@ -1311,12 +1313,12 @@ SQL
                                 'label' => $currency->getSign() . ' ' . $value,
                             ];
                         },
-                        $insurancePossibilities
+                        $insurancePossibilitiesEU
                     ),
                     'id'    => 'value',
                     'name'  => 'label',
                 ],
-                'class'            => 'col-lg-2',
+                'class'   => 'col-lg-2',
             ];
 
             if (! $prefix && $this->module->isNL()) {
@@ -1395,18 +1397,19 @@ SQL
     }
 
     /**
-     * @param \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
+     * @param  \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
+     * @param                                                    $country
      *
      * @return int[]
      */
-    private function getInsurancePossibilities(AbstractCarrier $myParcelCarrier): array
+    private function getInsurancePossibilities(AbstractCarrier $myParcelCarrier, $country): array
     {
         try {
             $consignment = ConsignmentFactory::createByCarrierId($myParcelCarrier->getId());
             $consignment->setPackageType(AbstractConsignment::PACKAGE_TYPE_PACKAGE);
             $insurancePossibilities = array_merge(
                 Constant::DEFAULT_INSURANCE_POSSIBILITIES,
-                $consignment->getInsurancePossibilities($consignment->country)
+                $consignment->getInsurancePossibilities($country)
             );
         } catch (\Throwable $e) {
             $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
