@@ -31,6 +31,7 @@ use PrestaShopException;
 use PrestaShopLogger;
 use RangePrice;
 use RangeWeight;
+use Throwable;
 use Validate;
 use Zone;
 
@@ -82,62 +83,19 @@ class CarriersForm extends AbstractForm
         return $this->getMessage() . $this->getList();
     }
 
-    protected function redirectToCarrierList(): void
-    {
-        // Redirect back to list
-        Tools::redirectAdmin((new Link())->getAdminLink('AdminModules', true, [], [
-            'configure' => 'myparcelbe',
-            'tab_module' => 'shipping_logistics',
-            'module_name' => 'myparcelbe',
-            'menu' => 5,
-        ]));
-    }
-
-    protected function getMessage(): string
-    {
-        if (!isset($this->context->cookie)) {
-            return '';
-        }
-
-        $message = $this->context->cookie->{'myparcelbe.message'};
-
-        if ($message) {
-            $message = $this->module->displayConfirmation($message);
-        }
-
-        unset($this->context->cookie->{'myparcelbe.message'});
-
-        return $message ?? '';
-    }
-
-    protected function getLegend(): string
-    {
-        return '';
-    }
-
-    protected function getFields(): array
-    {
-        return [];
-    }
-
-    protected function getNamespace(): string
-    {
-        return 'carriersform';
-    }
-
     protected function addCarrier($configuration)
     {
         $carrier = new Carrier();
 
-        $carrier->name = $configuration['name'];
-        $carrier->is_module = true;
-        $carrier->active = 1;
-        $carrier->range_behavior = 1;
-        $carrier->need_range = 1;
-        $carrier->shipping_external = true;
-        $carrier->range_behavior = 0;
+        $carrier->name                 = $configuration['name'];
+        $carrier->is_module            = true;
+        $carrier->active               = 1;
+        $carrier->range_behavior       = 1;
+        $carrier->need_range           = 1;
+        $carrier->shipping_external    = true;
+        $carrier->range_behavior       = 0;
         $carrier->external_module_name = $this->module->name;
-        $carrier->shipping_method = 2;
+        $carrier->shipping_method      = 2;
 
         foreach (Language::getLanguages() as $lang) {
             $carrier->delay[$lang['id_lang']] = 'Super fast delivery';
@@ -186,7 +144,7 @@ class CarriersForm extends AbstractForm
     protected function addGroups($carrier): void
     {
         $groups_ids = [];
-        $groups = Group::getGroups(Context::getContext()->language->id);
+        $groups     = Group::getGroups(Context::getContext()->language->id);
         foreach ($groups as $group) {
             $groups_ids[] = $group['id_group'];
         }
@@ -218,126 +176,382 @@ class CarriersForm extends AbstractForm
         }
     }
 
+    protected function getFields(): array
+    {
+        return [];
+    }
+
+    protected function getLegend(): string
+    {
+        return '';
+    }
+
+    protected function getMessage(): string
+    {
+        if (! isset($this->context->cookie)) {
+            return '';
+        }
+
+        $message = $this->context->cookie->{'myparcelbe.message'};
+
+        if ($message) {
+            $message = $this->module->displayConfirmation($message);
+        }
+
+        unset($this->context->cookie->{'myparcelbe.message'});
+
+        return $message ?? '';
+    }
+
+    protected function getNamespace(): string
+    {
+        return 'carriersform';
+    }
+
+    protected function redirectToCarrierList(): void
+    {
+        // Redirect back to list
+        Tools::redirectAdmin(
+            (new Link())->getAdminLink('AdminModules', true, [], [
+                'configure'   => 'myparcelbe',
+                'tab_module'  => 'shipping_logistics',
+                'module_name' => 'myparcelbe',
+                'menu'        => 5,
+            ])
+        );
+    }
+
     /**
-     * @param  int  $carrierId
-     * @param  bool $isInsert
-     *
      * @return void
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    private function updateConfigurationFields(int $carrierId, bool $isInsert = false): void
+    private function createNewCarrier(): void
     {
-        $dropOff = [];
-        $postFields = Tools::getAllValues();
+        $carrierType = Tools::getValue('carrierType');
+        $carrierName = Tools::getValue('carrierName');
 
-        $carrierType = CarrierConfigurationProvider::get($carrierId, 'carrierType');
+        $image = 'postnl.jpg';
 
-        // if carrier is not found and not insert, should be insert
-        if (is_null($carrierType) && !$isInsert) {
-            $isInsert = true;
-        }
-
-        foreach ($postFields as $key => $value) {
-            if (stripos($key, 'dropOffDays') !== false) {
-                $temp = explode('_', $key);
-                $dropOff[] = end($temp);
-            }
-        }
-        $postFields['dropOffDays'] = '';
-        if (!empty($dropOff)) {
-            $postFields['dropOffDays'] = implode(',', $dropOff);
-        }
-
-        $insert = [];
-
-        foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $field) {
-            if (!isset($postFields[$field]) && $field === 'carrierType') {
-                continue;
-            }
-
-            $updatedValue = $postFields[$field] ?? '';
-
-            if (stripos($field, 'price') === 0) {
-                $price = $updatedValue = Tools::normalizeFloat($updatedValue);
-                if (! empty($price) && ! Validate::isFloat($price)) {
-                    switch ($field) {
-                        case 'priceMondayDelivery':
-                            $label = $this->module->l('Delivery Monday price', 'carriers');
-
-                            break;
-
-                        case 'priceMorningDelivery':
-                            $label = $this->module->l('Delivery morning price', 'carriers');
-
-                            break;
-
-                        case 'priceEveningDelivery':
-                            $label = $this->module->l('Delivery evening price', 'carriers');
-
-                            break;
-
-                        case 'priceSaturdayDelivery':
-                            $label = $this->module->l('Delivery Saturday price', 'carriers');
-
-                            break;
-
-                        case 'priceSignature':
-                            $label = $this->module->l('Signature price', 'carriers');
-
-                            break;
-
-                        case 'priceOnlyRecipient':
-                            $label = $this->module->l('Only recipient price', 'carriers');
-
-                            break;
-
-                        case 'pricePickup':
-                            $label = $this->module->l('Pickup price', 'carriers');
-
-                            break;
-
-                        default:
-                            $label = $this->module->l('Price field', 'carriers');
-
-                            break;
-                    }
-                    $this->context->controller->errors[] = sprintf(
-                        $this->module->l('Wrong price format for %s', 'carriers'),
-                        $label
-                    );
-
-                    continue;
-                }
-            }
-
-            if ($isInsert) {
-                $insert[] = [
-                    'id_carrier' => $carrierId,
-                    'name'       => pSQL($field),
-                    'value'      => pSQL($updatedValue),
-                ];
-            } else {
-                CarrierConfigurationProvider::updateValue($carrierId, $field, $updatedValue);
+        if ($this->module->isBE()) {
+            $image = 'dpd.jpg';
+            if ($carrierType == CarrierBpost::NAME) {
+                $image = 'bpost.jpg';
             }
         }
 
-        if ($isInsert) {
-            Db::getInstance()->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
-        }
-
-        $carrier = new Carrier($carrierId);
-
-        if ($carrier->external_module_name !== $this->module->name) {
+        if (Tools::getValue('psCarriers')) {
+            $carrier                       = new Carrier(Tools::getValue('psCarriers'));
             $carrier->external_module_name = 'myparcelbe';
             $carrier->is_module            = true;
-            $carrier->active               = 1;
             $carrier->need_range           = 1;
             $carrier->shipping_external    = true;
-            $carrier->range_behavior       = 0;
-            $carrier->shipping_method      = 2;
             $carrier->update();
+        } else {
+            $carrier = $this->addCarrier(
+                ['name' => $carrierName, 'image' => $image]
+            );
+
+            $this->addZones($carrier);
+            $this->addGroups($carrier);
+            $this->addRanges($carrier);
         }
+
+        $psCarriersConfig               = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
+        $psCarriersConfig[$carrier->id] = $carrierType;
+        Configuration::updateValue('MYPARCEL_PSCARRIERS', json_encode($psCarriersConfig));
+
+        $configurationPsCarriers = CarrierConfigurationProvider::get($carrier->id, 'carrierType');
+        if (is_null($configurationPsCarriers)) {
+            $this->updateConfigurationFields($carrier->id, true);
+        } else {
+            $this->updateConfigurationFields($carrier->id);
+        }
+    }
+
+    /**
+     * @return array[]
+     */
+    private function getCarrierType(): array
+    {
+        if ($this->module->isBE()) {
+            return [
+                ['name' => CarrierBpost::HUMAN, 'configuration_name' => CarrierBpost::NAME],
+                ['name' => CarrierDPD::HUMAN, 'configuration_name' => CarrierDPD::NAME],
+                ['name' => CarrierPostNL::HUMAN, 'configuration_name' => CarrierPostNL::NAME],
+            ];
+        }
+
+        return [
+            ['name' => CarrierPostNL::HUMAN, 'configuration_name' => CarrierPostNL::NAME],
+        ];
+    }
+
+    /**
+     * @param  \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
+     * @param  \Currency                                     $currency
+     * @param  string                                        $prefix
+     *
+     * @return array
+     * @throws \Exception
+     */
+    private function getExtraTabFields(Carrier $carrier, Currency $currency, string $prefix = ''): array
+    {
+        $fields     = [];
+        $countryIso = $this->module->getModuleCountry();
+        $tabName    = 'ALLOW_DELIVERY_FORM';
+        $tabId      = 'delivery';
+
+        if ('return' === $prefix) {
+            $tabName = 'ALLOW_RETURN_FORM';
+            $tabId   = $prefix;
+            $prefix  .= '_';
+        }
+
+        $myParcelCarrier = CarrierService::getMyParcelCarrier($carrier->id);
+        $carrierType     = $myParcelCarrier->getName();
+
+        if (! $this->exclusiveField->isAvailable($countryIso, $carrierType, $tabName)) {
+            return $fields;
+        }
+
+        $carrierOptionsCalculator = (new CarrierOptionsCalculator($myParcelCarrier));
+
+        $fields[] = [
+            'tab'     => $tabId,
+            'type'    => 'select',
+            'label'   => $this->module->l('Default package type', 'carriers'),
+            'name'    => $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
+            'options' => [
+                'query' => $carrierOptionsCalculator->getAvailablePackageTypes($prefix),
+                'id'    => 'id',
+                'name'  => 'human',
+            ],
+        ];
+
+        $fields[] = [
+            'tab'     => $tabId,
+            'type'    => 'select',
+            'label'   => $this->module->l('Default package format', 'carriers'),
+            'name'    => $prefix . Constant::PACKAGE_FORMAT_CONFIGURATION_NAME,
+            'options' => [
+                'query' => $carrierOptionsCalculator->getAvailablePackageFormats($prefix),
+                'id'    => 'value',
+                'name'  => 'label',
+            ],
+        ];
+
+        if ($this->exclusiveField->isAvailable(
+            $countryIso,
+            $carrierType,
+            $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME
+        )) {
+            $fields[] = [
+                'tab'     => $tabId,
+                'type'    => 'switch',
+                'is_bool' => true,
+                'values'  => [
+                    [
+                        'id'    => $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME . '_on',
+                        'value' => 1,
+                        'label' => $this->module->l('Yes', 'carriers'),
+                    ],
+                    [
+                        'id'    => $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME . '_off',
+                        'value' => 0,
+                        'label' => $this->module->l('No', 'carriers'),
+                    ],
+                ],
+                'label'   => $this->module->l('Deliver only to recipient', 'carriers'),
+                'name'    => $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME,
+            ];
+        }
+        if ($this->exclusiveField->isAvailable(
+            $countryIso,
+            $carrierType,
+            $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME
+        )) {
+            $fields[] = [
+                'tab'     => $tabId,
+                'type'    => 'switch',
+                'is_bool' => true,
+                'values'  => [
+                    [
+                        'id'    => $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME . '_on',
+                        'value' => 1,
+                        'label' => $this->module->l('Yes', 'carriers'),
+                    ],
+                    [
+                        'id'    => $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME . '_off',
+                        'value' => 0,
+                        'label' => $this->module->l('No', 'carriers'),
+                    ],
+                ],
+                'label'   => $this->module->l('Age check', 'carriers'),
+                'name'    => $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME,
+            ];
+        }
+        if ($this->exclusiveField->isAvailable(
+            $countryIso,
+            $carrierType,
+            $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME
+        )) {
+            $fields[] = [
+                'tab'     => $tabId,
+                'type'    => 'switch',
+                'is_bool' => true,
+                'values'  => [
+                    [
+                        'id'    => $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME . '_on',
+                        'value' => 1,
+                        'label' => $this->module->l('Yes', 'carriers'),
+                    ],
+                    [
+                        'id'    => $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME . '_off',
+                        'value' => 0,
+                        'label' => $this->module->l('No', 'carriers'),
+                    ],
+                ],
+                'label'   => $this->module->l('Return package when recipient is not home', 'carriers'),
+                'name'    => $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME,
+            ];
+        }
+        if ($this->exclusiveField->isAvailable(
+            $countryIso,
+            $carrierType,
+            $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME
+        )) {
+            $fields[] = [
+                'tab'     => $tabId,
+                'type'    => 'switch',
+                'is_bool' => true,
+                'values'  => [
+                    [
+                        'id'    => $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME . '_on',
+                        'value' => 1,
+                        'label' => $this->module->l('Yes', 'carriers'),
+                    ],
+                    [
+                        'id'    => $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME . '_off',
+                        'value' => 0,
+                        'label' => $this->module->l('No', 'carriers'),
+                    ],
+                ],
+                'label'   => $this->module->l('Recipient need to sign', 'carriers'),
+                'name'    => $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
+            ];
+        }
+        if ($this->exclusiveField->isAvailable(
+            $countryIso,
+            $carrierType,
+            $prefix . Constant::INSURANCE_CONFIGURATION_NAME
+        )) {
+            $fields[] = [
+                'tab'     => $tabId,
+                'type'    => 'switch',
+                'is_bool' => true,
+                'values'  => [
+                    [
+                        'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_NAME . '_on',
+                        'value' => 1,
+                        'label' => $this->module->l('Yes', 'carriers'),
+                    ],
+                    [
+                        'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_NAME . '_off',
+                        'value' => 0,
+                        'label' => $this->module->l('No', 'carriers'),
+                    ],
+                ],
+                'label'   => $this->module->l('Always insure package', 'carriers'),
+                'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
+                'desc'    => $this->module->l(
+                    'Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.',
+                    'carriers'
+                ),
+            ];
+
+            $insurancePossibilities = $this->getInsurancePossibilities($myParcelCarrier, 'NL');
+
+            $fields[] = [
+                'tab'    => $tabId,
+                'type'   => 'text',
+                'label'  => $this->module->l('Insure from price', 'carriers'),
+                'name'   => $prefix . Constant::INSURANCE_CONFIGURATION_FROM_PRICE,
+                'suffix' => $currency->getSign(),
+                'class'  => 'col-lg-2',
+            ];
+
+            $fields[] = [
+                'tab'     => $tabId,
+                'type'    => 'select',
+                'label'   => $this->module->l('Max insured amount', 'carriers'),
+                'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT,
+                'options' => [
+                    'query' => array_map(
+                        static function ($value) use ($currency) {
+                            return [
+                                'value' => $value,
+                                'label' => $currency->getSign() . ' ' . $value,
+                            ];
+                        },
+                        $insurancePossibilities
+                    ),
+                    'id'    => 'value',
+                    'name'  => 'label',
+                ],
+                'class'   => 'col-lg-2',
+            ];
+
+            $insurancePossibilitiesEU = $this->getInsurancePossibilities($myParcelCarrier, 'EU');
+            $fields[]                 = [
+                'tab'     => $tabId,
+                'type'    => 'select',
+                'label'   => $this->module->l('Max insured amount EU', 'carriers'),
+                'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_EU,
+                'options' => [
+                    'query' => array_map(
+                        static function ($value) use ($currency) {
+                            return [
+                                'value' => $value,
+                                'label' => $currency->getSign() . ' ' . $value,
+                            ];
+                        },
+                        $insurancePossibilitiesEU
+                    ),
+                    'id'    => 'value',
+                    'name'  => 'label',
+                ],
+                'class'   => 'col-lg-2',
+            ];
+
+            if (! $prefix && $this->module->isNL()) {
+                $fields[] = [
+                    'tab'     => $tabId,
+                    'type'    => 'switch',
+                    'is_bool' => true,
+                    'values'  => [
+                        [
+                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_on',
+                            'value' => 1,
+                            'label' => $this->module->l('Yes', 'carriers'),
+                        ],
+                        [
+                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_off',
+                            'value' => 0,
+                            'label' => $this->module->l('No', 'carriers'),
+                        ],
+                    ],
+                    'label'   => $this->module->l('Insure towards Belgium', 'carriers'),
+                    'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM,
+                    'desc'    => $this->module->l(
+                        'When this setting is "on", packages from NL to BE will be insured for a maximum of € 500.',
+                        'carriers'
+                    ),
+                ];
+            }
+        }
+
+        return $fields;
     }
 
     /**
@@ -431,7 +645,6 @@ SELECT *
 FROM `$table`
 WHERE `id_carrier` = $carrierId
 SQL
-
             );
 
         $vars = [];
@@ -488,70 +701,6 @@ SQL
         ];
 
         return $helper->generateForm([$fields]);
-    }
-
-    /**
-     * @return false|string
-     * @throws \PrestaShopDatabaseException
-     */
-    private function getList()
-    {
-        $fieldsList = [
-            'id_carrier' => [
-                'title' => $this->module->l('ID', 'carriers'),
-                'align' => 'center',
-                'class' => 'fixed-width-xs',
-                'search' => false,
-            ],
-            'name' => [
-                'title' => $this->module->l('Name', 'carriers'),
-                'search' => false,
-            ],
-        ];
-
-        $helper = new HelperList();
-        $helper->shopLinkType = '';
-        $helper->simple_header = false;
-        $helper->actions = ['edit'];
-        $helper->show_toolbar = true;
-        $helper->toolbar_btn = [
-            'new' => [
-                'desc' => 'Add new carrier',
-                'imgclass' => 'new',
-                'href' => AdminController::$currentIndex
-                . '&configure=' . $this->module->name
-                . '&menu=' . Tools::getValue('menu', 0)
-                . '&addcarrier='
-                . '&token=' . Tools::getAdminTokenLite('AdminModules'),
-            ],
-        ];
-        $helper->module = $this;
-        $helper->has_bulk_actions = false;
-        $helper->identifier = 'id_carrier';
-        $helper->title = $this->module->l('Delivery options', 'carriers');
-        $helper->table = 'carrier';
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->module->name . '&menu=' . Tools::getValue(
-            'menu',
-            0
-        );
-        $helper->colorOnBackground = true;
-        $helper->no_link = true;
-
-        $table = Table::withPrefix('carrier');
-        $list = Db::getInstance()
-            ->executeS(
-                <<<SQL
-SELECT *
-FROM $table
-WHERE external_module_name = '{$this->module->name}'
-         AND deleted = 0 
-         ORDER BY position
-         LIMIT 0, 50
-SQL
-            );
-
-        return $helper->generateList($list, $fieldsList);
     }
 
     /**
@@ -643,24 +792,6 @@ SQL
         }
 
         return array_merge($fields, $formTabFields, $deliveryTabFields, $returnTabFields);
-    }
-
-    /**
-     * @return array[]
-     */
-    private function getCarrierType(): array
-    {
-        if ($this->module->isBE()) {
-            return [
-                ['name' => CarrierBpost::HUMAN, 'configuration_name' => CarrierBpost::NAME],
-                ['name' => CarrierDPD::HUMAN, 'configuration_name' => CarrierDPD::NAME],
-                ['name' => CarrierPostNL::HUMAN, 'configuration_name' => CarrierPostNL::NAME],
-            ];
-        }
-
-        return [
-            ['name' => CarrierPostNL::HUMAN, 'configuration_name' => CarrierPostNL::NAME],
-        ];
     }
 
     /**
@@ -1088,315 +1219,6 @@ SQL
     }
 
     /**
-     * @param \PrestaShop\PrestaShop\Adapter\Entity\Carrier $carrier
-     * @param \Currency                                     $currency
-     * @param string                                        $prefix
-     *
-     * @return array
-     * @throws \Exception
-     */
-    private function getExtraTabFields(Carrier $carrier, Currency $currency, string $prefix = ''): array
-    {
-        $fields      = [];
-        $countryIso  = $this->module->getModuleCountry();
-        $tabName     = 'ALLOW_DELIVERY_FORM';
-        $tabId       = 'delivery';
-
-        if ('return' === $prefix) {
-            $tabName = 'ALLOW_RETURN_FORM';
-            $tabId   = $prefix;
-            $prefix  .= '_';
-        }
-
-        $myParcelCarrier = CarrierService::getMyParcelCarrier($carrier->id);
-        $carrierType     = $myParcelCarrier->getName();
-
-        if (! $this->exclusiveField->isAvailable($countryIso, $carrierType, $tabName)) {
-            return $fields;
-        }
-
-        $carrierOptionsCalculator = (new CarrierOptionsCalculator($myParcelCarrier));
-
-        $fields[] = [
-            'tab'     => $tabId,
-            'type'    => 'select',
-            'label'   => $this->module->l('Default package type', 'carriers'),
-            'name'    => $prefix . Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
-            'options' => [
-                'query' => $carrierOptionsCalculator->getAvailablePackageTypes($prefix),
-                'id'    => 'id',
-                'name'  => 'human',
-            ],
-        ];
-
-        $fields[] = [
-            'tab'     => $tabId,
-            'type'    => 'select',
-            'label'   => $this->module->l('Default package format', 'carriers'),
-            'name'    => $prefix . Constant::PACKAGE_FORMAT_CONFIGURATION_NAME,
-            'options' => [
-                'query' => $carrierOptionsCalculator->getAvailablePackageFormats($prefix),
-                'id'    => 'value',
-                'name'  => 'label',
-            ],
-        ];
-
-        if ($this->exclusiveField->isAvailable(
-            $countryIso,
-            $carrierType,
-            $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME
-        )) {
-            $fields[] = [
-                'tab' => $tabId,
-                'type' => 'switch',
-                'is_bool' => true,
-                'values' => [
-                    [
-                        'id' => $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME . '_on',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carriers'),
-                    ],
-                    [
-                        'id' => $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME . '_off',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carriers'),
-                    ],
-                ],
-                'label' => $this->module->l('Deliver only to recipient', 'carriers'),
-                'name' => $prefix . Constant::ONLY_RECIPIENT_CONFIGURATION_NAME,
-            ];
-        }
-        if ($this->exclusiveField->isAvailable(
-            $countryIso,
-            $carrierType,
-            $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME
-        )) {
-            $fields[] = [
-                'tab' => $tabId,
-                'type' => 'switch',
-                'is_bool' => true,
-                'values' => [
-                    [
-                        'id' => $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME . '_on',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carriers'),
-                    ],
-                    [
-                        'id' => $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME . '_off',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carriers'),
-                    ],
-                ],
-                'label' => $this->module->l('Age check', 'carriers'),
-                'name' => $prefix . Constant::AGE_CHECK_CONFIGURATION_NAME,
-            ];
-        }
-        if ($this->exclusiveField->isAvailable(
-            $countryIso,
-            $carrierType,
-            $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME
-        )) {
-            $fields[] = [
-                'tab' => $tabId,
-                'type' => 'switch',
-                'is_bool' => true,
-                'values' => [
-                    [
-                        'id' => $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME . '_on',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carriers'),
-                    ],
-                    [
-                        'id' => $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME . '_off',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carriers'),
-                    ],
-                ],
-                'label' => $this->module->l('Return package when recipient is not home', 'carriers'),
-                'name' => $prefix . Constant::RETURN_PACKAGE_CONFIGURATION_NAME,
-            ];
-        }
-        if ($this->exclusiveField->isAvailable(
-            $countryIso,
-            $carrierType,
-            $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME
-        )) {
-            $fields[] = [
-                'tab' => $tabId,
-                'type' => 'switch',
-                'is_bool' => true,
-                'values' => [
-                    [
-                        'id' => $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME . '_on',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carriers'),
-                    ],
-                    [
-                        'id' => $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME . '_off',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carriers'),
-                    ],
-                ],
-                'label' => $this->module->l('Recipient need to sign', 'carriers'),
-                'name' => $prefix . Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
-            ];
-        }
-        if ($this->exclusiveField->isAvailable(
-            $countryIso,
-            $carrierType,
-            $prefix . Constant::INSURANCE_CONFIGURATION_NAME
-        )) {
-            $fields[] = [
-                'tab' => $tabId,
-                'type' => 'switch',
-                'is_bool' => true,
-                'values' => [
-                    [
-                        'id' => $prefix . Constant::INSURANCE_CONFIGURATION_NAME . '_on',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carriers'),
-                    ],
-                    [
-                        'id' => $prefix . Constant::INSURANCE_CONFIGURATION_NAME . '_off',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carriers'),
-                    ],
-                ],
-                'label' => $this->module->l('Always insure package', 'carriers'),
-                'name'  => $prefix . Constant::INSURANCE_CONFIGURATION_NAME,
-                'desc'  => $this->module->l('Package will be insured according to below settings when Always insure package is on, or any product in the order has insurance set to on.', 'carriers'),
-            ];
-
-            $insurancePossibilities = $this->getInsurancePossibilities($myParcelCarrier, 'NL');
-
-            $fields[] = [
-                'tab'              => $tabId,
-                'type'             => 'text',
-                'label'            => $this->module->l('Insure from price', 'carriers'),
-                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_FROM_PRICE,
-                'suffix'           => $currency->getSign(),
-                'class'            => 'col-lg-2',
-            ];
-
-            $fields[] = [
-                'tab'              => $tabId,
-                'type'             => 'select',
-                'label'            => $this->module->l('Max insured amount', 'carriers'),
-                'name'             => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT,
-                'options'          => [
-                    'query' => array_map(
-                        static function ($value) use ($currency) {
-                            return [
-                                'value' => $value,
-                                'label' => $currency->getSign() . ' ' . $value,
-                            ];
-                        },
-                        $insurancePossibilities
-                    ),
-                    'id'    => 'value',
-                    'name'  => 'label',
-                ],
-                'class'            => 'col-lg-2',
-            ];
-
-            $insurancePossibilitiesEU = $this->getInsurancePossibilities($myParcelCarrier, 'EU');
-            $fields[]                  = [
-                'tab'     => $tabId,
-                'type'    => 'select',
-                'label'   => $this->module->l('Max insured amount EU', 'carriers'),
-                'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_EU,
-                'options' => [
-                    'query' => array_map(
-                        static function ($value) use ($currency) {
-                            return [
-                                'value' => $value,
-                                'label' => $currency->getSign() . ' ' . $value,
-                            ];
-                        },
-                        $insurancePossibilitiesEU
-                    ),
-                    'id'    => 'value',
-                    'name'  => 'label',
-                ],
-                'class'   => 'col-lg-2',
-            ];
-
-            if (! $prefix && $this->module->isNL()) {
-                $fields[] = [
-                    'tab'     => $tabId,
-                    'type'    => 'switch',
-                    'is_bool' => true,
-                    'values'  => [
-                        [
-                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_on',
-                            'value' => 1,
-                            'label' => $this->module->l('Yes', 'carriers'),
-                        ],
-                        [
-                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_off',
-                            'value' => 0,
-                            'label' => $this->module->l('No', 'carriers'),
-                        ],
-                    ],
-                    'label'   => $this->module->l('Insure towards Belgium', 'carriers'),
-                    'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM,
-                    'desc'  => $this->module->l('When this setting is "on", packages from NL to BE will be insured for a maximum of € 500.', 'carriers'),
-                ];
-            }
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    private function createNewCarrier(): void
-    {
-        $carrierType = Tools::getValue('carrierType');
-        $carrierName = Tools::getValue('carrierName');
-
-        $image = 'postnl.jpg';
-
-        if ($this->module->isBE()) {
-            $image = 'dpd.jpg';
-            if ($carrierType == CarrierBpost::NAME) {
-                $image = 'bpost.jpg';
-            }
-        }
-
-        if (Tools::getValue('psCarriers')) {
-            $carrier                       = new Carrier(Tools::getValue('psCarriers'));
-            $carrier->external_module_name = 'myparcelbe';
-            $carrier->is_module            = true;
-            $carrier->need_range           = 1;
-            $carrier->shipping_external    = true;
-            $carrier->update();
-        } else {
-            $carrier = $this->addCarrier(
-                ['name' => $carrierName, 'image' => $image]
-            );
-
-            $this->addZones($carrier);
-            $this->addGroups($carrier);
-            $this->addRanges($carrier);
-        }
-
-        $psCarriersConfig               = (array) json_decode(Configuration::get('MYPARCEL_PSCARRIERS'));
-        $psCarriersConfig[$carrier->id] = $carrierType;
-        Configuration::updateValue('MYPARCEL_PSCARRIERS', json_encode($psCarriersConfig));
-
-        $configurationPsCarriers = CarrierConfigurationProvider::get($carrier->id, 'carrierType');
-        if (is_null($configurationPsCarriers)) {
-            $this->updateConfigurationFields($carrier->id, true);
-        } else {
-            $this->updateConfigurationFields($carrier->id);
-        }
-    }
-
-    /**
      * @param  \MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier $myParcelCarrier
      * @param                                                    $country
      *
@@ -1411,9 +1233,196 @@ SQL
                 Constant::DEFAULT_INSURANCE_POSSIBILITIES,
                 $consignment->getInsurancePossibilities($country)
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $insurancePossibilities = Constant::DEFAULT_INSURANCE_POSSIBILITIES;
         }
         return $insurancePossibilities;
+    }
+
+    /**
+     * @return false|string
+     * @throws \PrestaShopDatabaseException
+     */
+    private function getList()
+    {
+        $fieldsList = [
+            'id_carrier' => [
+                'title'  => $this->module->l('ID', 'carriers'),
+                'align'  => 'center',
+                'class'  => 'fixed-width-xs',
+                'search' => false,
+            ],
+            'name'       => [
+                'title'  => $this->module->l('Name', 'carriers'),
+                'search' => false,
+            ],
+        ];
+
+        $helper                    = new HelperList();
+        $helper->shopLinkType      = '';
+        $helper->simple_header     = false;
+        $helper->actions           = ['edit'];
+        $helper->show_toolbar      = true;
+        $helper->toolbar_btn       = [
+            'new' => [
+                'desc'     => 'Add new carrier',
+                'imgclass' => 'new',
+                'href'     => AdminController::$currentIndex
+                    . '&configure=' . $this->module->name
+                    . '&menu=' . Tools::getValue('menu', 0)
+                    . '&addcarrier='
+                    . '&token=' . Tools::getAdminTokenLite('AdminModules'),
+            ],
+        ];
+        $helper->module            = $this;
+        $helper->has_bulk_actions  = false;
+        $helper->identifier        = 'id_carrier';
+        $helper->title             = $this->module->l('Delivery options', 'carriers');
+        $helper->table             = 'carrier';
+        $helper->token             = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex      = AdminController::$currentIndex . '&configure=' . $this->module->name . '&menu=' . Tools::getValue(
+            'menu',
+            0
+        );
+        $helper->colorOnBackground = true;
+        $helper->no_link           = true;
+
+        $table = Table::withPrefix('carrier');
+        $list  = Db::getInstance()
+            ->executeS(
+                <<<SQL
+SELECT *
+FROM $table
+WHERE external_module_name = '{$this->module->name}'
+         AND deleted = 0 
+         ORDER BY position
+         LIMIT 0, 50
+SQL
+            );
+
+        return $helper->generateList($list, $fieldsList);
+    }
+
+    /**
+     * @param  int  $carrierId
+     * @param  bool $isInsert
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    private function updateConfigurationFields(int $carrierId, bool $isInsert = false): void
+    {
+        $dropOff    = [];
+        $postFields = Tools::getAllValues();
+
+        $carrierType = CarrierConfigurationProvider::get($carrierId, 'carrierType');
+
+        // if carrier is not found and not insert, should be insert
+        if (is_null($carrierType) && ! $isInsert) {
+            $isInsert = true;
+        }
+
+        foreach ($postFields as $key => $value) {
+            if (stripos($key, 'dropOffDays') !== false) {
+                $temp      = explode('_', $key);
+                $dropOff[] = end($temp);
+            }
+        }
+        $postFields['dropOffDays'] = '';
+        if (! empty($dropOff)) {
+            $postFields['dropOffDays'] = implode(',', $dropOff);
+        }
+
+        $insert = [];
+
+        foreach (Constant::CARRIER_CONFIGURATION_FIELDS as $field) {
+            if (! isset($postFields[$field]) && $field === 'carrierType') {
+                continue;
+            }
+
+            $updatedValue = $postFields[$field] ?? '';
+
+            if (stripos($field, 'price') === 0) {
+                $price = $updatedValue = Tools::normalizeFloat($updatedValue);
+                if (! empty($price) && ! Validate::isFloat($price)) {
+                    switch ($field) {
+                        case 'priceMondayDelivery':
+                            $label = $this->module->l('Delivery Monday price', 'carriers');
+
+                            break;
+
+                        case 'priceMorningDelivery':
+                            $label = $this->module->l('Delivery morning price', 'carriers');
+
+                            break;
+
+                        case 'priceEveningDelivery':
+                            $label = $this->module->l('Delivery evening price', 'carriers');
+
+                            break;
+
+                        case 'priceSaturdayDelivery':
+                            $label = $this->module->l('Delivery Saturday price', 'carriers');
+
+                            break;
+
+                        case 'priceSignature':
+                            $label = $this->module->l('Signature price', 'carriers');
+
+                            break;
+
+                        case 'priceOnlyRecipient':
+                            $label = $this->module->l('Only recipient price', 'carriers');
+
+                            break;
+
+                        case 'pricePickup':
+                            $label = $this->module->l('Pickup price', 'carriers');
+
+                            break;
+
+                        default:
+                            $label = $this->module->l('Price field', 'carriers');
+
+                            break;
+                    }
+                    $this->context->controller->errors[] = sprintf(
+                        $this->module->l('Wrong price format for %s', 'carriers'),
+                        $label
+                    );
+
+                    continue;
+                }
+            }
+
+            if ($isInsert) {
+                $insert[] = [
+                    'id_carrier' => $carrierId,
+                    'name'       => pSQL($field),
+                    'value'      => pSQL($updatedValue),
+                ];
+            } else {
+                CarrierConfigurationProvider::updateValue($carrierId, $field, $updatedValue);
+            }
+        }
+
+        if ($isInsert) {
+            Db::getInstance()
+                ->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert);
+        }
+
+        $carrier = new Carrier($carrierId);
+
+        if ($carrier->external_module_name !== $this->module->name) {
+            $carrier->external_module_name = 'myparcelbe';
+            $carrier->is_module            = true;
+            $carrier->active               = 1;
+            $carrier->need_range           = 1;
+            $carrier->shipping_external    = true;
+            $carrier->range_behavior       = 0;
+            $carrier->shipping_method      = 2;
+            $carrier->update();
+        }
     }
 }
