@@ -8,7 +8,8 @@
   },
   "require": {
     "php": ">=7.2.0",
-    "myparcelnl/pdk": ">=1.19.0"
+    "myparcelnl/pdk": ">=1.19.0",
+    "myparcelnl/sdk": ">=7.6.1"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0"
