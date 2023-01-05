@@ -30,8 +30,8 @@ use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use OrderLabel;
-use Validate;
 use Throwable;
+use Validate;
 
 class AdminOrderService extends AbstractService
 {
@@ -114,7 +114,9 @@ class AdminOrderService extends AbstractService
             ->setCity($address->city)
             ->setEmail($customer->email)
             ->setContents(5)
-            ->setPackageType(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP[$packageType] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE )
+            ->setPackageType(
+                AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP[$packageType] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE
+            )
 
             // This may be overridden
             ->setLabelDescription($postValues['labelDescription'] ?? $orderLabel->barcode)
@@ -266,10 +268,8 @@ class AdminOrderService extends AbstractService
      */
     public function refreshLabels(array $labelIds): array
     {
-        $apiKey     = Configuration::get(Constant::API_KEY_CONFIGURATION_NAME);
-        $collection = ConsignmentCollection::findMany($labelIds, $apiKey);
-        $collection->setLinkOfLabels();
-
+        $apiKey      = Configuration::get(Constant::API_KEY_CONFIGURATION_NAME);
+        $collection  = ConsignmentCollection::findMany($labelIds, $apiKey);
         $orderLabels = [];
 
         foreach ($collection as $consignment) {
@@ -287,54 +287,6 @@ class AdminOrderService extends AbstractService
     }
 
     /**
-     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
-     *
-     * @return \OrderLabel
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    private function consignmentToOrderLabel(AbstractConsignment $consignment): OrderLabel
-    {
-        $orderLabel             = OrderLabel::findByLabelId($consignment->getConsignmentId());
-        $orderLabel->barcode    = $consignment->getBarcode();
-        $orderLabel->status     = MyParcelStatusProvider::getInstance()
-            ->getStatus($consignment->getStatus());
-        $orderLabel->track_link = $consignment->getBarcodeUrl(
-            $consignment->getBarcode(),
-            $consignment->getPostalCode(),
-            $consignment->getCountry()
-        );
-        $orderLabel->save();
-
-        $order = new Order((int) $orderLabel->id_order);
-
-        OrderLogger::addLog(
-            [
-                'order'   => $order,
-                'message' => "Refreshed label $orderLabel->id_label",
-            ]
-        );
-
-        return $orderLabel;
-    }
-
-
-    private function setLabelOptionsInsurance(array $postValues): array
-    {
-        try {
-            $hasInsurance                            =
-                ('0' !== $postValues['deliveryOptions']['shipmentOptions']['insurance']);
-            $postValues['labelOptions']['insurance'] = $hasInsurance;
-        } catch (\Throwable $e) {
-            /**
-             * When one or both fields are not present, there is no need to adjust any of them.
-             */
-        }
-
-        return $postValues;
-    }
-
-    /**
      * @param  \Gett\MyparcelBE\Model\Core\Order $order
      * @param  array                             $values
      *
@@ -344,7 +296,8 @@ class AdminOrderService extends AbstractService
      */
     public function updateDeliveryOptions(Order $order, array $values): AbstractDeliveryOptionsAdapter
     {
-        $orderDeliveryOptions = OrderSettingsFactory::create($order)->getDeliveryOptions();
+        $orderDeliveryOptions = OrderSettingsFactory::create($order)
+            ->getDeliveryOptions();
         $deliveryOptions      = DeliveryOptionsMerger::create(
             $orderDeliveryOptions,
             new DeliveryOptionsFromFormAdapter($values)
@@ -382,6 +335,38 @@ class AdminOrderService extends AbstractService
     }
 
     /**
+     * @param  \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @return \OrderLabel
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    private function consignmentToOrderLabel(AbstractConsignment $consignment): OrderLabel
+    {
+        $orderLabel             = OrderLabel::findByLabelId($consignment->getConsignmentId());
+        $orderLabel->barcode    = $consignment->getBarcode();
+        $orderLabel->status     = MyParcelStatusProvider::getInstance()
+            ->getStatus($consignment->getStatus());
+        $orderLabel->track_link = $consignment->getBarcodeUrl(
+            $consignment->getBarcode(),
+            $consignment->getPostalCode(),
+            $consignment->getCountry()
+        );
+        $orderLabel->save();
+
+        $order = new Order((int) $orderLabel->id_order);
+
+        OrderLogger::addLog(
+            [
+                'order'   => $order,
+                'message' => "Refreshed label $orderLabel->id_label",
+            ]
+        );
+
+        return $orderLabel;
+    }
+
+    /**
      * @param  array $labelIds
      *
      * @return array
@@ -416,6 +401,21 @@ class AdminOrderService extends AbstractService
         }
 
         return $value;
+    }
+
+    private function setLabelOptionsInsurance(array $postValues): array
+    {
+        try {
+            $hasInsurance                            =
+                ('0' !== $postValues['deliveryOptions']['shipmentOptions']['insurance']);
+            $postValues['labelOptions']['insurance'] = $hasInsurance;
+        } catch (\Throwable $e) {
+            /**
+             * When one or both fields are not present, there is no need to adjust any of them.
+             */
+        }
+
+        return $postValues;
     }
 
     /**

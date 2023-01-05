@@ -26,13 +26,13 @@
 
       <div class="btn-group">
         <PsButton
-          variant="outline-primary"
           icon="add"
           label="action_new_shipment"
+          variant="outline-primary"
           @click="exportOrder" />
         <PsButton
-          variant="outline-primary"
           :icon="['add', 'local_printshop']"
+          variant="outline-primary"
           @click="() => exportOrder(true)">
           {{ $filters.translate('action_new_shipment_print') }}
         </PsButton>
@@ -75,11 +75,11 @@ export default defineComponent({
         shipmentOptionsContextEventBus,
       ),
 
-      saveDeliveryOptions: async(): Promise<void> => {
+      saveDeliveryOptions: async (): Promise<void> => {
         await deliveryOptionsEventBus.saveConfiguration();
       },
 
-      exportOrder: async(print: boolean = false): Promise<void> => {
+      exportOrder: async (print: boolean = false): Promise<void> => {
         const action = print ? OrderAction.EXPORT_PRINT : OrderAction.EXPORT;
 
         await executeOrderAction(action);
