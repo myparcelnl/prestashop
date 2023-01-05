@@ -7,14 +7,14 @@
       v-model="packageTypeRef"
       :package-types="contextData.options.packageType" />
     <PackageFormatSelectFormGroup
-      v-if="contextData.options.packageFormat.length"
+      v-if="packageTypeRef === 'package'"
       v-model="packageFormatRef"
       :options="contextData.options.packageFormat" />
   </div>
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, ref, watchEffect } from '@vue/composition-api';
+import { defineComponent, PropType, ref, watchEffect } from '@vue/composition-api';
 import { ContextKey } from '@/data/global/context';
 import FormGroup from '@/components/common/form/FormGroup.vue';
 import PackageFormatSelectFormGroup from '@/components/common/form/PackageFormatSelectFormGroup.vue';
@@ -41,12 +41,11 @@ export default defineComponent({
 
   setup: (props) => {
     const contextData = useGlobalContext(ContextKey.RETURNS_FORM);
-    const { packageFormat, packageType } = contextData.value;
-    const label = { barcode: props.modalData.barcode };
-
+    const {packageFormat, packageType} = contextData.value;
+    const label = {barcode: props.modalData.barcode};
     const labelDescriptionRef = ref<string>(`${translate('return_prefix')} ${label.barcode}`);
 
-    const packageTypeRef = ref<PackageType>(packageType);
+    const packageTypeRef = ref<PackageType['name']>(packageType);
     const packageFormatRef = ref<number>(packageFormat);
 
     watchEffect(() => {

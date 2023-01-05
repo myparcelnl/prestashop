@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\Module\Carrier;
 
-use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
 use Gett\MyparcelBE\Constant;
 use MyParcelBE;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Support\Arr;
 
 class CarrierOptionsCalculator
 {
     public const PACKAGE_FORMAT_OPTIONS = [
-        Constant::PACKAGE_FORMAT_NORMAL    => 'Normal',
-        Constant::PACKAGE_FORMAT_LARGE     => 'Large',
-        Constant::PACKAGE_FORMAT_AUTOMATIC => 'Automatic',
+        Constant::PACKAGE_FORMAT_NORMAL => 'Normal',
+        Constant::PACKAGE_FORMAT_LARGE  => 'Large',
     ];
     public const PACKAGE_TYPE_OPTIONS   = [
         [
