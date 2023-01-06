@@ -231,7 +231,7 @@ class AdminPanelRenderService extends RenderService
             'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),
         ];
 
-        if (CountryService::isPostNLToEU($consignment)) {
+        if (CountryService::isPostNLToOtherCountry($consignment)) {
             return $consignmentOptions;
         }
 

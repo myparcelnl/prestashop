@@ -46,7 +46,7 @@ class CountryService
             && CarrierPostNL::NAME === $consignment->getCarrierName();
     }
 
-    public static function isPostNLToEU(AbstractConsignment $consignment): bool
+    public static function isPostNLToOtherCountry(AbstractConsignment $consignment): bool
     {
         return AbstractConsignment::CC_NL !== $consignment->getCountry()
             && AbstractConsignment::CC_BE !== $consignment->getCountry()
