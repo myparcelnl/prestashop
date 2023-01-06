@@ -28,6 +28,10 @@ use PrestaShop\PrestaShop\Adapter\Entity\AddressFormat;
 use PrestaShop\PrestaShop\Adapter\Entity\Customer;
 use Throwable;
 
+const RETURN_PACKAGE_TYPES = [
+    AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME,
+    AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
+];
 class AdminPanelRenderService extends RenderService
 {
     public const  ID_PRINT_OPTIONS                         = 'printOptions';
@@ -123,16 +127,8 @@ class AdminPanelRenderService extends RenderService
             $context['labelOptions'] = $orderSettings->getLabelOptions();
 
             $carrierOptionsCalculator            = $this->getCarrierOptionsCalculator($order);
-            $context['options']['packageType']   = $carrierOptionsCalculator->getAvailablePackageTypes();
+            $context['options']['packageType']   = $this->getPackageTypes($carrierOptionsCalculator, $order);
             $context['options']['packageFormat'] = $carrierOptionsCalculator->getAvailablePackageFormats();
-            if (CountryService::getShippingCountryIso2($order) !== $this->module->getModuleCountry()) {
-                $context['options']['packageType'] = [
-                    [
-                        'value' => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
-                        'label' => AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
-                    ],
-                ];
-            }
 
             $context = array_merge($context, $this->getDeliveryOptionsContext($order, $presetDeliveryOptions));
 
@@ -194,9 +190,7 @@ class AdminPanelRenderService extends RenderService
      */
     public function renderOrderSettings(Order $order): string
     {
-        return $this->renderWithContext(
-            'renderOrderCard',
-            [
+        return $this->renderWithContext('renderOrderCard', [
                 self::ID_RETURNS_FORM     => $this->getReturnsContext($order),
                 self::ID_SHIPMENT_LABELS  => $this->getShipmentLabelsContext($order),
                 self::ID_SHIPMENT_OPTIONS => $this->getShipmentOptionsContext($order),
@@ -217,23 +211,29 @@ class AdminPanelRenderService extends RenderService
         array                           $map,
         ?AbstractDeliveryOptionsAdapter $presetDeliveryOptions = null
     ): array {
-        $consignment = $this->createConsignmentForOrder($order, $presetDeliveryOptions);
+        $consignment        = $this->createConsignmentForOrder($order, $presetDeliveryOptions);
+        $consignmentOptions = [
+            'canHaveInsurance' => true,
+        ];
 
         if (! $consignment) {
             return [];
         }
 
         if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
-            return [
-                'canHaveInsurance' => true,
-                'insuranceOptions' => [Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT],
-            ];
+            return $consignmentOptions + [
+                    'insuranceOptions' => [Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT],
+                ];
         }
 
         $isStandardDelivery = $consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_STANDARD;
-        $consignmentOptions = [
-            'insuranceOptions' => $consignment->getInsurancePossibilities(),
+        $consignmentOptions += [
+            'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),
         ];
+
+        if (CountryService::isPostNLToOtherCountry($consignment)) {
+            return $consignmentOptions;
+        }
 
         foreach ($map as $key => $consignmentOption) {
             $consignmentOptions[$key] = $isStandardDelivery && $consignment->canHaveShipmentOption($consignmentOption);
@@ -293,11 +293,6 @@ class AdminPanelRenderService extends RenderService
                     ->getDeliveryOptions()
                 )
                 ->first();
-
-            if (! CountryService::isPostNLShipmentFromNLToBE($consignment)
-                && $consignment->getCountry() !== $this->module->getModuleCountry()) {
-                $consignment = null;
-            }
         } catch (Throwable $e) {
             OrderLogger::addLog(['message' => $e, 'order' => $order], OrderLogger::ERROR);
             $this->addOrderError($e, $order);
@@ -350,6 +345,25 @@ class AdminPanelRenderService extends RenderService
     }
 
     /**
+     * @param  \Gett\MyparcelBE\Module\Carrier\CarrierOptionsCalculator $carrierOptionsCalculator
+     * @param  \Gett\MyparcelBE\Model\Core\Order                        $order
+     *
+     * @return array
+     */
+    private function getPackageTypes(CarrierOptionsCalculator $carrierOptionsCalculator, Order $order): array
+    {
+        $packageTypes = $carrierOptionsCalculator->getAvailablePackageTypes();
+
+        if (CountryService::getShippingCountryIso2($order) !== $this->module->getModuleCountry()) {
+            return array_filter($packageTypes, static function (array $packageType) {
+                return $packageType['name'] === AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+            });
+        }
+
+        return $packageTypes;
+    }
+
+    /**
      * @param  \Gett\MyparcelBE\Model\Core\Order $order
      *
      * @return array
@@ -359,29 +373,20 @@ class AdminPanelRenderService extends RenderService
     {
         $address                  = (new Address($order->id_address_delivery));
         $carrierOptionsCalculator = $this->getCarrierOptionsCalculator($order);
-        $orderSettings            = OrderSettingsFactory::create($order);
-        $deliveryOptions          = $orderSettings->getDeliveryOptions();
-        $filter                   = $this->getCarrierSettingsFilter($order);
 
         return [
-            'name'          => $address->firstname . ' ' . $address->lastname,
-            'email'         => (new Customer($order->id_customer))->email,
-            'consignment'   => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP),
-            'options'       => [
+            'name'        => $address->firstname . ' ' . $address->lastname,
+            'email'       => (new Customer($order->id_customer))->email,
+            'consignment' => $this->getConsignmentOptions($order, self::CONSIGNMENT_OPTIONS_CARRIER_SETTINGS_MAP),
+            'options'     => [
                 'packageType'   => array_filter(
-                    $carrierOptionsCalculator->getAvailablePackageTypes(),
-                    static function ($item) use ($filter) {
-                        return $filter('packageType')(['value' => $item['id']]);
+                    $this->getPackageTypes($carrierOptionsCalculator, $order),
+                    static function ($item) {
+                        return in_array($item['name'], RETURN_PACKAGE_TYPES);
                     }
                 ),
-                'packageFormat' => Arr::where(
-                    $carrierOptionsCalculator->getAvailablePackageFormats(),
-                    $filter('packageFormat')
-                ),
+                'packageFormat' => $carrierOptionsCalculator->getAvailablePackageFormats(),
             ],
-            'packageType'   => $deliveryOptions->getPackageType(),
-            'packageFormat' => $deliveryOptions->getShipmentOptions()
-                ->hasLargeFormat(),
         ];
     }
 }

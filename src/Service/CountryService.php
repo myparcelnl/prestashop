@@ -45,4 +45,11 @@ class CountryService
             && MyParcelBE::getModule()->isNL()
             && CarrierPostNL::NAME === $consignment->getCarrierName();
     }
+
+    public static function isPostNLToOtherCountry(AbstractConsignment $consignment): bool
+    {
+        return AbstractConsignment::CC_NL !== $consignment->getCountry()
+            && AbstractConsignment::CC_BE !== $consignment->getCountry()
+            && CarrierPostNL::NAME === $consignment->getCarrierName();
+    }
 }
