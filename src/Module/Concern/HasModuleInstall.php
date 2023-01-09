@@ -9,15 +9,20 @@ use Configuration;
 use Context;
 use Db;
 use DbQuery;
+use Doctrine\ORM\EntityManager;
 use Group;
 use Language;
 use MyParcelNL\Pdk\Carrier\Model\CarrierOptions;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Constant;
-use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Database\Migrations;
+use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierConfiguration;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
-use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
 use MyParcelNL\Sdk\src\Support\Arr;
+use MyParcelNL\Sdk\src\Support\Str;
 use RangePrice;
 use RangeWeight;
 use Tab;
@@ -49,21 +54,25 @@ trait HasModuleInstall
         ],
     ];
 
-    /** @var int */
-    private $installSuccess = 1;
-
     /**
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Throwable
      */
     public function executeInstall(): bool
     {
+        $this->installSuccess = 1;
+
+        DefaultLogger::debug('Installing module');
+
         $this->migrateUp();
         $this->registerHooks();
         $this->installTabs();
         $this->addDefaultConfigurations();
-        $this->installCarriers();
+        // $this->installCarriers();
+
+        Tools::clearSf2Cache();
 
         return (bool) $this->installSuccess;
     }
@@ -79,6 +88,11 @@ trait HasModuleInstall
     {
         $name = $configuration['name'];
 
+        /** @var \MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository $repository */
+//        $repository = Pdk::get(PsCarrierConfigurationRepository::class);
+
+//        $configuration = $repository->createEntity();
+
         $query = new DbQuery();
         $query->select('id_carrier');
         $query->from('carrier');
@@ -86,6 +100,8 @@ trait HasModuleInstall
         $query->where("name = '$name'");
         $existingId = Db::getInstance(_PS_USE_SQL_SLAVE_)
             ->getValue($query) ?: null;
+
+        $carrierConfiguration = $repository->findOneBy(['idCarrier' => $carrier->id]);
 
         $carrier = new Carrier($existingId);
 
@@ -100,7 +116,7 @@ trait HasModuleInstall
         $carrier->shipping_method      = Carrier::SHIPPING_METHOD_PRICE;
 
         foreach (Language::getLanguages() as $lang) {
-            $carrier->delay[$lang['id_lang']] = 'Super fast delivery';
+            $carrier->delay[$lang['id_lang']] = sprintf('Delivery by %s', $name);
         }
 
         $success = $existingId ? $carrier->update() : $carrier->add();
@@ -116,18 +132,18 @@ trait HasModuleInstall
 
         Configuration::updateValue($configuration['configuration_name'], $carrier->id);
 
-        $insert = array_map(static function ($item) use ($carrier) {
-            return ['id_carrier' => $carrier->id, 'name' => $item, 'value' => ''];
-        }, Constant::CARRIER_CONFIGURATION_FIELDS);
-
-        Db::getInstance()
-            ->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert, false, false, Db::REPLACE);
-
-        CarrierConfigurationProvider::updateValue(
-            (int) $carrier->id,
-            'carrierType',
-            $configuration['carrier_type']
-        );
+        //        $insert = array_map(static function ($item) use ($carrier) {
+        //            return ['id_carrier' => $carrier->id, 'name' => $item, 'value' => ''];
+        //        }, Constant::CARRIER_CONFIGURATION_FIELDS);
+        //
+        //        Db::getInstance()
+        //            ->insert(Table::TABLE_CARRIER_CONFIGURATION, $insert, false, false, Db::REPLACE);
+        //
+        //        CarrierConfigurationProvider::updateValue(
+        //            (int) $carrier->id,
+        //            'carrierType',
+        //            $configuration['carrier_type']
+        //        );
 
         return $carrier;
     }
@@ -160,7 +176,7 @@ trait HasModuleInstall
         $newGroups = array_diff($groups, $existingGroups);
 
         if (empty($newGroups)) {
-            DefaultLogger::notice(
+            DefaultLogger::error(
                 'Groups already present in carrier',
                 ['carrier' => $carrier->id, 'groups' => $groups]
             );
@@ -182,7 +198,7 @@ trait HasModuleInstall
     private function addOrUpdateModel(?string $existingId, Carrier $carrier, \ObjectModel $objectModel): bool
     {
         if ($existingId) {
-            DefaultLogger::notice(
+            DefaultLogger::error(
                 sprintf('%s already present for carrier', get_class($objectModel)),
                 ['carrier' => $carrier->id, 'existingId' => $existingId]
             );
@@ -250,27 +266,33 @@ trait HasModuleInstall
             }
 
             $result &= $carrier->addZone($zone['id_zone']);
-            DefaultLogger::debug('Added zone to carrier', $logContext);
+
+            if (! $result) {
+                DefaultLogger::error('Failed to add zone to carrier', $logContext);
+            }
         }
 
         return (bool) $result;
     }
 
     /**
+     * Define the tabs this module adds to the admin.
+     *
      * @return array[]
      */
     private function getAdminTabsDefinition(): array
     {
         $languages = [];
+        $name      = Str::replaceLast('Controller', '', \AdminMyParcelNLController::class);
 
         foreach (Language::getLanguages() as $lang) {
-            $languages['AdminMyParcelNL'][$lang['id_lang']] = 'MyParcelBE';
+            $languages[$name][$lang['id_lang']] = 'MyParcelNL';
         }
 
         return [
             [
-                'class_name'   => 'AdminMyParcelNL',
-                'name'         => $languages['AdminMyParcelNL'],
+                'class_name'   => $name,
+                'name'         => $languages[$name],
                 'parent_class' => 'AdminParentShipping',
             ],
         ];
@@ -298,6 +320,7 @@ trait HasModuleInstall
      * @return void
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @deprecated
      */
     private function installCarriers(): void
     {
@@ -316,44 +339,63 @@ trait HasModuleInstall
             $result  &= $this->addGroups($carrier);
             $result  &= $this->addRangeWeight($carrier);
             $result  &= $this->addRangePrice($carrier);
+
+            if (! $result) {
+                DefaultLogger::error('Failed to add carrier', ['carrier' => $carrier->id]);
+            }
         }
 
-        $this->installSuccess = $result;
+        $this->installSuccess &= $result;
     }
 
     /**
-     * @param  array $newTab
-     *
      * @return void
+     * @throws \Exception
      */
-    private function installTab(array $newTab): void
-    {
-        $tab             = new Tab();
-        $tab->active     = 1;
-        $tab->class_name = $newTab['class_name'];
-        $tab->name       = $newTab['name'];
-        $tab->id_parent  = (! empty($newTab['parent_class'])
-            ? (int) Tab::getIdFromClassName($newTab['parent_class'])
-            : -1);
-        $tab->module     = $this->name;
-
-        $this->installSuccess &= $tab->add();
-    }
-
     private function installTabs(): void
     {
-        foreach ($this->getAdminTabsDefinition() as $tab) {
-            $this->installTab($tab);
+        foreach ($this->getAdminTabsDefinition() as $definition) {
+            /** @var \PrestaShopBundle\Entity\Repository\TabRepository $tabRepository */
+            $tabRepository = $this->get('prestashop.core.admin.tab.repository');
+
+            $tab                 = new Tab();
+            $tab->active         = 1;
+            $tab->class_name     = $definition['class_name'];
+            $tab->module         = $this->name;
+            $tab->name           = $definition['name'];
+            $tab->wording        = $definition['class_name'];
+            $tab->wording_domain = \MyParcelNL::TRANSLATION_DOMAIN;
+            $tab->id_parent      = (! empty($definition['parent_class'])
+                ? (int) $tabRepository->findOneIdByClassName($definition['parent_class'])
+                : -1);
+
+            $result = $tab->add();
+
+            if (! $result) {
+                $this->_errors[] = sprintf('Failed to install tab: %s', $definition['name']);
+                DefaultLogger::error('Failed to install tab', ['tab' => $definition]);
+            }
+
+            $this->installSuccess &= $result;
         }
     }
 
+    /**
+     * @return void
+     */
     private function migrateUp(): void
     {
-        foreach ($this->migrations as $migration) {
-            $result = $migration::up();
+        /** @var \MyParcelNL\PrestaShop\Database\Migrations $migrations */
+        $migrations = Pdk::get(Migrations::class);
+
+        foreach ($migrations->get() as $migration) {
+            /** @var \MyParcelNL\PrestaShop\Database\AbstractMigration $class */
+            $class  = Pdk::get($migration);
+            $result = $class->up();
 
             if (! $result) {
                 $this->_errors[] = sprintf('Failed to execute migration: %s', $migration);
+                DefaultLogger::error('[Install] Failed to execute migration', ['migration' => $migration]);
             }
 
             $this->installSuccess &= $result;
@@ -367,6 +409,7 @@ trait HasModuleInstall
 
             if (! $result) {
                 $this->_errors[] = sprintf('Hook %s could not be registered.', $hook);
+                DefaultLogger::error('[Install] Hook could not be registered', ['hook' => $hook]);
             }
 
             $this->installSuccess &= $result;

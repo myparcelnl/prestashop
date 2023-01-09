@@ -1,46 +1,49 @@
-const {createBuildTask} = require('./private/gulp/createBuildTask');
 const {createCleanTask} = require('./private/gulp/createCleanTask');
 const {createCopyTask} = require('./private/gulp/createCopyTask');
-const {createDefaultTask} = require('./private/gulp/createDefaultTask');
-const {createTasksForAllModules} = require('./private/gulp/createTasksForAllModules');
-const {createTransferTask} = require('./private/gulp/createTransferTask');
+const {createWorkspaceRunTask} = require('./private/gulp/createWorkspaceRunTask');
 const {createTransformTask} = require('./private/gulp/createTransformTask');
-const {createViewsCleanTask} = require('./private/gulp/createViewsCleanTask');
 const {createZipTask} = require('./private/gulp/createZipTask');
 const gulp = require('gulp');
 const {modules} = require('./private/gulp/variables');
-const {createJsBuildTask} = require('./private/gulp/createJsBuildTask');
-const plugins = require('gulp-load-plugins')();
 
 /**
  * Clean the /dist folder.
  */
-gulp.task('clean', createCleanTask(gulp, plugins));
+gulp.task('clean', createCleanTask('dist/*'));
 
-/**
- * Clean the /views/dist folder.
- */
-gulp.task('views:clean', createViewsCleanTask(gulp, plugins));
-
-gulp.task('js:build', createJsBuildTask());
+gulp.task('build:js', createWorkspaceRunTask('build'));
+gulp.task('build:js:dev', createWorkspaceRunTask('build:dev'));
 
 modules.forEach((moduleName) => {
-  gulp.task(`copy:${moduleName}`, createCopyTask(gulp, plugins, moduleName));
-  gulp.task(`transform:${moduleName}`, createTransformTask(gulp, plugins, moduleName));
-  gulp.task(`transfer:${moduleName}`, createTransferTask(gulp, plugins, moduleName));
-  // gulp.task(`build:${moduleName}`, createBuildTask(gulp, plugins, moduleName));
-  gulp.task(`zip:${moduleName}`, createZipTask(gulp, plugins, moduleName));
+  gulp.task(`copy:${moduleName}`, createCopyTask(moduleName));
+  gulp.task(`copy:js:${moduleName}`, createCopyTask(moduleName));
+  gulp.task(`transform:${moduleName}`, createTransformTask(moduleName));
+  gulp.task(
+    `build:${moduleName}`,
+    gulp.series(`copy:${moduleName}`, `copy:js:${moduleName}`, `transform:${moduleName}`),
+  );
+  gulp.task(`zip:${moduleName}`, createZipTask(moduleName));
 });
 
-// createTasksForAllModules(gulp, 'build');
-createTasksForAllModules(gulp, 'transform');
-createTasksForAllModules(gulp, 'copy');
-createTasksForAllModules(gulp, 'transfer');
-createTasksForAllModules(gulp, 'zip');
+['build', 'copy', 'transform', 'zip'].forEach((task) => {
+  gulp.task(task, gulp.parallel(...modules.map((moduleName) => `${task}:${moduleName}`)));
+});
 
-const defaultTask = createDefaultTask(gulp);
+const defaultTask = gulp.series(
+  'clean',
+  'build:js',
+  gulp.parallel(...modules.map((moduleName) => gulp.series(`build:${moduleName}`, `zip:${moduleName}`))),
+);
 
 gulp.task('build', defaultTask);
-// gulp.task('build:dev', createDevBuildTask(gulp));
+
+gulp.task(
+  'build:dev',
+  gulp.series(
+    'clean',
+    'build:js:dev',
+    gulp.parallel(...modules.map((moduleName) => gulp.series(`build:${moduleName}`, `zip:${moduleName}`))),
+  ),
+);
 
 exports.default = defaultTask;

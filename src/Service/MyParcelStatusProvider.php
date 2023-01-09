@@ -7,6 +7,9 @@ namespace MyParcelNL\PrestaShop\Service;
 use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
 use MyParcelNL;
 
+/**
+ * @deprecated
+ */
 class MyParcelStatusProvider
 {
     use HasInstance;

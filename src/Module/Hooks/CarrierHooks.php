@@ -10,8 +10,7 @@ use MyParcelNL\PrestaShop\Database\Table;
 trait CarrierHooks
 {
     /**
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @param  array $params
      */
     public function hookActionCarrierUpdate(array $params): void
     {

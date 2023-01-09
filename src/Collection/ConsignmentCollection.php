@@ -9,6 +9,7 @@ use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 
 /**
  * Replacement of MyParcelCollection which ensures a user agent is set for every request.
+ * @deprecated
  */
 class ConsignmentCollection extends MyParcelCollection
 {

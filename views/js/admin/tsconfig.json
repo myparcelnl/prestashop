@@ -1,21 +1,4 @@
 {
   "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "types": [
-      "jquery",
-      "vite/client"
-    ]
-  },
-  "include": [
-    "./src/**/*"
-  ],
-  "exclude": [
-    "./src/**/__tests__/*",
-    "./src/**/*.spec.*"
-  ]
+  "include": ["./src/**/*", "!./src/__test__/**"]
 }

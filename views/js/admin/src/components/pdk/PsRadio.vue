@@ -5,21 +5,32 @@
       v-model="model"
       :value="value"
       type="radio"
-      class="myparcel-radio">
+      class="myparcel-radio" />
     <label
-      v-t="label"
-      :for="`radio_${value}`" />
+      :for="`radio_${value}`"
+      v-text="translate(label)" />
   </div>
 </template>
 
 <script lang="ts">
-import {useVModel} from '@vueuse/core';
 import {defineComponent} from 'vue';
+import {useTranslate} from '@myparcel/pdk-frontend';
+import {useVModel} from '@vueuse/core';
 
 export default defineComponent({
-  name: 'PsRadio',
+  name: 'PsRadioInput',
 
   props: {
+    disabled: {
+      type: Boolean,
+    },
+
+    label: {
+      type: String,
+      default: '',
+    },
+
+    // eslint-disable-next-line vue/no-unused-properties
     modelValue: {
       type: [String, Number],
       default: null,
@@ -29,19 +40,12 @@ export default defineComponent({
       type: [String, Number],
       required: true,
     },
-
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-
-    label: {
-      type: String,
-      default: '',
-    },
   },
 
+  emits: ['update:modelValue'],
+
   setup: (props, ctx) => ({
+    translate: useTranslate(),
     model: useVModel(props, 'modelValue', ctx.emit),
   }),
 });

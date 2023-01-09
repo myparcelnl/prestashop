@@ -43,6 +43,27 @@ class Tools extends ToolsPresta
     }
 
     /**
+     * Get the translated value of a string in the following priority:
+     *  1. The value of the key in the current language
+     *  2. The value of the key in English
+     *  3. The first key that exists
+     *
+     * @param  array $translatable
+     *
+     * @return void
+     */
+    public static function getTranslatedString(array $translatable): string
+    {
+        $context = \Context::getContext();
+
+        if ($context && isset($translatable[$context->language->id])) {
+            return $translatable[$context->language->id];
+        }
+
+        return $translatable[1] ?? reset($translatable);
+    }
+
+    /**
      * @param  mixed $value
      *
      * @return int|null

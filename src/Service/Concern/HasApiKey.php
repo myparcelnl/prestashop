@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service\Concern;
 
+/**
+ * @deprecated
+ */
 trait HasApiKey
 {
     /**

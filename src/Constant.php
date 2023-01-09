@@ -175,9 +175,9 @@ class Constant
     public const IGNORE_ORDER_STATUS_CONFIGURATION_NAME                 = 'MYPARCELNL_IGNORE_ORDER_STATUS';
     public const WEBHOOK_ID_CONFIGURATION_NAME                          = 'MYPARCELNL_WEBHOOK_ID';
     public const WEBHOOK_HASH_CONFIGURATION_NAME                        = 'MYPARCELNL_WEBHOOK_HASH';
-    public const POSTNL_CONFIGURATION_NAME                              = 'MYPARCELBE_POSTNL';
-    public const BPOST_CONFIGURATION_NAME                               = 'MYPARCELBE_BPOST';
-    public const DPD_CONFIGURATION_NAME                                 = 'MYPARCELBE_DPD';
+    public const POSTNL_CONFIGURATION_NAME                              = 'MYPARCELNL_POSTNL';
+    public const BPOST_CONFIGURATION_NAME                               = 'MYPARCELNL_BPOST';
+    public const DPD_CONFIGURATION_NAME                                 = 'MYPARCELNL_DPD';
 
     public const CARRIER_CONFIGURATION_MAP = [
         CarrierPostNL::class => Constant::POSTNL_CONFIGURATION_NAME,

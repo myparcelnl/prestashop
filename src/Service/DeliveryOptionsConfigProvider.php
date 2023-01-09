@@ -9,12 +9,13 @@ use Configuration;
 use Context;
 use Country;
 use DateTime;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
 use MyParcelNL\PrestaShop\Constant;
-use MyParcelNL\PrestaShop\Logger\DeprecatedFileLogger;
 use MyParcelNL\PrestaShop\Module\Configuration\Form\CheckoutForm;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\ShippingOptions;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use Order;
 use RuntimeException;
@@ -183,9 +184,12 @@ class DeliveryOptionsConfigProvider extends AbstractProvider
             throw new RuntimeException("PsCarrier $this->psCarrierId not found.");
         }
 
-        $carrierName           = CarrierService::getMyParcelCarrier((int) $psCarrier->id)
+        $carrierName = CarrierService::getMyParcelCarrier((int) $psCarrier->id)
             ->getName();
-        $shippingOptions       = $this->module->getShippingOptions($psCarrier->id, $address);
+
+        /** @var \MyParcelNL\PrestaShop\ShippingOptions $class */
+        $class                 = Pdk::get(ShippingOptions::class);
+        $shippingOptions       = $class->get($psCarrier->id, $address);
         $basePrice             = $this->context->cart->getTotalShippingCost(null, $shippingOptions['include_tax']);
         $priceStandardDelivery = $showPriceSurcharge ? 0 : Tools::ps_round($basePrice, 2);
 

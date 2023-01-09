@@ -18,6 +18,9 @@ use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use Throwable;
 
+/**
+ * @deprecated
+ */
 class LabelOptionsResolver
 {
     /**

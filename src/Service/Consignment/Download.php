@@ -13,6 +13,9 @@ use MyParcelNL\PrestaShop\Timer;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use Tools;
 
+/**
+ * @deprecated
+ */
 class Download
 {
     /**

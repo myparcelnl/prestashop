@@ -6,10 +6,9 @@ namespace MyParcelNL\PrestaShop\Entity\OrderStatus;
 
 use Configuration;
 use Exception;
-use MyParcelNL\PrestaShop\Constant;
-use MyParcelNL\PrestaShop\Entity\OrderStatusUpdateInterface;
-use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use OrderLabel;
 
 abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface

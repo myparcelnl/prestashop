@@ -1,66 +1,39 @@
 <template>
-  <button
-    type="button"
-    class="btn text-nowrap"
-    :class="{
-      [`btn-${size}`]: size,
-      [`btn-${variant}`]: variant,
-    }"
+  <BaseButton
+    :icon="icon"
+    :label="label"
     :disabled="disabled"
-    @click="() => $emit('click')">
-    <MaterialIcon
-      v-for="iconName in icons"
-      :key="iconName"
-      class="mr-1"
-      >{{ iconName }}</MaterialIcon
-    >
-    <slot>
-      {{ translate(label) }}
-    </slot>
-  </button>
+    class="btn btn-primary text-nowrap"
+    @click="$emit('click')">
+    <slot />
+  </BaseButton>
 </template>
 
 <script lang="ts">
-import {PropType, computed, defineComponent} from 'vue';
-import {toArray, useTranslate} from '@myparcel/pdk-frontend';
-import MaterialIcon from '@/components/MaterialIcon.vue';
+/* eslint-disable vue/no-unused-properties */
+import {PropType, defineComponent} from 'vue';
+import BaseButton from '../BaseButton.vue';
+import {PdkIcon} from '@myparcel/pdk-frontend';
 
 export default defineComponent({
   name: 'PsButton',
-  components: {MaterialIcon},
+  components: {BaseButton},
   props: {
-    variant: {
-      type: String,
-      default: 'primary',
-    },
-
     disabled: {
       type: Boolean,
     },
 
-    size: {
-      type: String,
-      default: null,
-    },
-
     icon: {
-      type: [Array, String] as PropType<string | string[]>,
-      default: () => [],
+      type: String as PropType<PdkIcon>,
+      default: null,
     },
 
     label: {
       type: String,
-      default: 'save',
+      default: null,
     },
   },
 
   emits: ['click'],
-
-  setup: (props) => {
-    return {
-      translate: useTranslate(),
-      icons: computed(() => toArray(props.icon)),
-    };
-  },
 });
 </script>

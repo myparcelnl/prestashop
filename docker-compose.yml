@@ -2,8 +2,8 @@ version: "3.9"
 
 services:
   php:
-    image: ghcr.io/myparcelnl/php-xd:7.2-alpine
-    command: [ "sh", "-c", "composer install --no-interaction --no-progress --no-scripts --no-dev --ignore-platform-reqs" ]
+    image: ghcr.io/myparcelnl/php-xd:7.4-cli-alpine
+    command: [ "sh", "-c", "composer install --no-interaction --no-progress --no-scripts --ignore-platform-reqs" ]
     volumes:
       - ./:/app
       - composer-cache:/www-data/.composer/cache
@@ -12,13 +12,13 @@ services:
   node:
     image: node:18-alpine
     working_dir: /app
-    command: [ "sh", "-c", "yarn && yarn compile" ]
+    command: [ "sh", "-c", "yarn && yarn zip" ]
     volumes:
       - ./:/app
       - yarn-cache:/usr/local/share/.cache/yarn/v6
       - node-modules:/app/node_modules
       - /Users/edie/Sites/myparcel/pdk-frontend:/Users/edie/Sites/myparcel/pdk-frontend
-      - /Users/edie/Sites/vue-form-builder:/Users/edie/Sites/vue-form-builder
+      - /Users/edie/Sites/myparcel/js-sdk:/Users/edie/Sites/myparcel/js-sdk
 
 volumes:
   composer-cache:

@@ -1,41 +1,42 @@
-import {URL, fileURLToPath} from 'url';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 import {defineConfig} from 'vitest/config';
-import path from 'path';
 import vue from '@vitejs/plugin-vue';
 
 /**
  * @see https://vitejs.dev/config/
  */
-export default defineConfig({
-  plugins: [vue({}), basicSsl()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
-  // server: {
-  //   port: LOCAL_PORT,
-  //   https: true,
-  // },
+export default defineConfig((env) => ({
   build: {
-    // minify: false,
-    // cssCodeSplit: false,
-    // sourcemap: true,
-    // manifest: true,
-    outDir: path.resolve(__dirname, '..', '..', 'dist', 'js', 'admin'),
-
+    emptyOutDir: false,
     lib: {
-      name: 'MyParcelPrestaShopAdmin',
       entry: 'src/index.ts',
-      formats: ['cjs'],
+      formats: ['iife'],
+      name: 'MyParcelAdmin',
     },
+    minify: env.mode !== 'development',
+    outDir: 'lib',
+    rollupOptions: {
+      external: ['vue'],
+      output: {
+        globals: {
+          vue: 'Vue',
+          pinia: 'Pinia',
+          '@tanstack/vue-query': 'VueQuery',
+        },
+      },
+    },
+    sourcemap: env.mode === 'development',
   },
+
+  define: {
+    'process.env': {},
+  },
+
+  plugins: [vue()],
 
   test: {
-    environment: 'happy-dom',
     coverage: {
       reporter: ['text', 'clover'],
     },
+    environment: 'happy-dom',
   },
-});
+}));

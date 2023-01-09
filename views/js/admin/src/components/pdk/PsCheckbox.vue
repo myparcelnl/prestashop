@@ -20,6 +20,7 @@ import {useVModel} from '@vueuse/core';
 
 export default defineComponent({
   name: 'PsCheckbox',
+
   props: {
     disabled: {
       type: Boolean,
@@ -27,20 +28,22 @@ export default defineComponent({
 
     label: {
       type: String,
-      required: true,
+      default: null,
     },
 
     value: {
-      type: [String, Boolean],
+      type: [Boolean, String, Number],
       default: true,
     },
 
     // eslint-disable-next-line vue/no-unused-properties
     modelValue: {
-      type: [String, Boolean],
+      type: [String, Boolean, Array],
       default: null,
     },
   },
+
+  emits: ['update:modelValue'],
 
   setup: (props, ctx) => {
     return {

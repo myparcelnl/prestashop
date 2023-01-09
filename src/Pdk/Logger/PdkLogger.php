@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Logger;
 
 use FileLogger;
+use InvalidArgumentException;
 use MyParcelNL;
 use MyParcelNL\Pdk\Logger\AbstractLogger;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -28,6 +29,19 @@ class PdkLogger extends AbstractLogger
         LogLevel::ALERT,
         LogLevel::EMERGENCY,
     ];
+    /**
+     * Map of PSR-3 log levels to FileLogger log levels.
+     */
+    private const LEVEL_MAP = [
+        LogLevel::DEBUG     => FileLogger::DEBUG,
+        LogLevel::INFO      => FileLogger::INFO,
+        LogLevel::NOTICE    => FileLogger::WARNING,
+        LogLevel::WARNING   => FileLogger::WARNING,
+        LogLevel::ERROR     => FileLogger::ERROR,
+        LogLevel::CRITICAL  => FileLogger::ERROR,
+        LogLevel::ALERT     => FileLogger::ERROR,
+        LogLevel::EMERGENCY => FileLogger::ERROR,
+    ];
 
     /**
      * @var \FileLogger
@@ -49,31 +63,36 @@ class PdkLogger extends AbstractLogger
     public function createLogDirectory(string $directory): void
     {
         if (! is_dir($directory) && ! mkdir($directory) && ! is_dir($directory)) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $directory));
+            throw new RuntimeException("Directory \"$directory\" was not created");
         }
 
-        if (_PS_MODE_DEV_) {
-            foreach (self::LOG_LEVELS as $level) {
-                // Create all log files in advance on dev for easier tail usage
-                $handle = fopen($this->getLogFilename($level), 'wb');
-                fclose($handle);
-            }
+        if (! _PS_MODE_DEV_) {
+            return;
+        }
+
+        // Create all log files in advance on dev for easier tail usage
+        foreach (self::LOG_LEVELS as $level) {
+            $this->createLogFile($level);
         }
     }
 
     /**
-     * @param        $level
-     * @param        $message
-     * @param  array $context
+     * @param  string                  $level
+     * @param  \Throwable|array|string $message
+     * @param  array                   $context
      *
      * @return void
      */
     public function log($level, $message, array $context = []): void
     {
+        if (! is_string($level) || ! in_array($level, self::LOG_LEVELS, true)) {
+            throw new InvalidArgumentException(sprintf('Invalid log level "%s"', $level));
+        }
+
         $logger = $this->getLogger($level);
         $string = $this->createMessage($message, $context, $level);
 
-        $logger->log($string);
+        $logger->log($string, self::LEVEL_MAP[$level]);
     }
 
     /**
@@ -85,11 +104,11 @@ class PdkLogger extends AbstractLogger
      */
     protected function createMessage($message, array $context, string $level): string
     {
-        $output = $this->getOutput($message);
+        $output     = $this->getOutput($message);
         $logContext = Arr::except($context, 'exception');
 
         if (! empty($logContext)) {
-            $output .= "\nContext: " . json_encode($logContext, JSON_PRETTY_PRINT);
+            $output .= "\n" . json_encode($logContext, JSON_PRETTY_PRINT);
         }
 
         if (LogLevel::DEBUG !== $level) {
@@ -97,6 +116,20 @@ class PdkLogger extends AbstractLogger
         }
 
         return $output;
+    }
+
+    /**
+     * @param  string $level
+     *
+     * @return void
+     */
+    private function createLogFile(string $level): void
+    {
+        $file = $this->getLogFilename($level);
+
+        if (! file_exists($file)) {
+            touch($file);
+        }
     }
 
     /**
@@ -141,11 +174,11 @@ class PdkLogger extends AbstractLogger
     }
 
     /**
-     * @param $level
+     * @param  string $level
      *
      * @return \FileLogger
      */
-    private function getLogger($level): FileLogger
+    private function getLogger(string $level): FileLogger
     {
         if (! isset(self::$loggers[$level])) {
             self::$loggers[$level] = $this->initializeLogger($level);
@@ -202,12 +235,14 @@ class PdkLogger extends AbstractLogger
     }
 
     /**
-     * @param $level
+     * @param  string $level
      *
      * @return \FileLogger
      */
-    private function initializeLogger($level): FileLogger
+    private function initializeLogger(string $level): FileLogger
     {
+        $this->createLogFile($level);
+
         $logger = new FileLogger($level);
         $logger->setFilename($this->getLogFilename($level));
 

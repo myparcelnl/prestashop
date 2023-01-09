@@ -10,6 +10,9 @@ use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\BpostConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 
+/**
+ * @deprecated
+ */
 class ConsignmentNormalizer
 {
     /**

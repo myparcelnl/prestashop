@@ -4,16 +4,28 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
-use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
-use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\RenderService;
+use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
+use MyParcelNL\PrestaShop\Pdk\Product\Repository\ProductRepository;
+use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 use Throwable;
+use Tools;
 
 trait HasPdkRenderHooks
 {
+    /**
+     * Renders the module configuration page.
+     *
+     * @return string
+     */
+    public function getContent(): string
+    {
+        return'henlo';
+    }
+
     /**
      * Renders MyParcel buttons in order grid.
      *
@@ -46,24 +58,26 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminAfterHeader(): string
     {
-        return RenderService::renderNotifications();
+        if (! $this->shouldRenderPdk()) {
+            return '';
+        }
+
+        $html = RenderService::renderNotifications();
+        $html .= RenderService::renderModals();
+
+        return $html;
     }
 
     /**
-     * Renders the initialisation script.
-     *
-     * @throws \Exception
+     * @return string
      */
     public function hookDisplayAdminEndContent(): string
     {
-        $controller = \Tools::getValue('controller');
-        $html       = RenderService::renderInitScript();
-
-        if (in_array($controller, ['AdminOrders'])) {
-            $html .= RenderService::renderModals();
+        if (! $this->shouldRenderPdk()) {
+            return '';
         }
 
-        return $html;
+        return RenderService::renderInitScript();
     }
 
     /**
@@ -89,5 +103,75 @@ trait HasPdkRenderHooks
 
             return '';
         }
+    }
+
+    /**
+     * Renders the product settings.
+     *
+     * @param  array $params
+     *
+     * @return string
+     */
+    public function hookDisplayAdminProductsExtra(array $params): string
+    {
+        /** @var \MyParcelNL\PrestaShop\Pdk\Product\Repository\ProductRepository $repository */
+        $repository = Pdk::get(ProductRepository::class);
+        $product    = $repository->getProduct($params['id_product']);
+
+        return RenderService::renderProductSettings($product);
+    }
+
+    /**
+     * Load the js and css files of the admin app.
+     *
+     * @return void
+     */
+    public function hookDisplayBackOfficeHeader(): void
+    {
+        /** @var \AdminLegacyLayoutControllerCore $controller */
+        $controller = $this->context->controller;
+
+        if (! $this->shouldRenderPdk()) {
+            return;
+        }
+
+        if (Pdk::isDevelopment()) {
+            $controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.45/vue.global.js');
+            $controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/vue-demi/0.13.11/index.iife.js');
+        } else {
+            $controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.45/vue.global.min.js');
+            $controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/vue-demi/0.13.11/index.iife.min.js');
+        }
+
+        $controller->addCSS($this->_path . 'views/js/admin/lib/style.css');
+    }
+
+    /**
+     * @return bool
+     */
+    private function shouldRenderPdk(): bool
+    {
+        $controller = Tools::getValue('controller');
+
+        // Match only the order overview and the modules page.
+        if (! in_array(
+            $controller,
+            [
+                'AdminModules',
+                'AdminOrders',
+                'AdminProducts',
+                Str::replaceLast('Controller', '', \AdminMyParcelNLController::class),
+            ],
+            true
+        )) {
+            return false;
+        }
+
+        // Match the module configuration page
+        if ($controller === 'AdminModules' && Tools::getValue('module_name') !== $this->name) {
+            return false;
+        }
+
+        return true;
     }
 }

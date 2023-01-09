@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MyParcelNL\PrestaShop\Service;
 
 use MyParcelNL\PrestaShop\Database\Table;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
+/**
+ * @deprecated
+ */
 class ProductConfigurationProvider
 {
     /**

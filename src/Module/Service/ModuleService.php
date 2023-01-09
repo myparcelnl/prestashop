@@ -6,14 +6,12 @@ namespace MyParcelNL\PrestaShop\Module\Service;
 
 use Cart;
 use Context;
-use MyParcelNL\PrestaShop\DeliveryOptions\DeliveryOptionsManager;
-use MyParcelNL\PrestaShop\Module\Configuration\SettingsMenu;
-use MyParcelNL\PrestaShop\Module\Tools\Tools;
-use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
 use MyParcelNL;
-use MyParcelNL\Pdk\Base\Data\CountryCodes;
 use MyParcelNL\Pdk\Base\Service\CountryService;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\PrestaShop\DeliveryOptions\DeliveryOptionsManager;
+use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Service\CarrierConfigurationProvider;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Str;
 use ReflectionClass;
@@ -38,24 +36,6 @@ class ModuleService
     {
         $this->module  = $module;
         $this->context = Context::getContext();
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent(): string
-    {
-        $configuration = new SettingsMenu($this->module);
-
-        $this->context->smarty->assign([
-            'menutabs' => $configuration->initNavigation(),
-            'ajaxUrl'  => $this->module->getBaseUrl(true),
-        ]);
-
-        $this->context->smarty->assign('module_dir', $this->module->getPathUri());
-        $output = $this->module->display($this->module->getLocalPath(), 'views/templates/admin/navbar.tpl');
-
-        return $output . $configuration->renderMenu((int) Tools::getValue('menu') ?: 0);
     }
 
     /**
@@ -161,23 +141,5 @@ class ModuleService
         }
 
         return $shippingCost + $myParcelCost;
-    }
-
-    /**
-     * @return bool
-     * @deprecated
-     */
-    public function isBE(): bool
-    {
-        return 'BE' === $this->getModuleCountry();
-    }
-
-    /**
-     * @return bool
-     * @deprecated
-     */
-    public function isNL(): bool
-    {
-        return 'NL' === $this->getModuleCountry();
     }
 }

@@ -1,35 +1,40 @@
 {
   "name": "myparcelnl/prestashop-module",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "license": "MIT",
   "type": "prestashop-module",
   "require": {
     "myparcelnl/pdk": "*",
-    "php": ">=7.2.0",
-    "symfony/http-foundation": "^3.4.37"
+    "php": ">=7.2.0"
   },
   "require-dev": {
-    "myparcelnl/devtools": "^1.0"
+    "doctrine/orm": "2.7.4",
+    "pestphp/pest": "^1.22",
+    "spatie/pest-plugin-snapshots": "^1.1.0"
+  },
+  "config": {
+    "prepend-autoloader": false,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   },
   "autoload": {
     "psr-4": {
       "MyParcelNL\\PrestaShop\\": "src/"
     },
     "classmap": [
-      "myparcelnl.php",
-      "src/Model/OrderLabel.php"
-    ],
-    "exclude-from-classmap": [ ]
+      "myparcelnl.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
-      "MyParcelNL\\PrestaShop\\Tests\\": "tests"
-    },
-    "repositories": [
-      {
-        "type": "path",
-        "url": "/Users/edie/Sites/myparcel/pdk"
-      }
-    ]
-  }
+      "MyParcelNL\\PrestaShop\\Tests\\": "tests/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "/Users/edie/Sites/myparcel/pdk"
+    }
+  ]
 }

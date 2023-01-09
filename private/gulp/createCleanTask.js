@@ -1,11 +1,12 @@
+const gulp = require('gulp');
+const clean = require('gulp-clean');
+
 /**
- * @param {import('gulp').Gulp} gulp
- * @param {Object} plugins
+ * @param {string[]} globs
  * @returns {Function}
  */
-function createCleanTask(gulp, plugins) {
-  return () => gulp.src(['dist/*'], {read: false})
-    .pipe(plugins.clean({force: true}));
+function createCleanTask(globs) {
+  return () => gulp.src(globs, {read: false}).pipe(clean({force: true}));
 }
 
 module.exports = {createCleanTask};

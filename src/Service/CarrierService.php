@@ -12,6 +12,9 @@ use MyParcelNL\Sdk\src\Model\Carrier\AbstractCarrier;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierFactory;
 use Validate;
 
+/**
+ * @deprecated
+ */
 class CarrierService
 {
     /**

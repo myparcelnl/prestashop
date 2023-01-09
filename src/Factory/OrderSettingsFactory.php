@@ -8,6 +8,9 @@ use MyParcelNL\PrestaShop\Entity\Cache;
 use MyParcelNL\PrestaShop\Model\Core\Order;
 use MyParcelNL\PrestaShop\OrderSettings\OrderSettings;
 
+/**
+ * @deprecated
+ */
 class OrderSettingsFactory
 {
     /**

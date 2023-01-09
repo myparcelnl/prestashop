@@ -9,7 +9,7 @@
         <strong
           v-if="notification.title"
           class="mb-1"
-          v-text="notification.title"></strong>
+          v-text="notification.title" />
 
         <p
           v-for="(item, index) in contentArray"
@@ -21,8 +21,9 @@
 </template>
 
 <script lang="ts">
-import {PdkNotification, toArray} from '@myparcel/pdk-frontend';
-import {computed, defineComponent, PropType} from 'vue';
+import {PropType, computed, defineComponent} from 'vue';
+import {PdkNotification} from '@myparcel/pdk-frontend';
+import {toArray} from '@myparcel/ts-utils';
 
 export default defineComponent({
   name: 'PsAlert',

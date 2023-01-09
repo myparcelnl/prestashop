@@ -15,6 +15,9 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Shipment\Service\DeliveryOptionsMerger;
 
+/**
+ * @deprecated
+ */
 class OrderSettings
 {
     /**

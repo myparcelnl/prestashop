@@ -4,103 +4,48 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
-use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\PrestaShop\Database\Table;
 
 class Upgrade2_0_0 extends AbstractUpgrade
 {
-    /**
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    public function dropTables(): void
-    {
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getOrderDataTable()}`");
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getProductSettingsTable()}`");
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getSettingsTable()}`");
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getDeliveryOptionsTable()}`");
-    }
+    protected const LEGACY_TABLE_CARRIER_CONFIGURATION = 'myparcelnl_carrier_configuration';
+
+    protected const LEGACY_TABLE_DELIVERY_SETTINGS = 'myparcelnl_delivery_settings';
+
+    protected const LEGACY_TABLE_ORDER_LABEL = 'myparcelnl_order_label';
+
+    protected const LEGACY_TABLE_PRODUCT_CONFIGURATION = 'myparcelnl_product_configuration';
 
     /**
      * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     public function upgrade(): void
     {
-        $this->dropTables();
-        $this->addTables();
+        // $this->dropOldTables();
 
-        $this->migrateDeliveryOptions();
-        $this->migrateSettings();
+        // $this->migrateCartDeliveryOptions();
+        // $this->migrateConfiguration();
+        // $this->migrateOrderData();
+        // $this->migrateOrderShipments();
     }
 
     /**
      * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
-    private function addTables(): void
+    protected function dropOldTables(): void
     {
-        $this->db->execute(
-            <<<EOF
-CREATE TABLE `{$this->getOrderDataTable()}`
-(
-    `id`                 int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `externalIdentifier` varchar(10),
-    `deliveryOptions`    text,
-    `shipments`          text
-);
-EOF
-
-        );
-
-        $this->db->execute(
-            <<<EOF
-CREATE TABLE `{$this->getProductSettingsTable()}`
-(
-    `id`         int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `product_id` int(10) NOT NULL
-);
-EOF
-        );
-
-        $this->db->execute(
-            <<<EOF
-CREATE TABLE `{$this->getSettingsTable()}`
-(
-    `id`    int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `name`  varchar(255) NOT NULL,
-    `value` text         NOT NULL
-);
-EOF
-        );
-        $this->db->execute(
-            <<<EOF
-CREATE TABLE `{$this->getDeliveryOptionsTable()}`
-(
-    `id`              int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `cartId`          varchar(10),
-    `deliveryOptions` text
-);
-EOF
-        );
-
-        DefaultLogger::debug(
-            'Created tables',
-            [
-                'tables' => [$this->getOrderDataTable(), $this->getProductSettingsTable(), $this->getSettingsTable()],
-            ]
-        );
+        $this->db->execute("DROP TABLE IF EXISTS `{$this->getOrderDataTable()}`");
+        $this->db->execute("DROP TABLE IF EXISTS `{$this->getProductSettingsTable()}`");
+        $this->db->execute("DROP TABLE IF EXISTS `{$this->getOrderShipmentsTable()}`");
+        $this->db->execute("DROP TABLE IF EXISTS `{$this->getCartDeliveryOptionsTable()}`");
     }
 
     /**
      * @return string
      */
-    private function getDeliveryOptionsTable(): string
+    private function getCartDeliveryOptionsTable(): string
     {
         return Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
     }
@@ -116,17 +61,17 @@ EOF
     /**
      * @return string
      */
-    private function getProductSettingsTable(): string
+    private function getOrderShipmentsTable(): string
     {
-        return Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
+        return Table::withPrefix(Table::TABLE_ORDER_SHIPMENT);
     }
 
     /**
      * @return string
      */
-    private function getSettingsTable(): string
+    private function getProductSettingsTable(): string
     {
-        return Table::withPrefix(Table::TABLE_SETTINGS);
+        return Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
     }
 
     /**
@@ -134,11 +79,12 @@ EOF
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      * @throws \PrestaShopException
      */
-    private function migrateDeliveryOptions(): void
+    private function migrateCartDeliveryOptions(): void
     {
         $query = new \DbQuery();
+
         $query->select('*');
-        $query->from('myparcelnl_delivery_settings');
+        $query->from(self::LEGACY_TABLE_DELIVERY_SETTINGS);
 
         $oldValues = $this->db->executeS($query);
         $newValues = [];
@@ -155,9 +101,9 @@ EOF
         }
 
         $newValuesString      = implode(',', $newValues);
-        $deliveryOptionsTable = $this->getDeliveryOptionsTable();
+        $deliveryOptionsTable = Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
 
-        $strr= array_reduce($newValues, static function ($acc, $val) {
+        $strr = array_reduce($newValues, static function ($acc, $val) {
             $acc .= sprintf("('%s'),\n", implode("','", $val));
 
             return $acc;
@@ -170,7 +116,10 @@ EOF
         DefaultLogger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
     }
 
-    private function migrateSettings()
+    /**
+     * @throws \PrestaShopDatabaseException
+     */
+    private function migrateConfiguration(): void
     {
         $query = new \DbQuery();
         $query->select('*');
@@ -179,11 +128,6 @@ EOF
 
         $oldValues = $this->db->executeS($query);
         $newValues = [];
-
-        $newValuesString      = implode(',', $newValues);
-        $deliveryOptionsTable = $this->getDeliveryOptionsTable();
-
-        DefaultLogger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
 
         $config = [
             'MYPARCELNL_API_KEY'                             => 'general.apiKey',
@@ -213,22 +157,40 @@ EOF
             'MYPARCELNL_LABEL_SIZE'                          => '',
             'MYPARCELNL_ORDER_NOTIFICATION_AFTER'            => '',
             'MYPARCELNL_PACKAGE_FORMAT'                      => '',
-            'MYPARCELBE_PACKAGE_TYPE'                        => '',
-            'MYPARCELBE_POSTNL'                              => '',
-            'MYPARCELBE_RECIPIENT_ONLY'                      => '',
-            'MYPARCELBE_RETURN_PACKAGE'                      => '',
-            'MYPARCELBE_SENT_ORDER_STATE_FOR_DIGITAL_STAMPS' => '',
-            'MYPARCELBE_SHARE_CUSTOMER_EMAIL'                => '',
-            'MYPARCELBE_SHARE_CUSTOMER_PHONE'                => '',
-            'MYPARCELBE_SIGNATURE_REQUIRED'                  => '',
-            'MYPARCELBE_STATUS_CHANGE_MAIL'                  => '',
-            'MYPARCELBE_USE_ADDRESS2_AS_STREET_NUMBER'       => '',
-            'MYPARCELBE_WEBHOOK_HASH'                        => '',
-            'MYPARCELBE_WEBHOOK_ID'                          => '',
+            'MYPARCELNL_PACKAGE_TYPE'                        => '',
+            'MYPARCELNL_POSTNL'                              => '',
+            'MYPARCELNL_RECIPIENT_ONLY'                      => '',
+            'MYPARCELNL_RETURN_PACKAGE'                      => '',
+            'MYPARCELNL_SENT_ORDER_STATE_FOR_DIGITAL_STAMPS' => '',
+            'MYPARCELNL_SHARE_CUSTOMER_EMAIL'                => '',
+            'MYPARCELNL_SHARE_CUSTOMER_PHONE'                => '',
+            'MYPARCELNL_SIGNATURE_REQUIRED'                  => '',
+            'MYPARCELNL_STATUS_CHANGE_MAIL'                  => '',
+            'MYPARCELNL_USE_ADDRESS2_AS_STREET_NUMBER'       => '',
+            'MYPARCELNL_WEBHOOK_HASH'                        => '',
+            'MYPARCELNL_WEBHOOK_ID'                          => '',
         ];
 
-        $this->db->execute(
-            "INSERT INTO `{$this->getSettingsTable()}` (`storeId`, `name`, `value`) VALUES $newValuesString"
-        );
+        foreach ($oldValues as $oldValue) {
+            $newValues[] = [
+                'name'  => $config[$oldValue['name']],
+                'value' => $oldValue['value'],
+            ];
+        }
+
+        $newValuesString = implode(',', $newValues);
+
+        $this->db->execute("INSERT INTO `configuration` (`storeId`, `name`, `value`) VALUES $newValuesString");
+        DefaultLogger::debug('Migrated configuration', compact('oldValues', 'newValues'));
+    }
+
+    private function migrateOrderData(): void
+    {
+        // from
+    }
+
+    private function migrateOrderShipments()
+    {
+        // from order_label to order_shipment
     }
 }

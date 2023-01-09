@@ -9,6 +9,9 @@ views/dist/
 .php_cs.cache
 .php-cs-fixer.cache
 
+**/lib
+**/dist
+
 # OS files
 .DS_Store
 

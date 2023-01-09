@@ -25,6 +25,6 @@ class OrderLogger extends Facade
      */
     public static function getFacadeAccessor(): string
     {
-        return 'logger.order';
+        return \MyParcelNL\PrestaShop\Pdk\Logger\OrderLogger::class;
     }
 }

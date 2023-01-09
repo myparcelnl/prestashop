@@ -13,7 +13,7 @@ if (! defined('_PS_VERSION_')) {
     return;
 }
 
-class MyParcelBEHookModuleFrontController extends FrontController
+class MyParcelNLHookModuleFrontController extends FrontController
 {
     /**
      * Initialize content and block unauthorized calls.

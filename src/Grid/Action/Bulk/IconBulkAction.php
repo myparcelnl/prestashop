@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Grid\Action\Bulk;
 
+use MyParcelNL\Pdk\Plugin\Service\RenderService;
 use PrestaShop\PrestaShop\Core\Grid\Action\Bulk\AbstractBulkAction;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,10 +24,11 @@ class IconBulkAction extends AbstractBulkAction
     {
         $resolver->setDefaults([
             'submit_route' => '',
+            'event'        => RenderService::EVENT_ACTION,
         ]);
 
         $resolver
-            ->setRequired(['material_icon'])
-            ->setAllowedTypes('material_icon', 'string');
+            ->setRequired(['icon'])
+            ->setAllowedTypes('icon', 'string');
     }
 }

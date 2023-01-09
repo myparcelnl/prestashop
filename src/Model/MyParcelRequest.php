@@ -2,6 +2,9 @@
 
 namespace MyParcelNL\PrestaShop\Model;
 
+/**
+ * @deprecated
+ */
 class MyParcelRequest extends \MyParcelNL\Sdk\src\Model\MyParcelRequest
 {
     /**

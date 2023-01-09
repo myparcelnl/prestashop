@@ -8,6 +8,9 @@ use Configuration;
 use MyParcelNL\PrestaShop\Constant;
 use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
 
+/**
+ * @deprecated
+ */
 class LabelOptionsService
 {
     use HasInstance;

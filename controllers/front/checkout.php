@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use MyParcelNL\PrestaShop\Service\DeliveryOptionsConfigProvider;
 
-class MyParcelBECheckoutModuleFrontController extends ModuleFrontController
+class MyParcelNLCheckoutModuleFrontController extends ModuleFrontController
 {
     /**
      * @var bool

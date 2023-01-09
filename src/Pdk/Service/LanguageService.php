@@ -6,7 +6,9 @@ namespace MyParcelNL\PrestaShop\Pdk\Service;
 
 use Context;
 use MyParcelNL;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Language\Service\AbstractLanguageService;
+use function _HumbugBoxcbe25c660cef\RingCentral\Psr7\str;
 
 class LanguageService extends AbstractLanguageService
 {
@@ -30,17 +32,5 @@ class LanguageService extends AbstractLanguageService
     public function getLanguage(): string
     {
         return Context::getContext()->language->iso_code;
-    }
-
-    /**
-     * @param  string      $key
-     * @param  null|string $language
-     *
-     * @return string
-     */
-    public function translate(string $key, ?string $language = null): string
-    {
-        return MyParcelNL::getModule()
-            ->l($key);
     }
 }

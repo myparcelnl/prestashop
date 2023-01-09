@@ -19,6 +19,7 @@ class WebhookService extends AbstractEndpoint
      * @param  \MyParcelNL\PrestaShop\Model\Webhook\Subscription $subscription
      *
      * @return mixed|null
+     * @throws \MyParcelNL\Sdk\src\Exception\AccountNotActiveException
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException
      * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
@@ -58,7 +59,10 @@ class WebhookService extends AbstractEndpoint
     {
         $content = (new Curl())
             ->setHeader('Authorization', 'basic ' . base64_encode($this->apiKey))
-            ->setHeader('User-Agent', $this->createRequest()->getUserAgentHeader())
+            ->setHeader('User-Agent',
+                $this->createRequest()
+                    ->getUserAgentHeader()
+            )
             ->setHeader('Content-Type', 'application/json; charset=utf-8')
             ->delete(MyParcelRequest::REQUEST_URL . '/' . $url);
 

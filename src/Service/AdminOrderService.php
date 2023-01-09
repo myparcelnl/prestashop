@@ -9,6 +9,7 @@ use Configuration;
 use Country;
 use Customer;
 use Exception;
+use MyParcelNL\Pdk\Shipment\Service\DeliveryOptionsMerger;
 use MyParcelNL\PrestaShop\Adapter\DeliveryOptionsFromFormAdapter;
 use MyParcelNL\PrestaShop\Collection\ConsignmentCollection;
 use MyParcelNL\PrestaShop\Constant;
@@ -32,6 +33,9 @@ use OrderLabel;
 use Throwable;
 use Validate;
 
+/**
+ * @deprecated
+ */
 class AdminOrderService extends AbstractService
 {
     /**
@@ -362,7 +366,7 @@ class AdminOrderService extends AbstractService
         $orderDeliveryOptions = OrderSettingsFactory::create($order)
             ->getDeliveryOptions();
 
-        $deliveryOptions = \MyParcelNL\Pdk\Shipment\Service\DeliveryOptionsMerger::create([
+        $deliveryOptions = DeliveryOptionsMerger::create([
             $orderDeliveryOptions,
             (new DeliveryOptionsFromFormAdapter($values)),
         ]);

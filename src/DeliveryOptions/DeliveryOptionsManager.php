@@ -9,6 +9,9 @@ use MyParcelNL\PrestaShop\DeliverySettings\DeliverySettingsRepository;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 
+/**
+ * @deprecated
+ */
 class DeliveryOptionsManager
 {
     /**

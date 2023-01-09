@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\PrestaShop\Constant;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Entity\OrderStatus\AbstractOrderStatusUpdate;
@@ -9,11 +10,9 @@ use MyParcelNL\PrestaShop\Factory\Consignment\ConsignmentFactory;
 use MyParcelNL\PrestaShop\Factory\OrderSettingsFactory;
 use MyParcelNL\PrestaShop\Factory\OrderStatus\OrderStatusUpdateCollectionFactory;
 use MyParcelNL\PrestaShop\Model\Core\Order;
-use MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0;
 use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
 use MyParcelNL\PrestaShop\Service\MyParcelStatusProvider;
 use MyParcelNL\PrestaShop\Service\Tracktrace;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Sdk\src\Exception\ApiException;
 use MyParcelNL\Sdk\src\Helper\Utils;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
@@ -202,12 +201,9 @@ class OrderLabel extends ObjectModel
             throw new InvalidArgumentException('Order id is missing');
         }
 
-        return \MyParcelNL\PrestaShop\Entity\Cache::remember(
-            "data_labels_create_$orderId",
-            static function () use ($orderId) {
-                $qb = new DbQuery();
-                $qb->select(
-                    'orders.id_order,
+        $qb = new DbQuery();
+        $qb->select(
+            'orders.id_order,
                     orders.id_order AS id,
                     orders.reference,
                     country.iso_code,
@@ -219,59 +215,40 @@ class OrderLabel extends ObjectModel
                     address.company,
                     customer.email,
                     address.phone,
-                    delivery_settings.delivery_settings,
                     orders.id_carrier,
                     address.id_country,
                     orders.invoice_number,
                     orders.shipping_number,
-                    order_data.shipments'
-                );
-
-                $qb->from('orders', 'orders');
-                $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
-                $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
-                $qb->leftJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
-                $qb->leftJoin('state', 'state', 'state.id_state = address.id_state');
-                $qb->leftJoin(
-                    Table::TABLE_DELIVERY_SETTINGS,
-                    'delivery_settings',
-                    'orders.id_cart = delivery_settings.id_cart'
-                );
-                $qb->leftJoin(
-                    Table::TABLE_ORDER_DATA,
-                    'order_data',
-                    'orders.id_order = order_data.externalIdentifier'
-                );
-
-                $qb->where("id_order = $orderId");
-
-                $result = Db::getInstance()
-                    ->executeS($qb);
-
-                if (! $result) {
-                    OrderLogger::warning(
-                        'Order data is incomplete',
-                        [
-                            'order' => $orderId,
-                            'query' => array_map('trim', explode(PHP_EOL, $qb->build())),
-                        ]
-                    );
-                }
-
-                $result[0] = array_merge(['delivery_settings' => []], $result[0]);
-
-                $emptyFields = Utils::getKeysWithoutValue($result[0], Constant::REQUIRED_LABEL_KEYS);
-
-                if (! empty($emptyFields)) {
-                    OrderLogger::error(
-                        'One or more required fields are missing',
-                        ['order' => $orderId, 'missingFields' => $emptyFields,]
-                    );
-                }
-
-                return $result[0];
-            }
+                    orderData.data'
         );
+
+        $qb->from('orders', 'orders');
+        $qb->innerJoin('address', 'address', 'orders.id_address_delivery = address.id_address');
+        $qb->innerJoin('country', 'country', 'country.id_country = address.id_country');
+        $qb->leftJoin('customer', 'customer', 'orders.id_customer = customer.id_customer');
+        $qb->leftJoin('state', 'state', 'state.id_state = address.id_state');
+        $qb->leftJoin(
+            Table::TABLE_ORDER_DATA,
+            'orderData',
+            'orders.id_order = orderData.orderId'
+        );
+
+        $qb->where("id_order = $orderId");
+
+        $result = Db::getInstance()
+            ->executeS($qb);
+
+        if (! $result) {
+            OrderLogger::error(
+                'Failed to retrieve order data',
+                [
+                    'order' => $orderId,
+                    'query' => array_map('trim', explode(PHP_EOL, $qb->build())),
+                ]
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -536,7 +513,7 @@ class OrderLabel extends ObjectModel
 
     /**
      * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
-     * @param  string                            $barcode
+     * @param  string                                  $barcode
      *
      * @return bool
      * @throws \PrestaShopDatabaseException
@@ -710,9 +687,9 @@ SQL
     }
 
     /**
-     * @param  \OrderLabel                       $orderLabel
+     * @param  \OrderLabel                             $orderLabel
      * @param  \MyParcelNL\PrestaShop\Model\Core\Order $order
-     * @param  int                               $newOrderStatus
+     * @param  int                                     $newOrderStatus
      *
      * @return bool
      * @throws \PrestaShopDatabaseException

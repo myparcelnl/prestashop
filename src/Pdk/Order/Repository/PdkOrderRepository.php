@@ -4,47 +4,81 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
-use Configuration;
-use MyParcelNL\PrestaShop\Constant;
-use MyParcelNL\PrestaShop\Pdk\Order\Storage\DatabaseOrderStorage;
-use MyParcelNL\PrestaShop\Service\ProductConfigurationProvider;
-use MyParcelNL\PrestaShop\Service\WeightService;
-use MyParcelNL\Pdk\Api\Service\ApiServiceInterface;
-use MyParcelNL\Pdk\Base\Service\CountryService;
-use MyParcelNL\Pdk\Base\Support\Collection;
-use MyParcelNL\Pdk\Facade\Config;
+use MyParcelNL\Pdk\Base\Service\CurrencyService;
+use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\Plugin\Model\PdkOrder;
 use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkOrderRepository;
+use MyParcelNL\Pdk\Product\Repository\AbstractProductRepository;
+use MyParcelNL\Pdk\Shipment\Collection\ShipmentCollection;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
-use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
-use MyParcelNL\Sdk\src\Support\Arr;
+use MyParcelNL\Pdk\Shipment\Model\Shipment;
+use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
+use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
+use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use Order;
-use OrderLabel;
-use Tools;
 
 class PdkOrderRepository extends AbstractPdkOrderRepository
 {
     /**
-     * @var \MyParcelNL\Pdk\Base\Service\CountryService
+     * @var \MyParcelNL\Pdk\Product\Repository\AbstractProductRepository
      */
-    private $countryService;
+    protected $productRepository;
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Pdk\Order\Storage\DatabaseOrderStorage $storage
-     * @param  \MyParcelNL\Pdk\Api\Service\ApiServiceInterface         $api
-     * @param  \MyParcelNL\Pdk\Base\Service\CountryService             $countryService
+     * @var \MyParcelNL\Pdk\Base\Service\CurrencyService
      */
-    public function __construct(DatabaseOrderStorage $storage, ApiServiceInterface $api, CountryService $countryService)
-    {
-        parent::__construct($storage, $api);
-        $this->countryService = $countryService;
+    private $currencyService;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkShipmentRepository
+     */
+    private $pdkShipmentRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository
+     */
+    private $psOrderDataRepository;
+
+    /**
+     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                   $storage
+     * @param  \MyParcelNL\Pdk\Base\Service\CurrencyService                 $currencyService
+     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository      $psOrderDataRepository
+     * @param  \MyParcelNL\Pdk\Product\Repository\AbstractProductRepository $productRepository
+     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository  $psOrderShipmentRepository
+     */
+    public function __construct(
+        MemoryCacheStorage        $storage,
+        CurrencyService           $currencyService,
+        PsOrderDataRepository     $psOrderDataRepository,
+        AbstractProductRepository $productRepository,
+        PsOrderShipmentRepository $psOrderShipmentRepository
+    ) {
+        parent::__construct($storage);
+        $this->currencyService           = $currencyService;
+        $this->psOrderDataRepository     = $psOrderDataRepository;
+        $this->productRepository         = $productRepository;
+        $this->psOrderShipmentRepository = $psOrderShipmentRepository;
     }
 
     /**
-     * @throws \PrestaShopException
+     * @param  mixed $input
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function delete($input): void
+    {
+        throw new \RuntimeException('Not implemented');
+    }
+
+    /**
+     * @param  mixed $input
+     *
+     * @return \MyParcelNL\Pdk\Plugin\Model\PdkOrder
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function get($input): PdkOrder
     {
@@ -55,7 +89,22 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         }
 
         return $this->retrieve((string) $order->id, function () use ($order) {
-            return $this->getDataFromOrder($order);
+            $orderData = $this->psOrderDataRepository->firstWhere('idOrder', $order->id);
+            $data      = $orderData ? $orderData->getData() : [];
+
+            $orderProducts = $order->getProducts() ?: [];
+
+            return new PdkOrder([
+                'externalIdentifier'  => $order->id,
+                'recipient'           => $this->getRecipient($order),
+                'deliveryOptions'     => $data['deliveryOptions'] ?? [],
+                'shipments'           => $this->getShipments($order),
+                'referenceIdentifier' => "PrestaShop: $order->id",
+                'shipmentPrice'       => $this->currencyService->convertToCents($order->total_shipping_tax_incl),
+                'shipmentVat'         => $this->currencyService->convertToCents($order->total_shipping_tax_excl),
+                'lines'               => $this->createOrderLines($orderProducts),
+                'customsDeclaration'  => $this->createCustomsDeclaration($order, $orderProducts),
+            ]);
         });
     }
 
@@ -63,145 +112,156 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
      * @param  \MyParcelNL\Pdk\Plugin\Model\PdkOrder $order
      *
      * @return \MyParcelNL\Pdk\Plugin\Model\PdkOrder
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     public function update(PdkOrder $order): PdkOrder
     {
-        //        $originalOrder = $this->get($order->externalIdentifier);
-        //        $updatedOrder  = $order->fill($order->toArray());
+        $collection = new PdkOrderCollection([$order]);
 
-        $this->save();
-
-        return $order;
+        return $this->updateMany($collection)
+            ->first();
     }
 
     /**
      * @param  \MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection $collection
      *
      * @return \MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     public function updateMany(PdkOrderCollection $collection): PdkOrderCollection
     {
-        return $collection->map([$this, 'update']);
+        $collection->each(function (PdkOrder $order) {
+            $this->psOrderDataRepository->updateOrCreate(
+                [
+                    'idOrder' => $order->externalIdentifier,
+                ],
+                [
+                    'data' => json_encode([
+                        'deliveryOptions' => $order->deliveryOptions->toArray(),
+                    ]),
+                ]
+            );
+
+            $order->shipments->each(function (Shipment $shipment) use ($order) {
+                $this->psOrderShipmentRepository->updateOrCreate(
+                    [
+                        'idOrder'    => $order->externalIdentifier,
+                        'idShipment' => $shipment->id,
+                    ],
+                    [
+                        'data' => json_encode($shipment->toStorableArray()),
+                    ]
+                );
+            });
+        });
+
+        $this->psOrderShipmentRepository->flush();
+        $this->psOrderDataRepository->flush();
+
+        return $collection;
     }
 
     /**
      * @param  \Order $order
-     * @param  array  $orderData
+     * @param  array  $orderProducts
      *
-     * @return null|\MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration
-     * @throws \PrestaShopDatabaseException
+     * @return \MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration
      */
-    private function getCustomsDeclaration(Order $order, array $orderData): ?CustomsDeclaration
+    protected function createCustomsDeclaration(Order $order, array $orderProducts): CustomsDeclaration
     {
-        $isToRowCountry          = $this->countryService->isRowCountry(strtoupper($orderData['iso_code']));
-        $customFormConfiguration = Configuration::get(Constant::CUSTOMS_FORM_CONFIGURATION_NAME);
-
-        if (! $isToRowCountry || 'No' === $customFormConfiguration) {
-            return null;
-        }
-
-        $products = OrderLabel::getCustomsOrderProducts($order->id);
-
-        $items = (new Collection($products))
-            ->filter()
-            ->map(function ($product) {
-                $productHsCode = ProductConfigurationProvider::get(
-                    $product['product_id'],
-                    Constant::CUSTOMS_CODE_CONFIGURATION_NAME
-                );
-
-                $productCountryOfOrigin = ProductConfigurationProvider::get(
-                    $product['product_id'],
-                    Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME
-                );
-
-                return new CustomsDeclarationItem([
-                    'amount'         => $product['product_quantity'],
-                    'classification' => (int) ($productHsCode
-                        ?: Configuration::get(
-                            Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME
-                        )),
-                    'country'        => $productCountryOfOrigin ?? Configuration::get(
-                            Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME
-                        ),
-                    'description'    => $product['product_name'],
-                    'itemValue'      => Tools::ps_round($product['unit_price_tax_incl'] * 100),
-                    'weight'         => WeightService::convertToGrams($product['product_weight']),
-                ]);
-            });
-
         return new CustomsDeclaration([
-            'contents' => null,
-            'invoice'  => null,
-            'items'    => $items->toArray(),
-            'weight'   => null,
+            'invoice' => $order->invoice_number,
+            'items'   => array_map(function (array $product) {
+                $pdkProduct = $this->productRepository->getProduct($product['id_product']);
+
+                return CustomsDeclarationItem::fromProduct($pdkProduct, [
+                    'amount'    => $product['product_quantity'] ?? 1,
+                    'itemValue' => [
+                        'amount' => $this->currencyService->convertToCents($product['product_price_wt'] ?? 0),
+                    ],
+                ]);
+            }, array_values($orderProducts)),
         ]);
     }
 
     /**
+     * @param  array $orderProducts
+     *
+     * @return array|array[]
+     */
+    protected function createOrderLines(array $orderProducts): array
+    {
+        return array_map(
+            function (array $product) {
+                return [
+                    'quantity'      => $this->currencyService->convertToCents(
+                        $product['product_quantity'] ?? 0
+                    ),
+                    'price'         => $this->currencyService->convertToCents($product['product_price'] ?? 0),
+                    'priceAfterVat' => $this->currencyService->convertToCents(
+                        $product['product_price_wt'] ?? 0
+                    ),
+                    'product'       => $this->productRepository->getProduct($product['product_id']),
+                ];
+            },
+            array_values($orderProducts)
+        );
+    }
+
+    /**
      * @param  \Order $order
      *
-     * @return \MyParcelNL\Pdk\Plugin\Model\PdkOrder
+     * @return array
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    private function getDataFromOrder(Order $order): PdkOrder
+    protected function getRecipient(Order $order): array
     {
-        $orderData        = OrderLabel::getDataForLabelsCreate((int) $order->id);
-        $deliverySettings = json_decode($orderData['delivery_settings'] ?? '{}', true);
-        $deliveryOptions  = new DeliveryOptions(Arr::except($deliverySettings, 'isPickup'));
+        $address  = new \Address($order->id_address_delivery);
+        $customer = new \Customer($order->id_customer);
+        $country  = new \Country($address->id_country);
 
-        if (! $deliveryOptions->carrier) {
-            $primaryCarrier = (new Collection(Config::get('carriers')))->firstWhere('primary', true);
+        return [
+            'cc'         => $country->iso_code,
+            'city'       => $address->city,
+            'company'    => $address->company,
+            'email'      => $customer->email,
+            'fullStreet' => $address->address1,
+            'person'     => $customer->firstname . ' ' . $customer->lastname,
+            'phone'      => $address->phone,
+            'postalCode' => $address->postcode,
+            'region'     => $country->iso_code === Platform::get('localCountry')
+                ? null
+                : (new \State($address->id_state))->name,
+        ];
+    }
 
-            $deliveryOptions->carrier = $primaryCarrier['name'] ?? null;
-        }
+    /**
+     * @param  \Order $order
+     *
+     * @return \MyParcelNL\Pdk\Shipment\Collection\ShipmentCollection
+     */
+    protected function getShipments(Order $order): ShipmentCollection
+    {
+        $shipments = $this->psOrderShipmentRepository->where('idOrder', $order->id);
 
-        $shipments = [];
+        $shipmentsArray = $shipments->map(function ($shipment) {
+            return array_merge(
+                $shipment->getData(),
+                [
+                    'id'      => $shipment->getIdShipment(),
+                    'orderId' => $shipment->getIdOrder(),
+                ]
+            );
+        })
+            ->toArray();
 
-        //        [
-        //                [
-        //                    'id'                       => null,
-        //                    'orderId'                  => $order->id,
-        ////                    'carrier'                  => $carrier ? ['name' => $carrier] : null,
-        //                    'barcode'                  => null,
-        //                    'isReturn'                 => null,
-        //                    'sender'                   => null,
-        //                    //  'deliveryOptions'          => $orderData,
-        //                    'dropOffPoint'             => null,
-        //                    // 'customsDeclaration'       => [],
-        //                    'physicalProperties'       => [
-        //                        'weight' => WeightService::convertToGrams($order->getTotalWeight()),
-        //                    ],
-        //                    'collectionContact'        => null,
-        //                    'delayed'                  => null,
-        //                    'delivered'                => null,
-        //                    'externalIdentifier'       => null,
-        //                    'linkConsumerPortal'       => null,
-        //                    'multiColloMainShipmentId' => null,
-        //                    'partnerTrackTraces'       => null,
-        //                    'referenceIdentifier'      => "PrestaShop: $order->id",
-        //                    'multiCollo'               => $deliveryOptions->labelAmount > 1,
-        //                ],
-        //            ]
-
-        return new PdkOrder([
-            'externalIdentifier' => $order->id,
-            'recipient'          => [
-                'cc'         => strtoupper($orderData['iso_code']),
-                'city'       => $orderData['city'],
-                'company'    => $orderData['company'],
-                'email'      => $orderData['email'],
-                'fullStreet' => $orderData['full_street'],
-                'person'     => $orderData['person'],
-                'phone'      => $orderData['phone'],
-                'postalCode' => $orderData['postcode'],
-                'region'     => $orderData['state_name'],
-            ],
-            'sender'             => [],
-            'deliveryOptions'    => $deliveryOptions,
-            'shipments'          => $shipments,
-            'customsDeclaration' => $this->getCustomsDeclaration($order, $orderData),
-        ]);
+        return (new ShipmentCollection($shipmentsArray))
+            ->where('deleted', false)
+            ->values();
     }
 }

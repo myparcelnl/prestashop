@@ -4,8 +4,11 @@ namespace MyParcelNL\PrestaShop\Factory\Consignment;
 
 use BadMethodCallException;
 use Configuration;
-use DateTime;
 use Exception;
+use MyParcelNL;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Pdk\Shipment\Service\DeliveryDateService;
 use MyParcelNL\PrestaShop\Adapter\DeliveryOptionsFromOrderAdapter;
 use MyParcelNL\PrestaShop\Carrier\PackageTypeCalculator;
 use MyParcelNL\PrestaShop\Collection\ConsignmentCollection;
@@ -17,18 +20,13 @@ use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
 use MyParcelNL\PrestaShop\Service\CarrierService;
 use MyParcelNL\PrestaShop\Service\Consignment\ConsignmentNormalizer;
-use MyParcelNL\Pdk\Base\Service\CountryService;
 use MyParcelNL\PrestaShop\Service\CountryService;
 use MyParcelNL\PrestaShop\Service\ProductConfigurationProvider;
 use MyParcelNL\PrestaShop\Service\WeightService;
-use MyParcelNL;
-use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory as SdkConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Carrier\CarrierPostNL;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
-use MyParcelNL\Pdk\Shipment\Service\DeliveryDateService;
 use OrderLabel;
 use Tools;
 
@@ -37,13 +35,18 @@ use Tools;
  */
 class ConsignmentFactory
 {
+    public const  FORMAT_TIMESTAMP = 'Y-m-d H:i:s';
     private const MAX_COLLO_WEIGHT_GRAMS = 30000;
-    public const FORMAT_TIMESTAMP        = 'Y-m-d H:i:s';
 
     /**
      * @var array|array[]
      */
     private $carrierSettings;
+
+    /**
+     * @var AbstractConsignment
+     */
+    private $consignment;
 
     /**
      * @var \MyParcelNL\Pdk\Base\Service\CountryService
@@ -56,6 +59,16 @@ class ConsignmentFactory
     private $deliveryOptions;
 
     /**
+     * @var \MyParcelNL
+     */
+    private $module;
+
+    /**
+     * @var array
+     */
+    private $orderData;
+
+    /**
      * @var \MyParcelNL\PrestaShop\Model\Core\Order
      */
     private $orderObject;
@@ -64,21 +77,6 @@ class ConsignmentFactory
      * @var array
      */
     private $request;
-
-    /**
-     * @var \MyParcelNL
-     */
-    private $module;
-
-    /**
-     * @var AbstractConsignment
-     */
-    private $consignment;
-
-    /**
-     * @var array
-     */
-    private $orderData;
 
     /**
      * @param  array $request
@@ -92,7 +90,15 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
+     * @return bool
+     */
+    public static function isConceptFirstConfiguration(): bool
+    {
+        return Configuration::get(Constant::CONCEPT_FIRST);
+    }
+
+    /**
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order             $order
      * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
      *
      * @return \MyParcelNL\PrestaShop\Collection\ConsignmentCollection
@@ -102,7 +108,7 @@ class ConsignmentFactory
      * @throws \Exception
      */
     public function fromOrder(
-        Order                          $order,
+        Order           $order,
         DeliveryOptions $deliveryOptions = null
     ): ConsignmentCollection {
         $this->setOrderData($order, $deliveryOptions);
@@ -119,7 +125,8 @@ class ConsignmentFactory
         if ($extraOptions->getLabelAmount() > 1) {
             $countryService = Pdk::get(CountryService::class);
             $orderIso       = $countryService->getShippingCountryIso2($order);
-            $carrierName    = CarrierService::getMyParcelCarrier($order->getIdCarrier())->getName();
+            $carrierName    = CarrierService::getMyParcelCarrier($order->getIdCarrier())
+                ->getName();
 
             if (
                 CarrierPostNL::NAME === $carrierName
@@ -142,48 +149,32 @@ class ConsignmentFactory
     }
 
     /**
+     * Create a new consignment
+     *
      * @return void
      * @throws \Exception
      */
-    private function setDeliveryOptions(): void
+    private function createConsignment(): void
     {
-        $deliveryOptionsData = json_decode($this->orderData['delivery_settings'] ?? '', true);
-
-        try {
-            // Create new instance from known json
-            $this->deliveryOptions = new DeliveryOptions((array) $deliveryOptionsData);
-        } catch (BadMethodCallException $exception) {
-            $order = $this->orderObject->getId();
-            OrderLogger::info($exception->getMessage(), compact('exception', 'order'));
-
-            // Create new instance from unknown json data
-            $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();
-            $this->deliveryOptions = new DeliveryOptionsFromOrderAdapter($deliveryOptions);
-        }
+        $carrier           = CarrierService::getMyParcelCarrier($this->orderObject->getIdCarrier());
+        $this->consignment = SdkConsignmentFactory::createByCarrierId($carrier->getId());
     }
 
     /**
-     * @throws \Exception
+     * @param  int $productId
+     *
+     * @return string
+     * @throws \PrestaShopDatabaseException
      */
-    private function setBaseData(): void
+    private function getCountryOfOrigin(int $productId): string
     {
-        $floatWeight = $this->orderObject->getTotalWeight();
-        $this->consignment
-            ->setApiKey(Configuration::get(Constant::API_KEY_CONFIGURATION_NAME))
-            ->setReferenceIdentifier((string) $this->orderObject->getId())
-            ->setPackageType($this->getPackageType())
-            ->setDeliveryDate($this->getDeliveryDate())
-            ->setDeliveryType($this->getDeliveryType())
-            ->setLabelDescription($this->getFormattedLabelDescription())
-            ->setTotalWeight(WeightService::convertToGrams($floatWeight));
-    }
+        $productCountryOfOrigin = ProductConfigurationProvider::get(
+            $productId,
+            Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME
+        );
+        $defaultCountryOfOrigin = Configuration::get(Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME);
 
-    /**
-     * @return int
-     */
-    private function getPackageType(): int
-    {
-        return (new PackageTypeCalculator())->convertToId($this->deliveryOptions->getPackageType());
+        return $productCountryOfOrigin ?? $defaultCountryOfOrigin;
     }
 
     /**
@@ -219,6 +210,20 @@ class ConsignmentFactory
     }
 
     /**
+     * @return string
+     */
+    private function getEmailConfiguration(): string
+    {
+        if (ModuleService::isBE()) {
+            return $this->orderData['email'];
+        }
+
+        $emailConfiguration = Configuration::get(Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME);
+
+        return $emailConfiguration ? $this->orderData['email'] : '';
+    }
+
+    /**
      * Get the label description from the Order and check the maximum number of characters.
      *
      * @return string
@@ -235,200 +240,6 @@ class ConsignmentFactory
     }
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Model\Core\Order                                               $order
-     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
-     *
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
-     */
-    private function setOrderData(Order $order, ?DeliveryOptions $deliveryOptions): void
-    {
-        $this->orderObject = $order;
-        $this->orderData   = OrderLabel::getDataForLabelsCreate($order->getId());
-        $carrierSettingsProvider = new CarrierSettingsProvider();
-        $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
-
-        if ($deliveryOptions) {
-            $this->deliveryOptions = $deliveryOptions;
-        } else {
-            $this->setDeliveryOptions();
-        }
-    }
-
-    /**
-     * Gets the recipient and puts its data in the consignment.
-     *
-     * @throws Exception
-     */
-    private function setRecipient(): void
-    {
-        $this->consignment
-            ->setCountry(strtoupper($this->orderData['iso_code']))
-            ->setPerson($this->orderData['person'])
-            ->setCompany($this->orderData['company'])
-            ->setFullStreet($this->orderData['full_street'])
-            ->setPostalCode($this->orderData['postcode'])
-            ->setCity($this->orderData['city'])
-            ->setRegion($this->orderData['state_name'])
-            ->setEmail($this->getEmailConfiguration())
-            ->setPhone($this->getPhoneConfiguration())
-            ->setSaveRecipientAddress(false);
-    }
-
-    /**
-     * @return string
-     */
-    private function getEmailConfiguration(): string
-    {
-        if (ModuleService::isBE()) {
-            return $this->orderData['email'];
-        }
-
-        $emailConfiguration = Configuration::get(Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME);
-
-        return $emailConfiguration ? $this->orderData['email'] : '';
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isConceptFirstConfiguration(): bool
-    {
-        return Configuration::get(Constant::CONCEPT_FIRST);
-    }
-
-    /**
-     * @return string
-     */
-    private function getPhoneConfiguration(): string
-    {
-        $phoneConfiguration = Configuration::get(Constant::SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME);
-
-        return $phoneConfiguration ? $this->orderData['phone'] : '';
-    }
-
-    /**
-     * Set the shipment options.
-     *
-     * @throws Exception
-     */
-    private function setShipmentOptions(): void
-    {
-        $shipmentOptions = $this->deliveryOptions->getShipmentOptions();
-
-        $this->consignment
-            ->setOnlyRecipient($shipmentOptions && true === $shipmentOptions->hasOnlyRecipient())
-            ->setLargeFormat($shipmentOptions && $shipmentOptions->hasLargeFormat())
-            ->setReturn($shipmentOptions && $shipmentOptions->isReturn())
-            ->setSignature($this->hasSignature())
-            ->setInsurance($shipmentOptions ? $shipmentOptions->getInsurance() : null)
-            ->setAgeCheck($shipmentOptions && true === $shipmentOptions->hasAgeCheck())
-            ->setContents(AbstractConsignment::PACKAGE_CONTENTS_COMMERCIAL_GOODS)
-            ->setInvoice($this->orderData['invoice_number']);
-    }
-
-    /**
-     * @return bool
-     */
-    private function hasSignature(): bool
-    {
-        $canHaveSignature = $this->consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE);
-        $isHomeCountry    = $this->consignment->getCountry() === ModuleService::getModuleCountry();
-        $shipmentOptions  = $this->deliveryOptions->getShipmentOptions();
-
-        $hasSignature = $shipmentOptions
-            && $canHaveSignature
-            && $isHomeCountry
-            && $shipmentOptions->hasSignature();
-
-        return $this->consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_PICKUP || $hasSignature;
-    }
-
-    /**
-     * Set the pickup location
-     */
-    private function setPickupLocation(): void
-    {
-        $pickupLocation = $this->deliveryOptions->getPickupLocation();
-
-        if (! $pickupLocation || AbstractConsignment::DELIVERY_TYPE_PICKUP !== $this->getDeliveryType()) {
-            return;
-        }
-
-        $this->consignment->setPickupCountry($pickupLocation->getCountry())
-            ->setPickupCity($pickupLocation->getCity())
-            ->setPickupLocationName($pickupLocation->getLocationName())
-            ->setPickupStreet($pickupLocation->getStreet())
-            ->setPickupNumber($pickupLocation->getNumber())
-            ->setPickupPostalCode($pickupLocation->getPostalCode())
-            ->setRetailNetworkId($pickupLocation->getRetailNetworkId())
-            ->setPickupLocationCode($pickupLocation->getLocationCode());
-    }
-
-    /**
-     * Sets a customs declaration for the consignment if necessary.
-     *
-     * @throws \Exception
-     */
-    private function setCustomsDeclaration(): void
-    {
-        $isToRowCountry          = $this->consignment->isCdCountry();
-        $customFormConfiguration = Configuration::get(Constant::CUSTOMS_FORM_CONFIGURATION_NAME);
-
-        if (! $isToRowCountry || 'No' === $customFormConfiguration) {
-            return;
-        }
-
-        $this->setCustomItems();
-    }
-
-    /**
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
-     * @throws \Exception
-     */
-    private function setCustomItems(): void
-    {
-        $products = OrderLabel::getCustomsOrderProducts($this->orderObject->getId());
-
-        foreach ($products as $product) {
-            if (! $product) {
-                continue;
-            }
-
-            $weight      = WeightService::convertToGrams($product['product_weight']);
-            $description = $product['product_name'];
-            $itemValue   = Tools::ps_round($product['unit_price_tax_incl'] * 100);
-
-            $this->consignment->addItem(
-                (new MyParcelCustomsItem())
-                    ->setDescription($description)
-                    ->setAmount($product['product_quantity'])
-                    ->setWeight($weight)
-                    ->setItemValue($itemValue)
-                    ->setCountry($this->getCountryOfOrigin($product['product_id']))
-                    ->setClassification($this->getHsCode($product['product_id']))
-            );
-        }
-    }
-
-    /**
-     * @param  int $productId
-     *
-     * @return string
-     * @throws \PrestaShopDatabaseException
-     */
-    private function getCountryOfOrigin(int $productId): string
-    {
-        $productCountryOfOrigin = ProductConfigurationProvider::get($productId, Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME);
-        $defaultCountryOfOrigin = Configuration::get(Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME);
-
-        return $productCountryOfOrigin ?? $defaultCountryOfOrigin;
-    }
-
-    /**
      * @param  int $productId
      *
      * @return int
@@ -440,36 +251,6 @@ class ConsignmentFactory
         $defaultHsCode = Configuration::get(Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME);
 
         return (int) ($productHsCode ?: $defaultHsCode);
-    }
-
-    /**
-     * Create a new consignment
-     *
-     * @return void
-     * @throws \Exception
-     */
-    private function createConsignment(): void
-    {
-        $carrier           = CarrierService::getMyParcelCarrier($this->orderObject->getIdCarrier());
-        $this->consignment = SdkConsignmentFactory::createByCarrierId($carrier->getId());
-    }
-
-    /**
-     * @return AbstractConsignment
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     * @throws \Exception
-     */
-    private function initConsignment(): AbstractConsignment
-    {
-        $this->setBaseData();
-        $this->setRecipient();
-        $this->setShipmentOptions();
-        $this->setPickupLocation();
-        $this->setCustomsDeclaration();
-        $this->setTotalWeight();
-
-        return $this->consignment;
     }
 
     /**
@@ -518,6 +299,230 @@ class ConsignmentFactory
         }
 
         return trim($labelDescription);
+    }
+
+    /**
+     * @return int
+     */
+    private function getPackageType(): int
+    {
+        return (new PackageTypeCalculator())->convertToId($this->deliveryOptions->getPackageType());
+    }
+
+    /**
+     * @return string
+     */
+    private function getPhoneConfiguration(): string
+    {
+        $phoneConfiguration = Configuration::get(Constant::SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME);
+
+        return $phoneConfiguration ? $this->orderData['phone'] : '';
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasSignature(): bool
+    {
+        $canHaveSignature = $this->consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_SIGNATURE);
+        $isHomeCountry    = $this->consignment->getCountry() === ModuleService::getModuleCountry();
+        $shipmentOptions  = $this->deliveryOptions->getShipmentOptions();
+
+        $hasSignature = $shipmentOptions
+            && $canHaveSignature
+            && $isHomeCountry
+            && $shipmentOptions->hasSignature();
+
+        return $this->consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_PICKUP || $hasSignature;
+    }
+
+    /**
+     * @return AbstractConsignment
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     * @throws \Exception
+     */
+    private function initConsignment(): AbstractConsignment
+    {
+        $this->setBaseData();
+        $this->setRecipient();
+        $this->setShipmentOptions();
+        $this->setPickupLocation();
+        $this->setCustomsDeclaration();
+        $this->setTotalWeight();
+
+        return $this->consignment;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function setBaseData(): void
+    {
+        $floatWeight = $this->orderObject->getTotalWeight();
+        $this->consignment
+            ->setApiKey(Configuration::get(Constant::API_KEY_CONFIGURATION_NAME))
+            ->setReferenceIdentifier((string) $this->orderObject->getId())
+            ->setPackageType($this->getPackageType())
+            ->setDeliveryDate($this->getDeliveryDate())
+            ->setDeliveryType($this->getDeliveryType())
+            ->setLabelDescription($this->getFormattedLabelDescription())
+            ->setTotalWeight(WeightService::convertToGrams($floatWeight));
+    }
+
+    /**
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     * @throws \Exception
+     */
+    private function setCustomItems(): void
+    {
+        $products = OrderLabel::getCustomsOrderProducts($this->orderObject->getId());
+
+        foreach ($products as $product) {
+            if (! $product) {
+                continue;
+            }
+
+            $weight      = WeightService::convertToGrams($product['product_weight']);
+            $description = $product['product_name'];
+            $itemValue   = Tools::ps_round($product['unit_price_tax_incl'] * 100);
+
+            $this->consignment->addItem(
+                (new MyParcelCustomsItem())
+                    ->setDescription($description)
+                    ->setAmount($product['product_quantity'])
+                    ->setWeight($weight)
+                    ->setItemValue($itemValue)
+                    ->setCountry($this->getCountryOfOrigin($product['product_id']))
+                    ->setClassification($this->getHsCode($product['product_id']))
+            );
+        }
+    }
+
+    /**
+     * Sets a customs declaration for the consignment if necessary.
+     *
+     * @throws \Exception
+     */
+    private function setCustomsDeclaration(): void
+    {
+        $isToRowCountry          = $this->consignment->isCdCountry();
+        $customFormConfiguration = Configuration::get(Constant::CUSTOMS_FORM_CONFIGURATION_NAME);
+
+        if (! $isToRowCountry || 'No' === $customFormConfiguration) {
+            return;
+        }
+
+        $this->setCustomItems();
+    }
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    private function setDeliveryOptions(): void
+    {
+        $deliveryOptionsData = json_decode($this->orderData['delivery_settings'] ?? '', true);
+
+        try {
+            // Create new instance from known json
+            $this->deliveryOptions = new DeliveryOptions((array) $deliveryOptionsData);
+        } catch (BadMethodCallException $exception) {
+            $order = $this->orderObject->getId();
+            OrderLogger::info($exception->getMessage(), compact('exception', 'order'));
+
+            // Create new instance from unknown json data
+            $deliveryOptions       = (new ConsignmentNormalizer((array) $deliveryOptionsData))->normalize();
+            $this->deliveryOptions = new DeliveryOptionsFromOrderAdapter($deliveryOptions);
+        }
+    }
+
+    /**
+     * @param  \MyParcelNL\PrestaShop\Model\Core\Order             $order
+     * @param  null|\MyParcelNL\Pdk\Shipment\Model\DeliveryOptions $deliveryOptions
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    private function setOrderData(Order $order, ?DeliveryOptions $deliveryOptions): void
+    {
+        /** @var \MyParcelNL\PrestaShop\Model\DatabaseShipmentRepository $database */
+        $database = Pdk::get(MyParcelNL\PrestaShop\Model\DatabaseShipmentRepository::class);
+
+        $this->orderObject       = $order;
+        $this->orderData         = $database->getOrdersData($order->getId());
+        $carrierSettingsProvider = new CarrierSettingsProvider();
+        $this->carrierSettings   = $carrierSettingsProvider->provide($order->getIdCarrier());
+
+        if ($deliveryOptions) {
+            $this->deliveryOptions = $deliveryOptions;
+        } else {
+            $this->setDeliveryOptions();
+        }
+    }
+
+    /**
+     * Set the pickup location
+     */
+    private function setPickupLocation(): void
+    {
+        $pickupLocation = $this->deliveryOptions->getPickupLocation();
+
+        if (! $pickupLocation || AbstractConsignment::DELIVERY_TYPE_PICKUP !== $this->getDeliveryType()) {
+            return;
+        }
+
+        $this->consignment->setPickupCountry($pickupLocation->getCountry())
+            ->setPickupCity($pickupLocation->getCity())
+            ->setPickupLocationName($pickupLocation->getLocationName())
+            ->setPickupStreet($pickupLocation->getStreet())
+            ->setPickupNumber($pickupLocation->getNumber())
+            ->setPickupPostalCode($pickupLocation->getPostalCode())
+            ->setRetailNetworkId($pickupLocation->getRetailNetworkId())
+            ->setPickupLocationCode($pickupLocation->getLocationCode());
+    }
+
+    /**
+     * Gets the recipient and puts its data in the consignment.
+     *
+     * @throws Exception
+     */
+    private function setRecipient(): void
+    {
+        $this->consignment
+            ->setCountry(strtoupper($this->orderData['iso_code']))
+            ->setPerson($this->orderData['person'])
+            ->setCompany($this->orderData['company'])
+            ->setFullStreet($this->orderData['full_street'])
+            ->setPostalCode($this->orderData['postcode'])
+            ->setCity($this->orderData['city'])
+            ->setRegion($this->orderData['state_name'])
+            ->setEmail($this->getEmailConfiguration())
+            ->setPhone($this->getPhoneConfiguration())
+            ->setSaveRecipientAddress(false);
+    }
+
+    /**
+     * Set the shipment options.
+     *
+     * @throws Exception
+     */
+    private function setShipmentOptions(): void
+    {
+        $shipmentOptions = $this->deliveryOptions->getShipmentOptions();
+
+        $this->consignment
+            ->setOnlyRecipient($shipmentOptions && true === $shipmentOptions->hasOnlyRecipient())
+            ->setLargeFormat($shipmentOptions && $shipmentOptions->hasLargeFormat())
+            ->setReturn($shipmentOptions && $shipmentOptions->isReturn())
+            ->setSignature($this->hasSignature())
+            ->setInsurance($shipmentOptions ? $shipmentOptions->getInsurance() : null)
+            ->setAgeCheck($shipmentOptions && true === $shipmentOptions->hasAgeCheck())
+            ->setContents(AbstractConsignment::PACKAGE_CONTENTS_COMMERCIAL_GOODS)
+            ->setInvoice($this->orderData['invoice_number']);
     }
 
     /**

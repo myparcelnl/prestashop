@@ -8,10 +8,12 @@ use Carrier;
 use Configuration;
 use Db;
 use DbQuery;
-use MyParcelNL\PrestaShop\Constant;
-use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Constant;
+use MyParcelNL\PrestaShop\Database\Migrations;
+use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Tab;
 use RuntimeException;
@@ -69,9 +71,12 @@ trait HasModuleUninstall
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Throwable
      */
     public function executeUninstall(): bool
     {
+        DefaultLogger::debug('Uninstalling module');
+
         $this->unregisterHooks();
         $this->migrateDown();
         $this->uninstallTabs();
@@ -89,11 +94,17 @@ trait HasModuleUninstall
 
     private function migrateDown(): void
     {
-        foreach ($this->migrations as $migration) {
-            $result = $migration::down();
+        /** @var \MyParcelNL\PrestaShop\Database\Migrations $migrations */
+        $migrations = Pdk::get(Migrations::class);
+
+        foreach ($migrations->get() as $migration) {
+            /** @var \MyParcelNL\PrestaShop\Database\AbstractMigration $class */
+            $class  = Pdk::get($migration);
+            $result = $class->down();
 
             if (! $result) {
-                $this->_errors[] = sprintf("Failed to execute migration: %s", $migration);
+                $this->_errors[] = "Failed to execute migration: $migration";
+                DefaultLogger::error('Failed to execute migration', ['migration' => $migration]);
             }
 
             $this->uninstallSuccess &= $result;
@@ -120,7 +131,8 @@ trait HasModuleUninstall
             $result                   = $carrierInstance->update();
 
             if (! $result) {
-                $this->_errors[] = sprintf("Failed to remove carrier: %s", $carrier->name);
+                $this->_errors[] = "Failed to remove carrier: $carrier->name";
+                DefaultLogger::error('Failed to remove carrier', ['carrier' => $carrier]);
             }
 
             $this->uninstallSuccess &= $result;
@@ -132,11 +144,12 @@ trait HasModuleUninstall
      */
     private function removeConfigurations(): void
     {
-        foreach ($this->configItems as $configItem) {
-            $result = Configuration::deleteByName($configItem);
+        foreach ($this->configItems as $item) {
+            $result = Configuration::deleteByName($item);
 
             if (! $result) {
-                $this->_errors[] = sprintf("Failed to remove configuration: %s", $configItem);
+                $this->_errors[] = "Failed to remove configuration: $item";
+                DefaultLogger::warning('Failed to remove configuration', ['item' => $item]);
             }
 
             $this->uninstallSuccess &= $result;
@@ -154,6 +167,7 @@ trait HasModuleUninstall
         $query->select('id_tab');
         $query->from('tab');
         $query->where(sprintf("module = '%s'", MyParcelNL::MODULE_NAME));
+
         $ids = Db::getInstance(_PS_USE_SQL_SLAVE_)
             ->executeS($query);
 
@@ -162,7 +176,8 @@ trait HasModuleUninstall
             $result = $tab->delete();
 
             if (! $result) {
-                $this->_errors[] = "Failed uninstalling tab $tabId";
+                $this->_errors[] = "Failed uninstalling tab: $tabId";
+                DefaultLogger::error('Failed uninstalling tab', ['tab' => $tabId]);
             }
 
             $this->uninstallSuccess &= $result;
@@ -175,7 +190,8 @@ trait HasModuleUninstall
             $result = $this->unregisterHook($hook);
 
             if (! $result) {
-                DefaultLogger::warning(sprintf("Failed to unregister hook: %s", $hook));
+                $this->_errors[] = "Failed to unregister hook: $hook";
+                DefaultLogger::error('Failed to unregister hook', ['hook' => $hook]);
             }
         }
     }

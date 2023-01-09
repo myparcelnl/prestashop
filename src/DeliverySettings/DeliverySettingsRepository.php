@@ -12,6 +12,9 @@ use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
+/**
+ * @deprecated
+ */
 class DeliverySettingsRepository
 {
     /**
@@ -59,7 +62,7 @@ class DeliverySettingsRepository
      */
     private static function getByCartId(int $cartId): array
     {
-        return Cache::remember("myparcelbe_cart_delivery_settings_$cartId", static function () use ($cartId) {
+        return Cache::remember("myparcelnl_cart_delivery_settings_$cartId", static function () use ($cartId) {
             $query = self::getSelectQuery();
             $query->where("id_cart = $cartId");
 

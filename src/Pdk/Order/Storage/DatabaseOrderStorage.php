@@ -28,12 +28,13 @@ class DatabaseOrderStorage extends AbstractStorage
     {
         $qb = new \DbQuery();
         $qb->select('*');
-        $qb->from(Table::TABLE_ORDER_DATA);
+        $qb->from('orders');
 
         $data = Db::getInstance(_PS_USE_SQL_SLAVE_)
             ->executeS($qb->build());
 
         $order = new PdkOrder();
+
         return $order->fill(Arr::only($order->getAttributes(), $data));
     }
 

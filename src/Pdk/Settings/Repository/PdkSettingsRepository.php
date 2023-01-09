@@ -4,81 +4,72 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
-use MyParcelNL\PrestaShop\Constant;
-use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
-use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
-use MyParcelNL\Pdk\Settings\Model\CustomsSettings;
-use MyParcelNL\Pdk\Settings\Model\GeneralSettings;
-use MyParcelNL\Pdk\Settings\Model\LabelSettings;
-use MyParcelNL\Pdk\Settings\Model\OrderSettings;
-use MyParcelNL\Pdk\Settings\Model\Settings;
+use MyParcelNL\Pdk\Api\Service\ApiServiceInterface;
+use MyParcelNL\Pdk\Settings\Model\AbstractSettingsModel;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
+use MyParcelNL\Pdk\Storage\StorageInterface;
+use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
+use MyParcelNL\Sdk\src\Support\Str;
 
 class PdkSettingsRepository extends AbstractSettingsRepository
 {
+    protected const KEY_CONFIGURATION = ':module_:name';
+
     /**
-     * @return \MyParcelNL\Pdk\Settings\Model\Settings
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
+     * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
      */
-    public function getSettings(): Settings
+    private $configurationService;
+
+    /**
+     * @param  \MyParcelNL\Pdk\Storage\StorageInterface                                   $storage
+     * @param  \MyParcelNL\Pdk\Api\Service\ApiServiceInterface                            $api
+     * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
+     */
+    public function __construct(
+        StorageInterface              $storage,
+        ApiServiceInterface           $api,
+        ConfigurationServiceInterface $configurationService
+    ) {
+        parent::__construct($storage, $api);
+        $this->configurationService = $configurationService;
+    }
+
+    /**
+     * @param  string $name
+     *
+     * @return mixed
+     */
+    public function get(string $name)
     {
-        return new Settings([
-            GeneralSettings::ID  => $this->getGeneralSettings(),
-            OrderSettings::ID    => [],
-            LabelSettings::ID    => [],
-            CustomsSettings::ID  => [],
-            CheckoutSettings::ID => $this->getCheckoutSettings(),
-            CarrierSettings::ID  => [],
+        return $this->retrieve($name, function () use ($name) {
+            return $this->configurationService->get($this->getConfigurationKey($name));
+        });
+    }
+
+    /**
+     * @param  \MyParcelNL\Pdk\Settings\Model\AbstractSettingsModel $settingsModel
+     *
+     * @return void
+     */
+    public function store(AbstractSettingsModel $settingsModel): void
+    {
+        $id = $settingsModel->getId();
+
+        foreach ($settingsModel->getAttributes() as $key => $value) {
+            $this->configurationService->set($this->getConfigurationKey("$id.$key"), $value);
+        }
+    }
+
+    /**
+     * @param  string $name
+     *
+     * @return string
+     */
+    protected function getConfigurationKey(string $name): string
+    {
+        return strtr(self::KEY_CONFIGURATION, [
+            ':module' => \MyParcelNL::MODULE_NAME,
+            ':name'   => Str::snake(str_replace('.', '_', $name)),
         ]);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getCheckoutSettings(): array
-    {
-        return [
-            CheckoutSettings::PRICE_TYPE               => \Configuration::get(
-                Constant::DELIVERY_OPTIONS_PRICE_FORMAT_CONFIGURATION_NAME
-            ),
-            CheckoutSettings::SHOW_DELIVERY_DAY        => true,
-            CheckoutSettings::STRING_ADDRESS_NOT_FOUND => '',
-            CheckoutSettings::STRING_CITY              => '',
-            CheckoutSettings::STRING_COUNTRY           => '',
-            CheckoutSettings::STRING_DELIVERY          => '',
-            CheckoutSettings::STRING_DISCOUNT          => '',
-            CheckoutSettings::STRING_EVENING_DELIVERY  => '',
-            CheckoutSettings::STRING_FROM              => '',
-            CheckoutSettings::STRING_HOUSE_NUMBER      => '',
-            CheckoutSettings::STRING_LOAD_MORE         => '',
-            CheckoutSettings::STRING_MORNING_DELIVERY  => '',
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getGeneralSettings(): array
-    {
-        return [
-            GeneralSettings::API_KEY                    => \Configuration::get(Constant::API_KEY_CONFIGURATION_NAME),
-            GeneralSettings::API_LOGGING                => \Configuration::get(
-                Constant::API_LOGGING_CONFIGURATION_NAME
-            ),
-            GeneralSettings::BARCODE_IN_NOTE            => false,
-            GeneralSettings::CONCEPT_SHIPMENTS          => \Configuration::get(Constant::CONCEPT_FIRST),
-            GeneralSettings::ORDER_MODE                 => false,
-            GeneralSettings::PROCESS_DIRECTLY           => false,
-            GeneralSettings::SHARE_CUSTOMER_INFORMATION => \Configuration::get(
-                Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME
-            ),
-            GeneralSettings::TRACK_TRACE_IN_ACCOUNT     => false,
-            GeneralSettings::TRACK_TRACE_IN_EMAIL       => false,
-        ];
-    }
-
-    public function store(Settings $settings): void
-    {
-        // TODO: Implement store() method.
     }
 }

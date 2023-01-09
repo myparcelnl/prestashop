@@ -3,24 +3,19 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\PrestaShop\Boot;
-use MyParcelNL\PrestaShop\Database\CreateCarrierConfigurationTableMigration;
-use MyParcelNL\PrestaShop\Database\CreateDeliverySettingTableMigration;
-use MyParcelNL\PrestaShop\Database\CreateOrderLabelTableMigration;
-use MyParcelNL\PrestaShop\Database\CreateProductConfigurationTableMigration;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleInstall;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleUninstall;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\PrestaShop\Module\Hooks\CarrierHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\DisplayAdminProductsExtra;
-use MyParcelNL\PrestaShop\Module\Hooks\DisplayBackOfficeHeader;
-use MyParcelNL\PrestaShop\Module\Hooks\FrontHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\HasFrontendHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\LegacyOrderPageHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\OrderHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\OrdersGridHooks;
 use MyParcelNL\PrestaShop\Module\Tools\Tools;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
 use PrestaShopBundle\Exception\InvalidModuleException;
 
 defined('_PS_VERSION_') or exit();
@@ -31,8 +26,7 @@ class MyParcelNL extends CarrierModule
 {
     use CarrierHooks;
     use DisplayAdminProductsExtra;
-    use DisplayBackOfficeHeader;
-    use FrontHooks;
+    use HasFrontendHooks;
     use LegacyOrderPageHooks;
     use OrderHooks;
     use OrdersGridHooks;
@@ -42,7 +36,11 @@ class MyParcelNL extends CarrierModule
 
     use HasPdkRenderHooks;
 
-    public const MODULE_NAME = 'myparcelnl';
+    public const MODULE_NAME        = 'myparcelnl';
+    /**
+     * @deprecated
+     */
+    public const TRANSLATION_DOMAIN = 'Modules.MyParcelNL.Admin';
 
     public $baseUrl;
 
@@ -52,14 +50,9 @@ class MyParcelNL extends CarrierModule
     public $id_carrier;
 
     /**
-     * @var class-string<\MyParcelNL\PrestaShop\Database\Migration>[]
+     * @var int
      */
-    public $migrations = [
-        CreateProductConfigurationTableMigration::class,
-        CreateCarrierConfigurationTableMigration::class,
-        CreateOrderLabelTableMigration::class,
-        CreateDeliverySettingTableMigration::class,
-    ];
+    private $installSuccess = 1;
 
     /**
      * @throws \Throwable
@@ -70,19 +63,20 @@ class MyParcelNL extends CarrierModule
         $this->tab                    = 'shipping_logistics';
         $this->version                = $this->getVersionFromComposer();
         $this->author                 = 'MyParcel';
+        $this->author_uri             = 'https://myparcel.nl';
         $this->need_instance          = 1;
         $this->bootstrap              = true;
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
+        $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => _PS_VERSION_];
+        $this->displayName            = $this->l('prestashop_module_name');
+        $this->description            = $this->l('prestashop_module_description');
 
         parent::__construct();
-        $this->setupPdk();
 
         if (! empty(Context::getContext()->employee->id)) {
             $this->baseUrl = $this->getBaseUrl();
         }
 
-        $this->displayName = $this->l('Myparcelnl');
-        $this->description = $this->l('PrestaShop module which integrates with MyParcel NL');
+        $this->setupPdk();
     }
 
     /**
@@ -123,14 +117,6 @@ class MyParcelNL extends CarrierModule
     }
 
     /**
-     * @return string
-     */
-    public function getContent(): string
-    {
-        return ModuleService::getContent();
-    }
-
-    /**
      * @param  \Cart $params
      * @param  \int  $shipping_cost
      *
@@ -152,32 +138,10 @@ class MyParcelNL extends CarrierModule
     }
 
     /**
-     * @param $carrierId
-     * @param $address
-     *
-     * @return array
-     */
-    public function getShippingOptions($carrierId, $address): array
-    {
-        $carrier = new Carrier($carrierId);
-
-        $taxRate = ($carrier->getTaxesRate($address) / 100) + 1;
-
-        $includeTax      = ! Product::getTaxCalculationMethod((int) $this->context->cart->id_customer)
-            && (int) Configuration::get('PS_TAX');
-        $displayTaxLabel = (Configuration::get('PS_TAX') && ! Configuration::get('AEUC_LABEL_TAX_INC_EXC'));
-
-        return [
-            'tax_rate'          => ($includeTax) ? $taxRate : 1,
-            'include_tax'       => $includeTax,
-            'display_tax_label' => $displayTaxLabel,
-        ];
-    }
-
-    /**
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Throwable
      */
     public function install(): bool
     {
@@ -185,9 +149,19 @@ class MyParcelNL extends CarrierModule
     }
 
     /**
+     * @return void
+     * @throws \Throwable
+     */
+    public function setupPdk(): void
+    {
+        Boot::setupPdk($this);
+    }
+
+    /**
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Throwable
      */
     public function uninstall(): bool
     {
@@ -216,14 +190,5 @@ class MyParcelNL extends CarrierModule
         $composerData = json_decode(file_get_contents($filename), true);
 
         return $composerData['version'];
-    }
-
-    /**
-     * @return void
-     * @throws \Throwable
-     */
-    private function setupPdk(): void
-    {
-        Boot::setupPdk($this);
     }
 }

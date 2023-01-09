@@ -6,6 +6,9 @@ use MyParcelNL\PrestaShop\Module\Carrier\Provider\CarrierSettingsProvider;
 use Order;
 use OrderLabel;
 
+/**
+ * @deprecated
+ */
 class OrderLabelProvider
 {
     /**

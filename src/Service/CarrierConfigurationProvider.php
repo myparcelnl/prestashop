@@ -7,6 +7,9 @@ use MyParcelNL\Sdk\src\Support\Collection;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
 use PrestaShop\PrestaShop\Adapter\Entity\DbQuery;
 
+/**
+ * @deprecated
+ */
 class CarrierConfigurationProvider
 {
     public const COLUMN_ID_CARRIER = 'id_carrier';

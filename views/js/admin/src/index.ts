@@ -1,48 +1,90 @@
-import './assets/css/myparceladmin.css';
-import * as COMPONENTS from '@myparcel-pdk/frontend-components';
-import {ModalKey, createPdkFrontend, useModalStore} from '@myparcel/pdk-frontend';
-import PsAlert from '@/components/pdk/PsAlert.vue';
-import PsButton from '@/components/pdk/PsButton.vue';
-import PsCard from '@/components/pdk/PsCard.vue';
-import PsCheckbox from '@/components/pdk/PsCheckbox.vue';
-import PsDropdownButton from '@/components/pdk/PsDropdownButton.vue';
-import PsDropdownButtonItem from '@/components/pdk/PsDropdownButtonItem.vue';
-import PsInput from '@/components/pdk/PsInput.vue';
-import PsRadio from '@/components/pdk/PsRadio.vue';
-import PsSelect from '@/components/pdk/PsSelect.vue';
+import {
+  DefaultButton,
+  DefaultButtonGroup,
+  DefaultCard,
+  DefaultCheckboxInput,
+  DefaultCol,
+  DefaultCurrencyInput,
+  DefaultDropdownButton,
+  DefaultFormGroup,
+  DefaultImage,
+  DefaultLink,
+  DefaultModal,
+  DefaultMultiCheckbox,
+  DefaultMultiRadio,
+  DefaultNotification,
+  DefaultNumberInput,
+  DefaultPluginSettingsWrapper,
+  DefaultRadioInput,
+  DefaultRow,
+  DefaultSelectInput,
+  DefaultTable,
+  DefaultTableCol,
+  DefaultTableRow,
+  DefaultTextInput,
+  DefaultToggleInput,
+} from '@myparcel/pdk-components';
+import {LogLevel, createPdkFrontend} from '@myparcel/pdk-frontend';
+import {PsIcon} from './components';
 
 createPdkFrontend({
-  components: {
-    PdkAccordion: COMPONENTS.DefaultPdkAccordion,
-    PdkAlert: PsAlert,
-    PdkButton: PsButton,
-    PdkCard: PsCard,
-    PdkCheckbox: PsCheckbox,
-    PdkDropdownButton: PsDropdownButton,
-    PdkDropdownButtonItem: PsDropdownButtonItem,
-    PdkFormGroup: COMPONENTS.DefaultPdkFormGroup,
-    PdkIcon: COMPONENTS.DefaultPdkIcon,
-    PdkInput: PsInput,
-    PdkModal: COMPONENTS.DefaultPdkModal,
-    PdkMultiCheckbox: COMPONENTS.DefaultPdkMultiCheckbox,
-    PdkRadio: PsRadio,
-    PdkSelect: PsSelect,
-    PdkTable: COMPONENTS.DefaultPdkTable,
-    PdkTableCol: COMPONENTS.DefaultPdkTableCol,
-    PdkTableRow: COMPONENTS.DefaultPdkTableRow,
+  // ...defaultBootstrap4Config,
+  logLevel: LogLevel.DEBUG,
+  transitions: {
+    labelCard: 'fade',
+    notification: 'fade',
+    shipmentRow: 'fade',
   },
 
-  onCreateStore: () => {
-    const modalStore = useModalStore();
+  formConfig: {
+    formClass: 'form-horizontal',
+  },
 
-    modalStore.$patch({
-      onOpen: (modal: ModalKey) => {
-        jQuery(`#${modal}`).modal('show');
-      },
+  components: {
+    PdkButton: DefaultButton,
+    PdkButtonGroup: DefaultButtonGroup,
+    PdkCard: DefaultCard,
+    PdkCheckboxInput: DefaultCheckboxInput,
+    PdkCol: DefaultCol,
+    PdkCurrencyInput: DefaultCurrencyInput,
+    PdkDropdownButton: DefaultDropdownButton,
+    PdkFormGroup: DefaultFormGroup,
+    PdkImage: DefaultImage,
+    PdkLink: DefaultLink,
+    PdkModal: DefaultModal,
+    PdkMultiCheckbox: DefaultMultiCheckbox,
+    PdkMultiRadio: DefaultMultiRadio,
+    PdkNotification: DefaultNotification,
+    PdkNumberInput: DefaultNumberInput,
+    PdkPluginSettingsWrapper: DefaultPluginSettingsWrapper,
+    PdkRadioInput: DefaultRadioInput,
+    PdkRow: DefaultRow,
+    PdkSelectInput: DefaultSelectInput,
+    PdkTable: DefaultTable,
+    PdkTableCol: DefaultTableCol,
+    PdkTableRow: DefaultTableRow,
+    PdkTextInput: DefaultTextInput,
+    PdkToggleInput: DefaultToggleInput,
+    // ...bootstrap4Components,
+    // PdkSelectInput: PsSelectInput,
+    // PdkTextInput: PsTextInput,
+    // PdkToggleInput: PsToggleInput,
+    //
+    // PdkCheckbox: PsCheckbox,
+    // PdkFormGroup: PsFormGroup,
+    // PdkRadio: PsRadio,
+    // PdkToggle: PsToggleInput,
+    //
+    // PdkButton: PsButton,
+    // PdkDropdownButton: PsDropdownButton,
+    //
+    // PdkPluginSettingsWrapper: PsPluginSettingsWrapper,
+    // PdkAlert: PsAlert,
+    // PdkCard: PsCard,
+    // PdkImage: PsImage,
+    // PdkModal: PsModal,
+    // PdkTable: PsTable,
 
-      onClose: (modal: ModalKey) => {
-        jQuery(`#${modal}`).modal('hide');
-      },
-    });
+    PdkIcon: PsIcon,
   },
 });
