@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.0](https://github.com/myparcelnl/prestashop/compare/v1.7.2...v1.8.0) (2023-02-06)
+
+
+### :bug: Bug Fixes
+
+* allow upgrade from 1.3.0 without errors ([#211](https://github.com/myparcelnl/prestashop/issues/211)) ([fbfaef6](https://github.com/myparcelnl/prestashop/commit/fbfaef606110ce5fa27d25d494694e9c83b964f0))
+* fix actions on cards and modals ([#208](https://github.com/myparcelnl/prestashop/issues/208)) ([0e9de9c](https://github.com/myparcelnl/prestashop/commit/0e9de9c3a8a39fd8b2bca88ae24ca1d26d443bef))
+
+
+### :sparkles: New Features
+
+* add insurance options for eu shipments ([#206](https://github.com/myparcelnl/prestashop/issues/206)) ([e934728](https://github.com/myparcelnl/prestashop/commit/e934728f09272dd880562269f3db86ecbd70896b))
+
 ### [1.7.2](https://github.com/myparcelnl/prestashop/compare/v1.7.1...v1.7.2) (2022-12-06)
 
 
