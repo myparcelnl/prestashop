@@ -7,7 +7,7 @@
 function createBuildTask(gulp, plugins, moduleName) {
   return gulp.series(
     `transfer:${moduleName}`,
-    `composer:update:${moduleName}`,
+    `composer:install:${moduleName}`,
   );
 }
 

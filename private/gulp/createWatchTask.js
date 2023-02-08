@@ -11,7 +11,7 @@ function createWatchTask(gulp) {
     // When files are modified, just transfer them.
     gulp.watch(sourceFiles, {events: ['change']}, gulp.series('transfer'));
 
-    // When files are added or deleted, transfer the files and run composer update.
+    // When files are added or deleted, transfer the files and run composer install.
     gulp.watch(sourceFiles, {events: ['add', 'unlink']}, gulp.series('build'));
   };
 

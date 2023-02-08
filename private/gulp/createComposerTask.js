@@ -11,10 +11,10 @@ const ci = require('ci-info');
 function createComposerTask(gulp, plugins, moduleName) {
   return (callback) => {
     const cwd = path.resolve(`dist/${moduleName}`);
-    let command = `docker compose run --rm -it -v ${cwd}:/var/www/html web composer update --no-dev`;
+    let command = `docker run --rm --volume ${cwd}:/app ghcr.io/myparcelnl/php-xd:7.4 composer install --no-dev`;
 
     if (ci.isCI) {
-      command = 'composer update --no-dev';
+      command = 'composer install --no-dev';
     }
 
     execute(command, {cwd}, callback);

@@ -57,7 +57,7 @@ modules.forEach((moduleName) => {
   gulp.task(`copy:${moduleName}`, createCopyTask(gulp, plugins, moduleName));
   gulp.task(`transform:${moduleName}`, createTransformTask(gulp, plugins, moduleName));
   gulp.task(`transfer:${moduleName}`, createTransferTask(gulp, plugins, moduleName));
-  gulp.task(`composer:update:${moduleName}`, createComposerTask(gulp, plugins, moduleName));
+  gulp.task(`composer:install:${moduleName}`, createComposerTask(gulp, plugins, moduleName));
   gulp.task(`build:${moduleName}`, createBuildTask(gulp, plugins, moduleName));
   gulp.task(`zip:${moduleName}`, createZipTask(gulp, plugins, moduleName));
 });
@@ -66,7 +66,7 @@ createTasksForAllModules(gulp, 'build');
 createTasksForAllModules(gulp, 'transform');
 createTasksForAllModules(gulp, 'copy');
 createTasksForAllModules(gulp, 'transfer');
-createTasksForAllModules(gulp, 'composer:update');
+createTasksForAllModules(gulp, 'composer:install');
 createTasksForAllModules(gulp, 'zip');
 
 const defaultTask = createDefaultTask(gulp);
