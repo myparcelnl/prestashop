@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.8.1](https://github.com/myparcelnl/prestashop/compare/v1.8.0...v1.8.1) (2023-02-08)
+
+
+### :bug: Bug Fixes
+
+* fix fatal error in weight service ([3b0eb49](https://github.com/myparcelnl/prestashop/commit/3b0eb498bdf6f4e92c4d74be73af1ffc3134f8ab)), closes [#209](https://github.com/myparcelnl/prestashop/issues/209)
+
 ## [1.8.0](https://github.com/myparcelnl/prestashop/compare/v1.7.2...v1.8.0) (2023-02-06)
 
 
