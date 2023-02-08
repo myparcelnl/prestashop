@@ -48,5 +48,6 @@
   },
   "optionalDependencies": {
     "@myparcel/eslint-config": "^3.4.2"
-  }
+  },
+  "packageManager": "yarn@3.4.1"
 }
