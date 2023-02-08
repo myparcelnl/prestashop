@@ -15,7 +15,7 @@ class WeightService extends PdkWeightService
      *
      * @return int
      */
-    public static function convertToGrams($weight, string $unit = ''): int
+    public function convertToGrams($weight, string $unit = ''): int
     {
         return parent::convertToGrams($weight, strtolower(Configuration::get('PS_WEIGHT_UNIT')));
     }
