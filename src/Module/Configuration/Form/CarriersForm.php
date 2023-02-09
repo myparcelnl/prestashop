@@ -502,6 +502,27 @@ class CarriersForm extends AbstractForm
                 'class'   => 'col-lg-2',
             ];
 
+            $fields[] = [
+                'tab'     => $tabId,
+                'type'    => 'select',
+                'label'   => $this->module->l('Max insured amount for Belgium', 'carriers'),
+                'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_BE,
+                'options' => [
+                    'query' => array_map(
+                        static function ($value) use ($currency) {
+                            return [
+                                'value' => $value,
+                                'label' => $currency->getSign() . ' ' . $value,
+                            ];
+                        },
+                        $insurancePossibilities
+                    ),
+                    'id'    => 'value',
+                    'name'  => 'label',
+                ],
+                'class'   => 'col-lg-2',
+            ];
+
             $insurancePossibilitiesEU = $this->getInsurancePossibilities($myParcelCarrier, 'EU');
             $fields[]                 = [
                 'tab'     => $tabId,
@@ -523,32 +544,6 @@ class CarriersForm extends AbstractForm
                 ],
                 'class'   => 'col-lg-2',
             ];
-
-            if (! $prefix && $this->module->isNL()) {
-                $fields[] = [
-                    'tab'     => $tabId,
-                    'type'    => 'switch',
-                    'is_bool' => true,
-                    'values'  => [
-                        [
-                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_on',
-                            'value' => 1,
-                            'label' => $this->module->l('Yes', 'carriers'),
-                        ],
-                        [
-                            'id'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM . '_off',
-                            'value' => 0,
-                            'label' => $this->module->l('No', 'carriers'),
-                        ],
-                    ],
-                    'label'   => $this->module->l('Insure towards Belgium', 'carriers'),
-                    'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_BELGIUM,
-                    'desc'    => $this->module->l(
-                        'When this setting is "on", packages from NL to BE will be insured for a maximum of € 500.',
-                        'carriers'
-                    ),
-                ];
-            }
         }
 
         return $fields;
@@ -1281,9 +1276,9 @@ SQL
         $helper->table             = 'carrier';
         $helper->token             = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex      = AdminController::$currentIndex . '&configure=' . $this->module->name . '&menu=' . Tools::getValue(
-            'menu',
-            0
-        );
+                'menu',
+                0
+            );
         $helper->colorOnBackground = true;
         $helper->no_link           = true;
 
