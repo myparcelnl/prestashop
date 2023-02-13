@@ -502,26 +502,28 @@ class CarriersForm extends AbstractForm
                 'class'   => 'col-lg-2',
             ];
 
-            $fields[] = [
-                'tab'     => $tabId,
-                'type'    => 'select',
-                'label'   => $this->module->l('Max insured amount for Belgium', 'carriers'),
-                'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_BE,
-                'options' => [
-                    'query' => array_map(
-                        static function ($value) use ($currency) {
-                            return [
-                                'value' => $value,
-                                'label' => $currency->getSign() . ' ' . $value,
-                            ];
-                        },
-                        $insurancePossibilities
-                    ),
-                    'id'    => 'value',
-                    'name'  => 'label',
-                ],
-                'class'   => 'col-lg-2',
-            ];
+            if ($this->module->isNL() && CarrierPostNL::NAME === $myParcelCarrier->getName()) {
+                $fields[] = [
+                    'tab'     => $tabId,
+                    'type'    => 'select',
+                    'label'   => $this->module->l('Max insured amount for Belgium', 'carriers'),
+                    'name'    => $prefix . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_BE,
+                    'options' => [
+                        'query' => array_map(
+                            static function ($value) use ($currency) {
+                                return [
+                                    'value' => $value,
+                                    'label' => $currency->getSign() . ' ' . $value,
+                                ];
+                            },
+                            $insurancePossibilities
+                        ),
+                        'id'    => 'value',
+                        'name'  => 'label',
+                    ],
+                    'class'   => 'col-lg-2',
+                ];
+            }
 
             $insurancePossibilitiesEU = $this->getInsurancePossibilities($myParcelCarrier, 'EU');
             $fields[]                 = [

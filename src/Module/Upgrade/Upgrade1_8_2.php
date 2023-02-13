@@ -17,6 +17,10 @@ class Upgrade1_8_2 extends AbstractUpgrade
      */
     public function upgrade(): void
     {
+        if ($this->module->isBE()) {
+            return;
+        }
+
         $this->addInsuranceOptionsBeForCarriers();
     }
 
