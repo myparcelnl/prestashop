@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.8.2](https://github.com/myparcelnl/prestashop/compare/v1.8.1...v1.8.2) (2023-02-27)
+
+
+### :bug: Bug Fixes
+
+* fix opening pdf in new window ([#216](https://github.com/myparcelnl/prestashop/issues/216)) ([f28a95f](https://github.com/myparcelnl/prestashop/commit/f28a95f610f0b9da90ff03c3ca9b2b5974e15d09)), closes [#213](https://github.com/myparcelnl/prestashop/issues/213)
+
 ### [1.8.1](https://github.com/myparcelnl/prestashop/compare/v1.8.0...v1.8.1) (2023-02-08)
 
 
