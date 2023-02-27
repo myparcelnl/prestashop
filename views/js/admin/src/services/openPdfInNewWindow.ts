@@ -4,8 +4,8 @@ import { usePdfWindow } from '@/composables/usePdfWindow';
  * Creates a new window from given base64 encoded pdf string.
  */
 export function openPdfInNewWindow(pdf: string): void {
-  const buffer = Buffer.from(pdf, 'base64');
-  const byteArray = new Uint8Array(buffer);
+  const byteArray = Uint8Array.from(atob(pdf), (element) => element.charCodeAt(0));
+
   const file = new Blob([byteArray], { type: 'application/pdf;base64' });
   const fileURL = URL.createObjectURL(file);
 
