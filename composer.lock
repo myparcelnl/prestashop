@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7b4a7b002f158cc90eb260ec16bfb5d",
+    "content-hash": "9eeacc87de4605818c8e9a7526a44cad",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -138,16 +138,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "1.31.0",
+            "version": "1.34.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "73e23daaf5b1748d23291dba6c58a94f6bb9d207"
+                "url": "git@github.com:myparcelnl/pdk.git",
+                "reference": "d03e120d93f19f2aeef35dd659a1df26a4635c54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/73e23daaf5b1748d23291dba6c58a94f6bb9d207",
-                "reference": "73e23daaf5b1748d23291dba6c58a94f6bb9d207",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/d03e120d93f19f2aeef35dd659a1df26a4635c54",
+                "reference": "d03e120d93f19f2aeef35dd659a1df26a4635c54",
                 "shasum": ""
             },
             "require": {
@@ -182,24 +182,20 @@
             ],
             "description": "MyParcel Plugin Development Kit",
             "homepage": "https://myparcel.nl",
-            "support": {
-                "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v1.31.0"
-            },
-            "time": "2022-12-22T08:28:49+00:00"
+            "time": "2023-01-27T10:26:45+00:00"
         },
         {
             "name": "myparcelnl/sdk",
-            "version": "7.6.1",
+            "version": "7.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/sdk.git",
-                "reference": "2cace877d79f253ec320563fb68fb5e733cb76e9"
+                "reference": "1f0445d87d3ef6538d51cd93e466a6ad28c8dda2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/2cace877d79f253ec320563fb68fb5e733cb76e9",
-                "reference": "2cace877d79f253ec320563fb68fb5e733cb76e9",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/1f0445d87d3ef6538d51cd93e466a6ad28c8dda2",
+                "reference": "1f0445d87d3ef6538d51cd93e466a6ad28c8dda2",
                 "shasum": ""
             },
             "require": {
@@ -248,9 +244,9 @@
             ],
             "support": {
                 "issues": "https://github.com/myparcelnl/sdk/issues",
-                "source": "https://github.com/myparcelnl/sdk/tree/v7.6.1"
+                "source": "https://github.com/myparcelnl/sdk/tree/v7.6.2"
             },
-            "time": "2023-01-02T12:28:21+00:00"
+            "time": "2023-02-20T09:15:26+00:00"
         },
         {
             "name": "php-di/invoker",
@@ -1201,16 +1197,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.14.3",
+            "version": "v3.14.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "b418036b95b4936a33fe906245d3044395935e73"
+                "reference": "1b3d9dba63d93b8a202c31e824748218781eae6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/b418036b95b4936a33fe906245d3044395935e73",
-                "reference": "b418036b95b4936a33fe906245d3044395935e73",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/1b3d9dba63d93b8a202c31e824748218781eae6b",
+                "reference": "1b3d9dba63d93b8a202c31e824748218781eae6b",
                 "shasum": ""
             },
             "require": {
@@ -1221,7 +1217,7 @@
                 "ext-json": "*",
                 "ext-tokenizer": "*",
                 "php": "^7.4 || ^8.0",
-                "sebastian/diff": "^4.0",
+                "sebastian/diff": "^4.0 || ^5.0",
                 "symfony/console": "^5.4 || ^6.0",
                 "symfony/event-dispatcher": "^5.4 || ^6.0",
                 "symfony/filesystem": "^5.4 || ^6.0",
@@ -1279,7 +1275,7 @@
             "description": "A tool to automatically fix PHP code style",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.14.3"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.14.4"
             },
             "funding": [
                 {
@@ -1287,7 +1283,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-01-30T00:24:29+00:00"
+            "time": "2023-02-09T21:49:13+00:00"
         },
         {
             "name": "psr/cache",
