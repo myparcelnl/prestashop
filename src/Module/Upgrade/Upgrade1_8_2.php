@@ -6,6 +6,7 @@ namespace Gett\MyparcelBE\Module\Upgrade;
 
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
+use MyParcelBE;
 use MyParcelNL\Sdk\src\Support\Collection;
 
 class Upgrade1_8_2 extends AbstractUpgrade
@@ -17,7 +18,7 @@ class Upgrade1_8_2 extends AbstractUpgrade
      */
     public function upgrade(): void
     {
-        if ($this->module->isBE()) {
+        if (MyParcelBE::getModule()->isBE()) {
             return;
         }
 
