@@ -9,7 +9,7 @@
   "require": {
     "php": ">=7.2.0",
     "myparcelnl/pdk": "~1.34.0",
-    "myparcelnl/sdk": "~7.6.1"
+    "myparcelnl/sdk": "~7.7.2"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0"
