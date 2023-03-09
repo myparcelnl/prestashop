@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
 use MyParcelNL\Pdk\Api\Service\ApiServiceInterface;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\AbstractSettingsModel;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\StorageInterface;
@@ -67,8 +68,10 @@ class PdkSettingsRepository extends AbstractSettingsRepository
      */
     protected function getConfigurationKey(string $name): string
     {
+        $appInfo = Pdk::getAppInfo();
+
         return strtr(self::KEY_CONFIGURATION, [
-            ':module' => \MyParcelNL::MODULE_NAME,
+            ':module' => $appInfo->name,
             ':name'   => Str::snake(str_replace('.', '_', $name)),
         ]);
     }

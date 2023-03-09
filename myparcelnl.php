@@ -24,28 +24,35 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 class MyParcelNL extends CarrierModule
 {
-    use CarrierHooks;
-    use DisplayAdminProductsExtra;
-    use HasFrontendHooks;
-    use LegacyOrderPageHooks;
-    use OrderHooks;
-    use OrdersGridHooks;
+//    use CarrierHooks;
+//    use DisplayAdminProductsExtra;
+//    use HasFrontendHooks;
+//    use LegacyOrderPageHooks;
+//    use OrderHooks;
+//    use OrdersGridHooks;
 
-    use HasModuleInstall;
-    use HasModuleUninstall;
+//    use HasModuleInstall;
+//    use HasModuleUninstall;
 
     use HasPdkRenderHooks;
 
+    /**
+     * @deprecated
+     */
     public const MODULE_NAME        = 'myparcelnl';
     /**
      * @deprecated
      */
     public const TRANSLATION_DOMAIN = 'Modules.MyParcelNL.Admin';
 
+    /**
+     * * @deprecated
+     */
     public $baseUrl;
 
     /**
      * @var int
+     * @deprecated
      */
     public $id_carrier;
 
