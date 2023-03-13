@@ -12,9 +12,9 @@ use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Storage\StorageInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\PrestaShop\Module\Tools\Tools;
-use MyParcelNL\PrestaShop\Service\WeightService;
+use MyParcelNL\PrestaShop\Service\PsWeightService;
 
-class ProductRepository extends AbstractProductRepository
+class PdkProductRepository extends AbstractProductRepository
 {
     /**
      * @var \Doctrine\ORM\EntityRepository
@@ -22,15 +22,15 @@ class ProductRepository extends AbstractProductRepository
     private $psProductRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Service\WeightService
+     * @var \MyParcelNL\PrestaShop\Service\PsWeightService
      */
     private $weightService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\StorageInterface     $storage
-     * @param  \MyParcelNL\PrestaShop\Service\WeightService $weightService
+     * @param  \MyParcelNL\Pdk\Storage\StorageInterface       $storage
+     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService $weightService
      */
-    public function __construct(StorageInterface $storage, WeightService $weightService)
+    public function __construct(StorageInterface $storage, PsWeightService $weightService)
     {
         parent::__construct($storage);
         $this->weightService = $weightService;
@@ -89,13 +89,8 @@ class ProductRepository extends AbstractProductRepository
         return (new PdkProductCollection($products));
     }
 
-    /**
-     * @param  \MyParcelNL\Pdk\Plugin\Model\PdkProduct $product
-     *
-     * @return void
-     */
-    public function store(PdkProduct $product): void
+    public function update(PdkProduct $product): void
     {
-        // TODO: Implement store() method.
+        // TODO: Implement update() method.
     }
 }

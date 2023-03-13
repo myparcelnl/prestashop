@@ -17,13 +17,12 @@ class LanguageService extends AbstractLanguageService
      *
      * @return string
      */
-    public function getFilePath(?string $language = null): string
+    protected function getFilePath(?string $language = null): string
     {
+        $appInfo    = Pdk::getAppInfo();
         $language   = $language ?? $this->getLanguage();
-        $modulePath = MyParcelNL::getModule()
-            ->getLocalPath();
 
-        return sprintf("%sconfig/pdk/translations/%s.json", $modulePath, $language);
+        return sprintf("%sconfig/pdk/translations/%s.json", $appInfo['path'], $language);
     }
 
     /**

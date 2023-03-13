@@ -8,7 +8,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\RenderService;
 use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
-use MyParcelNL\PrestaShop\Pdk\Product\Repository\ProductRepository;
+use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 use Throwable;
@@ -114,8 +114,8 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminProductsExtra(array $params): string
     {
-        /** @var \MyParcelNL\PrestaShop\Pdk\Product\Repository\ProductRepository $repository */
-        $repository = Pdk::get(ProductRepository::class);
+        /** @var \MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository $repository */
+        $repository = Pdk::get(PdkProductRepository::class);
         $product    = $repository->getProduct($params['id_product']);
 
         return RenderService::renderProductSettings($product);

@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Boot;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleInstall;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleUninstall;
@@ -92,7 +93,7 @@ class MyParcelNL extends CarrierModule
     public static function getModule(): self
     {
         /** @var self|false $module */
-        $module = Module::getInstanceByName(self::MODULE_NAME);
+        $module = Module::getInstanceByName(Pdk::get('appInfo')['name']);
 
         if (! $module) {
             throw new InvalidModuleException('Failed to get module instance');
@@ -113,6 +114,7 @@ class MyParcelNL extends CarrierModule
             throw new RuntimeException('Not authenticated');
         }
 
+        // todo remove Tools from this module
         return Tools::appendQuery(
             $this->context->link->getAdminLink('AdminModules', ! $withoutToken),
             [

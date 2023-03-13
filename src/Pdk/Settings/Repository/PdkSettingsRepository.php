@@ -14,8 +14,6 @@ use MyParcelNL\Sdk\src\Support\Str;
 
 class PdkSettingsRepository extends AbstractSettingsRepository
 {
-    protected const KEY_CONFIGURATION = ':module_:name';
-
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
      */
@@ -36,43 +34,38 @@ class PdkSettingsRepository extends AbstractSettingsRepository
     }
 
     /**
-     * @param  string $name
+     * @param  string $namespace
      *
-     * @return mixed
+     * @return array|\MyParcelNL\Pdk\Settings\Model\AbstractSettingsModel
      */
-    public function get(string $name)
+    public function getGroup(string $namespace)
     {
-        return $this->retrieve($name, function () use ($name) {
-            return $this->configurationService->get($this->getConfigurationKey($name));
-        });
+        return $this->configurationService->get($this->getOptionName($namespace));
     }
 
     /**
-     * @param  \MyParcelNL\Pdk\Settings\Model\AbstractSettingsModel $settingsModel
+     * @param  string $key
+     * @param  mixed  $value
      *
      * @return void
      */
-    public function store(AbstractSettingsModel $settingsModel): void
+    protected function store(string $key, $value): void
     {
-        $id = $settingsModel->getId();
-
-        foreach ($settingsModel->getAttributes() as $key => $value) {
-            $this->configurationService->set($this->getConfigurationKey("$id.$key"), $value);
-        }
+        $this->configurationService->set($this->getOptionName($key), $value);
     }
 
     /**
-     * @param  string $name
+     * @param  string $key
      *
      * @return string
      */
-    protected function getConfigurationKey(string $name): string
+    protected function getOptionName(string $key): string
     {
         $appInfo = Pdk::getAppInfo();
 
-        return strtr(self::KEY_CONFIGURATION, [
-            ':module' => $appInfo->name,
-            ':name'   => Str::snake(str_replace('.', '_', $name)),
+        return strtr('_:plugin_:name', [
+            ':plugin' => $appInfo['name'],
+            ':name'   => Str::snake($key),
         ]);
     }
 }

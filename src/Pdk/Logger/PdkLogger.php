@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Logger;
 use FileLogger;
 use InvalidArgumentException;
 use MyParcelNL;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Logger\AbstractLogger;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -160,7 +161,7 @@ class PdkLogger extends AbstractLogger
 
     private function getLogDirectory(): string
     {
-        return sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, MyParcelNL::MODULE_NAME);
+        return sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, Pdk::get('appInfo')['name']);
     }
 
     /**
