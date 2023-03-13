@@ -9,10 +9,11 @@ use MyParcelNL\Pdk\Plugin\Collection\PdkProductCollection;
 use MyParcelNL\Pdk\Plugin\Model\PdkProduct;
 use MyParcelNL\Pdk\Product\Repository\AbstractProductRepository;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
-use MyParcelNL\Pdk\Storage\StorageInterface;
+use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use MyParcelNL\PrestaShop\Service\PsWeightService;
+use Product;
 
 class PdkProductRepository extends AbstractProductRepository
 {
@@ -27,8 +28,8 @@ class PdkProductRepository extends AbstractProductRepository
     private $weightService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\StorageInterface       $storage
-     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService $weightService
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface $storage
+     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService    $weightService
      */
     public function __construct(StorageInterface $storage, PsWeightService $weightService)
     {
@@ -48,7 +49,7 @@ class PdkProductRepository extends AbstractProductRepository
     public function getProduct($identifier): PdkProduct
     {
         return $this->retrieve('product_' . $identifier, function () use ($identifier) {
-            $psProduct = new \Product($identifier);
+            $psProduct = new Product($identifier);
 
             return new PdkProduct([
                 'sku'      => $psProduct->id,

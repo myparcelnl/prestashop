@@ -3,20 +3,12 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Boot;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleInstall;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleUninstall;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
-use MyParcelNL\PrestaShop\Module\Hooks\CarrierHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\DisplayAdminProductsExtra;
-use MyParcelNL\PrestaShop\Module\Hooks\HasFrontendHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\LegacyOrderPageHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\OrderHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\OrdersGridHooks;
-use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use PrestaShopBundle\Exception\InvalidModuleException;
 
 defined('_PS_VERSION_') or exit();
@@ -25,22 +17,22 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 class MyParcelNL extends CarrierModule
 {
-//    use CarrierHooks;
-//    use DisplayAdminProductsExtra;
-//    use HasFrontendHooks;
-//    use LegacyOrderPageHooks;
-//    use OrderHooks;
-//    use OrdersGridHooks;
+    //    use CarrierHooks;
+    //    use DisplayAdminProductsExtra;
+    //    use HasFrontendHooks;
+    //    use LegacyOrderPageHooks;
+    //    use OrderHooks;
+    //    use OrdersGridHooks;
 
-//    use HasModuleInstall;
-//    use HasModuleUninstall;
+    use HasModuleInstall;
+    use HasModuleUninstall;
 
     use HasPdkRenderHooks;
 
     /**
      * @deprecated
      */
-    public const MODULE_NAME        = 'myparcelnl';
+    public const MODULE_NAME = 'myparcelnl';
     /**
      * @deprecated
      */
@@ -67,62 +59,50 @@ class MyParcelNL extends CarrierModule
      */
     public function __construct()
     {
-        $this->name                   = self::MODULE_NAME;
-        $this->tab                    = 'shipping_logistics';
-        $this->version                = $this->getVersionFromComposer();
-        $this->author                 = 'MyParcel';
-        $this->author_uri             = 'https://myparcel.nl';
-        $this->need_instance          = 1;
-        $this->bootstrap              = true;
-        $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => _PS_VERSION_];
-        $this->displayName            = $this->l('prestashop_module_name');
-        $this->description            = $this->l('prestashop_module_description');
+        $name        = self::MODULE_NAME;
+        $version     = $this->getVersionFromComposer();
+        $displayName = $this->l('prestashop_module_name');
+
+        $this->name          = $name;
+        $this->version       = $version;
+        $this->author        = 'MyParcel';
+        $this->author_uri    = 'https://myparcel.nl';
+        $this->need_instance = 1;
+        $this->bootstrap     = true;
+        $this->displayName   = $displayName;
+        $this->description   = $this->l('prestashop_module_description');
 
         parent::__construct();
 
-        if (! empty(Context::getContext()->employee->id)) {
-            $this->baseUrl = $this->getBaseUrl();
-        }
+        PsPdkBootstrapper::boot(
+            $name,
+            $displayName,
+            $version,
+            $this->getLocalPath(),
+            $this->getBaseUrl()
+        );
 
-        $this->setupPdk();
+        $this->tab                    = Pdk::get('moduleTabName');
+        $this->ps_versions_compliancy = [
+            'min' => Pdk::get('prestaShopVersionMin'),
+            'max' => Pdk::get('prestaShopVersionMax'),
+        ];
     }
 
     /**
      * @return self
+     * @deprecated
      */
     public static function getModule(): self
     {
         /** @var self|false $module */
-        $module = Module::getInstanceByName(Pdk::get('appInfo')['name']);
+        $module = Module::getInstanceByName(self::MODULE_NAME);
 
         if (! $module) {
             throw new InvalidModuleException('Failed to get module instance');
         }
 
         return $module;
-    }
-
-    /**
-     * @param  bool $withoutToken
-     *
-     * @return string
-     */
-    public function getBaseUrl(bool $withoutToken = false): string
-    {
-        if (empty(Context::getContext()->employee->id)) {
-            DefaultLogger::warning('Unauthenticated user tried getting base url');
-            throw new RuntimeException('Not authenticated');
-        }
-
-        // todo remove Tools from this module
-        return Tools::appendQuery(
-            $this->context->link->getAdminLink('AdminModules', ! $withoutToken),
-            [
-                'configure'   => $this->name,
-                'tab_module'  => $this->tab,
-                'module_name' => $this->name,
-            ]
-        );
     }
 
     /**
@@ -158,15 +138,6 @@ class MyParcelNL extends CarrierModule
     }
 
     /**
-     * @return void
-     * @throws \Throwable
-     */
-    public function setupPdk(): void
-    {
-        Boot::setupPdk($this);
-    }
-
-    /**
      * @return bool
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
@@ -188,6 +159,20 @@ class MyParcelNL extends CarrierModule
         $upgrade = new $class($this);
 
         return $upgrade->execute();
+    }
+
+    /**
+     * @return string
+     */
+    private function getBaseUrl(): string
+    {
+        // todo
+        return $this->context->link->getAdminLink('AdminModules');
+        //            [
+        //                'configure'   => $this->name,
+        //                'tab_module'  => $this->tab,
+        //                'module_name' => $this->name,
+        //            ]
     }
 
     /**

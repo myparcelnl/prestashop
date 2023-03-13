@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Concern;
 
+use AdminMyParcelNLController;
 use Carrier;
 use Configuration;
 use Context;
 use Db;
 use DbQuery;
-use Doctrine\ORM\EntityManager;
 use Group;
 use Language;
-use MyParcelNL\Pdk\Carrier\Model\CarrierOptions;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Constant;
 use MyParcelNL\PrestaShop\Database\Migrations;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierConfiguration;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\PrestaShop\Module\Tools\Tools;
-use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
+use ObjectModel;
 use RangePrice;
 use RangeWeight;
 use Tab;
@@ -34,14 +32,14 @@ trait HasModuleInstall
         [
             'name'               => 'Bpost',
             'image'              => 'bpost.jpg',
-            'configuration_name' => Constant::BPOST_CONFIGURATION_NAME,
-            'carrier_type'       => CarrierOptions::CARRIER_BPOST_NAME,
+            'configuration_name' => 'BPOST_CONFIGURATION_NAME',
+            'carrier_type'       => MyParcelNL\Pdk\Carrier\Model\Carrier::CARRIER_BPOST_NAME,
         ],
         [
             'name'               => 'DPD',
             'image'              => 'dpd.jpg',
-            'configuration_name' => Constant::DPD_CONFIGURATION_NAME,
-            'carrier_type'       => CarrierOptions::CARRIER_DPD_NAME,
+            'configuration_name' => 'DPD_CONFIGURATION_NAME',
+            'carrier_type'       => MyParcelNL\Pdk\Carrier\Model\Carrier::CARRIER_DPD_NAME,
         ],
     ];
 
@@ -49,8 +47,8 @@ trait HasModuleInstall
         [
             'name'               => 'PostNL',
             'image'              => 'postnl.jpg',
-            'configuration_name' => Constant::POSTNL_CONFIGURATION_NAME,
-            'carrier_type'       => CarrierOptions::CARRIER_POSTNL_NAME,
+            'configuration_name' => 'POSTNL_CONFIGURATION_NAME',
+            'carrier_type'       => MyParcelNL\Pdk\Carrier\Model\Carrier::CARRIER_POSTNL_NAME,
         ],
     ];
 
@@ -69,10 +67,10 @@ trait HasModuleInstall
         $this->migrateUp();
         $this->registerHooks();
         $this->installTabs();
-        $this->addDefaultConfigurations();
+        //        $this->addDefaultConfigurations();
         // $this->installCarriers();
 
-        Tools::clearSf2Cache();
+        //        Tools::clearSf2Cache();
 
         return (bool) $this->installSuccess;
     }
@@ -89,9 +87,9 @@ trait HasModuleInstall
         $name = $configuration['name'];
 
         /** @var \MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository $repository */
-//        $repository = Pdk::get(PsCarrierConfigurationRepository::class);
+        //        $repository = Pdk::get(PsCarrierConfigurationRepository::class);
 
-//        $configuration = $repository->createEntity();
+        //        $configuration = $repository->createEntity();
 
         $query = new DbQuery();
         $query->select('id_carrier');
@@ -101,7 +99,7 @@ trait HasModuleInstall
         $existingId = Db::getInstance(_PS_USE_SQL_SLAVE_)
             ->getValue($query) ?: null;
 
-        $carrierConfiguration = $repository->findOneBy(['idCarrier' => $carrier->id]);
+        //        $carrierConfiguration = $repository->findOneBy(['idCarrier' => $carrier->id]);
 
         $carrier = new Carrier($existingId);
 
@@ -148,20 +146,20 @@ trait HasModuleInstall
         return $carrier;
     }
 
-    private function addDefaultConfigurations(): void
-    {
-        $configs = [
-            Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME     => '{order.reference}',
-            Constant::LABEL_SIZE_CONFIGURATION_NAME            => 'a4',
-            Constant::LABEL_POSITION_CONFIGURATION_NAME        => 1,
-            Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME   => false,
-            Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME => 1,
-        ];
-
-        foreach ($configs as $key => $value) {
-            $this->installSuccess &= Configuration::updateValue($key, $value);
-        }
-    }
+    //    private function addDefaultConfigurations(): void
+    //    {
+    //        $configs = [
+    //            Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME     => '{order.reference}',
+    //            Constant::LABEL_SIZE_CONFIGURATION_NAME            => 'a4',
+    //            Constant::LABEL_POSITION_CONFIGURATION_NAME        => 1,
+    //            Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME   => false,
+    //            Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME => 1,
+    //        ];
+    //
+    //        foreach ($configs as $key => $value) {
+    //            $this->installSuccess &= Configuration::updateValue($key, $value);
+    //        }
+    //    }
 
     /**
      * @param  \Carrier $carrier
@@ -195,7 +193,7 @@ trait HasModuleInstall
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    private function addOrUpdateModel(?string $existingId, Carrier $carrier, \ObjectModel $objectModel): bool
+    private function addOrUpdateModel(?string $existingId, Carrier $carrier, ObjectModel $objectModel): bool
     {
         if ($existingId) {
             DefaultLogger::error(
@@ -283,7 +281,7 @@ trait HasModuleInstall
     private function getAdminTabsDefinition(): array
     {
         $languages = [];
-        $name      = Str::replaceLast('Controller', '', \AdminMyParcelNLController::class);
+        $name      = Str::replaceLast('Controller', '', AdminMyParcelNLController::class);
 
         foreach (Language::getLanguages() as $lang) {
             $languages[$name][$lang['id_lang']] = 'MyParcelNL';
@@ -326,9 +324,9 @@ trait HasModuleInstall
     {
         $carriers = self::$carriers_nl;
 
-        if (ModuleService::isBE()) {
-            $carriers = array_merge($carriers, self::$carriers_be);
-        }
+        //        if (ModuleService::isBE()) {
+        //            $carriers = array_merge($carriers, self::$carriers_be);
+        //        }
 
         $result = 1;
 
@@ -364,7 +362,7 @@ trait HasModuleInstall
             $tab->module         = $this->name;
             $tab->name           = $definition['name'];
             $tab->wording        = $definition['class_name'];
-            $tab->wording_domain = \MyParcelNL::TRANSLATION_DOMAIN;
+            $tab->wording_domain = MyParcelNL::TRANSLATION_DOMAIN;
             $tab->id_parent      = (! empty($definition['parent_class'])
                 ? (int) $tabRepository->findOneIdByClassName($definition['parent_class'])
                 : -1);

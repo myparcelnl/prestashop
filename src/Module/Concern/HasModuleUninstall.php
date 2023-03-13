@@ -11,7 +11,6 @@ use DbQuery;
 use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Constant;
 use MyParcelNL\PrestaShop\Database\Migrations;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -20,47 +19,47 @@ use RuntimeException;
 
 trait HasModuleUninstall
 {
-    private $configItems = [
-        Constant::POSTNL_CONFIGURATION_NAME,
-        Constant::BPOST_CONFIGURATION_NAME,
-        Constant::DPD_CONFIGURATION_NAME,
-
-        Constant::STATUS_CHANGE_MAIL_CONFIGURATION_NAME,
-        Constant::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME,
-        Constant::LABEL_SCANNED_ORDER_STATUS_CONFIGURATION_NAME,
-        Constant::DELIVERED_ORDER_STATUS_CONFIGURATION_NAME,
-        Constant::ORDER_NOTIFICATION_AFTER_CONFIGURATION_NAME,
-
-        Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME,
-        Constant::WEBHOOK_ID_CONFIGURATION_NAME,
-
-        Constant::API_LOGGING_CONFIGURATION_NAME, // Keep the API key
-
-        Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
-        Constant::ONLY_RECIPIENT_CONFIGURATION_NAME,
-        Constant::AGE_CHECK_CONFIGURATION_NAME,
-        Constant::PACKAGE_FORMAT_CONFIGURATION_NAME,
-
-        Constant::RETURN_PACKAGE_CONFIGURATION_NAME,
-        Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
-        Constant::INSURANCE_CONFIGURATION_NAME,
-        Constant::CUSTOMS_FORM_CONFIGURATION_NAME,
-        Constant::CUSTOMS_CODE_CONFIGURATION_NAME,
-        Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME,
-        Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME,
-        Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME,
-
-        Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
-        Constant::SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME,
-
-        Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME,
-        Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
-        Constant::LABEL_SIZE_CONFIGURATION_NAME,
-        Constant::LABEL_POSITION_CONFIGURATION_NAME,
-        Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME,
-
-        Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME,
-    ];
+    //    private $configItems = [
+    //        Constant::POSTNL_CONFIGURATION_NAME,
+    //        Constant::BPOST_CONFIGURATION_NAME,
+    //        Constant::DPD_CONFIGURATION_NAME,
+    //
+    //        Constant::STATUS_CHANGE_MAIL_CONFIGURATION_NAME,
+    //        Constant::SENT_ORDER_STATE_FOR_DIGITAL_STAMPS_CONFIGURATION_NAME,
+    //        Constant::LABEL_SCANNED_ORDER_STATUS_CONFIGURATION_NAME,
+    //        Constant::DELIVERED_ORDER_STATUS_CONFIGURATION_NAME,
+    //        Constant::ORDER_NOTIFICATION_AFTER_CONFIGURATION_NAME,
+    //
+    //        Constant::IGNORE_ORDER_STATUS_CONFIGURATION_NAME,
+    //        Constant::WEBHOOK_ID_CONFIGURATION_NAME,
+    //
+    //        Constant::API_LOGGING_CONFIGURATION_NAME, // Keep the API key
+    //
+    //        Constant::PACKAGE_TYPE_CONFIGURATION_NAME,
+    //        Constant::ONLY_RECIPIENT_CONFIGURATION_NAME,
+    //        Constant::AGE_CHECK_CONFIGURATION_NAME,
+    //        Constant::PACKAGE_FORMAT_CONFIGURATION_NAME,
+    //
+    //        Constant::RETURN_PACKAGE_CONFIGURATION_NAME,
+    //        Constant::SIGNATURE_REQUIRED_CONFIGURATION_NAME,
+    //        Constant::INSURANCE_CONFIGURATION_NAME,
+    //        Constant::CUSTOMS_FORM_CONFIGURATION_NAME,
+    //        Constant::CUSTOMS_CODE_CONFIGURATION_NAME,
+    //        Constant::DEFAULT_CUSTOMS_CODE_CONFIGURATION_NAME,
+    //        Constant::CUSTOMS_ORIGIN_CONFIGURATION_NAME,
+    //        Constant::DEFAULT_CUSTOMS_ORIGIN_CONFIGURATION_NAME,
+    //
+    //        Constant::SHARE_CUSTOMER_EMAIL_CONFIGURATION_NAME,
+    //        Constant::SHARE_CUSTOMER_PHONE_CONFIGURATION_NAME,
+    //
+    //        Constant::LABEL_DESCRIPTION_CONFIGURATION_NAME,
+    //        Constant::LABEL_OPEN_DOWNLOAD_CONFIGURATION_NAME,
+    //        Constant::LABEL_SIZE_CONFIGURATION_NAME,
+    //        Constant::LABEL_POSITION_CONFIGURATION_NAME,
+    //        Constant::LABEL_PROMPT_POSITION_CONFIGURATION_NAME,
+    //
+    //        Constant::LABEL_CREATED_ORDER_STATUS_CONFIGURATION_NAME,
+    //    ];
 
     /**
      * @var int
@@ -80,8 +79,8 @@ trait HasModuleUninstall
         $this->unregisterHooks();
         $this->migrateDown();
         $this->uninstallTabs();
-        $this->removeCarriers();
-        $this->removeConfigurations();
+        //        $this->removeCarriers();
+        //        $this->removeConfigurations();
 
         if (! empty($this->errors)) {
             throw new RuntimeException(

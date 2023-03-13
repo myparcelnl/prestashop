@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
 use Context;
-use MyParcelNL\Pdk\Plugin\Service\OrderStatusServiceInterface;
+use MyParcelNL\Pdk\Plugin\Contract\OrderStatusServiceInterface;
+use OrderState;
 
 class OrderStatusService implements OrderStatusServiceInterface
 {
@@ -14,7 +15,7 @@ class OrderStatusService implements OrderStatusServiceInterface
      */
     public function all(): array
     {
-        $orderStates = \OrderState::getOrderStates((int) Context::getContext()->language->id);
+        $orderStates = OrderState::getOrderStates((int) Context::getContext()->language->id);
 
         $array = [];
 

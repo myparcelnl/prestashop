@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
 use MyParcelNL\Pdk\Base\Model\Model;
 use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkRepository;
-use MyParcelNL\Pdk\Storage\StorageInterface;
+use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 
 class PdkShipmentRepository extends AbstractPdkRepository
@@ -17,7 +17,7 @@ class PdkShipmentRepository extends AbstractPdkRepository
     private $psOrderShipmentRepository;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\StorageInterface                    $storage
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface           $storage
      * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository $psOrderShipmentRepository
      */
     public function __construct(StorageInterface $storage, PsOrderShipmentRepository $psOrderShipmentRepository)
@@ -34,7 +34,7 @@ class PdkShipmentRepository extends AbstractPdkRepository
      */
     public function delete($input): void
     {
-//        $this->psOrderShipmentRepository->($input);
+        //        $this->psOrderShipmentRepository->($input);
     }
 
     /**

@@ -17,7 +17,7 @@ class AdminMyParcelNLController extends AdminController
         $this->multishop_context = Shop::CONTEXT_ALL;
         $this->show_toolbar      = true;
 
-        $this->module = MyParcelNL::getModule();
+        MyParcelNL::getModule();
 
         parent::__construct();
     }

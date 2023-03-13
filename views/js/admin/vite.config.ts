@@ -1,4 +1,4 @@
-import {defineConfig} from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
 
 /**
@@ -8,7 +8,7 @@ export default defineConfig((env) => ({
   build: {
     emptyOutDir: false,
     lib: {
-      entry: 'src/index.ts',
+      entry: 'src/main.ts',
       formats: ['iife'],
       name: 'MyParcelAdmin',
     },

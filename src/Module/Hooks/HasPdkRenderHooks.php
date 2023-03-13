@@ -6,13 +6,11 @@ namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\RenderService;
-use MyParcelNL\PrestaShop\Pdk\Facade\OrderLogger;
+use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
+use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
-use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
-use Throwable;
-use Tools;
 
 trait HasPdkRenderHooks
 {
@@ -23,7 +21,10 @@ trait HasPdkRenderHooks
      */
     public function getContent(): string
     {
-        return'henlo';
+        /** @var \MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface $renderService */
+        $renderService = Pdk::get(RenderServiceInterface::class);
+
+        return $renderService->renderPluginSettings();
     }
 
     /**
@@ -44,7 +45,7 @@ trait HasPdkRenderHooks
                 $repository = Pdk::get(PdkOrderRepository::class);
                 $order      = $repository->get($row['id_order']);
 
-                $row['myparcel'] = RenderService::renderOrderListColumn($order);
+                $row['myparcel'] = RenderService::renderOrderListItem($order);
 
                 return $row;
             }, $params['presented_grid']['data']['records']->all())
@@ -58,10 +59,6 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminAfterHeader(): string
     {
-        if (! $this->shouldRenderPdk()) {
-            return '';
-        }
-
         $html = RenderService::renderNotifications();
         $html .= RenderService::renderModals();
 
@@ -70,13 +67,10 @@ trait HasPdkRenderHooks
 
     /**
      * @return string
+     * @noinspection PhpUnused
      */
     public function hookDisplayAdminEndContent(): string
     {
-        if (! $this->shouldRenderPdk()) {
-            return '';
-        }
-
         return RenderService::renderInitScript();
     }
 
@@ -86,23 +80,16 @@ trait HasPdkRenderHooks
      * @param  array $params
      *
      * @return string
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function hookDisplayAdminOrderMain(array $params): string
     {
-        try {
-            /** @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository $repository */
-            $repository = Pdk::get(PdkOrderRepository::class);
-            $order      = $repository->get($params['id_order']);
+        /** @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository $repository */
+        $repository = Pdk::get(PdkOrderRepository::class);
+        $order      = $repository->get($params['id_order']);
 
-            return RenderService::renderOrderCard($order);
-        } catch (Throwable $exception) {
-            OrderLogger::error('Failed to render order card.', [
-                'exception' => $exception,
-                'order'     => $params['id_order'],
-            ]);
-
-            return '';
-        }
+        return RenderService::renderOrderBox($order);
     }
 
     /**
@@ -128,12 +115,11 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayBackOfficeHeader(): void
     {
+        /** @var ScriptServiceInterface $scriptService */
+        $scriptService = Pdk::get(ScriptServiceInterface::class);
+
         /** @var \AdminLegacyLayoutControllerCore $controller */
         $controller = $this->context->controller;
-
-        if (! $this->shouldRenderPdk()) {
-            return;
-        }
 
         if (Pdk::isDevelopment()) {
             $controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.45/vue.global.js');
@@ -144,34 +130,6 @@ trait HasPdkRenderHooks
         }
 
         $controller->addCSS($this->_path . 'views/js/admin/lib/style.css');
-    }
-
-    /**
-     * @return bool
-     */
-    private function shouldRenderPdk(): bool
-    {
-        $controller = Tools::getValue('controller');
-
-        // Match only the order overview and the modules page.
-        if (! in_array(
-            $controller,
-            [
-                'AdminModules',
-                'AdminOrders',
-                'AdminProducts',
-                Str::replaceLast('Controller', '', \AdminMyParcelNLController::class),
-            ],
-            true
-        )) {
-            return false;
-        }
-
-        // Match the module configuration page
-        if ($controller === 'AdminModules' && Tools::getValue('module_name') !== $this->name) {
-            return false;
-        }
-
-        return true;
+        $controller->addJS($this->_path . 'views/js/admin/lib/prestashop-admin.iife.js');
     }
 }

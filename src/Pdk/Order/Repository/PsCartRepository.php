@@ -6,19 +6,19 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
 use MyParcelNL\Pdk\Plugin\Model\PdkCart;
 use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkCartRepository;
-use MyParcelNL\Pdk\Product\Repository\ProductRepositoryInterface;
-use MyParcelNL\Pdk\Storage\StorageInterface;
+use MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface;
+use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 
 class PsCartRepository extends AbstractPdkCartRepository
 {
     /**
-     * @var \MyParcelNL\Pdk\Product\Repository\ProductRepositoryInterface
+     * @var \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface
      */
     private $productRepository;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\StorageInterface                      $storage
-     * @param  \MyParcelNL\Pdk\Product\Repository\ProductRepositoryInterface $productRepository
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface           $storage
+     * @param  \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface $productRepository
      */
     public function __construct(StorageInterface $storage, ProductRepositoryInterface $productRepository)
     {

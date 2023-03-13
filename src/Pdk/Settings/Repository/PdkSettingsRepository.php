@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
-use MyParcelNL\Pdk\Api\Service\ApiServiceInterface;
+use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Settings\Model\AbstractSettingsModel;
-use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
-use MyParcelNL\Pdk\Storage\StorageInterface;
+use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Model\Settings;
+use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 use MyParcelNL\Sdk\src\Support\Str;
 
-class PdkSettingsRepository extends AbstractSettingsRepository
+class PdkSettingsRepository extends Repository implements SettingsRepositoryInterface
 {
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
@@ -20,17 +20,25 @@ class PdkSettingsRepository extends AbstractSettingsRepository
     private $configurationService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\StorageInterface                                   $storage
-     * @param  \MyParcelNL\Pdk\Api\Service\ApiServiceInterface                            $api
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                          $storage
      * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
      */
     public function __construct(
         StorageInterface              $storage,
-        ApiServiceInterface           $api,
         ConfigurationServiceInterface $configurationService
     ) {
-        parent::__construct($storage, $api);
+        parent::__construct($storage);
         $this->configurationService = $configurationService;
+    }
+
+    public function all(): Settings
+    {
+        return new Settings();
+    }
+
+    public function get(string $key)
+    {
+        return '';
     }
 
     /**
@@ -43,15 +51,9 @@ class PdkSettingsRepository extends AbstractSettingsRepository
         return $this->configurationService->get($this->getOptionName($namespace));
     }
 
-    /**
-     * @param  string $key
-     * @param  mixed  $value
-     *
-     * @return void
-     */
-    protected function store(string $key, $value): void
+    public function storeSettings($settings): void
     {
-        $this->configurationService->set($this->getOptionName($key), $value);
+        // TODO: Implement storeSettings() method.
     }
 
     /**
@@ -67,5 +69,16 @@ class PdkSettingsRepository extends AbstractSettingsRepository
             ':plugin' => $appInfo['name'],
             ':name'   => Str::snake($key),
         ]);
+    }
+
+    /**
+     * @param  string $key
+     * @param  mixed  $value
+     *
+     * @return void
+     */
+    protected function store(string $key, $value): void
+    {
+        $this->configurationService->set($this->getOptionName($key), $value);
     }
 }
