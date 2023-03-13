@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Controller;
 
-use MyParcelNL\Pdk\Base\PdkEndpoint;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Module\Tools\Tools;
+use MyParcelNL\Pdk\Plugin\Api\PdkEndpoint;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +26,7 @@ class AdminMyParcelPdkController extends FrameworkBundleAdminController
         parent::__construct();
 
         // Trigger PDK setup
-        \MyParcelNL::getModule();
+        MyParcelNL::getModule();
     }
 
     /**
@@ -37,12 +37,12 @@ class AdminMyParcelPdkController extends FrameworkBundleAdminController
         try {
             $request = $this->createNormalizedRequest();
 
-            /** @var \MyParcelNL\Pdk\Base\PdkEndpoint $endpoint */
+            /** @var \MyParcelNL\Pdk\Plugin\Api\PdkEndpoint $endpoint */
             $endpoint = Pdk::get(PdkEndpoint::class);
 
-            $response = $endpoint->call($request);
+            $response = $endpoint->call($request, PdkEndpoint::CONTEXT_BACKEND);
         } catch (Throwable $e) {
-            DefaultLogger::error($e->getMessage(), ['values' => Tools::getAllValues()]);
+            DefaultLogger::error($e->getMessage(), ['values' => $_REQUEST]);
             return new Response($e->getMessage(), 400);
         }
 
