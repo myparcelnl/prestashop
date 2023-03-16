@@ -9,7 +9,6 @@ import {
   Bootstrap4Image,
   Bootstrap4Modal,
   Bootstrap4Notification,
-  Bootstrap4NumberInput,
   Bootstrap4RadioInput,
   Bootstrap4Row,
   Bootstrap4SelectInput,
@@ -33,6 +32,8 @@ import {
 import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin/src';
 import {PsIcon} from './components';
 import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
+import {DefaultNumberInput} from '@myparcel-pdk/admin-components';
+import {h} from 'vue';
 
 window.onload = () => {
   createPdkAdmin({
@@ -67,9 +68,10 @@ window.onload = () => {
       PdkDropdownButton: Bootstrap4DropdownButton,
       PdkFormGroup: Bootstrap4FormGroup,
       PdkImage: Bootstrap4Image,
+      PdkLoader: h('div'),
       PdkModal: Bootstrap4Modal,
       PdkNotification: Bootstrap4Notification,
-      PdkNumberInput: Bootstrap4NumberInput,
+      PdkNumberInput: DefaultNumberInput,
       PdkRadioInput: Bootstrap4RadioInput,
       PdkRow: Bootstrap4Row,
       PdkSelectInput: Bootstrap4SelectInput,
@@ -77,19 +79,19 @@ window.onload = () => {
       PdkTextInput: Bootstrap4TextInput,
 
       PdkCurrencyInput: DefaultCurrencyInput,
+      PdkDropOffInput: DefaultDropOffInput,
+      PdkHeading: DefaultHeading,
       PdkLink: DefaultLink,
       PdkMultiCheckbox: DefaultMultiCheckbox,
       PdkMultiRadio: DefaultMultiRadio,
+      PdkTabNavButton: DefaultTabNavButton,
       PdkTableCol: DefaultTableCol,
       PdkTableRow: DefaultTableRow,
-      PdkToggleInput: DefaultToggleInput,
       PdkTimeInput: DefaultTimeInput,
-      PdkDropOffInput: DefaultDropOffInput,
-      PdkHeading: DefaultHeading,
-      PdkTabNavButton: DefaultTabNavButton,
+      PdkToggleInput: DefaultToggleInput,
 
-      PdkPluginSettingsWrapper: PsPluginSettingsWrapper,
       PdkIcon: PsIcon,
+      PdkPluginSettingsWrapper: PsPluginSettingsWrapper,
     },
   });
 };

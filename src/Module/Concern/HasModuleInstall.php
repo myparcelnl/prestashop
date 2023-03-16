@@ -70,7 +70,7 @@ trait HasModuleInstall
         //        $this->addDefaultConfigurations();
         // $this->installCarriers();
 
-        //        Tools::clearSf2Cache();
+        //Tools::clearSf2Cache();
 
         return (bool) $this->installSuccess;
     }

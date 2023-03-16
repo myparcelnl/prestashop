@@ -12,11 +12,11 @@
     "typecheck": "vue-tsc --noEmit --skipLibCheck --declarationMap false"
   },
   "dependencies": {
-    "@myparcel-pdk/admin": "*",
-    "@myparcel-pdk/admin-components": "*",
-    "@myparcel-pdk/admin-preset-bootstrap4": "*",
-    "@myparcel/ts-utils": "^1.6.0",
-    "@vueuse/core": "^9.12.0"
+    "@myparcel-pdk/admin": "^1.0.0-alpha.1",
+    "@myparcel-pdk/admin-components": "^1.0.0-alpha.1",
+    "@myparcel-pdk/admin-preset-bootstrap4": "^1.0.0-alpha.1",
+    "@myparcel/ts-utils": "^1.7.0",
+    "@vueuse/core": "^9.13.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

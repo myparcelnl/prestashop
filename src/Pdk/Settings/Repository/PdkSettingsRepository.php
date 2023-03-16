@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
-use MyParcelNL\Pdk\Base\Repository\Repository;
+use MyParcelNL\Pdk\Api\Contract\ApiServiceInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\Pdk\Settings\Model\Settings;
+use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 use MyParcelNL\Sdk\src\Support\Str;
 
-class PdkSettingsRepository extends Repository implements SettingsRepositoryInterface
+class PdkSettingsRepository extends AbstractSettingsRepository
 {
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
@@ -21,24 +21,16 @@ class PdkSettingsRepository extends Repository implements SettingsRepositoryInte
 
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                          $storage
+     * @param  \MyParcelNL\Pdk\Api\Contract\ApiServiceInterface                           $api
      * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
      */
     public function __construct(
         StorageInterface              $storage,
+        ApiServiceInterface           $api,
         ConfigurationServiceInterface $configurationService
     ) {
-        parent::__construct($storage);
+        parent::__construct($storage, $api);
         $this->configurationService = $configurationService;
-    }
-
-    public function all(): Settings
-    {
-        return new Settings();
-    }
-
-    public function get(string $key)
-    {
-        return '';
     }
 
     /**
@@ -49,11 +41,6 @@ class PdkSettingsRepository extends Repository implements SettingsRepositoryInte
     public function getGroup(string $namespace)
     {
         return $this->configurationService->get($this->getOptionName($namespace));
-    }
-
-    public function storeSettings($settings): void
-    {
-        // TODO: Implement storeSettings() method.
     }
 
     /**

@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
+use Address;
+use Country;
+use Customer;
 use MyParcelNL\Pdk\Base\Service\CurrencyService;
 use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\Plugin\Model\PdkOrder;
 use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkOrderRepository;
-use MyParcelNL\Pdk\Product\Repository\AbstractProductRepository;
+use MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface;
 use MyParcelNL\Pdk\Shipment\Collection\ShipmentCollection;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
-use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
-use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository;
 use Order;
+use RuntimeException;
+use State;
 
 class PdkOrderRepository extends AbstractPdkOrderRepository
 {
@@ -37,23 +42,23 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     private $pdkShipmentRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository
+     * @var \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository
      */
     private $psOrderDataRepository;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                   $storage
-     * @param  \MyParcelNL\Pdk\Base\Service\CurrencyService                 $currencyService
-     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository      $psOrderDataRepository
-     * @param  \MyParcelNL\Pdk\Product\Repository\AbstractProductRepository $productRepository
-     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository  $psOrderShipmentRepository
+     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                             $storage
+     * @param  \MyParcelNL\Pdk\Base\Service\CurrencyService                           $currencyService
+     * @param  \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository     $psOrderDataRepository
+     * @param  \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface            $productRepository
+     * @param  \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository $psOrderShipmentRepository
      */
     public function __construct(
-        MemoryCacheStorage        $storage,
-        CurrencyService           $currencyService,
-        PsOrderDataRepository     $psOrderDataRepository,
-        AbstractProductRepository $productRepository,
-        PsOrderShipmentRepository $psOrderShipmentRepository
+        MemoryCacheStorage         $storage,
+        CurrencyService            $currencyService,
+        PsOrderDataRepository      $psOrderDataRepository,
+        ProductRepositoryInterface $productRepository,
+        PsOrderShipmentRepository  $psOrderShipmentRepository
     ) {
         parent::__construct($storage);
         $this->currencyService           = $currencyService;
@@ -70,7 +75,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
      */
     public function delete($input): void
     {
-        throw new \RuntimeException('Not implemented');
+        throw new RuntimeException('Not implemented');
     }
 
     /**
@@ -221,9 +226,9 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
      */
     protected function getRecipient(Order $order): array
     {
-        $address  = new \Address($order->id_address_delivery);
-        $customer = new \Customer($order->id_customer);
-        $country  = new \Country($address->id_country);
+        $address  = new Address($order->id_address_delivery);
+        $customer = new Customer($order->id_customer);
+        $country  = new Country($address->id_country);
 
         return [
             'cc'         => $country->iso_code,
@@ -236,7 +241,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
             'postalCode' => $address->postcode,
             'region'     => $country->iso_code === Platform::get('localCountry')
                 ? null
-                : (new \State($address->id_state))->name,
+                : (new State($address->id_state))->name,
         ];
     }
 

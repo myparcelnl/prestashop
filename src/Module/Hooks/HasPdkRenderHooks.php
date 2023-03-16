@@ -55,6 +55,7 @@ trait HasPdkRenderHooks
     /**
      * Renders the notification area.
      *
+     * @noinspection PhpUnused
      * @return string
      */
     public function hookDisplayAdminAfterHeader(): string

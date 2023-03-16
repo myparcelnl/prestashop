@@ -42,7 +42,7 @@ class Ps17ConfigurationService implements ConfigurationServiceInterface
      */
     public function get(string $key, $default = null, ShopConstraint $shopConstraint = null)
     {
-        return $this->configurationService->get($key, $default, $shopConstraint);
+        return json_decode($this->configurationService->get($key, $default, $shopConstraint) ?? '', true);
     }
 
     /**
@@ -66,6 +66,6 @@ class Ps17ConfigurationService implements ConfigurationServiceInterface
      */
     public function set(string $key, $value, ShopConstraint $shopConstraint = null): void
     {
-        $this->configurationService->set($key, $value, $shopConstraint);
+        $this->configurationService->set($key, json_encode($value), $shopConstraint);
     }
 }

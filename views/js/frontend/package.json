@@ -14,8 +14,8 @@
     "vite": "^4.1.2"
   },
   "dependencies": {
-    "@myparcel/delivery-options": "^5.4.0",
-    "@myparcel/sdk": "^2.11.0",
-    "@myparcel/ts-utils": "^1.6.0"
+    "@myparcel/delivery-options": "^5.7.0",
+    "@myparcel/sdk": "^3.0.0",
+    "@myparcel/ts-utils": "^1.7.0"
   }
 }

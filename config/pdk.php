@@ -25,8 +25,10 @@ use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointServiceInterface;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PdkAccountRepository;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsWebhooksRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\OrderStatusService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsViewService;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Pdk\Service\LanguageService;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
@@ -86,8 +88,8 @@ return [
     /**
      * Webhooks
      */
-    PdkWebhookServiceInterface::class     => autowire(),
-    PdkWebhooksRepositoryInterface::class => autowire(),
+    PdkWebhookServiceInterface::class     => autowire(PsWebhookService::class),
+    PdkWebhooksRepositoryInterface::class => autowire(PsWebhooksRepository::class),
 
     DeliveryOptionsServiceInterface::class => autowire(),
 
