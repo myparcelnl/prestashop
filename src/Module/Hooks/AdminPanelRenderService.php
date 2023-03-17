@@ -220,12 +220,6 @@ class AdminPanelRenderService extends RenderService
             return [];
         }
 
-        if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
-            return $consignmentOptions + [
-                    'insuranceOptions' => [Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT],
-                ];
-        }
-
         $isStandardDelivery = $consignment->getDeliveryType() === AbstractConsignment::DELIVERY_TYPE_STANDARD;
         $consignmentOptions += [
             'insuranceOptions' => $consignment->getInsurancePossibilities($consignment->country),

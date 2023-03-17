@@ -14,6 +14,7 @@ use Gett\MyparcelBE\Service\ProductConfigurationProvider;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
+use Throwable;
 
 class LabelOptionsResolver
 {
@@ -29,41 +30,8 @@ class LabelOptionsResolver
     ];
 
     /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
-     *
-     * @return false|string
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
-     */
-    public function getLabelOptionsJson(Order $order)
-    {
-        return json_encode($this->getLabelOptions($order));
-    }
-
-    /**
-     * @param  \Gett\MyparcelBE\Model\Core\Order $order
-     *
-     * @return array
-     * @throws \PrestaShopDatabaseException
-     * @throws \Exception
-     */
-    public function getLabelOptions(Order $order): array
-    {
-        $deliveryOptions = OrderSettingsFactory::create($order)
-            ->getDeliveryOptions();
-
-        return array_merge(
-            $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
-            [
-                'package_type'   => $this->getPackageType($order, $deliveryOptions),
-                'package_format' => $this->getPackageFormat($order, $deliveryOptions),
-            ]
-        );
-    }
-
-    /**
-     * @param \Gett\MyparcelBE\Model\Core\Order                                               $order
-     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|null $deliveryOptions
+     * @param  \Gett\MyparcelBE\Model\Core\Order                                               $order
+     * @param  \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|null $deliveryOptions
      *
      * @return array
      * @throws \PrestaShopDatabaseException
@@ -96,9 +64,9 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
-     * @param int                                                                        $packageType
-     * @param \Gett\MyparcelBE\Model\Core\Order                                          $order
+     * @param  \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     * @param  int                                                                        $packageType
+     * @param  \Gett\MyparcelBE\Model\Core\Order                                          $order
      *
      * @return int the amount in euro for which the package should be insured
      */
@@ -107,25 +75,30 @@ class LabelOptionsResolver
         $psCarrierId = $order->getIdCarrier();
 
         try {
-            $fromPrice   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_FROM_PRICE);
-            $maxAmount   = CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT);
+            $fromPrice   = CarrierConfigurationProvider::get(
+                $psCarrierId,
+                Constant::INSURANCE_CONFIGURATION_FROM_PRICE
+            );
+            $maxAmount   = CarrierConfigurationProvider::get(
+                $psCarrierId,
+                Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT
+            );
             $consignment = (new ConsignmentFactory(Constant::CONSIGNMENT_INIT_PARAMS_FOR_CHECKING_ONLY))
                 ->fromOrder(
                     $order,
-                    OrderSettingsFactory::create($order)->getDeliveryOptions()
+                    OrderSettingsFactory::create($order)
+                        ->getDeliveryOptions()
                 )
                 ->first();
             $consignment->setPackageType($packageType);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return Constant::INSURANCE_CONFIGURATION_NONE;
         }
 
         if (CountryService::isPostNLShipmentFromNLToBE($consignment)) {
             try {
-                if (CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_BELGIUM)) {
-                    return Constant::INSURANCE_CONFIGURATION_BELGIUM_AMOUNT;
-                }
-            } catch (\Throwable $e) {
+                return CarrierConfigurationProvider::get($psCarrierId, Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_BE);
+            } catch (Throwable $e) {
                 return Constant::INSURANCE_CONFIGURATION_NONE;
             }
         }
@@ -136,12 +109,16 @@ class LabelOptionsResolver
 
         $grandTotal = $order->getTotalProductsWithTaxes();
 
-        if ($grandTotal < $fromPrice || ! $consignment->canHaveShipmentOption(AbstractConsignment::SHIPMENT_OPTION_INSURANCE)) {
+        if ($grandTotal < $fromPrice
+            || ! $consignment->canHaveShipmentOption(
+                AbstractConsignment::SHIPMENT_OPTION_INSURANCE
+            )) {
             return Constant::INSURANCE_CONFIGURATION_NONE;
         }
 
         if ($deliveryOptions->getShipmentOptions()) {
-            $insuredAmount = $deliveryOptions->getShipmentOptions()->getInsurance();
+            $insuredAmount = $deliveryOptions->getShipmentOptions()
+                ->getInsurance();
         }
 
         $insuredAmount = (int) min($insuredAmount ?? $grandTotal, $maxAmount ?? Constant::INSURANCE_CONFIGURATION_NONE);
@@ -150,21 +127,36 @@ class LabelOptionsResolver
     }
 
     /**
-     * @param int   $threshold
-     * @param array $allowedValues this must be an indexed array with values sorted from low to high
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
      *
-     * @return int lowest allowed value that is higher than or equal to threshold, or the highest allowed value
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
      */
-    private function getHighestAllowedValue(int $threshold, array $allowedValues): int
+    public function getLabelOptions(Order $order): array
     {
-        foreach ($allowedValues as $allowedValue) {
-            if ($allowedValue < $threshold) {
-                continue;
-            }
-            return $allowedValue;
-        }
+        $deliveryOptions = OrderSettingsFactory::create($order)
+            ->getDeliveryOptions();
 
-        return Arr::last($allowedValues);
+        return array_merge(
+            $this->getShipmentOptions($deliveryOptions, $order->getProducts(), $order->getIdCarrier()),
+            [
+                'package_type'   => $this->getPackageType($order, $deliveryOptions),
+                'package_format' => $this->getPackageFormat($order, $deliveryOptions),
+            ]
+        );
+    }
+
+    /**
+     * @param  \Gett\MyparcelBE\Model\Core\Order $order
+     *
+     * @return false|string
+     * @throws \PrestaShopDatabaseException
+     * @throws \Exception
+     */
+    public function getLabelOptionsJson(Order $order)
+    {
+        return json_encode($this->getLabelOptions($order));
     }
 
     /**
@@ -184,6 +176,24 @@ class LabelOptionsResolver
         });
 
         return (bool) $product;
+    }
+
+    /**
+     * @param  int   $threshold
+     * @param  array $allowedValues this must be an indexed array with values sorted from low to high
+     *
+     * @return int lowest allowed value that is higher than or equal to threshold, or the highest allowed value
+     */
+    private function getHighestAllowedValue(int $threshold, array $allowedValues): int
+    {
+        foreach ($allowedValues as $allowedValue) {
+            if ($allowedValue < $threshold) {
+                continue;
+            }
+            return $allowedValue;
+        }
+
+        return Arr::last($allowedValues);
     }
 
     /**
