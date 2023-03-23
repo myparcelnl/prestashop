@@ -8,6 +8,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\RenderService;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
+use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
@@ -25,6 +26,29 @@ trait HasPdkRenderHooks
         $renderService = Pdk::get(RenderServiceInterface::class);
 
         return $renderService->renderPluginSettings();
+    }
+
+    public function hookActionOrderGridDefinitionModifier(array $params): void
+    {
+        /** @var \PrestaShop\PrestaShop\Core\Grid\Definition\GridDefinitionInterface $definition */
+        $definition = $params['definition'];
+
+        $definition
+            ->getColumns()
+            ->addBefore(
+                'actions',
+                (new LabelsColumn('myparcel'))
+                    ->setName('MyParcel')
+            );
+
+        //        $bulkActions = $definition->getBulkActions();
+        //        foreach ($this->getBulkActionsMap() as $action => $data) {
+        //            $bulkActions->add(
+        //                (new IconBulkAction($action))
+        //                    ->setName(LanguageService::translate($data['label']))
+        //                    ->setOptions(['icon' => $data['icon']])
+        //            );
+        //        }
     }
 
     /**

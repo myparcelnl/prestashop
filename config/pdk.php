@@ -73,7 +73,7 @@ return [
     //CronServiceInterface::class        => autowire(),
     LanguageServiceInterface::class         => autowire(LanguageService::class),
     OrderStatusServiceInterface::class      => autowire(OrderStatusService::class),
-    //    RenderServiceInterface::class           => autowire(RenderService::class),
+    //    RenderServiceInterface::class           => autowire(RenderService::class), // not necessary probably
     ViewServiceInterface::class             => autowire(PsViewService::class),
     WeightServiceInterface::class           => autowire(PsWeightService::class),
 

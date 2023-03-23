@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
 use MyParcelNL\Pdk\Plugin\Service\AbstractViewService;
 use PrestaShop\PrestaShop\Adapter\Entity\Dispatcher;
+use RuntimeException;
 
 class PsViewService extends AbstractViewService
 {
@@ -22,7 +23,7 @@ class PsViewService extends AbstractViewService
      */
     public function isOrderListPage(): bool
     {
-        return 'AdminOrdersList' === $this->getPage();
+        return 'AdminOrders' === $this->getPage();
     }
 
     /**
@@ -57,7 +58,7 @@ class PsViewService extends AbstractViewService
     {
         $dispatcher = Dispatcher::getInstance();
         if (! $dispatcher) {
-            throw new \RuntimeException('Dispatcher not found');
+            throw new RuntimeException('Dispatcher not found');
         }
 
         return $dispatcher->getController();

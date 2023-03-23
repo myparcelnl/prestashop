@@ -70,7 +70,7 @@ class MyParcelNL extends CarrierModule
         $this->need_instance = 1;
         $this->bootstrap     = true;
         $this->displayName   = $displayName;
-        $this->description   = $this->l('prestashop_module_description');
+        $this->description   = 'MyParcel';
 
         parent::__construct();
 
