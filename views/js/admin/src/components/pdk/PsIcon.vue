@@ -10,20 +10,23 @@ import {AdminIcon} from '@myparcel-pdk/admin/src';
 import {isEnumValue} from '@myparcel/ts-utils';
 
 const materialIconMap: Record<AdminIcon, string> = {
-  [AdminIcon.ADD]: 'add',
-  [AdminIcon.ARROW_DOWN]: 'arrow-down',
-  [AdminIcon.ARROW_UP]: 'arrow-up',
-  [AdminIcon.CLOSE]: 'close',
-  [AdminIcon.DELETE]: 'delete',
-  [AdminIcon.DOWNLOAD]: 'download',
-  [AdminIcon.EDIT]: 'edit',
-  [AdminIcon.EXPORT]: 'add',
-  [AdminIcon.EXTERNAL]: 'external',
-  [AdminIcon.PRINT]: 'print',
-  [AdminIcon.REFRESH]: 'refresh',
-  [AdminIcon.RETURN]: 'reply',
-  [AdminIcon.SAVE]: 'save',
-
+  [AdminIcon.Add]: 'add',
+  [AdminIcon.ArrowDown]: 'south',
+  [AdminIcon.ArrowUp]: 'north',
+  [AdminIcon.Close]: 'close',
+  [AdminIcon.Delete]: 'delete',
+  [AdminIcon.Download]: 'download',
+  [AdminIcon.Edit]: 'edit',
+  [AdminIcon.Export]: 'export',
+  [AdminIcon.External]: 'external',
+  [AdminIcon.Print]: 'print',
+  [AdminIcon.Refresh]: 'refresh',
+  [AdminIcon.Return]: 'reply',
+  [AdminIcon.Save]: 'save',
+  [AdminIcon.No]: 'clear',
+  [AdminIcon.Shipment]: 'local_shipping',
+  [AdminIcon.Spinner]: 'loop',
+  [AdminIcon.Yes]: 'check',
 };
 
 export default defineComponent({

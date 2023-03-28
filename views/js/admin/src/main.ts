@@ -23,6 +23,7 @@ import {
   DefaultLink,
   DefaultMultiCheckbox,
   DefaultMultiRadio,
+  DefaultNumberInput,
   DefaultTabNavButton,
   DefaultTableCol,
   DefaultTableRow,
@@ -32,14 +33,13 @@ import {
 import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin/src';
 import {PsIcon} from './components';
 import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
-import {DefaultNumberInput} from '@myparcel-pdk/admin-components';
 import {h} from 'vue';
 
 window.onload = () => {
   createPdkAdmin({
     ...bootstrap4Config,
 
-    logLevel: LogLevel.DEBUG,
+    logLevel: LogLevel.Debug,
 
     transitions: {
       modal: 'fade',

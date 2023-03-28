@@ -23,7 +23,6 @@ use MyParcelNL\PrestaShop\Pdk\Logger\PdkLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointServiceInterface;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsWebhooksRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\OrderStatusService;

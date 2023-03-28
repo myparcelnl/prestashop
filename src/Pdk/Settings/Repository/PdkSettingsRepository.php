@@ -6,7 +6,6 @@ namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
 use MyParcelNL\Pdk\Api\Contract\ApiServiceInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
