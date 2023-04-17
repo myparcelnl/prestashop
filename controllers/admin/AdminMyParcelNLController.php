@@ -17,9 +17,11 @@ class AdminMyParcelNLController extends AdminController
         $this->multishop_context = Shop::CONTEXT_ALL;
         $this->show_toolbar      = true;
 
-        MyParcelNL::getModule();
+        $module = MyParcelNL::getModule();
 
         parent::__construct();
+
+        Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminModules') . '&configure=' . $module->name);
     }
 
     /**
