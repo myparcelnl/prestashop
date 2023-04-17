@@ -20,6 +20,7 @@ use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository;
+use MyParcelNL\PrestaShop\Service\PsWeightService;
 use Order;
 use RuntimeException;
 use State;
@@ -47,6 +48,16 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     private $psOrderDataRepository;
 
     /**
+     * @var \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository
+     */
+    private $psOrderShipmentRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Service\PsWeightService
+     */
+    private $psWeightService;
+
+    /**
      * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                             $storage
      * @param  \MyParcelNL\Pdk\Base\Service\CurrencyService                           $currencyService
      * @param  \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository     $psOrderDataRepository
@@ -58,13 +69,15 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         CurrencyService            $currencyService,
         PsOrderDataRepository      $psOrderDataRepository,
         ProductRepositoryInterface $productRepository,
-        PsOrderShipmentRepository  $psOrderShipmentRepository
+        PsOrderShipmentRepository  $psOrderShipmentRepository,
+        PsWeightService            $psWeightService
     ) {
         parent::__construct($storage);
         $this->currencyService           = $currencyService;
         $this->psOrderDataRepository     = $psOrderDataRepository;
         $this->productRepository         = $productRepository;
         $this->psOrderShipmentRepository = $psOrderShipmentRepository;
+        $this->psWeightService           = $psWeightService;
     }
 
     /**
@@ -103,6 +116,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
                 'externalIdentifier'  => $order->id,
                 'recipient'           => $this->getRecipient($order),
                 'deliveryOptions'     => $data['deliveryOptions'] ?? [],
+                'physicalProperties'  => $this->getPhysicalProperties($orderProducts),
                 'shipments'           => $this->getShipments($order),
                 'referenceIdentifier' => "PrestaShop: $order->id",
                 'shipmentPrice'       => $this->currencyService->convertToCents($order->total_shipping_tax_incl),
@@ -268,5 +282,23 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         return (new ShipmentCollection($shipmentsArray))
             ->where('deleted', false)
             ->values();
+    }
+
+    /**
+     * @param  array $orderProducts
+     *
+     * @return int[]
+     */
+    private function getPhysicalProperties(array $orderProducts): array
+    {
+        $weight = 0;
+
+        foreach ($orderProducts as $product) {
+            $weight += ((float) $product['product_weight'] * $product['product_quantity']);
+        }
+
+        return [
+            'weight' => $this->psWeightService->convertToGrams($weight),
+        ];
     }
 }

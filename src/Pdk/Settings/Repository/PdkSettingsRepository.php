@@ -44,6 +44,17 @@ class PdkSettingsRepository extends AbstractSettingsRepository
 
     /**
      * @param  string $key
+     * @param  mixed  $value
+     *
+     * @return void
+     */
+    public function store(string $key, $value): void
+    {
+        $this->configurationService->set($this->getOptionName($key), $value);
+    }
+
+    /**
+     * @param  string $key
      *
      * @return string
      */
@@ -55,16 +66,5 @@ class PdkSettingsRepository extends AbstractSettingsRepository
             ':plugin' => $appInfo['name'],
             ':name'   => Str::snake($key),
         ]);
-    }
-
-    /**
-     * @param  string $key
-     * @param  mixed  $value
-     *
-     * @return void
-     */
-    protected function store(string $key, $value): void
-    {
-        $this->configurationService->set($this->getOptionName($key), $value);
     }
 }
