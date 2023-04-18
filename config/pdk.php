@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Account\Contract\AccountRepositoryInterface;
 use MyParcelNL\Pdk\Api\Contract\ClientAdapterInterface;
+use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Base\Pdk;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
 use MyParcelNL\Pdk\Plugin\Api\Contract\BackendEndpointServiceInterface;
 use MyParcelNL\Pdk\Plugin\Api\Contract\FrontendEndpointServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\DeliveryOptionsServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\OrderStatusServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkCartRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkShippingMethodRepositoryInterface;
+use MyParcelNL\Pdk\Plugin\Contract\TaxServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhooksRepositoryInterface;
@@ -28,6 +29,7 @@ use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsShippingMethodRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsWebhooksRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\OrderStatusService;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsCronService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsViewService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
@@ -71,12 +73,12 @@ return [
     /**
      * Services
      */
-    //CronServiceInterface::class        => autowire(),
+    CronServiceInterface::class                 => autowire(PsCronService::class),
     LanguageServiceInterface::class             => autowire(LanguageService::class),
     OrderStatusServiceInterface::class          => autowire(OrderStatusService::class),
-    //    RenderServiceInterface::class           => autowire(RenderService::class), // not necessary probably
     ViewServiceInterface::class                 => autowire(PsViewService::class),
     WeightServiceInterface::class               => autowire(PsWeightService::class),
+    TaxServiceInterface::class                  => autowire(), //TODO
 
     /**
      * Endpoints
@@ -92,8 +94,11 @@ return [
     PdkWebhookServiceInterface::class     => autowire(PsWebhookService::class),
     PdkWebhooksRepositoryInterface::class => autowire(PsWebhooksRepository::class),
 
-    DeliveryOptionsServiceInterface::class => autowire(),
-
-    ClientAdapterInterface::class => autowire(Guzzle5ClientAdapter::class),
-    LoggerInterface::class        => autowire(PdkLogger::class),
+    /**
+     * Miscellaneous
+     */
+    ClientAdapterInterface::class         => autowire(Guzzle5ClientAdapter::class),
+    LoggerInterface::class                => autowire(PdkLogger::class),
+    //    ScriptServiceInterface::class         => autowire(PsScriptService::class), //TODO
 ];
+
