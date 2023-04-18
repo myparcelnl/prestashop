@@ -1,9 +1,7 @@
 <template>
-  <div class="content-div">
-    <div class="row">
-      <div class="col-sm-12">
-        <slot />
-      </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <slot />
     </div>
   </div>
 </template>

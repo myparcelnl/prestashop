@@ -2,42 +2,93 @@ import {
   Bootstrap4Box,
   Bootstrap4Button,
   Bootstrap4ButtonGroup,
-  Bootstrap4CheckboxInput,
   Bootstrap4Col,
   Bootstrap4DropdownButton,
-  Bootstrap4FormGroup,
   Bootstrap4Image,
   Bootstrap4Modal,
   Bootstrap4Notification,
   Bootstrap4RadioInput,
-  Bootstrap4Row,
   Bootstrap4SelectInput,
-  Bootstrap4Table,
   Bootstrap4TextInput,
   bootstrap4Config,
 } from '@myparcel-pdk/admin-preset-bootstrap4/src';
 import {
   DefaultCurrencyInput,
-  DefaultDropOffInput,
   DefaultHeading,
   DefaultLink,
-  DefaultMultiCheckbox,
-  DefaultMultiRadio,
+  DefaultMultiSelectInput,
   DefaultNumberInput,
-  DefaultTabNavButton,
+  DefaultRadioGroup,
+  DefaultTable,
   DefaultTableCol,
   DefaultTableRow,
   DefaultTimeInput,
-  DefaultToggleInput,
-} from '@myparcel-pdk/admin-components/src';
+} from '@myparcel-pdk/admin-preset-default/src';
 import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin/src';
 import {PsIcon} from './components';
 import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
 import {h} from 'vue';
+import PsCheckbox from './components/pdk/PsCheckbox.vue';
+import PsToggleInput from './components/pdk/PsToggleInput.vue';
+import PsCheckboxGroup from './components/pdk/PsCheckboxGroup.vue';
+import PsTextArea from './components/pdk/PsTextArea.vue';
+import PsDropOffInput from './components/pdk/PsDropOffInput.vue';
+import PsRow from './components/pdk/PsRow.vue';
+import PsTabNavButton from './components/pdk/PsTabNavButton.vue';
+import PsTabNavButtonWrapper from './components/pdk/PsTabNavButtonWrapper.vue';
+import PsFormGroup from './components/pdk/PsFormGroup.vue';
 
+// eslint-disable-next-line max-lines-per-function
 window.onload = () => {
   createPdkAdmin({
     ...bootstrap4Config,
+
+    components: {
+      PdkBox: Bootstrap4Box,
+      PdkButton: Bootstrap4Button,
+      PdkButtonGroup: Bootstrap4ButtonGroup,
+      PdkCheckboxGroup: PsCheckboxGroup,
+      PdkCheckboxInput: PsCheckbox,
+      PdkCodeEditor: PsTextArea,
+      PdkCol: Bootstrap4Col,
+      PdkCurrencyInput: DefaultCurrencyInput,
+      PdkDropOffInput: PsDropOffInput,
+      PdkDropdownButton: Bootstrap4DropdownButton,
+      PdkFormGroup: PsFormGroup,
+      PdkHeading: DefaultHeading,
+      PdkIcon: PsIcon,
+      PdkImage: Bootstrap4Image,
+      PdkLink: DefaultLink,
+      PdkLoader: h('div'),
+      PdkModal: Bootstrap4Modal,
+      PdkMultiSelectInput: DefaultMultiSelectInput,
+      PdkNotification: Bootstrap4Notification,
+      PdkNumberInput: DefaultNumberInput,
+      PdkPluginSettingsWrapper: PsPluginSettingsWrapper,
+      PdkRadioGroup: DefaultRadioGroup,
+      PdkRadioInput: Bootstrap4RadioInput,
+      PdkRow: PsRow,
+      PdkSelectInput: Bootstrap4SelectInput,
+      PdkSettingsDivider: h('hr'),
+      // PdkShipmentLabelWrapper,
+      PdkTabNavButton: PsTabNavButton,
+      PdkTabNavButtonWrapper: PsTabNavButtonWrapper,
+      PdkTable: DefaultTable,
+      PdkTableCol: DefaultTableCol,
+      PdkTableRow: DefaultTableRow,
+      PdkTextArea: PsTextArea,
+      PdkTextInput: Bootstrap4TextInput,
+      PdkTimeInput: DefaultTimeInput,
+      PdkToggleInput: PsToggleInput,
+    },
+
+    formConfig: {
+      form: {
+        attributes: {
+          class: 'form-horizontal',
+        },
+      },
+    },
 
     logLevel: LogLevel.Debug,
 
@@ -49,49 +100,6 @@ window.onload = () => {
       shipmentRow: 'fade',
       tabNavigation: 'fade',
       tableRow: 'fade',
-    },
-
-    formConfig: {
-      form: {
-        attributes: {
-          class: 'form-horizontal',
-        },
-      },
-    },
-
-    components: {
-      PdkBox: Bootstrap4Box,
-      PdkButton: Bootstrap4Button,
-      PdkButtonGroup: Bootstrap4ButtonGroup,
-      PdkCheckboxInput: Bootstrap4CheckboxInput,
-      PdkCol: Bootstrap4Col,
-      PdkDropdownButton: Bootstrap4DropdownButton,
-      PdkFormGroup: Bootstrap4FormGroup,
-      PdkImage: Bootstrap4Image,
-      PdkLoader: h('div'),
-      PdkModal: Bootstrap4Modal,
-      PdkNotification: Bootstrap4Notification,
-      PdkNumberInput: DefaultNumberInput,
-      PdkRadioInput: Bootstrap4RadioInput,
-      PdkRow: Bootstrap4Row,
-      PdkSelectInput: Bootstrap4SelectInput,
-      PdkTable: Bootstrap4Table,
-      PdkTextInput: Bootstrap4TextInput,
-
-      PdkCurrencyInput: DefaultCurrencyInput,
-      PdkDropOffInput: DefaultDropOffInput,
-      PdkHeading: DefaultHeading,
-      PdkLink: DefaultLink,
-      PdkMultiCheckbox: DefaultMultiCheckbox,
-      PdkMultiRadio: DefaultMultiRadio,
-      PdkTabNavButton: DefaultTabNavButton,
-      PdkTableCol: DefaultTableCol,
-      PdkTableRow: DefaultTableRow,
-      PdkTimeInput: DefaultTimeInput,
-      PdkToggleInput: DefaultToggleInput,
-
-      PdkIcon: PsIcon,
-      PdkPluginSettingsWrapper: PsPluginSettingsWrapper,
     },
   });
 };

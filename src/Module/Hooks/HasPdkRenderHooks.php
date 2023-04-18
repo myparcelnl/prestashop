@@ -154,6 +154,13 @@ trait HasPdkRenderHooks
             $controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/vue-demi/0.13.11/index.iife.min.js');
         }
 
+        /** use new-theme */
+        $controller->addCSS(
+            __PS_BASE_URI__ . $controller->admin_webpath . '/themes/new-theme/public/theme.css',
+            'all',
+            1
+        );
+
         $controller->addCSS($this->_path . 'views/js/admin/lib/style.css');
         $controller->addJS($this->_path . 'views/js/admin/lib/prestashop-admin.iife.js');
     }

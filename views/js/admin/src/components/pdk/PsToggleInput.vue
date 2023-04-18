@@ -6,23 +6,23 @@
           :id="`${id}_no`"
           :checked="model === false"
           class="ps-switch"
-          value="0"
           type="radio"
+          value="0"
           @change="model = false" />
         <label
           :for="`${id}_no`"
-          v-text="translate(labelNo)" />
+          v-text="translate('no')" />
 
         <input
           :id="`${id}_yes`"
           :checked="model === true"
           class="ps-switch"
-          value="1"
           type="radio"
+          value="1"
           @change="model = true" />
         <label
           :for="`${id}_yes`"
-          v-text="translate(labelYes)" />
+          v-text="translate('yes')" />
 
         <span class="slide-button" />
       </span>
@@ -32,65 +32,18 @@
   </div>
 </template>
 
-<script lang="ts">
-import {computed, defineComponent} from 'vue';
-import {generateId, useTranslate} from '@myparcel-pdk/admin/src';
+<script lang="ts" setup>
+import {ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/admin/src';
+import {InteractiveElementInstance} from '@myparcel/vue-form-builder/src';
+import {useVModel} from '@vueuse/core';
 
-/**
- * A checkbox. Needs an unique value.
- */
-export default defineComponent({
-  name: 'PsToggleInput',
+// eslint-disable-next-line vue/no-unused-properties
+const props = defineProps<{modelValue: boolean; element: InteractiveElementInstance}>();
+const emit = defineEmits<(e: 'update:modelValue', value: boolean) => void>();
 
-  props: {
-    /**
-     * Controls the disabled state.
-     */
-    disabled: {
-      type: Boolean,
-    },
+const model = useVModel(props, undefined, emit);
 
-    /**
-     * Label in the disabled state.
-     */
-    labelNo: {
-      type: String,
-      default: 'no',
-    },
+const id = generateFieldId(props.element as ElementInstance);
 
-    /**
-     * Label in the enabled state.
-     */
-    labelYes: {
-      type: String,
-      default: 'yes',
-    },
-
-    /**
-     * The value of the model.
-     */
-    // eslint-disable-next-line vue/no-unused-properties
-    modelValue: {
-      type: [String, Number, Boolean],
-      default: false,
-    },
-  },
-
-  emits: ['update:modelValue'],
-
-  setup: (props, ctx) => {
-    return {
-      id: generateId(),
-
-      model: computed({
-        get: () => Boolean(props.modelValue),
-        set: (value) => {
-          ctx.emit('update:modelValue', value);
-        },
-      }),
-
-      translate: useTranslate(),
-    };
-  },
-});
+const {translate} = useLanguage();
 </script>

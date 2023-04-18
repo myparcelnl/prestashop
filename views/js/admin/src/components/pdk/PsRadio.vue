@@ -4,8 +4,8 @@
       :id="`radio_${value}`"
       v-model="model"
       :value="value"
-      type="radio"
-      class="myparcel-radio" />
+      class="myparcel-radio"
+      type="radio" />
     <label
       :for="`radio_${value}`"
       v-text="translate(label)" />
@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
-import {useTranslate} from '@myparcel-pdk/admin/src';
+import {useLanguage} from '@myparcel-pdk/admin/src';
 import {useVModel} from '@vueuse/core';
 
 export default defineComponent({
@@ -45,7 +45,7 @@ export default defineComponent({
   emits: ['update:modelValue'],
 
   setup: (props, ctx) => ({
-    translate: useTranslate(),
+    translate: useLanguage(),
     model: useVModel(props, 'modelValue', ctx.emit),
   }),
 });

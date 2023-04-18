@@ -8,35 +8,34 @@
   }
 
   & + label:before {
-    content: " ";
     display: inline-flex;
     width: 20px;
     height: 20px;
     margin-right: 8px;
-    background-color: #FFF;
+    content: " ";
+    transition: border 0.15s ease-in-out 0s;
     border-width: 2px;
     border-style: solid;
     border-color: #B3C7CD;
     border-radius: 50%;
-    transition: border 0.15s ease-in-out 0s;
+    background-color: #FFF;
   }
 
   & + label:after {
-    content: " ";
     position: absolute;
-    margin: auto;
+    top: 3px;
+    left: 3px;
     width: 14px;
     height: 14px;
-    left: 3px;
-    top: 3px;
-    background-color: var(--primary);
+    margin: auto;
+    content: " ";
+    transition: transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33) 0s;
     transform: scale(0, 0);
     border-radius: 50%;
-    transition: transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33) 0s;
+    background-color: var(--primary);
   }
 
   &:checked + label:after {
     transform: scale(1, 1);
   }
 }
-

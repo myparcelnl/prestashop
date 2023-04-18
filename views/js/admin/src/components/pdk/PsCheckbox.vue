@@ -4,10 +4,10 @@
       <slot>{{ translate(label) }}</slot>
       <input
         v-model="model"
-        type="checkbox"
-        class="form-control"
         :disabled="disabled"
-        :value="value" />
+        :value="value"
+        class="form-control"
+        type="checkbox" />
       <i class="md-checkbox-control" />
     </label>
   </div>
@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
-import {useTranslate} from '@myparcel-pdk/admin/src';
+import {useLanguage} from '@myparcel-pdk/admin/src';
 import {useVModel} from '@vueuse/core';
 
 export default defineComponent({
@@ -48,7 +48,7 @@ export default defineComponent({
   setup: (props, ctx) => {
     return {
       model: useVModel(props, 'modelValue', ctx.emit),
-      translate: useTranslate(),
+      translate: useLanguage(),
     };
   },
 });

@@ -1,12 +1,12 @@
 <template>
   <button
-    type="button"
     :disabled="disabled"
+    type="button"
     @click="$emit('click')">
     <PdkIcon
       v-if="icon"
-      class="mr-1"
-      :icon="icon" />
+      :icon="icon"
+      class="mr-1" />
     <slot>
       {{ translate(label) }}
     </slot>
@@ -15,7 +15,7 @@
 
 <script lang="ts">
 /* eslint-disable vue/no-unused-properties */
-import {PdkIcon, useTranslate} from '@myparcel-pdk/admin/src';
+import {PdkIcon, useLanguage} from '@myparcel-pdk/admin/src';
 import {PropType, defineComponent} from 'vue';
 
 export default defineComponent({
@@ -39,7 +39,7 @@ export default defineComponent({
   emits: ['click'],
 
   setup: () => ({
-    translate: useTranslate(),
+    translate: useLanguage(),
   }),
 });
 </script>
