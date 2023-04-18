@@ -1,3 +1,4 @@
+import './assets/scss/index.scss';
 import {
   Bootstrap4Box,
   Bootstrap4Button,
