@@ -3,6 +3,7 @@ import {
   Bootstrap4Box,
   Bootstrap4Button,
   Bootstrap4ButtonGroup,
+  Bootstrap4CheckboxInput,
   Bootstrap4Col,
   Bootstrap4DropdownButton,
   Bootstrap4Image,
@@ -29,7 +30,6 @@ import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin/src';
 import {PsIcon} from './components';
 import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
 import {h} from 'vue';
-import PsCheckbox from './components/pdk/PsCheckbox.vue';
 import PsToggleInput from './components/pdk/PsToggleInput.vue';
 import PsCheckboxGroup from './components/pdk/PsCheckboxGroup.vue';
 import PsTextArea from './components/pdk/PsTextArea.vue';
@@ -49,7 +49,7 @@ window.onload = () => {
       PdkButton: Bootstrap4Button,
       PdkButtonGroup: Bootstrap4ButtonGroup,
       PdkCheckboxGroup: PsCheckboxGroup,
-      PdkCheckboxInput: PsCheckbox,
+      PdkCheckboxInput: Bootstrap4CheckboxInput,
       PdkCodeEditor: PsTextArea,
       PdkCol: Bootstrap4Col,
       PdkCurrencyInput: DefaultCurrencyInput,

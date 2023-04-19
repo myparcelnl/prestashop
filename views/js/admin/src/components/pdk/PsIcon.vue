@@ -17,7 +17,7 @@ const materialIconMap: Record<AdminIcon, string> = {
   [AdminIcon.Delete]: 'delete',
   [AdminIcon.Download]: 'download',
   [AdminIcon.Edit]: 'edit',
-  [AdminIcon.Export]: 'export',
+  [AdminIcon.Export]: 'exit_to_app',
   [AdminIcon.External]: 'external',
   [AdminIcon.Print]: 'print',
   [AdminIcon.Refresh]: 'refresh',

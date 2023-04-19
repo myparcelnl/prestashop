@@ -15,7 +15,7 @@
 
 <script lang="ts">
 /* eslint-disable vue/no-unused-properties */
-import {PdkIcon, useLanguage} from '@myparcel-pdk/admin/src';
+import {AdminIcon, useLanguage} from '@myparcel-pdk/admin/src';
 import {PropType, defineComponent} from 'vue';
 
 export default defineComponent({
@@ -26,7 +26,7 @@ export default defineComponent({
     },
 
     icon: {
-      type: String as PropType<PdkIcon>,
+      type: String as PropType<AdminIcon>,
       default: null,
     },
 
