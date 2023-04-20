@@ -13,33 +13,37 @@
   </button>
 </template>
 
-<script lang="ts">
-/* eslint-disable vue/no-unused-properties */
-import {AdminIcon, useLanguage} from '@myparcel-pdk/admin/src';
-import {PropType, defineComponent} from 'vue';
+<script lang="ts" setup>
+import {AdminIcon, useLanguage} from '@myparcel-pdk/frontend-admin-core/src';
+import {PropType} from 'vue';
+import {Size} from '@myparcel-pdk/common/src';
 
-export default defineComponent({
-  name: 'BaseButton',
-  props: {
-    disabled: {
-      type: Boolean,
-    },
-
-    icon: {
-      type: String as PropType<AdminIcon>,
-      default: null,
-    },
-
-    label: {
-      type: String,
-      default: null,
-    },
+defineProps({
+  disabled: {
+    type: Boolean,
   },
 
-  emits: ['click'],
+  icon: {
+    type: String as PropType<AdminIcon>,
+    default: null,
+  },
 
-  setup: () => ({
-    translate: useLanguage(),
-  }),
+  label: {
+    type: String,
+    default: null,
+  },
+
+  loading: {
+    type: Boolean,
+  },
+
+  size: {
+    type: String as PropType<Size>,
+    default: 'md',
+  },
 });
+
+defineEmits<(event: 'click') => void>();
+
+const {translate} = useLanguage();
 </script>

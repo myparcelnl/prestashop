@@ -1,11 +1,9 @@
 import './assets/scss/index.scss';
 import {
   Bootstrap4Box,
-  Bootstrap4Button,
   Bootstrap4ButtonGroup,
   Bootstrap4CheckboxInput,
   Bootstrap4Col,
-  Bootstrap4DropdownButton,
   Bootstrap4Image,
   Bootstrap4Modal,
   Bootstrap4Notification,
@@ -15,6 +13,7 @@ import {
   bootstrap4Config,
 } from '@myparcel-pdk/admin-preset-bootstrap4/src';
 import {
+  DefaultButton,
   DefaultCurrencyInput,
   DefaultHeading,
   DefaultLink,
@@ -27,17 +26,18 @@ import {
   DefaultTimeInput,
 } from '@myparcel-pdk/admin-preset-default/src';
 import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin/src';
-import {PsIcon} from './components';
-import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
-import {h} from 'vue';
-import PsToggleInput from './components/pdk/PsToggleInput.vue';
 import PsCheckboxGroup from './components/pdk/PsCheckboxGroup.vue';
-import PsTextArea from './components/pdk/PsTextArea.vue';
 import PsDropOffInput from './components/pdk/PsDropOffInput.vue';
+import PsFormGroup from './components/pdk/PsFormGroup.vue';
+import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
 import PsRow from './components/pdk/PsRow.vue';
 import PsTabNavButton from './components/pdk/PsTabNavButton.vue';
 import PsTabNavButtonWrapper from './components/pdk/PsTabNavButtonWrapper.vue';
-import PsFormGroup from './components/pdk/PsFormGroup.vue';
+import PsTextArea from './components/pdk/PsTextArea.vue';
+import PsToggleInput from './components/pdk/PsToggleInput.vue';
+import {h} from 'vue';
+import {PsIcon} from './components';
+import PsDropdownButton from './components/pdk/PsDropdownButton.vue';
 
 // eslint-disable-next-line max-lines-per-function
 window.onload = () => {
@@ -46,7 +46,7 @@ window.onload = () => {
 
     components: {
       PdkBox: Bootstrap4Box,
-      PdkButton: Bootstrap4Button,
+      PdkButton: DefaultButton,
       PdkButtonGroup: Bootstrap4ButtonGroup,
       PdkCheckboxGroup: PsCheckboxGroup,
       PdkCheckboxInput: Bootstrap4CheckboxInput,
@@ -54,7 +54,7 @@ window.onload = () => {
       PdkCol: Bootstrap4Col,
       PdkCurrencyInput: DefaultCurrencyInput,
       PdkDropOffInput: PsDropOffInput,
-      PdkDropdownButton: Bootstrap4DropdownButton,
+      PdkDropdownButton: PsDropdownButton,
       PdkFormGroup: PsFormGroup,
       PdkHeading: DefaultHeading,
       PdkIcon: PsIcon,
