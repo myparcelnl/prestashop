@@ -1,3 +1,8 @@
 .bootstrap .page-head h4.page-subtitle {
   display: none;
 }
+
+[data-pdk-context] .alert {
+  position: fixed;
+  z-index: 51;
+}
