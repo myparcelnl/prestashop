@@ -16,13 +16,13 @@
       :size="size"
       aria-haspopup="true"
       class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split"
-      @click="toggled = !toggled">
+      @click="toggled = !toggled"
+      @focusout="unToggle">
       <slot />
 
       <div
         v-show="toggled"
-        class="dropdown-menu"
-        @mouseleave="toggled = false">
+        class="dropdown-menu">
         <ActionButton
           v-for="(action, index) in dropdownActions.hidden"
           :key="`${index}_${action.id}`"
@@ -41,6 +41,12 @@
 <script lang="ts" setup>
 import {ActionButton, ActionDefinition, useDropdownData, useLanguage} from '@myparcel-pdk/frontend-admin-core/src';
 import {Size} from '@myparcel-pdk/common/src';
+
+const unToggle = () => {
+  setTimeout(() => {
+    toggled.value = false;
+  }, 200);
+};
 
 const props = defineProps<{
   // eslint-disable-next-line vue/no-unused-properties
