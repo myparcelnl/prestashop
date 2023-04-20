@@ -61,6 +61,11 @@ return [
     ]),
 
     /**
+     * Carrier used when fallback is required
+     */
+    'defaultCarrier'                            => value('postnl'),
+
+    /**
      * Repositories
      */
     AccountRepositoryInterface::class           => autowire(PdkAccountRepository::class),

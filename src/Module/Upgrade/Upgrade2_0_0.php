@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
+use Db;
+use DbQuery;
 use Generator;
 use MyParcelNL\Pdk\Base\Service\CurrencyService;
 use MyParcelNL\Pdk\Base\Support\Arr;
@@ -19,41 +21,19 @@ use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 class Upgrade2_0_0 extends AbstractUpgrade
 {
     protected const LEGACY_TABLE_CARRIER_CONFIGURATION = 'myparcelnl_carrier_configuration';
-
-    protected const LEGACY_TABLE_DELIVERY_SETTINGS = 'myparcelnl_delivery_settings';
-
-    protected const LEGACY_TABLE_ORDER_LABEL = 'myparcelnl_order_label';
-
+    protected const LEGACY_TABLE_DELIVERY_SETTINGS     = 'myparcelnl_delivery_settings';
+    protected const LEGACY_TABLE_ORDER_LABEL           = 'myparcelnl_order_label';
     protected const LEGACY_TABLE_PRODUCT_CONFIGURATION = 'myparcelnl_product_configuration';
-    private const OLD_CARRIERS            = ['postnl', 'dhlforyou', 'dhlparcelconnect', 'dhleuroplus'];
-    private const TRANSFORM_CAST_BOOL     = 'bool';
-    private const TRANSFORM_CAST_CENTS    = 'cents';
-    private const TRANSFORM_CAST_FLOAT    = 'float';
-    private const TRANSFORM_CAST_INT      = 'int';
-    private const TRANSFORM_CAST_STRING   = 'string';
-    private const TRANSFORM_KEY_CAST      = 'cast';
-    private const TRANSFORM_KEY_SOURCE    = 'source';
-    private const TRANSFORM_KEY_TARGET    = 'target';
-    private const TRANSFORM_KEY_TRANSFORM = 'transform';
-
-    /**
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     */
-    public function upgrade(): void
-    {
-        $query = new \DbQuery();
-        $query->select('*');
-        $query->from('configuration');
-        $query->where('name LIKE "myparcelnl_%"');
-
-        $oldValues = $this->db->executeS($query);
-        
-        $this->migrateSettings($oldValues);
-        // $this->migrateCartDeliveryOptions();
-        // $this->migrateOrderData();
-        // $this->migrateOrderShipments();
-    }
+    private const   OLD_CARRIERS                       = ['postnl', 'dhlforyou', 'dhlparcelconnect', 'dhleuroplus'];
+    private const   TRANSFORM_CAST_BOOL                = 'bool';
+    private const   TRANSFORM_CAST_CENTS               = 'cents';
+    private const   TRANSFORM_CAST_FLOAT               = 'float';
+    private const   TRANSFORM_CAST_INT                 = 'int';
+    private const   TRANSFORM_CAST_STRING              = 'string';
+    private const   TRANSFORM_KEY_CAST                 = 'cast';
+    private const   TRANSFORM_KEY_SOURCE               = 'source';
+    private const   TRANSFORM_KEY_TARGET               = 'target';
+    private const   TRANSFORM_KEY_TRANSFORM            = 'transform';
 
     /**
      * @param  array $oldSettings
@@ -80,6 +60,25 @@ class Upgrade2_0_0 extends AbstractUpgrade
         $settingsRepository->storeAllSettings($settings);
     }
 
+    /**
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     */
+    public function upgrade(): void
+    {
+        $this->createPsCarriers();
+        $query = new DbQuery();
+        $query->select('*');
+        $query->from('configuration');
+        $query->where('name LIKE "myparcelnl_%"');
+
+        $oldValues = $this->db->executeS($query);
+
+        $this->migrateSettings($oldValues);
+        // $this->migrateCartDeliveryOptions();
+        // $this->migrateOrderData();
+        // $this->migrateOrderShipments();
+    }
 
     /**
      * @return void
@@ -123,6 +122,66 @@ class Upgrade2_0_0 extends AbstractUpgrade
         }
     }
 
+    private function createCarrierConfigurationTable()
+    {
+        $db = Db::getInstance();
+        $db->execute(
+            "CREATE TABLE if NOT EXISTS `ps_myparcelnl_carrier_configuration` (
+  `ps_carrier_id` int(11) NOT NULL,
+  `myparcel_carrier` varchar(255) NOT NULL,
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;"
+        );
+    }
+
+    /**
+     * Creates and maps one PrestaShop carrier to a MyParcel carrier.
+     *
+     * @return void
+     */
+    private function createPsCarriers()
+    {
+        $this->createCarrierConfigurationTable();
+
+        $db         = Db::getInstance();
+        $carriers   = ['PostNL' => 'postnl'];
+        $carrierIds = [];
+
+        foreach ($carriers as $carrierHuman => $carrierName) {
+            $result = $db->insert('carrier', [
+                'name'                 => $carrierHuman . ' MyParcel',
+                'active'               => 1,
+                'is_module'            => 1,
+                'shipping_external'    => 1,
+                'need_range'           => 1,
+                'external_module_name' => Pdk::get('platform'),
+            ]);
+
+            if (! $result) {
+                // TODO: throw/log error when db operation has failed
+                return;
+            }
+
+            $request   = "SELECT id_carrier FROM ps_carrier WHERE name = '${carrierHuman} MyParcel'";
+            $carrierId = $db->getValue($request);
+
+            if (! $carrierId) {
+                //TODO: throw/log error when db operation has failed
+                return;
+            }
+
+            $carrierIds[$carrierName] = $carrierId;
+
+            $result = $db->insert('myparcelnl_carrier_configuration', [
+                'ps_carrier_id'    => $carrierId,
+                'myparcel_carrier' => $carrierName,
+            ]);
+        }
+
+        if (! $result) {
+            // TODO: throw/log error when db operation has failed
+            return;
+        }
+    }
 
     /**
      * @return string
@@ -154,58 +213,6 @@ class Upgrade2_0_0 extends AbstractUpgrade
     private function getProductSettingsTable(): string
     {
         return Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
-    }
-
-    /**
-     * @throws \PrestaShopDatabaseException
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
-     * @throws \PrestaShopException
-     */
-    private function migrateCartDeliveryOptions(): void
-    {
-        $query = new \DbQuery();
-
-        $query->select('*');
-        $query->from(self::LEGACY_TABLE_DELIVERY_SETTINGS);
-
-        $oldValues = $this->db->executeS($query);
-        $newValues = [];
-
-        foreach ($oldValues as $deliveryOptions) {
-            $data     = json_decode($deliveryOptions['delivery_settings'], true);
-            $instance = (new DeliveryOptions())->fill($data);
-
-            $newValues[] = [
-                'cartId'          => $deliveryOptions['id_cart'],
-                'shippingMethod'  => $deliveryOptions['id_delivery_setting'],
-                'deliveryOptions' => json_encode($instance->toArray()),
-            ];
-        }
-
-        $newValuesString      = implode(',', $newValues);
-        $deliveryOptionsTable = Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
-
-        $strr = array_reduce($newValues, static function ($acc, $val) {
-            $acc .= sprintf("('%s'),\n", implode("','", $val));
-
-            return $acc;
-        }, '');
-
-        $this->db->execute(
-            "INSERT INTO `$deliveryOptionsTable` (`cartId`, `deliveryOptions`, `deliveryMethod`) VALUES $newValuesString"
-        );
-
-        DefaultLogger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
-    }
-
-    private function migrateOrderData(): void
-    {
-        // from
-    }
-
-    private function migrateOrderShipments()
-    {
-        // from order_label to order_shipment
     }
 
     /**
@@ -719,6 +726,58 @@ class Upgrade2_0_0 extends AbstractUpgrade
     }
 
     /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
+     * @throws \PrestaShopException
+     */
+    private function migrateCartDeliveryOptions(): void
+    {
+        $query = new DbQuery();
+
+        $query->select('*');
+        $query->from(self::LEGACY_TABLE_DELIVERY_SETTINGS);
+
+        $oldValues = $this->db->executeS($query);
+        $newValues = [];
+
+        foreach ($oldValues as $deliveryOptions) {
+            $data     = json_decode($deliveryOptions['delivery_settings'], true);
+            $instance = (new DeliveryOptions())->fill($data);
+
+            $newValues[] = [
+                'cartId'          => $deliveryOptions['id_cart'],
+                'shippingMethod'  => $deliveryOptions['id_delivery_setting'],
+                'deliveryOptions' => json_encode($instance->toArray()),
+            ];
+        }
+
+        $newValuesString      = implode(',', $newValues);
+        $deliveryOptionsTable = Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
+
+        $strr = array_reduce($newValues, static function ($acc, $val) {
+            $acc .= sprintf("('%s'),\n", implode("','", $val));
+
+            return $acc;
+        }, '');
+
+        $this->db->execute(
+            "INSERT INTO `$deliveryOptionsTable` (`cartId`, `deliveryOptions`, `deliveryMethod`) VALUES $newValuesString"
+        );
+
+        DefaultLogger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
+    }
+
+    private function migrateOrderData(): void
+    {
+        // from
+    }
+
+    private function migrateOrderShipments()
+    {
+        // from order_label to order_shipment
+    }
+
+    /**
      * @param  array $oldSettings
      *
      * @return array
@@ -748,7 +807,6 @@ class Upgrade2_0_0 extends AbstractUpgrade
             }, DropOffDay::WEEKDAYS),
         ];
     }
-
 
     /**
      * @param  array $oldSettings
@@ -780,5 +838,4 @@ class Upgrade2_0_0 extends AbstractUpgrade
 
         return $newSettings;
     }
-
 }
