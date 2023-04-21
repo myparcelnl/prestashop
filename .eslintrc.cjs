@@ -4,6 +4,9 @@ module.exports = {
   rules: {
     'class-methods-use-this': 'off',
   },
+  env: {
+    jquery: true,
+  },
   overrides: [
     {
       files: ['./**/*.vue'],

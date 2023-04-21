@@ -91,6 +91,11 @@ window.onload = () => {
       },
     },
 
+    cssUtilities: {
+      whitespaceNoWrap: 'whitespace-nowrap',
+      displayFlex: 'd-flex',
+    },
+
     logLevel: LogLevel.Debug,
 
     transitions: {

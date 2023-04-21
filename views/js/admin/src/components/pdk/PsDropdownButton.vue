@@ -10,19 +10,16 @@
 
     <PdkButton
       v-if="dropdownActions.hidden.length > 0"
-      :aria-expanded="toggled"
+      ref="dropdown"
       :aria-label="translate('toggle_dropdown')"
       :disabled="disabled"
       :size="size"
       aria-haspopup="true"
       class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split"
-      @click="toggled = !toggled"
-      @focusout="unToggle">
+      data-toggle="dropdown">
       <slot />
 
-      <div
-        v-show="toggled"
-        class="dropdown-menu">
+      <div class="dropdown-menu">
         <ActionButton
           v-for="(action, index) in dropdownActions.hidden"
           :key="`${index}_${action.id}`"
@@ -40,13 +37,8 @@
 
 <script lang="ts" setup>
 import {ActionButton, ActionDefinition, useDropdownData, useLanguage} from '@myparcel-pdk/frontend-admin-core/src';
+import {ComponentPublicInstance, onMounted, ref} from 'vue';
 import {Size} from '@myparcel-pdk/common/src';
-
-const unToggle = () => {
-  setTimeout(() => {
-    toggled.value = false;
-  }, 200);
-};
 
 const props = defineProps<{
   // eslint-disable-next-line vue/no-unused-properties
@@ -56,7 +48,17 @@ const props = defineProps<{
   size?: Size;
 }>();
 
-const {dropdownActions, toggled} = useDropdownData(props);
+const {dropdownActions} = useDropdownData(props);
 
 const {translate} = useLanguage();
+
+const dropdown = ref<ComponentPublicInstance | null>(null);
+
+onMounted(() => {
+  if (!dropdown.value) {
+    return;
+  }
+
+  jQuery(dropdown.value.$el).dropdown();
+});
 </script>
