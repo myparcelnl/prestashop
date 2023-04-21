@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Upgrade;
 
-use Db;
 use DbQuery;
 use Generator;
 use MyParcelNL\Pdk\Base\Service\CurrencyService;
@@ -17,6 +16,7 @@ use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
+use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
 
 class Upgrade2_0_0 extends AbstractUpgrade
 {
@@ -63,10 +63,12 @@ class Upgrade2_0_0 extends AbstractUpgrade
     /**
      * @return void
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
      */
     public function upgrade(): void
     {
         $this->createPsCarriers();
+
         $query = new DbQuery();
         $query->select('*');
         $query->from('configuration');
@@ -122,14 +124,16 @@ class Upgrade2_0_0 extends AbstractUpgrade
         }
     }
 
-    private function createCarrierConfigurationTable()
+    /**
+     * @return void
+     */
+    private function createCarrierConfigurationTable(): void
     {
-        $db = Db::getInstance();
-        $db->execute(
-            "CREATE TABLE if NOT EXISTS `ps_myparcelnl_carrier_configuration` (
-  `ps_carrier_id` int(11) NOT NULL,
-  `myparcel_carrier` varchar(255) NOT NULL,
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;"
+        $this->db->execute(
+            "CREATE TABLE IF NOT EXISTS `ps_myparcel_carrier_configuration` (
+	ps_carrier_id int(11) NOT NULL DEFAULT '0',
+    myparcel_carrier varchar(255) NOT NULL DEFAULT ''
+) AUTO_INCREMENT=1;"
         );
     }
 
@@ -137,18 +141,19 @@ class Upgrade2_0_0 extends AbstractUpgrade
      * Creates and maps one PrestaShop carrier to a MyParcel carrier.
      *
      * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
      */
-    private function createPsCarriers()
+    private function createPsCarriers(): void
     {
         $this->createCarrierConfigurationTable();
 
-        $db         = Db::getInstance();
         $carriers   = ['PostNL' => 'postnl'];
         $carrierIds = [];
 
         foreach ($carriers as $carrierHuman => $carrierName) {
-            $result = $db->insert('carrier', [
-                'name'                 => $carrierHuman . ' MyParcel',
+            $result = $this->db->insert('carrier', [
+                'name'                 => sprintf('%s MyParcel', $carrierHuman),
                 'active'               => 1,
                 'is_module'            => 1,
                 'shipping_external'    => 1,
@@ -157,29 +162,26 @@ class Upgrade2_0_0 extends AbstractUpgrade
             ]);
 
             if (! $result) {
-                // TODO: throw/log error when db operation has failed
-                return;
+                throw new Exception('Cannot insert new carrier with name', compact($carrierHuman));
             }
 
             $request   = "SELECT id_carrier FROM ps_carrier WHERE name = '${carrierHuman} MyParcel'";
-            $carrierId = $db->getValue($request);
+            $carrierId = $this->db->getValue($request);
 
             if (! $carrierId) {
-                //TODO: throw/log error when db operation has failed
-                return;
+                throw new Exception('Cannot retrieve carrierId while upgrading', compact($request));
             }
 
             $carrierIds[$carrierName] = $carrierId;
 
-            $result = $db->insert('myparcelnl_carrier_configuration', [
+            $result = $this->db->insert('myparcel_carrier_configuration', [
                 'ps_carrier_id'    => $carrierId,
                 'myparcel_carrier' => $carrierName,
             ]);
         }
 
         if (! $result) {
-            // TODO: throw/log error when db operation has failed
-            return;
+            throw new Exception('Cannot insert new generated carrier configuration for carrier', compact($carrierName));
         }
     }
 
@@ -220,59 +222,16 @@ class Upgrade2_0_0 extends AbstractUpgrade
      */
     private function getTransformationMap(): Generator
     {
-        [
-            'MYPARCELNL_API_LOGGING'                         => 'general.apiLogging',
-            'MYPARCELNL_BPOST'                               => '',
-            'MYPARCELNL_AGE_CHECK'                           => '',
-            'MYPARCELNL_CONCEPT_FIRST'                       => '',
-            'MYPARCELNL_CUSTOMS_CODE'                        => '',
-            'MYPARCELNL_CUSTOMS_FORM'                        => '',
-            'MYPARCELNL_CUSTOMS_ORIGIN'                      => '',
-            'MYPARCELNL_DEFAULT_CUSTOMS_CODE'                => '',
-            'MYPARCELNL_DEFAULT_CUSTOMS_ORIGIN'              => '',
-            'MYPARCELNL_DELIVERED_ORDER_STATUS'              => '',
-            'MYPARCELNL_DELIVERY_OPTIONS_PRICE_FORMAT'       => '',
-            'MYPARCELNL_DPD'                                 => '',
-            'MYPARCELNL_IGNORE_ORDER_STATUS'                 => '',
-            'MYPARCELNL_INSURANCE'                           => '',
-            'MYPARCELNL_INSURANCE_BELGIUM'                   => '',
-            'MYPARCELNL_INSURANCE_FROM_PRICE'                => '',
-            'MYPARCELNL_INSURANCE_MAX_AMOUNT'                => '',
-            'MYPARCELNL_LABEL_CREATED_ORDER_STATUS'          => '',
-            'MYPARCELNL_LABEL_DESCRIPTION'                   => '',
-            'MYPARCELNL_LABEL_OPEN_DOWNLOAD'                 => '',
-            'MYPARCELNL_LABEL_POSITION'                      => '',
-            'MYPARCELNL_LABEL_PROMPT_POSITION'               => '',
-            'MYPARCELNL_LABEL_SCANNED_ORDER_STATUS'          => '',
-            'MYPARCELNL_LABEL_SIZE'                          => '',
-            'MYPARCELNL_ORDER_NOTIFICATION_AFTER'            => '',
-            'MYPARCELNL_PACKAGE_FORMAT'                      => '',
-            'MYPARCELNL_PACKAGE_TYPE'                        => '',
-            'MYPARCELNL_POSTNL'                              => '',
-            'MYPARCELNL_RECIPIENT_ONLY'                      => '',
-            'MYPARCELNL_RETURN_PACKAGE'                      => '',
-            'MYPARCELNL_SENT_ORDER_STATE_FOR_DIGITAL_STAMPS' => '',
-            'MYPARCELNL_SHARE_CUSTOMER_EMAIL'                => '',
-            'MYPARCELNL_SHARE_CUSTOMER_PHONE'                => '',
-            'MYPARCELNL_SIGNATURE_REQUIRED'                  => '',
-            'MYPARCELNL_STATUS_CHANGE_MAIL'                  => '',
-            'MYPARCELNL_USE_ADDRESS2_AS_STREET_NUMBER'       => '',
-            'MYPARCELNL_WEBHOOK_HASH'                        => '',
-            'MYPARCELNL_WEBHOOK_ID'                          => '',
-        ];
-
         /**
          * General
          */
-
         yield [
             self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_API_KEY',
             self::TRANSFORM_KEY_TARGET => 'general.apiKey',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
-        // general.trigger_manual_update
-
+        // TODO: Prestashop doesn't have PPS
         yield [
             self::TRANSFORM_KEY_SOURCE    => 'general.export_mode',
             self::TRANSFORM_KEY_TARGET    => 'general.orderMode',
@@ -282,7 +241,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'general.download_display',
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_LABEL_OPEN_DOWNLOAD',
             self::TRANSFORM_KEY_TARGET    => 'label.output',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
                 return $value === 'display' ? 'open' : 'download';
@@ -290,7 +249,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'general.label_format',
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_LABEL_SIZE',
             self::TRANSFORM_KEY_TARGET    => 'label.format',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
                 return $value === 'A6' ? 'a6' : 'a4';
@@ -298,17 +257,18 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'general.ask_for_print_position',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_LABEL_PROMPT_POSITION',
             self::TRANSFORM_KEY_TARGET => 'label.prompt',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'general.track_trace_email',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_STATUS_CHANGE_MAIL',
             self::TRANSFORM_KEY_TARGET => 'general.trackTraceInEmail',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'general.track_trace_my_account',
             self::TRANSFORM_KEY_TARGET => 'general.trackTraceInAccount',
@@ -321,7 +281,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
         //        ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'general.process_directly',
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_CONCEPT_FIRST',
             self::TRANSFORM_KEY_TARGET    => 'general.conceptShipments',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): bool {
                 return ! $value;
@@ -334,10 +294,11 @@ class Upgrade2_0_0 extends AbstractUpgrade
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'general.change_order_status_after',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_ORDER_NOTIFICATION_AFTER',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
+        // TODO
         // NOTE: Risky. Resulting value may not exist in array of order statuses.
         yield [
             self::TRANSFORM_KEY_SOURCE => 'general.automatic_order_status',
@@ -345,20 +306,20 @@ class Upgrade2_0_0 extends AbstractUpgrade
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'general.barcode_in_note',
-            self::TRANSFORM_KEY_TARGET => 'general.barcodeInNote',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
+        //        yield [
+        //            self::TRANSFORM_KEY_SOURCE => 'general.barcode_in_note',
+        //            self::TRANSFORM_KEY_TARGET => 'general.barcodeInNote',
+        //            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        //        ];
+
+        //        yield [
+        //            self::TRANSFORM_KEY_SOURCE => 'general.barcode_in_note_title',
+        //            self::TRANSFORM_KEY_TARGET => 'general.barcodeInNoteTitle',
+        //            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING, // TODO: can also be null, is this a problem?
+        //        ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'general.barcode_in_note_title',
-            self::TRANSFORM_KEY_TARGET => 'general.barcodeInNoteTitle',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING, // TODO: can also be null, is this a problem?
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'general.error_logging',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_API_LOGGING',
             self::TRANSFORM_KEY_TARGET => 'general.apiLogging',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
@@ -368,23 +329,26 @@ class Upgrade2_0_0 extends AbstractUpgrade
          */
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'checkout.use_split_address_fields',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_USE_ADDRESS2_AS_STREET_NUMBER',
             self::TRANSFORM_KEY_TARGET => 'checkout.useSeparateAddressFields',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_enabled',
             self::TRANSFORM_KEY_TARGET => 'checkout.enableDeliveryOptions',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_enabled_for_backorders',
             self::TRANSFORM_KEY_TARGET => 'checkout.enableDeliveryOptionsWhenNotInStock',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_display',
             self::TRANSFORM_KEY_TARGET => 'checkout.deliveryOptionsDisplay',
@@ -392,6 +356,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
             // TODO check this setting, should be for specific shipping methods
         ];
 
+        // TODO
         // NOTE: Risky. Resulting value may not exist in array of checkout hooks.
         yield [
             self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_position',
@@ -400,13 +365,14 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'checkout.delivery_options_price_format',
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_DELIVERY_OPTIONS_PRICE_FORMAT',
             self::TRANSFORM_KEY_TARGET    => 'checkout.priceType',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
                 return $value === 'total_price' ? 'included' : 'excluded';
             },
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE    => 'checkout.pickup_locations_default_view',
             self::TRANSFORM_KEY_TARGET    => 'checkout.pickupLocationsDefaultView',
@@ -415,6 +381,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
             },
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_custom_css',
             self::TRANSFORM_KEY_TARGET => 'checkout.deliveryOptionsCustomCss',
@@ -427,22 +394,22 @@ class Upgrade2_0_0 extends AbstractUpgrade
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_title',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_TITLE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.morning_title',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_MORNING_TITLE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.standard_title',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_STANDARD_TITLE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.evening_title',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_EVENING_TITLE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
@@ -452,18 +419,33 @@ class Upgrade2_0_0 extends AbstractUpgrade
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.only_recipient_title',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_ONLY_RECIPIENT_TITLE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.signature_title',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SIGNATURE_TITLE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.pickup_title',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_PICKUP_TITLE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
+        //        ];
+
+        //        yield [
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_HOUSE_NUMBER_TITLE',
+        //            self::TRANSFORM_KEY_TARGET => '' // TODO
+        //        ];
+
+        //        yield [
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_CITY_TITLE',
+        //            self::TRANSFORM_KEY_TARGET => '' // TODO
+        //        ];
+
+        //        yield [
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_POSTCODE_TITLE',
+        //            self::TRANSFORM_KEY_TARGET => '' // TODO
         //        ];
 
         //        yield [
@@ -476,7 +458,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
          */
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'export_defaults.shipping_methods_package_types',
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_PACKAGE_TYPE',
             self::TRANSFORM_KEY_TARGET    => 'checkout.allowedShippingMethods',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): array {
                 if (! is_array($value)) {
@@ -500,15 +482,16 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'export_defaults.connect_email',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SHARE_CUSTOMER_EMAIL',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'export_defaults.connect_phone',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SHARE_CUSTOMER_PHONE',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'export_defaults.save_customer_address',
             self::TRANSFORM_KEY_TARGET => 'order.saveCustomerAddress',
@@ -516,17 +499,19 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_defaults.label_description',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_LABEL_DESCRIPTION',
             self::TRANSFORM_KEY_TARGET => 'label.description',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'export_defaults.empty_parcel_weight',
             self::TRANSFORM_KEY_TARGET => 'order.emptyParcelWeight',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'export_defaults.empty_digital_stamp_weight',
             self::TRANSFORM_KEY_TARGET => 'order.emptyDigitalStampWeight',
@@ -534,11 +519,12 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_defaults.hs_code',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DEFAULT_CUSTOMS_CODE',
             self::TRANSFORM_KEY_TARGET => 'customs.customsCode',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'export_defaults.package_contents',
             self::TRANSFORM_KEY_TARGET => 'customs.packageContents',
@@ -546,7 +532,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_defaults.country_of_origin',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DEFAULT_CUSTOMS_ORIGIN',
             self::TRANSFORM_KEY_TARGET => 'customs.countryOfOrigin',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
@@ -565,25 +551,25 @@ class Upgrade2_0_0 extends AbstractUpgrade
          * Carriers
          */
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_age_check',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_AGE_CHECK',
             self::TRANSFORM_KEY_TARGET => 'exportAgeCheck',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_insured',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE',
             self::TRANSFORM_KEY_TARGET => 'exportInsurance',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_insured_from_price',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_FROM_PRICE',
             self::TRANSFORM_KEY_TARGET => 'exportInsuranceAmount',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_insured_amount',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_MAX_AMOUNT',
             self::TRANSFORM_KEY_TARGET => 'exportInsuranceUpTo',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
@@ -594,130 +580,147 @@ class Upgrade2_0_0 extends AbstractUpgrade
         //        ];
 
         //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'export_insured_for_be',
+        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_BELGIUM',
         //            self::TRANSFORM_KEY_TARGET => '',
         //        ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_large_format',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_PACKAGE_FORMAT',
             self::TRANSFORM_KEY_TARGET => 'exportLargeFormat',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_only_recipient',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_RECIPIENT_ONLY',
             self::TRANSFORM_KEY_TARGET => 'exportOnlyRecipient',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'export_return_shipments',
-        //            self::TRANSFORM_KEY_TARGET => 'exportReturn',
-        //            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        //        ];
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_RETURN_PACKAGE',
+            self::TRANSFORM_KEY_TARGET => 'exportReturn',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_signature',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SIGNATURE_REQUIRED',
             self::TRANSFORM_KEY_TARGET => 'exportSignature',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'delivery_enabled',
             self::TRANSFORM_KEY_TARGET => 'allowDeliveryOptions',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'delivery_standard_fee',
             self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypeStandard',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'digital_stamp_default_weight',
             self::TRANSFORM_KEY_TARGET => 'digitalStampDefaultWeight',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'allow_show_delivery_date',
             self::TRANSFORM_KEY_TARGET => 'showDeliveryDay',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'delivery_days_window',
             self::TRANSFORM_KEY_TARGET => 'deliveryDaysWindow',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'drop_off_delay',
             self::TRANSFORM_KEY_TARGET => 'dropOffDelay',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'monday_delivery_enabled',
             self::TRANSFORM_KEY_TARGET => 'allowMondayDelivery',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'delivery_morning_enabled',
             self::TRANSFORM_KEY_TARGET => 'allowMorningDelivery',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'delivery_morning_fee',
             self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypeMorning',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'delivery_evening_enabled',
             self::TRANSFORM_KEY_TARGET => 'allowEveningDelivery',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'delivery_evening_fee',
             self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypeEvening',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'only_recipient_enabled',
             self::TRANSFORM_KEY_TARGET => 'allowOnlyRecipient',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'only_recipient_fee',
             self::TRANSFORM_KEY_TARGET => 'priceOnlyRecipient',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'signature_enabled',
             self::TRANSFORM_KEY_TARGET => 'allowSignature',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'signature_fee',
             self::TRANSFORM_KEY_TARGET => 'priceSignature',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'pickup_enabled',
             self::TRANSFORM_KEY_TARGET => 'allowPickupPoints',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
+        // TODO
         yield [
             self::TRANSFORM_KEY_SOURCE => 'pickup_fee',
             self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypePickup',

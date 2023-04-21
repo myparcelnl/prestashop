@@ -54,6 +54,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
                 'MyParcel-PrestaShop' => $version,
             ]),
 
+            'triggerUpgradeBefore' => '2.0.1',
             'moduleTabName' => value('shipping_logistics'),
 
             'prestaShopVersionMin' => '1.7.6',

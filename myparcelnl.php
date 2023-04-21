@@ -61,7 +61,7 @@ class MyParcelNL extends CarrierModule
     {
         $name        = self::MODULE_NAME;
         $version     = $this->getVersionFromComposer();
-        $displayName = $this->l('prestashop_module_name');
+        $displayName = $this->l($name);
 
         $this->name          = $name;
         $this->version       = $version;
@@ -81,6 +81,12 @@ class MyParcelNL extends CarrierModule
             $this->getLocalPath(),
             $this->getBaseUrl()
         );
+
+        /** @note trigger upgrade */
+        if ($version <= Pdk::get('triggerUpgradeBefore')) {
+            $upgrade = new \MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0();
+            $upgrade->upgrade();
+        }
 
         $this->tab                    = Pdk::get('moduleTabName');
         $this->ps_versions_compliancy = [

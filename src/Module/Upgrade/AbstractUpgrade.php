@@ -7,10 +7,10 @@ namespace MyParcelNL\PrestaShop\Module\Upgrade;
 defined('_PS_VERSION_') or die();
 
 use Exception;
-use MyParcelNL\PrestaShop\Service\Concern\HasInstance;
-use MyParcelNL\PrestaShop\Service\Platform\PlatformServiceFactory;
+use MyParcelNL\Sdk\src\Concerns\HasInstance;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
+
 
 abstract class AbstractUpgrade
 {
@@ -32,7 +32,7 @@ abstract class AbstractUpgrade
     final public function __construct()
     {
         $this->db              = Db::getInstance();
-        $this->platformService = PlatformServiceFactory::create();
+        $this->platformService = self::createPlatform();
     }
 
     /**
@@ -59,5 +59,19 @@ abstract class AbstractUpgrade
         }
 
         return true;
+    }
+
+    /**
+     */
+    public static function createPlatform()
+    {
+        // TODO determine which platform has to be returned
+        //return MyParcelPlatformService::getInstance();
+
+        // if (Pdk::get('name') === 'myparcelbe') {
+        //    return SendMyParcelPlatformService::getInstance();
+        // }
+
+        //throw new \RuntimeException('Could not determine platform.');
     }
 }
