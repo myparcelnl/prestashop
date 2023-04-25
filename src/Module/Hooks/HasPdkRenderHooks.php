@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use Address;
+use Media;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Facade\RenderService;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
+use MyParcelNL\Pdk\Plugin\Service\RenderService;
 use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Service\PsRenderService;
-use PrestaShop\PrestaShop\Adapter\Validate;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
 trait HasPdkRenderHooks
@@ -162,29 +162,24 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayCarrierExtraContent($params)
     {
-        /** @var PsRenderService $renderService */
+        /** @var \MyParcelNL\Pdk\Plugin\Service\RenderService $renderService */
         $renderService = Pdk::get(PsRenderService::class);
+
         /** @var PsCartRepository $cartRepository */
         $cartRepository = Pdk::get(PsCartRepository::class);
-        $renderService->renderDeliveryOptions($cartRepository->get($this->context->cart));
-        $address = new Address($this->context->cart->id_address_delivery);
 
-        if (! Validate::isLoadedObject($address)) {
-            return '';
-        }
-
-        $address->address1 = preg_replace('/\D/', '', $address->address1);
+        //        $address->address1 = preg_replace('/\D/', '', $address->address1);
 
         if (empty($this->context->cart->id_carrier)) {
-            $selectedDeliveryOption          = current($this->context->cart->getDeliveryOption(null, false, false));
+            $selectedDeliveryOption = current($this->context->cart->getDeliveryOption(null, false, false));
             $this->context->cart->id_carrier = (int) $selectedDeliveryOption;
         }
 
+        $cart = $cartRepository->get($this->context->cart);
+        $this->context->smarty->setEscapeHtml(false);
+        $renderService->renderDeliveryOptions($cart);
         $this->context->smarty->assign([
-            'address'               => $address,
-            'shipping_cost'         => 0,
-            'carrier'               => $params['carrier'],
-            'enableDeliveryOptions' => true,
+            'deliveryOptions' => $renderService->renderDeliveryOptions($cart),
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier.tpl');
@@ -193,9 +188,16 @@ trait HasPdkRenderHooks
     public function hookHeader()
     {
         $version = Pdk::get('deliveryOptionsVersion');
+
+        $this->context->controller->registerJavascript(
+            'myparcelnl-frontend-scripts',
+            $this->_path . 'views/js/frontend/lib/prestashop-frontend.iife.js',
+            ['server' => 'local', 'position' => 'head', 'priority' => 1]
+        );
+
         $this->context->controller->registerJavascript(
             'myparcelnl-delivery-options',
-            sprintf('https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.lib.js', $version),
+            sprintf('https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js', $version),
             ['server' => 'remote', 'position' => 'head', 'priority' => 1]
         );
     }

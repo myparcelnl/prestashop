@@ -1,8 +1,8 @@
-import {getDeliveryOptionsRow} from './functions/jquery/getDeliveryOptionsRow';
-import {initializeMyParcelForm} from './functions/initializeMyParcelForm';
-import {onUpdatedDeliveryOptions} from './hooks/onUpdatedDeliveryOptions';
-import {psOnChangedCheckoutStep} from './hooks/psOnChangedCheckoutStep';
-import {psOnUpdatedDeliveryForm} from './hooks/psOnUpdatedDeliveryForm';
+import { getDeliveryOptionsRow } from './functions/jquery/getDeliveryOptionsRow';
+import { initializeMyParcelForm } from './functions/initializeMyParcelForm';
+import { onUpdatedDeliveryOptions } from './hooks/onUpdatedDeliveryOptions';
+import { psOnChangedCheckoutStep } from './hooks/psOnChangedCheckoutStep';
+import { psOnUpdatedDeliveryForm } from './hooks/psOnUpdatedDeliveryForm';
 
 (() => {
   /**

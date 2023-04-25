@@ -28,6 +28,7 @@ class PsCartRepository extends AbstractPdkCartRepository
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface           $storage
      * @param  \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface $productRepository
+     * @param  \MyParcelNL\Pdk\Plugin\Contract\TaxServiceInterface         $taxService
      */
     public function __construct(
         StorageInterface           $storage,
