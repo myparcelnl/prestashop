@@ -88,6 +88,8 @@ class MyParcelNL extends CarrierModule
             $upgrade->upgrade();
         }
 
+        $this->registerHook('header');
+
         $this->tab                    = Pdk::get('moduleTabName');
         $this->ps_versions_compliancy = [
             'min' => Pdk::get('prestaShopVersionMin'),

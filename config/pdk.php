@@ -16,6 +16,7 @@ use MyParcelNL\Pdk\Plugin\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkShippingMethodRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\TaxServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface;
+use MyParcelNL\Pdk\Plugin\Service\RenderServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhooksRepositoryInterface;
 use MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface;
@@ -30,6 +31,7 @@ use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsShippingMethodRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsWebhooksRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\OrderStatusService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsCronService;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsFrontendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsViewService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
@@ -37,13 +39,17 @@ use MyParcelNL\PrestaShop\Pdk\Service\LanguageService;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\Ps17ConfigurationService;
+use MyParcelNL\PrestaShop\Service\PsRenderService;
+use MyParcelNL\PrestaShop\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Service\PsWeightService;
 use Psr\Log\LoggerInterface;
 use function DI\autowire;
 use function DI\value;
 
 return [
-    'mode'                                      => value(_PS_MODE_DEV_ ? Pdk::MODE_DEVELOPMENT : Pdk::MODE_PRODUCTION),
+    'mode'                                      => value(
+        _PS_MODE_DEV_ ? Pdk::MODE_DEVELOPMENT : Pdk::MODE_PRODUCTION
+    ),
 
     /**
      * The version of the delivery options in the checkout.
@@ -83,12 +89,13 @@ return [
     OrderStatusServiceInterface::class          => autowire(OrderStatusService::class),
     ViewServiceInterface::class                 => autowire(PsViewService::class),
     WeightServiceInterface::class               => autowire(PsWeightService::class),
-    TaxServiceInterface::class                  => autowire(), //TODO
+    TaxServiceInterface::class                  => autowire(PsTaxService::class),
+    RenderServiceInterface::class               => autowire(PsRenderService::class),
 
     /**
      * Endpoints
      */
-    FrontendEndpointServiceInterface::class     => autowire(),
+    FrontendEndpointServiceInterface::class     => autowire(PsFrontendEndpointService::class),
     BackendEndpointServiceInterface::class      => autowire(PsBackendEndpointService::class),
 
     ConfigurationServiceInterface::class  => autowire(Ps17ConfigurationService::class),

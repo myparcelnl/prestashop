@@ -17,7 +17,6 @@ use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Database\Migrations;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
-use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
 use ObjectModel;
@@ -68,7 +67,7 @@ trait HasModuleInstall
         $this->registerHooks();
         $this->installTabs();
         //        $this->addDefaultConfigurations();
-        // $this->installCarriers();
+        $this->installCarriers();
 
         //Tools::clearSf2Cache();
 
