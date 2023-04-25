@@ -7,6 +7,7 @@ use MyParcelNL\Pdk\Api\Contract\ClientAdapterInterface;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Base\Pdk;
+use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
 use MyParcelNL\Pdk\Plugin\Api\Contract\BackendEndpointServiceInterface;
 use MyParcelNL\Pdk\Plugin\Api\Contract\FrontendEndpointServiceInterface;
@@ -14,9 +15,9 @@ use MyParcelNL\Pdk\Plugin\Contract\OrderStatusServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkCartRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkShippingMethodRepositoryInterface;
+use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\TaxServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface;
-use MyParcelNL\Pdk\Plugin\Service\RenderServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhooksRepositoryInterface;
 use MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface;
@@ -32,6 +33,7 @@ use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsWebhooksRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\OrderStatusService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsCronService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsFrontendEndpointService;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsScriptService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsViewService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
@@ -111,6 +113,6 @@ return [
      */
     ClientAdapterInterface::class         => autowire(Guzzle5ClientAdapter::class),
     LoggerInterface::class                => autowire(PdkLogger::class),
-    //    ScriptServiceInterface::class         => autowire(PsScriptService::class), //TODO
+    ScriptServiceInterface::class         => autowire(PsScriptService::class),
 ];
 
