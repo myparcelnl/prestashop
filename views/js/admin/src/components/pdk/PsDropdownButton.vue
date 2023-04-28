@@ -6,7 +6,7 @@
       :action="action"
       :disabled="disabled"
       :hide-text="hideText"
-      class="btn btn-primary btn-sm text-nowrap" />
+      class="btn-sm text-nowrap" />
 
     <PdkButton
       v-if="dropdownActions.hidden.length > 0"
@@ -15,7 +15,7 @@
       :disabled="disabled"
       :size="size"
       aria-haspopup="true"
-      class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split"
+      class="btn-sm dropdown-toggle dropdown-toggle-split"
       data-toggle="dropdown">
       <slot />
 

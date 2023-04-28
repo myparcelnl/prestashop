@@ -1,6 +1,7 @@
 import './assets/scss/index.scss';
 import {
   Bootstrap4Box,
+  Bootstrap4Button,
   Bootstrap4ButtonGroup,
   Bootstrap4CheckboxInput,
   Bootstrap4Col,
@@ -13,7 +14,6 @@ import {
   bootstrap4Config,
 } from '@myparcel-pdk/admin-preset-bootstrap4/src';
 import {
-  DefaultButton,
   DefaultCurrencyInput,
   DefaultHeading,
   DefaultLink,
@@ -46,7 +46,7 @@ window.onload = () => {
 
     components: {
       PdkBox: Bootstrap4Box,
-      PdkButton: DefaultButton,
+      PdkButton: Bootstrap4Button,
       PdkButtonGroup: Bootstrap4ButtonGroup,
       PdkCheckboxGroup: PsCheckboxGroup,
       PdkCheckboxInput: Bootstrap4CheckboxInput,
