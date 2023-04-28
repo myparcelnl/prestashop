@@ -14,6 +14,7 @@ use MyParcelNL\Pdk\Facade\Settings as SettingsFacade;
 use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
 use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Pdk\Shipment\Model\DropOffDay;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
@@ -130,7 +131,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
     private function createCarrierConfigurationTable(): void
     {
         $this->db->execute(
-            "CREATE TABLE IF NOT EXISTS `ps_myparcel_carrier_configuration` (
+            "CREATE TABLE IF NOT EXISTS ps_myparcel_carrier_configuration (
 	ps_carrier_id int(11) NOT NULL DEFAULT '0',
     myparcel_carrier varchar(255) NOT NULL DEFAULT ''
 ) AUTO_INCREMENT=1;"

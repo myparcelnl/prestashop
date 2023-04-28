@@ -24,7 +24,6 @@ class PsPdkBootstrapper extends PdkBootstrapper
         'OrderShipmentRepository'        => MyparcelnlOrderShipment::class,
         'ProductSettingsRepository'      => MyparcelnlProductSettings::class,
     ];
-
     protected const PRESTASHOP_SERVICES     = [
         'ps.entityManager' => 'doctrine.orm.entity_manager',
         'ps.configuration' => 'prestashop.adapter.legacy.configuration',
@@ -55,7 +54,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             ]),
 
             'triggerUpgradeBefore' => '2.0.1',
-            'moduleTabName' => value('shipping_logistics'),
+            'moduleTabName'        => value('shipping_logistics'),
 
             'prestaShopVersionMin' => '1.7.6',
             'prestaShopVersionMax' => '8.0',
@@ -72,12 +71,12 @@ class PsPdkBootstrapper extends PdkBootstrapper
      */
     private function resolvePrestaShopRepositories(): array
     {
-        return array_map(static function ($serviceName) {
-            return factory(function () use ($serviceName) {
+        return array_map(static function ($repositoryName) {
+            return factory(function () use ($repositoryName) {
                 /** @var \PrestaShop\PrestaShop\Core\Foundation\Database\EntityManager $entityManager */
                 $entityManager = Pdk::get('ps.entityManager');
 
-                return $entityManager->getRepository($serviceName);
+                return $entityManager->getRepository($repositoryName);
             });
         }, self::PRESTASHOP_REPOSITORIES);
     }

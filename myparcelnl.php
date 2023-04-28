@@ -8,6 +8,7 @@ use MyParcelNL\PrestaShop\Module\Concern\HasModuleInstall;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleUninstall;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
+use MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use PrestaShopBundle\Exception\InvalidModuleException;
 
@@ -84,8 +85,9 @@ class MyParcelNL extends CarrierModule
 
         /** @note trigger upgrade */
         if ($version <= Pdk::get('triggerUpgradeBefore')) {
-            $upgrade = new \MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0();
-            $upgrade->upgrade();
+            $this->upgrade(Upgrade2_0_0::class);
+            //$upgrade = new \MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0();
+            //$upgrade->upgrade();
         }
 
         $this->registerHook('header');
