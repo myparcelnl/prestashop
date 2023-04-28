@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
-use Address;
-use Media;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
-use MyParcelNL\Pdk\Plugin\Service\RenderService;
 use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
@@ -26,10 +23,8 @@ trait HasPdkRenderHooks
      */
     public function getContent(): string
     {
-        /** @var \MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface $renderService */
-        $renderService = Pdk::get(RenderServiceInterface::class);
-
-        return $renderService->renderPluginSettings();
+        return $this->renderService()
+            ->renderPluginSettings();
     }
 
     public function hookActionOrderGridDefinitionModifier(array $params): void
@@ -73,7 +68,8 @@ trait HasPdkRenderHooks
                 $repository = Pdk::get(PdkOrderRepository::class);
                 $order      = $repository->get($row['id_order']);
 
-                $row['myparcel'] = RenderService::renderOrderListItem($order);
+                $row['myparcel'] = self::renderService()
+                    ->renderOrderListItem($order);
 
                 return $row;
             }, $params['presented_grid']['data']['records']->all())
@@ -88,8 +84,10 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminAfterHeader(): string
     {
-        $html = RenderService::renderNotifications();
-        $html .= RenderService::renderModals();
+        $html = $this->renderService()
+            ->renderNotifications();
+        $html .= $this->renderService()
+            ->renderModals();
 
         return $html;
     }
@@ -100,7 +98,8 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminEndContent(): string
     {
-        return RenderService::renderInitScript();
+        return $this->renderService()
+            ->renderInitScript();
     }
 
     /**
@@ -118,7 +117,8 @@ trait HasPdkRenderHooks
         $repository = Pdk::get(PdkOrderRepository::class);
         $order      = $repository->get($params['id_order']);
 
-        return RenderService::renderOrderBox($order);
+        return $this->renderService()
+            ->renderOrderBox($order);
     }
 
     /**
@@ -134,7 +134,8 @@ trait HasPdkRenderHooks
         $repository = Pdk::get(PdkProductRepository::class);
         $product    = $repository->getProduct($params['id_product']);
 
-        return RenderService::renderProductSettings($product);
+        return $this->renderService()
+            ->renderProductSettings($product);
     }
 
     /**
@@ -200,5 +201,10 @@ trait HasPdkRenderHooks
             sprintf('https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js', $version),
             ['server' => 'remote', 'position' => 'head', 'priority' => 1]
         );
+    }
+
+    private function renderService(): RenderServiceInterface
+    {
+        return Pdk::get(RenderServiceInterface::class);
     }
 }
