@@ -10,3 +10,7 @@
 .dropdown-item.btn-primary {
   background-color: transparent;
 }
+
+.nav-pills + div .card {
+  margin-top: .625rem;
+}

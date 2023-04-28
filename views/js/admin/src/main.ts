@@ -94,6 +94,7 @@ window.onload = () => {
     cssUtilities: {
       whitespaceNoWrap: 'whitespace-nowrap',
       displayFlex: 'd-flex',
+      card: 'card card-body',
     },
 
     logLevel: LogLevel.Debug,
