@@ -16,6 +16,58 @@ export const updateDeliveryOptionsConfig = (carrierName: string): void => {
   const configStore = getConfigStore();
   const hasCarrierConfig = configStore.hasOwnProperty(carrierName);
 
+  createPdkCheckout({
+    fields: {
+      [PdkField.ShippingMethod]: createId('shipping_method'),
+      [PdkField.ToggleAddressType]: '#ship-to-different-address-checkbox',
+      [AddressType.Billing]: createFields(PREFIX_BILLING, createName),
+      [AddressType.Shipping]: createFields(PREFIX_SHIPPING, createName),
+    },
+
+    formData: {
+      [PdkField.ShippingMethod]: 'delivery_option_13',
+      [PdkField.ToggleAddressType]: 'delivery_option_13',
+      [AddressType.Billing]: createFields(PREFIX_BILLING),
+      [AddressType.Shipping]: createFields(PREFIX_SHIPPING),
+    },
+
+    getForm: () => {
+      const getElement = useUtil('getElement');
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return getElement('#js-delivery')!;
+    },
+
+    initialize: () => {
+      return new Promise((resolve) => {
+        jQuery(() => {
+          resolve();
+        });
+      });
+    },
+
+    selectors: {
+      deliveryOptionsWrapper: '#mypa-delivery-options-wrapper',
+      hasAddressType: '.woocommerce-billing-fields__field-wrapper',
+    },
+
+    toggleField(field: HTMLInputElement, show: boolean): void {
+      const $field = jQuery(field);
+      const $wrapper = $field.closest('.form-row');
+
+      if (show) {
+        $wrapper.show();
+      } else {
+        $wrapper.hide();
+      }
+    },
+  });
+
+  usePdkCheckout().onInitialize(() => {
+    initializeCheckoutDeliveryOptions();
+  });
+  return;
+
   if (!hasCarrierConfig) {
     void $.ajax({
       url: `${window.myparcel_delivery_options_url}?carrier_id=${carrierName}`,
