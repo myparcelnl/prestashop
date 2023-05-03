@@ -1,25 +1,31 @@
-import {updateDeliveryOptionsConfig} from './updateDeliveryOptionsConfig';
-import {updateDeliveryOptions} from './updateDeliveryOptions';
-import {createOrMoveDeliveryOptionsForm} from './createOrMoveDeliveryOptionsForm';
+import { updateDeliveryOptionsConfig } from './updateDeliveryOptionsConfig';
+import { initializeCheckoutDeliveryOptions, usePdkCheckout } from '@myparcel-pdk/checkout/src';
+import { useCheckoutStore } from '@myparcel-pdk/checkout';
 
-/**
- * @param {jQuery} $deliveryOptionsRow
- */
-export const initializeMyParcelForm = ($deliveryOptionsRow: JQuery): void => {
-  const checkedInputs = $deliveryOptionsRow.find('input:checked') as JQuery<HTMLInputElement>;
+export const initializeMyParcelForm = (shippingAddress, billingAddress): void => {
+  updateDeliveryOptionsConfig();
+  usePdkCheckout().onInitialize(() => {
+    const checkout = useCheckoutStore();
 
-  if (!$deliveryOptionsRow || !$deliveryOptionsRow.length || !checkedInputs.length) {
-    return;
-  }
+    checkout.set({
+      form: {
+        ['billing']: {
+          ['address1']: billingAddress.fullStreet,
+          ['country']: billingAddress.cc,
+          ['postalCode']: billingAddress.postalCode,
+          ['city']: billingAddress.city,
+          ['number']: billingAddress.number,
+        },
+        ['shipping']: {
+          ['address1']: shippingAddress.fullStreet,
+          ['country']: shippingAddress.cc,
+          ['postalCode']: shippingAddress.postalCode,
+          ['city']: shippingAddress.city,
+          ['number']: shippingAddress.number,
+        },
+      },
+    });
 
-  const carrierId = checkedInputs[0].value.split(',').join('');
-  const $wrapper = $deliveryOptionsRow.next().find('.myparcel-delivery-options-wrapper');
-
-  if (!$wrapper) {
-    return;
-  }
-
-  createOrMoveDeliveryOptionsForm($wrapper);
-  updateDeliveryOptionsConfig(carrierId);
-  updateDeliveryOptions();
+    initializeCheckoutDeliveryOptions();
+  });
 };

@@ -1,6 +1,4 @@
-import { createPdkCheckout, initializeCheckoutDeliveryOptions, usePdkCheckout } from '@myparcel-pdk/checkout/src';
-import { getConfigStore } from './getConfigStore';
-import { updateDeliveryOptions } from './updateDeliveryOptions';
+import { createPdkCheckout } from '@myparcel-pdk/checkout/src';
 import { createFields } from './createFields';
 import { AddressType, PdkField, useUtil } from '@myparcel-pdk/checkout';
 
@@ -12,11 +10,21 @@ const FIELD_SHIPPING_METHOD = 'shipping_method';
 const createName = (name: string) => `[name="${name}"]`;
 const createId = (name: string) => `#${name}`;
 
-export const updateDeliveryOptionsConfig = (carrierName: string): void => {
-  const configStore = getConfigStore();
-  const hasCarrierConfig = configStore.hasOwnProperty(carrierName);
-
+export const updateDeliveryOptionsConfig = (): void => {
   createPdkCheckout({
+    async doRequest(endpoint) {
+      const query = new URLSearchParams(endpoint.parameters).toString();
+
+      const response = await window.fetch(`${endpoint.baseUrl}/${endpoint.path}?${query}`, {
+        method: endpoint.method,
+        body: endpoint.body,
+      });
+
+      if (response.ok) {
+        return response.json();
+      }
+    },
+
     fields: {
       [PdkField.ShippingMethod]: createId('shipping_method'),
       [PdkField.ToggleAddressType]: '#ship-to-different-address-checkbox',
@@ -62,25 +70,4 @@ export const updateDeliveryOptionsConfig = (carrierName: string): void => {
       }
     },
   });
-
-  usePdkCheckout().onInitialize(() => {
-    initializeCheckoutDeliveryOptions();
-  });
-  return;
-
-  if (!hasCarrierConfig) {
-    void $.ajax({
-      url: `${window.myparcel_delivery_options_url}?carrier_id=${carrierName}`,
-      dataType: 'json',
-      async: false,
-      success: function (data) {
-        configStore[carrierName] = data;
-
-        window.MyParcelConfig = configStore[carrierName]?.data ?? window.MyParcelConfig;
-        updateDeliveryOptions();
-      },
-    });
-  }
-
-  window.MyParcelConfig = configStore[carrierName]?.data ?? window.MyParcelConfig;
 };

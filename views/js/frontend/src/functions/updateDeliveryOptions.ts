@@ -1,9 +1,13 @@
-import {hasUnRenderedDeliveryOptions} from './hasUnRenderedDeliveryOptions';
+import { hasUnRenderedDeliveryOptions } from './hasUnRenderedDeliveryOptions';
 
 export const updateDeliveryOptions = (): void => {
-  if (hasUnRenderedDeliveryOptions()) {
-    document.dispatchEvent(new Event('myparcel_render_delivery_options'));
-  } else {
-    document.dispatchEvent(new Event('myparcel_update_config'));
+  if (window.MyParcelPdk) {
+    const deliveryOptionsStore = window.MyParcelPdk.stores.deliveryOptions;
+
+    if (hasUnRenderedDeliveryOptions()) {
+      document.dispatchEvent(new CustomEvent('myparcel_render_delivery_options', {detail: deliveryOptionsStore}));
+    } else {
+      document.dispatchEvent(new CustomEvent('myparcel_update_config', {detail: deliveryOptionsStore}));
+    }
   }
 };

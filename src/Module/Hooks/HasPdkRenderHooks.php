@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
+use Address;
+use Country;
+use MyParcelNL\Pdk\Base\Model\ContactDetails;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
@@ -172,15 +175,20 @@ trait HasPdkRenderHooks
         //        $address->address1 = preg_replace('/\D/', '', $address->address1);
 
         if (empty($this->context->cart->id_carrier)) {
-            $selectedDeliveryOption = current($this->context->cart->getDeliveryOption(null, false, false));
+            $selectedDeliveryOption          = current($this->context->cart->getDeliveryOption(null, false, false));
             $this->context->cart->id_carrier = (int) $selectedDeliveryOption;
         }
+
+        $shippingAddress = $this->getContactDetails(new Address($this->context->cart->id_address_delivery));
+        $billingAddress  = $this->getContactDetails(new Address($this->context->cart->id_address_invoice));
 
         $cart = $cartRepository->get($this->context->cart);
         $this->context->smarty->setEscapeHtml(false);
         $renderService->renderDeliveryOptions($cart);
         $this->context->smarty->assign([
             'deliveryOptions' => $renderService->renderDeliveryOptions($cart),
+            'shippingAddress' => $this->encodeAddress($shippingAddress),
+            'billingAddress'  => $this->encodeAddress($billingAddress),
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier.tpl');
@@ -201,6 +209,35 @@ trait HasPdkRenderHooks
             sprintf('https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js', $version),
             ['server' => 'remote', 'position' => 'head', 'priority' => 1]
         );
+    }
+
+    private function encodeAddress(ContactDetails $contactDetails): string
+    {
+        return htmlspecialchars(
+            json_encode(array_filter($contactDetails->toArray())),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+    }
+
+    private function getContactDetails(Address $address): ContactDetails
+    {
+        return new ContactDetails([
+            'boxNumber'            => null,
+            'cc'                   => Country::getIsoById($address->id_country),
+            'city'                 => $address->city,
+            'fullStreet'           => $address->address1,
+            'number'               => null,
+            'numberSuffix'         => null,
+            'postalCode'           => $address->postcode,
+            'region'               => null,
+            'state'                => null,
+            'street'               => null,
+            'streetAdditionalInfo' => null,
+            'person'               => $address->firstname . ' ' . $address->lastname,
+            'email'                => $this->context->customer->email,
+            'phone'                => $address->phone,
+        ]);
     }
 
     private function renderService(): RenderServiceInterface

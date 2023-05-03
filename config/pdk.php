@@ -58,7 +58,7 @@ return [
      *
      * @see https://github.com/myparcelnl/delivery-options/releases
      */
-    'deliveryOptionsVersion'                    => value('5.7.0'),
+    'deliveryOptionsVersion'                    => value('5.7.3'),
 
     /**
      * Only use carriers that we tested and we have a schema for, at the moment

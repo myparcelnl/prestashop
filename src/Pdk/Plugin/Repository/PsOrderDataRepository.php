@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Repository;
-
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
 
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
