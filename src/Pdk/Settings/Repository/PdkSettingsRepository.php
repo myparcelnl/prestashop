@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
 use MyParcelNL\Pdk\Api\Contract\ApiServiceInterface;
-use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
+use MyParcelNL\PrestaShop\Module\Concern\NeedsSettingsKey;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
-use MyParcelNL\Sdk\src\Support\Str;
 
 class PdkSettingsRepository extends AbstractSettingsRepository
 {
+    use NeedsSettingsKey;
+
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
      */
@@ -51,20 +52,5 @@ class PdkSettingsRepository extends AbstractSettingsRepository
     public function store(string $key, $value): void
     {
         $this->configurationService->set($this->getOptionName($key), $value);
-    }
-
-    /**
-     * @param  string $key
-     *
-     * @return string
-     */
-    protected function getOptionName(string $key): string
-    {
-        $appInfo = Pdk::getAppInfo();
-
-        return strtr('_:plugin_:name', [
-            ':plugin' => $appInfo['name'],
-            ':name'   => Str::snake($key),
-        ]);
     }
 }

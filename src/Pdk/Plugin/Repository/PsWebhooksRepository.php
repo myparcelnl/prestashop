@@ -9,10 +9,13 @@ use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\Pdk\Webhook\Collection\WebhookSubscriptionCollection;
 use MyParcelNL\Pdk\Webhook\Model\WebhookSubscription;
 use MyParcelNL\Pdk\Webhook\Repository\WebhookSubscriptionRepository;
+use MyParcelNL\PrestaShop\Module\Concern\NeedsSettingsKey;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 
 class PsWebhooksRepository extends AbstractPdkWebhooksRepository
 {
+    use NeedsSettingsKey;
+
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
      */
@@ -29,12 +32,12 @@ class PsWebhooksRepository extends AbstractPdkWebhooksRepository
 
     public function getAll(): WebhookSubscriptionCollection
     {
-        return $this->retrieve('myparcelnl_webhooks', [$this, 'getFromStorage']);
+        return $this->retrieve($this->getOptionName('webhooks'), [$this, 'getFromStorage']);
     }
 
     public function getHashedUrl(): ?string
     {
-        return $this->configurationService->get('myparcelnl_webhooks_hash', null);
+        return $this->configurationService->get($this->getOptionName('webhooks_hash'), null);
     }
 
     public function remove(string $hook): void
@@ -49,17 +52,17 @@ class PsWebhooksRepository extends AbstractPdkWebhooksRepository
 
     public function store(WebhookSubscriptionCollection $subscriptions): void
     {
-        $this->configurationService->set('myparcelnl_webhooks', $subscriptions->toArray());
+        $this->configurationService->set($this->getOptionName('webhooks'), $subscriptions->toArray());
     }
 
     public function storeHashedUrl(string $url): void
     {
-        $this->configurationService->set('myparcelnl_webhooks_hash', $url);
+        $this->configurationService->set($this->getOptionName('webhooks_hash'), $url);
     }
 
     private function getFromStorage(): WebhookSubscriptionCollection
     {
-        $items = $this->configurationService->get('myparcelnl_webhooks', null);
+        $items = $this->configurationService->get($this->getOptionName('webhooks'), null);
 
         return new WebhookSubscriptionCollection($items);
     }
