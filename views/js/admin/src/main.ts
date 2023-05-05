@@ -5,6 +5,7 @@ import {
   Bootstrap4ButtonGroup,
   Bootstrap4CheckboxInput,
   Bootstrap4Col,
+  Bootstrap4DropOffInput,
   Bootstrap4Image,
   Bootstrap4Modal,
   Bootstrap4Notification,
@@ -20,6 +21,7 @@ import {
   DefaultMultiSelectInput,
   DefaultNumberInput,
   DefaultRadioGroup,
+  DefaultSettingsDivider,
   DefaultTable,
   DefaultTableCol,
   DefaultTableRow,
@@ -27,7 +29,6 @@ import {
 } from '@myparcel-pdk/admin-preset-default/src';
 import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin/src';
 import PsCheckboxGroup from './components/pdk/PsCheckboxGroup.vue';
-import PsDropOffInput from './components/pdk/PsDropOffInput.vue';
 import PsFormGroup from './components/pdk/PsFormGroup.vue';
 import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
 import PsRow from './components/pdk/PsRow.vue';
@@ -53,7 +54,7 @@ window.onload = () => {
       PdkCodeEditor: PsTextArea,
       PdkCol: Bootstrap4Col,
       PdkCurrencyInput: DefaultCurrencyInput,
-      PdkDropOffInput: PsDropOffInput,
+      PdkDropOffInput: Bootstrap4DropOffInput,
       PdkDropdownButton: PsDropdownButton,
       PdkFormGroup: PsFormGroup,
       PdkHeading: DefaultHeading,
@@ -70,7 +71,7 @@ window.onload = () => {
       PdkRadioInput: Bootstrap4RadioInput,
       PdkRow: PsRow,
       PdkSelectInput: Bootstrap4SelectInput,
-      PdkSettingsDivider: h('hr'),
+      PdkSettingsDivider: DefaultSettingsDivider,
       // PdkShipmentLabelWrapper,
       PdkTabNavButton: PsTabNavButton,
       PdkTabNavButtonWrapper: PsTabNavButtonWrapper,
@@ -93,8 +94,7 @@ window.onload = () => {
 
     cssUtilities: {
       whitespaceNoWrap: 'whitespace-nowrap',
-      displayFlex: 'd-flex',
-      card: 'card card-body',
+      displayFlex: 'd-flex justify-content-between',
     },
 
     logLevel: LogLevel.Debug,

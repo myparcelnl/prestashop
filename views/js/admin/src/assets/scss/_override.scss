@@ -14,3 +14,11 @@
 .nav-pills + div .card {
   margin-top: .625rem;
 }
+
+.column-myparcel .card {
+  width: 282px;
+}
+
+.text-nowrap > div:not(.dropdown-menu) {
+  display: inline;
+}
