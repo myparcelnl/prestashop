@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
 use MyParcelNL\Pdk\Plugin\Api\Frontend\AbstractFrontendEndpointService;
+use MyParcelNL\PrestaShop\Module\Concern\NeedsModuleUrl;
 
 class PsFrontendEndpointService extends AbstractFrontendEndpointService
 {
+    use NeedsModuleUrl;
+
     /**
      * @return string
      */
     public function getBaseUrl(): string
     {
-        return '/admin-dev/index.php/modules/myparcelnl/pdk';
+        return $this->getUrl('myparcelnl_pdk');
+        //return '/admin-dev/index.php/modules/myparcelnl/pdk';
     }
 }

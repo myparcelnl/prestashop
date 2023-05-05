@@ -49,7 +49,7 @@ use function DI\autowire;
 use function DI\value;
 
 return [
-    'mode'                                      => value(
+    'mode'                   => value(
         _PS_MODE_DEV_ ? Pdk::MODE_DEVELOPMENT : Pdk::MODE_PRODUCTION
     ),
 
@@ -58,7 +58,11 @@ return [
      *
      * @see https://github.com/myparcelnl/delivery-options/releases
      */
-    'deliveryOptionsVersion'                    => value('5.7.3'),
+    'deliveryOptionsVersion' => value('5.7.3'),
+
+    'routeBackend'                              => value("https://prestashop.dev.myparcel.nl/admin-dev/"),
+    'routeBackendPdk'                           => value('pdk'),
+    'routeBackendWebhook'                       => value('webhook'),
 
     /**
      * Only use carriers that we tested and we have a schema for, at the moment

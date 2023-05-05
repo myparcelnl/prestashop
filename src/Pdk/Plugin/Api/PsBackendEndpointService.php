@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Api;
 
 use MyParcelNL\Pdk\Plugin\Api\Backend\AbstractPdkBackendEndpointService;
-use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
-use RuntimeException;
+use MyParcelNL\PrestaShop\Module\Concern\NeedsModuleUrl;
 
 class PsBackendEndpointService extends AbstractPdkBackendEndpointService
 {
+    use NeedsModuleUrl;
+
     private $baseUrl;
 
     public function __construct()
     {
-        $url           = $this->getUrl();
+        $url           = $this->getUrl('myparcelnl_pdk');
         $parts         = explode('?', $url);
         $this->baseUrl = $parts[0];
 
@@ -33,26 +34,5 @@ class PsBackendEndpointService extends AbstractPdkBackendEndpointService
     public function getBaseUrl(): string
     {
         return $this->baseUrl;
-    }
-
-    /**
-     * @return string
-     */
-    private function getUrl(): string
-    {
-        $container = SymfonyContainer::getInstance();
-
-        if (! $container) {
-            throw new RuntimeException('Container not found');
-        }
-
-        /** @var \PrestaShopBundle\Service\Routing\Router $router */
-        $router = $container->get('router');
-
-        if (! $router) {
-            throw new RuntimeException('Router not found');
-        }
-
-        return $router->generate('myparcelnl_pdk');
     }
 }
