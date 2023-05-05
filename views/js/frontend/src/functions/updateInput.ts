@@ -1,5 +1,5 @@
-import {MyParcelDeliveryOptions} from '@myparcel/delivery-options';
-import {getInput} from './jquery/getInput';
+import { MyParcelDeliveryOptions } from '@myparcel/delivery-options';
+import { getInput } from './jquery/getInput';
 
 export const updateInput = (data: MyParcelDeliveryOptions.Configuration): void => {
   const $input = getInput();

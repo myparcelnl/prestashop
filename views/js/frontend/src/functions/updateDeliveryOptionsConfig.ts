@@ -21,7 +21,7 @@ export const updateDeliveryOptionsConfig = (): void => {
       });
 
       if (response.ok) {
-        return response.json();
+        return response;
       }
     },
 
