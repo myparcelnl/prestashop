@@ -7,6 +7,8 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 use Address;
 use Country;
 use Customer;
+use Db;
+use DbQuery;
 use MyParcelNL\Pdk\Base\Service\CurrencyService;
 use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection;
@@ -107,15 +109,13 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         }
 
         return $this->retrieve((string) $order->id, function () use ($order) {
-            $orderData = $this->psOrderDataRepository->firstWhere('idOrder', $order->id);
-            $data      = $orderData ? $orderData->getData() : [];
-
-            $orderProducts = $order->getProducts() ?: [];
+            $deliveryOptions = $this->getDeliveryOptions((int) $order->id_cart);
+            $orderProducts   = $order->getProducts() ?: [];
 
             return new PdkOrder([
                 'externalIdentifier'  => $order->id,
                 'recipient'           => $this->getRecipient($order),
-                'deliveryOptions'     => $data['deliveryOptions'] ?? [],
+                'deliveryOptions'     => $deliveryOptions,
                 'physicalProperties'  => $this->getPhysicalProperties($orderProducts),
                 'shipments'           => $this->getShipments($order),
                 'referenceIdentifier' => "PrestaShop: $order->id",
@@ -282,6 +282,24 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         return (new ShipmentCollection($shipmentsArray))
             ->where('deleted', false)
             ->values();
+    }
+
+    /**
+     * @param  int $cartId
+     *
+     * @return array|false|string
+     */
+    private function getDeliveryOptions(int $cartId)
+    {
+        $query = (new DbQuery(_PS_USE_SQL_SLAVE_))
+            ->select('delivery_options')
+            ->from('myparcelnl_delivery_options')
+            ->where("id_cart = $cartId");
+
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->getValue($query) ?: '';
+
+        return json_decode($result, true);
     }
 
     /**

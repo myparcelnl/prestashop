@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use Address;
 use Country;
+use Db;
 use MyParcelNL\Pdk\Base\Model\ContactDetails;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
@@ -16,6 +17,7 @@ use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Service\PsRenderService;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
+use Tools;
 
 trait HasPdkRenderHooks
 {
@@ -28,6 +30,36 @@ trait HasPdkRenderHooks
     {
         return $this->renderService()
             ->renderPluginSettings();
+    }
+
+    /**
+     * @param $params
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function hookActionCarrierProcess($params)
+    {
+        $options = Tools::getValue(Pdk::get('checkoutHiddenInputName'));
+
+        if (! $options || '[]' === $options) {
+            return;
+        }
+
+        /**
+         * @var \PrestaShop\PrestaShop\Adapter\Entity\Cart $cart
+         */
+        $cart = $params['cart'];
+
+        $optionsArray    = json_decode($options, true);
+        $deliveryOptions = $this->createDeliveryOptions($optionsArray);
+
+        $action    = Tools::getValue('action');
+        $carrierId = Tools::getValue('delivery_option');
+
+        if (('selectDeliveryOption' === $action && ! empty($carrierId)) || Tools::isSubmit('confirmDeliveryOption')) {
+            $this->saveDeliveryOptions($cart->id, $deliveryOptions);
+        }
     }
 
     public function hookActionOrderGridDefinitionModifier(array $params): void
@@ -211,6 +243,18 @@ trait HasPdkRenderHooks
         );
     }
 
+    private function createDeliveryOptions(array $deliveryOptions): array
+    {
+        return [
+            'carrier'         => $deliveryOptions['carrier'],
+            'date'            => $deliveryOptions['date'],
+            'pickupLocation'  => null,
+            'shipmentOptions' => $deliveryOptions['shipmentOptions'],
+            'deliveryType'    => $deliveryOptions['deliveryType'],
+            'packageType'     => $deliveryOptions['packageType'],
+        ];
+    }
+
     private function encodeAddress(ContactDetails $contactDetails): string
     {
         return htmlspecialchars(
@@ -243,5 +287,22 @@ trait HasPdkRenderHooks
     private function renderService(): RenderServiceInterface
     {
         return Pdk::get(RenderServiceInterface::class);
+    }
+
+    private function saveDeliveryOptions(int $cartId, array $deliveryOptions): void
+    {
+        $values = [
+            'id_cart'          => $cartId,
+            'delivery_options' => pSQL(json_encode($deliveryOptions)),
+        ];
+
+        Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->insert(
+                'myparcelnl_delivery_options',
+                $values,
+                false,
+                true,
+                Db::REPLACE
+            );
     }
 }
