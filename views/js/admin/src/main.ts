@@ -18,6 +18,7 @@ import {
   DefaultCurrencyInput,
   DefaultHeading,
   DefaultLink,
+  DefaultLoader,
   DefaultMultiSelectInput,
   DefaultNumberInput,
   DefaultRadioGroup,
@@ -36,7 +37,6 @@ import PsTabNavButton from './components/pdk/PsTabNavButton.vue';
 import PsTabNavButtonWrapper from './components/pdk/PsTabNavButtonWrapper.vue';
 import PsTextArea from './components/pdk/PsTextArea.vue';
 import PsToggleInput from './components/pdk/PsToggleInput.vue';
-import {h} from 'vue';
 import {PsIcon} from './components';
 import PsDropdownButton from './components/pdk/PsDropdownButton.vue';
 
@@ -61,7 +61,7 @@ window.onload = () => {
       PdkIcon: PsIcon,
       PdkImage: Bootstrap4Image,
       PdkLink: DefaultLink,
-      PdkLoader: h('div'),
+      PdkLoader: DefaultLoader,
       PdkModal: Bootstrap4Modal,
       PdkMultiSelectInput: DefaultMultiSelectInput,
       PdkNotification: Bootstrap4Notification,
@@ -72,7 +72,6 @@ window.onload = () => {
       PdkRow: PsRow,
       PdkSelectInput: Bootstrap4SelectInput,
       PdkSettingsDivider: DefaultSettingsDivider,
-      // PdkShipmentLabelWrapper,
       PdkTabNavButton: PsTabNavButton,
       PdkTabNavButtonWrapper: PsTabNavButtonWrapper,
       PdkTable: DefaultTable,
@@ -93,6 +92,7 @@ window.onload = () => {
     },
 
     cssUtilities: {
+      animationSpin: 'mypa-spinner',
       whitespaceNoWrap: 'whitespace-nowrap',
       displayFlex: 'd-flex justify-content-between',
     },

@@ -1,6 +1,6 @@
 <template>
-  <div class="row">
-    <div class="col-sm-12">
+  <div class="card row">
+    <div class="card-body col-sm-12 pdk-plugin-settings-wrapper">
       <slot />
     </div>
   </div>
