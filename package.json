@@ -19,10 +19,10 @@
     "prepare": "is-ci || husky install",
     "test": "nx run-many --output-style=stream --target=test",
     "test:watch": "nx run-many --output-style=stream --target=test:watch",
+    "translations:import": "npx -q @edielemoine/google-docs-importer --documentId 1TPE7gwG2GXtX7vlKIaskwMy0Xr4o_ir-lsedWB86xyc -o config/pdk/translations",
     "watch": "yarn build:js:dev --parallel=99 -- --watch",
     "watch:backend": "yarn build:js:dev:backend --parallel=99 -- --watch",
     "watch:frontend": "yarn build:js:dev:frontend --parallel=99 -- --watch",
-    "translations:import": "npx -q @edielemoine/google-docs-importer --documentId 1TPE7gwG2GXtX7vlKIaskwMy0Xr4o_ir-lsedWB86xyc -o config/pdk/translations",
     "ws:build": "vite build",
     "ws:build:dev": "vite build --mode development",
     "ws:dev": "vite",
@@ -57,21 +57,5 @@
     "nx-cloud": "latest",
     "prettier": "^2.8.4"
   },
-  "packageManager": "yarn@3.3.0",
-  "resolutions": {
-    "@myparcel/pdk-component-tests": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-component-tests",
-    "@myparcel/pdk-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-components",
-    "@myparcel/pdk-frontend": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-frontend",
-    "@myparcel/pdk-preset-bootstrap4": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/pdk-preset-bootstrap4",
-    "@myparcel-pdk/common": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/common",
-    "@myparcel-pdk/frontend-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/frontend/components",
-    "@myparcel-pdk/frontend-core": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/frontend/core",
-    "@myparcel-pdk/frontend": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin",
-    "@myparcel-pdk/admin-component-tests": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin-component-tests",
-    "@myparcel-pdk/admin-components": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin-components",
-    "@myparcel-pdk/admin-preset-bootstrap4": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin-preset-bootstrap4",
-    "@myparcel-pdk/checkout": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/checkout",
-    "@myparcel-pdk/frontend-delivery-options": "portal:/Users/edie/Sites/myparcel/pdk-frontend/libs/frontend/delivery-options",
-    "@myparcel-pdk/admin": "portal:/Users/edie/Sites/myparcel/pdk-frontend/apps/admin"
-  }
+  "packageManager": "yarn@3.3.0"
 }

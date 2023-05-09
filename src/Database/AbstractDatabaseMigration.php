@@ -5,25 +5,21 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Database;
 
 use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Plugin\Installer\Contract\MigrationInterface;
 
-abstract class AbstractMigration
+abstract class AbstractDatabaseMigration implements MigrationInterface
 {
-    /**
-     * @return bool
-     */
-    abstract public function down(): bool;
-
-    /**
-     * @return bool
-     */
-    abstract public function up(): bool;
+    public function getVersion(): string
+    {
+        return '';
+    }
 
     /**
      * @param  string $sql
      *
-     * @return bool
+     * @return void
      */
-    protected function execute(string $sql): bool
+    protected function execute(string $sql): void
     {
         $replacedSql = strtr($sql, [
             '{ENGINE}' => _MYSQL_ENGINE_,
@@ -33,11 +29,9 @@ abstract class AbstractMigration
         $trimmedSql = trim(preg_replace('/\s+/m', ' ', $trimmedSql));
 
         try {
-            $status = \Db::getInstance(_PS_USE_SQL_SLAVE_)
+            \Db::getInstance(_PS_USE_SQL_SLAVE_)
                 ->execute($trimmedSql);
             DefaultLogger::info('Query executed', ['class' => static::class, 'sql' => $trimmedSql]);
-
-            return $status;
         } catch (\Throwable $e) {
             DefaultLogger::error(
                 'Query failed',
@@ -47,7 +41,6 @@ abstract class AbstractMigration
                     'error' => $e->getMessage(),
                 ]
             );
-            return false;
         }
     }
 }

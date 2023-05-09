@@ -3,11 +3,10 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Module\Concern\HasModuleInstall;
-use MyParcelNL\PrestaShop\Module\Concern\HasModuleUninstall;
-use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
+use MyParcelNL\PrestaShop\Module\Service\ModuleService;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use PrestaShopBundle\Exception\InvalidModuleException;
 
@@ -24,8 +23,8 @@ class MyParcelNL extends CarrierModule
     //    use OrderHooks;
     //    use OrdersGridHooks;
 
-    use HasModuleInstall;
-    use HasModuleUninstall;
+    //    use HasModuleInstall;
+    //    use HasModuleUninstall;
 
     use HasPdkRenderHooks;
 
@@ -82,21 +81,6 @@ class MyParcelNL extends CarrierModule
             $this->getBaseUrl()
         );
 
-        Db::getInstance()
-            ->execute(
-                "CREATE TABLE if NOT EXISTS ps_myparcelnl_delivery_options (
-	id_cart int(11) NOT NULL DEFAULT '0',
-    delivery_options text NOT NULL DEFAULT ''
-) AUTO_INCREMENT=1;"
-            );
-
-        /** @note trigger upgrade */
-        //        if ($version <= Pdk::get('triggerUpgradeBefore')) {
-        //            $this->upgrade(Upgrade2_0_0::class);
-        //$upgrade = new \MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0();
-        //$upgrade->upgrade();
-        //        }
-
         $this->registerHook('header');
 
         $this->tab                    = Pdk::get('moduleTabName');
@@ -108,7 +92,7 @@ class MyParcelNL extends CarrierModule
 
     /**
      * @return self
-     * @deprecated
+     * @deprecated use Pdk::get('moduleInstance')
      */
     public static function getModule(): self
     {
@@ -127,10 +111,14 @@ class MyParcelNL extends CarrierModule
      * @param  \int  $shipping_cost
      *
      * @return float|int
+     * @throws \PrestaShopDatabaseException
      */
     public function getOrderShippingCost($params, $shipping_cost)
     {
-        return ModuleService::getOrderShippingCost($params, $shipping_cost);
+        /** @var \MyParcelNL\PrestaShop\Module\Service\ModuleService $moduleService */
+        $moduleService = Pdk::get(ModuleService::class);
+
+        return $moduleService->getOrderShippingCost($params, $shipping_cost);
     }
 
     /**
@@ -145,24 +133,36 @@ class MyParcelNL extends CarrierModule
 
     /**
      * @return bool
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     * @throws \Throwable
      */
     public function install(): bool
     {
-        return parent::install() && $this->executeInstall();
+        $success = parent::install();
+
+        try {
+            Installer::install();
+        } catch (Throwable $e) {
+            $this->_errors[] = $e->getMessage() . ' ' . $e->getTraceAsString();
+            $success         = false;
+        }
+
+        return $success;
     }
 
     /**
      * @return bool
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     * @throws \Throwable
      */
     public function uninstall(): bool
     {
-        return $this->executeUninstall() && parent::uninstall();
+        $success = parent::uninstall();
+
+        try {
+            Installer::uninstall();
+        } catch (Throwable $e) {
+            $this->_errors[] = $e->getMessage() . ' ' . $e->getTraceAsString();
+            $success         = false;
+        }
+
+        return $success;
     }
 
     /**

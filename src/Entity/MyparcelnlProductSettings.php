@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Entity;
 /**
  * @Doctrine\ORM\Mapping\Table()
  * @Doctrine\ORM\Mapping\Entity()
- * @see \MyParcelNL\PrestaShop\Database\CreateProductSettingsTableMigration
+ * @see \MyParcelNL\PrestaShop\Database\CreateProductSettingsTableDatabaseMigration
  */
 class MyparcelnlProductSettings extends AbstractEntity
 {

@@ -1,7 +1,8 @@
 {
   "name": "@myparcelnl-prestashop/frontend-checkout-delivery-options",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
     "build": "run ws:build \"$(pwd)\"",
     "build:dev": "run ws:build:dev \"$(pwd)\"",

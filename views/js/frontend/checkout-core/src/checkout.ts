@@ -1,5 +1,5 @@
-import { AddressField, AddressType, createPdkCheckout, PdkField, useUtil } from '@myparcel-pdk/checkout/src';
-import { createFields } from './functions/createFields';
+import {AddressField, AddressType, PdkField, createPdkCheckout, useUtil} from '@myparcel-pdk/checkout/src';
+import {createFields} from './functions/createFields';
 
 const PREFIX_BILLING = `${AddressType.Billing}_`;
 const PREFIX_SHIPPING = `${AddressType.Shipping}_`;
@@ -7,7 +7,6 @@ const PREFIX_SHIPPING = `${AddressType.Shipping}_`;
 const createName = (name: string) => `[name="${name}"]`;
 const createId = (name: string) => `#${name}`;
 
-console.log('checkout.ts');
 createPdkCheckout({
   getFormData() {
     const addressField = document.querySelector('.myparcelnl-address');
@@ -84,7 +83,6 @@ createPdkCheckout({
 
   selectors: {
     deliveryOptionsWrapper: '#mypa-delivery-options-wrapper',
-    hasAddressType: '.woocommerce-billing-fields__field-wrapper',
   },
 
   toggleField(field: HTMLInputElement, show: boolean): void {
@@ -100,5 +98,10 @@ createPdkCheckout({
 
   onFormChange(callback) {
     window.prestashop.on('updatedDeliveryForm', callback);
+  },
+
+  hasAddressType(addressType: AddressType) {
+    // TODO
+    return true;
   },
 });

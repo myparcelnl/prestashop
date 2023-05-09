@@ -5,7 +5,6 @@ import {
   Bootstrap4ButtonGroup,
   Bootstrap4CheckboxInput,
   Bootstrap4Col,
-  Bootstrap4DropOffInput,
   Bootstrap4Image,
   Bootstrap4Modal,
   Bootstrap4Notification,
@@ -16,6 +15,7 @@ import {
 } from '@myparcel-pdk/admin-preset-bootstrap4/src';
 import {
   DefaultCurrencyInput,
+  DefaultDropOffInput,
   DefaultHeading,
   DefaultLink,
   DefaultLoader,
@@ -54,7 +54,7 @@ window.onload = () => {
       PdkCodeEditor: PsTextArea,
       PdkCol: Bootstrap4Col,
       PdkCurrencyInput: DefaultCurrencyInput,
-      PdkDropOffInput: Bootstrap4DropOffInput,
+      PdkDropOffInput: DefaultDropOffInput,
       PdkDropdownButton: PsDropdownButton,
       PdkFormGroup: PsFormGroup,
       PdkHeading: DefaultHeading,

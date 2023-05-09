@@ -1,21 +1,11 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
     "importsNotUsedAsValues": "remove",
     "incremental": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Node16",
     "preserveValueImports": false,
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "types": [
-      "node",
-      "vite/client"
-    ]
+    "types": ["node", "vite/client"]
   },
-  "exclude": [
-    "../**/__tests__/*",
-    "../**/*.spec.*"
-  ]
+  "exclude": ["../**/__tests__/*", "../**/*.spec.*"]
 }

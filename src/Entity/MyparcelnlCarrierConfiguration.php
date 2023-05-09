@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Entity;
 /**
  * @Doctrine\ORM\Mapping\Table()
  * @Doctrine\ORM\Mapping\Entity()
- * @see \MyParcelNL\PrestaShop\Database\CreateCarrierConfigurationTableMigration
+ * @see \MyParcelNL\PrestaShop\Database\CreateCarrierConfigurationTableDatabaseMigration
  */
 class MyparcelnlCarrierConfiguration extends AbstractEntity
 {
@@ -24,6 +24,12 @@ class MyparcelnlCarrierConfiguration extends AbstractEntity
     protected $idConfiguration;
 
     /**
+     * @var string
+     * @Doctrine\ORM\Mapping\Column(type="string", nullable=false, unique=true)
+     */
+    protected $myparcelCarrier;
+
+    /**
      * @return int
      */
     public function getIdCarrier(): int
@@ -37,6 +43,14 @@ class MyparcelnlCarrierConfiguration extends AbstractEntity
     public function getIdConfiguration(): int
     {
         return $this->idConfiguration;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMyparcelCarrier(): string
+    {
+        return $this->myparcelCarrier;
     }
 
     /**

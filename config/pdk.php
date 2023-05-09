@@ -18,10 +18,14 @@ use MyParcelNL\Pdk\Plugin\Contract\PdkShippingMethodRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\TaxServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface;
+use MyParcelNL\Pdk\Plugin\Installer\Contract\InstallerServiceInterface;
+use MyParcelNL\Pdk\Plugin\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhooksRepositoryInterface;
 use MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\PrestaShop\Module\Installer\PsInstallerService;
+use MyParcelNL\PrestaShop\Module\Installer\PsMigrationService;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle5ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Logger\PdkLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
@@ -60,7 +64,7 @@ return [
      */
     'deliveryOptionsVersion' => value('5.7.3'),
 
-    'routeBackend'                              => value("https://prestashop.dev.myparcel.nl/admin-dev/"),
+    'routeBackend'                              => value('https://prestashop.dev.myparcel.nl/admin-dev/'),
     'routeBackendPdk'                           => value('pdk'),
     'routeBackendWebhook'                       => value('webhook'),
 
@@ -116,7 +120,9 @@ return [
      * Miscellaneous
      */
     ClientAdapterInterface::class         => autowire(Guzzle5ClientAdapter::class),
+    InstallerServiceInterface::class      => autowire(PsInstallerService::class),
     LoggerInterface::class                => autowire(PdkLogger::class),
+    MigrationServiceInterface::class      => autowire(PsMigrationService::class),
     ScriptServiceInterface::class         => autowire(PsScriptService::class),
 ];
 

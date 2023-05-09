@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Database;
 /**
  * @see \MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData
  */
-class CreateOrderDataTableMigration extends AbstractMigration
+class CreateOrderDataTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): bool
     {

@@ -2,6 +2,7 @@
   "name": "@myparcel-prestashop/vite-config",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "main": "index.cjs",
   "types": "index.d.ts",
   "dependencies": {

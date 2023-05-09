@@ -60,6 +60,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
      * @param  \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository     $psOrderDataRepository
      * @param  \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface            $productRepository
      * @param  \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository $psOrderShipmentRepository
+     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService                         $psWeightService
      */
     public function __construct(
         MemoryCacheStorage         $storage,

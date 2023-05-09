@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Base;
 
+use Module;
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierConfiguration;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
+use MyParcelNL\Sdk\src\Support\Str;
+use PrestaShopBundle\Exception\InvalidModuleException;
+use ReflectionClass;
+use ReflectionMethod;
 use function DI\factory;
 use function DI\value;
 
@@ -58,6 +64,34 @@ class PsPdkBootstrapper extends PdkBootstrapper
 
             'prestaShopVersionMin' => '1.7.6',
             'prestaShopVersionMax' => '8.0',
+
+            'moduleInstance' => factory(static function () use ($name): MyParcelNL {
+                /** @var MyParcelNL|false $module */
+                $module = Module::getInstanceByName($name);
+
+                if (! $module) {
+                    throw new InvalidModuleException('Failed to get module instance');
+                }
+
+                return $module;
+            }),
+
+            /**
+             * Get all hooks from the MyParcelNL class dynamically.
+             */
+            'moduleHooks' => factory(function () {
+                $reflectionClass = new ReflectionClass(MyParcelNL::class);
+
+                $hooks = (new Collection($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC)))
+                    ->filter(function (ReflectionMethod $method) {
+                        return Str::startsWith($method->getName(), 'hook');
+                    })
+                    ->map(function (ReflectionMethod $method) {
+                        return lcfirst(preg_replace('/^hook/', '', $method->getName()));
+                    });
+
+                return $hooks->toArray();
+            }),
         ],
             $this->resolvePrestaShopRepositories(),
             $this->resolvePrestaShopServices()

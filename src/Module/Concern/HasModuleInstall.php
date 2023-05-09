@@ -15,7 +15,7 @@ use Language;
 use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Database\Migrations;
+use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -25,6 +25,9 @@ use RangeWeight;
 use Tab;
 use Zone;
 
+/**
+ * @deprecated
+ */
 trait HasModuleInstall
 {
     private static $carriers_be = [
@@ -63,11 +66,14 @@ trait HasModuleInstall
 
         DefaultLogger::debug('Installing module');
 
-        $this->migrateUp();
+//        $this->migrateUp();
         $this->registerHooks();
         $this->installTabs();
+
+
+
         //        $this->addDefaultConfigurations();
-        $this->installCarriers();
+//        $this->installCarriers();
 
         //Tools::clearSf2Cache();
 
@@ -122,10 +128,10 @@ trait HasModuleInstall
             return false;
         }
 
-        copy(
-            sprintf("%s%s/views/images/%s", _PS_MODULE_DIR_, $this->name, $configuration['image']),
-            sprintf("%s/%d.jpg", _PS_SHIP_IMG_DIR_, (int) $carrier->id)
-        );
+//        copy(
+//            sprintf("%s%s/views/images/%s", _PS_MODULE_DIR_, $this->name, $configuration['image']),
+//            sprintf("%s/%d.jpg", _PS_SHIP_IMG_DIR_, (int) $carrier->id)
+//        );
 
         Configuration::updateValue($configuration['configuration_name'], $carrier->id);
 
@@ -382,11 +388,11 @@ trait HasModuleInstall
      */
     private function migrateUp(): void
     {
-        /** @var \MyParcelNL\PrestaShop\Database\Migrations $migrations */
-        $migrations = Pdk::get(Migrations::class);
+        /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */
+        $migrations = Pdk::get(DatabaseMigrations::class);
 
         foreach ($migrations->get() as $migration) {
-            /** @var \MyParcelNL\PrestaShop\Database\AbstractMigration $class */
+            /** @var \MyParcelNL\PrestaShop\Database\AbstractDatabaseMigration $class */
             $class  = Pdk::get($migration);
             $result = $class->up();
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Module\Upgrade;
+namespace MyParcelNL\PrestaShop\Module\Migration;
 
 use DbQuery;
 use Generator;
@@ -16,10 +16,12 @@ use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Shipment\Model\DropOffDay;
 use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsCarrierConfigurationRepository;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
 
-class Upgrade2_0_0 extends AbstractUpgrade
+final class Migration2_0_0 extends AbstractPsMigration
 {
     protected const         LEGACY_TABLE_CARRIER_CONFIGURATION = 'myparcelnl_carrier_configuration';
     protected const         LEGACY_TABLE_DELIVERY_SETTINGS     = 'myparcelnl_delivery_settings';
@@ -42,60 +44,26 @@ class Upgrade2_0_0 extends AbstractUpgrade
     private const           TRANSFORM_KEY_TARGET               = 'target';
     private const           TRANSFORM_KEY_TRANSFORM            = 'transform';
 
-    /**
-     * @param  array $oldConfigurationSettings
-     * @param  array $oldCarrierSettings
-     *
-     * @return void
-     */
-    public function migrateSettings(array $oldConfigurationSettings, array $oldCarrierSettings): void
+    public function down(): void
     {
-        $settingsRepository = Pdk::get(PdkSettingsRepository::class);
-
-        $newSettings = $this->transformSettings($oldConfigurationSettings);
-
-        $newSettings['carrier'] = new SettingsModelCollection();
-
-        foreach (self::OLD_CARRIERS as $carrier) {
-            $transformed                         = $this->transformSettings($oldConfigurationSettings[$carrier] ?? []);
-            $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities(
-                $oldConfigurationSettings[$carrier] ?? []
-            );
-
-            $newSettings['carrier']->put($carrier, $transformed);
-        }
-
-        $settings = new Settings(array_replace_recursive(SettingsFacade::getDefaults(), $newSettings));
-
-        $settingsRepository->storeAllSettings($settings);
+        // TODO: Implement down() method.
     }
 
-    /**
-     * @param $setting
-     * @param $array
-     *
-     * @return null|int|string
-     */
-    public function searchForValue($setting, $array)
+    public function getVersion(): string
     {
-        foreach ($array as $key => $val) {
-            if ($val['name'] === $setting) {
-                return $key;
-            }
-        }
-        return null;
+        return '2.0.0';
     }
 
     /**
      * @return void
+     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
      */
-    public function upgrade(): void
+    public function up(): void
     {
-        $this->createPsCarriers();
-
-        $this->migrateSettings($this->getConfigurationSettings(), $this->getCarrierSettings());
+        $this->installCarriers();
+        $this->migrateSettings();
         // $this->migrateCartDeliveryOptions();
         // $this->migrateOrderData();
         // $this->migrateOrderShipments();
@@ -103,6 +71,7 @@ class Upgrade2_0_0 extends AbstractUpgrade
 
     /**
      * @return void
+     * TODO: NEE!!!!!!!!!!
      */
     protected function dropOldTables(): void
     {
@@ -148,13 +117,15 @@ class Upgrade2_0_0 extends AbstractUpgrade
 
     /**
      * @return void
+     * TODO use DatabaseMigrations
+     * @see \MyParcelNL\PrestaShop\Database\DatabaseMigrations
      */
     private function createCarrierConfigurationTable(): void
     {
         $this->db->execute(
             "CREATE TABLE if NOT EXISTS ps_myparcel_carrier_configuration (
-	ps_carrier_id int(11) NOT NULL DEFAULT '0',
-    myparcel_carrier varchar(255) NOT NULL DEFAULT ''
+	ps_carrier_id INT(11) NOT NULL DEFAULT '0',
+    myparcel_carrier VARCHAR(255) NOT NULL DEFAULT ''
 ) AUTO_INCREMENT=1;"
         );
     }
@@ -196,9 +167,12 @@ class Upgrade2_0_0 extends AbstractUpgrade
 
             $carrierIds[$carrierName] = $carrierId;
 
-            $result = $this->db->insert('myparcel_carrier_configuration', [
-                'ps_carrier_id'    => $carrierId,
-                'myparcel_carrier' => $carrierName,
+            /** @var PsCarrierConfigurationRepository $carrierConfigurationRepository */
+            $carrierConfigurationRepository = Pdk::get(PsCarrierConfigurationRepository::class);
+
+            $carrierConfigurationRepository->create([
+                'idCarrier'       => $carrierId,
+                'myparcelCarrier' => $carrierName,
             ]);
         }
 
@@ -796,6 +770,20 @@ class Upgrade2_0_0 extends AbstractUpgrade
     }
 
     /**
+     * @return void
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
+     */
+    private function installCarriers(): void
+    {
+        /** @var \MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService $service */
+        $service = Pdk::get(PsPdkUpgradeService::class);
+
+        $service->createPsCarriers();
+    }
+
+    /**
      * @throws \PrestaShopDatabaseException
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      * @throws \PrestaShopException
@@ -845,6 +833,49 @@ class Upgrade2_0_0 extends AbstractUpgrade
     private function migrateOrderShipments()
     {
         // from order_label to order_shipment
+    }
+
+    /**
+     * @return void
+     */
+    private function migrateSettings(): void
+    {
+        $oldConfigurationSettings = $this->getConfigurationSettings();
+
+        $settingsRepository = Pdk::get(PdkSettingsRepository::class);
+
+        $newSettings = $this->transformSettings($oldConfigurationSettings);
+
+        $newSettings['carrier'] = new SettingsModelCollection();
+
+        foreach (self::OLD_CARRIERS as $carrier) {
+            $transformed                         = $this->transformSettings($oldConfigurationSettings[$carrier] ?? []);
+            $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities(
+                $oldConfigurationSettings[$carrier] ?? []
+            );
+
+            $newSettings['carrier']->put($carrier, $transformed);
+        }
+
+        $settings = new Settings(array_replace_recursive(SettingsFacade::getDefaults(), $newSettings));
+
+        $settingsRepository->storeAllSettings($settings);
+    }
+
+    /**
+     * @param $setting
+     * @param $array
+     *
+     * @return null|int|string
+     */
+    private function searchForValue($setting, $array)
+    {
+        foreach ($array as $key => $val) {
+            if ($val['name'] === $setting) {
+                return $key;
+            }
+        }
+        return null;
     }
 
     /**

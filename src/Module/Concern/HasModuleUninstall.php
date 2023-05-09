@@ -11,7 +11,7 @@ use DbQuery;
 use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Database\Migrations;
+use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Tab;
@@ -93,11 +93,11 @@ trait HasModuleUninstall
 
     private function migrateDown(): void
     {
-        /** @var \MyParcelNL\PrestaShop\Database\Migrations $migrations */
-        $migrations = Pdk::get(Migrations::class);
+        /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */
+        $migrations = Pdk::get(DatabaseMigrations::class);
 
         foreach ($migrations->get() as $migration) {
-            /** @var \MyParcelNL\PrestaShop\Database\AbstractMigration $class */
+            /** @var \MyParcelNL\PrestaShop\Database\AbstractDatabaseMigration $class */
             $class  = Pdk::get($migration);
             $result = $class->down();
 

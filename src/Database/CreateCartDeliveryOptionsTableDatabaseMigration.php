@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Database;
 /**
  * @see \MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions
  */
-class CreateCartDeliveryOptionsTableMigration extends AbstractMigration
+class CreateCartDeliveryOptionsTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): bool
     {
