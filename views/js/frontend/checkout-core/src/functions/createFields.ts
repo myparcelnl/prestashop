@@ -1,25 +1,13 @@
-import { AddressFields } from '@myparcel-pdk/checkout/src';
-
-const addressBase = {
-  address1: `address_1`,
-  city: `city`,
-  country: `country`,
-  eoriNumber: `eori_number`,
-  number: `number`,
-  numberSuffix: `number_suffix`,
-  postalCode: `postcode`,
-  street: `street`,
-  vatNumber: `vat_number`,
-};
+import {AddressField, AddressFields} from '@myparcel-pdk/checkout/src';
 
 export const createFields = (
   prefix: string,
   callback: (string: string) => string = (string: string) => string,
 ): AddressFields =>
-  Object.entries(addressBase).reduce(
-    (acc, [key, value]) => ({
+  Object.values(AddressField).reduce(
+    (acc, value) => ({
       ...acc,
-      [key]: callback(`${prefix}${value}`),
+      [value]: callback(`${prefix}${value}`),
     }),
     {} as AddressFields,
   );

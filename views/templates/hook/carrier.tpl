@@ -1,5 +1,5 @@
 {$deliveryOptions}
 <div
         class="myparcelnl-address"
-        shipping-address-data="{$shippingAddress}"
-        billing-address-data="{$billingAddress}"></div>
+        data-shipping-address="{$shippingAddress}"
+        data-billing-address="{$billingAddress}"></div>

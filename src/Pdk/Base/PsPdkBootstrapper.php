@@ -31,8 +31,9 @@ class PsPdkBootstrapper extends PdkBootstrapper
         'ProductSettingsRepository'      => MyparcelnlProductSettings::class,
     ];
     protected const PRESTASHOP_SERVICES     = [
-        'ps.entityManager' => 'doctrine.orm.entity_manager',
         'ps.configuration' => 'prestashop.adapter.legacy.configuration',
+        'ps.entityManager' => 'doctrine.orm.entity_manager',
+        'ps.router'        => 'router',
         'ps.twig'          => 'twig',
     ];
 
@@ -59,11 +60,11 @@ class PsPdkBootstrapper extends PdkBootstrapper
                 'MyParcel-PrestaShop' => $version,
             ]),
 
-            'triggerUpgradeBefore' => '2.0.1',
+            'triggerUpgradeBefore' => value('2.0.1'),
             'moduleTabName'        => value('shipping_logistics'),
 
-            'prestaShopVersionMin' => '1.7.6',
-            'prestaShopVersionMax' => '8.0',
+            'prestaShopVersionMin' => value('1.7.6'),
+            'prestaShopVersionMax' => value('8.0'),
 
             'moduleInstance' => factory(static function () use ($name): MyParcelNL {
                 /** @var MyParcelNL|false $module */
@@ -79,7 +80,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             /**
              * Get all hooks from the MyParcelNL class dynamically.
              */
-            'moduleHooks' => factory(function () {
+            'moduleHooks'    => factory(function () {
                 $reflectionClass = new ReflectionClass(MyParcelNL::class);
 
                 $hooks = (new Collection($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC)))

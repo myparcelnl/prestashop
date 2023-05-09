@@ -12,11 +12,13 @@ use MyParcelNL;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
-use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\Sdk\src\Support\Arr;
 use PrestaShop\PrestaShop\Adapter\Entity\Tab;
 use RuntimeException;
 
+/**
+ * @deprecated Installer::uninstall()
+ */
 trait HasModuleUninstall
 {
     //    private $configItems = [

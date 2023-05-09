@@ -5,6 +5,8 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "Node16",
     "preserveValueImports": false,
+    "strict": true,
+    "strictNullChecks": true,
     "types": ["node", "vite/client"]
   },
   "exclude": ["../**/__tests__/*", "../**/*.spec.*"]

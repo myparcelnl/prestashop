@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Installer;
 
+use Carrier;
+use Context;
+use Group;
+use Language;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\LanguageService;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsCarrierConfigurationRepository;
+use PrestaShop\PrestaShop\Adapter\Entity\Zone;
 use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
+use RangePrice;
+use RangeWeight;
+use RuntimeException;
 
 /**
  * May only contain code that is needed for a bare installation as well as the PDK upgrade.
@@ -18,61 +27,145 @@ use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
 final class PsPdkUpgradeService
 {
     /**
+     * @param  \Carrier $carrier
+     *
+     * @return void
+     */
+    public function addZones(Carrier $carrier): void
+    {
+        $zones = Zone::getZones();
+
+        foreach ($zones as $zone) {
+            if ($carrier->addZone($zone['id_zone'])) {
+                continue;
+            }
+
+            throw new RuntimeException("Failed to add zone {$zone['id_zone']} to carrier {$carrier->id}");
+        }
+    }
+
+    /**
      * Creates and maps one PrestaShop carrier to a MyParcel carrier.
      *
      * @return void
-     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
+     * @todo maybe differentiate between installing from scratch and upgrading
      */
     public function createPsCarriers(): void
     {
         DefaultLogger::warning('Creating carriers');
 
-        $db      = \Db::getInstance(_PS_USE_SQL_SLAVE_);
+        $carriers = Pdk::get('allowedCarriers');
+
+        /** @var \MyParcelNL\Pdk\Carrier\Model\CarrierOptions $carrier */
+        foreach ($carriers as $carrierName) {
+            $carrier = $this->addCarrier($carrierName);
+
+            $this->addGroups($carrier);
+            $this->addRanges($carrier);
+            $this->addZones($carrier);
+
+            $carrier->update();
+        }
+    }
+
+    /**
+     * @param  \Carrier $carrier
+     *
+     * @return void
+     */
+    protected function addGroups(Carrier $carrier): void
+    {
+        $groups = Group::getGroups(Context::getContext()->language->id);
+
+        if ($carrier->setGroups(Arr::pluck($groups, 'id_group'))) {
+            return;
+        }
+
+        throw new RuntimeException("Failed to add groups to carrier {$carrier->id}");
+    }
+
+    /**
+     * @param  \Carrier $carrier
+     *
+     * @return void
+     */
+    protected function addRanges(Carrier $carrier): void
+    {
+        foreach ([new RangePrice(), new RangeWeight()] as $item) {
+            $item->id_carrier = $carrier->id;
+            $item->delimiter1 = '0';
+            $item->delimiter2 = '10000';
+
+            if ($item->add()) {
+                continue;
+            }
+
+            throw new RuntimeException("Failed to add range to carrier {$carrier->id}");
+        }
+    }
+
+    /**
+     * @param  string $carrierName
+     *
+     * @return Carrier
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
+     */
+    private function addCarrier(string $carrierName): Carrier
+    {
+        /** @var \MyParcelNL $module */
+        $module = Pdk::get('moduleInstance');
+
         $appInfo = Pdk::getAppInfo();
 
-        // TODO: do not
-        $carriers   = ['PostNL' => 'postnl'];
-        $carrierIds = [];
+        //        /** @var callable $createSettingsKey */
+        //        $createSettingsKey = Pdk::get('createSettingsKey');
+        //
+        //        $carrierSettingKey = $createSettingsKey(sprintf("carrier_%s", $carrierName));
 
-        foreach ($carriers as $carrierHuman => $carrierName) {
-            $nameField = sprintf('%s %s', $carrierHuman, $appInfo->name);
-            $result    = $db->insert('carrier', [
-                'name'                 => $nameField,
-                'active'               => 1,
-                'is_module'            => 1,
-                'shipping_external'    => 1,
-                'need_range'           => 1,
-                'external_module_name' => $appInfo->name,
-            ]);
+        // todo: check if carrier already exists using $carrierSettingKey, if so, update it instead of creating a new one
 
-            if (! $result) {
-                throw new Exception('Cannot insert new carrier with name', compact($carrierName));
-            }
+        $carrier = new Carrier();
 
-            DefaultLogger::debug('Created carrier', ['carrier' => $carrierName]);
+        $carrier->name                 = sprintf('%s (%s)', $carrierName, $appInfo->title);
+        /**
+         * TODO: activate the carrier when account settings are present and we know it should be enabled
+         * @see \MyParcelNL\PrestaShop\Pdk\Plugin\Action\Backend\Account\PsUpdateAccountAction::updateAndSaveAccount
+         */
+        $carrier->active               = 0;
+        $carrier->external_module_name = $module->name;
+        $carrier->is_module            = true;
+        $carrier->need_range           = 1;
+        $carrier->range_behavior       = 1;
+        $carrier->shipping_external    = true;
+        $carrier->shipping_method      = 2;
 
-            // TODO kijk of dit zonder sql kan!!!
-            $request = "SELECT id_carrier FROM ps_carrier WHERE name = '$nameField'";
-
-            $carrierId = $db->getValue($request);
-
-            if (! $carrierId) {
-                throw new Exception('Cannot retrieve carrierId while upgrading', compact($request));
-            }
-
-            $carrierIds[$carrierName] = $carrierId;
-
-            /** @var PsCarrierConfigurationRepository $carrierConfigurationRepository */
-            $carrierConfigurationRepository = Pdk::get(PsCarrierConfigurationRepository::class);
-
-            $carrierConfigurationRepository->create([
-                'idCarrier'       => $carrierId,
-                'myparcelCarrier' => $carrierName,
-            ]);
-
-            DefaultLogger::debug('Created carrier configuration', ['carrier' => $carrierName]);
+        foreach (Language::getLanguages() as $lang) {
+            $carrier->delay[$lang['id_lang']] = LanguageService::translate('delivery_time', $lang['iso_code']);
         }
+
+        if (! $carrier->add()) {
+            throw new Exception(sprintf('Cannot add carrier %s', $carrierName));
+        }
+
+        // TODO: save new carrier id to setting "$carrierSettingKey"
+
+        DefaultLogger::warning('Created carrier', ['carrier' => $carrierName]);
+
+        // todo fix this:
+        //        $this->carrierConfigurationRepository->updateOrCreate(
+        //            [
+        //                'idCarrier' => $carrier->id,
+        //            ],
+        //            [
+        //                'myparcelCarrier' => $carrierOptions->carrier->name,
+        //            ]
+        //        );
+
+        return $carrier;
     }
 }

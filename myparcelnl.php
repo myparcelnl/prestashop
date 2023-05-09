@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
@@ -58,7 +59,7 @@ class MyParcelNL extends CarrierModule
      */
     public function __construct()
     {
-        $name        = self::MODULE_NAME;
+        $name        = 'myparcelnl';
         $version     = $this->getVersionFromComposer();
         $displayName = $this->l($name);
 
@@ -141,7 +142,7 @@ class MyParcelNL extends CarrierModule
         try {
             Installer::install();
         } catch (Throwable $e) {
-            $this->_errors[] = $e->getMessage() . ' ' . $e->getTraceAsString();
+            $this->_errors[] = $e->getMessage();
             $success         = false;
         }
 
@@ -158,7 +159,7 @@ class MyParcelNL extends CarrierModule
         try {
             Installer::uninstall();
         } catch (Throwable $e) {
-            $this->_errors[] = $e->getMessage() . ' ' . $e->getTraceAsString();
+            $this->_errors[] = $e->getMessage();
             $success         = false;
         }
 

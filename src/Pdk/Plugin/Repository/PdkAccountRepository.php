@@ -8,13 +8,13 @@ use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Repository\AbstractAccountRepository;
 use MyParcelNL\Pdk\Api\Contract\ApiServiceInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
-use MyParcelNL\PrestaShop\Module\Concern\NeedsSettingsKey;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 
+/**
+ * TODO: move 'account_data' to config
+ */
 class PdkAccountRepository extends AbstractAccountRepository
 {
-    use NeedsSettingsKey;
-
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
      */
@@ -36,7 +36,7 @@ class PdkAccountRepository extends AbstractAccountRepository
 
     public function getFromStorage(): ?Account
     {
-        $result = $this->configurationService->get($this->getOptionName('account_data'));
+        $result = $this->configurationService->get('account_data');
 
         return new Account($result);
     }
@@ -47,11 +47,12 @@ class PdkAccountRepository extends AbstractAccountRepository
     public function store(?Account $account): ?Account
     {
         if (! $account) {
-            $this->configurationService->delete($this->getOptionName('account_data'));
+            $this->configurationService->delete('account_data');
             return $account;
         }
-        $this->configurationService->set($this->getOptionName('account_data'), $account->toStorableArray());
 
-        return $this->save($this->getOptionName('account_data'), $account);
+        $this->configurationService->set('account_data', $account->toStorableArray());
+
+        return $this->save('account_data', $account);
     }
 }

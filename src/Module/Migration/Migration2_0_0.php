@@ -17,7 +17,7 @@ use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Shipment\Model\DropOffDay;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsCarrierConfigurationRepository;
+use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
 

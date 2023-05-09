@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Service;
 
 use Configuration;
+use MyParcelNL\Pdk\Base\Service\WeightService;
 
-class PsWeightService extends \MyParcelNL\Pdk\Base\Service\WeightService
+class PsWeightService extends WeightService
 {
     /**
      * @param  int|float $weight

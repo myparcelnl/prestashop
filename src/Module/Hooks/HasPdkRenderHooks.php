@@ -68,12 +68,14 @@ trait HasPdkRenderHooks
         /** @var \PrestaShop\PrestaShop\Core\Grid\Definition\GridDefinitionInterface $definition */
         $definition = $params['definition'];
 
+        $appInfo = Pdk::getAppInfo();
+
         $definition
             ->getColumns()
             ->addBefore(
                 'actions',
-                (new LabelsColumn('myparcel'))
-                    ->setName('MyParcel')
+                (new LabelsColumn($appInfo->name))
+                    ->setName($appInfo->title)
             );
 
         //        $bulkActions = $definition->getBulkActions();
@@ -215,11 +217,10 @@ trait HasPdkRenderHooks
         $shippingAddress = $this->getContactDetails(new Address($this->context->cart->id_address_delivery));
         $billingAddress  = $this->getContactDetails(new Address($this->context->cart->id_address_invoice));
 
-        $cart = $cartRepository->get($this->context->cart);
         $this->context->smarty->setEscapeHtml(false);
-        $renderService->renderDeliveryOptions($cart);
+
         $this->context->smarty->assign([
-            'deliveryOptions' => $renderService->renderDeliveryOptions($cart),
+            'deliveryOptions' => $renderService->renderDeliveryOptions($cartRepository->get($this->context->cart)),
             'shippingAddress' => $this->encodeAddress($shippingAddress),
             'billingAddress'  => $this->encodeAddress($billingAddress),
         ]);

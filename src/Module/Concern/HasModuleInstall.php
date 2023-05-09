@@ -26,7 +26,7 @@ use Tab;
 use Zone;
 
 /**
- * @deprecated
+ * @deprecated Installer::install()
  */
 trait HasModuleInstall
 {

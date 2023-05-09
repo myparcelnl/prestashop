@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
-use MyParcelNL\Pdk\Api\Contract\ApiServiceInterface;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
-use MyParcelNL\PrestaShop\Module\Concern\NeedsSettingsKey;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 
 class PdkSettingsRepository extends AbstractSettingsRepository
 {
-    use NeedsSettingsKey;
-
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
      */
@@ -21,15 +18,13 @@ class PdkSettingsRepository extends AbstractSettingsRepository
 
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                          $storage
-     * @param  \MyParcelNL\Pdk\Api\Contract\ApiServiceInterface                           $api
      * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
      */
     public function __construct(
         StorageInterface              $storage,
-        ApiServiceInterface           $api,
         ConfigurationServiceInterface $configurationService
     ) {
-        parent::__construct($storage, $api);
+        parent::__construct($storage);
         $this->configurationService = $configurationService;
     }
 
@@ -40,7 +35,7 @@ class PdkSettingsRepository extends AbstractSettingsRepository
      */
     public function getGroup(string $namespace)
     {
-        return $this->configurationService->get($this->getOptionName($namespace));
+        return $this->configurationService->get($namespace);
     }
 
     /**
@@ -48,9 +43,16 @@ class PdkSettingsRepository extends AbstractSettingsRepository
      * @param  mixed  $value
      *
      * @return void
+     * @todo maybe create delete method in pdk?
      */
     public function store(string $key, $value): void
     {
-        $this->configurationService->set($this->getOptionName($key), $value);
+        if ($value === null) {
+            DefaultLogger::debug("Deleting option {$key}");
+            $this->configurationService->delete($key);
+            return;
+        }
+
+        $this->configurationService->set($key, $value);
     }
 }

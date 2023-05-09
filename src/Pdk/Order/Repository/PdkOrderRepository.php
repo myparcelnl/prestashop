@@ -7,9 +7,9 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 use Address;
 use Country;
 use Customer;
-use Db;
-use DbQuery;
-use MyParcelNL\Pdk\Base\Service\CurrencyService;
+use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
+use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
+use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\Plugin\Model\PdkOrder;
@@ -20,73 +20,69 @@ use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository;
-use MyParcelNL\PrestaShop\Service\PsWeightService;
+use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
+use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
+use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use Order;
-use RuntimeException;
 use State;
 
 class PdkOrderRepository extends AbstractPdkOrderRepository
 {
     /**
-     * @var \MyParcelNL\Pdk\Product\Repository\AbstractProductRepository
+     * @var \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface
      */
     protected $productRepository;
 
     /**
-     * @var \MyParcelNL\Pdk\Base\Service\CurrencyService
+     * @var \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface
      */
     private $currencyService;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository
+     * @var \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository
+     */
+    private $psCartDeliveryOptionsRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository
      */
     private $psOrderDataRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository
+     * @var \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository
      */
     private $psOrderShipmentRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Service\PsWeightService
+     * @var \MyParcelNL\Pdk\Base\Contract\WeightServiceInterface
      */
-    private $psWeightService;
+    private $weightService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                             $storage
-     * @param  \MyParcelNL\Pdk\Base\Service\CurrencyService                           $currencyService
-     * @param  \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository     $psOrderDataRepository
-     * @param  \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface            $productRepository
-     * @param  \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderShipmentRepository $psOrderShipmentRepository
-     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService                         $psWeightService
+     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                        $storage
+     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository           $psOrderDataRepository
+     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository       $psOrderShipmentRepository
+     * @param  \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository
+     * @param  \MyParcelNL\Pdk\Base\Service\CurrencyService                      $currencyService
+     * @param  \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface       $productRepository
+     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService                    $weightService
      */
     public function __construct(
-        MemoryCacheStorage         $storage,
-        CurrencyService            $currencyService,
-        PsOrderDataRepository      $psOrderDataRepository,
-        ProductRepositoryInterface $productRepository,
-        PsOrderShipmentRepository  $psOrderShipmentRepository,
-        PsWeightService            $psWeightService
+        MemoryCacheStorage              $storage,
+        PsOrderDataRepository           $psOrderDataRepository,
+        PsOrderShipmentRepository       $psOrderShipmentRepository,
+        PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository,
+        CurrencyServiceInterface        $currencyService,
+        ProductRepositoryInterface      $productRepository,
+        WeightServiceInterface          $weightService
     ) {
         parent::__construct($storage);
-        $this->currencyService           = $currencyService;
-        $this->psOrderDataRepository     = $psOrderDataRepository;
-        $this->productRepository         = $productRepository;
-        $this->psOrderShipmentRepository = $psOrderShipmentRepository;
-        $this->psWeightService           = $psWeightService;
-    }
-
-    /**
-     * @param  mixed $input
-     *
-     * @return void
-     * @throws \Exception
-     */
-    public function delete($input): void
-    {
-        throw new RuntimeException('Not implemented');
+        $this->psOrderDataRepository           = $psOrderDataRepository;
+        $this->psOrderShipmentRepository       = $psOrderShipmentRepository;
+        $this->psCartDeliveryOptionsRepository = $psCartDeliveryOptionsRepository;
+        $this->currencyService                 = $currencyService;
+        $this->productRepository               = $productRepository;
+        $this->weightService                   = $weightService;
     }
 
     /**
@@ -95,6 +91,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
      * @return \MyParcelNL\Pdk\Plugin\Model\PdkOrder
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function get($input): PdkOrder
     {
@@ -105,21 +102,22 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         }
 
         return $this->retrieve((string) $order->id, function () use ($order) {
-            $deliveryOptions = $this->getDeliveryOptions((int) $order->id_cart);
-            $orderProducts   = $order->getProducts() ?: [];
+            $orderData     = $this->getOrderData($order);
+            $orderProducts = $order->getProducts() ?: [];
 
-            return new PdkOrder([
-                'externalIdentifier'  => $order->id,
-                'recipient'           => $this->getRecipient($order),
-                'deliveryOptions'     => $deliveryOptions,
-                'physicalProperties'  => $this->getPhysicalProperties($orderProducts),
-                'shipments'           => $this->getShipments($order),
-                'referenceIdentifier' => "PrestaShop: $order->id",
-                'shipmentPrice'       => $this->currencyService->convertToCents($order->total_shipping_tax_incl),
-                'shipmentVat'         => $this->currencyService->convertToCents($order->total_shipping_tax_excl),
-                'lines'               => $this->createOrderLines($orderProducts),
-                'customsDeclaration'  => $this->createCustomsDeclaration($order, $orderProducts),
-            ]);
+            return new PdkOrder(
+                array_merge([
+                    'externalIdentifier'  => $order->id,
+                    'recipient'           => $this->getRecipient($order),
+                    'physicalProperties'  => $this->getPhysicalProperties($orderProducts),
+                    'shipments'           => $this->getShipments($order),
+                    'referenceIdentifier' => "PrestaShop: $order->id",
+                    'shipmentPrice'       => $this->currencyService->convertToCents($order->total_shipping_tax_incl),
+                    'shipmentVat'         => $this->currencyService->convertToCents($order->total_shipping_tax_excl),
+                    'lines'               => $this->createOrderLines($orderProducts),
+                    'customsDeclaration'  => $this->createCustomsDeclaration($order, $orderProducts),
+                ], $orderData)
+            );
         });
     }
 
@@ -150,16 +148,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     public function updateMany(PdkOrderCollection $collection): PdkOrderCollection
     {
         $collection->each(function (PdkOrder $order) {
-            $this->psOrderDataRepository->updateOrCreate(
-                [
-                    'idOrder' => $order->externalIdentifier,
-                ],
-                [
-                    'data' => json_encode([
-                        'deliveryOptions' => $order->deliveryOptions->toArray(),
-                    ]),
-                ]
-            );
+            $this->saveOrderData($order);
 
             $order->shipments->each(function (Shipment $shipment) use ($order) {
                 $this->psOrderShipmentRepository->updateOrCreate(
@@ -281,21 +270,42 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  int $cartId
+     * In PrestaShop, the delivery options are stored in the cart, not in the order. So we need to get them from the
+     * cart if they are not present in the order yet.
      *
-     * @return array|false|string
+     * @param  \Order $order
+     *
+     * @return array
+     * @throws \Doctrine\ORM\ORMException
      */
-    private function getDeliveryOptions(int $cartId)
+    private function getOrderData(Order $order): array
     {
-        $query = (new DbQuery(_PS_USE_SQL_SLAVE_))
-            ->select('delivery_options')
-            ->from('myparcelnl_delivery_options')
-            ->where("id_cart = $cartId");
+        $fromOrder = $this->psOrderDataRepository->findOneBy(['idOrder' => $order->id]);
 
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->getValue($query) ?: '';
+        if (! $fromOrder) {
+            $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['idCart' => $order->id_cart]);
 
-        return json_decode($result, true);
+            $context = [
+                'cartId'  => $order->id_cart,
+                'orderId' => $order->id,
+            ];
+
+            if (! $fromCart) {
+                DefaultLogger::debug('No delivery options found in cart, saving empty order data to order', $context);
+            } else {
+                DefaultLogger::debug('Delivery options found in cart, saving to order', $context);
+            }
+
+            $deliveryOptions = $fromCart ? $fromCart->getData() : [];
+
+            $this->saveOrderData((string) $order->id, [
+                'deliveryOptions' => $deliveryOptions,
+            ]);
+
+            return $deliveryOptions;
+        }
+
+        return $fromOrder->getData();
     }
 
     /**
@@ -312,7 +322,26 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         }
 
         return [
-            'weight' => $this->psWeightService->convertToGrams($weight),
+            'weight' => $this->weightService->convertToGrams($weight),
         ];
+    }
+
+    /**
+     * @param  string $id
+     * @param  array  $deliveryOptions
+     *
+     * @return void
+     * @throws \Doctrine\ORM\ORMException
+     */
+    private function saveOrderData(string $id, array $orderData): void
+    {
+        $this->psOrderDataRepository->updateOrCreate(
+            [
+                'idOrder' => $id,
+            ],
+            [
+                'data' => json_encode($orderData),
+            ]
+        );
     }
 }

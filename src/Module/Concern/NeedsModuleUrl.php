@@ -7,6 +7,9 @@ namespace MyParcelNL\PrestaShop\Module\Concern;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use RuntimeException;
 
+/**
+ * @deprecated Pdk::get('ps.router') === $router
+ */
 trait NeedsModuleUrl
 {
     /**
