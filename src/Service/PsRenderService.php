@@ -20,17 +20,13 @@ class PsRenderService extends RenderService
      */
     public function renderDeliveryOptions(PdkCart $cart): string
     {
-        ob_start();
-
         $customCss = Settings::get(CheckoutSettings::DELIVERY_OPTIONS_CUSTOM_CSS, CheckoutSettings::ID);
         $context   = $this->contextService->createContexts([Context::ID_CHECKOUT], ['cart' => $cart]);
 
-        printf(
-            '<div id="mypa-delivery-options-wrapper" class="woocommerce-myparcel__delivery-options" data-context="%s">%s<div id="myparcel-delivery-options"></div></div>',
+        return sprintf(
+            '<div id="mypa-delivery-options-wrapper" data-context="%s">%s<div id="myparcel-delivery-options"></div></div>',
             $this->encodeContext($context),
             $customCss ? sprintf('<style>%s</style>', $customCss) : ''
         );
-
-        return ob_get_clean();
     }
 }

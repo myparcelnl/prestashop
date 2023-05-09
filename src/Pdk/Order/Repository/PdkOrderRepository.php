@@ -40,11 +40,6 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     private $currencyService;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkShipmentRepository
-     */
-    private $pdkShipmentRepository;
-
-    /**
      * @var \MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsOrderDataRepository
      */
     private $psOrderDataRepository;

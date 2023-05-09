@@ -8,7 +8,6 @@ use MyParcelNL\PrestaShop\Module\Concern\HasModuleInstall;
 use MyParcelNL\PrestaShop\Module\Concern\HasModuleUninstall;
 use MyParcelNL\PrestaShop\Module\Facade\ModuleService;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
-use MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use PrestaShopBundle\Exception\InvalidModuleException;
 
@@ -83,12 +82,20 @@ class MyParcelNL extends CarrierModule
             $this->getBaseUrl()
         );
 
+        Db::getInstance()
+            ->execute(
+                "CREATE TABLE if NOT EXISTS ps_myparcelnl_delivery_options (
+	id_cart int(11) NOT NULL DEFAULT '0',
+    delivery_options text NOT NULL DEFAULT ''
+) AUTO_INCREMENT=1;"
+            );
+
         /** @note trigger upgrade */
-        if ($version <= Pdk::get('triggerUpgradeBefore')) {
-            $this->upgrade(Upgrade2_0_0::class);
-            //$upgrade = new \MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0();
-            //$upgrade->upgrade();
-        }
+        //        if ($version <= Pdk::get('triggerUpgradeBefore')) {
+        //            $this->upgrade(Upgrade2_0_0::class);
+        //$upgrade = new \MyParcelNL\PrestaShop\Module\Upgrade\Upgrade2_0_0();
+        //$upgrade->upgrade();
+        //        }
 
         $this->registerHook('header');
 

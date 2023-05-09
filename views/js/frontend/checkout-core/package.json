@@ -1,0 +1,20 @@
+{
+  "name": "@myparcelnl-prestashop/frontend-checkout-core",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "run ws:build \"$(pwd)\"",
+    "build:dev": "run ws:build:dev \"$(pwd)\"",
+    "dev": "run ws:dev \"$(pwd)\"",
+    "test": "run ws:test \"$(pwd)\"",
+    "test:watch": "run ws:test:watch \"$(pwd)\""
+  },
+  "devDependencies": {
+    "@myparcel-prestashop/vite-config": "workspace:*",
+    "@types/jquery": "^3.5.16",
+    "vite": "^4.1.2"
+  },
+  "dependencies": {
+    "@myparcel-pdk/checkout": "^1.0.0-alpha.1"
+  }
+}

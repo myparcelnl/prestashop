@@ -1,19 +1,11 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "strict": true,
-    "target": "ES2018"
+    "paths": {
+      "@myparcel-prestashop/frontend-*": ["./views/js/frontend/*/src"],
+      "@myparcel-prestashop/backend-*": ["./views/js/backend/*/src"]
+    }
   },
-  "include": [
-    "./**/*"
-  ]
+  "include": ["./**/*"],
+  "exclude": []
 }

@@ -11,6 +11,7 @@ use MyParcelNL\Pdk\Base\Model\ContactDetails;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
+use MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface;
 use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
@@ -228,30 +229,27 @@ trait HasPdkRenderHooks
 
     public function hookHeader()
     {
-        $version = Pdk::get('deliveryOptionsVersion');
+        /** @var \MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface $viewService */
+        $viewService = Pdk::get(ViewServiceInterface::class);
 
-        $this->context->controller->registerJavascript(
-            'myparcelnl-frontend-scripts',
-            $this->_path . 'views/js/frontend/lib/prestashop-frontend.iife.js',
-            ['server' => 'local', 'position' => 'head', 'priority' => 1]
-        );
+        if (! $viewService->isCheckoutPage()) {
+            return;
+        }
 
-        $this->context->controller->registerJavascript(
-            'myparcelnl-delivery-options',
-            sprintf('https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js', $version),
-            ['server' => 'remote', 'position' => 'head', 'priority' => 1]
-        );
+        $this->loadCoreScripts();
+
+        $this->loadDeliveryOptionsScripts();
     }
 
     private function createDeliveryOptions(array $deliveryOptions): array
     {
         return [
-            'carrier'         => $deliveryOptions['carrier'],
-            'date'            => $deliveryOptions['date'],
+            'carrier'         => $deliveryOptions['carrier'] ?? null,
+            'date'            => $deliveryOptions['date'] ?? null,
             'pickupLocation'  => null,
-            'shipmentOptions' => $deliveryOptions['shipmentOptions'],
-            'deliveryType'    => $deliveryOptions['deliveryType'],
-            'packageType'     => $deliveryOptions['packageType'],
+            'shipmentOptions' => $deliveryOptions['shipmentOptions'] ?? null,
+            'deliveryType'    => $deliveryOptions['deliveryType'] ?? null,
+            'packageType'     => $deliveryOptions['packageType'] ?? null,
         ];
     }
 
@@ -284,6 +282,28 @@ trait HasPdkRenderHooks
         ]);
     }
 
+    private function loadCoreScripts(): void
+    {
+        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout-core/lib/checkout-core.iife.js");
+        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-core/lib/style.css");
+    }
+
+    private function loadDeliveryOptionsScripts(): void
+    {
+        $version = Pdk::get('deliveryOptionsVersion');
+
+        $this->context->controller->registerJavascript(
+            'myparcelnl-delivery-options',
+            sprintf('https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js', $version),
+            ['server' => 'remote', 'position' => 'head', 'priority' => 1]
+        );
+
+        $this->context->controller->addJS(
+            "{$this->_path}views/js/frontend/checkout-delivery-options/lib/checkout-delivery-options.iife.js"
+        );
+        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-delivery-options/lib/style.css");
+    }
+
     private function renderService(): RenderServiceInterface
     {
         return Pdk::get(RenderServiceInterface::class);
@@ -297,7 +317,7 @@ trait HasPdkRenderHooks
         ];
 
         Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->insert(
+            ->update(
                 'myparcelnl_delivery_options',
                 $values,
                 false,

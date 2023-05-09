@@ -16,7 +16,7 @@ class PsFrontendEndpointService extends AbstractFrontendEndpointService
      */
     public function getBaseUrl(): string
     {
-        return $this->getUrl('myparcelnl_pdk');
-        //return '/admin-dev/index.php/modules/myparcelnl/pdk';
+        //        return $this->getUrl('myparcelnl_pdk');
+        return '/admin-dev/index.php/modules/myparcelnl/pdk';
     }
 }
