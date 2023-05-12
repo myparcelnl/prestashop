@@ -9,13 +9,13 @@ namespace MyParcelNL\PrestaShop\Database;
  */
 class CreateProductSettingsTableDatabaseMigration extends AbstractDatabaseMigration
 {
-    public function down(): bool
+    public function down(): void
     {
         $table = Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
-        return $this->execute("DROP TABLE IF EXISTS `$table`");
+        $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
-    public function up(): bool
+    public function up(): void
     {
         $table = Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
         $sql   = <<<SQL
@@ -30,6 +30,6 @@ class CreateProductSettingsTableDatabaseMigration extends AbstractDatabaseMigrat
             ) ENGINE={ENGINE} DEFAULT CHARSET=utf8;
 SQL;
 
-        return $this->execute($sql);
+        $this->execute($sql);
     }
 }

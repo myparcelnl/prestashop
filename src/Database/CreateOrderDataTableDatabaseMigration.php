@@ -9,13 +9,13 @@ namespace MyParcelNL\PrestaShop\Database;
  */
 class CreateOrderDataTableDatabaseMigration extends AbstractDatabaseMigration
 {
-    public function down(): bool
+    public function down(): void
     {
         $table = Table::withPrefix(Table::TABLE_ORDER_DATA);
-        return $this->execute("DROP TABLE IF EXISTS `$table`");
+        $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
-    public function up(): bool
+    public function up(): void
     {
         $table = Table::withPrefix(Table::TABLE_ORDER_DATA);
         $sql   = <<<SQL
@@ -30,6 +30,6 @@ class CreateOrderDataTableDatabaseMigration extends AbstractDatabaseMigration
             ) ENGINE={ENGINE} DEFAULT CHARSET=utf8;
 SQL;
 
-        return $this->execute($sql);
+        $this->execute($sql);
     }
 }

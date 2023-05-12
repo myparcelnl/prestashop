@@ -33,7 +33,8 @@ final class PsInstallerService extends InstallerService
     private function executeDatabaseMigrations(): void
     {
         /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */
-        $migrations = Pdk::get(DatabaseMigrations::class);
+        $migrations = Pdk::get(DatabaseMigrations::class)
+            ->get();
 
         foreach ($migrations as $migration) {
             /** @var \MyParcelNL\Pdk\Plugin\Installer\Contract\MigrationInterface $instance */

@@ -16,6 +16,7 @@ use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
+use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
 use MyParcelNL\PrestaShop\Service\PsRenderService;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 use Tools;
@@ -223,6 +224,7 @@ trait HasPdkRenderHooks
             'deliveryOptions' => $renderService->renderDeliveryOptions($cartRepository->get($this->context->cart)),
             'shippingAddress' => $this->encodeAddress($shippingAddress),
             'billingAddress'  => $this->encodeAddress($billingAddress),
+            'carrier'         => $this->getCarrierName((int) $this->context->cart->id_carrier),
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier.tpl');
@@ -261,6 +263,19 @@ trait HasPdkRenderHooks
             ENT_QUOTES,
             'UTF-8'
         );
+    }
+
+    private function getCarrierName(int $carrierId): string
+    {
+        /** @var \MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository $carrierRepository */
+        $carrierRepository = Pdk::get(PsCarrierConfigurationRepository::class);
+        $fromCarrierConfig = $carrierRepository->findOneBy(['idCarrier' => $carrierId]);
+
+        if ($fromCarrierConfig) {
+            return $fromCarrierConfig->getMyparcelCarrier();
+        }
+
+        return 'postnl';
     }
 
     private function getContactDetails(Address $address): ContactDetails
