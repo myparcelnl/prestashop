@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\LanguageService;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
 use PrestaShop\PrestaShop\Adapter\Entity\Zone;
 use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
 use RangePrice;
@@ -26,6 +27,16 @@ use RuntimeException;
  */
 final class PsPdkUpgradeService
 {
+    /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository
+     */
+    private $carrierConfigurationRepository;
+
+    public function __construct(PsCarrierConfigurationRepository $carrierConfigurationRepository)
+    {
+        $this->carrierConfigurationRepository = $carrierConfigurationRepository;
+    }
+
     /**
      * @param  \Carrier $carrier
      *
@@ -48,6 +59,7 @@ final class PsPdkUpgradeService
      * Creates and maps one PrestaShop carrier to a MyParcel carrier.
      *
      * @return void
+     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
@@ -59,7 +71,6 @@ final class PsPdkUpgradeService
 
         $carriers = Pdk::get('allowedCarriers');
 
-        /** @var \MyParcelNL\Pdk\Carrier\Model\CarrierOptions $carrier */
         foreach ($carriers as $carrierName) {
             $carrier = $this->addCarrier($carrierName);
 
@@ -68,6 +79,7 @@ final class PsPdkUpgradeService
             $this->addZones($carrier);
 
             $carrier->update();
+            $this->addCarrierConfiguration($carrier, $carrierName);
         }
     }
 
@@ -131,18 +143,19 @@ final class PsPdkUpgradeService
 
         $carrier = new Carrier();
 
-        $carrier->name                 = sprintf('%s (%s)', $carrierName, $appInfo->title);
+        $carrier->name = sprintf('%s (%s)', $carrierName, $appInfo->title);
         /**
          * TODO: activate the carrier when account settings are present and we know it should be enabled
+         *
          * @see \MyParcelNL\PrestaShop\Pdk\Plugin\Action\Backend\Account\PsUpdateAccountAction::updateAndSaveAccount
          */
-        $carrier->active               = 0;
+        $carrier->active = 0;
         $carrier->external_module_name = $module->name;
-        $carrier->is_module            = true;
-        $carrier->need_range           = 1;
-        $carrier->range_behavior       = 1;
-        $carrier->shipping_external    = true;
-        $carrier->shipping_method      = 2;
+        $carrier->is_module = true;
+        $carrier->need_range = 1;
+        $carrier->range_behavior = 1;
+        $carrier->shipping_external = true;
+        $carrier->shipping_method = 2;
 
         foreach (Language::getLanguages() as $lang) {
             $carrier->delay[$lang['id_lang']] = LanguageService::translate('delivery_time', $lang['iso_code']);
@@ -156,16 +169,22 @@ final class PsPdkUpgradeService
 
         DefaultLogger::warning('Created carrier', ['carrier' => $carrierName]);
 
-        // todo fix this:
-        //        $this->carrierConfigurationRepository->updateOrCreate(
-        //            [
-        //                'idCarrier' => $carrier->id,
-        //            ],
-        //            [
-        //                'myparcelCarrier' => $carrierOptions->carrier->name,
-        //            ]
-        //        );
-
         return $carrier;
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    private function addCarrierConfiguration(Carrier $carrier, string $carrierName)
+    {
+        // todo fix this:
+        $this->carrierConfigurationRepository->updateOrCreate(
+            [
+                'idCarrier' => (int) $carrier->id,
+            ],
+            [
+                'myparcelCarrier' => $carrierName,
+            ]
+        );
     }
 }

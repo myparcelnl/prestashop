@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Installer;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\DocParser;
+use Doctrine\Common\Annotations\PsrCachedReader;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Plugin\Installer\InstallerService;
 use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
 use RuntimeException;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class PsInstallerService extends InstallerService
 {
@@ -20,6 +27,8 @@ final class PsInstallerService extends InstallerService
      */
     protected function executeInstallation(): void
     {
+        $this->prepareEntityManager();
+
         $this->executeDatabaseMigrations();
         $this->installCarriers();
 
@@ -58,6 +67,33 @@ final class PsInstallerService extends InstallerService
         $service = Pdk::get(PsPdkUpgradeService::class);
 
         $service->createPsCarriers();
+    }
+
+    /**
+     * @return void
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     */
+    private function prepareEntityManager(): void
+    {
+        $appInfo = Pdk::getAppInfo();
+
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = Pdk::get('ps.entityManager');
+
+        $driverChain = $entityManager
+            ->getConfiguration()
+            ->getMetadataDriverImpl();
+
+        $docParser = new DocParser();
+        $reader    = new AnnotationReader($docParser);
+        $reader    = new PsrCachedReader($reader, new ArrayAdapter());
+
+        $driver = new AnnotationDriver($reader, ["{$appInfo->path}src/Entity"]);
+
+        if ($driverChain instanceof MappingDriverChain) {
+            $driverChain->addDriver($driver, 'MyParcelNL\PrestaShop\Entity');
+        }
     }
 
     private function registerHooks(): void
