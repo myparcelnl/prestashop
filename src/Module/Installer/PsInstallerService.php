@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Installer;
 
-use _HumbugBoxcbe25c660cef\Symfony\Component\Console\Exception\RuntimeException;
 use MyParcelNL\Pdk\Facade\DefaultLogger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Plugin\Installer\InstallerService;
 use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
+use RuntimeException;
 
 final class PsInstallerService extends InstallerService
 {
@@ -49,6 +49,7 @@ final class PsInstallerService extends InstallerService
      * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
+     * @throws \PrestaShopException
      */
     private function installCarriers(): void
     {

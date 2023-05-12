@@ -11,6 +11,7 @@ use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
 use MyParcelNL\Pdk\Plugin\Api\Contract\BackendEndpointServiceInterface;
 use MyParcelNL\Pdk\Plugin\Api\Contract\FrontendEndpointServiceInterface;
+use MyParcelNL\Pdk\Plugin\Contract\DeliveryOptionsServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\OrderStatusServiceInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkCartRepositoryInterface;
 use MyParcelNL\Pdk\Plugin\Contract\PdkOrderRepositoryInterface;
@@ -42,6 +43,7 @@ use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsViewService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Pdk\Service\LanguageService;
+use MyParcelNL\PrestaShop\Pdk\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\Ps17ConfigurationService;
@@ -101,6 +103,7 @@ return [
     WeightServiceInterface::class               => autowire(PsWeightService::class),
     TaxServiceInterface::class                  => autowire(PsTaxService::class),
     RenderServiceInterface::class               => autowire(PsRenderService::class),
+    DeliveryOptionsServiceInterface::class      => autowire(PsDeliveryOptionsService::class),
 
     /**
      * Endpoints
@@ -125,4 +128,3 @@ return [
     MigrationServiceInterface::class      => autowire(PsMigrationService::class),
     ScriptServiceInterface::class         => autowire(PsScriptService::class),
 ];
-

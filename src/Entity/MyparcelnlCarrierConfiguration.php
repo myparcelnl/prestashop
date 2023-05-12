@@ -18,12 +18,6 @@ class MyparcelnlCarrierConfiguration extends AbstractEntity
     protected $idCarrier;
 
     /**
-     * @var int
-     * @Doctrine\ORM\Mapping\Column(type="integer", nullable=false, unique=true)
-     */
-    protected $idConfiguration;
-
-    /**
      * @var string
      * @Doctrine\ORM\Mapping\Column(type="string", nullable=false, unique=true)
      */
@@ -35,14 +29,6 @@ class MyparcelnlCarrierConfiguration extends AbstractEntity
     public function getIdCarrier(): int
     {
         return $this->idCarrier;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIdConfiguration(): int
-    {
-        return $this->idConfiguration;
     }
 
     /**
@@ -62,10 +48,10 @@ class MyparcelnlCarrierConfiguration extends AbstractEntity
     }
 
     /**
-     * @param  int $idConfiguration
+     * @param  string $myparcelCarrier
      */
-    public function setIdConfiguration(int $idConfiguration): void
+    public function setMyparcelCarrier(string $myparcelCarrier): void
     {
-        $this->idConfiguration = $idConfiguration;
+        $this->myparcelCarrier = $myparcelCarrier;
     }
 }
