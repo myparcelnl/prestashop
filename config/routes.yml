@@ -15,12 +15,3 @@ myparcelnl_pdk:
   methods: [ GET, POST, PUT, DELETE ]
   defaults:
     _controller: 'MyParcelNL\PrestaShop\Pdk\Controller\AdminMyParcelPdkController::index'
-
-##
-# The controller that executes all webhook actions
-##
-myparcelnl_webhook:
-  path: myparcelnl/webhook
-  methods: [ GET, POST, PUT, DELETE ]
-  defaults:
-    _controller: 'MyParcelNL\PrestaShop\Pdk\Controller\AdminWebhookController::index'

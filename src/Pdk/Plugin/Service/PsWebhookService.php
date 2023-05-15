@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
+use Context;
 use MyParcelNL\Pdk\App\Webhook\Service\AbstractPdkWebhookService;
-use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Module\Concern\NeedsModuleUrl;
-use Tools;
 
 class PsWebhookService extends AbstractPdkWebhookService
 {
-    use NeedsModuleUrl;
+    /**
+     * @return string
+     */
+    public function createUrl(): string
+    {
+        return sprintf('%s?hash=%s', $this->getBaseUrl(), $this->generateHash());
+    }
 
     public function getBaseUrl(): string
     {
-        /** @var \PrestaShopBundle\Service\Routing\Router $router */
-        $router = Pdk::get('ps.router');
-
-        return sprintf(
-            '%s%s',
-            Tools::getAdminUrl(),
-            // TODO move route names to config
-            strtok($router->generate('myparcelnl_webhook'), '?')
-        );
+        return Context::getContext()->link->getModuleLink('myparcelnl', 'webhook');
     }
 }

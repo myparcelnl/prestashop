@@ -16,7 +16,7 @@ class PsCronService implements CronServiceInterface
      */
     public function dispatch(callable $callback, ...$args): void
     {
-        call_user_func($callback);
+        $callback(...$args);
     }
 
     public function schedule(callable $callback, int $timestamp, ...$args): void
