@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Entity\OrderStatus;
 
 use Configuration;
 use Exception;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Constant;
 use MyParcelNL\PrestaShop\Module\Tools\Tools;
 use OrderLabel;
@@ -47,7 +47,7 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
         $newOrderStatus = $this->getNewOrderStatus();
 
         if (! $newOrderStatus) {
-            DefaultLogger::debug(
+            Logger::debug(
                 'Order status won\'t be updated because setting is not set.',
                 [
                     'shipmentId' => $this->shipmentId,
@@ -73,7 +73,7 @@ abstract class AbstractOrderStatusUpdate implements OrderStatusUpdateInterface
             try {
                 OrderLabel::sendShippedNotification($this->shipmentId);
             } catch (Exception $exception) {
-                DefaultLogger::error($exception->getMessage(), compact('exception'));
+                Logger::error($exception->getMessage(), compact('exception'));
             }
         }
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Facade\RenderService;
+use MyParcelNL\Pdk\Facade\Frontend;
 
 /**
  * This controller is used to show a tab under "Shipping" in the admin.
@@ -32,7 +32,7 @@ class AdminMyParcelNLController extends AdminController
         parent::initContent();
 
         $this->context->smarty->assign([
-            'content' => RenderService::renderPluginSettings(),
+            'content' => Frontend::renderPluginSettings(),
         ]);
     }
 

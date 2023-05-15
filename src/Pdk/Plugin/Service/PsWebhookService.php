@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
+use MyParcelNL\Pdk\App\Webhook\Service\AbstractPdkWebhookService;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Plugin\Webhook\AbstractPdkWebhookService;
 use MyParcelNL\PrestaShop\Module\Concern\NeedsModuleUrl;
 use Tools;
 

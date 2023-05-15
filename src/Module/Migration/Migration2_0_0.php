@@ -8,7 +8,7 @@ use DbQuery;
 use Generator;
 use MyParcelNL\Pdk\Base\Service\CurrencyService;
 use MyParcelNL\Pdk\Base\Support\Arr;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings as SettingsFacade;
 use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
@@ -822,7 +822,7 @@ final class Migration2_0_0 extends AbstractPsMigration
             "INSERT INTO `$deliveryOptionsTable` (`cartId`, `deliveryOptions`, `deliveryMethod`) VALUES $newValuesString"
         );
 
-        DefaultLogger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
+        Logger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
     }
 
     private function migrateOrderData(): void

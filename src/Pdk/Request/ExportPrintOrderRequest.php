@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Request;
 
-use MyParcelNL\Pdk\Plugin\Request\AbstractEndpointRequest;
+use MyParcelNL\Pdk\App\Request\AbstractEndpointRequest;
 
 class ExportPrintOrderRequest extends AbstractEndpointRequest
 {

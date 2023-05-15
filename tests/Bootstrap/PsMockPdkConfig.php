@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Bootstrap;
 
-use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkOrderRepository;
+use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderRepository;
 use MyParcelNL\Pdk\Tests\Bootstrap\MockPdkConfig;
 use function DI\autowire;
 

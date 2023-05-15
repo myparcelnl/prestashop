@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Controller;
 
 use MyParcelNL;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\App\Webhook\PdkWebhook;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Plugin\Api\PdkWebhook;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,14 +38,14 @@ class AdminWebhookController extends FrameworkBundleAdminController
         try {
             $request = $this->createNormalizedRequest();
 
-            DefaultLogger::info('Webhook received', ['request' => $request->query]);
+            Logger::info('Webhook received', ['request' => $request->query]);
 
-            /** @var \MyParcelNL\Pdk\Plugin\Api\PdkWebhook $webhooks */
+            /** @var \MyParcelNL\Pdk\App\Api\PdkWebhook $webhooks */
             $webhooks = Pdk::get(PdkWebhook::class);
 
             $response = $webhooks->call($request);
         } catch (Throwable $e) {
-            DefaultLogger::error($e->getMessage(), ['values' => $_REQUEST]);
+            Logger::error($e->getMessage(), ['values' => $_REQUEST]);
             return new Response($e->getMessage(), 400);
         }
 

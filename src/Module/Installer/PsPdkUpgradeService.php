@@ -7,10 +7,10 @@ namespace MyParcelNL\PrestaShop\Module\Installer;
 use Carrier;
 use Context;
 use Group;
-use Language;
+use Language as PsLanguage;
 use MyParcelNL\Pdk\Base\Support\Arr;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
-use MyParcelNL\Pdk\Facade\LanguageService;
+use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\Facade\Language;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
 use PrestaShop\PrestaShop\Adapter\Entity\Zone;
@@ -67,7 +67,7 @@ final class PsPdkUpgradeService
      */
     public function createPsCarriers(): void
     {
-        DefaultLogger::warning('Creating carriers');
+        Logger::warning('Creating carriers');
 
         $carriers = Pdk::get('allowedCarriers');
 
@@ -157,8 +157,8 @@ final class PsPdkUpgradeService
         $carrier->shipping_external = true;
         $carrier->shipping_method = 2;
 
-        foreach (Language::getLanguages() as $lang) {
-            $carrier->delay[$lang['id_lang']] = LanguageService::translate('delivery_time', $lang['iso_code']);
+        foreach (PsLanguage::getLanguages() as $lang) {
+            $carrier->delay[$lang['id_lang']] = Language::translate('delivery_time', $lang['iso_code']);
         }
 
         if (! $carrier->add()) {
@@ -167,7 +167,7 @@ final class PsPdkUpgradeService
 
         // TODO: save new carrier id to setting "$carrierSettingKey"
 
-        DefaultLogger::warning('Created carrier', ['carrier' => $carrierName]);
+        Logger::warning('Created carrier', ['carrier' => $carrierName]);
 
         return $carrier;
     }

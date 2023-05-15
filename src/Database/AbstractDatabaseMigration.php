@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
-use MyParcelNL\Pdk\Facade\DefaultLogger;
-use MyParcelNL\Pdk\Plugin\Installer\Contract\MigrationInterface;
+use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface;
 
 abstract class AbstractDatabaseMigration implements MigrationInterface
 {
@@ -31,9 +31,9 @@ abstract class AbstractDatabaseMigration implements MigrationInterface
         try {
             \Db::getInstance(_PS_USE_SQL_SLAVE_)
                 ->execute($trimmedSql);
-            DefaultLogger::info('Query executed', ['class' => static::class, 'sql' => $trimmedSql]);
+            Logger::info('Query executed', ['class' => static::class, 'sql' => $trimmedSql]);
         } catch (\Throwable $e) {
-            DefaultLogger::error(
+            Logger::error(
                 'Query failed',
                 [
                     'class' => static::class,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Action\Backend\Account;
 
 use MyParcelNL\Pdk\Account\Model\Account;
-use MyParcelNL\Pdk\Plugin\Action\Backend\Account\UpdateAccountAction;
+use MyParcelNL\Pdk\App\Action\Backend\Account\UpdateAccountAction;
 
 final class PsUpdateAccountAction extends UpdateAccountAction
 {

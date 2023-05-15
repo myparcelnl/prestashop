@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
 use Context;
-use MyParcelNL\Pdk\Plugin\Contract\OrderStatusServiceInterface;
+use MyParcelNL\Pdk\App\Order\Contract\OrderStatusServiceInterface;
 use OrderState;
 
 class OrderStatusService implements OrderStatusServiceInterface

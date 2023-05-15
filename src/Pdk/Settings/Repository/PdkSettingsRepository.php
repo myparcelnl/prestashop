@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
@@ -48,7 +48,7 @@ class PdkSettingsRepository extends AbstractSettingsRepository
     public function store(string $key, $value): void
     {
         if ($value === null) {
-            DefaultLogger::debug("Deleting option {$key}");
+            Logger::debug("Deleting option {$key}");
             $this->configurationService->delete($key);
             return;
         }

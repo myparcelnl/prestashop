@@ -8,16 +8,16 @@ use Address;
 use Country;
 use Db;
 use MyParcelNL\Pdk\Base\Model\ContactDetails;
+use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface;
+use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
 use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
-use MyParcelNL\PrestaShop\Service\PsRenderService;
+use MyParcelNL\PrestaShop\Service\PsFrontendRenderService;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 use Tools;
 
@@ -30,8 +30,7 @@ trait HasPdkRenderHooks
      */
     public function getContent(): string
     {
-        return $this->renderService()
-            ->renderPluginSettings();
+        return Frontend::renderPluginSettings();
     }
 
     /**
@@ -83,7 +82,7 @@ trait HasPdkRenderHooks
         //        foreach ($this->getBulkActionsMap() as $action => $data) {
         //            $bulkActions->add(
         //                (new IconBulkAction($action))
-        //                    ->setName(LanguageService::translate($data['label']))
+        //                    ->setName(Language::translate($data['label']))
         //                    ->setOptions(['icon' => $data['icon']])
         //            );
         //        }
@@ -107,8 +106,7 @@ trait HasPdkRenderHooks
                 $repository = Pdk::get(PdkOrderRepository::class);
                 $order      = $repository->get($row['id_order']);
 
-                $row['myparcel'] = self::renderService()
-                    ->renderOrderListItem($order);
+                $row['myparcel'] = Frontend::renderOrderListItem($order);
 
                 return $row;
             }, $params['presented_grid']['data']['records']->all())
@@ -123,10 +121,8 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminAfterHeader(): string
     {
-        $html = $this->renderService()
-            ->renderNotifications();
-        $html .= $this->renderService()
-            ->renderModals();
+        $html = Frontend::renderNotifications();
+        $html .= Frontend::renderModals();
 
         return $html;
     }
@@ -137,8 +133,7 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminEndContent(): string
     {
-        return $this->renderService()
-            ->renderInitScript();
+        return Frontend::renderInitScript();
     }
 
     /**
@@ -147,6 +142,7 @@ trait HasPdkRenderHooks
      * @param  array $params
      *
      * @return string
+     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -156,8 +152,7 @@ trait HasPdkRenderHooks
         $repository = Pdk::get(PdkOrderRepository::class);
         $order      = $repository->get($params['id_order']);
 
-        return $this->renderService()
-            ->renderOrderBox($order);
+        return Frontend::renderOrderBox($order);
     }
 
     /**
@@ -173,8 +168,7 @@ trait HasPdkRenderHooks
         $repository = Pdk::get(PdkProductRepository::class);
         $product    = $repository->getProduct($params['id_product']);
 
-        return $this->renderService()
-            ->renderProductSettings($product);
+        return Frontend::renderProductSettings($product);
     }
 
     /**
@@ -202,8 +196,8 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayCarrierExtraContent($params)
     {
-        /** @var \MyParcelNL\Pdk\Plugin\Service\RenderService $renderService */
-        $renderService = Pdk::get(PsRenderService::class);
+        /** @var \MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface $renderService */
+        $renderService = Pdk::get(PsFrontendRenderService::class);
 
         /** @var PsCartRepository $cartRepository */
         $cartRepository = Pdk::get(PsCartRepository::class);
@@ -221,7 +215,7 @@ trait HasPdkRenderHooks
         $this->context->smarty->setEscapeHtml(false);
 
         $this->context->smarty->assign([
-            'deliveryOptions' => $renderService->renderDeliveryOptions($cartRepository->get($this->context->cart)),
+            'deliveryOptions' => Frontend::renderDeliveryOptions($cartRepository->get($this->context->cart)),
             'shippingAddress' => $this->encodeAddress($shippingAddress),
             'billingAddress'  => $this->encodeAddress($billingAddress),
             'carrier'         => $this->getCarrierName((int) $this->context->cart->id_carrier),
@@ -232,7 +226,7 @@ trait HasPdkRenderHooks
 
     public function hookHeader()
     {
-        /** @var \MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface $viewService */
+        /** @var \MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface $viewService */
         $viewService = Pdk::get(ViewServiceInterface::class);
 
         if (! $viewService->isCheckoutPage()) {
@@ -320,11 +314,14 @@ trait HasPdkRenderHooks
         $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-delivery-options/lib/style.css");
     }
 
-    private function renderService(): RenderServiceInterface
-    {
-        return Pdk::get(RenderServiceInterface::class);
-    }
-
+    /**
+     * @todo do this using entities
+     *
+     * @param  int   $cartId
+     * @param  array $deliveryOptions
+     *
+     * @return void
+     */
     private function saveDeliveryOptions(int $cartId, array $deliveryOptions): void
     {
         $values = [

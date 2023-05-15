@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Controller;
 
 use MyParcelNL;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Plugin\Api\PdkEndpoint;
+use MyParcelNL\Pdk\App\Api\PdkEndpoint;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,12 +37,12 @@ class AdminMyParcelPdkController extends FrameworkBundleAdminController
         try {
             $request = $this->createNormalizedRequest();
 
-            /** @var \MyParcelNL\Pdk\Plugin\Api\PdkEndpoint $endpoint */
+            /** @var \MyParcelNL\Pdk\App\Api\PdkEndpoint $endpoint */
             $endpoint = Pdk::get(PdkEndpoint::class);
 
             $response = $endpoint->call($request, PdkEndpoint::CONTEXT_BACKEND);
         } catch (Throwable $e) {
-            DefaultLogger::error($e->getMessage(), ['values' => $_REQUEST]);
+            Logger::error($e->getMessage(), ['values' => $_REQUEST]);
             return new Response($e->getMessage(), 400);
         }
 

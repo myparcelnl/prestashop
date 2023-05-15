@@ -10,9 +10,9 @@ use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Plugin\Installer\InstallerService;
 use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -21,8 +21,10 @@ final class PsInstallerService extends InstallerService
 {
     /**
      * @return void
+     * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
      */
     protected function executeInstallation(): void
@@ -46,11 +48,11 @@ final class PsInstallerService extends InstallerService
             ->get();
 
         foreach ($migrations as $migration) {
-            /** @var \MyParcelNL\Pdk\Plugin\Installer\Contract\MigrationInterface $instance */
+            /** @var \MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface $instance */
             $instance = Pdk::get($migration);
 
             $instance->up();
-            DefaultLogger::debug('Executed migration', ['migration' => $migration]);
+            Logger::debug('Executed migration', ['migration' => $migration]);
         }
     }
 

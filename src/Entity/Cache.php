@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Entity;
 
 use Cache as PsCache;
 use MyParcelNL;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Logger;
 
 class Cache
 {

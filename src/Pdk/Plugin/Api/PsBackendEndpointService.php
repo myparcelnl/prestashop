@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Api;
 
-use MyParcelNL\Pdk\Plugin\Api\Backend\AbstractPdkBackendEndpointService;
+use MyParcelNL\Pdk\App\Api\Backend\AbstractPdkBackendEndpointService;
 use MyParcelNL\PrestaShop\Module\Concern\NeedsModuleUrl;
 
 class PsBackendEndpointService extends AbstractPdkBackendEndpointService

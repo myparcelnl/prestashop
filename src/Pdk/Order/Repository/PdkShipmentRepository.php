@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
 use MyParcelNL\Pdk\Base\Model\Model;
-use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkRepository;
+use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 
-class PdkShipmentRepository extends AbstractPdkRepository
+class PdkShipmentRepository extends Repository
 {
     /**
      * @var \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository

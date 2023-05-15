@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Product\Repository;
 
 use Context;
+use MyParcelNL\Pdk\App\Order\Collection\PdkProductCollection;
+use MyParcelNL\Pdk\App\Order\Model\PdkProduct;
+use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkPdkProductRepository;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Plugin\Collection\PdkProductCollection;
-use MyParcelNL\Pdk\Plugin\Model\PdkProduct;
-use MyParcelNL\Pdk\Product\Repository\AbstractProductRepository;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\PrestaShop\Service\PsWeightService;
 use Product;
 
-class PdkProductRepository extends AbstractProductRepository
+class PdkProductRepository extends AbstractPdkPdkProductRepository
 {
     /**
      * @var \Doctrine\ORM\EntityRepository
@@ -44,7 +44,7 @@ class PdkProductRepository extends AbstractProductRepository
     /**
      * @param  int|string $identifier
      *
-     * @return \MyParcelNL\Pdk\Plugin\Model\PdkProduct
+     * @return \MyParcelNL\Pdk\App\Order\Model\PdkProduct
      */
     public function getProduct($identifier): PdkProduct
     {
@@ -86,7 +86,7 @@ class PdkProductRepository extends AbstractProductRepository
     /**
      * @param  array $identifiers
      *
-     * @return \MyParcelNL\Pdk\Plugin\Collection\PdkProductCollection
+     * @return \MyParcelNL\Pdk\App\Order\Collection\PdkProductCollection
      */
     public function getProducts(array $identifiers = []): PdkProductCollection
     {

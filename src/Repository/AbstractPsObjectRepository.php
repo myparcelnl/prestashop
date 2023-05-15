@@ -8,7 +8,7 @@ use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping\Entity;
 use MyParcelNL\Pdk\Base\Repository\Repository;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\Sdk\src\Support\Collection;
@@ -49,7 +49,7 @@ abstract class AbstractPsObjectRepository extends Repository
             try {
                 $this->entityManager->flush();
             } catch (Throwable $e) {
-                DefaultLogger::error($e);
+                Logger::error($e);
             }
         });
     }

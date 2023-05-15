@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Service;
 
-use MyParcelNL\Pdk\Plugin\Model\PdkCart;
-use MyParcelNL\Pdk\Plugin\Service\DeliveryOptionsService;
+use MyParcelNL\Pdk\App\Cart\Model\PdkCart;
+use MyParcelNL\Pdk\App\DeliveryOptions\Service\DeliveryOptionsService;
 
 /**
  * @todo zorg hier dat er maar 1 carrier gereturned wordt

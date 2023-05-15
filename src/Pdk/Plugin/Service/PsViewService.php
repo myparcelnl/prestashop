@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
-use MyParcelNL\Pdk\Plugin\Service\AbstractViewService;
+use MyParcelNL\Pdk\Frontend\Service\AbstractViewService;
 use PrestaShop\PrestaShop\Adapter\Entity\Dispatcher;
 use RuntimeException;
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
 
-use MyParcelNL\Pdk\Plugin\Collection\PdkShippingMethodCollection;
-use MyParcelNL\Pdk\Plugin\Model\PdkShippingMethod;
-use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkShippingMethodRepository;
+use MyParcelNL\Pdk\App\ShippingMethod\Collection\PdkShippingMethodCollection;
+use MyParcelNL\Pdk\App\ShippingMethod\Model\PdkShippingMethod;
+use MyParcelNL\Pdk\App\ShippingMethod\Repository\AbstractPdkShippingMethodRepository;
 
 class PsShippingMethodRepository extends AbstractPdkShippingMethodRepository
 {

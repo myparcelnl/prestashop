@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Account\Contract\AccountRepositoryInterface;
 use MyParcelNL\Pdk\Api\Contract\ClientAdapterInterface;
+use MyParcelNL\Pdk\App\Api\Contract\BackendEndpointServiceInterface;
+use MyParcelNL\Pdk\App\Api\Contract\FrontendEndpointServiceInterface;
+use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
+use MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsServiceInterface;
+use MyParcelNL\Pdk\App\Installer\Contract\InstallerServiceInterface;
+use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
+use MyParcelNL\Pdk\App\Order\Contract\OrderStatusServiceInterface;
+use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
+use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
+use MyParcelNL\Pdk\App\ShippingMethod\Contract\PdkShippingMethodRepositoryInterface;
+use MyParcelNL\Pdk\App\Tax\Contract\TaxServiceInterface;
+use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhookServiceInterface;
+use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhooksRepositoryInterface;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Base\Pdk;
+use MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
+use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
-use MyParcelNL\Pdk\Plugin\Api\Contract\BackendEndpointServiceInterface;
-use MyParcelNL\Pdk\Plugin\Api\Contract\FrontendEndpointServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\DeliveryOptionsServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\OrderStatusServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\PdkCartRepositoryInterface;
-use MyParcelNL\Pdk\Plugin\Contract\PdkOrderRepositoryInterface;
-use MyParcelNL\Pdk\Plugin\Contract\PdkShippingMethodRepositoryInterface;
-use MyParcelNL\Pdk\Plugin\Contract\RenderServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\TaxServiceInterface;
-use MyParcelNL\Pdk\Plugin\Contract\ViewServiceInterface;
-use MyParcelNL\Pdk\Plugin\Installer\Contract\InstallerServiceInterface;
-use MyParcelNL\Pdk\Plugin\Installer\Contract\MigrationServiceInterface;
-use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhookServiceInterface;
-use MyParcelNL\Pdk\Plugin\Webhook\Contract\PdkWebhooksRepositoryInterface;
-use MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Module\Installer\PsInstallerService;
 use MyParcelNL\PrestaShop\Module\Installer\PsMigrationService;
@@ -47,7 +47,7 @@ use MyParcelNL\PrestaShop\Pdk\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\Ps17ConfigurationService;
-use MyParcelNL\PrestaShop\Service\PsRenderService;
+use MyParcelNL\PrestaShop\Service\PsFrontendRenderService;
 use MyParcelNL\PrestaShop\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Service\PsWeightService;
 use Psr\Log\LoggerInterface;
@@ -71,39 +71,26 @@ return [
     'routeBackendWebhook'                       => value('webhook'),
 
     /**
-     * Only use carriers that we tested and we have a schema for, at the moment
-     */
-    'allowedCarriers'                           => value([
-        'dhlforyou',
-        'postnl',
-    ]),
-
-    /**
-     * Carrier used when fallback is required
-     */
-    'defaultCarrier'                            => value('postnl'),
-
-    /**
      * Repositories
      */
     AccountRepositoryInterface::class           => autowire(PdkAccountRepository::class),
-    PdkOrderRepositoryInterface::class          => autowire(PdkOrderRepository::class),
-    ProductRepositoryInterface::class           => autowire(PdkProductRepository::class),
-    SettingsRepositoryInterface::class          => autowire(PdkSettingsRepository::class),
     PdkCartRepositoryInterface::class           => autowire(PsCartRepository::class),
+    PdkOrderRepositoryInterface::class          => autowire(PdkOrderRepository::class),
+    PdkProductRepositoryInterface::class        => autowire(PdkProductRepository::class),
     PdkShippingMethodRepositoryInterface::class => autowire(PsShippingMethodRepository::class),
+    SettingsRepositoryInterface::class          => autowire(PdkSettingsRepository::class),
 
     /**
      * Services
      */
     CronServiceInterface::class                 => autowire(PsCronService::class),
-    LanguageServiceInterface::class             => autowire(LanguageService::class),
+    DeliveryOptionsServiceInterface::class      => autowire(PsDeliveryOptionsService::class),
+    FrontendRenderServiceInterface::class       => autowire(PsFrontendRenderService::class),
+    LanguageServiceInterface::class             => autowire(Language::class),
     OrderStatusServiceInterface::class          => autowire(OrderStatusService::class),
+    TaxServiceInterface::class                  => autowire(PsTaxService::class),
     ViewServiceInterface::class                 => autowire(PsViewService::class),
     WeightServiceInterface::class               => autowire(PsWeightService::class),
-    TaxServiceInterface::class                  => autowire(PsTaxService::class),
-    RenderServiceInterface::class               => autowire(PsRenderService::class),
-    DeliveryOptionsServiceInterface::class      => autowire(PsDeliveryOptionsService::class),
 
     /**
      * Endpoints

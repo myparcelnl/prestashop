@@ -7,14 +7,14 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 use Address;
 use Country;
 use Customer;
+use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
+use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
+use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
+use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderRepository;
 use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
-use MyParcelNL\Pdk\Facade\DefaultLogger;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection;
-use MyParcelNL\Pdk\Plugin\Model\PdkOrder;
-use MyParcelNL\Pdk\Plugin\Repository\AbstractPdkOrderRepository;
-use MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface;
 use MyParcelNL\Pdk\Shipment\Collection\ShipmentCollection;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
@@ -29,7 +29,7 @@ use State;
 class PdkOrderRepository extends AbstractPdkOrderRepository
 {
     /**
-     * @var \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface
+     * @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface
      */
     protected $productRepository;
 
@@ -63,9 +63,9 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
      * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository           $psOrderDataRepository
      * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository       $psOrderShipmentRepository
      * @param  \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository
-     * @param  \MyParcelNL\Pdk\Base\Service\CurrencyService                      $currencyService
-     * @param  \MyParcelNL\Pdk\Product\Contract\ProductRepositoryInterface       $productRepository
-     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService                    $weightService
+     * @param  \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface            $currencyService
+     * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface  $productRepository
+     * @param  \MyParcelNL\Pdk\Base\Contract\WeightServiceInterface              $weightService
      */
     public function __construct(
         MemoryCacheStorage              $storage,
@@ -73,7 +73,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
         PsOrderShipmentRepository       $psOrderShipmentRepository,
         PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository,
         CurrencyServiceInterface        $currencyService,
-        ProductRepositoryInterface      $productRepository,
+        PdkProductRepositoryInterface   $productRepository,
         WeightServiceInterface          $weightService
     ) {
         parent::__construct($storage);
@@ -88,10 +88,10 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     /**
      * @param  mixed $input
      *
-     * @return \MyParcelNL\Pdk\Plugin\Model\PdkOrder
+     * @return \MyParcelNL\Pdk\App\Order\Model\PdkOrder
+     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
-     * @throws \Doctrine\ORM\ORMException
      */
     public function get($input): PdkOrder
     {
@@ -122,9 +122,9 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  \MyParcelNL\Pdk\Plugin\Model\PdkOrder $order
+     * @param  \MyParcelNL\Pdk\App\Order\Model\PdkOrder $order
      *
-     * @return \MyParcelNL\Pdk\Plugin\Model\PdkOrder
+     * @return \MyParcelNL\Pdk\App\Order\Model\PdkOrder
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
@@ -138,9 +138,9 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  \MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection $collection
+     * @param  \MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection $collection
      *
-     * @return \MyParcelNL\Pdk\Plugin\Collection\PdkOrderCollection
+     * @return \MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
@@ -291,9 +291,9 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
             ];
 
             if (! $fromCart) {
-                DefaultLogger::debug('No delivery options found in cart, saving empty order data to order', $context);
+                Logger::debug('No delivery options found in cart, saving empty order data to order', $context);
             } else {
-                DefaultLogger::debug('Delivery options found in cart, saving to order', $context);
+                Logger::debug('Delivery options found in cart, saving to order', $context);
             }
 
             $deliveryOptions = $fromCart ? $fromCart->getData() : [];
@@ -328,7 +328,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
 
     /**
      * @param  string $id
-     * @param  array  $deliveryOptions
+     * @param  array  $orderData
      *
      * @return void
      * @throws \Doctrine\ORM\ORMException

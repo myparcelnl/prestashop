@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
+use MyParcelNL\Pdk\App\Cart\Model\PdkCart;
+use MyParcelNL\Pdk\Context\Context;
 use MyParcelNL\Pdk\Facade\Settings;
-use MyParcelNL\Pdk\Plugin\Context;
-use MyParcelNL\Pdk\Plugin\Model\PdkCart;
-use MyParcelNL\Pdk\Plugin\Service\RenderService;
+use MyParcelNL\Pdk\Frontend\Service\FrontendRenderService;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 
-class PsRenderService extends RenderService
+class PsFrontendRenderService extends FrontendRenderService
 {
     /**
-     * @param  \MyParcelNL\Pdk\Plugin\Model\PdkCart $cart
+     * @param  \MyParcelNL\Pdk\App\Cart\Model\PdkCart $cart
      *
      * @return string
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException

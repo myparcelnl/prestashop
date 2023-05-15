@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Module\Service;
 
 use Cart;
-use MyParcelNL\Pdk\Plugin\Contract\DeliveryOptionsFeesServiceInterface;
 
 final class ModuleService
 {
     /**
      * Adds prices of MyParcel delivery options to the shipping cost.
      *
-     * @see DeliveryOptionsFeesServiceInterface
+     * @see \MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsFeesServiceInterface
      *
      * @todo Implement this method correctly using pdk stuff
      *
