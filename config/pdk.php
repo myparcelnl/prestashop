@@ -86,7 +86,7 @@ return [
     CronServiceInterface::class                 => autowire(PsCronService::class),
     DeliveryOptionsServiceInterface::class      => autowire(PsDeliveryOptionsService::class),
     FrontendRenderServiceInterface::class       => autowire(PsFrontendRenderService::class),
-    LanguageServiceInterface::class             => autowire(Language::class),
+    LanguageServiceInterface::class             => autowire(LanguageService::class),
     OrderStatusServiceInterface::class          => autowire(OrderStatusService::class),
     TaxServiceInterface::class                  => autowire(PsTaxService::class),
     ViewServiceInterface::class                 => autowire(PsViewService::class),
