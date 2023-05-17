@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Migration;
 
+use DateTime;
 use DbQuery;
 use Generator;
-use MyParcelNL\Pdk\Base\Service\CurrencyService;
 use MyParcelNL\Pdk\Base\Support\Arr;
-use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings as SettingsFacade;
-use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
 use MyParcelNL\Pdk\Settings\Model\Settings;
-use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
-use MyParcelNL\Pdk\Shipment\Model\DropOffDay;
-use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
 use MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService;
-use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
-use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
+use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
+use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
+use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 
 final class Migration2_0_0 extends AbstractPsMigration
 {
@@ -44,6 +41,45 @@ final class Migration2_0_0 extends AbstractPsMigration
     private const           TRANSFORM_KEY_TARGET               = 'target';
     private const           TRANSFORM_KEY_TRANSFORM            = 'transform';
 
+    /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository
+     */
+    private $orderDataRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository
+     */
+    private $orderShipmentRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService
+     */
+    private $pdkUpgradeService;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository
+     */
+    private $productSettingsRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository
+     */
+    private $settingsRepository;
+
+    public function __construct(
+        PsOrderDataRepository       $orderDataRepository,
+        PsOrderShipmentRepository   $orderShipmentRepository,
+        PsPdkUpgradeService         $pdkUpgradeService,
+        PdkSettingsRepository       $pdkSettingsRepository,
+        PsProductSettingsRepository $productSettingsRepository
+    ) {
+        $this->orderDataRepository       = $orderDataRepository;
+        $this->orderShipmentRepository   = $orderShipmentRepository;
+        $this->pdkUpgradeService         = $pdkUpgradeService;
+        $this->settingsRepository        = $pdkSettingsRepository;
+        $this->productSettingsRepository = $productSettingsRepository;
+    }
+
     public function down(): void
     {
         // TODO: Implement down() method.
@@ -59,26 +95,18 @@ final class Migration2_0_0 extends AbstractPsMigration
      * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
+     * @throws \PrestaShopException
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     public function up(): void
     {
-        $this->installCarriers();
+        $this->createDatabaseMigrations();
+        $this->pdkUpgradeService->createPsCarriers();
+        $this->migrateCarrierSettings();
         $this->migrateSettings();
-        // $this->migrateCartDeliveryOptions();
-        // $this->migrateOrderData();
-        // $this->migrateOrderShipments();
-    }
-
-    /**
-     * @return void
-     * TODO: NEE!!!!!!!!!!
-     */
-    protected function dropOldTables(): void
-    {
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getOrderDataTable()}`");
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getProductSettingsTable()}`");
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getOrderShipmentsTable()}`");
-        $this->db->execute("DROP TABLE IF EXISTS `{$this->getCartDeliveryOptionsTable()}`");
+        $this->migrateProductSettings();
+        $this->migrateDeliveryOptions();
+        $this->migrateOrderShipments();
     }
 
     /**
@@ -89,8 +117,6 @@ final class Migration2_0_0 extends AbstractPsMigration
      */
     private function castValue(string $cast, $value)
     {
-        $currencyService = Pdk::get(CurrencyService::class);
-
         switch ($cast) {
             case self::TRANSFORM_CAST_BOOL:
                 return (bool) $value;
@@ -105,7 +131,7 @@ final class Migration2_0_0 extends AbstractPsMigration
                 return (float) $value;
 
             case self::TRANSFORM_CAST_CENTS:
-                return $currencyService->convertToCents((float) $value);
+                return (int) round((float) $value * 100);
 
             case self::TRANSFORM_CAST_ARRAY:
                 return (array) $value;
@@ -115,74 +141,21 @@ final class Migration2_0_0 extends AbstractPsMigration
         }
     }
 
-    /**
-     * @return void
-     * TODO use DatabaseMigrations
-     * @see \MyParcelNL\PrestaShop\Database\DatabaseMigrations
-     */
-    private function createCarrierConfigurationTable(): void
+    private function createDatabaseMigrations()
     {
-        $this->db->execute(
-            "CREATE TABLE if NOT EXISTS ps_myparcel_carrier_configuration (
-	ps_carrier_id INT(11) NOT NULL DEFAULT '0',
-    myparcel_carrier VARCHAR(255) NOT NULL DEFAULT ''
-) AUTO_INCREMENT=1;"
-        );
-    }
+        /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */
+        $migrations = Pdk::get(DatabaseMigrations::class);
 
-    /**
-     * Creates and maps one PrestaShop carrier to a MyParcel carrier.
-     *
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
-     */
-    private function createPsCarriers(): void
-    {
-        $this->createCarrierConfigurationTable();
-
-        $carriers   = ['PostNL' => 'postnl'];
-        $carrierIds = [];
-
-        foreach ($carriers as $carrierHuman => $carrierName) {
-            $result = $this->db->insert('carrier', [
-                'name'                 => sprintf('%s MyParcel', $carrierHuman),
-                'active'               => 1,
-                'is_module'            => 1,
-                'shipping_external'    => 1,
-                'need_range'           => 1,
-                'external_module_name' => Pdk::get('platform'),
-            ]);
-
-            if (! $result) {
-                throw new Exception('Cannot insert new carrier with name', compact($carrierHuman));
-            }
-
-            $request   = "SELECT id_carrier FROM ps_carrier WHERE name = '${carrierHuman} MyParcel'";
-            $carrierId = $this->db->getValue($request);
-
-            if (! $carrierId) {
-                throw new Exception('Cannot retrieve carrierId while upgrading', compact($request));
-            }
-
-            $carrierIds[$carrierName] = $carrierId;
-
-            /** @var PsCarrierConfigurationRepository $carrierConfigurationRepository */
-            $carrierConfigurationRepository = Pdk::get(PsCarrierConfigurationRepository::class);
-
-            $carrierConfigurationRepository->create([
-                'idCarrier'       => $carrierId,
-                'myparcelCarrier' => $carrierName,
-            ]);
-        }
-
-        if (! $result) {
-            throw new Exception('Cannot insert new generated carrier configuration for carrier', compact($carrierName));
+        foreach ($migrations->get() as $migration) {
+            /** @var \MyParcelNL\PrestaShop\Database\AbstractDatabaseMigration $class */
+            $class = Pdk::get($migration);
+            $class->up();
         }
     }
 
     /**
      * @return array
+     * @throws \PrestaShopDatabaseException
      */
     private function getCarrierSettings(): array
     {
@@ -191,21 +164,209 @@ final class Migration2_0_0 extends AbstractPsMigration
         $query->from('myparcelnl_carrier_configuration');
         $query->groupBy('id_carrier');
 
-        $result = $this->db->executeS($query);
-
-        return $result;
+        return $this->db->executeS($query);
     }
 
-    /**
-     * @return string
-     */
-    private function getCartDeliveryOptionsTable(): string
+    private function getCarrierSettingsTransformationMap()
     {
-        return Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_AGE_CHECK',
+            self::TRANSFORM_KEY_TARGET => 'exportAgeCheck',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE',
+            self::TRANSFORM_KEY_TARGET => 'exportInsurance',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_FROM_PRICE',
+            self::TRANSFORM_KEY_TARGET => 'exportInsuranceAmount',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_MAX_AMOUNT',
+            self::TRANSFORM_KEY_TARGET => 'exportInsuranceUpTo',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_MAX_AMOUNT_BE',
+            self::TRANSFORM_KEY_TARGET => '',
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_MAX_AMOUNT_EU',
+            self::TRANSFORM_KEY_TARGET => '',
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_PACKAGE_FORMAT',
+            self::TRANSFORM_KEY_TARGET => 'exportLargeFormat',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_RECIPIENT_ONLY',
+            self::TRANSFORM_KEY_TARGET => 'exportOnlyRecipient',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_RETURN_PACKAGE',
+            self::TRANSFORM_KEY_TARGET => 'exportReturn',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SIGNATURE_REQUIRED',
+            self::TRANSFORM_KEY_TARGET => 'exportSignature',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_AGE_CHECK',
+            self::TRANSFORM_KEY_TARGET => 'exportAgeCheck',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE',
+            self::TRANSFORM_KEY_TARGET => 'exportInsurance',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_FROM_PRICE',
+            self::TRANSFORM_KEY_TARGET => 'exportInsuranceAmount',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT',
+            self::TRANSFORM_KEY_TARGET => 'exportInsuranceUpTo',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT_BE',
+            self::TRANSFORM_KEY_TARGET => '',
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT_EU',
+            self::TRANSFORM_KEY_TARGET => '',
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_PACKAGE_FORMAT',
+            self::TRANSFORM_KEY_TARGET => 'exportLargeFormat',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_RECIPIENT_ONLY',
+            self::TRANSFORM_KEY_TARGET => 'exportOnlyRecipient',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_RETURN_PACKAGE',
+            self::TRANSFORM_KEY_TARGET => 'exportReturn',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_SIGNATURE_REQUIRED',
+            self::TRANSFORM_KEY_TARGET => 'exportSignature',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'deliveryDaysWindow',
+            self::TRANSFORM_KEY_TARGET => 'deliveryDaysWindow',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'dropOffDelay',
+            self::TRANSFORM_KEY_TARGET => 'dropOffDelay',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'allowMondayDelivery',
+            self::TRANSFORM_KEY_TARGET => 'allowMondayDelivery',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'allowMorningDelivery',
+            self::TRANSFORM_KEY_TARGET => 'allowMorningDelivery',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'priceMorningDelivery',
+            self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypeMorning',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'allowEveningDelivery',
+            self::TRANSFORM_KEY_TARGET => 'allowEveningDelivery',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'priceEveningDelivery',
+            self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypeEvening',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'allowOnlyRecipient',
+            self::TRANSFORM_KEY_TARGET => 'allowOnlyRecipient',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'priceOnlyRecipient',
+            self::TRANSFORM_KEY_TARGET => 'priceOnlyRecipient',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'allowSignature',
+            self::TRANSFORM_KEY_TARGET => 'allowSignature',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'priceSignature',
+            self::TRANSFORM_KEY_TARGET => 'priceSignature',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'allowPickupPoints',
+            self::TRANSFORM_KEY_TARGET => 'allowPickupPoints',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'pricePickup',
+            self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypePickup',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
+        ];
     }
 
     /**
      * @return array
+     * @throws \PrestaShopDatabaseException
      */
     private function getConfigurationSettings(): array
     {
@@ -217,34 +378,20 @@ final class Migration2_0_0 extends AbstractPsMigration
         return $this->db->executeS($query);
     }
 
-    /**
-     * @return string
-     */
-    private function getOrderDataTable(): string
+    private function getOrderIdByCartId($cartId)
     {
-        return Table::withPrefix(Table::TABLE_ORDER_DATA);
-    }
+        $query = new DbQuery();
+        $query->select('id_order');
+        $query->from('orders');
+        $query->where('id_cart = ' . $cartId);
 
-    /**
-     * @return string
-     */
-    private function getOrderShipmentsTable(): string
-    {
-        return Table::withPrefix(Table::TABLE_ORDER_SHIPMENT);
-    }
-
-    /**
-     * @return string
-     */
-    private function getProductSettingsTable(): string
-    {
-        return Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
+        return $this->db->getValue($query);
     }
 
     /**
      * @return \Generator
      */
-    private function getTransformationMap(): Generator
+    private function getSettingsTransformationMap(): Generator
     {
         /**
          * General
@@ -570,225 +717,40 @@ final class Migration2_0_0 extends AbstractPsMigration
         //            self::TRANSFORM_KEY_SOURCE => 'export_defaults.export_automatic_status',
         //            self::TRANSFORM_KEY_TARGET => '', // TODO
         //        ];
-
-        /**
-         * Carriers
-         */
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_AGE_CHECK',
-            self::TRANSFORM_KEY_TARGET => 'exportAgeCheck',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE',
-            self::TRANSFORM_KEY_TARGET => 'exportInsurance',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_FROM_PRICE',
-            self::TRANSFORM_KEY_TARGET => 'exportInsuranceAmount',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_MAX_AMOUNT',
-            self::TRANSFORM_KEY_TARGET => 'exportInsuranceUpTo',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_MAX_AMOUNT_BE',
-            self::TRANSFORM_KEY_TARGET => '',
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_INSURANCE_MAX_AMOUNT_EU',
-            self::TRANSFORM_KEY_TARGET => '',
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_PACKAGE_FORMAT',
-            self::TRANSFORM_KEY_TARGET => 'exportLargeFormat',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_RECIPIENT_ONLY',
-            self::TRANSFORM_KEY_TARGET => 'exportOnlyRecipient',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_RETURN_PACKAGE',
-            self::TRANSFORM_KEY_TARGET => 'exportReturn',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SIGNATURE_REQUIRED',
-            self::TRANSFORM_KEY_TARGET => 'exportSignature',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_AGE_CHECK',
-            self::TRANSFORM_KEY_TARGET => 'exportAgeCheck',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE',
-            self::TRANSFORM_KEY_TARGET => 'exportInsurance',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_FROM_PRICE',
-            self::TRANSFORM_KEY_TARGET => 'exportInsuranceAmount',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT',
-            self::TRANSFORM_KEY_TARGET => 'exportInsuranceUpTo',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT_BE',
-            self::TRANSFORM_KEY_TARGET => '',
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT_EU',
-            self::TRANSFORM_KEY_TARGET => '',
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_PACKAGE_FORMAT',
-            self::TRANSFORM_KEY_TARGET => 'exportLargeFormat',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_RECIPIENT_ONLY',
-            self::TRANSFORM_KEY_TARGET => 'exportOnlyRecipient',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_RETURN_PACKAGE',
-            self::TRANSFORM_KEY_TARGET => 'exportReturn',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_SIGNATURE_REQUIRED',
-            self::TRANSFORM_KEY_TARGET => 'exportSignature',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'deliveryDaysWindow',
-            self::TRANSFORM_KEY_TARGET => 'deliveryDaysWindow',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'dropOffDelay',
-            self::TRANSFORM_KEY_TARGET => 'dropOffDelay',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'allowMondayDelivery',
-            self::TRANSFORM_KEY_TARGET => 'allowMondayDelivery',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'allowMorningDelivery',
-            self::TRANSFORM_KEY_TARGET => 'allowMorningDelivery',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'priceMorningDelivery',
-            self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypeMorning',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'allowEveningDelivery',
-            self::TRANSFORM_KEY_TARGET => 'allowEveningDelivery',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'priceEveningDelivery',
-            self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypeEvening',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'allowOnlyRecipient',
-            self::TRANSFORM_KEY_TARGET => 'allowOnlyRecipient',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'priceOnlyRecipient',
-            self::TRANSFORM_KEY_TARGET => 'priceOnlyRecipient',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'allowSignature',
-            self::TRANSFORM_KEY_TARGET => 'allowSignature',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'priceSignature',
-            self::TRANSFORM_KEY_TARGET => 'priceSignature',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'allowPickupPoints',
-            self::TRANSFORM_KEY_TARGET => 'allowPickupPoints',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'pricePickup',
-            self::TRANSFORM_KEY_TARGET => 'priceDeliveryTypePickup',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
-        ];
     }
 
     /**
-     * @return void
-     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
      */
-    private function installCarriers(): void
+    private function migrateCarrierSettings()
     {
-        /** @var \MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService $service */
-        $service = Pdk::get(PsPdkUpgradeService::class);
+        $oldCarrierSettings = $this->getCarrierSettings();
 
-        $service->createPsCarriers();
+        // TODO: Hier geldt hetzelfde als bij de product settings. Per rij in de tabel
+        // is er maar één instelling met een id_carrier en dit zal geconverteerd moeten
+        // worden naar één rij met een id_carrier en alle velden die behoren tot die carrier.
+
+        $newSettings = $this->transformSettings($oldCarrierSettings, $this->getCarrierSettingsTransformationMap());
+        //        $newSettings['carrier'] = new SettingsModelCollection();
+        //
+        //        foreach (self::OLD_CARRIERS as $carrier) {
+        //            $transformed                         = $this->transformSettings(
+        //                $oldConfigurationSettings[$carrier] ?? [],
+        //                $this->getCarrierSettingsTransformationMap()
+        //            );
+        //            $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities(
+        //                $oldConfigurationSettings[$carrier] ?? []
+        //            );
+        //
+        //            $newSettings['carrier']->put($carrier, $transformed);
+        //        }
     }
 
     /**
      * @throws \PrestaShopDatabaseException
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
-     * @throws \PrestaShopException
+     * @throws \Doctrine\ORM\ORMException
      */
-    private function migrateCartDeliveryOptions(): void
+    private function migrateDeliveryOptions()
     {
         $query = new DbQuery();
 
@@ -796,70 +758,152 @@ final class Migration2_0_0 extends AbstractPsMigration
         $query->from(self::LEGACY_TABLE_DELIVERY_SETTINGS);
 
         $oldValues = $this->db->executeS($query);
-        $newValues = [];
 
-        foreach ($oldValues as $deliveryOptions) {
-            $data     = json_decode($deliveryOptions['delivery_settings'], true);
-            $instance = (new DeliveryOptions())->fill($data);
-
-            $newValues[] = [
-                'cartId'          => $deliveryOptions['id_cart'],
-                'shippingMethod'  => $deliveryOptions['id_delivery_setting'],
-                'deliveryOptions' => json_encode($instance->toArray()),
+        foreach ($oldValues as $oldTableRow) {
+            $cartId           = json_decode($oldTableRow['id_cart'], true);
+            $deliverySettings = json_decode($oldTableRow['delivery_settings'], true);
+            $extraOptions     = json_decode($oldTableRow['extra_options'], true);
+            $shipmentOptions  = $deliverySettings['shipmentOptions'];
+            $orderId          = $this->getOrderIdByCartId($cartId);
+            $deliveryOptions  = [
+                'carrier'         => $deliverySettings['carrier'],
+                'date'            => $deliverySettings['date'],
+                'labelAmount'     => $extraOptions['labelAmount'],
+                'pickupLocation'  => $shipmentOptions['pickupLocation'] ? [
+                    'boxNumber'            => $shipmentOptions['pickupLocation']['box_number'] ?? null,
+                    'cc'                   => $shipmentOptions['pickupLocation']['cc'] ?? null,
+                    'city'                 => $shipmentOptions['pickupLocation']['city'] ?? null,
+                    'number'               => $shipmentOptions['pickupLocation']['number'] ?? null,
+                    'numberSuffix'         => $shipmentOptions['pickupLocation']['number_suffix'] ?? null,
+                    'postalCode'           => $shipmentOptions['pickupLocation']['postal_code'] ?? null,
+                    'region'               => $shipmentOptions['pickupLocation']['region'] ?? null,
+                    'state'                => $shipmentOptions['pickupLocation']['state'] ?? null,
+                    'street'               => $shipmentOptions['pickupLocation']['street'] ?? null,
+                    'streetAdditionalInfo' => $shipmentOptions['pickupLocation']['street_additional_info'] ?? null,
+                    'locationCode'         => $shipmentOptions['pickupLocation']['location_code'] ?? null,
+                    'locationName'         => $shipmentOptions['pickupLocation']['location_name'] ?? null,
+                    'retailNetworkId'      => $shipmentOptions['pickupLocation']['retail_network_id'] ?? null,
+                ] : null,
+                'shipmentOptions' => $shipmentOptions ? [
+                    'ageCheck'         => $shipmentOptions['age_check'] ?? null,
+                    'insurance'        => $shipmentOptions['insurance'] ?? null,
+                    'labelDescription' => $shipmentOptions['label_description'] ?? null,
+                    'largeFormat'      => $shipmentOptions['large_format'] ?? null,
+                    'onlyRecipient'    => $shipmentOptions['only_recipient'] ?? null,
+                    'return'           => $shipmentOptions['return'] ?? null,
+                    'sameDayDelivery'  => $shipmentOptions['same_day_delivery'] ?? null,
+                    'signature'        => $shipmentOptions['signature'] ?? null,
+                ] : null,
+                'deliveryType'    => $deliverySettings['deliveryType'],
+                'packageType'     => $deliverySettings['packageType'],
             ];
+
+            $this->orderDataRepository->updateOrCreate(
+                [
+                    'idOrder' => (int) $orderId,
+                ],
+                [
+                    'data' => ['deliveryOptions' => $deliveryOptions],
+                ]
+            );
         }
-
-        $newValuesString      = implode(',', $newValues);
-        $deliveryOptionsTable = Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
-
-        $strr = array_reduce($newValues, static function ($acc, $val) {
-            $acc .= sprintf("('%s'),\n", implode("','", $val));
-
-            return $acc;
-        }, '');
-
-        $this->db->execute(
-            "INSERT INTO `$deliveryOptionsTable` (`cartId`, `deliveryOptions`, `deliveryMethod`) VALUES $newValuesString"
-        );
-
-        Logger::debug('Migrated delivery options', compact('oldValues', 'newValues'));
     }
 
-    private function migrateOrderData(): void
-    {
-        // from
-    }
-
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
+     */
     private function migrateOrderShipments()
     {
-        // from order_label to order_shipment
+        $query = new DbQuery();
+
+        $query->select('*');
+        $query->from(self::LEGACY_TABLE_ORDER_LABEL);
+
+        $oldOrderLabels = $this->db->executeS($query);
+
+        foreach ($oldOrderLabels as $oldOrderLabel) {
+            $shipment = [
+                'id'                  => $oldOrderLabel['id_label'],
+                'orderId'             => $oldOrderLabel['id_order'],
+                'referenceIdentifier' => $oldOrderLabel['id_order'],
+                'barcode'             => $oldOrderLabel['barcode'],
+                'status'              => $oldOrderLabel['status'],
+                'deleted'             => DateTime::class,
+                'updated'             => new DateTime($oldOrderLabel['date_upd']),
+                'created'             => new DateTime($oldOrderLabel['date_add']),
+            ];
+
+            $this->orderShipmentRepository->updateOrCreate(
+                [
+                    'idShipment' => $oldOrderLabel['id_label'],
+                ],
+                [
+                    'idOrder' => (int) $oldOrderLabel['id_order'],
+                    'data'    => $shipment,
+                ]
+            );
+        }
+    }
+
+    /**
+     * @throws \PrestaShopDatabaseException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    private function migrateProductSettings()
+    {
+        $query = new DbQuery();
+
+        $query->select('*');
+        $query->from(self::LEGACY_TABLE_PRODUCT_CONFIGURATION);
+
+        $oldProductSettings = $this->db->executeS($query);
+
+        // TODO: Data wordt momenteel op een vreemde manier opgeslagen. Per instelling
+        // is een aparte rij aangemaakt in de tabel met ieder een id_product. Dit moet
+        // worden geconverteerd naar een enkele array met 1 carrier en alle velden, zodat
+        // het overeenkomt met een datastructuur waar de foreach iets mee kan.
+
+        foreach ($oldProductSettings as $oldProductSetting) {
+            $this->productSettingsRepository->updateOrCreate(
+                [
+                    'idProduct' => (int) $oldProductSetting['id_product'],
+                ],
+                [
+                    'data' => [
+                        'id'                     => 'product',
+                        'countryOfOrigin'        => $oldProductSetting['country_of_origin'],
+                        'customsCode'            => $oldProductSetting['customs_code'],
+                        'disableDeliveryOptions' => false,
+                        'dropOffDelay'           => 0,
+                        'exportAgeCheck'         => $oldProductSetting['age_check'],
+                        'exportInsurance'        => $oldProductSetting['insurance'],
+                        'exportLargeFormat'      => $oldProductSetting['large_format'],
+                        'exportOnlyRecipient'    => $oldProductSetting['only_recipient'],
+                        'exportReturn'           => $oldProductSetting['return'],
+                        'exportSignature'        => $oldProductSetting['signature'],
+                        'fitInMailbox'           => 0,
+                        'packageType'            => $oldProductSetting['package_type'],
+                    ],
+                ]
+            );
+        }
     }
 
     /**
      * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     private function migrateSettings(): void
     {
         $oldConfigurationSettings = $this->getConfigurationSettings();
 
-        $settingsRepository = Pdk::get(PdkSettingsRepository::class);
+        $newSettings = $this->transformSettings($oldConfigurationSettings, $this->getSettingsTransformationMap());
+        $settings    = new Settings(array_replace_recursive(SettingsFacade::getDefaults(), $newSettings));
 
-        $newSettings = $this->transformSettings($oldConfigurationSettings);
-
-        $newSettings['carrier'] = new SettingsModelCollection();
-
-        foreach (self::OLD_CARRIERS as $carrier) {
-            $transformed                         = $this->transformSettings($oldConfigurationSettings[$carrier] ?? []);
-            $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities(
-                $oldConfigurationSettings[$carrier] ?? []
-            );
-
-            $newSettings['carrier']->put($carrier, $transformed);
-        }
-
-        $settings = new Settings(array_replace_recursive(SettingsFacade::getDefaults(), $newSettings));
-
-        $settingsRepository->storeAllSettings($settings);
+        $this->settingsRepository->storeAllSettings($settings);
     }
 
     /**
@@ -890,11 +934,12 @@ final class Migration2_0_0 extends AbstractPsMigration
                 $cutoffTime = $oldSettings['cutoff_time'] ?? null;
 
                 switch ($weekday) {
-                    case DropOffDay::WEEKDAY_FRIDAY:
+                    // Friday
+                    case 5:
                         $cutoffTime = $oldSettings['friday_cutoff_time'] ?? $cutoffTime;
                         break;
-
-                    case DropOffDay::WEEKDAY_SATURDAY:
+                    // Saturday
+                    case 6:
                         $cutoffTime = $oldSettings['saturday_cutoff_time'] ?? $cutoffTime;
                         break;
                 }
@@ -905,20 +950,21 @@ final class Migration2_0_0 extends AbstractPsMigration
                     'weekday'           => $weekday,
                     'dispatch'          => in_array($weekday, $oldSettings['drop_off_days'] ?? [], true),
                 ];
-            }, DropOffDay::WEEKDAYS),
+            }, [1, 2, 3, 4, 5, 6, 0]),
         ];
     }
 
     /**
-     * @param  array $oldSettings
+     * @param  array      $oldSettings
+     * @param  \Generator $transformationMap
      *
      * @return array
      */
-    private function transformSettings(array $oldSettings): array
+    private function transformSettings(array $oldSettings, Generator $transformationMap): array
     {
         $newSettings = [];
 
-        foreach ($this->getTransformationMap() as $item) {
+        foreach ($transformationMap as $item) {
             if (! $this->searchForValue($item[self::TRANSFORM_KEY_SOURCE], $oldSettings)) {
                 continue;
             }

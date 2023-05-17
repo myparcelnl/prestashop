@@ -3,7 +3,6 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
@@ -112,7 +111,6 @@ class MyParcelNL extends CarrierModule
      * @param  \int  $shipping_cost
      *
      * @return float|int
-     * @throws \PrestaShopDatabaseException
      */
     public function getOrderShippingCost($params, $shipping_cost)
     {

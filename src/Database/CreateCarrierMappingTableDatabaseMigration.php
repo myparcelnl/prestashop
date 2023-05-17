@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
-class CreateCarrierConfigurationTableDatabaseMigration extends AbstractDatabaseMigration
+class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): void
     {

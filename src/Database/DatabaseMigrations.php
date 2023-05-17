@@ -12,7 +12,7 @@ final class DatabaseMigrations
     public function get(): array
     {
         return [
-            CreateCarrierConfigurationTableDatabaseMigration::class,
+            CreateCarrierMappingTableDatabaseMigration::class,
             CreateCartDeliveryOptionsTableDatabaseMigration::class,
             CreateOrderDataTableDatabaseMigration::class,
             CreateOrderShipmentTableDatabaseMigration::class,

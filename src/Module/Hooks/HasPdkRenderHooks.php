@@ -16,7 +16,7 @@ use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
-use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
+use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use MyParcelNL\PrestaShop\Service\PsFrontendRenderService;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 use Tools;
@@ -261,8 +261,8 @@ trait HasPdkRenderHooks
 
     private function getCarrierName(int $carrierId): string
     {
-        /** @var \MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository $carrierRepository */
-        $carrierRepository = Pdk::get(PsCarrierConfigurationRepository::class);
+        /** @var \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository $carrierRepository */
+        $carrierRepository = Pdk::get(PsCarrierMappingRepository::class);
         $fromCarrierConfig = $carrierRepository->findOneBy(['idCarrier' => $carrierId]);
 
         if ($fromCarrierConfig) {
@@ -315,12 +315,11 @@ trait HasPdkRenderHooks
     }
 
     /**
-     * @todo do this using entities
-     *
      * @param  int   $cartId
      * @param  array $deliveryOptions
      *
      * @return void
+     * @todo do this using entities
      */
     private function saveDeliveryOptions(int $cartId, array $deliveryOptions): void
     {

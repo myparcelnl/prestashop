@@ -7,9 +7,9 @@ namespace MyParcelNL\PrestaShop\Entity;
 /**
  * @Doctrine\ORM\Mapping\Table()
  * @Doctrine\ORM\Mapping\Entity()
- * @see \MyParcelNL\PrestaShop\Database\CreateCarrierConfigurationTableDatabaseMigration
+ * @see \MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration
  */
-class MyparcelnlCarrierConfiguration extends AbstractEntity
+class MyparcelnlCarrierMapping extends AbstractEntity
 {
     /**
      * @var int

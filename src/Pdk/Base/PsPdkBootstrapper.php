@@ -9,7 +9,7 @@ use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierConfiguration;
+use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
@@ -24,7 +24,7 @@ use function DI\value;
 class PsPdkBootstrapper extends PdkBootstrapper
 {
     protected const PRESTASHOP_REPOSITORIES = [
-        'CarrierConfigurationRepository' => MyparcelnlCarrierConfiguration::class,
+        'CarrierConfigurationRepository' => MyparcelnlCarrierMapping::class,
         'CartDeliveryOptionsRepository'  => MyparcelnlCartDeliveryOptions::class,
         'OrderDataRepository'            => MyparcelnlOrderData::class,
         'OrderShipmentRepository'        => MyparcelnlOrderShipment::class,

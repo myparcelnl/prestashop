@@ -9,10 +9,10 @@ use Context;
 use Group;
 use Language as PsLanguage;
 use MyParcelNL\Pdk\Base\Support\Arr;
-use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Language;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository;
+use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use PrestaShop\PrestaShop\Adapter\Entity\Zone;
 use PrestaShop\PrestaShop\Core\Foundation\Database\Exception;
 use RangePrice;
@@ -28,11 +28,11 @@ use RuntimeException;
 final class PsPdkUpgradeService
 {
     /**
-     * @var \MyParcelNL\PrestaShop\Repository\PsCarrierConfigurationRepository
+     * @var \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository
      */
     private $carrierConfigurationRepository;
 
-    public function __construct(PsCarrierConfigurationRepository $carrierConfigurationRepository)
+    public function __construct(PsCarrierMappingRepository $carrierConfigurationRepository)
     {
         $this->carrierConfigurationRepository = $carrierConfigurationRepository;
     }
@@ -177,7 +177,6 @@ final class PsPdkUpgradeService
      */
     private function addCarrierConfiguration(Carrier $carrier, string $carrierName)
     {
-        // todo fix this:
         $this->carrierConfigurationRepository->updateOrCreate(
             [
                 'idCarrier' => (int) $carrier->id,

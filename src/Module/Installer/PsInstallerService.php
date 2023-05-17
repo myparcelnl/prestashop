@@ -26,6 +26,7 @@ final class PsInstallerService extends InstallerService
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
+     * @throws \PrestaShopException|\Doctrine\Common\Annotations\AnnotationException
      */
     protected function executeInstallation(): void
     {
