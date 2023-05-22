@@ -73,6 +73,8 @@ final class Migration2_0_0 extends AbstractPsMigration
         PdkSettingsRepository       $pdkSettingsRepository,
         PsProductSettingsRepository $productSettingsRepository
     ) {
+        parent::__construct();
+
         $this->orderDataRepository       = $orderDataRepository;
         $this->orderShipmentRepository   = $orderShipmentRepository;
         $this->pdkUpgradeService         = $pdkUpgradeService;
@@ -398,7 +400,7 @@ final class Migration2_0_0 extends AbstractPsMigration
          */
         yield [
             self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_API_KEY',
-            self::TRANSFORM_KEY_TARGET => 'general.apiKey',
+            self::TRANSFORM_KEY_TARGET => 'account.apiKey',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
@@ -965,22 +967,22 @@ final class Migration2_0_0 extends AbstractPsMigration
         $newSettings = [];
 
         foreach ($transformationMap as $item) {
-            if (! $this->searchForValue($item[self::TRANSFORM_KEY_SOURCE], $oldSettings)) {
+            $index = $this->searchForValue($item[self::TRANSFORM_KEY_SOURCE], $oldSettings);
+            $value = Arr::get($oldSettings, $index)['value'] ?? null;
+
+            if (! isset($index, $value)) {
                 continue;
             }
 
-            $value    = Arr::get($oldSettings, $item[self::TRANSFORM_KEY_SOURCE]);
-            $newValue = $value;
-
             if ($item[self::TRANSFORM_KEY_TRANSFORM] ?? false) {
-                $newValue = $item[self::TRANSFORM_KEY_TRANSFORM]($newValue);
+                $value = $item[self::TRANSFORM_KEY_TRANSFORM]($value);
             }
 
             if ($item[self::TRANSFORM_KEY_CAST] ?? false) {
-                $newValue = $this->castValue($item[self::TRANSFORM_KEY_CAST], $newValue);
+                $value = $this->castValue($item[self::TRANSFORM_KEY_CAST], $value);
             }
 
-            Arr::set($newSettings, $item[self::TRANSFORM_KEY_TARGET], $newValue);
+            Arr::set($newSettings, $item[self::TRANSFORM_KEY_TARGET], $value);
         }
 
         return $newSettings;
