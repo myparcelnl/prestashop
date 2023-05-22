@@ -160,8 +160,12 @@ abstract class AbstractPsObjectRepository extends Repository
      */
     public function updateOrCreate(array $where, array $values)
     {
-        $entity = empty($where) ? null : $this->entityRepository->findOneBy($where);
-
+        try {
+            $entity = empty($where) ? null : $this->entityRepository->findOneBy($where);
+        } catch (Throwable $e) {
+            $entity = null;
+        }
+        
         if (! $entity) {
             $entity          = $this->createEntity();
             $entity->created = new DateTime();
