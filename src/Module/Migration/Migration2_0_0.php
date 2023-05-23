@@ -395,37 +395,71 @@ final class Migration2_0_0 extends AbstractPsMigration
      */
     private function getSettingsTransformationMap(): Generator
     {
-        /**
-         * General
-         */
         yield [
             self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_API_KEY',
             self::TRANSFORM_KEY_TARGET => 'account.apiKey',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
-        // TODO: Prestashop doesn't have PPS
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'general.export_mode',
-            self::TRANSFORM_KEY_TARGET    => 'general.orderMode',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_API_LOGGING',
+            self::TRANSFORM_KEY_TARGET => 'general.apiLogging',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SHARE_CUSTOMER_EMAIL',
+            self::TRANSFORM_KEY_TARGET => 'general.shareCustomerInformation',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_USE_ADDRESS2_AS_STREET_NUMBER',
+            self::TRANSFORM_KEY_TARGET => 'checkout.useSeparateAddressFields',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_CONCEPT_FIRST',
+            self::TRANSFORM_KEY_TARGET    => 'general.processDirectly',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): bool {
-                return $value === 'pps';
+                return ! $value;
             },
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_LABEL_OPEN_DOWNLOAD',
-            self::TRANSFORM_KEY_TARGET    => 'label.output',
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_DELIVERY_OPTIONS_PRICE_FORMAT',
+            self::TRANSFORM_KEY_TARGET    => 'checkout.priceType',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
-                return $value === 'display' ? 'open' : 'download';
+                return 'total_price' === $value ? 'included' : 'excluded';
             },
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_LABEL_DESCRIPTION',
+            self::TRANSFORM_KEY_TARGET => 'label.description',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
         yield [
             self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_LABEL_SIZE',
             self::TRANSFORM_KEY_TARGET    => 'label.format',
             self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
-                return $value === 'A6' ? 'a6' : 'a4';
+                return 'A6' === $value ? 'a6' : 'a4';
+            },
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_LABEL_POSITION',
+            self::TRANSFORM_KEY_TARGET => 'label.position',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_LABEL_OPEN_DOWNLOAD',
+            self::TRANSFORM_KEY_TARGET    => 'label.output',
+            self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
+                return $value ? 'open' : 'download';
             },
         ];
 
@@ -436,195 +470,62 @@ final class Migration2_0_0 extends AbstractPsMigration
         ];
 
         yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_LABEL_CREATED_ORDER_STATUS',
+            self::TRANSFORM_KEY_TARGET => 'order.orderstatusOnLabelCreate',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_LABEL_SCANNED_ORDER_STATUS',
+            self::TRANSFORM_KEY_TARGET => 'order.orderstatusWhenLabelScanned',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERED_ORDER_STATUS',
+            self::TRANSFORM_KEY_TARGET => 'order.orderstatusWhenDelivered',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
+        ];
+
+        // MYPARCELNL_IGNORE_ORDER_STATUS is ignored.
+
+        yield [
             self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_STATUS_CHANGE_MAIL',
-            self::TRANSFORM_KEY_TARGET => 'general.trackTraceInEmail',
+            self::TRANSFORM_KEY_TARGET => 'order.orderStatusMail',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
-        // TODO
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'general.track_trace_my_account',
-            self::TRANSFORM_KEY_TARGET => 'general.trackTraceInAccount',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_ORDER_NOTIFICATION_AFTER',
+            self::TRANSFORM_KEY_TARGET => 'order.sendNotificationAfter',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
+        ];
+
+        yield [
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SENT_ORDER_STATE_FOR_DIGITAL_STAMPS',
+            self::TRANSFORM_KEY_TARGET => 'order.sendOrderStateForDigitalStamp',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
         ];
 
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'general.show_delivery_day',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
+        // MYPARCELNL_CUSTOMS_FORM is ignored.
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_CONCEPT_FIRST',
-            self::TRANSFORM_KEY_TARGET    => 'general.conceptShipments',
-            self::TRANSFORM_KEY_TRANSFORM => function ($value): bool {
-                return ! $value;
-            },
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DEFAULT_CUSTOMS_CODE',
+            self::TRANSFORM_KEY_TARGET => 'customs.customsCode',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
         ];
 
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'general.order_status_automation',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_ORDER_NOTIFICATION_AFTER',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        // TODO
-        // NOTE: Risky. Resulting value may not exist in array of order statuses.
         yield [
-            self::TRANSFORM_KEY_SOURCE => 'general.automatic_order_status',
-            self::TRANSFORM_KEY_TARGET => 'general.orderStatusOnLabelCreate',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
-        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'general.barcode_in_note',
-        //            self::TRANSFORM_KEY_TARGET => 'general.barcodeInNote',
-        //            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'general.barcode_in_note_title',
-        //            self::TRANSFORM_KEY_TARGET => 'general.barcodeInNoteTitle',
-        //            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING, // TODO: can also be null, is this a problem?
-        //        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_API_LOGGING',
-            self::TRANSFORM_KEY_TARGET => 'general.apiLogging',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        /**
-         * Checkout
-         */
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_USE_ADDRESS2_AS_STREET_NUMBER',
-            self::TRANSFORM_KEY_TARGET => 'checkout.useSeparateAddressFields',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_enabled',
-            self::TRANSFORM_KEY_TARGET => 'checkout.enableDeliveryOptions',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_enabled_for_backorders',
-            self::TRANSFORM_KEY_TARGET => 'checkout.enableDeliveryOptionsWhenNotInStock',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_display',
-            self::TRANSFORM_KEY_TARGET => 'checkout.deliveryOptionsDisplay',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-            // TODO check this setting, should be for specific shipping methods
-        ];
-
-        // TODO
-        // NOTE: Risky. Resulting value may not exist in array of checkout hooks.
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_position',
-            self::TRANSFORM_KEY_TARGET => 'checkout.deliveryOptionsPosition',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DEFAULT_CUSTOMS_ORIGIN',
+            self::TRANSFORM_KEY_TARGET => 'customs.countryOfOrigin',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
 
         yield [
-            self::TRANSFORM_KEY_SOURCE    => 'MYPARCELNL_DELIVERY_OPTIONS_PRICE_FORMAT',
-            self::TRANSFORM_KEY_TARGET    => 'checkout.priceType',
-            self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
-                return $value === 'total_price' ? 'included' : 'excluded';
-            },
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE    => 'checkout.pickup_locations_default_view',
-            self::TRANSFORM_KEY_TARGET    => 'checkout.pickupLocationsDefaultView',
-            self::TRANSFORM_KEY_TRANSFORM => function ($value): string {
-                return $value === 'map' ? 'map' : 'list';
-            },
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'checkout.delivery_options_custom_css',
-            self::TRANSFORM_KEY_TARGET => 'checkout.deliveryOptionsCustomCss',
+            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_TITLE',
+            self::TRANSFORM_KEY_TARGET => 'checkout.deliveryOptionsHeader',
             self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
         ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.header_delivery_options_title',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_MORNING_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_STANDARD_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DELIVERY_EVENING_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.same_day_title',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_ONLY_RECIPIENT_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SIGNATURE_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_PICKUP_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_HOUSE_NUMBER_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '' // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_CITY_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '' // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_POSTCODE_TITLE',
-        //            self::TRANSFORM_KEY_TARGET => '' // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'checkout.address_not_found_title',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
 
         /**
          * Export defaults
@@ -653,72 +554,6 @@ final class Migration2_0_0 extends AbstractPsMigration
                 );
             },
         ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SHARE_CUSTOMER_EMAIL',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_SHARE_CUSTOMER_PHONE',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_defaults.save_customer_address',
-            self::TRANSFORM_KEY_TARGET => 'order.saveCustomerAddress',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_BOOL,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_LABEL_DESCRIPTION',
-            self::TRANSFORM_KEY_TARGET => 'label.description',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_defaults.empty_parcel_weight',
-            self::TRANSFORM_KEY_TARGET => 'order.emptyParcelWeight',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_defaults.empty_digital_stamp_weight',
-            self::TRANSFORM_KEY_TARGET => 'order.emptyDigitalStampWeight',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_INT,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DEFAULT_CUSTOMS_CODE',
-            self::TRANSFORM_KEY_TARGET => 'customs.customsCode',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
-        ];
-
-        // TODO
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'export_defaults.package_contents',
-            self::TRANSFORM_KEY_TARGET => 'customs.packageContents',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
-        ];
-
-        yield [
-            self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_DEFAULT_CUSTOMS_ORIGIN',
-            self::TRANSFORM_KEY_TARGET => 'customs.countryOfOrigin',
-            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_STRING,
-        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'export_defaults.export_automatic',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
-
-        //        yield [
-        //            self::TRANSFORM_KEY_SOURCE => 'export_defaults.export_automatic_status',
-        //            self::TRANSFORM_KEY_TARGET => '', // TODO
-        //        ];
     }
 
     /**
