@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Migration;
 
-use DateTime;
 use DbQuery;
 use Generator;
 use MyParcelNL\Pdk\Base\Support\Arr;
@@ -608,29 +607,30 @@ final class Migration2_0_0 extends AbstractPsMigration
         $oldValues = $this->db->executeS($query);
 
         foreach ($oldValues as $oldTableRow) {
-            $cartId           = json_decode($oldTableRow['id_cart'], true);
-            $deliverySettings = json_decode($oldTableRow['delivery_settings'], true);
-            $extraOptions     = json_decode($oldTableRow['extra_options'], true);
-            $shipmentOptions  = $deliverySettings['shipmentOptions'];
+            $cartId           = json_decode($oldTableRow['id_cart'] ?? '', true);
+            $deliverySettings = json_decode($oldTableRow['delivery_settings'] ?? '', true);
+            $extraOptions     = json_decode($oldTableRow['extra_options'] ?? '', true);
+            $shipmentOptions  = $deliverySettings ? $deliverySettings['shipmentOptions'] : null;
+            $pickupLocation   = $deliverySettings ? $deliverySettings['pickupLocation'] : null;
             $orderId          = $this->getOrderIdByCartId($cartId);
             $deliveryOptions  = [
-                'carrier'         => $deliverySettings['carrier'],
-                'date'            => $deliverySettings['date'],
-                'labelAmount'     => $extraOptions['labelAmount'],
-                'pickupLocation'  => $shipmentOptions['pickupLocation'] ? [
-                    'boxNumber'            => $shipmentOptions['pickupLocation']['box_number'] ?? null,
-                    'cc'                   => $shipmentOptions['pickupLocation']['cc'] ?? null,
-                    'city'                 => $shipmentOptions['pickupLocation']['city'] ?? null,
-                    'number'               => $shipmentOptions['pickupLocation']['number'] ?? null,
-                    'numberSuffix'         => $shipmentOptions['pickupLocation']['number_suffix'] ?? null,
-                    'postalCode'           => $shipmentOptions['pickupLocation']['postal_code'] ?? null,
-                    'region'               => $shipmentOptions['pickupLocation']['region'] ?? null,
-                    'state'                => $shipmentOptions['pickupLocation']['state'] ?? null,
-                    'street'               => $shipmentOptions['pickupLocation']['street'] ?? null,
-                    'streetAdditionalInfo' => $shipmentOptions['pickupLocation']['street_additional_info'] ?? null,
-                    'locationCode'         => $shipmentOptions['pickupLocation']['location_code'] ?? null,
-                    'locationName'         => $shipmentOptions['pickupLocation']['location_name'] ?? null,
-                    'retailNetworkId'      => $shipmentOptions['pickupLocation']['retail_network_id'] ?? null,
+                'carrier'         => $deliverySettings ? $deliverySettings['carrier'] : null,
+                'date'            => $deliverySettings ? $deliverySettings['date'] : null,
+                'labelAmount'     => $extraOptions ? $extraOptions['labelAmount'] : null,
+                'pickupLocation'  => $pickupLocation ? [
+                    'boxNumber'            => $pickupLocation['box_number'] ?? null,
+                    'cc'                   => $pickupLocation['cc'] ?? null,
+                    'city'                 => $pickupLocation['city'] ?? null,
+                    'number'               => $pickupLocation['number'] ?? null,
+                    'numberSuffix'         => $pickupLocation['number_suffix'] ?? null,
+                    'postalCode'           => $pickupLocation['postal_code'] ?? null,
+                    'region'               => $pickupLocation['region'] ?? null,
+                    'state'                => $pickupLocation['state'] ?? null,
+                    'street'               => $pickupLocation['street'] ?? null,
+                    'streetAdditionalInfo' => $pickupLocation['street_additional_info'] ?? null,
+                    'locationCode'         => $pickupLocation['location_code'] ?? null,
+                    'locationName'         => $pickupLocation['location_name'] ?? null,
+                    'retailNetworkId'      => $pickupLocation['retail_network_id'] ?? null,
                 ] : null,
                 'shipmentOptions' => $shipmentOptions ? [
                     'ageCheck'         => $shipmentOptions['age_check'] ?? null,
@@ -642,16 +642,16 @@ final class Migration2_0_0 extends AbstractPsMigration
                     'sameDayDelivery'  => $shipmentOptions['same_day_delivery'] ?? null,
                     'signature'        => $shipmentOptions['signature'] ?? null,
                 ] : null,
-                'deliveryType'    => $deliverySettings['deliveryType'],
-                'packageType'     => $deliverySettings['packageType'],
+                'deliveryType'    => $deliverySettings ? $deliverySettings['deliveryType'] : null,
+                'packageType'     => $deliverySettings ? $deliverySettings['packageType'] : null,
             ];
 
             $this->orderDataRepository->updateOrCreate(
                 [
-                    'idOrder' => (int) $orderId,
+                    'idOrder' => (string) $orderId,
                 ],
                 [
-                    'data' => ['deliveryOptions' => $deliveryOptions],
+                    'data' => json_encode(['deliveryOptions' => $deliveryOptions]),
                 ]
             );
         }
@@ -673,23 +673,20 @@ final class Migration2_0_0 extends AbstractPsMigration
 
         foreach ($oldOrderLabels as $oldOrderLabel) {
             $shipment = [
-                'id'                  => $oldOrderLabel['id_label'],
-                'orderId'             => $oldOrderLabel['id_order'],
-                'referenceIdentifier' => $oldOrderLabel['id_order'],
-                'barcode'             => $oldOrderLabel['barcode'],
-                'status'              => $oldOrderLabel['status'],
-                'deleted'             => DateTime::class,
-                'updated'             => new DateTime($oldOrderLabel['date_upd']),
-                'created'             => new DateTime($oldOrderLabel['date_add']),
+                'id'                  => $oldOrderLabel['id_label'] ?? null,
+                'orderId'             => $oldOrderLabel['id_order'] ?? null,
+                'referenceIdentifier' => $oldOrderLabel['id_order'] ?? null,
+                'barcode'             => $oldOrderLabel['barcode'] ?? null,
+                'status'              => $oldOrderLabel['status'] ?? null,
             ];
 
             $this->orderShipmentRepository->updateOrCreate(
                 [
-                    'idShipment' => $oldOrderLabel['id_label'],
+                    'idShipment' => (int) $oldOrderLabel['id_label'],
                 ],
                 [
-                    'idOrder' => (int) $oldOrderLabel['id_order'],
-                    'data'    => $shipment,
+                    'idOrder' => (string) $oldOrderLabel['id_order'],
+                    'data'    => json_encode($shipment),
                 ]
             );
         }
@@ -721,7 +718,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         foreach ($productsWithSettings as $productId => $productSettings) {
             $this->productSettingsRepository->updateOrCreate(
                 [
-                    'idProduct' => (int) $productId,
+                    'idProduct' => (string) $productId,
                 ],
                 [
                     'data' => json_encode([
