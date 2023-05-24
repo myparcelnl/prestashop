@@ -8,13 +8,13 @@ class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseMigrati
 {
     public function down(): void
     {
-        $table = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+        $table = Table::withPrefix(Table::TABLE_CARRIER_MAPPING);
         $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
     public function up(): void
     {
-        $table = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
+        $table = Table::withPrefix(Table::TABLE_CARRIER_MAPPING);
         $sql   = <<<SQL
             CREATE TABLE IF NOT EXISTS `$table` (
                 `id`               INT AUTO_INCREMENT                                             NOT NULL,

@@ -24,6 +24,17 @@ final class Migration2_0_0 extends AbstractPsMigration
     protected const         LEGACY_TABLE_DELIVERY_SETTINGS     = 'myparcelnl_delivery_settings';
     protected const         LEGACY_TABLE_ORDER_LABEL           = 'myparcelnl_order_label';
     protected const         LEGACY_TABLE_PRODUCT_CONFIGURATION = 'myparcelnl_product_configuration';
+    private const           LEGACY_PRODUCT_SETTINGS_MAP        = [
+        'MYPARCELNL_PACKAGE_TYPE'       => 'packageType',
+        'MYPARCELNL_CUSTOMS_ORIGIN'     => 'countryOfOrigin',
+        'MYPARCELNL_CUSTOMS_CODE'       => 'customsCode',
+        'MYPARCELNL_INSURANCE'          => 'exportInsurance',
+        'MYPARCELNL_SIGNATURE_REQUIRED' => 'exportSignature',
+        'MYPARCELNL_RETURN_PACKAGE'     => 'exportReturn',
+        'MYPARCELNL_PACKAGE_FORMAT'     => 'exportLargeFormat',
+        'MYPARCELNL_ONLY_RECIPIENT'     => 'exportOnlyRecipient',
+        'MYPARCELNL_AGE_CHECK'          => 'exportAgeCheck',
+    ];
     private const           OLD_CARRIERS                       = [
         'postnl',
         'dhlforyou',
@@ -697,32 +708,26 @@ final class Migration2_0_0 extends AbstractPsMigration
 
         $oldProductSettings = $this->db->executeS($query);
 
-        // TODO: Data wordt momenteel op een vreemde manier opgeslagen. Per instelling
-        // is een aparte rij aangemaakt in de tabel met ieder een id_product. Dit moet
-        // worden geconverteerd naar een enkele array met 1 carrier en alle velden, zodat
-        // het overeenkomt met een datastructuur waar de foreach iets mee kan.
+        $productsWithSettings = [];
 
         foreach ($oldProductSettings as $oldProductSetting) {
+            if (! array_key_exists($oldProductSetting['name'], self::LEGACY_PRODUCT_SETTINGS_MAP)) {
+                continue;
+            }
+
+            $productsWithSettings[$oldProductSetting['id_product']][self::LEGACY_PRODUCT_SETTINGS_MAP[$oldProductSetting['name']]] = $oldProductSetting['value'];
+        }
+
+        foreach ($productsWithSettings as $productId => $productSettings) {
             $this->productSettingsRepository->updateOrCreate(
                 [
-                    'idProduct' => (int) $oldProductSetting['id_product'],
+                    'idProduct' => (int) $productId,
                 ],
                 [
-                    'data' => [
-                        'id'                     => 'product',
-                        'countryOfOrigin'        => $oldProductSetting['country_of_origin'],
-                        'customsCode'            => $oldProductSetting['customs_code'],
-                        'disableDeliveryOptions' => false,
-                        'dropOffDelay'           => 0,
-                        'exportAgeCheck'         => $oldProductSetting['age_check'],
-                        'exportInsurance'        => $oldProductSetting['insurance'],
-                        'exportLargeFormat'      => $oldProductSetting['large_format'],
-                        'exportOnlyRecipient'    => $oldProductSetting['only_recipient'],
-                        'exportReturn'           => $oldProductSetting['return'],
-                        'exportSignature'        => $oldProductSetting['signature'],
-                        'fitInMailbox'           => 0,
-                        'packageType'            => $oldProductSetting['package_type'],
-                    ],
+                    'data' => json_encode([
+                        'id'   => 'product',
+                        'data' => $productSettings,
+                    ]),
                 ]
             );
         }
