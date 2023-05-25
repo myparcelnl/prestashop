@@ -49,7 +49,7 @@ abstract class AbstractPsObjectRepository extends Repository
             try {
                 $this->entityManager->flush();
             } catch (Throwable $e) {
-                Logger::error($e);
+                Logger::error($e->getMessage());
             }
         });
     }
@@ -165,7 +165,7 @@ abstract class AbstractPsObjectRepository extends Repository
         } catch (Throwable $e) {
             $entity = null;
         }
-        
+
         if (! $entity) {
             $entity          = $this->createEntity();
             $entity->created = new DateTime();
