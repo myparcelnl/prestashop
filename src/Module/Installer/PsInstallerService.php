@@ -51,6 +51,11 @@ final class PsInstallerService extends InstallerService
         $this->prepareEntityManager();
 
         parent::migrateUp($version);
+
+        /**
+         * Always register hooks, since the methods may have changed. PrestaShops checks if hook is already registered.
+         */
+        $this->registerHooks();
     }
 
     private function executeDatabaseMigrations(): void
