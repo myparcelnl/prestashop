@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Module\Migration;
 
 use DbQuery;
+use Exception;
 use Generator;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -571,13 +572,13 @@ final class Migration2_0_0 extends AbstractPsMigration
      */
     private function migrateCarrierSettings()
     {
-        $oldCarrierSettings = $this->getCarrierSettings();
+        //$oldCarrierSettings = $this->getCarrierSettings();
 
         // TODO: Hier geldt hetzelfde als bij de product settings. Per rij in de tabel
         // is er maar één instelling met een id_carrier en dit zal geconverteerd moeten
         // worden naar één rij met een id_carrier en alle velden die behoren tot die carrier.
 
-        $newSettings = $this->transformSettings($oldCarrierSettings, $this->getCarrierSettingsTransformationMap());
+        //$newSettings = $this->transformSettings($oldCarrierSettings, $this->getCarrierSettingsTransformationMap());
         //        $newSettings['carrier'] = new SettingsModelCollection();
         //
         //        foreach (self::OLD_CARRIERS as $carrier) {
@@ -732,15 +733,22 @@ final class Migration2_0_0 extends AbstractPsMigration
 
     /**
      * @return void
-     * @throws \PrestaShopDatabaseException
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     private function migrateSettings(): void
     {
-        $oldConfigurationSettings = $this->getConfigurationSettings();
-
-        $newSettings = $this->transformSettings($oldConfigurationSettings, $this->getSettingsTransformationMap());
-        $settings    = new Settings(array_replace_recursive(SettingsFacade::getDefaults(), $newSettings));
+        try {
+            $oldConfigurationSettings = $this->getConfigurationSettings();
+            $newSettings              = $this->transformSettings(
+                $oldConfigurationSettings,
+                $this->getSettingsTransformationMap()
+            );
+            $settings                 = new Settings(
+                array_replace_recursive(SettingsFacade::getDefaults(), $newSettings)
+            );
+        } catch (Exception $e) {
+            $settings = new Settings(SettingsFacade::getDefaults());
+        }
 
         $this->settingsRepository->storeAllSettings($settings);
     }
