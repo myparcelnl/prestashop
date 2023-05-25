@@ -42,6 +42,17 @@ final class PsInstallerService extends InstallerService
         parent::executeInstallation();
     }
 
+    /**
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    protected function migrateUp(string $version): void
+    {
+        $this->prepareEntityManager();
+
+        parent::migrateUp($version);
+    }
+
     private function executeDatabaseMigrations(): void
     {
         /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */

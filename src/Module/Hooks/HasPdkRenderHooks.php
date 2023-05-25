@@ -17,7 +17,6 @@ use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
-use MyParcelNL\PrestaShop\Service\PsFrontendRenderService;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 use Tools;
 
@@ -165,10 +164,17 @@ trait HasPdkRenderHooks
     public function hookDisplayAdminProductsExtra(array $params): string
     {
         /** @var \MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository $repository */
-        $repository = Pdk::get(PdkProductRepository::class);
-        $product    = $repository->getProduct($params['id_product']);
+        $repository          = Pdk::get(PdkProductRepository::class);
+        $product             = $repository->getProduct($params['id_product']);
+        $productSettingsView = Frontend::renderProductSettings($product);
 
-        return Frontend::renderProductSettings($product);
+        $this->context->smarty->assign(
+            [
+                'productSettingsView' => $productSettingsView,
+            ]
+        );
+
+        return $this->display($this->name, 'views/templates/admin/hook/product_settings.tpl');
     }
 
     /**
@@ -196,13 +202,8 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayCarrierExtraContent($params)
     {
-        /** @var \MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface $renderService */
-        $renderService = Pdk::get(PsFrontendRenderService::class);
-
         /** @var PsCartRepository $cartRepository */
         $cartRepository = Pdk::get(PsCartRepository::class);
-
-        //        $address->address1 = preg_replace('/\D/', '', $address->address1);
 
         if (empty($this->context->cart->id_carrier)) {
             $selectedDeliveryOption          = current($this->context->cart->getDeliveryOption(null, false, false));
