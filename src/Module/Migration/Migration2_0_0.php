@@ -10,6 +10,7 @@ use Generator;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings as SettingsFacade;
+use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
 use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
 use MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService;
@@ -185,7 +186,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         return $this->db->executeS($query);
     }
 
-    private function getCarrierSettingsTransformationMap()
+    private function getCarrierSettingsTransformationMap(): Generator
     {
         yield [
             self::TRANSFORM_KEY_SOURCE => 'MYPARCELNL_AGE_CHECK',
@@ -271,12 +272,14 @@ final class Migration2_0_0 extends AbstractPsMigration
 
         yield [
             self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT_BE',
-            self::TRANSFORM_KEY_TARGET => '',
+            self::TRANSFORM_KEY_TARGET => 'exportInsuranceUpToBe',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
         yield [
             self::TRANSFORM_KEY_SOURCE => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT_EU',
-            self::TRANSFORM_KEY_TARGET => '',
+            self::TRANSFORM_KEY_TARGET => 'exportInsuranceUpToEu',
+            self::TRANSFORM_KEY_CAST   => self::TRANSFORM_CAST_CENTS,
         ];
 
         yield [
@@ -577,26 +580,54 @@ final class Migration2_0_0 extends AbstractPsMigration
      */
     private function migrateCarrierSettings()
     {
-        //$oldCarrierSettings = $this->getCarrierSettings();
+        $oldCarrierSettings = $this->getCarrierSettings();
 
-        // TODO: Hier geldt hetzelfde als bij de product settings. Per rij in de tabel
-        // is er maar één instelling met een id_carrier en dit zal geconverteerd moeten
-        // worden naar één rij met een id_carrier en alle velden die behoren tot die carrier.
+        $carrierNamesAndIds  = [];
+        $transformedSettings = [];
+        foreach ($oldCarrierSettings as $setting) {
+            if (isset($setting['id_carrier'], $setting['name'], $setting['value'])) {
+                $id_carrier = $setting['id_carrier'];
+                $name       = $setting['name'];
+                $value      = $setting['value'];
+                if (! isset($transformedSettings[$id_carrier])) {
+                    $transformedSettings[$id_carrier] = [];
+                }
+                if ('carrierType' === $name) {
+                    $carrierNamesAndIds[$value] = $id_carrier;
+                }
 
-        //$newSettings = $this->transformSettings($oldCarrierSettings, $this->getCarrierSettingsTransformationMap());
-        //        $newSettings['carrier'] = new SettingsModelCollection();
-        //
-        //        foreach (self::OLD_CARRIERS as $carrier) {
-        //            $transformed                         = $this->transformSettings(
-        //                $oldConfigurationSettings[$carrier] ?? [],
-        //                $this->getCarrierSettingsTransformationMap()
-        //            );
-        //            $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities(
-        //                $oldConfigurationSettings[$carrier] ?? []
-        //            );
-        //
-        //            $newSettings['carrier']->put($carrier, $transformed);
-        //        }
+                $transformedSettings[$id_carrier][] = $setting;
+            }
+        }
+        $oldCarrierSettings = [];
+        foreach ($carrierNamesAndIds as $name => $id_carrier) {
+            $oldCarrierSettings[$name] = $transformedSettings[$id_carrier];
+        }
+        // transform de settings per carrier en sla op
+
+        // let op converteer dropoffdays en cutoff tijden naar dropoffpossibilities
+
+        //        $newSettings            = $this->transformSettings(
+        //            $oldCarrierSettings,
+        //            $this->getCarrierSettingsTransformationMap()
+        //        );                                                       // dit doet nooit iets
+
+        $newSettings['carrier'] = new SettingsModelCollection();
+
+        foreach (self::OLD_CARRIERS as $carrier) {
+            $transformed                         = $this->transformSettings(
+                $oldCarrierSettings[$carrier] ?? [],
+                $this->getCarrierSettingsTransformationMap()
+            );
+            $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities(
+                $oldCarrierSettings[$carrier] ?? []
+            );
+            //unset($transformed['']);
+
+            $newSettings['carrier']->put($carrier, $transformed);
+        }
+
+        $this->settingsRepository->store(Pdk::get('createSettingsKey')('carrier'), $newSettings['carrier']->toArray());
     }
 
     /**
@@ -729,7 +760,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         foreach ($productsWithSettings as $productId => $productSettings) {
             $this->productSettingsRepository->updateOrCreate(
                 [
-                    'idProduct' => (string) $productId,
+                    'idProduct' => (int) $productId,
                 ],
                 [
                     'data' => json_encode([
@@ -801,13 +832,15 @@ final class Migration2_0_0 extends AbstractPsMigration
                         break;
                 }
 
-                return [
-                    'cutoffTime'        => $cutoffTime,
-                    'sameDayCutoffTime' => $oldSettings['same_day_delivery_cutoff_time'] ?? null,
-                    'weekday'           => $weekday,
-                    'dispatch'          => in_array($weekday, $oldSettings['drop_off_days'] ?? [], true),
-                ];
-            }, [1, 2, 3, 4, 5, 6, 0]),
+                    return [
+                        'cutoffTime'        => $cutoffTime,
+                        'sameDayCutoffTime' => $sameDayDeliveryCutoffTime,
+                        'weekday'           => $weekday,
+                        'dispatch'          => in_array((string) $weekday, $dropOffDays, true),
+                    ];
+                },
+                [1, 2, 3, 4, 5, 6, 0]
+            ),
         ];
     }
 
@@ -825,7 +858,7 @@ final class Migration2_0_0 extends AbstractPsMigration
             $index = $this->searchForValue($item[self::TRANSFORM_KEY_SOURCE], $oldSettings);
             $value = Arr::get($oldSettings, $index)['value'] ?? null;
 
-            if (! isset($index, $value)) {
+            if (! isset($value)) {
                 continue;
             }
 
