@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Installer;
 
+use Db;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\DocParser;
 use Doctrine\Common\Annotations\PsrCachedReader;
@@ -40,6 +41,18 @@ final class PsInstallerService extends InstallerService
         // $this->installTabs();
 
         parent::executeInstallation();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getInstalledVersion(): string
+    {
+        $table = _DB_PREFIX_ . 'module';
+        $name  = Pdk::getAppInfo()->name;
+
+        return Db::getInstance()
+            ->getValue("SELECT version from $table WHERE name='$name';") ?: '';
     }
 
     /**
