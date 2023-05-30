@@ -120,6 +120,11 @@ final class Migration2_0_0 extends AbstractPsMigration
         $this->migrateProductSettings();
         $this->migrateDeliveryOptions();
         $this->migrateOrderShipments();
+
+        /** @var \Doctrine\ORM\EntityManager $entityManager */
+        $entityManager = Pdk::get('ps.entityManager');
+
+        $entityManager->flush();
     }
 
     /**
@@ -614,7 +619,12 @@ final class Migration2_0_0 extends AbstractPsMigration
             $shipmentOptions  = $deliverySettings ? $deliverySettings['shipmentOptions'] : null;
             $pickupLocation   = $deliverySettings ? $deliverySettings['pickupLocation'] : null;
             $orderId          = $this->getOrderIdByCartId($cartId);
-            $deliveryOptions  = [
+
+            if (! $orderId) {
+                continue;
+            }
+
+            $deliveryOptions = [
                 'carrier'         => $deliverySettings ? $deliverySettings['carrier'] : null,
                 'date'            => $deliverySettings ? $deliverySettings['date'] : null,
                 'labelAmount'     => $extraOptions ? $extraOptions['labelAmount'] : null,
