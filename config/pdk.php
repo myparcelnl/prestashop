@@ -66,7 +66,7 @@ return [
      */
     'deliveryOptionsVersion' => value('5.7.3'),
 
-    'routeBackend'                              => value('https://prestashop.dev.myparcel.nl/admin-dev/'),
+    'routeBackend'                              => value(Context::getContext()->link->getAdminBaseLink()),
     'routeBackendPdk'                           => value('pdk'),
     'routeBackendWebhook'                       => value('webhook'),
 
