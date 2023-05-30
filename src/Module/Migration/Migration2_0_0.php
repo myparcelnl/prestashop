@@ -181,7 +181,6 @@ final class Migration2_0_0 extends AbstractPsMigration
         $query = new DbQuery();
         $query->select('*');
         $query->from('myparcelnl_carrier_configuration');
-        $query->groupBy('id_carrier');
 
         return $this->db->executeS($query);
     }
@@ -804,7 +803,7 @@ final class Migration2_0_0 extends AbstractPsMigration
     {
         foreach ($array as $key => $val) {
             if ($val['name'] === $setting) {
-                return $key;
+                return Arr::get($array, $key)['value'] ?? null;
             }
         }
         return null;
@@ -817,20 +816,43 @@ final class Migration2_0_0 extends AbstractPsMigration
      */
     private function transformDropOffPossibilities(array $oldSettings): array
     {
+        $sameDayDeliveryCutoffTime = $this->searchForValue('sameDayDeliveryCutoffTime', $oldSettings) ?? '9:30';
+        $dropOffDaysAsString       = $this->searchForValue('dropOffDays', $oldSettings) ?? '';
+        $dropOffDays               = explode(',', $dropOffDaysAsString);
         return [
-            'dropOffDays' => array_map(static function ($weekday) use ($oldSettings) {
-                $cutoffTime = $oldSettings['cutoff_time'] ?? null;
-
-                switch ($weekday) {
-                    // Friday
-                    case 5:
-                        $cutoffTime = $oldSettings['friday_cutoff_time'] ?? $cutoffTime;
-                        break;
-                    // Saturday
-                    case 6:
-                        $cutoffTime = $oldSettings['saturday_cutoff_time'] ?? $cutoffTime;
-                        break;
-                }
+            'dropOffDays' => array_map(
+                function ($weekday) use (
+                    $oldSettings,
+                    $sameDayDeliveryCutoffTime,
+                    $dropOffDays
+                ) {
+                    switch ($weekday) {
+                        case 0: // Sunday
+                            $cutoffTime = $this->searchForValue('sundayCutoffTime', $oldSettings) ?? '17:00';
+                            break;
+                        case 1: // Monday
+                            $cutoffTime = $this->searchForValue('mondayCutoffTime', $oldSettings) ?? '17:00';
+                            break;
+                        case 2: // Tuesday
+                            $cutoffTime = $this->searchForValue('tuesdayCutoffTime', $oldSettings) ?? '17:00';
+                            break;
+                        case 3: // Wednesday
+                            $cutoffTime = $this->searchForValue('wednesdayCutoffTime', $oldSettings) ?? '17:00';
+                            break;
+                        case 4: // Thursday
+                            $cutoffTime = $this->searchForValue('thursdayCutoffTime', $oldSettings) ?? '17:00';
+                            break;
+                        // Friday
+                        case 5:
+                            $cutoffTime = $this->searchForValue('fridayCutoffTime', $oldSettings) ?? '17:00';
+                            break;
+                        // Saturday
+                        case 6:
+                            $cutoffTime = $this->searchForValue('saturdayCutoffTime', $oldSettings) ?? '17:00';
+                            break;
+                        default:
+                            $cutoffTime = '17:00';
+                    }
 
                     return [
                         'cutoffTime'        => $cutoffTime,
@@ -855,8 +877,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         $newSettings = [];
 
         foreach ($transformationMap as $item) {
-            $index = $this->searchForValue($item[self::TRANSFORM_KEY_SOURCE], $oldSettings);
-            $value = Arr::get($oldSettings, $index)['value'] ?? null;
+            $value = $this->searchForValue($item[self::TRANSFORM_KEY_SOURCE], $oldSettings);
 
             if (! isset($value)) {
                 continue;
