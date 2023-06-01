@@ -579,10 +579,10 @@ final class Migration2_0_0 extends AbstractPsMigration
      */
     private function migrateCarrierSettings()
     {
-        $oldCarrierSettings = $this->getCarrierSettings();
-
+        $oldCarrierSettings  = $this->getCarrierSettings();
         $carrierNamesAndIds  = [];
         $transformedSettings = [];
+
         foreach ($oldCarrierSettings as $setting) {
             if (isset($setting['id_carrier'], $setting['name'], $setting['value'])) {
                 $id_carrier = $setting['id_carrier'];
@@ -598,18 +598,12 @@ final class Migration2_0_0 extends AbstractPsMigration
                 $transformedSettings[$id_carrier][] = $setting;
             }
         }
+
         $oldCarrierSettings = [];
+
         foreach ($carrierNamesAndIds as $name => $id_carrier) {
             $oldCarrierSettings[$name] = $transformedSettings[$id_carrier];
         }
-        // transform de settings per carrier en sla op
-
-        // let op converteer dropoffdays en cutoff tijden naar dropoffpossibilities
-
-        //        $newSettings            = $this->transformSettings(
-        //            $oldCarrierSettings,
-        //            $this->getCarrierSettingsTransformationMap()
-        //        );                                                       // dit doet nooit iets
 
         $newSettings['carrier'] = new SettingsModelCollection();
 
@@ -621,7 +615,6 @@ final class Migration2_0_0 extends AbstractPsMigration
             $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities(
                 $oldCarrierSettings[$carrier] ?? []
             );
-            //unset($transformed['']);
 
             $newSettings['carrier']->put($carrier, $transformed);
         }
