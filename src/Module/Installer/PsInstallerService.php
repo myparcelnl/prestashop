@@ -48,11 +48,7 @@ final class PsInstallerService extends InstallerService
      */
     protected function getInstalledVersion(): string
     {
-        $table = _DB_PREFIX_ . 'module';
-        $name  = Pdk::getAppInfo()->name;
-
-        return Db::getInstance()
-            ->getValue("SELECT version from $table WHERE name='$name';") ?: '';
+        return parent::getInstalledVersion() ?? $this->getLegacyInstalledVersion();
     }
 
     /**
@@ -84,6 +80,15 @@ final class PsInstallerService extends InstallerService
             $instance->up();
             Logger::debug('Executed migration', ['migration' => $migration]);
         }
+    }
+
+    private function getLegacyInstalledVersion(): string
+    {
+        $table = _DB_PREFIX_ . 'module';
+        $name  = Pdk::getAppInfo()->name;
+
+        return Db::getInstance()
+            ->getValue("SELECT version from $table WHERE name='$name';") ?: '';
     }
 
     /**
