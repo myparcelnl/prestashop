@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
 
 use MyParcelNL\Pdk\Account\Model\Account;
-use MyParcelNL\Pdk\Account\Repository\AbstractAccountRepository;
-use MyParcelNL\Pdk\Api\Contract\ApiServiceInterface;
+use MyParcelNL\Pdk\Account\Repository\AccountRepository;
+use MyParcelNL\Pdk\App\Account\Repository\AbstractPdkAccountRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 
 /**
  * TODO: move 'account_data' to config
  */
-class PdkAccountRepository extends AbstractAccountRepository
+class PdkAccountRepository extends AbstractPdkAccountRepository
 {
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
@@ -21,19 +21,23 @@ class PdkAccountRepository extends AbstractAccountRepository
     private $configurationService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Api\Contract\ApiServiceInterface                           $apiService
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                          $storage
+     * @param  \MyParcelNL\Pdk\Account\Repository\AccountRepository                       $accountRepository
      * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
      */
     public function __construct(
-        ApiServiceInterface           $apiService,
         StorageInterface              $storage,
+        AccountRepository             $accountRepository,
         ConfigurationServiceInterface $configurationService
     ) {
-        parent::__construct($storage, $apiService);
+        parent::__construct($storage, $accountRepository);
+
         $this->configurationService = $configurationService;
     }
 
+    /**
+     * @return null|\MyParcelNL\Pdk\Account\Model\Account
+     */
     public function getFromStorage(): ?Account
     {
         $result = $this->configurationService->get('account_data');

@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import {PropType, computed, defineComponent} from 'vue';
-import {AdminIcon} from '@myparcel-pdk/admin/src';
+import {AdminIcon} from '@myparcel-pdk/admin';
 import {isEnumValue} from '@myparcel/ts-utils';
 
 const materialIconMap: Record<AdminIcon, string> = {

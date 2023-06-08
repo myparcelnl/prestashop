@@ -10,6 +10,7 @@ use Db;
 use Gett\MyparcelBE\Constant;
 use Gett\MyparcelBE\Database\Table;
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
+use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Base\Model\ContactDetails;
 use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Frontend;
@@ -116,27 +117,25 @@ trait HasPdkRenderHooks
         );
     }
 
+    /**
+     * @param  array $params
+     *
+     * @return void
+     *
+     * @todo move to separate hooks file
+     */
     public function hookActionProductUpdate(array $params): void
     {
         $productId = (int) $params['id_product'];
 
+
+
         //        $productSettingsRepository = Pdk::get(PsProductSettingsRepository::class);
 
+        // todo: refactor to use a \Symfony\Component\HttpFoundation\Request, pass body as json with data.product_settings[0]
         Actions::execute(PdkBackendActions::UPDATE_PRODUCT_SETTINGS, [
             'idProduct' => $productId,
         ]);
-
-        //        $productSettingsRepository->updateOrCreate(
-        //            [
-        //                'idProduct' => (int) $productId,
-        //            ],
-        //            [
-        //                'data' => json_encode([
-        //                    'id'   => 'product',
-        //                    'data' => $productSettings,
-        //                ]),
-        //            ]
-        //        );
     }
 
     /**
@@ -190,8 +189,8 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminProductsExtra(array $params): string
     {
-        /** @var \MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository $repository */
-        $repository          = Pdk::get(PdkProductRepository::class);
+        /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $repository */
+        $repository          = Pdk::get(PdkProductRepositoryInterface::class);
         $product             = $repository->getProduct($params['id_product']);
         $productSettingsView = Frontend::renderProductSettings($product);
 
@@ -201,7 +200,8 @@ trait HasPdkRenderHooks
             ]
         );
 
-        return $this->display($this->name, 'views/templates/admin/hook/product_settings.tpl');
+        // todo move to twig
+        return $this->display($this->name, 'views/templates/hook/product_settings.tpl');
     }
 
     /**

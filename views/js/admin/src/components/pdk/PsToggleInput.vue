@@ -33,9 +33,11 @@
 </template>
 
 <script lang="ts" setup>
-import {ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/admin/src';
-import {InteractiveElementInstance} from '@myparcel/vue-form-builder/src';
+import {ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/admin';
+import {InteractiveElementInstance} from '@myparcel/vue-form-builder';
 import {useVModel} from '@vueuse/core';
+
+// TODO: refactor to have one input component. Check WooCommerce for example.
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<{modelValue: boolean; element: InteractiveElementInstance}>();

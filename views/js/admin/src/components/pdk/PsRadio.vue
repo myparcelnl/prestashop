@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
-import {useLanguage} from '@myparcel-pdk/admin/src';
+import {useLanguage} from '@myparcel-pdk/admin';
 import {useVModel} from '@vueuse/core';
 
 export default defineComponent({

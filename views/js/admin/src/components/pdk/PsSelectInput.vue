@@ -3,6 +3,7 @@
     :id="id"
     v-model="model"
     class="custom-select form-control"
+    :name="id"
     :class="{
       disabled: element.props.options.length === 1 || element.isDisabled || element.isSuspended,
     }">
@@ -18,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import {ElementInstance, generateFieldId} from '@myparcel-pdk/admin/src';
+import {ElementInstance, generateFieldId} from '@myparcel-pdk/admin';
 import {useVModel} from '@vueuse/core';
 
 const props = defineProps<{

@@ -12,13 +12,8 @@ class PsScriptService extends ScriptService
 {
     public function addForAdminHeader(AdminControllerCore $controller, string $path): void
     {
-        if (Pdk::isDevelopment()) {
-            $this->addVue($controller, '3.2.45');
-            $this->addVueDemi($controller, '0.13.11');
-        } else {
-            $this->addVue($controller, '3.2.45');
-            $this->addVueDemi($controller, '0.13.11');
-        }
+        $this->addVue($controller, Pdk::get('vueVersion'));
+        $this->addVueDemi($controller, Pdk::get('vueDemiVersion'));
 
         /** use new-theme */
         $controller->addCSS(

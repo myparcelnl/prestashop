@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ElementInstance, generateFieldId} from '@myparcel-pdk/admin/src';
-import {InteractiveElementInstance} from '@myparcel/vue-form-builder/src';
+import {ElementInstance, generateFieldId} from '@myparcel-pdk/admin';
+import {InteractiveElementInstance} from '@myparcel/vue-form-builder';
 import {useVModel} from '@vueuse/core';
 
 // eslint-disable-next-line vue/no-unused-properties

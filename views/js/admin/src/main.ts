@@ -12,7 +12,7 @@ import {
   Bootstrap4SelectInput,
   Bootstrap4TextInput,
   bootstrap4Config,
-} from '@myparcel-pdk/admin-preset-bootstrap4/src';
+} from '@myparcel-pdk/admin-preset-bootstrap4';
 import {
   DefaultCurrencyInput,
   DefaultDropOffInput,
@@ -27,8 +27,8 @@ import {
   DefaultTableCol,
   DefaultTableRow,
   DefaultTimeInput,
-} from '@myparcel-pdk/admin-preset-default/src';
-import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin/src';
+} from '@myparcel-pdk/admin-preset-default';
+import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin';
 import PsCheckboxGroup from './components/pdk/PsCheckboxGroup.vue';
 import PsFormGroup from './components/pdk/PsFormGroup.vue';
 import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
@@ -91,6 +91,14 @@ window.onload = () => {
       },
     },
 
+    formConfigOverrides: {
+      productSettings: {
+        form: {
+          tag: 'div',
+        },
+      },
+    },
+
     cssUtilities: {
       animationSpin: 'mypa-spinner',
       whitespaceNoWrap: 'whitespace-nowrap',
@@ -107,6 +115,10 @@ window.onload = () => {
       shipmentRow: 'fade',
       tabNavigation: 'fade',
       tableRow: 'fade',
+    },
+
+    generateFieldId: (element) => {
+      return `myparcelnl-${element.form.name}-${element.name}`;
     },
   });
 };
