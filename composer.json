@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "prestashop-module",
   "require": {
-    "myparcelnl/pdk": "*",
+    "myparcelnl/pdk": "^2.0.0",
     "php": ">=7.2.0"
   },
   "require-dev": {
@@ -30,11 +30,5 @@
     "psr-4": {
       "MyParcelNL\\PrestaShop\\Tests\\": "tests/"
     }
-  },
-  "repositories": [
-    {
-      "type": "path",
-      "url": "/Users/edie/Sites/myparcel/pdk"
-    }
-  ]
+  }
 }
