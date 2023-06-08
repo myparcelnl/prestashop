@@ -7,7 +7,11 @@ namespace MyParcelNL\PrestaShop\Module\Hooks;
 use Address;
 use Country;
 use Db;
+use Gett\MyparcelBE\Constant;
+use Gett\MyparcelBE\Database\Table;
+use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\Base\Model\ContactDetails;
+use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
@@ -110,6 +114,29 @@ trait HasPdkRenderHooks
                 return $row;
             }, $params['presented_grid']['data']['records']->all())
         );
+    }
+
+    public function hookActionProductUpdate(array $params): void
+    {
+        $productId = (int) $params['id_product'];
+
+        //        $productSettingsRepository = Pdk::get(PsProductSettingsRepository::class);
+
+        Actions::execute(PdkBackendActions::UPDATE_PRODUCT_SETTINGS, [
+            'idProduct' => $productId,
+        ]);
+
+        //        $productSettingsRepository->updateOrCreate(
+        //            [
+        //                'idProduct' => (int) $productId,
+        //            ],
+        //            [
+        //                'data' => json_encode([
+        //                    'id'   => 'product',
+        //                    'data' => $productSettings,
+        //                ]),
+        //            ]
+        //        );
     }
 
     /**
