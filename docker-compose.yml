@@ -7,7 +7,6 @@ services:
     volumes:
       - ./:/app
       - composer-cache:/www-data/.composer/cache
-      - /Users/edie/Sites/myparcel/pdk:/Users/edie/Sites/myparcel/pdk
 
   node:
     image: node:18-alpine
@@ -17,8 +16,6 @@ services:
       - ./:/app
       - yarn-cache:/usr/local/share/.cache/yarn/v6
       - node-modules:/app/node_modules
-      - /Users/edie/Sites/myparcel/pdk-frontend:/Users/edie/Sites/myparcel/pdk-frontend
-      - /Users/edie/Sites/myparcel/js-sdk:/Users/edie/Sites/myparcel/js-sdk
 
 volumes:
   composer-cache:
