@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
+use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 use MyParcelNL\PrestaShop\Service\PsWeightService;
 use Product;
 
@@ -28,13 +29,18 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
     private $weightService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface $storage
-     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService    $weightService
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface             $storage
+     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService                $weightService
+     * @param  \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository $productSettingsRepository
      */
-    public function __construct(StorageInterface $storage, PsWeightService $weightService)
-    {
+    public function __construct(
+        StorageInterface            $storage,
+        PsWeightService             $weightService,
+        PsProductSettingsRepository $productSettingsRepository
+    ) {
         parent::__construct($storage);
-        $this->weightService = $weightService;
+        $this->weightService             = $weightService;
+        $this->productSettingsRepository = $productSettingsRepository;
 
         /** @var \Doctrine\ORM\EntityManager $entityManager */
         $entityManager             = Pdk::get('ps.entityManager');
@@ -78,8 +84,8 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
             /** @var \MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings $psProductSettings */
             $psProductSettings = $this->psProductRepository->findOneBy(['idProduct' => $identifier]);
             $data              = $psProductSettings ? $psProductSettings->toArray() : [];
-
-            return new ProductSettings($data);
+            $parameters        = json_decode($data['data'] ?? '', true);
+            return new ProductSettings($parameters);
         });
     }
 
@@ -97,8 +103,19 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
         return (new PdkProductCollection($products));
     }
 
+    /**
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function update(PdkProduct $product): void
     {
-        // TODO: Implement update() method.
+        $this->productSettingsRepository->updateOrCreate(
+            [
+                'idProduct' => (int) $product->externalIdentifier,
+            ],
+            [
+                'data' => json_encode($product->settings->toArray()),
+            ]
+        );
     }
 }

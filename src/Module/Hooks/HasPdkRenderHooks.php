@@ -20,7 +20,6 @@ use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
 use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
-use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 use Tools;
@@ -121,20 +120,28 @@ trait HasPdkRenderHooks
      * @param  array $params
      *
      * @return void
-     *
      * @todo move to separate hooks file
      */
     public function hookActionProductUpdate(array $params): void
     {
-        $productId = (int) $params['id_product'];
+        $productId               = (int) $params['id_product'];
+        $postValues              = Tools::getAllValues();
+        $myparcelProductSettings = array_filter($postValues, static function ($key) {
+            return str_starts_with($key, 'myparcelnl');
+        }, ARRAY_FILTER_USE_KEY);
 
+        $productSettingsBody = [];
 
-
-        //        $productSettingsRepository = Pdk::get(PsProductSettingsRepository::class);
+        foreach ($myparcelProductSettings as $key => $value) {
+            $explodedKey                  = explode('-', $key);
+            $newKey                       = end($explodedKey);
+            $productSettingsBody[$newKey] = $value;
+        }
 
         // todo: refactor to use a \Symfony\Component\HttpFoundation\Request, pass body as json with data.product_settings[0]
         Actions::execute(PdkBackendActions::UPDATE_PRODUCT_SETTINGS, [
-            'idProduct' => $productId,
+            'productId'       => $productId,
+            'productSettings' => $productSettingsBody,
         ]);
     }
 
