@@ -148,7 +148,7 @@ class PdkOrderRepository extends AbstractPdkOrderRepository
     public function updateMany(PdkOrderCollection $collection): PdkOrderCollection
     {
         $collection->each(function (PdkOrder $order) {
-            $this->saveOrderData($order);
+            $this->saveOrderData((string) $order->externalIdentifier, $order->toArray());
 
             $order->shipments->each(function (Shipment $shipment) use ($order) {
                 $this->psOrderShipmentRepository->updateOrCreate(
