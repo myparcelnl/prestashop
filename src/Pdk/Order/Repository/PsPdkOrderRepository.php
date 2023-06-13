@@ -116,6 +116,9 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                     'shipmentVat'         => $this->currencyService->convertToCents($order->total_shipping_tax_excl),
                     'lines'               => $this->createOrderLines($orderProducts),
                     'customsDeclaration'  => $this->createCustomsDeclaration($order, $orderProducts),
+                    'invoiceId'           => $order->id,
+                    'invoiceDate'         => $order->date_add,
+                    'paymentMethod'       => $order->payment,
                 ], $orderData)
             );
         });
@@ -210,6 +213,7 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                         $product['product_price_wt'] ?? 0
                     ),
                     'product'       => $this->productRepository->getProduct($product['product_id']),
+                    'vatRate'       => $product['tax_rate'],
                 ];
             },
             array_values($orderProducts)
