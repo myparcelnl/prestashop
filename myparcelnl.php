@@ -5,7 +5,10 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Module\Hooks\HasPdkCheckoutHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\HasPdkProductHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\HasPdkScriptHooks;
 use MyParcelNL\PrestaShop\Module\Service\ModuleService;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use PrestaShopBundle\Exception\InvalidModuleException;
@@ -14,19 +17,12 @@ defined('_PS_VERSION_') or exit();
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-class MyParcelNL extends CarrierModule
+final class MyParcelNL extends CarrierModule
 {
-    //    use CarrierHooks;
-    //    use DisplayAdminProductsExtra;
-    //    use HasFrontendHooks;
-    //    use LegacyOrderPageHooks;
-    //    use OrderHooks;
-    //    use OrdersGridHooks;
-
-    //    use HasModuleInstall;
-    //    use HasModuleUninstall;
-
+    use HasPdkCheckoutHooks;
+    use HasPdkProductHooks;
     use HasPdkRenderHooks;
+    use HasPdkScriptHooks;
 
     /**
      * @deprecated
@@ -58,32 +54,27 @@ class MyParcelNL extends CarrierModule
      */
     public function __construct()
     {
-        $name        = 'myparcelnl';
-        $version     = $this->getVersionFromComposer();
-        $displayName = $this->l($name);
-
-        $this->name          = $name;
-        $this->version       = $version;
+        $this->name          = 'myparcelnl';
+        $this->version       = $this->getVersionFromComposer();
         $this->author        = 'MyParcel';
         $this->author_uri    = 'https://myparcel.nl';
         $this->need_instance = 1;
         $this->bootstrap     = true;
-        $this->displayName   = $displayName;
+        $this->displayName   = 'MyParcel';
         $this->description   = 'MyParcel';
 
         parent::__construct();
 
         PsPdkBootstrapper::boot(
-            $name,
-            $displayName,
-            $version,
+            $this->name,
+            $this->displayName,
+            $this->version,
             $this->getLocalPath(),
             $this->getBaseUrl()
         );
 
-        $this->registerHook('header');
+        $this->tab = Pdk::get('moduleTabName');
 
-        $this->tab                    = Pdk::get('moduleTabName');
         $this->ps_versions_compliancy = [
             'min' => Pdk::get('prestaShopVersionMin'),
             'max' => Pdk::get('prestaShopVersionMax'),
