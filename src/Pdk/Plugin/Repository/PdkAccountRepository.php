@@ -42,7 +42,7 @@ class PdkAccountRepository extends AbstractPdkAccountRepository
     {
         $result = $this->configurationService->get('account_data');
 
-        return new Account($result);
+        return $result ? new Account($result) : null;
     }
 
     /**
