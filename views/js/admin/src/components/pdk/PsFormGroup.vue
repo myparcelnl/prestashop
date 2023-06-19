@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/frontend-admin-core';
+import {type ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/frontend-admin-core';
 
 const props = defineProps<{element: ElementInstance<{description: string}>}>();
 

@@ -1,19 +1,6 @@
 import './assets/scss/index.scss';
 import {
-  Bootstrap4Box,
-  Bootstrap4Button,
-  Bootstrap4ButtonGroup,
-  Bootstrap4CheckboxInput,
-  Bootstrap4Col,
-  Bootstrap4Image,
-  Bootstrap4Modal,
-  Bootstrap4Notification,
-  Bootstrap4RadioInput,
-  Bootstrap4SelectInput,
-  Bootstrap4TextInput,
-  bootstrap4Config,
-} from '@myparcel-pdk/admin-preset-bootstrap4';
-import {
+  DefaultCheckboxGroup,
   DefaultCurrencyInput,
   DefaultDropOffInput,
   DefaultHeading,
@@ -28,17 +15,32 @@ import {
   DefaultTableRow,
   DefaultTimeInput,
 } from '@myparcel-pdk/admin-preset-default';
+import {
+  Bootstrap4Box,
+  Bootstrap4Button,
+  Bootstrap4ButtonGroup,
+  Bootstrap4CheckboxInput,
+  Bootstrap4Col,
+  Bootstrap4Image,
+  Bootstrap4Modal,
+  Bootstrap4Notification,
+  Bootstrap4RadioInput,
+  Bootstrap4SelectInput,
+  Bootstrap4TextInput,
+  bootstrap4Config,
+} from '@myparcel-pdk/admin-preset-bootstrap4';
 import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin';
-import PsCheckboxGroup from './components/pdk/PsCheckboxGroup.vue';
-import PsFormGroup from './components/pdk/PsFormGroup.vue';
-import PsPluginSettingsWrapper from './components/pdk/PsPluginSettingsWrapper.vue';
-import PsRow from './components/pdk/PsRow.vue';
-import PsTabNavButton from './components/pdk/PsTabNavButton.vue';
-import PsTabNavButtonWrapper from './components/pdk/PsTabNavButtonWrapper.vue';
-import PsTextArea from './components/pdk/PsTextArea.vue';
-import PsToggleInput from './components/pdk/PsToggleInput.vue';
-import {PsIcon} from './components';
-import PsDropdownButton from './components/pdk/PsDropdownButton.vue';
+import {
+  PsDropdownButton,
+  PsFormGroup,
+  PsIcon,
+  PsPluginSettingsWrapper,
+  PsRow,
+  PsTabNavButton,
+  PsTabNavButtonWrapper,
+  PsTextArea,
+  PsToggleInput,
+} from './components';
 
 // eslint-disable-next-line max-lines-per-function
 window.onload = () => {
@@ -49,7 +51,7 @@ window.onload = () => {
       PdkBox: Bootstrap4Box,
       PdkButton: Bootstrap4Button,
       PdkButtonGroup: Bootstrap4ButtonGroup,
-      PdkCheckboxGroup: PsCheckboxGroup,
+      PdkCheckboxGroup: DefaultCheckboxGroup,
       PdkCheckboxInput: Bootstrap4CheckboxInput,
       PdkCodeEditor: PsTextArea,
       PdkCol: Bootstrap4Col,
@@ -86,7 +88,7 @@ window.onload = () => {
     formConfig: {
       form: {
         attributes: {
-          class: 'form-horizontal',
+          class: 'form-horizontal py-4',
         },
       },
     },

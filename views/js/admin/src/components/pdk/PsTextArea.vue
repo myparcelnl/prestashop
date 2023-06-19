@@ -10,9 +10,9 @@
 </template>
 
 <script lang="ts" setup>
-import {ElementInstance, generateFieldId} from '@myparcel-pdk/admin';
-import {InteractiveElementInstance} from '@myparcel/vue-form-builder';
 import {useVModel} from '@vueuse/core';
+import {type ElementInstance, generateFieldId} from '@myparcel-pdk/admin';
+import {type InteractiveElementInstance} from '@myparcel/vue-form-builder';
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<{modelValue: string | number; element: InteractiveElementInstance}>();

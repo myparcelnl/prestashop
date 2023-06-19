@@ -1,4 +1,4 @@
-import { createViteConfig } from '@myparcel-prestashop/vite-config';
+import {createViteConfig} from '@myparcel-prestashop/vite-config';
 
 export default createViteConfig({
   build: {

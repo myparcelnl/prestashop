@@ -1,9 +1,9 @@
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  @apply mypa-transition-opacity mypa-duration-200 mypa-ease-in-out;
 }
 
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
+  @apply mypa-opacity-0;
 }

@@ -1,4 +1,4 @@
-import { hasUnRenderedDeliveryOptions } from './hasUnRenderedDeliveryOptions';
+import {hasUnRenderedDeliveryOptions} from './hasUnRenderedDeliveryOptions';
 
 export const updateDeliveryOptions = (): void => {
   if (window.MyParcelPdk) {

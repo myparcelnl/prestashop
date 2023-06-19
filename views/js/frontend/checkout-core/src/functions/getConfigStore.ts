@@ -1,4 +1,4 @@
-import {MyParcelDeliveryOptions} from '@myparcel/delivery-options';
+import {type MyParcelDeliveryOptions} from '@myparcel/delivery-options';
 
 type ConfigData = {
   data: MyParcelDeliveryOptions.Configuration;

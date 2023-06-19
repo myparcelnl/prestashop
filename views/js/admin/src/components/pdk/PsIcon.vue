@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import {PropType, computed, defineComponent} from 'vue';
+import {type PropType, computed, defineComponent} from 'vue';
 import {AdminIcon} from '@myparcel-pdk/admin';
 import {isEnumValue} from '@myparcel/ts-utils';
 

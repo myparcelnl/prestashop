@@ -1,4 +1,4 @@
-import {MyParcelDeliveryOptions} from '@myparcel/delivery-options';
+import {type MyParcelDeliveryOptions} from '@myparcel/delivery-options';
 
 declare global {
   type PsCallbackParameters = {deliveryOption: JQuery; event: Event};

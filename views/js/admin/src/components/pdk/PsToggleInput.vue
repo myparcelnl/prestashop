@@ -3,41 +3,30 @@
     <div class="input-group">
       <span class="ps-switch">
         <input
-          :id="`${id}_no`"
-          :checked="model === false"
-          class="ps-switch"
-          type="radio"
-          value="0"
-          @change="model = false" />
-        <label
-          :for="`${id}_no`"
-          v-text="translate('no')" />
+          :id="id"
+          v-model="model"
+          :disabled="element.isDisabled || element.isSuspended"
+          :value="true"
+          tabindex="-1"
+          type="checkbox" />
 
-        <input
-          :id="`${id}_yes`"
-          :checked="model === true"
-          class="ps-switch"
-          type="radio"
-          value="1"
-          @change="model = true" />
         <label
-          :for="`${id}_yes`"
-          v-text="translate('yes')" />
+          role="label"
+          :for="id"
+          class="!mypa-opacity-100">
+          {{ translate(`toggle_${model ? 'yes' : 'no'}`) }}
+        </label>
 
         <span class="slide-button" />
       </span>
     </div>
-
-    <!--    <small class="form-text">Enable suppliers page on your front office even when its module is disabled.</small> -->
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/admin';
-import {InteractiveElementInstance} from '@myparcel/vue-form-builder';
 import {useVModel} from '@vueuse/core';
-
-// TODO: refactor to have one input component. Check WooCommerce for example.
+import {type ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/admin';
+import {type InteractiveElementInstance} from '@myparcel/vue-form-builder';
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<{modelValue: boolean; element: InteractiveElementInstance}>();

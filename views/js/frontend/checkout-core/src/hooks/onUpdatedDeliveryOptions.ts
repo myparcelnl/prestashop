@@ -1,6 +1,6 @@
-import { getDeliveryOptionsFormHandle } from '../functions/jquery/getDeliveryOptionsFormHandle';
-import { isOfType } from '@myparcel/ts-utils';
-import { updateInput } from '../functions/updateInput';
+import {isOfType} from '@myparcel/ts-utils';
+import {updateInput} from '../functions/updateInput';
+import {getDeliveryOptionsFormHandle} from '../functions/jquery/getDeliveryOptionsFormHandle';
 
 /**
  * Initialize all listeners.

@@ -1,4 +1,4 @@
-import { initializeCheckoutDeliveryOptions, usePdkCheckout } from '@myparcel-pdk/checkout';
+import {initializeCheckoutDeliveryOptions, usePdkCheckout} from '@myparcel-pdk/checkout';
 
 usePdkCheckout().onInitialize(() => {
   initializeCheckoutDeliveryOptions();

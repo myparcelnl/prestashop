@@ -1,4 +1,4 @@
-import { getDeliveryOptionsFormHandle } from './getDeliveryOptionsFormHandle';
+import {getDeliveryOptionsFormHandle} from './getDeliveryOptionsFormHandle';
 
 export const getInput = (): JQuery => {
   let $input = $('#mypa-input');

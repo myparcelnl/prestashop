@@ -14,9 +14,9 @@
 </template>
 
 <script lang="ts" setup>
-import {AdminIcon, useLanguage} from '@myparcel-pdk/frontend-admin-core';
-import {PropType} from 'vue';
-import {Size} from '@myparcel-pdk/common';
+import {type PropType} from 'vue';
+import {type AdminIcon, useLanguage} from '@myparcel-pdk/frontend-admin-core';
+import {type Size} from '@myparcel-pdk/common';
 
 defineProps({
   disabled: {
