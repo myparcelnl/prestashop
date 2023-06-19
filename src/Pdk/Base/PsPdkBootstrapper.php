@@ -66,6 +66,12 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'prestaShopVersionMin' => value('1.7.6'),
             'prestaShopVersionMax' => value('8.0'),
 
+            /**
+             * The symfony routes that are used by the pdk.
+             */
+            'routeNamePdk'         => value('myparcelnl_pdk'),
+            'routeNameFrontend'    => value('myparcelnl_frontend'),
+
             'moduleInstance' => factory(static function () use ($name): MyParcelNL {
                 /** @var MyParcelNL|false $module */
                 $module = Module::getInstanceByName($name);

@@ -5,27 +5,25 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Api;
 
 use MyParcelNL\Pdk\App\Api\Backend\AbstractPdkBackendEndpointService;
-use MyParcelNL\PrestaShop\Module\Concern\NeedsModuleUrl;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Service\PsRouterServiceInterface;
 
-class PsBackendEndpointService extends AbstractPdkBackendEndpointService
+final class PsBackendEndpointService extends AbstractPdkBackendEndpointService
 {
-    use NeedsModuleUrl;
-
+    /**
+     * @var string
+     */
     private $baseUrl;
 
-    public function __construct()
+    /**
+     * @param  \MyParcelNL\PrestaShop\Service\PsRouterServiceInterface $psRouterService
+     */
+    public function __construct(PsRouterServiceInterface $psRouterService)
     {
-        $url           = $this->getUrl('myparcelnl_pdk');
-        $parts         = explode('?', $url);
-        $this->baseUrl = $parts[0];
+        $route = Pdk::get('routeNamePdk');
 
-        array_map(function ($part) {
-            $kv = explode('=', $part);
-
-            $this->parameters[$kv[0]] = $kv[1];
-        },
-            explode('&', $parts[1])
-        );
+        $this->baseUrl              = $psRouterService->getBaseUrl($route);
+        $this->parameters['_token'] = $psRouterService->getRouteToken($route);
     }
 
     /**

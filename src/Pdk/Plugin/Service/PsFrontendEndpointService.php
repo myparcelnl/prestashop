@@ -5,18 +5,32 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
 
 use MyParcelNL\Pdk\App\Api\Frontend\AbstractFrontendEndpointService;
-use MyParcelNL\PrestaShop\Module\Concern\NeedsModuleUrl;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Service\PsRouterServiceInterface;
 
-class PsFrontendEndpointService extends AbstractFrontendEndpointService
+final class PsFrontendEndpointService extends AbstractFrontendEndpointService
 {
-    use NeedsModuleUrl;
+    /**
+     * @var string
+     */
+    private $baseUrl;
+
+    /**
+     * @param  \MyParcelNL\PrestaShop\Service\PsRouterServiceInterface $psRouterService
+     */
+    public function __construct(PsRouterServiceInterface $psRouterService)
+    {
+        $route = Pdk::get('routeNameFrontend');
+
+        $this->baseUrl              = $psRouterService->getBaseUrl($route);
+        $this->parameters['_token'] = $psRouterService->getRouteToken($route);
+    }
 
     /**
      * @return string
      */
     public function getBaseUrl(): string
     {
-        //        return $this->getUrl('myparcelnl_pdk');
-        return '/admin-dev/index.php/modules/myparcelnl/pdk';
+        return $this->baseUrl;
     }
 }

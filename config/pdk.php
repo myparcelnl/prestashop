@@ -48,6 +48,8 @@ use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\Ps17ConfigurationService;
 use MyParcelNL\PrestaShop\Service\PsFrontendRenderService;
+use MyParcelNL\PrestaShop\Service\PsRouterService;
+use MyParcelNL\PrestaShop\Service\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Service\PsWeightService;
 use Psr\Log\LoggerInterface;
@@ -114,4 +116,6 @@ return [
     LoggerInterface::class                => autowire(PdkLogger::class),
     MigrationServiceInterface::class      => autowire(PsMigrationService::class),
     ScriptServiceInterface::class         => autowire(PsScriptService::class),
+
+    PsRouterServiceInterface::class => autowire(PsRouterService::class),
 ];
