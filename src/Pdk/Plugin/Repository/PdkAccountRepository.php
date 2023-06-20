@@ -7,14 +7,14 @@ namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
 use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Repository\AccountRepository;
 use MyParcelNL\Pdk\App\Account\Repository\AbstractPdkAccountRepository;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 
-/**
- * TODO: move 'account_data' to config
- */
 class PdkAccountRepository extends AbstractPdkAccountRepository
 {
+    private const STORAGE_KEY_ACCOUNT = 'account';
+
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
      */
@@ -31,7 +31,6 @@ class PdkAccountRepository extends AbstractPdkAccountRepository
         ConfigurationServiceInterface $configurationService
     ) {
         parent::__construct($storage, $accountRepository);
-
         $this->configurationService = $configurationService;
     }
 
@@ -40,23 +39,38 @@ class PdkAccountRepository extends AbstractPdkAccountRepository
      */
     public function getFromStorage(): ?Account
     {
-        $result = $this->configurationService->get('account_data');
+        return $this->retrieve(self::STORAGE_KEY_ACCOUNT, function () {
+            $result = $this->configurationService->get($this->getConfigurationKey());
 
-        return $result ? new Account($result) : null;
+            return $result ? new Account($result) : null;
+        });
     }
 
     /**
+     * @param  null|\MyParcelNL\Pdk\Account\Model\Account $account
+     *
+     * @return null|\MyParcelNL\Pdk\Account\Model\Account
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     public function store(?Account $account): ?Account
     {
+        $key = $this->getConfigurationKey();
+
         if (! $account) {
-            $this->configurationService->delete('account_data');
+            $this->configurationService->delete($key);
             return $account;
         }
 
-        $this->configurationService->set('account_data', $account->toStorableArray());
+        $this->configurationService->set($key, $account->toStorableArray());
 
-        return $this->save('account_data', $account);
+        return $this->save(self::STORAGE_KEY_ACCOUNT, $account);
+    }
+
+    /**
+     * @return string
+     */
+    private function getConfigurationKey(): string
+    {
+        return Pdk::get('createSettingsKey')('account');
     }
 }
