@@ -20,10 +20,8 @@ class PdkSettingsRepository extends AbstractSettingsRepository
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                          $storage
      * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
      */
-    public function __construct(
-        StorageInterface              $storage,
-        ConfigurationServiceInterface $configurationService
-    ) {
+    public function __construct(StorageInterface $storage, ConfigurationServiceInterface $configurationService)
+    {
         parent::__construct($storage);
         $this->configurationService = $configurationService;
     }
@@ -43,12 +41,11 @@ class PdkSettingsRepository extends AbstractSettingsRepository
      * @param  mixed  $value
      *
      * @return void
-     * @todo maybe create delete method in pdk?
      */
     public function store(string $key, $value): void
     {
         if ($value === null) {
-            Logger::debug("Deleting option {$key}");
+            Logger::debug("Deleting option $key");
             $this->configurationService->delete($key);
             return;
         }

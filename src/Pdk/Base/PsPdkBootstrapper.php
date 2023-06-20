@@ -69,8 +69,9 @@ class PsPdkBootstrapper extends PdkBootstrapper
             /**
              * The symfony routes that are used by the pdk.
              */
-            'routeNamePdk'         => value('myparcelnl_pdk'),
-            'routeNameFrontend'    => value('myparcelnl_frontend'),
+
+            'routeNamePdk'      => value('myparcelnl_pdk'),
+            'routeNameFrontend' => value('myparcelnl_frontend'),
 
             'moduleInstance' => factory(static function () use ($name): MyParcelNL {
                 /** @var MyParcelNL|false $module */
