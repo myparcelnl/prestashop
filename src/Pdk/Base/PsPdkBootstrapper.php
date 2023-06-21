@@ -64,7 +64,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'moduleTabName'        => value('shipping_logistics'),
 
             'prestaShopVersionMin' => value('1.7.6'),
-            'prestaShopVersionMax' => value('8.0'),
+            'prestaShopVersionMax' => value('8.0.4'),
 
             /**
              * The symfony routes that are used by the pdk.
