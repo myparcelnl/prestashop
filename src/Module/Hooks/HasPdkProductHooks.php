@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\Facade\Actions;
+use Symfony\Component\HttpFoundation\Request;
 use Tools;
 
 trait HasPdkProductHooks
@@ -31,10 +32,20 @@ trait HasPdkProductHooks
             $productSettingsBody[$newKey] = $value;
         }
 
-        // todo: refactor to use a \Symfony\Component\HttpFoundation\Request, pass body as json with data.product_settings[0]
-        Actions::execute(PdkBackendActions::UPDATE_PRODUCT_SETTINGS, [
-            'productId'       => $productId,
-            'productSettings' => $productSettingsBody,
-        ]);
+        $request = new Request(
+            ['productId' => $productId],
+            ['action' => PdkBackendActions::UPDATE_PRODUCT_SETTINGS],
+            [],
+            [],
+            [],
+            [],
+            json_encode([
+                'data' => [
+                    'product_settings' => $productSettingsBody,
+                ],
+            ])
+        );
+
+        Actions::execute($request);
     }
 }
