@@ -40,6 +40,7 @@ import {
   PsTabNavButtonWrapper,
   PsTextArea,
   PsToggleInput,
+  PsTristateInput,
 } from './components';
 
 // eslint-disable-next-line max-lines-per-function
@@ -83,6 +84,7 @@ window.onload = () => {
       PdkTextInput: Bootstrap4TextInput,
       PdkTimeInput: DefaultTimeInput,
       PdkToggleInput: PsToggleInput,
+      PdkTristateInput: PsTristateInput,
     },
 
     formConfig: {
