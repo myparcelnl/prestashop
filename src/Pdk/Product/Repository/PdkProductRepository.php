@@ -61,11 +61,11 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
             };
 
             return new PdkProduct([
-                'sku'      => $psProduct->id,
-                'name'     => $translate($psProduct->name),
-                'weight'   => $this->weightService->convertToGrams($psProduct->weight),
-                'settings' => $this->getProductSettings($identifier),
-                'price'    => [
+                'externalIdentifier' => $psProduct->id,
+                'name'               => $translate($psProduct->name),
+                'weight'             => $this->weightService->convertToGrams($psProduct->weight),
+                'settings'           => $this->getProductSettings($identifier),
+                'price'              => [
                     'currency' => Context::getContext()->currency->iso_code,
                     'amount'   => $psProduct->price,
                 ],
