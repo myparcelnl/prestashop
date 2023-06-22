@@ -125,28 +125,4 @@ trait HasPdkRenderHooks
 
         return Frontend::renderOrderBox($order);
     }
-
-    /**
-     * Renders the product settings.
-     *
-     * @param  array $params
-     *
-     * @return string
-     */
-    public function hookDisplayAdminProductsExtra(array $params): string
-    {
-        /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $repository */
-        $repository          = Pdk::get(PdkProductRepositoryInterface::class);
-        $product             = $repository->getProduct($params['id_product']);
-        $productSettingsView = Frontend::renderProductSettings($product);
-
-        $this->context->smarty->assign(
-            [
-                'productSettingsView' => $productSettingsView,
-            ]
-        );
-
-        // todo move to twig
-        return $this->display($this->name, 'views/templates/hook/product_settings.tpl');
-    }
 }
