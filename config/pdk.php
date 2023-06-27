@@ -27,7 +27,7 @@ use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Module\Installer\PsInstallerService;
 use MyParcelNL\PrestaShop\Module\Installer\PsMigrationService;
-use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle5ClientAdapter;
+use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Logger\PdkLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
@@ -111,7 +111,7 @@ return [
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class         => autowire(Guzzle5ClientAdapter::class),
+    ClientAdapterInterface::class         => autowire(Guzzle7ClientAdapter::class),
     InstallerServiceInterface::class      => autowire(PsInstallerService::class),
     LoggerInterface::class                => autowire(PdkLogger::class),
     MigrationServiceInterface::class      => autowire(PsMigrationService::class),

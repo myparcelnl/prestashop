@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Api\Adapter;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use MyParcelNL\Pdk\Api\Contract\ClientAdapterInterface;
 use MyParcelNL\Pdk\Api\Contract\ClientResponseInterface;
 use MyParcelNL\Pdk\Api\Response\ClientResponse;
-use Symfony\Component\HttpFoundation\Response;
 
-class Guzzle5ClientAdapter implements ClientAdapterInterface
+class Guzzle7ClientAdapter implements ClientAdapterInterface
 {
-    private const DEFAULT_OPTIONS = [
-        'exceptions' => false,
-    ];
-
     /**
      * @var \GuzzleHttp\Client
      */
@@ -39,21 +35,21 @@ class Guzzle5ClientAdapter implements ClientAdapterInterface
      */
     public function doRequest(string $httpMethod, string $uri, array $options = []): ClientResponseInterface
     {
-        $clientRequest = $this->client->createRequest(
-            $httpMethod,
-            $uri,
-            self::DEFAULT_OPTIONS + $options
-        );
+        $requestOptions = array_filter([
+            RequestOptions::HTTP_ERRORS => false,
+            RequestOptions::HEADERS     => $options['headers'] ?? null,
+            RequestOptions::BODY        => $options['body'] ?? null,
+        ], static function ($value) {
+            return $value !== null;
+        });
 
-        $response   = $this->client->send($clientRequest);
-        $statusCode = $response ? $response->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
+        $response     = $this->client->request(strtolower($httpMethod), $uri, $requestOptions);
+        $responseBody = $response->getBody();
 
-        $body = $response
-            ? $response
-                ->getBody()
-                ->getContents()
+        $body = $responseBody->isReadable()
+            ? $responseBody->getContents()
             : null;
 
-        return new ClientResponse($body, $statusCode);
+        return new ClientResponse($body, $response->getStatusCode() ?? 500, $response->getHeaders());
     }
 }
