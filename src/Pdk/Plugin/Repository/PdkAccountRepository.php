@@ -13,7 +13,7 @@ use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
 
 class PdkAccountRepository extends AbstractPdkAccountRepository
 {
-    private const STORAGE_KEY_ACCOUNT = 'account';
+    private const STORAGE_KEY_ACCOUNT = 'data_account';
 
     /**
      * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
@@ -71,6 +71,6 @@ class PdkAccountRepository extends AbstractPdkAccountRepository
      */
     private function getConfigurationKey(): string
     {
-        return Pdk::get('createSettingsKey')('account');
+        return Pdk::get('createSettingsKey')('data_account');
     }
 }
