@@ -29,7 +29,7 @@ trait HasPdkScriptHooks
     /**
      * @return void
      */
-    public function hookHeader(): void
+    public function hookDisplayHeader(): void
     {
         /** @var \MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface $viewService */
         $viewService = Pdk::get(ViewServiceInterface::class);
