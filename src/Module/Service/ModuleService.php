@@ -11,15 +11,12 @@ final class ModuleService
     /**
      * Adds prices of MyParcel delivery options to the shipping cost.
      *
-     * @see \MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsFeesServiceInterface
-     *
-     * @todo Implement this method correctly using pdk stuff
-     *
-     *
      * @param  \Cart     $cart
      * @param  float|int $shippingCost
      *
      * @return float|int
+     * @todo Implement this method correctly using pdk stuff
+     * @see  \MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsFeesServiceInterface
      */
     public function getOrderShippingCost(Cart $cart, $shippingCost)
     {

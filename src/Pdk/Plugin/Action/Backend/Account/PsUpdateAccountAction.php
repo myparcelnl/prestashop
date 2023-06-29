@@ -17,7 +17,6 @@ final class PsUpdateAccountAction extends UpdateAccountAction
     protected function updateAndSaveAccount(?Account $account): void
     {
         parent::updateAndSaveAccount($account);
-
         // TODO: update our created ps carriers, setting enabled according to carrier configurations/options.
     }
 }

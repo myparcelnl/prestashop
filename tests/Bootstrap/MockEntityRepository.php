@@ -9,7 +9,6 @@ use MyParcelNL\Sdk\src\Support\Arr;
 
 class MockEntityRepository extends EntityRepository
 {
-
     private $entities = [];
 
     /**

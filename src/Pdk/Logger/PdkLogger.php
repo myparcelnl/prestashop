@@ -6,7 +6,6 @@ namespace MyParcelNL\PrestaShop\Pdk\Logger;
 
 use FileLogger;
 use InvalidArgumentException;
-use MyParcelNL;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Logger\AbstractLogger;
 use MyParcelNL\Sdk\src\Support\Arr;

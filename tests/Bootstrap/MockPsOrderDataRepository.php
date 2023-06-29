@@ -8,5 +8,4 @@ use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 
 class MockPsOrderDataRepository extends PsOrderDataRepository
 {
-
 }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Controller;
 
 use MyParcelNL;
+use MyParcelNL\Pdk\App\Api\PdkEndpoint;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\App\Api\PdkEndpoint;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
