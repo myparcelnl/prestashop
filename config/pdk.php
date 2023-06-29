@@ -25,12 +25,18 @@ use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Configuration\Service\Ps17ConfigurationService;
 use MyParcelNL\PrestaShop\Module\Installer\PsInstallerService;
 use MyParcelNL\PrestaShop\Module\Installer\PsMigrationService;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
+use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
+use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
+use MyParcelNL\PrestaShop\Pdk\DeliveryOptions\Service\PsDeliveryOptionsService;
+use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsFrontendRenderService;
+use MyParcelNL\PrestaShop\Pdk\Language\Service\LanguageService;
 use MyParcelNL\PrestaShop\Pdk\Logger\PdkLogger;
-use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
-use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsCartRepository;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsShippingMethodRepository;
@@ -42,16 +48,10 @@ use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsScriptService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsViewService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
-use MyParcelNL\PrestaShop\Pdk\Service\LanguageService;
-use MyParcelNL\PrestaShop\Pdk\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
-use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
-use MyParcelNL\PrestaShop\Service\Configuration\Ps17ConfigurationService;
-use MyParcelNL\PrestaShop\Service\PsFrontendRenderService;
-use MyParcelNL\PrestaShop\Service\PsRouterService;
-use MyParcelNL\PrestaShop\Service\PsRouterServiceInterface;
-use MyParcelNL\PrestaShop\Service\PsTaxService;
-use MyParcelNL\PrestaShop\Service\PsWeightService;
+use MyParcelNL\PrestaShop\Pdk\Tax\Service\PsTaxService;
+use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
+use MyParcelNL\PrestaShop\Router\Service\PsRouterService;
 use Psr\Log\LoggerInterface;
 use function DI\autowire;
 use function DI\value;
@@ -76,8 +76,8 @@ return [
      * Repositories
      */
     AccountRepositoryInterface::class           => autowire(PdkAccountRepository::class),
-    PdkCartRepositoryInterface::class           => autowire(PsCartRepository::class),
-    PdkOrderRepositoryInterface::class          => autowire(PdkOrderRepository::class),
+    PdkCartRepositoryInterface::class           => autowire(PsPdkCartRepository::class),
+    PdkOrderRepositoryInterface::class          => autowire(PsPdkOrderRepository::class),
     PdkProductRepositoryInterface::class        => autowire(PdkProductRepository::class),
     PdkShippingMethodRepositoryInterface::class => autowire(PsShippingMethodRepository::class),
     SettingsRepositoryInterface::class          => autowire(PdkSettingsRepository::class),

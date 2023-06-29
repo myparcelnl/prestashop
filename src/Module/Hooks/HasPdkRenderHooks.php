@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
-use Address;
-use Country;
-use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
-use MyParcelNL\Pdk\Base\Model\ContactDetails;
+use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
-use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
-use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
 trait HasPdkRenderHooks
@@ -73,8 +68,8 @@ trait HasPdkRenderHooks
     {
         $params['presented_grid']['data']['records'] = new RecordCollection(
             array_map(static function (array $row) {
-                /** @var PdkOrderRepository $repository */
-                $repository = Pdk::get(PdkOrderRepository::class);
+                /** @var PdkOrderRepositoryInterface $repository */
+                $repository = Pdk::get(PdkOrderRepositoryInterface::class);
                 $order      = $repository->get($row['id_order']);
 
                 $row['myparcel'] = Frontend::renderOrderListItem($order);
@@ -113,14 +108,11 @@ trait HasPdkRenderHooks
      * @param  array $params
      *
      * @return string
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     public function hookDisplayAdminOrderMain(array $params): string
     {
-        /** @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository $repository */
-        $repository = Pdk::get(PdkOrderRepository::class);
+        /** @var PdkOrderRepositoryInterface $repository */
+        $repository = Pdk::get(PdkOrderRepositoryInterface::class);
         $order      = $repository->get($params['id_order']);
 
         return Frontend::renderOrderBox($order);

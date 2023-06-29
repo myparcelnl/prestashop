@@ -9,21 +9,21 @@ use MyParcelNL\Pdk\Account\Repository\AccountRepository;
 use MyParcelNL\Pdk\App\Account\Repository\AbstractPdkAccountRepository;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
-use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 
 class PdkAccountRepository extends AbstractPdkAccountRepository
 {
     private const STORAGE_KEY_ACCOUNT = 'data_account';
 
     /**
-     * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
+     * @var \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface
      */
     private $configurationService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                          $storage
-     * @param  \MyParcelNL\Pdk\Account\Repository\AccountRepository                       $accountRepository
-     * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                           $storage
+     * @param  \MyParcelNL\Pdk\Account\Repository\AccountRepository                        $accountRepository
+     * @param  \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface $configurationService
      */
     public function __construct(
         StorageInterface              $storage,

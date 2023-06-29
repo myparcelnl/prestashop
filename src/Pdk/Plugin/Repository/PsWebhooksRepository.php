@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
 
-use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\App\Webhook\Repository\AbstractPdkWebhooksRepository;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\Pdk\Webhook\Collection\WebhookSubscriptionCollection;
 use MyParcelNL\Pdk\Webhook\Model\WebhookSubscription;
 use MyParcelNL\Pdk\Webhook\Repository\WebhookSubscriptionRepository;
-use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 
 class PsWebhooksRepository extends AbstractPdkWebhooksRepository
 {
     /**
-     * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
+     * @var \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface
      */
     private $configurationService;
 

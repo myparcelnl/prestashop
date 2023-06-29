@@ -12,8 +12,8 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
+use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
-use MyParcelNL\PrestaShop\Service\PsWeightService;
 use Product;
 
 class PdkProductRepository extends AbstractPdkPdkProductRepository
@@ -24,13 +24,13 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
     private $psProductRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Service\PsWeightService
+     * @var \MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService
      */
     private $weightService;
 
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface             $storage
-     * @param  \MyParcelNL\PrestaShop\Service\PsWeightService                $weightService
+     * @param  \MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService       $weightService
      * @param  \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository $productSettingsRepository
      */
     public function __construct(

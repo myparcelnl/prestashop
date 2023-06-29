@@ -26,7 +26,7 @@ use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use Order;
 use State;
 
-class PdkOrderRepository extends AbstractPdkOrderRepository
+class PsPdkOrderRepository extends AbstractPdkOrderRepository
 {
     /**
      * @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface

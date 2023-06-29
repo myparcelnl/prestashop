@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Language\Service;
 
 use Context;
 use MyParcelNL\Pdk\Facade\Pdk;

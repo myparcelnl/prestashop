@@ -7,18 +7,18 @@ namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
-use MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 
 class PdkSettingsRepository extends AbstractSettingsRepository
 {
     /**
-     * @var \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface
+     * @var \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface
      */
     private $configurationService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                          $storage
-     * @param  \MyParcelNL\PrestaShop\Service\Configuration\ConfigurationServiceInterface $configurationService
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                           $storage
+     * @param  \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface $configurationService
      */
     public function __construct(StorageInterface $storage, ConfigurationServiceInterface $configurationService)
     {

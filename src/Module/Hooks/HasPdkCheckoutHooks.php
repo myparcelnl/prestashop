@@ -9,8 +9,8 @@ use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
 use MyParcelNL\Pdk\Base\Model\ContactDetails;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Adapter\PsAddressAdapter;
-use MyParcelNL\PrestaShop\Adapter\PsCarrierAdapter;
+use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
+use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsCarrierAdapter;
 use Tools;
 
 /**
@@ -58,9 +58,9 @@ trait HasPdkCheckoutHooks
     {
         /** @var PdkCartRepositoryInterface $cartRepository */
         $cartRepository = Pdk::get(PdkCartRepositoryInterface::class);
-        /** @var \MyParcelNL\PrestaShop\Adapter\PsAddressAdapter $addressAdapter */
+        /** @var \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter $addressAdapter */
         $addressAdapter = Pdk::get(PsAddressAdapter::class);
-        /** @var \MyParcelNL\PrestaShop\Adapter\PsCarrierAdapter $carrierAdapter */
+        /** @var \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsCarrierAdapter $carrierAdapter */
         $carrierAdapter = Pdk::get(PsCarrierAdapter::class);
 
         if (empty($this->context->cart->id_carrier)) {

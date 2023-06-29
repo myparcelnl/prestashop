@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Bootstrap;
 
-use MyParcelNL\PrestaShop\Pdk\Order\Repository\PdkOrderRepository;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
 use Order;
 
-class MockPdkOrderRepository extends PdkOrderRepository
+class MockPdkOrderRepository extends PsPdkOrderRepository
 {
     /**
      * @param  \Order $order

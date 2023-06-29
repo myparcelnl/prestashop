@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Base\Service;
 
 use Configuration;
 use MyParcelNL\Pdk\Base\Service\WeightService;

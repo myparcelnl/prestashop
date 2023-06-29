@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Service;
+namespace MyParcelNL\PrestaShop\Pdk\DeliveryOptions\Service;
 
 use MyParcelNL\Pdk\App\Cart\Model\PdkCart;
 use MyParcelNL\Pdk\App\DeliveryOptions\Service\DeliveryOptionsService;

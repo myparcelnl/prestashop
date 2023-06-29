@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Tax\Service;
 
 use MyParcelNL\Pdk\App\Tax\Service\AbstractTaxService;
 

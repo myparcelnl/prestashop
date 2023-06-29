@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Plugin\Api;
 
 use MyParcelNL\Pdk\App\Api\Backend\AbstractPdkBackendEndpointService;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Service\PsRouterServiceInterface;
+use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 
 final class PsBackendEndpointService extends AbstractPdkBackendEndpointService
 {
@@ -16,7 +16,7 @@ final class PsBackendEndpointService extends AbstractPdkBackendEndpointService
     private $baseUrl;
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Service\PsRouterServiceInterface $psRouterService
+     * @param  \MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface $psRouterService
      */
     public function __construct(PsRouterServiceInterface $psRouterService)
     {

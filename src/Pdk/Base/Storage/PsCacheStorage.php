@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Base\Storage;
 
-use MyParcelNL\Pdk\Storage\AbstractStorage;
+use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use PrestaShop\PrestaShop\Adapter\Entity\Cache;
 
-class PrestaShopCacheStorage extends AbstractStorage
+final class PsCacheStorage implements StorageInterface
 {
     /**
      * @param  string $storageKey
@@ -27,6 +27,16 @@ class PrestaShopCacheStorage extends AbstractStorage
     public function get(string $storageKey)
     {
         return Cache::retrieve($storageKey);
+    }
+
+    /**
+     * @param  string $storageKey
+     *
+     * @return bool
+     */
+    public function has(string $storageKey): bool
+    {
+        return Cache::isStored($storageKey);
     }
 
     /**

@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Service;
-
-use MyParcelNL\Sdk\src\Support\Str;
+namespace MyParcelNL\PrestaShop\Router\Contract;
 
 interface PsRouterServiceInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Adapter;
+namespace MyParcelNL\PrestaShop\Pdk\Base\Adapter;
 
 use Address;
 use Country;

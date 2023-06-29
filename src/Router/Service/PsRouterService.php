@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Service;
+namespace MyParcelNL\PrestaShop\Router\Service;
 
 use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
+use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\Sdk\src\Support\Str;
 
 final class PsRouterService extends Repository implements PsRouterServiceInterface

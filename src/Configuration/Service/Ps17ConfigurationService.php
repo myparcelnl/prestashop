@@ -2,16 +2,27 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Service\Configuration;
+namespace MyParcelNL\PrestaShop\Configuration\Service;
 
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 use PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint;
-use PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopId;
 
 /**
- * PrestaShop < 1.7
+ * PrestaShop >= 1.7
  */
-class Ps16ConfigurationService implements ConfigurationServiceInterface
+class Ps17ConfigurationService implements ConfigurationServiceInterface
 {
+    /**
+     * @var \PrestaShop\PrestaShop\Adapter\Configuration
+     */
+    private $configurationService;
+
+    public function __construct()
+    {
+        $this->configurationService = Pdk::get('ps.configuration');
+    }
+
     /**
      * @param  string $key
      *
@@ -20,7 +31,7 @@ class Ps16ConfigurationService implements ConfigurationServiceInterface
      */
     public function delete(string $key): void
     {
-        \Configuration::deleteByName($key);
+        $this->configurationService->remove($key);
     }
 
     /**
@@ -28,11 +39,11 @@ class Ps16ConfigurationService implements ConfigurationServiceInterface
      * @param                                                                          $default
      * @param  \PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint|null $shopConstraint
      *
-     * @return null|mixed
+     * @return null|array|mixed
      */
     public function get(string $key, $default = null, ShopConstraint $shopConstraint = null)
     {
-        return \Configuration::get($key, null, null, $this->getShopId($shopConstraint), $default) ?: null;
+        return json_decode($this->configurationService->get($key, $default, $shopConstraint) ?? '', true);
     }
 
     /**
@@ -43,7 +54,7 @@ class Ps16ConfigurationService implements ConfigurationServiceInterface
      */
     public function has(string $key, ShopConstraint $shopConstraint = null): bool
     {
-        return \Configuration::hasKey($key, null, null, $this->getShopId($shopConstraint));
+        return $this->configurationService->has($key, $shopConstraint);
     }
 
     /**
@@ -56,17 +67,6 @@ class Ps16ConfigurationService implements ConfigurationServiceInterface
      */
     public function set(string $key, $value, ShopConstraint $shopConstraint = null): void
     {
-        \Configuration::set($key, $value, null, $this->getShopId($shopConstraint));
+        $this->configurationService->set($key, json_encode($value), $shopConstraint);
     }
-
-    /**
-     * @param  null|\PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint $shopConstraint
-     *
-     * @return null|\PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopId
-     */
-    private function getShopId(?ShopConstraint $shopConstraint): ?ShopId
-    {
-        return $shopConstraint ? $shopConstraint->getShopId() : null;
-    }
-
 }
