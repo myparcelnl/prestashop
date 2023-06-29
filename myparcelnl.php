@@ -129,7 +129,7 @@ final class MyParcelNL extends CarrierModule
         $success = parent::install();
 
         try {
-            Installer::install();
+            Installer::install($this);
         } catch (Throwable $e) {
             $this->_errors[] = $e->getMessage();
             $success         = false;
@@ -143,16 +143,14 @@ final class MyParcelNL extends CarrierModule
      */
     public function uninstall(): bool
     {
-        $success = parent::uninstall();
-
         try {
-            Installer::uninstall();
+            Installer::uninstall($this);
         } catch (Throwable $e) {
             $this->_errors[] = $e->getMessage();
-            $success         = false;
+            return false;
         }
 
-        return $success;
+        return parent::uninstall();
     }
 
     /**

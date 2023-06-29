@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Installer;
 
-use Db;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\DocParser;
 use Doctrine\Common\Annotations\PsrCachedReader;
@@ -21,15 +20,57 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 final class PsInstallerService extends InstallerService
 {
     /**
+     * @var \MyParcelNL
+     */
+    private $module;
+
+    /**
+     * @param  mixed ...$args
+     *
+     * @return void
+     */
+    public function install(...$args): void
+    {
+        $this->setModule($args);
+        parent::install($args);
+    }
+
+    /**
+     * @param  array $args
+     *
+     * @return void
+     */
+    public function setModule(array $args): void
+    {
+        if (! $args[0] instanceof \Module) {
+            throw new RuntimeException('Invalid module instance');
+        }
+
+        $this->module = $args[0];
+    }
+
+    /**
+     * @param  mixed ...$args
+     *
+     * @return void
+     */
+    public function uninstall(...$args): void
+    {
+        $this->setModule($args);
+        parent::uninstall($args);
+    }
+
+    /**
+     * @param  mixed ...$args
+     *
      * @return void
      * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
-     * @throws \PrestaShopException|\Doctrine\Common\Annotations\AnnotationException
      */
-    protected function executeInstallation(): void
+    protected function executeInstallation(...$args): void
     {
         $this->prepareEntityManager();
 
@@ -44,11 +85,29 @@ final class PsInstallerService extends InstallerService
     }
 
     /**
-     * @return string
+     * @param ...$args
+     *
+     * @return void
      */
-    protected function getInstalledVersion(): string
+    protected function executeUninstallation(...$args): void
     {
-        return parent::getInstalledVersion() ?? $this->getLegacyInstalledVersion();
+        parent::executeUninstallation($args);
+
+        foreach (Pdk::get('moduleHooks') as $hook) {
+            $result = $this->module->unregisterHook($hook);
+
+            if (! $result) {
+                throw new RuntimeException(sprintf('Hook %s could not be unregistered.', $hook));
+            }
+        }
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getInstalledVersion(): ?string
+    {
+        return $this->module->registered_version;
     }
 
     /**
@@ -67,6 +126,16 @@ final class PsInstallerService extends InstallerService
         $this->registerHooks();
     }
 
+    /**
+     * @param  null|string $version
+     *
+     * @return void
+     */
+    protected function updateInstalledVersion(?string $version): void
+    {
+        // PrestaShop does this later on in the process
+    }
+
     private function executeDatabaseMigrations(): void
     {
         /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */
@@ -80,15 +149,6 @@ final class PsInstallerService extends InstallerService
             $instance->up();
             Logger::debug('Executed migration', ['migration' => $migration]);
         }
-    }
-
-    private function getLegacyInstalledVersion(): string
-    {
-        $table = _DB_PREFIX_ . 'module';
-        $name  = Pdk::getAppInfo()->name;
-
-        return Db::getInstance()
-            ->getValue("SELECT version from $table WHERE name='$name';") ?: '';
     }
 
     /**
@@ -135,11 +195,8 @@ final class PsInstallerService extends InstallerService
 
     private function registerHooks(): void
     {
-        /** @var  \MyParcelNL $module */
-        $module = Pdk::get('moduleInstance');
-
         foreach (Pdk::get('moduleHooks') as $hook) {
-            $result = $module->registerHook($hook);
+            $result = $this->module->registerHook($hook);
 
             if (! $result) {
                 throw new RuntimeException(sprintf('Hook %s could not be registered.', $hook));

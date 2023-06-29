@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Base;
 
+use DI\Definition\Helper\FactoryDefinitionHelper;
 use Module;
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
@@ -15,6 +16,7 @@ use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\Sdk\src\Support\Str;
+use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShopBundle\Exception\InvalidModuleException;
 use ReflectionClass;
 use ReflectionMethod;
@@ -96,7 +98,8 @@ class PsPdkBootstrapper extends PdkBootstrapper
                     })
                     ->map(function (ReflectionMethod $method) {
                         return lcfirst(preg_replace('/^hook/', '', $method->getName()));
-                    });
+                    })
+                    ->values();
 
                 return $hooks->toArray();
             }),
@@ -124,14 +127,18 @@ class PsPdkBootstrapper extends PdkBootstrapper
     }
 
     /**
-     * @return array|\DI\Definition\Helper\FactoryDefinitionHelper[]
-     * @throws \PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException
+     * @return array|FactoryDefinitionHelper[]
+     * @throws ContainerNotFoundException
      */
     private function resolvePrestaShopServices(): array
     {
         return array_map(static function ($serviceName) {
-            return factory(function (MyParcelNL $module) use ($serviceName) {
-                return $module->getContainer()
+            return factory(function () use ($serviceName) {
+                /** @var MyParcelNL $module */
+                $module = Pdk::get('moduleInstance');
+
+                return $module
+                    ->getContainer()
                     ->get($serviceName);
             });
         }, self::PRESTASHOP_SERVICES);
