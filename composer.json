@@ -28,7 +28,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "MyParcelNL\\PrestaShop\\Tests\\": "tests/"
+      "MyParcelNL\\PrestaShop\\Tests\\": "tests/",
+      "MyParcelNL\\Pdk\\Tests\\": "vendor/myparcelnl/pdk/tests/"
     }
   }
 }
