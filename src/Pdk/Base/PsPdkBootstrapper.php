@@ -134,7 +134,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
      *
      * @return \Symfony\Component\Routing\Router
      */
-    private function getSymfonyRouter()
+    private function getSymfonyRouter(): Router
     {
         $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
         $locator         = new FileLocator([$routesDirectory]);

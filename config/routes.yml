@@ -8,6 +8,15 @@ myparcelnl:
     _controller: 'MyParcelNL\PrestaShop\Controller\AdminController::index'
 
 ##
+# Route for the front-end page
+##
+myparcelnl_frontend:
+  path: myparcelnl/views
+  methods: [ GET ]
+  defaults:
+    _controller: 'MyParcelNL\PrestaShop\Pdk\Controller\AdminMyParcelFrontController::index'
+
+##
 # The controller that executes all PDK actions
 ##
 myparcelnl_pdk:
