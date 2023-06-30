@@ -45,7 +45,7 @@ final class PsRouterService extends Repository implements PsRouterServiceInterfa
     {
         $query = [];
 
-        parse_str(parse_url($this->generateRoute($route), PHP_URL_QUERY), $query);
+        parse_str(parse_url($this->generateRoute($route), PHP_URL_QUERY) ?? '', $query);
 
         return $query['_token'] ?? '';
     }

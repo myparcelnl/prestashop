@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Base;
 
+use Context;
 use DI\Definition\Helper\FactoryDefinitionHelper;
 use Module;
 use MyParcelNL;
@@ -20,6 +21,9 @@ use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShopBundle\Exception\InvalidModuleException;
 use ReflectionClass;
 use ReflectionMethod;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\Routing\Router;
 use function DI\factory;
 use function DI\value;
 
@@ -35,7 +39,6 @@ class PsPdkBootstrapper extends PdkBootstrapper
     protected const PRESTASHOP_SERVICES     = [
         'ps.configuration' => 'prestashop.adapter.legacy.configuration',
         'ps.entityManager' => 'doctrine.orm.entity_manager',
-        'ps.router'        => 'router',
         'ps.twig'          => 'twig',
     ];
 
@@ -103,10 +106,41 @@ class PsPdkBootstrapper extends PdkBootstrapper
 
                 return $hooks->toArray();
             }),
+            'ps.router'      => factory(function () {
+                /** @var MyParcelNL $module */
+                $module    = Pdk::get('moduleInstance');
+                $container = $module->getContainer();
+
+                if (_PS_VERSION_ <= 8) {
+                    return $container->get('router');
+                }
+
+                $controller = Context::getContext()->controller;
+
+                if ($controller->php_self === 'order') {
+                    return $this->getSymfonyRouter();
+                }
+
+                return $container->get('prestashop.router');
+            }),
         ],
             $this->resolvePrestaShopRepositories(),
             $this->resolvePrestaShopServices()
         );
+    }
+
+    /**
+     * Returns an instance of \Symfony\Component\Routing\Router from Symfony scope into Legacy.
+     *
+     * @return \Symfony\Component\Routing\Router
+     */
+    private function getSymfonyRouter()
+    {
+        $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
+        $locator         = new FileLocator([$routesDirectory]);
+        $loader          = new YamlFileLoader($locator);
+
+        return new Router($loader, 'routes.yml');
     }
 
     /**
