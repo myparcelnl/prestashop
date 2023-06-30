@@ -8,6 +8,7 @@ const createDefaultConfig = (env) => {
     plugins: [customTsConfig()],
     build: {
       minify: !isDev,
+      sourcemap: isDev,
       outDir: 'lib',
     },
   };
