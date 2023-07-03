@@ -42,7 +42,7 @@ class MyparcelnlOrderShipment extends AbstractEntity
      */
     public function getIdOrder(): string
     {
-        return $this->idOrder;
+        return (string) $this->idOrder;
     }
 
     /**
