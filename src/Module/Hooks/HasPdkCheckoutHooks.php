@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
-use Db;
 use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
 use MyParcelNL\Pdk\Base\Model\ContactDetails;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsCarrierAdapter;
+use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use Tools;
 
 /**
@@ -120,22 +120,18 @@ trait HasPdkCheckoutHooks
      * @param  array $deliveryOptions
      *
      * @return void
-     * @todo do this using entities
      */
     private function saveDeliveryOptions(int $cartId, array $deliveryOptions): void
     {
-        $values = [
-            'id_cart'          => $cartId,
-            'delivery_options' => pSQL(json_encode($deliveryOptions)),
-        ];
+        $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
 
-        Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->update(
-                'myparcelnl_delivery_options',
-                $values,
-                false,
-                true,
-                Db::REPLACE
-            );
+        $cartDeliveryOptionsRepository->updateOrCreate(
+            [
+                'idCart' => $cartId,
+            ],
+            [
+                'data' => json_encode(['deliveryOptions' => $deliveryOptions]),
+            ]
+        );
     }
 }
