@@ -28,7 +28,7 @@ const createId = (name: string) => `#${name}`;
     }
   });
 
-  console.log({shippingMethodName, allowedShippingMethods});
+  console.log({ shippingMethodName, allowedShippingMethods });
 
   createPdkCheckout({
     async doRequest(endpoint) {
@@ -79,12 +79,12 @@ const createId = (name: string) => `#${name}`;
 
       return {
         [PdkField.ShippingMethod]: deliveryFormData[shippingMethodName ?? ''] ?? '',
-        [`${AddressType.Billing}_${AddressField.Address1}`]: billingAddress.fullStreet ?? '',
+        [`${AddressType.Billing}_${AddressField.Address1}`]: billingAddress.address1 ?? '',
         [`${AddressType.Billing}_${AddressField.Country}`]: billingAddress.cc ?? '',
         [`${AddressType.Billing}_${AddressField.PostalCode}`]: billingAddress.postalCode ?? '',
         [`${AddressType.Billing}_${AddressField.City}`]: billingAddress.city ?? '',
         [`${AddressType.Billing}_${AddressField.Number}`]: billingAddress.number ?? '',
-        [`${AddressType.Shipping}_${AddressField.Address1}`]: shippingAddress.fullStreet ?? '',
+        [`${AddressType.Shipping}_${AddressField.Address1}`]: shippingAddress.address1 ?? '',
         [`${AddressType.Shipping}_${AddressField.Country}`]: shippingAddress.cc ?? '',
         [`${AddressType.Shipping}_${AddressField.PostalCode}`]: shippingAddress.postalCode ?? '',
         [`${AddressType.Shipping}_${AddressField.City}`]: shippingAddress.city ?? '',
