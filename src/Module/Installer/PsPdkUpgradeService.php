@@ -80,6 +80,7 @@ final class PsPdkUpgradeService
 
             $carrier->update();
             $this->addCarrierConfiguration($carrier, $carrierName);
+            $this->carrierConfigurationRepository->flush();
         }
     }
 
