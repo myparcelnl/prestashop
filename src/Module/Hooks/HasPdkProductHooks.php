@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
+use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Actions;
+use MyParcelNL\Pdk\Facade\Frontend;
+use MyParcelNL\Pdk\Facade\Pdk;
 use Symfony\Component\HttpFoundation\Request;
 use Tools;
 
