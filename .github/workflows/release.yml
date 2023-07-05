@@ -1,61 +1,70 @@
-name: 'Build and publish 🚀'
+name: '🚀 Release'
 
 on:
   push:
     branches:
       - main
+      - develop
 
-  workflow_dispatch: ~
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: 7.4
+  NODE_VERSION: 18
 
 jobs:
   release:
     name: 'Build and publish 🚀'
     runs-on: ubuntu-22.04
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+      version: ${{ steps.release.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: myparcelnl/actions/setup-git-credentials@v3
+        id: credentials
         with:
-          fetch-depth: 0
-          persist-credentials: false
-          token: ${{ secrets.GH_REPO_TOKEN }}
-
-      # TODO: Switch to v3 with app credentials when GitHub apps are allowed to bypass status checks. https://github.com/orgs/community/discussions/43460
-      - uses: myparcelnl/actions/setup-git-credentials@v2
-        with:
-          token: ${{ secrets.GH_REPO_TOKEN }}
+          app-id: ${{ secrets.MYPARCEL_APP_ID }}
+          private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
 
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_REPO_TOKEN }}
+          token: ${{ steps.credentials.outputs.token }}
 
-      - uses: myparcelnl/actions/composer-install@v3
-        with:
-          php-version: '7.4'
+      - uses: ./.github/actions/install
 
-      - uses: myparcelnl/actions/yarn-install@v3
-        with:
-          node-version: '16'
+      - uses: ./.github/actions/build
 
       - uses: myparcelnl/actions/semantic-release@v3
+        id: release
         with:
-          token: ${{ secrets.GH_REPO_TOKEN }}
+          token: ${{ steps.credentials.outputs.token }}
+          write-summary: true
 
-  rebase:
+  rebase-develop:
     name: 'Rebase develop onto main'
     uses: ./.github/workflows/rebase.yml
     secrets: inherit
     needs: release
-    if: always()
+    if: always() && github.ref == 'refs/heads/main'
     with:
       base: 'main'
       target: 'develop'
+      force: true
 
   rebase-prs:
-    name: 'Rebase pull requests onto develop'
-    needs: rebase
+    name: 'Rebase pull requests'
+    needs:
+      - release
+      - rebase-develop
+    if: always()
     runs-on: ubuntu-22.04
     steps:
-      - uses: myparcelnl/actions/setup-git-credentials@v3
+      - uses: myparcelnl/actions/setup-app-credentials@v3
         id: credentials
         with:
           app-id: ${{ secrets.MYPARCEL_APP_ID }}
@@ -64,6 +73,24 @@ jobs:
       - uses: peter-evans/rebase@v2
         with:
           token: ${{ steps.credentials.outputs.token }}
-          base: develop
+          base: ${{ github.ref_name }}
           exclude-drafts: true
           exclude-labels: 'hotfix'
+
+  prune-releases:
+    needs: release
+    if: github.ref == 'refs/heads/alpha' && needs.release.outputs.released == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: myparcelnl/actions/setup-app-credentials@v3
+        id: credentials
+        with:
+          app-id: ${{ secrets.MYPARCEL_APP_ID }}
+          private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
+
+      - uses: dev-drprasad/delete-older-releases@02a7034dca897d85c149ca759d6e1fd40b953af3
+        with:
+          keep_latest: 1
+          delete_tag_pattern: alpha
+        env:
+          GITHUB_TOKEN: ${{ steps.credentials.outputs.token }}

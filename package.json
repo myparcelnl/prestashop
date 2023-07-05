@@ -1,6 +1,6 @@
 {
   "name": "@myparcel/prestashop-module",
-  "version": "2.0.0",
+  "version": "2.0.0-alpha.0",
   "private": true,
   "repository": "github:myparcelnl/prestashop",
   "license": "MIT",
@@ -14,8 +14,6 @@
     "build:js:dev": "nx run-many --output-style=stream --target=build:dev",
     "build:js:dev:backend": "yarn build:js:dev --projects='backend-*'",
     "build:js:dev:frontend": "yarn build:js:dev --projects='frontend-*'",
-    "docker:build": "docker build -t myparcelnl/prestashop .",
-    "docker:run": "docker run -it --rm -v $(pwd):/app myparcelnl/prestashop",
     "prepare": "is-ci || husky install",
     "test": "nx run-many --output-style=stream --target=test",
     "test:watch": "nx run-many --output-style=stream --target=test:watch",
@@ -30,8 +28,8 @@
     "ws:test:watch": "vitest"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": "eslint --fix",
-    "*.{md,html,json,html.twig}": "prettier --write",
+    "*.{js,cjs,mjs,ts,vue}": "eslint --fix",
+    "*.{md,html,json,html,yml}": "prettier --write",
     "package.json": "npx -q sort-package-json"
   },
   "browserslist": [
@@ -47,16 +45,19 @@
     "@myparcel-eslint/eslint-config-prettier-typescript": "^1.2.0",
     "@myparcel-eslint/eslint-config-prettier-typescript-vue": "^1.2.0",
     "@myparcel-pdk/app-builder": "^1.0.0-alpha.9",
-    "@myparcel/semantic-release-config": "^4.2.3",
+    "@myparcel/semantic-release-config": "^5.0.0",
     "@types/node": "^18.13.0",
     "@vue/tsconfig": "^0.3.2",
-    "eslint": "^8.34.0",
+    "eslint": "^8.44.0",
     "husky": "^8.0.3",
     "is-ci": "^3.0.1",
     "lint-staged": "^13.1.2",
     "nx": "^16.1.2",
     "nx-cloud": "latest",
-    "prettier": "^2.8.4"
+    "prettier": "^2.8.8"
   },
-  "packageManager": "yarn@3.3.0"
+  "packageManager": "yarn@3.3.0",
+  "volta": {
+    "node": "18.16.1"
+  }
 }
