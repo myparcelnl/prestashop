@@ -65,6 +65,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
                 'name'               => $translate($psProduct->name),
                 'weight'             => $this->weightService->convertToGrams($psProduct->weight),
                 'settings'           => $this->getProductSettings($identifier),
+                'isDeliverable'      => $this->isDeliverable($psProduct),
                 'price'              => [
                     'currency' => Context::getContext()->currency->iso_code,
                     'amount'   => $psProduct->price,
@@ -117,5 +118,17 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
                 'data' => json_encode($product->settings->toArray()),
             ]
         );
+    }
+
+    /**
+     * @param  \Product $psProduct
+     *
+     * @return bool
+     */
+    private function isDeliverable(Product $psProduct): bool
+    {
+        return $psProduct->available_for_order
+            && $psProduct->active
+            && ! $psProduct->is_virtual;
     }
 }
