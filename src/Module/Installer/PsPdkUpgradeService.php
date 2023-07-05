@@ -69,19 +69,15 @@ final class PsPdkUpgradeService
     {
         Logger::warning('Creating carriers');
 
-        $carriers = Pdk::get('allowedCarriers');
+        $carrier = $this->addCarrier();
 
-        foreach ($carriers as $carrierName) {
-            $carrier = $this->addCarrier($carrierName);
+        $this->addGroups($carrier);
+        $this->addRanges($carrier);
+        $this->addZones($carrier);
 
-            $this->addGroups($carrier);
-            $this->addRanges($carrier);
-            $this->addZones($carrier);
-
-            $carrier->update();
-            $this->addCarrierConfiguration($carrier, $carrierName);
-            $this->carrierConfigurationRepository->flush();
-        }
+        $carrier->update();
+        //        $this->addCarrierConfiguration($carrier, $carrierName);
+        //        $this->carrierConfigurationRepository->flush();
     }
 
     /**
@@ -121,19 +117,17 @@ final class PsPdkUpgradeService
     }
 
     /**
-     * @param  string $carrierName
-     *
      * @return Carrier
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
      */
-    private function addCarrier(string $carrierName): Carrier
+    private function addCarrier(): Carrier
     {
         /** @var \MyParcelNL $module */
         $module = Pdk::get('moduleInstance');
 
-        $appInfo = Pdk::getAppInfo();
+        $carrierName = Pdk::get('MyParcelCarrierName');
 
         //        /** @var callable $createSettingsKey */
         //        $createSettingsKey = Pdk::get('createSettingsKey');
@@ -144,7 +138,7 @@ final class PsPdkUpgradeService
 
         $carrier = new Carrier();
 
-        $carrier->name = sprintf('%s (%s)', $carrierName, $appInfo->title);
+        $carrier->name = $carrierName;
         /**
          * TODO: activate the carrier when account settings are present and we know it should be enabled
          *
