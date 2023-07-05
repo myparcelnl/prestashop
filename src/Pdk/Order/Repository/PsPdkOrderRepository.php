@@ -302,9 +302,7 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
 
             $deliveryOptions = $fromCart ? $fromCart->getData() : [];
 
-            $this->saveOrderData((string) $order->id, [
-                'deliveryOptions' => $deliveryOptions,
-            ]);
+            $this->saveOrderData((string) $order->id, $deliveryOptions);
 
             return $deliveryOptions;
         }
@@ -347,5 +345,6 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                 'data' => json_encode($orderData),
             ]
         );
+        $this->psOrderDataRepository->flush();
     }
 }
