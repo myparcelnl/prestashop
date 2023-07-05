@@ -15,8 +15,7 @@
 
 <script lang="ts" setup>
 import {type PropType} from 'vue';
-import {type AdminIcon, useLanguage} from '@myparcel-pdk/frontend-admin-core';
-import {type Size} from '@myparcel-pdk/common';
+import {type Size, type AdminIcon, useLanguage} from '@myparcel-pdk/admin';
 
 defineProps({
   disabled: {

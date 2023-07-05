@@ -42,7 +42,6 @@ import {
   PsTextArea,
   PsToggleInput,
 } from './components';
-import {Frontend} from '@myparcel-pdk/common';
 
 // eslint-disable-next-line max-lines-per-function
 window.onload = () => {
