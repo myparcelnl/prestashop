@@ -1,23 +1,14 @@
-version: "3.9"
+version: '3.9'
 
 services:
   php:
-    image: ghcr.io/myparcelnl/php-xd:7.4-cli-alpine
-    command: [ "sh", "-c", "composer install --no-interaction --no-progress --no-scripts --ignore-platform-reqs" ]
+    image: ghcr.io/myparcelnl/php-xd:7.4-alpine
     volumes:
-      - ./:/app
-      - composer-cache:/www-data/.composer/cache
+      - .:/app
+    command: ['composer', 'install']
 
-  node:
-    image: node:18-alpine
-    working_dir: /app
-    command: [ "sh", "-c", "yarn && yarn zip" ]
+  test:
+    image: ghcr.io/myparcelnl/php-xd:7.4-alpine
     volumes:
-      - ./:/app
-      - yarn-cache:/usr/local/share/.cache/yarn/v6
-      - node-modules:/app/node_modules
-
-volumes:
-  composer-cache:
-  node-modules:
-  yarn-cache:
+      - .:/app
+    command: ['php', 'vendor/bin/pest']
