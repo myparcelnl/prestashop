@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Module\Hooks;
 
 use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
-use MyParcelNL\Pdk\Base\Model\ContactDetails;
+use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
+use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Frontend;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsCarrierAdapter;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
+use Throwable;
 use Tools;
 
 /**
@@ -19,32 +22,41 @@ use Tools;
 trait HasPdkCheckoutHooks
 {
     /**
-     * @param  array $params
+     * @param  array{cart: \Cart} $params
      *
      * @return void
      * @throws \Exception
      */
     public function hookActionCarrierProcess(array $params): void
     {
+        $action    = Tools::getValue('action');
+        $carrierId = Tools::getValue('delivery_option');
+
+        if (('selectDeliveryOption' !== $action || empty($carrierId)) && ! Tools::isSubmit('confirmDeliveryOption')) {
+            return;
+        }
+
         $options = Tools::getValue(Pdk::get('checkoutHiddenInputName'));
 
         if (! $options || '[]' === $options) {
             return;
         }
 
-        /**
-         * @var \PrestaShop\PrestaShop\Adapter\Entity\Cart $cart
-         */
-        $cart = $params['cart'];
+        $cartId = $params['cart']->id ?? null;
 
-        $optionsArray    = json_decode($options, true);
-        $deliveryOptions = $this->createDeliveryOptions($optionsArray);
+        try {
+            $pdkOrder = new PdkOrder(['deliveryOptions' => json_decode($options, true)]);
 
-        $action    = Tools::getValue('action');
-        $carrierId = Tools::getValue('delivery_option');
-
-        if (('selectDeliveryOption' === $action && ! empty($carrierId)) || Tools::isSubmit('confirmDeliveryOption')) {
-            $this->saveDeliveryOptions($cart->id, $deliveryOptions);
+            $this->saveOrderData($cartId, $pdkOrder);
+        } catch (Throwable $e) {
+            Logger::error(
+                'Failed to save order data',
+                [
+                    'exception' => $e,
+                    'options'   => $options,
+                    'cartId'    => $cartId,
+                ]
+            );
         }
     }
 
@@ -52,7 +64,8 @@ trait HasPdkCheckoutHooks
      * @param $params
      *
      * @return false|string
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function hookDisplayCarrierExtraContent($params)
     {
@@ -87,45 +100,26 @@ trait HasPdkCheckoutHooks
     }
 
     /**
-     * @param  array $deliveryOptions
-     *
-     * @return array
-     */
-    private function createDeliveryOptions(array $deliveryOptions): array
-    {
-        return [
-            'carrier'         => ['name' => $deliveryOptions['carrier'] ?? null],
-            'date'            => $deliveryOptions['date'] ?? null,
-            'pickupLocation'  => null,
-            'shipmentOptions' => $deliveryOptions['shipmentOptions'] ?? null,
-            'deliveryType'    => $deliveryOptions['deliveryType'] ?? null,
-            'packageType'     => $deliveryOptions['packageType'] ?? null,
-        ];
-    }
-
-    /**
-     * @param  \MyParcelNL\Pdk\Base\Model\ContactDetails $contactDetails
+     * @param  array $address
      *
      * @return string
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
-    private function encodeAddress(ContactDetails $contactDetails): string
+    private function encodeAddress(array $address): string
     {
-        return htmlspecialchars(
-            json_encode(array_filter($contactDetails->toArray())),
-            ENT_QUOTES,
-            'UTF-8'
-        );
+        return htmlspecialchars(json_encode(Utils::filterNull($address)), ENT_QUOTES, 'UTF-8');
     }
 
     /**
-     * @param  int   $cartId
-     * @param  array $deliveryOptions
+     * @param  int                                      $cartId
+     * @param  \MyParcelNL\Pdk\App\Order\Model\PdkOrder $order
      *
      * @return void
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
-    private function saveDeliveryOptions(int $cartId, array $deliveryOptions): void
+    private function saveOrderData(int $cartId, PdkOrder $order): void
     {
+        /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
         $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
 
         $cartDeliveryOptionsRepository->updateOrCreate(
@@ -133,7 +127,7 @@ trait HasPdkCheckoutHooks
                 'idCart' => $cartId,
             ],
             [
-                'data' => json_encode(['deliveryOptions' => $deliveryOptions]),
+                'data' => json_encode($order->toStorableArray()),
             ]
         );
     }
