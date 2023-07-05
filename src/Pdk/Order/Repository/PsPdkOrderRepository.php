@@ -15,11 +15,12 @@ use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Shipment\Collection\ShipmentCollection;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
+use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
+use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
@@ -32,6 +33,11 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
      * @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface
      */
     protected $productRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter
+     */
+    private $addressAdapter;
 
     /**
      * @var \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface
@@ -66,6 +72,7 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
      * @param  \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface            $currencyService
      * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface  $productRepository
      * @param  \MyParcelNL\Pdk\Base\Contract\WeightServiceInterface              $weightService
+     * @param  \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter          $addressAdapter
      */
     public function __construct(
         MemoryCacheStorage              $storage,
@@ -74,7 +81,8 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
         PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository,
         CurrencyServiceInterface        $currencyService,
         PdkProductRepositoryInterface   $productRepository,
-        WeightServiceInterface          $weightService
+        WeightServiceInterface          $weightService,
+        PsAddressAdapter                $addressAdapter
     ) {
         parent::__construct($storage);
         $this->psOrderDataRepository           = $psOrderDataRepository;
@@ -83,6 +91,7 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
         $this->currencyService                 = $currencyService;
         $this->productRepository               = $productRepository;
         $this->weightService                   = $weightService;
+        $this->addressAdapter                  = $addressAdapter;
     }
 
     /**
@@ -106,9 +115,10 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
             $orderProducts = $order->getProducts() ?: [];
 
             return new PdkOrder(
-                array_merge([
+                array_replace([
                     'externalIdentifier'  => $order->id,
-                    'recipient'           => $this->getRecipient($order),
+                    'shippingAddress'     => $this->addressAdapter->fromOrder($order, 'shipping'),
+                    'billingAddress'      => $this->addressAdapter->fromOrder($order, 'billing'),
                     'physicalProperties'  => $this->getPhysicalProperties($orderProducts),
                     'shipments'           => $this->getShipments($order),
                     'referenceIdentifier' => "PrestaShop: $order->id",
@@ -224,10 +234,32 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
      * @param  \Order $order
      *
      * @return array
+     */
+    protected function getShipments(Order $order): array
+    {
+        $shipments = $this->psOrderShipmentRepository->where('idOrder', $order->id);
+
+        return $shipments
+            ->map(function (MyparcelnlOrderShipment $shipment) {
+                return array_merge(
+                    $shipment->getData(),
+                    [
+                        'id'      => $shipment->getIdShipment(),
+                        'orderId' => $shipment->getIdOrder(),
+                    ]
+                );
+            })
+            ->toArray();
+    }
+
+    /**
+     * @param  \Order $order
+     *
+     * @return array
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    protected function getRecipient(Order $order): array
+    protected function getShippingAddress(Order $order): array
     {
         $address  = new Address($order->id_address_delivery);
         $customer = new Customer($order->id_customer);
@@ -246,31 +278,6 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                 ? null
                 : (new State($address->id_state))->name,
         ];
-    }
-
-    /**
-     * @param  \Order $order
-     *
-     * @return \MyParcelNL\Pdk\Shipment\Collection\ShipmentCollection
-     */
-    protected function getShipments(Order $order): ShipmentCollection
-    {
-        $shipments = $this->psOrderShipmentRepository->where('idOrder', $order->id);
-
-        $shipmentsArray = $shipments->map(function ($shipment) {
-            return array_merge(
-                $shipment->getData(),
-                [
-                    'id'      => $shipment->getIdShipment(),
-                    'orderId' => $shipment->getIdOrder(),
-                ]
-            );
-        })
-            ->toArray();
-
-        return (new ShipmentCollection($shipmentsArray))
-            ->where('deleted', false)
-            ->values();
     }
 
     /**

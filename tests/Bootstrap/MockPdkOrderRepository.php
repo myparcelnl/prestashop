@@ -14,7 +14,7 @@ class MockPdkOrderRepository extends PsPdkOrderRepository
      *
      * @return string[]
      */
-    protected function getRecipient(Order $order): array
+    protected function getShippingAddress(Order $order): array
     {
         return [
             'cc'      => 'NL',

@@ -6,56 +6,91 @@ namespace MyParcelNL\PrestaShop\Pdk\Base\Adapter;
 
 use Address;
 use Country;
-use MyParcelNL\Pdk\Base\Model\ContactDetails;
+use MyParcelNL\Pdk\Facade\Platform;
+use Order;
+use PrestaShop\PrestaShop\Adapter\Entity\Customer;
+use State;
 
 final class PsAddressAdapter
 {
-    /**
-     * @var null|\Context
-     */
-    private $context;
-
-    public function __construct()
-    {
-        $this->context = \Context::getContext();
-    }
+    public const ADDRESS_TYPE_SHIPPING = 'shipping';
+    public const ADDRESS_TYPE_BILLING  = 'billing';
 
     /**
      * @param  \Address|int|null $address
      *
-     * @return \MyParcelNL\Pdk\Base\Model\ContactDetails
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
-    public function fromAddress($address): ContactDetails
+    public function fromAddress($address): array
     {
         if (! $address instanceof Address) {
             $address = new Address((int) $address);
         }
 
-        return $this->getContactDetails($address);
+        return $this->createFromAddress($address);
+    }
+
+    /**
+     * @param  int|string|\Order $order
+     * @param  string            $addressType
+     *
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function fromOrder($order, string $addressType = self::ADDRESS_TYPE_SHIPPING): array
+    {
+        if (! $order instanceof Order) {
+            $order = new Order((int) $order);
+        }
+
+        $addressId = $addressType === self::ADDRESS_TYPE_SHIPPING
+            ? $order->id_address_delivery
+            : $order->id_address_invoice;
+
+        $address  = new Address($addressId);
+        $customer = new Customer($order->id_customer);
+
+        return $this->createFromCustomer($customer) + $this->createFromAddress($address);
     }
 
     /**
      * @param  \Address $address
      *
-     * @return \MyParcelNL\Pdk\Base\Model\ContactDetails
+     * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
-    private function getContactDetails(Address $address): ContactDetails
+    private function createFromAddress(Address $address): array
     {
-        return new ContactDetails([
-            'boxNumber'            => null,
-            'cc'                   => Country::getIsoById($address->id_country),
-            'city'                 => $address->city,
-            'fullStreet'           => $address->address1,
-            'number'               => null,
-            'numberSuffix'         => null,
-            'postalCode'           => $address->postcode,
-            'region'               => null,
-            'state'                => null,
-            'street'               => null,
-            'streetAdditionalInfo' => null,
-            'person'               => sprintf("%s %s", $address->firstname, $address->lastname),
-            'email'                => $this->context ? $this->context->customer->email : null,
-            'phone'                => $address->phone,
-        ]);
+        $country = new Country($address->id_country);
+
+        return [
+            'cc'         => $country->iso_code,
+            'city'       => $address->city,
+            'address1'   => $address->address1,
+            'address2'   => $address->address2,
+            'postalCode' => $address->postcode,
+            'person'     => sprintf('%s %s', $address->firstname, $address->lastname),
+            'phone'      => $address->phone,
+            'region'     => $country->iso_code === Platform::get('localCountry')
+                ? null
+                : (new State($address->id_state))->name,
+        ];
+    }
+
+    /**
+     * @param  \PrestaShop\PrestaShop\Adapter\Entity\Customer $customer
+     *
+     * @return string[]
+     */
+    private function createFromCustomer(Customer $customer): array
+    {
+        return [
+            'person' => "$customer->firstname $customer->lastname",
+            'email'  => $customer->email,
+        ];
     }
 }
