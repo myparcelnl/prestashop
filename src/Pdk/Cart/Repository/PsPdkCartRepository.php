@@ -67,8 +67,8 @@ class PsPdkCartRepository extends AbstractPdkCartRepository
                     return [
                         'quantity'      => (int) $item['cart_quantity'],
                         'price'         => (int) $item['price'],
-                        'vat'           => '',
-                        'priceAfterVat' => '',
+                        'vat'           => 0,
+                        'priceAfterVat' => 0,
                         'product'       => $product,
                     ];
                 }, array_values($input->getProducts())),
