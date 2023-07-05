@@ -15,5 +15,3 @@ export {default as PsTabNavButton} from './PsTabNavButton.vue';
 export {default as PsTextArea} from './PsTextArea.vue';
 
 export {default as PsToggleInput} from './PsToggleInput.vue';
-
-export {default as PsTristateInput} from './PsTristateInput.vue';

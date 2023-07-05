@@ -14,6 +14,7 @@ import {
   DefaultTableCol,
   DefaultTableRow,
   DefaultTimeInput,
+  DefaultTriStateInput,
 } from '@myparcel-pdk/admin-preset-default';
 import {
   Bootstrap4Box,
@@ -40,8 +41,8 @@ import {
   PsTabNavButtonWrapper,
   PsTextArea,
   PsToggleInput,
-  PsTristateInput,
 } from './components';
+import {Frontend} from '@myparcel-pdk/common';
 
 // eslint-disable-next-line max-lines-per-function
 window.onload = () => {
@@ -84,7 +85,7 @@ window.onload = () => {
       PdkTextInput: Bootstrap4TextInput,
       PdkTimeInput: DefaultTimeInput,
       PdkToggleInput: PsToggleInput,
-      PdkTristateInput: PsTristateInput,
+      PdkTriStateInput: DefaultTriStateInput,
     },
 
     formConfig: {
@@ -121,7 +122,7 @@ window.onload = () => {
       tableRow: 'fade',
     },
 
-    generateFieldId: (element) => {
+    generateFieldId(element) {
       return `myparcelnl-${element.form.name}-${element.name}`;
     },
   });
