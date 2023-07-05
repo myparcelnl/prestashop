@@ -68,16 +68,19 @@ trait HasPdkCheckoutHooks
             $this->context->cart->id_carrier = (int) $selectedDeliveryOption;
         }
 
+        //        $carrierName     = $carrierAdapter->getCarrierName($params['carrier']['id']);
+        //        $carrier         = new Carrier(['name' => $carrierName]);
         $shippingAddress = $addressAdapter->fromAddress($this->context->cart->id_address_delivery);
         $billingAddress  = $addressAdapter->fromAddress($this->context->cart->id_address_invoice);
+        $deliveryOptions = Frontend::renderDeliveryOptions($cartRepository->get($this->context->cart));
 
         $this->context->smarty->setEscapeHtml(false);
 
         $this->context->smarty->assign([
-            'deliveryOptions' => Frontend::renderDeliveryOptions($cartRepository->get($this->context->cart)),
+            'deliveryOptions' => $deliveryOptions,
             'shippingAddress' => $this->encodeAddress($shippingAddress),
             'billingAddress'  => $this->encodeAddress($billingAddress),
-            'carrier'         => $carrierAdapter->getCarrierName((int) $this->context->cart->id_carrier),
+            //            'carrier'         => $carrierName,
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier.tpl');
@@ -91,7 +94,7 @@ trait HasPdkCheckoutHooks
     private function createDeliveryOptions(array $deliveryOptions): array
     {
         return [
-            'carrier'         => $deliveryOptions['carrier'] ?? null,
+            'carrier'         => ['name' => $deliveryOptions['carrier'] ?? null],
             'date'            => $deliveryOptions['date'] ?? null,
             'pickupLocation'  => null,
             'shipmentOptions' => $deliveryOptions['shipmentOptions'] ?? null,

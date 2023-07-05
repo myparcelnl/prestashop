@@ -28,7 +28,10 @@ const createId = (name: string) => `#${name}`;
     }
   });
 
-  console.log({ shippingMethodName, allowedShippingMethods });
+  // window.prestashop.on('updatedDeliveryForm', (event) => {
+  //   moveDeliveryOptionsForm(event.deliveryOption);
+  //   document.dispatchEvent(new Event('myparcel_update_delivery_options'));
+  // });
 
   createPdkCheckout({
     async doRequest(endpoint) {
@@ -56,6 +59,14 @@ const createId = (name: string) => `#${name}`;
       [PdkField.ToggleAddressType]: 'delivery_option_13',
       [AddressType.Billing]: createFields(PREFIX_BILLING),
       [AddressType.Shipping]: createFields(PREFIX_SHIPPING),
+    },
+
+    getAddressType(value: unknown): AddressType {
+      return AddressType.Shipping;
+    },
+
+    hasDeliveryOptions(shippingMethod: string): boolean {
+      return true;
     },
 
     getForm: () => {
@@ -147,3 +158,16 @@ const createId = (name: string) => `#${name}`;
   //   newState.settings.allowedShippingMethods = allowedShippingMethods;
   // });
 })();
+
+/**
+ * @param $deliveryOptionsRow
+ */
+function moveDeliveryOptionsForm($deliveryOptionsRow: JQuery) {
+  const $wrapper = jQuery('#mypa-delivery-options-wrapper');
+
+  if (!$wrapper) {
+    return;
+  }
+
+  $deliveryOptionsRow.next().append($wrapper);
+}
