@@ -71,6 +71,8 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'prestaShopVersionMin' => value('1.7.6'),
             'prestaShopVersionMax' => value('8.0.4'),
 
+            'MyParcelCarrierName' => value('MyParcel Carrier'),
+
             /**
              * The symfony routes that are used by the pdk.
              */
