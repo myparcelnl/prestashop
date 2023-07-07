@@ -1,10 +1,8 @@
-const { PdkPlatformName } = require('@myparcel-pdk/app-builder');
+const {PdkPlatformName, defineConfig} = require('@myparcel-pdk/app-builder');
 
-/**
- * @type {import('@myparcel-pdk/app-builder').PdkBuilderConfig}
- */
-module.exports = {
+module.exports = defineConfig({
   name: 'prestashop',
+  platformFolderName: `{{platform}}`,
   platforms: [PdkPlatformName.MyParcelNl, PdkPlatformName.MyParcelBe],
   source: [
     '!**/node_modules/**',
@@ -18,9 +16,5 @@ module.exports = {
     'composer.json',
     'myparcelnl.php',
   ],
-
-  versionSource: [
-    { path: 'package.json' },
-    { path: 'composer.json' },
-  ],
-};
+  versionSource: [{path: 'package.json'}, {path: 'composer.json'}],
+});
