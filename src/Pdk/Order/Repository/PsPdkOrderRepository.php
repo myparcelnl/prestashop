@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 use Address;
 use Country;
 use Customer;
+use CustomerMessage;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
@@ -15,6 +16,7 @@ use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Platform;
+use MyParcelNL\Pdk\Fulfilment\Collection\OrderNoteCollection;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
@@ -25,6 +27,7 @@ use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use Order;
+use OrderMessage;
 use State;
 
 class PsPdkOrderRepository extends AbstractPdkOrderRepository
@@ -132,6 +135,30 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                 ], $orderData)
             );
         });
+    }
+
+    public function getOrderNotes(?string $externalIdentifier): OrderNoteCollection
+    {
+        $orderNoteCollection = new OrderNoteCollection();
+        $customerNotes       = CustomerMessage::getMessagesByOrderId($externalIdentifier);
+
+        foreach ($customerNotes as $customerNote) {
+            $orderNoteCollection->push([
+                'note'   => $customerNote['message'],
+                'author' => 'customer',
+            ]);
+        }
+
+        $webshopNotes = OrderMessage::getOrderMessages($externalIdentifier);
+
+        foreach ($webshopNotes as $webshopNote) {
+            $orderNoteCollection->push([
+                'note'   => $webshopNote['message'],
+                'author' => 'webshop',
+            ]);
+        }
+
+        return $orderNoteCollection;
     }
 
     /**
