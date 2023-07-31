@@ -9,6 +9,7 @@ use Country;
 use Customer;
 use CustomerMessage;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
+use MyParcelNL\Pdk\App\Order\Collection\PdkOrderNoteCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
 use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderRepository;
@@ -16,7 +17,7 @@ use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Fulfilment\Collection\OrderNoteCollection;
+use MyParcelNL\Pdk\Fulfilment\Model\OrderNote;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
 use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
@@ -27,7 +28,6 @@ use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use Order;
-use OrderMessage;
 use State;
 
 class PsPdkOrderRepository extends AbstractPdkOrderRepository
@@ -128,6 +128,7 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                     'shipmentPrice'       => $this->currencyService->convertToCents($order->total_shipping_tax_incl),
                     'shipmentVat'         => $this->currencyService->convertToCents($order->total_shipping_tax_excl),
                     'lines'               => $this->createOrderLines($orderProducts),
+                    'notes'               => $this->getOrderNotes($order, $orderData['notes'] ?? []),
                     'customsDeclaration'  => $this->createCustomsDeclaration($order, $orderProducts),
                     'invoiceId'           => $order->id,
                     'invoiceDate'         => $order->date_add,
@@ -137,28 +138,34 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
         });
     }
 
-    public function getOrderNotes(?string $externalIdentifier): OrderNoteCollection
+    public function getOrderNotes(Order $order, array $existingNotes): PdkOrderNoteCollection
     {
-        $orderNoteCollection = new OrderNoteCollection();
-        $customerNotes       = CustomerMessage::getMessagesByOrderId($externalIdentifier);
+        return $this->retrieve(
+            sprintf("notes_%s", $order->id),
+            function () use ($existingNotes, $order) {
+                $collection = new PdkOrderNoteCollection($existingNotes);
+                $orderNotes = new PdkOrderNoteCollection();
 
-        foreach ($customerNotes as $customerNote) {
-            $orderNoteCollection->push([
-                'note'   => $customerNote['message'],
-                'author' => 'customer',
-            ]);
-        }
+                $customerNotes = CustomerMessage::getMessagesByOrderId($order->id);
 
-        $webshopNotes = OrderMessage::getOrderMessages($externalIdentifier);
+                foreach ($customerNotes as $customerNote) {
+                    $author = '0' === ($customerNote['id_employee'] ?? '0')
+                        ? OrderNote::AUTHOR_CUSTOMER
+                        : OrderNote::AUTHOR_WEBSHOP;
 
-        foreach ($webshopNotes as $webshopNote) {
-            $orderNoteCollection->push([
-                'note'   => $webshopNote['message'],
-                'author' => 'webshop',
-            ]);
-        }
+                    $orderNotes->push([
+                        'apiIdentifier'      => null,
+                        'externalIdentifier' => $customerNote['id_customer_message'],
+                        'note'               => $customerNote['message'],
+                        'author'             => $author,
+                        'createdAt'          => $customerNote['date_add'], // todo what if format changes or key is empty?
+                        'updatedAt'          => $customerNote['date_upd'],
+                    ]);
+                }
 
-        return $orderNoteCollection;
+                return $collection->mergeByKey($orderNotes, 'externalIdentifier');
+            }
+        );
     }
 
     /**

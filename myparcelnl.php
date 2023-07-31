@@ -7,6 +7,7 @@ use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkCheckoutHooks;
+use MyParcelNL\PrestaShop\Module\Hooks\HasPdkOrderHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkProductHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkScriptHooks;
@@ -24,6 +25,7 @@ final class MyParcelNL extends CarrierModule
     use HasPdkProductHooks;
     use HasPdkRenderHooks;
     use HasPdkScriptHooks;
+    use HasPdkOrderHooks;
 
     /**
      * @deprecated
