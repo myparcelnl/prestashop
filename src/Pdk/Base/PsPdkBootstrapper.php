@@ -29,19 +29,6 @@ use function DI\value;
 
 class PsPdkBootstrapper extends PdkBootstrapper
 {
-    protected const PRESTASHOP_REPOSITORIES = [
-        'CarrierConfigurationRepository' => MyparcelnlCarrierMapping::class,
-        'CartDeliveryOptionsRepository'  => MyparcelnlCartDeliveryOptions::class,
-        'OrderDataRepository'            => MyparcelnlOrderData::class,
-        'OrderShipmentRepository'        => MyparcelnlOrderShipment::class,
-        'ProductSettingsRepository'      => MyparcelnlProductSettings::class,
-    ];
-    protected const PRESTASHOP_SERVICES     = [
-        'ps.configuration' => 'prestashop.adapter.legacy.configuration',
-        'ps.entityManager' => 'doctrine.orm.entity_manager',
-        'ps.twig'          => 'twig',
-    ];
-
     /**
      * @param  string $name
      * @param  string $title
@@ -80,9 +67,9 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'routeNamePdk'      => value('myparcelnl_pdk'),
             'routeNameFrontend' => value('myparcelnl_frontend'),
 
-            'moduleInstance' => factory(static function () use ($name): MyParcelNL {
+            'moduleInstance' => factory(static function (): MyParcelNL {
                 /** @var MyParcelNL|false $module */
-                $module = Module::getInstanceByName($name);
+                $module = Module::getInstanceByName(Pdk::getAppInfo()->name);
 
                 if (! $module) {
                     throw new InvalidModuleException('Failed to get module instance');
@@ -108,7 +95,79 @@ class PsPdkBootstrapper extends PdkBootstrapper
 
                 return $hooks->toArray();
             }),
-            'ps.router'      => factory(function () {
+
+        ],
+            $this->resolvePrestaShopRepositories(),
+            $this->resolvePrestaShopServices()
+        );
+    }
+
+    /**
+     * Resolve entity manager repositories for our added entities, so we can use them intuitively.
+     *
+     * @return array
+     */
+    private function resolvePrestaShopRepositories(): array
+    {
+        return [
+            'getEntityRepository' => factory(function () {
+                return static function (string $entityName) {
+                    /** @var \PrestaShop\PrestaShop\Core\Foundation\Database\EntityManager $entityManager */
+                    $entityManager = Pdk::get('ps.entityManager');
+
+                    return $entityManager->getRepository($entityName);
+                };
+            }),
+
+            'CarrierConfigurationRepository' => factory(function () {
+                return Pdk::get('getEntityRepository')(MyparcelnlCarrierMapping::class);
+            }),
+
+            'CartDeliveryOptionsRepository' => factory(function () {
+                return Pdk::get('getEntityRepository')(MyparcelnlCartDeliveryOptions::class);
+            }),
+
+            'OrderDataRepository' => factory(function () {
+                return Pdk::get('getEntityRepository')(MyparcelnlOrderData::class);
+            }),
+
+            'OrderShipmentRepository' => factory(function () {
+                return Pdk::get('getEntityRepository')(MyparcelnlOrderShipment::class);
+            }),
+
+            'ProductSettingsRepository' => factory(function () {
+                return Pdk::get('getEntityRepository')(MyparcelnlProductSettings::class);
+            }),
+        ];
+    }
+
+    /**
+     * @return array|FactoryDefinitionHelper[]
+     * @throws ContainerNotFoundException
+     */
+    private function resolvePrestaShopServices(): array
+    {
+        return [
+            'getPsService' => factory(function () {
+                return static function (string $serviceName) {
+                    /** @var MyParcelNL $module */
+                    $module = Pdk::get('moduleInstance');
+
+                    return $module
+                        ->getContainer()
+                        ->get($serviceName);
+                };
+            }),
+
+            'ps.configuration' => factory(function () {
+                return Pdk::get('getPsService')('prestashop.adapter.legacy.configuration');
+            }),
+
+            'ps.entityManager' => factory(function () {
+                return Pdk::get('getPsService')('doctrine.orm.entity_manager');
+            }),
+
+            'ps.router' => factory(function () {
                 /** @var MyParcelNL $module */
                 $module    = Pdk::get('moduleInstance');
                 $container = $module->getContainer();
@@ -120,63 +179,20 @@ class PsPdkBootstrapper extends PdkBootstrapper
                 $controller = Context::getContext()->controller;
 
                 if ($controller->php_self === 'order') {
-                    return $this->getSymfonyRouter();
+                    $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
+                    $locator         = new FileLocator([$routesDirectory]);
+                    $loader          = new YamlFileLoader($locator);
+
+                    return new Router($loader, 'routes.yml');
                 }
 
                 return $container->get('prestashop.router');
             }),
-        ],
-            $this->resolvePrestaShopRepositories(),
-            $this->resolvePrestaShopServices()
-        );
-    }
 
-    /**
-     * Returns an instance of \Symfony\Component\Routing\Router from Symfony scope into Legacy.
-     *
-     * @return \Symfony\Component\Routing\Router
-     */
-    private function getSymfonyRouter(): Router
-    {
-        $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
-        $locator         = new FileLocator([$routesDirectory]);
-        $loader          = new YamlFileLoader($locator);
+            'ps.twig' => factory(function () {
+                return Pdk::get('getPsService')('twig');
+            }),
 
-        return new Router($loader, 'routes.yml');
-    }
-
-    /**
-     * Resolve entity manager repositories for our added entities, so we can use them intuitively.
-     *
-     * @return array
-     */
-    private function resolvePrestaShopRepositories(): array
-    {
-        return array_map(static function ($repositoryName) {
-            return factory(function () use ($repositoryName) {
-                /** @var \PrestaShop\PrestaShop\Core\Foundation\Database\EntityManager $entityManager */
-                $entityManager = Pdk::get('ps.entityManager');
-
-                return $entityManager->getRepository($repositoryName);
-            });
-        }, self::PRESTASHOP_REPOSITORIES);
-    }
-
-    /**
-     * @return array|FactoryDefinitionHelper[]
-     * @throws ContainerNotFoundException
-     */
-    private function resolvePrestaShopServices(): array
-    {
-        return array_map(static function ($serviceName) {
-            return factory(function () use ($serviceName) {
-                /** @var MyParcelNL $module */
-                $module = Pdk::get('moduleInstance');
-
-                return $module
-                    ->getContainer()
-                    ->get($serviceName);
-            });
-        }, self::PRESTASHOP_SERVICES);
+        ];
     }
 }
