@@ -19,7 +19,6 @@ use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhooksRepositoryInterface;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
-use MyParcelNL\Pdk\Base\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
@@ -57,10 +56,6 @@ use function DI\autowire;
 use function DI\value;
 
 return [
-    'mode'                   => value(
-        _PS_MODE_DEV_ ? Pdk::MODE_DEVELOPMENT : Pdk::MODE_PRODUCTION
-    ),
-
     /**
      * The version of the delivery options in the checkout.
      *

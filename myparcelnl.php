@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkCheckoutHooks;
@@ -70,7 +71,8 @@ final class MyParcelNL extends CarrierModule
             $this->displayName,
             $this->version,
             $this->getLocalPath(),
-            $this->getBaseUrl()
+            $this->getBaseUrl(),
+            _PS_MODE_DEV_ ? PdkInstance::MODE_DEVELOPMENT : PdkInstance::MODE_PRODUCTION
         );
 
         $this->tab = Pdk::get('moduleTabName');
