@@ -17,4 +17,8 @@ module.exports = defineConfig({
     'myparcelnl.php',
   ],
   versionSource: [{path: 'package.json'}, {path: 'composer.json'}],
+  translations: {
+    // eslint-disable-next-line no-magic-numbers
+    additionalSheet: 279275153,
+  },
 });

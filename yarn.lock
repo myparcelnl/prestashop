@@ -126,6 +126,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@edielemoine/google-docs-importer@npm:^1.1.1":
+  version: 1.1.2
+  resolution: "@edielemoine/google-docs-importer@npm:1.1.2"
+  dependencies:
+    csv-parse: ^5.3.0
+    debug: ^4.3.4
+    dotenv: ^16.0.1
+    yargs: ^17.5.1
+  bin:
+    google-docs-importer: dist/bin.js
+  checksum: 51718fe90724703162f5376ce5c6fcd573b9022f28dbd4360728312a21cc6cafe0a917d99a43a8ba91ce51063d1259aa96a6877d7a14106c06dee9e8a8745713
+  languageName: node
+  linkType: hard
+
 "@esbuild/android-arm64@npm:0.17.19":
   version: 0.17.19
   resolution: "@esbuild/android-arm64@npm:0.17.19"
@@ -629,62 +643,64 @@ __metadata:
   linkType: hard
 
 "@myparcel-pdk/admin-component-tests@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.82
-  resolution: "@myparcel-pdk/admin-component-tests@npm:1.0.0-alpha.82"
+  version: 1.0.0-alpha.91
+  resolution: "@myparcel-pdk/admin-component-tests@npm:1.0.0-alpha.91"
   dependencies:
-    "@myparcel-pdk/frontend-admin-core": ^1.0.0-alpha.80
+    "@myparcel-pdk/frontend-admin-core": ^1.0.0-alpha.88
     "@myparcel/vue-form-builder": ^1.0.0-alpha.1
     "@pinia/testing": ^0.1.2
     "@vitest/coverage-v8": ^0.32.4
     "@vue/test-utils": ^2.4.0
-    happy-dom: ^9.20.3
+    happy-dom: ^10.1.1
     pinia: ^2.1.3
     vitest: ^0.32.4
   peerDependencies:
     vue: ^3
-  checksum: 49226fe9c5d1a0238bbbffe64ba9d8e24aaad5ef7da827f46ec431ebe7b1a9c12758c8d4a8458168086c1569631e0b7ddfd495d1cd49d51d98983bf6477c809b
+  checksum: e987554a86ac7343ba555c75ea849ca7df8f9f3075011fd9143cdc038d98dee5c0e2751a6fc0bc6b27136b3755aa51ebae16427166a34129001ebab5d52acc6f
   languageName: node
   linkType: hard
 
 "@myparcel-pdk/admin-preset-bootstrap4@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.82
-  resolution: "@myparcel-pdk/admin-preset-bootstrap4@npm:1.0.0-alpha.82"
+  version: 1.0.0-alpha.90
+  resolution: "@myparcel-pdk/admin-preset-bootstrap4@npm:1.0.0-alpha.90"
   dependencies:
-    "@myparcel-pdk/admin": ^1.0.0-alpha.80
+    "@myparcel-pdk/admin": ^1.0.0-alpha.88
     "@myparcel/ts-utils": ^1.9.0
     vue: ^3.3.4
-  checksum: 43fa671ac35e767fa8fe2a0c53b36cae138fcc41f9649b0a1a94db7c5d59f0b49bc5d18404fcf47a5ee67bd66c7c5ba5b08a8d7751a35ae368c76538ebb57aeb
+  checksum: 8b3e51dc5243bceb1cf20b4ea6efd0b01423b042e32dbc7c356466bdedd2506e7500d62d886d212aaa47a779d2b6b7f67f106097032fea8ca2f86bb7c69d9d8c
   languageName: node
   linkType: hard
 
 "@myparcel-pdk/admin-preset-default@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.79
-  resolution: "@myparcel-pdk/admin-preset-default@npm:1.0.0-alpha.79"
+  version: 1.0.0-alpha.87
+  resolution: "@myparcel-pdk/admin-preset-default@npm:1.0.0-alpha.87"
   dependencies:
-    "@myparcel-pdk/admin": ^1.0.0-alpha.80
+    "@myparcel-pdk/admin": ^1.0.0-alpha.88
     "@myparcel/ts-utils": ^1.9.0
     "@vueuse/core": ^10.1.2
     vue: ^3.3.4
-  checksum: d40ebd86e2e65bce0774bbd26dcb288a86ac7e2765ef53950d879862efb568acb68aa65252d446c277a8c5474c05f42bd8bccbceecaf21fe12e7394e4ebb9628
+  checksum: 4cda0119d0978886f7a34c4ef0647d727aecb468542c088a1422296f6c8f011162ae290e9019f33058b77dc2b77cfea6b8ebd0aacbcc435ea6236e746985997d
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/admin@npm:^1.0.0-alpha.1, @myparcel-pdk/admin@npm:^1.0.0-alpha.80":
-  version: 1.0.0-alpha.80
-  resolution: "@myparcel-pdk/admin@npm:1.0.0-alpha.80"
+"@myparcel-pdk/admin@npm:^1.0.0-alpha.1, @myparcel-pdk/admin@npm:^1.0.0-alpha.88":
+  version: 1.0.0-alpha.88
+  resolution: "@myparcel-pdk/admin@npm:1.0.0-alpha.88"
   dependencies:
-    "@myparcel-pdk/frontend-admin-core": ^1.0.0-alpha.80
-  checksum: 3f3818134e3fae11ec48048ae082cd2690d09581bcfa8a8797a8553aeb99936f9b18b28ce80e88005c54a87cdf3978c3815b64fd0d590952e9d361291f1e4175
+    "@myparcel-pdk/frontend-admin-core": ^1.0.0-alpha.88
+  checksum: 66c299c9d84035e7e99c4f39c70cfe1e42b40a1c73cea7f9ae30a9a06fb4b35be38415e3043dd33bab0433f53c24434301dc90c465667644587cc24f23875f46
   languageName: node
   linkType: hard
 
 "@myparcel-pdk/app-builder@npm:^1.0.0-alpha.9":
-  version: 1.0.0-alpha.25
-  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-alpha.25"
+  version: 1.0.0-alpha.30
+  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-alpha.30"
   dependencies:
+    "@edielemoine/google-docs-importer": ^1.1.1
+    "@yarnpkg/parsers": ^3.0.0-rc.48.1
     archiver: ^5.3.1
     chalk: ^5.2.0
-    commander: ^10.0.0
+    commander: ^11.0.0
     debug: ^4.3.4
     inquirer: ^9.1.4
     interpret: ^3.1.1
@@ -692,35 +708,35 @@ __metadata:
     supports-color: ^9.3.1
   bin:
     pdk-builder: ./bin/index.js
-  checksum: 7799d22689f113cf2e3fd92c8e118f47ab350df48137642963e5d8e7d33ed6b7ceb74c64b4f873b1504f5aaddcdc79fee005dba83f757f0ed2e40d9176295e64
+  checksum: e68989d3b8df939c62c1ddc80bc74e8edc99739cd10230b98de4c9c8953b6bfaccc777a6fd36547f93c52dbe9670f1554b40313648061c30848323bca3934dc5
   languageName: node
   linkType: hard
 
 "@myparcel-pdk/checkout@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.50
-  resolution: "@myparcel-pdk/checkout@npm:1.0.0-alpha.50"
+  version: 1.0.0-alpha.54
+  resolution: "@myparcel-pdk/checkout@npm:1.0.0-alpha.54"
   dependencies:
-    "@myparcel-pdk/common": ^1.0.0-alpha.40
-    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.15
-    "@myparcel-pdk/frontend-checkout-delivery-options": ^1.0.0-alpha.14
-    "@myparcel-pdk/frontend-checkout-separate-address-fields": ^1.0.0-alpha.15
-    "@myparcel-pdk/frontend-checkout-tax-fields": ^1.0.0-alpha.16
-  checksum: 131dd06f0491eb0c125bd1472c1160be3f416ca0bb5e235efc7dc177bde46503898689fdad2970bf8bc5423a04c9450611f976cfe1130fb5d73195e56816badc
+    "@myparcel-pdk/common": ^1.0.0-alpha.44
+    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.19
+    "@myparcel-pdk/frontend-checkout-delivery-options": ^1.0.0-alpha.18
+    "@myparcel-pdk/frontend-checkout-separate-address-fields": ^1.0.0-alpha.19
+    "@myparcel-pdk/frontend-checkout-tax-fields": ^1.0.0-alpha.20
+  checksum: f63c202e690e1e39c455b5f14963d1e69ab7db91615289f5e09ab5c29c8b9067150f016cf5086ddb464fd3acb4b0e44c2f61b2bcd50419bb625e351ba5b2e94e
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/common@npm:^1.0.0-alpha.40":
-  version: 1.0.0-alpha.40
-  resolution: "@myparcel-pdk/common@npm:1.0.0-alpha.40"
-  checksum: 10e45bb6dc71da5a86238b2369cb4067ccadd9fab77d5543cdbcbbe0ff4105ce1295a4bb5f4f6302e9b7c8cc5452b75bdfed15bf5e71bc8867e41a5ad271e392
+"@myparcel-pdk/common@npm:^1.0.0-alpha.44":
+  version: 1.0.0-alpha.44
+  resolution: "@myparcel-pdk/common@npm:1.0.0-alpha.44"
+  checksum: 276f9b6bcb7ee747a5a2658f4bc27eee51ead579f2bf376c02b6b11950f3700c2a70ec2b9769762635978cffb2449bd7f32d8c53beb6088c41b9f6aa30625a7d
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/frontend-admin-core@npm:^1.0.0-alpha.80":
-  version: 1.0.0-alpha.80
-  resolution: "@myparcel-pdk/frontend-admin-core@npm:1.0.0-alpha.80"
+"@myparcel-pdk/frontend-admin-core@npm:^1.0.0-alpha.88":
+  version: 1.0.0-alpha.88
+  resolution: "@myparcel-pdk/frontend-admin-core@npm:1.0.0-alpha.88"
   dependencies:
-    "@myparcel-pdk/common": ^1.0.0-alpha.40
+    "@myparcel-pdk/common": ^1.0.0-alpha.44
     "@myparcel/constants": ^1.0.0
     "@myparcel/sdk": ^3.0.0
     "@myparcel/ts-utils": ^1.9.0
@@ -732,53 +748,53 @@ __metadata:
     lodash-unified: ^1.0.3
     pinia: ^2.1.3
     vue: ^3.3.4
-  checksum: 707979840c05fd48e7141b0c14cc4a434959eb55dd20f7ee9fa4605440cec3a0c4161c2ed6bc2106ee85073076af12cad819bba84562935c0fae56a3871c85a4
+  checksum: 2d5db834a4bd430cb3ad4e438ab450ceb0e9a7ea3bc10e21da2d9dd772c2fa6ac9bcc7f0b478616e28e0b70836f638e2456fd9e6fe4c7cdf4f68e45224ab695a
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/frontend-checkout-core@npm:^1.0.0-alpha.15":
-  version: 1.0.0-alpha.15
-  resolution: "@myparcel-pdk/frontend-checkout-core@npm:1.0.0-alpha.15"
+"@myparcel-pdk/frontend-checkout-core@npm:^1.0.0-alpha.19":
+  version: 1.0.0-alpha.19
+  resolution: "@myparcel-pdk/frontend-checkout-core@npm:1.0.0-alpha.19"
   dependencies:
-    "@myparcel-pdk/common": ^1.0.0-alpha.40
-  checksum: 87269636fbbb20daf475fc91f374e6d9a6f0b2bde5612483bb8e75a5f6b22274b610ba9d447483d12c07c92cabb062ec84e462e5e432d26f4cbd1c708437082a
+    "@myparcel-pdk/common": ^1.0.0-alpha.44
+  checksum: 9fabdedaacfc719137abf79b5a3e6f50a6481e777cf7e997b6011df02aaa6728826523705468ef2b9730b4eef70edc149832829e774336e582247205aa3b2fba
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/frontend-checkout-delivery-options@npm:^1.0.0-alpha.14":
-  version: 1.0.0-alpha.14
-  resolution: "@myparcel-pdk/frontend-checkout-delivery-options@npm:1.0.0-alpha.14"
+"@myparcel-pdk/frontend-checkout-delivery-options@npm:^1.0.0-alpha.18":
+  version: 1.0.0-alpha.18
+  resolution: "@myparcel-pdk/frontend-checkout-delivery-options@npm:1.0.0-alpha.18"
   dependencies:
-    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.15
-    "@myparcel-pdk/frontend-delivery-options": ^1.0.0-alpha.6
+    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.19
+    "@myparcel-pdk/frontend-delivery-options": ^1.0.0-alpha.8
     "@myparcel/delivery-options": ^5.7.2
     "@myparcel/ts-utils": ^1.9.0
-  checksum: f77650504517dc7b636492d2b570045bc107a72df477eb1c7b276c146dfee790f537c74068a796f6457e2a2331001604a939a4dfffa4d6932767594449bbe11c
+  checksum: ab382e4fc9e51ffa84d04ad2e803fd819a2b5ce8d15b871ffe7edb2b437a1ce136682cb826fd35a13c15cf5bb9195a860b87ab81af2ab85aca760c9fc70bc08b
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/frontend-checkout-separate-address-fields@npm:^1.0.0-alpha.15":
-  version: 1.0.0-alpha.15
-  resolution: "@myparcel-pdk/frontend-checkout-separate-address-fields@npm:1.0.0-alpha.15"
+"@myparcel-pdk/frontend-checkout-separate-address-fields@npm:^1.0.0-alpha.19":
+  version: 1.0.0-alpha.19
+  resolution: "@myparcel-pdk/frontend-checkout-separate-address-fields@npm:1.0.0-alpha.19"
   dependencies:
-    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.15
-  checksum: 428f1f56f387aa3727a951c6c40b4844f237927f46f82ffa85a933ffd44311791b6425813760c9d4830aa1334869f3e18b1b5f427a26ec3fe463d402f53fa2ca
+    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.19
+  checksum: b4299fdc6c2aa2497120a96a2f2e3be22dcba1a875b81d46fd92a11105ca881f849953267618afc31630512cb311f2112198586f34b4bbe291003b32add4506e
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/frontend-checkout-tax-fields@npm:^1.0.0-alpha.16":
-  version: 1.0.0-alpha.16
-  resolution: "@myparcel-pdk/frontend-checkout-tax-fields@npm:1.0.0-alpha.16"
+"@myparcel-pdk/frontend-checkout-tax-fields@npm:^1.0.0-alpha.20":
+  version: 1.0.0-alpha.20
+  resolution: "@myparcel-pdk/frontend-checkout-tax-fields@npm:1.0.0-alpha.20"
   dependencies:
-    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.15
-  checksum: b5ca4327f7b509ce1894456892612dd63b554a84d2348769736abda0ae62d998047df89af64e08cc949fbd6232ba394b18bfa22a91b4e2a292d6b6d6bc2ba79b
+    "@myparcel-pdk/frontend-checkout-core": ^1.0.0-alpha.19
+  checksum: 76a8bc19f2de1f9625cc217ad55ea8d70d3aadf64a71545bf736509b3a7694bd41a1843245c2d977a0324973765666b7649a7d368d63aed93912d6a432ba8df7
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/frontend-delivery-options@npm:^1.0.0-alpha.6":
-  version: 1.0.0-alpha.6
-  resolution: "@myparcel-pdk/frontend-delivery-options@npm:1.0.0-alpha.6"
-  checksum: 71aaf0d2c89d1a9b36c2e6ca0407f2d7df934abf85ccb6426e6f972c6a4d6a14b796a3b861e0d784409f0d7c825035ce61269c92bc58c006de91aface6eb645e
+"@myparcel-pdk/frontend-delivery-options@npm:^1.0.0-alpha.8":
+  version: 1.0.0-alpha.8
+  resolution: "@myparcel-pdk/frontend-delivery-options@npm:1.0.0-alpha.8"
+  checksum: 7ec165501a23eddabac860177bec562b3eef19067cd75a26c69837ccb837d65f88394d2e80bbd998fde1510dbf2525ee91ce9179a0a09182605b51e574fe19c7
   languageName: node
   linkType: hard
 
@@ -2508,7 +2524,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@yarnpkg/parsers@npm:^3.0.0-rc.18":
+"@yarnpkg/parsers@npm:^3.0.0-rc.18, @yarnpkg/parsers@npm:^3.0.0-rc.48.1":
   version: 3.0.0-rc.48.1
   resolution: "@yarnpkg/parsers@npm:3.0.0-rc.48.1"
   dependencies:
@@ -3555,6 +3571,13 @@ __metadata:
   version: 10.0.1
   resolution: "commander@npm:10.0.1"
   checksum: 436901d64a818295803c1996cd856621a74f30b9f9e28a588e726b2b1670665bccd7c1a77007ebf328729f0139838a88a19265858a0fa7a8728c4656796db948
+  languageName: node
+  linkType: hard
+
+"commander@npm:^11.0.0":
+  version: 11.0.0
+  resolution: "commander@npm:11.0.0"
+  checksum: 6621954e1e1d078b4991c1f5bbd9439ad37aa7768d6ab4842de1dbd4d222c8a27e1b8e62108b3a92988614af45031d5bb2a2aaa92951f4d0c934d1a1ac564bb4
   languageName: node
   linkType: hard
 
@@ -5371,6 +5394,20 @@ __metadata:
   bin:
     handlebars: bin/handlebars
   checksum: 1e79a43f5e18d15742977cb987923eab3e2a8f44f2d9d340982bcb69e1735ed049226e534d7c1074eaddaf37e4fb4f471a8adb71cddd5bc8cf3f894241df5cee
+  languageName: node
+  linkType: hard
+
+"happy-dom@npm:^10.1.1":
+  version: 10.5.2
+  resolution: "happy-dom@npm:10.5.2"
+  dependencies:
+    css.escape: ^1.5.1
+    entities: ^4.5.0
+    iconv-lite: ^0.6.3
+    webidl-conversions: ^7.0.0
+    whatwg-encoding: ^2.0.0
+    whatwg-mimetype: ^3.0.0
+  checksum: 5fa61c2367c7396da9e379e1b091d666dffa16336cfe95c058af3e3d7ada45a5c68746cee6cba524dc15a1bea6a7cdcd235be0e06f4f44ac0627ca0c08edf59b
   languageName: node
   linkType: hard
 
