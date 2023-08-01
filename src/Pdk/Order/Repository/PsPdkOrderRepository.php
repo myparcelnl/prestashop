@@ -8,6 +8,7 @@ use Address;
 use Country;
 use Customer;
 use CustomerMessage;
+use DateTimeImmutable;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderNoteCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
@@ -128,16 +129,39 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                     'shipmentPrice'       => $this->currencyService->convertToCents($order->total_shipping_tax_incl),
                     'shipmentVat'         => $this->currencyService->convertToCents($order->total_shipping_tax_excl),
                     'lines'               => $this->createOrderLines($orderProducts),
-                    'notes'               => $this->getOrderNotes($order, $orderData['notes'] ?? []),
                     'customsDeclaration'  => $this->createCustomsDeclaration($order, $orderProducts),
                     'invoiceId'           => $order->id,
                     'invoiceDate'         => $order->date_add,
                     'paymentMethod'       => $order->payment,
-                ], $orderData)
+                ], $orderData, [
+                    'notes' => $this->getOrderNotes($order, $orderData['notes'] ?? []),
+                ])
             );
         });
     }
 
+    /**
+     * @param  null|string $date
+     * @param  string      $fallback
+     *
+     * @return string
+     */
+    private function getDate(?string $date, string $fallback): string
+    {
+        try {
+            return (new DateTimeImmutable($date))->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            return $fallback;
+        }
+    }
+
+    /**
+     * @param  \Order $order
+     * @param  array  $existingNotes
+     *
+     * @return \MyParcelNL\Pdk\App\Order\Collection\PdkOrderNoteCollection
+     * @throws \Exception
+     */
     public function getOrderNotes(Order $order, array $existingNotes): PdkOrderNoteCollection
     {
         return $this->retrieve(
@@ -145,6 +169,7 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
             function () use ($existingNotes, $order) {
                 $collection = new PdkOrderNoteCollection($existingNotes);
                 $orderNotes = new PdkOrderNoteCollection();
+                $orderDate  = (new DateTimeImmutable($order->date_add))->format('Y-m-d H:i:s');
 
                 $customerNotes = CustomerMessage::getMessagesByOrderId($order->id);
 
@@ -158,12 +183,12 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                         'externalIdentifier' => $customerNote['id_customer_message'],
                         'note'               => $customerNote['message'],
                         'author'             => $author,
-                        'createdAt'          => $customerNote['date_add'], // todo what if format changes or key is empty?
-                        'updatedAt'          => $customerNote['date_upd'],
+                        'createdAt'          => $this->getDate($customerNote['date_add'] ?? null, $orderDate),
+                        'updatedAt'          => $this->getDate($customerNote['date_upd'] ?? null, $orderDate),
                     ]);
                 }
 
-                return $collection->mergeByKey($orderNotes, 'externalIdentifier');
+                return $orderNotes->mergeByKey($collection, 'externalIdentifier');
             }
         );
     }
