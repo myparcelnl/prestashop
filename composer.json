@@ -8,7 +8,7 @@
     "php": ">=7.2.0"
   },
   "require-dev": {
-    "doctrine/orm": "2.8.5",
+    "guzzlehttp/guzzle": "^7.4",
     "pestphp/pest": "^1.22",
     "spatie/pest-plugin-snapshots": "^1.1.0"
   },
@@ -23,13 +23,22 @@
       "MyParcelNL\\PrestaShop\\": "src/"
     },
     "classmap": [
-      "myparcelnl.php"
+      "myparcelnl.php",
+      "controllers"
     ]
   },
   "autoload-dev": {
     "psr-4": {
-      "MyParcelNL\\PrestaShop\\Tests\\": "tests/",
-      "MyParcelNL\\Pdk\\Tests\\": "vendor/myparcelnl/pdk/tests/"
-    }
+      "": "tests/factories",
+      "MyParcelNL\\Pdk\\": "vendor/myparcelnl/pdk/tests/factories/",
+      "MyParcelNL\\Pdk\\Tests\\": "vendor/myparcelnl/pdk/tests/",
+      "MyParcelNL\\PrestaShop\\": "tests/Unit",
+      "MyParcelNL\\PrestaShop\\Tests\\": "tests/"
+    },
+    "files": [
+      "vendor/myparcelnl/pdk/tests/functions.php",
+      "vendor/myparcelnl/pdk/tests/usesShared.php",
+      "tests/functions.php"
+    ]
   }
 }
