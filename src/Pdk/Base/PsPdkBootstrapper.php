@@ -58,6 +58,8 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'prestaShopVersionMin' => value('1.7.6'),
             'prestaShopVersionMax' => value('8.2.0'),
 
+            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+
             'MyParcelCarrierName' => value('MyParcel Carrier'),
 
             /**

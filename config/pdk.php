@@ -34,7 +34,7 @@ use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
 use MyParcelNL\PrestaShop\Pdk\DeliveryOptions\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsFrontendRenderService;
 use MyParcelNL\PrestaShop\Pdk\Language\Service\LanguageService;
-use MyParcelNL\PrestaShop\Pdk\Logger\PdkLogger;
+use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PdkAccountRepository;
@@ -108,7 +108,7 @@ return [
      */
     ClientAdapterInterface::class         => get(Guzzle7ClientAdapter::class),
     InstallerServiceInterface::class      => get(PsInstallerService::class),
-    LoggerInterface::class                => get(PdkLogger::class),
+    LoggerInterface::class                => get(PsLogger::class),
     MigrationServiceInterface::class      => get(PsMigrationService::class),
     ScriptServiceInterface::class         => get(PsScriptService::class),
 

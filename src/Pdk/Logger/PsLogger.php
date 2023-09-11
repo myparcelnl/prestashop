@@ -6,15 +6,15 @@ namespace MyParcelNL\PrestaShop\Pdk\Logger;
 
 use FileLogger;
 use InvalidArgumentException;
+use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Logger\AbstractLogger;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
 use Psr\Log\LogLevel;
-use RuntimeException;
 use Throwable;
 
-class PdkLogger extends AbstractLogger
+final class PsLogger extends AbstractLogger
 {
     /**
      * Log levels, in order of severity.
@@ -48,32 +48,16 @@ class PdkLogger extends AbstractLogger
      */
     private static $loggers = [];
 
-    public function __construct()
-    {
-        $directory = $this->getLogDirectory();
-
-        $this->createLogDirectory($directory);
-    }
-
     /**
-     * @param  string $directory
-     *
-     * @return void
+     * @var \MyParcelNL\Pdk\Base\FileSystemInterface
      */
-    public function createLogDirectory(string $directory): void
+    private $fileSystem;
+
+    public function __construct(FileSystemInterface $fileSystem)
     {
-        if (! is_dir($directory) && ! mkdir($directory) && ! is_dir($directory)) {
-            throw new RuntimeException("Directory \"$directory\" was not created");
-        }
+        $this->fileSystem = $fileSystem;
 
-        if (! _PS_MODE_DEV_) {
-            return;
-        }
-
-        // Create all log files in advance on dev for easier tail usage
-        foreach (self::LOG_LEVELS as $level) {
-            $this->createLogFile($level);
-        }
+        $this->createLogDirectory();
     }
 
     /**
@@ -92,7 +76,40 @@ class PdkLogger extends AbstractLogger
         $logger = $this->getLogger($level);
         $string = $this->createMessage($message, $context, $level);
 
-        $logger->log($string, self::LEVEL_MAP[$level]);
+        $logger->log($string, $this->mapLevel($level));
+    }
+
+    /**
+     * @return void
+     */
+    private function createLogDirectory(): void
+    {
+        if (Pdk::isProduction()) {
+            return;
+        }
+
+        // Create all log files in advance on dev for easier tail usage
+        foreach (self::LOG_LEVELS as $level) {
+            $this->createLogFile($level);
+        }
+    }
+
+    /**
+     * @param  string $level
+     *
+     * @return void
+     */
+    private function createLogFile(string $level): void
+    {
+        $file = $this->getLogFilename($level);
+
+        if (! $this->fileSystem->isDir(Pdk::get('logDirectory'))) {
+            $this->fileSystem->mkdir(Pdk::get('logDirectory'), true);
+        }
+
+        if (! $this->fileSystem->fileExists($file)) {
+            $this->fileSystem->put($file, '');
+        }
     }
 
     /**
@@ -102,7 +119,7 @@ class PdkLogger extends AbstractLogger
      *
      * @return void
      */
-    protected function createMessage($message, array $context, string $level): string
+    private function createMessage($message, array $context, string $level): string
     {
         $output     = $this->getOutput($message);
         $logContext = Arr::except($context, 'exception');
@@ -116,20 +133,6 @@ class PdkLogger extends AbstractLogger
         }
 
         return $output;
-    }
-
-    /**
-     * @param  string $level
-     *
-     * @return void
-     */
-    private function createLogFile(string $level): void
-    {
-        $file = $this->getLogFilename($level);
-
-        if (! file_exists($file)) {
-            touch($file);
-        }
     }
 
     /**
@@ -158,19 +161,14 @@ class PdkLogger extends AbstractLogger
         return $caller;
     }
 
-    private function getLogDirectory(): string
-    {
-        return sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, Pdk::get('appInfo')['name']);
-    }
-
     /**
-     * @param $level
+     * @param  string $level
      *
      * @return string
      */
-    private function getLogFilename($level): string
+    private function getLogFilename(string $level): string
     {
-        return sprintf("%s/%s.log", $this->getLogDirectory(), $level);
+        return sprintf('%s/%s.log', Pdk::get('logDirectory'), $level);
     }
 
     /**
@@ -243,9 +241,19 @@ class PdkLogger extends AbstractLogger
     {
         $this->createLogFile($level);
 
-        $logger = new FileLogger($level);
+        $logger = new FileLogger($this->mapLevel($level));
         $logger->setFilename($this->getLogFilename($level));
 
         return $logger;
+    }
+
+    /**
+     * @param  string $level
+     *
+     * @return int
+     */
+    private function mapLevel(string $level): int
+    {
+        return self::LEVEL_MAP[$level];
     }
 }
