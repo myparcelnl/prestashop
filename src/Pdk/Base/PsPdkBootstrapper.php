@@ -56,7 +56,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'moduleTabName'        => value('shipping_logistics'),
 
             'prestaShopVersionMin' => value('1.7.6'),
-            'prestaShopVersionMax' => value('8.0.4'),
+            'prestaShopVersionMax' => value('8.2.0'),
 
             'MyParcelCarrierName' => value('MyParcel Carrier'),
 
