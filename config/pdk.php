@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Account\Contract\AccountRepositoryInterface;
 use MyParcelNL\Pdk\Api\Contract\ClientAdapterInterface;
+use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
 use MyParcelNL\Pdk\App\Api\Contract\BackendEndpointServiceInterface;
 use MyParcelNL\Pdk\App\Api\Contract\FrontendEndpointServiceInterface;
 use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
@@ -52,7 +52,7 @@ use MyParcelNL\PrestaShop\Pdk\Tax\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\PsRouterService;
 use Psr\Log\LoggerInterface;
-use function DI\autowire;
+use function DI\get;
 use function DI\value;
 
 return [
@@ -70,47 +70,47 @@ return [
     /**
      * Repositories
      */
-    AccountRepositoryInterface::class           => autowire(PdkAccountRepository::class),
-    PdkCartRepositoryInterface::class           => autowire(PsPdkCartRepository::class),
-    PdkOrderRepositoryInterface::class          => autowire(PsPdkOrderRepository::class),
-    PdkProductRepositoryInterface::class        => autowire(PdkProductRepository::class),
-    PdkShippingMethodRepositoryInterface::class => autowire(PsShippingMethodRepository::class),
-    SettingsRepositoryInterface::class          => autowire(PdkSettingsRepository::class),
+    PdkAccountRepositoryInterface::class        => get(PdkAccountRepository::class),
+    PdkCartRepositoryInterface::class           => get(PsPdkCartRepository::class),
+    PdkOrderRepositoryInterface::class          => get(PsPdkOrderRepository::class),
+    PdkProductRepositoryInterface::class        => get(PdkProductRepository::class),
+    PdkShippingMethodRepositoryInterface::class => get(PsShippingMethodRepository::class),
+    SettingsRepositoryInterface::class          => get(PdkSettingsRepository::class),
 
     /**
      * Services
      */
-    CronServiceInterface::class                 => autowire(PsCronService::class),
-    DeliveryOptionsServiceInterface::class      => autowire(PsDeliveryOptionsService::class),
-    FrontendRenderServiceInterface::class       => autowire(PsFrontendRenderService::class),
-    LanguageServiceInterface::class             => autowire(LanguageService::class),
-    OrderStatusServiceInterface::class          => autowire(OrderStatusService::class),
-    TaxServiceInterface::class                  => autowire(PsTaxService::class),
-    ViewServiceInterface::class                 => autowire(PsViewService::class),
-    WeightServiceInterface::class               => autowire(PsWeightService::class),
+    CronServiceInterface::class                 => get(PsCronService::class),
+    DeliveryOptionsServiceInterface::class      => get(PsDeliveryOptionsService::class),
+    FrontendRenderServiceInterface::class       => get(PsFrontendRenderService::class),
+    LanguageServiceInterface::class             => get(LanguageService::class),
+    OrderStatusServiceInterface::class          => get(OrderStatusService::class),
+    TaxServiceInterface::class                  => get(PsTaxService::class),
+    ViewServiceInterface::class                 => get(PsViewService::class),
+    WeightServiceInterface::class               => get(PsWeightService::class),
 
     /**
      * Endpoints
      */
-    FrontendEndpointServiceInterface::class     => autowire(PsFrontendEndpointService::class),
-    BackendEndpointServiceInterface::class      => autowire(PsBackendEndpointService::class),
+    FrontendEndpointServiceInterface::class     => get(PsFrontendEndpointService::class),
+    BackendEndpointServiceInterface::class      => get(PsBackendEndpointService::class),
 
-    ConfigurationServiceInterface::class  => autowire(Ps17ConfigurationService::class),
+    ConfigurationServiceInterface::class  => get(Ps17ConfigurationService::class),
 
     /**
      * Webhooks
      */
-    PdkWebhookServiceInterface::class     => autowire(PsWebhookService::class),
-    PdkWebhooksRepositoryInterface::class => autowire(PsWebhooksRepository::class),
+    PdkWebhookServiceInterface::class     => get(PsWebhookService::class),
+    PdkWebhooksRepositoryInterface::class => get(PsWebhooksRepository::class),
 
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class         => autowire(Guzzle7ClientAdapter::class),
-    InstallerServiceInterface::class      => autowire(PsInstallerService::class),
-    LoggerInterface::class                => autowire(PdkLogger::class),
-    MigrationServiceInterface::class      => autowire(PsMigrationService::class),
-    ScriptServiceInterface::class         => autowire(PsScriptService::class),
+    ClientAdapterInterface::class         => get(Guzzle7ClientAdapter::class),
+    InstallerServiceInterface::class      => get(PsInstallerService::class),
+    LoggerInterface::class                => get(PdkLogger::class),
+    MigrationServiceInterface::class      => get(PsMigrationService::class),
+    ScriptServiceInterface::class         => get(PsScriptService::class),
 
-    PsRouterServiceInterface::class => autowire(PsRouterService::class),
+    PsRouterServiceInterface::class => get(PsRouterService::class),
 ];

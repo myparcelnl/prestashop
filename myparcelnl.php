@@ -12,14 +12,17 @@ use MyParcelNL\PrestaShop\Module\Hooks\HasPdkProductHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
 use MyParcelNL\PrestaShop\Module\Hooks\HasPdkScriptHooks;
 use MyParcelNL\PrestaShop\Module\Service\ModuleService;
-use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use PrestaShopBundle\Exception\InvalidModuleException;
+use function MyParcelNL\PrestaShop\bootPdk;
 
 defined('_PS_VERSION_') or exit();
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-final class MyParcelNL extends CarrierModule
+/**
+ * @final
+ */
+class MyParcelNL extends CarrierModule
 {
     use HasPdkCheckoutHooks;
     use HasPdkProductHooks;
@@ -68,7 +71,7 @@ final class MyParcelNL extends CarrierModule
 
         parent::__construct();
 
-        PsPdkBootstrapper::boot(
+        bootPdk(
             $this->name,
             $this->displayName,
             $this->version,

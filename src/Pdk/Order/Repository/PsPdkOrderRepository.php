@@ -9,6 +9,7 @@ use Country;
 use Customer;
 use CustomerMessage;
 use DateTimeImmutable;
+use Exception;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderNoteCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
@@ -141,21 +142,6 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  null|string $date
-     * @param  string      $fallback
-     *
-     * @return string
-     */
-    private function getDate(?string $date, string $fallback): string
-    {
-        try {
-            return (new DateTimeImmutable($date))->format('Y-m-d H:i:s');
-        } catch (\Exception $e) {
-            return $fallback;
-        }
-    }
-
-    /**
      * @param  \Order $order
      * @param  array  $existingNotes
      *
@@ -165,7 +151,7 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
     public function getOrderNotes(Order $order, array $existingNotes): PdkOrderNoteCollection
     {
         return $this->retrieve(
-            sprintf("notes_%s", $order->id),
+            sprintf('notes_%s', $order->id),
             function () use ($existingNotes, $order) {
                 $collection = new PdkOrderNoteCollection($existingNotes);
                 $orderNotes = new PdkOrderNoteCollection();
@@ -337,6 +323,21 @@ class PsPdkOrderRepository extends AbstractPdkOrderRepository
                 ? null
                 : (new State($address->id_state))->name,
         ];
+    }
+
+    /**
+     * @param  null|string $date
+     * @param  string      $fallback
+     *
+     * @return string
+     */
+    private function getDate(?string $date, string $fallback): string
+    {
+        try {
+            return (new DateTimeImmutable($date))->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            return $fallback;
+        }
     }
 
     /**

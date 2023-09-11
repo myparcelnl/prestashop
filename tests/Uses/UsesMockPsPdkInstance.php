@@ -4,37 +4,35 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Uses;
 
-use MyParcelNL\Pdk\Tests\Bootstrap\MockPdkConfig;
+use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
+use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Tests\Uses\UsesEachMockPdkInstance;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
+use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
+use function DI\get;
 
 final class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
 {
-    /**
-     * @return void
-     */
-    public function afterEach(): void
-    {
-        MockPsPdkBootstrapper::reset();
-
-        parent::afterEach();
-    }
-
     /**
      * @throws \Exception
      */
     protected function setup(): void
     {
-        $pluginFile = __DIR__ . '/../../myparcelnl.php';
+        MockPsPdkBootstrapper::create($this->getConfig());
+    }
 
-        MockPsPdkBootstrapper::setConfig(MockPdkConfig::create($this->config));
-
-        MockPsPdkBootstrapper::boot(
-            'myparcelnl',
-            'MyParcel [TEST]',
-            '0.0.1',
-            sprintf('%s/', dirname($pluginFile)),
-            'https://my-site/'
+    /**
+     * @return array
+     */
+    private function getConfig(): array
+    {
+        return array_replace(
+            $this->config,
+            [
+                PdkOrderRepositoryInterface::class => get(PsPdkOrderRepository::class),
+                PdkProductRepositoryInterface::class => get(PdkProductRepository::class),
+            ]
         );
     }
 }

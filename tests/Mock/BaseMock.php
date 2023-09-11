@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
-abstract class MockPsClass
+use BadMethodCallException;
+use MyParcelNL\Sdk\src\Support\Str;
+
+abstract class BaseMock
 {
     /**
      * @var array
      */
     protected $attributes;
 
-    /**
-     * @param  array $data
-     */
-    public function __construct(array $data = [])
+    public function __call($name, $arguments)
     {
-        $this->attributes = $data;
+        if (Str::startsWith($name, 'get')) {
+            $attribute = Str::snake(substr($name, 3));
+
+            return $this->attributes[$attribute] ?? null;
+        }
+
+        throw new BadMethodCallException("Method {$name} does not exist");
     }
 
     /**
@@ -48,5 +54,15 @@ abstract class MockPsClass
     public function __set(string $name, $value): void
     {
         $this->attributes[$name] = $value;
+    }
+
+    /**
+     * @param  array $attributes
+     *
+     * @return void
+     */
+    protected function fill(array $attributes): void
+    {
+        $this->attributes = $attributes;
     }
 }

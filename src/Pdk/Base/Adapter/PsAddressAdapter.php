@@ -6,9 +6,9 @@ namespace MyParcelNL\PrestaShop\Pdk\Base\Adapter;
 
 use Address;
 use Country;
+use Customer;
 use MyParcelNL\Pdk\Facade\Platform;
 use Order;
-use PrestaShop\PrestaShop\Adapter\Entity\Customer;
 use State;
 
 final class PsAddressAdapter

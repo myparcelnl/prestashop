@@ -3,25 +3,37 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Tests\Pdk\Order\Repository;
+namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Order;
+use OrderFactory;
 use function MyParcelNL\Pdk\Tests\usesShared;
+use function MyParcelNL\PrestaShop\psFactory;
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 usesShared(new UsesMockPsPdkInstance());
 
-it('creates a valid pdk order', function (array $input) {
+it('creates a valid pdk order', function (OrderFactory $orderFactory) {
     /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
     $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
 
-    $psOrder  = new Order($input);
+    $psOrder  = $orderFactory->store();
     $pdkOrder = $orderRepository->get($psOrder);
 
-    assertMatchesJsonSnapshot(json_encode($pdkOrder->toArray(), JSON_PRETTY_PRINT));
+    $array = $pdkOrder->toArrayWithoutNull();
+
+    assertMatchesJsonSnapshot(
+        json_encode(
+            Arr::except($array, ['deliveryOptions.carrier.capabilities', 'deliveryOptions.carrier.returnCapabilities']),
+            JSON_PRETTY_PRINT
+        )
+    );
 })->with([
-    // TODO
+    'simple order' => function () {
+        return psFactory(Order::class);
+    },
 ]);

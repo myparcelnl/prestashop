@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Tests\Bootstrap;
+namespace MyParcelNL\PrestaShop\Tests\Mock;
 
-use Doctrine\ORM\EntityRepository;
 use MyParcelNL\Sdk\src\Support\Arr;
+use ObjectModel;
 
-class MockEntityRepository extends EntityRepository
+final class MockPsRepository
 {
     private $entities = [];
 
@@ -41,7 +41,17 @@ class MockEntityRepository extends EntityRepository
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null): array
     {
-        return Arr::where($this->entities, $criteria);
+        return Arr::where($this->entities, static function (ObjectModel $entity) use ($criteria) {
+            foreach ($criteria as $key => $value) {
+                if ($entity->{$key} === $value) {
+                    continue;
+                }
+
+                return false;
+            }
+
+            return true;
+        });
     }
 
     /**
