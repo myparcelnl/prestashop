@@ -37,7 +37,7 @@ use MyParcelNL\PrestaShop\Pdk\Language\Service\LanguageService;
 use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PdkAccountRepository;
+use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsPdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsShippingMethodRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsWebhooksRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Service\OrderStatusService;
@@ -70,7 +70,7 @@ return [
     /**
      * Repositories
      */
-    PdkAccountRepositoryInterface::class        => get(PdkAccountRepository::class),
+    PdkAccountRepositoryInterface::class        => get(PsPdkAccountRepository::class),
     PdkCartRepositoryInterface::class           => get(PsPdkCartRepository::class),
     PdkOrderRepositoryInterface::class          => get(PsPdkOrderRepository::class),
     PdkProductRepositoryInterface::class        => get(PdkProductRepository::class),
