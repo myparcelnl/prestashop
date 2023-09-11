@@ -1,34 +1,40 @@
-name: 'Rebase'
+name: '🧩 Rebase branches'
 
 on:
   workflow_call:
     inputs:
       base:
         type: string
-        required: false
-        default: 'main'
+        required: true
 
       target:
         type: string
+        required: true
+
+      force:
+        type: boolean
         required: false
-        default: 'develop'
+        default: false
 
   workflow_dispatch:
     inputs:
       base:
         type: string
         description: 'Base branch'
-        default: 'main'
         required: true
+        default: 'develop'
 
       target:
         type: string
-        description: 'Target branch'
-        default: 'develop'
+        description: 'Target branch to update'
         required: true
+        default: 'main'
 
-  repository_dispatch:
-    types: [ rebase-command ]
+      force:
+        type: boolean
+        description: 'Force push target branch'
+        required: false
+        default: false
 
 jobs:
   rebase:
@@ -43,6 +49,6 @@ jobs:
       - uses: myparcelnl/actions/rebase@v3
         with:
           token: ${{ steps.credentials.outputs.token }}
-          base: ${{ github.event.client_payload.base || github.event.inputs.base || inputs.base || github.ref || github.ref_name }}
-          target: ${{ github.event.client_payload.target || github.event.inputs.target || inputs.target }}
+          base: ${{ inputs.base || github.ref_name }}
+          target: ${{ inputs.target }}
           force: ${{ inputs.force }}

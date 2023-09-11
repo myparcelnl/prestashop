@@ -4,13 +4,9 @@ description: ''
 runs:
   using: composite
   steps:
-    - name: 'Import translations'
-      shell: bash
-      run: |
-        yarn translations:import
-
     - name: 'Build JavaScript bundles'
       shell: bash
+      #language=sh
       run: |
         yarn nx run-many \
           --output-style=static \

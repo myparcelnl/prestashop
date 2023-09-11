@@ -9,16 +9,17 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PHP_VERSION: 7.4
-  NODE_VERSION: 18
-
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
   release:
-    name: 'Build and publish 🚀'
+    needs:
+      - test
     runs-on: ubuntu-22.04
     outputs:
       released: ${{ steps.release.outputs.released }}
@@ -35,7 +36,9 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.credentials.outputs.token }}
 
-      - uses: ./.github/actions/install
+      - uses: ./.github/actions/setup
+        with:
+          composer-flags: --no-dev
 
       - uses: ./.github/actions/build
 
@@ -46,7 +49,6 @@ jobs:
           write-summary: true
 
   rebase-develop:
-    name: 'Rebase develop onto main'
     uses: ./.github/workflows/rebase.yml
     secrets: inherit
     needs: release
@@ -57,29 +59,14 @@ jobs:
       force: true
 
   rebase-prs:
-    name: 'Rebase pull requests'
     needs:
       - release
       - rebase-develop
-    if: always()
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: myparcelnl/actions/setup-app-credentials@v3
-        id: credentials
-        with:
-          app-id: ${{ secrets.MYPARCEL_APP_ID }}
-          private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
-
-      - uses: peter-evans/rebase@v2
-        with:
-          token: ${{ steps.credentials.outputs.token }}
-          base: ${{ github.ref_name }}
-          exclude-drafts: true
-          exclude-labels: 'hotfix'
+    uses: ./.github/workflows/rebase-prs.yml
 
   prune-releases:
     needs: release
-    if: github.ref == 'refs/heads/alpha' && needs.release.outputs.released == 'true'
+    if: needs.release.outputs.released == 'true' && (github.ref_name == 'alpha' || github.ref_name == 'beta')
     runs-on: ubuntu-22.04
     steps:
       - uses: myparcelnl/actions/setup-app-credentials@v3
@@ -91,6 +78,6 @@ jobs:
       - uses: dev-drprasad/delete-older-releases@02a7034dca897d85c149ca759d6e1fd40b953af3
         with:
           keep_latest: 1
-          delete_tag_pattern: alpha
+          delete_tag_pattern: ${{ github.ref_name }} # alpha or beta
         env:
           GITHUB_TOKEN: ${{ steps.credentials.outputs.token }}
