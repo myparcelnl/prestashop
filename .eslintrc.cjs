@@ -6,6 +6,13 @@ module.exports = {
   },
   overrides: [
     {
+      files: ['./**/index.ts'],
+      plugins: ['sort-exports'],
+      rules: {
+        'sort-exports/sort-exports': ['warn', {sortDir: 'asc', sortExportKindFirst: 'type'}],
+      },
+    },
+    {
       files: ['./**/*.vue'],
       extends: ['@myparcel-eslint/eslint-config-prettier-typescript-vue', '@myparcel-eslint/eslint-config-import'],
       rules: {
