@@ -9,17 +9,24 @@ use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 class PsCronService implements CronServiceInterface
 {
     /**
-     * @param  callable $callback
-     * @param           ...$args
+     * @param  callable|string $callback
+     * @param  mixed           ...$args
      *
      * @return void
      */
-    public function dispatch(callable $callback, ...$args): void
+    public function dispatch($callback, ...$args): void
     {
         $callback(...$args);
     }
 
-    public function schedule(callable $callback, int $timestamp, ...$args): void
+    /**
+     * @param  callable|string $callback
+     * @param  int             $timestamp
+     * @param  mixed           ...$args
+     *
+     * @return void
+     */
+    public function schedule($callback, int $timestamp, ...$args): void
     {
         // TODO: Implement schedule() method.
     }

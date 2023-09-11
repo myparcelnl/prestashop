@@ -8,7 +8,7 @@ use MyParcelNL\Pdk\Frontend\Service\AbstractViewService;
 use PrestaShop\PrestaShop\Adapter\Entity\Dispatcher;
 use RuntimeException;
 
-class PsViewService extends AbstractViewService
+final class PsViewService extends AbstractViewService
 {
     /**
      * @throws \PrestaShopException
@@ -16,6 +16,14 @@ class PsViewService extends AbstractViewService
     public function isCheckoutPage(): bool
     {
         return 'order' === $this->getPage();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isChildProductPage(): bool
+    {
+        return false;
     }
 
     /**
@@ -57,6 +65,7 @@ class PsViewService extends AbstractViewService
     private function getPage(): string
     {
         $dispatcher = Dispatcher::getInstance();
+
         if (! $dispatcher) {
             throw new RuntimeException('Dispatcher not found');
         }
