@@ -36,7 +36,7 @@ use MyParcelNL\PrestaShop\Pdk\DeliveryOptions\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsFrontendRenderService;
 use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsInstallerService;
 use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsMigrationService;
-use MyParcelNL\PrestaShop\Pdk\Language\Service\LanguageService;
+use MyParcelNL\PrestaShop\Pdk\Language\Service\PsLanguageService;
 use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderNoteRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
@@ -90,7 +90,7 @@ return [
     CronServiceInterface::class                 => get(PsCronService::class),
     DeliveryOptionsServiceInterface::class      => get(PsDeliveryOptionsService::class),
     FrontendRenderServiceInterface::class       => get(PsFrontendRenderService::class),
-    LanguageServiceInterface::class             => get(LanguageService::class),
+    LanguageServiceInterface::class             => get(PsLanguageService::class),
     OrderStatusServiceInterface::class          => get(OrderStatusService::class),
     TaxServiceInterface::class                  => get(PsTaxService::class),
     ViewServiceInterface::class                 => get(PsViewService::class),

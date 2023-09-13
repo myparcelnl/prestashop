@@ -8,7 +8,7 @@ use Context;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Language\Service\AbstractLanguageService;
 
-class LanguageService extends AbstractLanguageService
+class PsLanguageService extends AbstractLanguageService
 {
     /**
      * @return string
