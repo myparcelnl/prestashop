@@ -1,33 +1,21 @@
 <?php
+/** @noinspection PhpUnused */
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Controller;
+namespace MyParcelNL\PrestaShop\Controller;
 
-use MyParcelNL;
 use MyParcelNL\Pdk\App\Api\PdkEndpoint;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-/**
- * @property \MyParcelNL $module
- * @noinspection PhpUnused
- */
-class AdminMyParcelPdkController extends FrameworkBundleAdminController
+final class PdkController extends AbstractAdminController
 {
     private const PRESTASHOP_TOKEN_PARAMETER = '_token';
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        // Trigger PDK setup
-        MyParcelNL::getModule();
-    }
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
@@ -43,8 +31,11 @@ class AdminMyParcelPdkController extends FrameworkBundleAdminController
             $response = $endpoint->call($request, PdkEndpoint::CONTEXT_BACKEND);
         } catch (Throwable $e) {
             Logger::error($e->getMessage(), ['values' => $_REQUEST]);
+
             return new Response($e->getMessage(), 400);
         }
+
+        $this->flushEntityManager();
 
         return $response;
     }
@@ -60,5 +51,17 @@ class AdminMyParcelPdkController extends FrameworkBundleAdminController
         $request->query->remove(self::PRESTASHOP_TOKEN_PARAMETER);
 
         return $request;
+    }
+
+    /**
+     * @return void
+     */
+    private function flushEntityManager(): void
+    {
+        if (! EntityManager::isOpen()) {
+            return;
+        }
+
+        EntityManager::flush();
     }
 }
