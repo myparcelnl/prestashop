@@ -11,6 +11,7 @@ use MyParcelNL\PrestaShop\Hooks\HasPdkOrderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkProductHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkRenderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkScriptHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPsCarrierHooks;
 use MyParcelNL\PrestaShop\Service\ModuleService;
 use PrestaShopBundle\Exception\InvalidModuleException;
 use function MyParcelNL\PrestaShop\bootPdk;
@@ -25,10 +26,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 class MyParcelNL extends CarrierModule
 {
     use HasPdkCheckoutHooks;
+    use HasPdkOrderHooks;
     use HasPdkProductHooks;
     use HasPdkRenderHooks;
     use HasPdkScriptHooks;
-    use HasPdkOrderHooks;
+    use HasPsCarrierHooks;
 
     /**
      * @deprecated

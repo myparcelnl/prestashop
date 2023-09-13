@@ -26,13 +26,14 @@ use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Configuration\Service\Ps17ConfigurationService;
-use MyParcelNL\PrestaShop\Module\Installer\PsInstallerService;
-use MyParcelNL\PrestaShop\Module\Installer\PsMigrationService;
+use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
 use MyParcelNL\PrestaShop\Pdk\DeliveryOptions\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsFrontendRenderService;
+use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsInstallerService;
+use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsMigrationService;
 use MyParcelNL\PrestaShop\Pdk\Language\Service\LanguageService;
 use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
@@ -51,6 +52,7 @@ use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use MyParcelNL\PrestaShop\Pdk\Tax\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\PsRouterService;
+use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use Psr\Log\LoggerInterface;
 use function DI\get;
 use function DI\value;
@@ -112,5 +114,9 @@ return [
     MigrationServiceInterface::class      => get(PsMigrationService::class),
     ScriptServiceInterface::class         => get(PsScriptService::class),
 
-    PsRouterServiceInterface::class => get(PsRouterService::class),
+    /**
+     * Custom services
+     */
+    PsCarrierServiceInterface::class      => get(PsCarrierService::class),
+    PsRouterServiceInterface::class       => get(PsRouterService::class),
 ];

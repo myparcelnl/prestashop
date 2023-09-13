@@ -7,11 +7,15 @@ namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
 use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Repository\AccountRepository;
 use MyParcelNL\Pdk\App\Account\Repository\AbstractPdkAccountRepository;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use Throwable;
 
-class PdkAccountRepository extends AbstractPdkAccountRepository
+final class PsPdkAccountRepository extends AbstractPdkAccountRepository
 {
     private const STORAGE_KEY_ACCOUNT = 'data_account';
 
@@ -23,27 +27,17 @@ class PdkAccountRepository extends AbstractPdkAccountRepository
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                           $storage
      * @param  \MyParcelNL\Pdk\Account\Repository\AccountRepository                        $accountRepository
+     * @param  \MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface               $settingsRepository
      * @param  \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface $configurationService
      */
     public function __construct(
         StorageInterface              $storage,
         AccountRepository             $accountRepository,
+        SettingsRepositoryInterface   $settingsRepository,
         ConfigurationServiceInterface $configurationService
     ) {
-        parent::__construct($storage, $accountRepository);
+        parent::__construct($storage, $accountRepository, $settingsRepository);
         $this->configurationService = $configurationService;
-    }
-
-    /**
-     * @return null|\MyParcelNL\Pdk\Account\Model\Account
-     */
-    public function getFromStorage(): ?Account
-    {
-        return $this->retrieve(self::STORAGE_KEY_ACCOUNT, function () {
-            $result = $this->configurationService->get($this->getConfigurationKey());
-
-            return $result ? new Account($result) : null;
-        });
     }
 
     /**
@@ -63,7 +57,27 @@ class PdkAccountRepository extends AbstractPdkAccountRepository
 
         $this->configurationService->set($key, $account->toStorableArray());
 
+        try {
+            /** @var PsCarrierServiceInterface $carrierService */
+            $carrierService = Pdk::get(PsCarrierServiceInterface::class);
+            $carrierService->updateCarriers();
+        } catch (Throwable $e) {
+            Logger::error($e->getMessage());
+        }
+
         return $this->save(self::STORAGE_KEY_ACCOUNT, $account);
+    }
+
+    /**
+     * @return null|\MyParcelNL\Pdk\Account\Model\Account
+     */
+    protected function getFromStorage(): ?Account
+    {
+        return $this->retrieve(self::STORAGE_KEY_ACCOUNT, function () {
+            $result = $this->configurationService->get($this->getConfigurationKey());
+
+            return $result ? new Account($result) : null;
+        });
     }
 
     /**
