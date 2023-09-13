@@ -8,7 +8,7 @@ use AdminControllerCore;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Service\ScriptService;
 
-class PsScriptService extends ScriptService
+final class PsScriptService extends ScriptService
 {
     public function addForAdminHeader(AdminControllerCore $controller, string $path): void
     {
@@ -22,16 +22,17 @@ class PsScriptService extends ScriptService
             1
         );
 
-        $controller->addCSS($path . 'views/js/admin/lib/style.css');
-        $controller->addJS($path . 'views/js/admin/lib/prestashop-admin.iife.js');
+        $controller->addCSS($path . 'views/js/backend/admin/lib/style.css');
+        $controller->addJS($path . 'views/js/backend/admin/lib/backend-admin.iife.js');
     }
 
     /**
-     * @param  string $version
+     * @param  \AdminControllerCore $controller
+     * @param  string               $version
      *
      * @return void
      */
-    public function addVue(AdminControllerCore $controller, string $version): void
+    protected function addVue(AdminControllerCore $controller, string $version): void
     {
         $isVue3   = version_compare($version, '3.0.0', '>=');
         $file     = $isVue3 ? 'vue.global' : 'vue';
@@ -41,11 +42,12 @@ class PsScriptService extends ScriptService
     }
 
     /**
-     * @param  string $version
+     * @param  \AdminControllerCore $controller
+     * @param  string               $version
      *
      * @return void
      */
-    public function addVueDemi(AdminControllerCore $controller, string $version): void
+    protected function addVueDemi(AdminControllerCore $controller, string $version): void
     {
         $filename = Pdk::isDevelopment() ? 'index.iife.js' : 'index.iife.min.js';
 
