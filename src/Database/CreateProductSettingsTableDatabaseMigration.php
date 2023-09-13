@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
+use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
+
 /**
  * @see \MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings
  */
-class CreateProductSettingsTableDatabaseMigration extends AbstractDatabaseMigration
+final class CreateProductSettingsTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): void
     {
-        $table = Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
+        $table = $this->getTable();
         $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
     public function up(): void
     {
-        $table = Table::withPrefix(Table::TABLE_PRODUCT_SETTINGS);
+        $table = $this->getTable();
         $sql   = <<<SQL
             CREATE TABLE IF NOT EXISTS `$table` (
                 `id`         INT AUTO_INCREMENT                                             NOT NULL,
@@ -31,5 +33,13 @@ class CreateProductSettingsTableDatabaseMigration extends AbstractDatabaseMigrat
 SQL;
 
         $this->execute($sql);
+    }
+
+    /**
+     * @return string
+     */
+    private function getTable(): string
+    {
+        return Table::withPrefix(MyparcelnlProductSettings::getTable());
     }
 }

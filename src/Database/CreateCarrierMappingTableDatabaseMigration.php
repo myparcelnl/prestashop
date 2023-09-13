@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
-class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseMigration
+final class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): void
     {
-        $table = Table::withPrefix(Table::TABLE_CARRIER_MAPPING);
+        $table = $this->getTable();
         $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
     public function up(): void
     {
-        $table = Table::withPrefix(Table::TABLE_CARRIER_MAPPING);
+        $table = $this->getTable();
         $sql   = <<<SQL
-            DROP TABLE IF EXISTS `$table`;
             CREATE TABLE IF NOT EXISTS `$table` (
                 `id`               INT AUTO_INCREMENT                                             NOT NULL,
                 `id_carrier`       INT                                                            NOT NULL,
@@ -30,5 +29,13 @@ class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseMigrati
 SQL;
 
         $this->execute($sql);
+    }
+
+    /**
+     * @return string
+     */
+    private function getTable(): string
+    {
+        return Table::withPrefix(Table::TABLE_CARRIER_MAPPING);
     }
 }

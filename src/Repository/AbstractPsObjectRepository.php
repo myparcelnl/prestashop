@@ -6,24 +6,24 @@ namespace MyParcelNL\PrestaShop\Repository;
 
 use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\Mapping\Entity;
-use MyParcelNL\Pdk\Base\Repository\Repository;
+use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
-use MyParcelNL\Sdk\src\Support\Collection;
+use MyParcelNL\PrestaShop\Contract\PsObjectRepositoryInterface;
+use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
 use MyParcelNL\Sdk\src\Support\Str;
 use Throwable;
 
 /**
- * @template-covariant T of object
+ * @template T of \MyParcelNL\PrestaShop\Entity\Contract\EntityInterface
  */
-abstract class AbstractPsObjectRepository extends Repository
+abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
 {
     /**
-     * @var \Doctrine\ORM\Mapping\Entity
+     * @var class-string<T>
      */
-    protected $entity = Entity::class;
+    protected $entity;
 
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -35,37 +35,24 @@ abstract class AbstractPsObjectRepository extends Repository
      */
     protected $entityRepository;
 
-    /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface $storage
-     */
-    public function __construct(StorageInterface $storage)
+    public function __construct()
     {
-        parent::__construct($storage);
         $this->entityManager    = Pdk::get('ps.entityManager');
         $this->entityRepository = $this->entityManager->getRepository($this->entity);
-
-        // on shutdown
-        register_shutdown_function(function () {
-            try {
-                $this->entityManager->flush();
-            } catch (Throwable $e) {
-                Logger::error($e->getMessage());
-            }
-        });
     }
 
     /**
-     * @return \MyParcelNL\Sdk\src\Support\Collection
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
      */
     public function all(): Collection
     {
-        return new Collection($this->entityRepository->findAll());
+        return new Collection(array_values($this->entityRepository->findAll()));
     }
 
     /**
      * @param  array $values
      *
-     * @return null|\Doctrine\ORM\Mapping\Entity|object
+     * @return null|T
      * @throws \Doctrine\ORM\ORMException
      */
     public function create(array $values)
@@ -76,25 +63,28 @@ abstract class AbstractPsObjectRepository extends Repository
     /**
      * @return T
      */
-    public function createEntity()
+    public function createEntity(): EntityInterface
     {
         return new $this->entity();
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @param  \MyParcelNL\PrestaShop\Entity\Contract\EntityInterface $entity
+     *
+     * @return void
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
-    public function delete(Entity $entity): void
+    public function delete(EntityInterface $entity): void
     {
         $this->entityManager->remove($entity);
     }
 
     /**
-     * @param  mixed $id
+     * @param  int $id
      *
      * @return null|T
      */
-    public function find($id): Entity
+    public function find(int $id): EntityInterface
     {
         return $this->entityRepository->find($id);
     }
@@ -121,26 +111,14 @@ abstract class AbstractPsObjectRepository extends Repository
     }
 
     /**
-     * @param  null|\Doctrine\ORM\Mapping\Entity $entity
-     *
-     * @return void
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    public function flush(?Entity $entity = null): void
-    {
-        $this->entityManager->flush($entity);
-    }
-
-    /**
      * @param  array $values
      * @param  array $where
      *
-     * @return null
+     * @return null|T
      * @throws \Doctrine\ORM\EntityNotFoundException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function update(array $values, array $where)
+    public function update(array $values, array $where): ?EntityInterface
     {
         $entity = $this->entityRepository->findOneBy($where);
 
@@ -173,11 +151,12 @@ abstract class AbstractPsObjectRepository extends Repository
 
         $entity->updated = new DateTime();
 
-        foreach (array_merge($where, $values) as $key => $value) {
-            $entity->{Str::camel("set_$key")}($value);
+        foreach (array_replace($where, $values) as $key => $value) {
+            $entity->{$key} = $value;
         }
 
         $this->entityManager->persist($entity);
+        Logger::debug(Utils::classBasename(__METHOD__) . ' – ' . $this->entity);
 
         return $entity;
     }
@@ -186,10 +165,18 @@ abstract class AbstractPsObjectRepository extends Repository
      * @param  string $key
      * @param  mixed  $value
      *
-     * @return \MyParcelNL\Sdk\src\Support\Collection
+     * @return \MyParcelNL\Pdk\Base\Support\Collection<T>
      */
     public function where(string $key, $value): Collection
     {
         return new Collection($this->entityRepository->findBy([$key => $value]));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getKeyPrefix(): string
+    {
+        return Str::snake(Utils::classBasename($this->entity));
     }
 }

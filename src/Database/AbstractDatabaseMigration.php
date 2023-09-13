@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
-use MyParcelNL\Pdk\Facade\Logger;
+use Db;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface;
+use MyParcelNL\Pdk\Facade\Logger;
 
 abstract class AbstractDatabaseMigration implements MigrationInterface
 {
@@ -28,19 +29,9 @@ abstract class AbstractDatabaseMigration implements MigrationInterface
         $trimmedSql = str_replace("\n", ' ', $replacedSql);
         $trimmedSql = trim(preg_replace('/\s+/m', ' ', $trimmedSql));
 
-        try {
-            \Db::getInstance(_PS_USE_SQL_SLAVE_)
-                ->execute($trimmedSql);
-            Logger::info('Query executed', ['class' => static::class, 'sql' => $trimmedSql]);
-        } catch (\Throwable $e) {
-            Logger::error(
-                'Query failed',
-                [
-                    'class' => static::class,
-                    'sql'   => $trimmedSql,
-                    'error' => $e->getMessage(),
-                ]
-            );
-        }
+        Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->execute($trimmedSql);
+
+        Logger::debug('Query executed', ['class' => static::class, 'sql' => $trimmedSql]);
     }
 }

@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
+use MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions;
+
 /**
  * @see \MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions
  */
-class CreateCartDeliveryOptionsTableDatabaseMigration extends AbstractDatabaseMigration
+final class CreateCartDeliveryOptionsTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): void
     {
-        $table = Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
+        $table = $this->getTable();
         $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
     public function up(): void
     {
-        $table = Table::withPrefix(Table::TABLE_CART_DELIVERY_OPTIONS);
+        $table = $this->getTable();
         $sql   = <<<SQL
             CREATE TABLE IF NOT EXISTS `$table` (
                 `id`      INT AUTO_INCREMENT                                             NOT NULL,
@@ -31,5 +33,13 @@ class CreateCartDeliveryOptionsTableDatabaseMigration extends AbstractDatabaseMi
 SQL;
 
         $this->execute($sql);
+    }
+
+    /**
+     * @return string
+     */
+    private function getTable(): string
+    {
+        return Table::withPrefix(MyparcelnlCartDeliveryOptions::getTable());
     }
 }

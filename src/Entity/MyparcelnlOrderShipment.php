@@ -4,76 +4,32 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Entity;
 
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Entity\Concern\HasJsonData;
+
 /**
  * @Doctrine\ORM\Mapping\Table()
  * @Doctrine\ORM\Mapping\Entity()
  * @see \MyParcelNL\PrestaShop\Database\CreateOrderShipmentTableDatabaseMigration
  */
-class MyparcelnlOrderShipment extends AbstractEntity
+final class MyparcelnlOrderShipment extends AbstractEntity
 {
-    /**
-     * @var string
-     * @Doctrine\ORM\Mapping\Column(type="text", nullable=false)
-     */
-    protected $data;
+    use HasJsonData;
 
     /**
      * @var string
      * @Doctrine\ORM\Mapping\Column(type="string", nullable=false)
      */
-    protected $idOrder;
+    public $idOrder;
 
     /**
      * @var int
      * @Doctrine\ORM\Mapping\Column(type="integer", nullable=false, unique=true)
      */
-    protected $idShipment;
+    public $idShipment;
 
-    /**
-     * @return array
-     */
-    public function getData(): array
+    public static function getTable(): string
     {
-        return json_decode($this->data, true);
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdOrder(): string
-    {
-        return (string) $this->idOrder;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIdShipment(): int
-    {
-        return $this->idShipment;
-    }
-
-    /**
-     * @param  string $data
-     */
-    public function setData(string $data): void
-    {
-        $this->data = $data;
-    }
-
-    /**
-     * @param  string $idOrder
-     */
-    public function setIdOrder(string $idOrder): void
-    {
-        $this->idOrder = $idOrder;
-    }
-
-    /**
-     * @param  int $idShipment
-     */
-    public function setIdShipment(int $idShipment): void
-    {
-        $this->idShipment = $idShipment;
+        return Table::TABLE_ORDER_SHIPMENT;
     }
 }

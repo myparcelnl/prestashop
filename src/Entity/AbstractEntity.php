@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Entity;
 
-abstract class AbstractEntity
+use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
+
+abstract class AbstractEntity implements EntityInterface
 {
     /**
      * @var \DateTime
@@ -23,18 +25,13 @@ abstract class AbstractEntity
 
     /**
      * @var \DateTime
-     * @Doctrine\ORM\Mapping\Column(type="datetime", nullable=false, options={"default" = "CURRENT_TIMESTAMP", "onUpdate" = "CURRENT_TIMESTAMP"})
+     * @Doctrine\ORM\Mapping\Column(type="datetime", nullable=false, options={"default" = "CURRENT_TIMESTAMP",
+     *                                               "onUpdate" = "CURRENT_TIMESTAMP"})
      * @Doctrine\ORM\Mapping\GeneratedValue(strategy="AUTO")
      */
     public $updated;
 
-    /**
-     * @return \DateTime
-     */
-    public function getCreated(): \DateTime
-    {
-        return $this->created;
-    }
+    public function __construct() {}
 
     /**
      * @return int
@@ -42,14 +39,6 @@ abstract class AbstractEntity
     public function getId(): int
     {
         return $this->id;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdated(): \DateTime
-    {
-        return $this->updated;
     }
 
     /**

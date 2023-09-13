@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
+use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
+
 /**
  * @see \MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment
  */
-class CreateOrderShipmentTableDatabaseMigration extends AbstractDatabaseMigration
+final class CreateOrderShipmentTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): void
     {
-        $table = Table::withPrefix(Table::TABLE_ORDER_SHIPMENT);
+        $table = $this->getTable();
         $this->execute("DROP TABLE IF EXISTS `$table`");
     }
 
     public function up(): void
     {
-        $table = Table::withPrefix(Table::TABLE_ORDER_SHIPMENT);
+        $table = $this->getTable();
         $sql   = <<<SQL
             CREATE TABLE IF NOT EXISTS `$table` (
                 `id`          INT AUTO_INCREMENT                                             NOT NULL,
@@ -33,5 +35,13 @@ class CreateOrderShipmentTableDatabaseMigration extends AbstractDatabaseMigratio
 SQL;
 
         $this->execute($sql);
+    }
+
+    /**
+     * @return string
+     */
+    private function getTable(): string
+    {
+        return Table::withPrefix(MyparcelnlOrderShipment::getTable());
     }
 }

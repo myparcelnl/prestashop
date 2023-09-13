@@ -4,54 +4,26 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Entity;
 
+use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Entity\Concern\HasJsonData;
+
 /**
  * @Doctrine\ORM\Mapping\Table()
  * @Doctrine\ORM\Mapping\Entity()
  * @see \MyParcelNL\PrestaShop\Database\CreateOrderDataTableDatabaseMigration
  */
-class MyparcelnlOrderData extends AbstractEntity
+final class MyparcelnlOrderData extends AbstractEntity
 {
-    /**
-     * @var string
-     * @Doctrine\ORM\Mapping\Column(type="text", nullable=false)
-     */
-    protected $data;
+    use HasJsonData;
 
     /**
      * @var string
      * @Doctrine\ORM\Mapping\Column(type="string", nullable=false, unique=true)
      */
-    protected $idOrder;
+    public $idOrder;
 
-    /**
-     * @return array
-     */
-    public function getData(): array
+    public static function getTable(): string
     {
-        return json_decode($this->data, true);
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdOrder(): string
-    {
-        return $this->idOrder;
-    }
-
-    /**
-     * @param  string $data
-     */
-    public function setData(string $data): void
-    {
-        $this->data = $data;
-    }
-
-    /**
-     * @param  string $idOrder
-     */
-    public function setIdOrder(string $idOrder): void
-    {
-        $this->idOrder = $idOrder;
+        return Table::TABLE_ORDER_DATA;
     }
 }
