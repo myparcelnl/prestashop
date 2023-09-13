@@ -11,11 +11,6 @@ use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShopBundle\Exception\InvalidModuleException;
@@ -46,21 +41,32 @@ class PsPdkBootstrapper extends PdkBootstrapper
         string $path,
         string $url
     ): array {
-        return array_merge([
+        return array_replace(
+            $this->getConfig($version, $name),
+            $this->resolvePrestaShopServices()
+        );
+    }
+
+    /**
+     * @param  string $version
+     * @param  string $name
+     *
+     * @return array
+     */
+    protected function getConfig(string $version, string $name): array
+    {
+        return [
             'userAgent' => value([
                 'PrestaShop'          => _PS_VERSION_,
                 'MyParcel-PrestaShop' => $version,
             ]),
 
-            'triggerUpgradeBefore' => value('2.0.1'),
-            'moduleTabName'        => value('shipping_logistics'),
+            'moduleTabName' => value('shipping_logistics'),
 
             'prestaShopVersionMin' => value('1.7.6'),
             'prestaShopVersionMax' => value('8.2.0'),
 
             'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
-
-            'MyParcelCarrierName' => value('MyParcel Carrier'),
 
             /**
              * The symfony routes that are used by the pdk.
@@ -69,12 +75,14 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'routeNamePdk'      => value('myparcelnl_pdk'),
             'routeNameFrontend' => value('myparcelnl_frontend'),
 
-            'moduleInstance' => factory(static function (): MyParcelNL {
+            'moduleInstance' => factory(static function (): Module {
+                $name = Pdk::getAppInfo()->name;
+
                 /** @var MyParcelNL|false $module */
-                $module = Module::getInstanceByName(Pdk::getAppInfo()->name);
+                $module = Module::getInstanceByName($name);
 
                 if (! $module) {
-                    throw new InvalidModuleException('Failed to get module instance');
+                    throw new InvalidModuleException("Failed to get module instance '$name'");
                 }
 
                 return $module;
@@ -96,49 +104,6 @@ class PsPdkBootstrapper extends PdkBootstrapper
                     ->values();
 
                 return $hooks->toArray();
-            }),
-
-        ],
-            $this->resolvePrestaShopRepositories(),
-            $this->resolvePrestaShopServices()
-        );
-    }
-
-    /**
-     * Resolve entity manager repositories for our added entities, so we can use them intuitively.
-     *
-     * @return array
-     */
-    private function resolvePrestaShopRepositories(): array
-    {
-        return [
-            'getEntityRepository' => factory(function () {
-                return static function (string $entityName) {
-                    /** @var \PrestaShop\PrestaShop\Core\Foundation\Database\EntityManager $entityManager */
-                    $entityManager = Pdk::get('ps.entityManager');
-
-                    return $entityManager->getRepository($entityName);
-                };
-            }),
-
-            'CarrierConfigurationRepository' => factory(function () {
-                return Pdk::get('getEntityRepository')(MyparcelnlCarrierMapping::class);
-            }),
-
-            'CartDeliveryOptionsRepository' => factory(function () {
-                return Pdk::get('getEntityRepository')(MyparcelnlCartDeliveryOptions::class);
-            }),
-
-            'OrderDataRepository' => factory(function () {
-                return Pdk::get('getEntityRepository')(MyparcelnlOrderData::class);
-            }),
-
-            'OrderShipmentRepository' => factory(function () {
-                return Pdk::get('getEntityRepository')(MyparcelnlOrderShipment::class);
-            }),
-
-            'ProductSettingsRepository' => factory(function () {
-                return Pdk::get('getEntityRepository')(MyparcelnlProductSettings::class);
             }),
         ];
     }
@@ -184,7 +149,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
 
                 $controller = Context::getContext()->controller;
 
-                if ($controller->php_self === 'order') {
+                if ('order' === $controller->php_self) {
                     $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
                     $locator         = new FileLocator([$routesDirectory]);
                     $loader          = new YamlFileLoader($locator);
