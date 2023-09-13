@@ -2,6 +2,7 @@
   <textarea
     :id="id"
     v-model.trim="model"
+    v-test="AdminComponent.TextArea"
     :class="{
       'form-required': !element.isValid,
     }"
@@ -10,15 +11,11 @@
 </template>
 
 <script lang="ts" setup>
-import {useVModel} from '@vueuse/core';
-import {type ElementInstance, generateFieldId} from '@myparcel-pdk/admin';
-import {type InteractiveElementInstance} from '@myparcel/vue-form-builder';
+import {AdminComponent, type TextAreaProps, type TextAreaEmits, useElementContext} from '@myparcel-pdk/admin';
 
 // eslint-disable-next-line vue/no-unused-properties
-const props = defineProps<{modelValue: string | number; element: InteractiveElementInstance}>();
-const emit = defineEmits<(e: 'update:modelValue', value: string | number) => void>();
+const props = defineProps<TextAreaProps>();
+const emit = defineEmits<TextAreaEmits>();
 
-const model = useVModel(props, undefined, emit);
-
-const id = generateFieldId(props.element as ElementInstance);
+const {id, model} = useElementContext(props, emit);
 </script>

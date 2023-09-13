@@ -6,10 +6,8 @@ import {
   DefaultHeading,
   DefaultLink,
   DefaultLoader,
-  DefaultMultiSelectInput,
   DefaultNumberInput,
   DefaultRadioGroup,
-  DefaultSettingsDivider,
   DefaultTable,
   DefaultTableCol,
   DefaultTableRow,
@@ -26,11 +24,10 @@ import {
   Bootstrap4Modal,
   Bootstrap4Notification,
   Bootstrap4RadioInput,
-  Bootstrap4SelectInput,
   Bootstrap4TextInput,
   bootstrap4Config,
 } from '@myparcel-pdk/admin-preset-bootstrap4';
-import {LogLevel, createPdkAdmin} from '@myparcel-pdk/admin';
+import {LogLevel, createPdkAdmin, type ElementInstance} from '@myparcel-pdk/admin';
 import {
   PsDropdownButton,
   PsFormGroup,
@@ -39,8 +36,11 @@ import {
   PsRow,
   PsTabNavButton,
   PsTabNavButtonWrapper,
+  PsSettingsDivider,
   PsTextArea,
   PsToggleInput,
+  PsMultiSelectInput,
+  PsSelectInput,
 } from './components';
 
 // eslint-disable-next-line max-lines-per-function
@@ -66,15 +66,15 @@ window.onload = () => {
       PdkLink: DefaultLink,
       PdkLoader: DefaultLoader,
       PdkModal: Bootstrap4Modal,
-      PdkMultiSelectInput: DefaultMultiSelectInput,
+      PdkMultiSelectInput: PsMultiSelectInput,
       PdkNotification: Bootstrap4Notification,
       PdkNumberInput: DefaultNumberInput,
       PdkPluginSettingsWrapper: PsPluginSettingsWrapper,
       PdkRadioGroup: DefaultRadioGroup,
       PdkRadioInput: Bootstrap4RadioInput,
       PdkRow: PsRow,
-      PdkSelectInput: Bootstrap4SelectInput,
-      PdkSettingsDivider: DefaultSettingsDivider,
+      PdkSelectInput: PsSelectInput,
+      PdkSettingsDivider: PsSettingsDivider,
       PdkTabNavButton: PsTabNavButton,
       PdkTabNavButtonWrapper: PsTabNavButtonWrapper,
       PdkTable: DefaultTable,
@@ -121,8 +121,10 @@ window.onload = () => {
       tableRow: 'fade',
     },
 
-    generateFieldId(element) {
-      return `myparcelnl-${element.form.name}-${element.name}`;
+    generateFieldId(element: ElementInstance) {
+      const {form, name} = element;
+
+      return `myparcelnl-${form.name}-${name}`;
     },
   });
 };

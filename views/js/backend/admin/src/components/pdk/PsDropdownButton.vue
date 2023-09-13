@@ -1,5 +1,7 @@
 <template>
-  <div class="btn-group">
+  <div
+    v-test="AdminComponent.DropdownButton"
+    class="btn-group">
     <ActionButton
       v-for="action in dropdownActions.standalone"
       :key="`dropdown_${action.id}`"
@@ -23,7 +25,6 @@
         <ActionButton
           v-for="(action, index) in dropdownActions.hidden"
           :key="`${index}_${action.id}`"
-          v-test="'HiddenDropdownAction'"
           :action="action"
           :disabled="disabled"
           :icon="action.icon"
@@ -37,15 +38,16 @@
 
 <script lang="ts" setup>
 import {type ComponentPublicInstance, onMounted, ref} from 'vue';
-import {type Size, ActionButton, type ActionDefinition, useDropdownData, useLanguage} from '@myparcel-pdk/admin';
+import {
+  ActionButton,
+  useDropdownData,
+  useLanguage,
+  type DropdownButtonProps,
+  AdminComponent,
+} from '@myparcel-pdk/admin';
 
-const props = defineProps<{
-  // eslint-disable-next-line vue/no-unused-properties
-  actions: ActionDefinition[];
-  disabled: boolean;
-  hideText: boolean;
-  size?: Size;
-}>();
+// eslint-disable-next-line vue/no-unused-properties
+const props = defineProps<DropdownButtonProps>();
 
 const {dropdownActions} = useDropdownData(props);
 

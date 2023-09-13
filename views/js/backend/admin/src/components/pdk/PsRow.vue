@@ -1,5 +1,6 @@
 <template>
   <div
+    v-test="AdminComponent.Row"
     :class="{
       'mypa-gap-4': !collapseGutters,
     }"
@@ -9,13 +10,10 @@
 </template>
 
 <script lang="ts" setup>
-defineProps({
-  collapseGutters: {
-    type: Boolean,
-  },
-  columns: {
-    type: [Number, String],
-    default: null,
-  },
-});
+import {AdminComponent} from '@myparcel-pdk/admin';
+
+defineProps<{
+  collapseGutters: boolean;
+  columns?: number | string;
+}>();
 </script>

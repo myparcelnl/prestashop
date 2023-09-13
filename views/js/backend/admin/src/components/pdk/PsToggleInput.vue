@@ -5,15 +5,16 @@
         <input
           :id="id"
           v-model="model"
-          :disabled="element.isDisabled || element.isSuspended"
+          :disabled="element.isDisabled || element.isSuspended || element.isReadOnly"
+          :readonly="element.isReadOnly"
           :value="true"
           tabindex="-1"
           type="checkbox" />
 
         <label
-          role="label"
           :for="id"
-          class="!mypa-opacity-100">
+          class="!mypa-opacity-100"
+          role="label">
           {{ translate(`toggle_${model ? 'yes' : 'no'}`) }}
         </label>
 
@@ -24,17 +25,13 @@
 </template>
 
 <script lang="ts" setup>
-import {useVModel} from '@vueuse/core';
-import {type ElementInstance, generateFieldId, useLanguage} from '@myparcel-pdk/admin';
-import {type InteractiveElementInstance} from '@myparcel/vue-form-builder';
+import {useLanguage, type PdkElementProps, type PdkElementEmits, useElementContext} from '@myparcel-pdk/admin';
 
 // eslint-disable-next-line vue/no-unused-properties
-const props = defineProps<{modelValue: boolean; element: InteractiveElementInstance}>();
-const emit = defineEmits<(e: 'update:modelValue', value: boolean) => void>();
+const props = defineProps<PdkElementProps<boolean>>();
+const emit = defineEmits<PdkElementEmits<boolean>>();
 
-const model = useVModel(props, undefined, emit);
-
-const id = generateFieldId(props.element as ElementInstance);
+const {id, model} = useElementContext(props, emit);
 
 const {translate} = useLanguage();
 </script>

@@ -1,15 +1,17 @@
 <template>
   <div
+    v-test="AdminComponent.Icon"
     class="material-icons"
     v-text="materialIcon" />
 </template>
 
-<script lang="ts">
-import {type PropType, computed, defineComponent} from 'vue';
-import {AdminIcon} from '@myparcel-pdk/admin';
-import {isEnumValue} from '@myparcel/ts-utils';
+<script lang="ts" setup>
+import {computed} from 'vue';
+import {AdminIcon, AdminComponent} from '@myparcel-pdk/admin';
 
-const materialIconMap: Record<AdminIcon, string> = {
+const props = defineProps<{icon: AdminIcon}>();
+
+const materialIconMap = {
   [AdminIcon.Add]: 'add',
   [AdminIcon.ArrowDown]: 'south',
   [AdminIcon.ArrowUp]: 'north',
@@ -27,22 +29,7 @@ const materialIconMap: Record<AdminIcon, string> = {
   [AdminIcon.Shipment]: 'local_shipping',
   [AdminIcon.Spinner]: 'loop',
   [AdminIcon.Yes]: 'check',
-};
+} satisfies Record<AdminIcon, string>;
 
-export default defineComponent({
-  name: 'PsIcon',
-  props: {
-    icon: {
-      type: String as PropType<AdminIcon>,
-      default: null,
-      validator: (value: string) => isEnumValue(value, AdminIcon),
-    },
-  },
-
-  setup: (props) => {
-    return {
-      materialIcon: computed(() => materialIconMap[props.icon]),
-    };
-  },
-});
+const materialIcon = computed(() => materialIconMap[props.icon]);
 </script>
