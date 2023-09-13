@@ -4,27 +4,31 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
 
+use Carrier;
+use Context;
 use MyParcelNL\Pdk\App\ShippingMethod\Collection\PdkShippingMethodCollection;
-use MyParcelNL\Pdk\App\ShippingMethod\Model\PdkShippingMethod;
-use MyParcelNL\Pdk\App\ShippingMethod\Repository\AbstractPdkShippingMethodRepository;
+use MyParcelNL\Pdk\App\ShippingMethod\Contract\PdkShippingMethodRepositoryInterface;
+use MyParcelNL\Pdk\Base\Repository\Repository;
+use MyParcelNL\Pdk\Base\Support\Collection;
 
-class PsShippingMethodRepository extends AbstractPdkShippingMethodRepository
+final class PsShippingMethodRepository extends Repository implements PdkShippingMethodRepositoryInterface
 {
     public function all(): PdkShippingMethodCollection
     {
-        // TODO: Implement all() method.
-        return new PdkShippingMethodCollection();
-    }
+        $lang     = Context::getContext()->language->id;
+        $carriers = Carrier::getCarriers($lang, true, false, false, null, Carrier::ALL_CARRIERS);
 
-    public function get($input): PdkShippingMethod
-    {
-        // TODO: Implement get() method.
-        return new PdkShippingMethod();
-    }
+        $shippingMethods = (new Collection($carriers))
+            ->filter(static function (array $shippingMethod) {
+                return 1 === $shippingMethod['active'];
+            })
+            ->map(static function (array $shippingMethod) {
+                return [
+                    'id'   => $shippingMethod['id_reference'],
+                    'name' => $shippingMethod['name'],
+                ];
+            });
 
-    public function getMany($input): PdkShippingMethodCollection
-    {
-        // TODO: Implement all() method.
-        return new PdkShippingMethodCollection();
+        return new PdkShippingMethodCollection($shippingMethods);
     }
 }
