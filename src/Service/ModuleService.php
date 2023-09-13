@@ -5,12 +5,23 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Service;
 
 use Cart;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 use Throwable;
 
 final class ModuleService
 {
+    /**
+     * @return \MyParcelNL
+     */
+    public function getInstance(): MyParcelNL
+    {
+        return Pdk::get('moduleInstance');
+    }
+
     /**
      * Adds prices of MyParcel delivery options to the shipping cost.
      *
@@ -98,5 +109,22 @@ final class ModuleService
         }
 
         return true;
+    }
+
+    /**
+     * @return void
+     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
+     */
+    public function registerHooks(): void
+    {
+        $instance = $this->getInstance();
+
+        foreach (Pdk::get('moduleHooks') as $hook) {
+            if ($instance->registerHook($hook)) {
+                continue;
+            }
+
+            throw new InstallationException(sprintf('Hook %s could not be registered.', $hook));
+        }
     }
 }

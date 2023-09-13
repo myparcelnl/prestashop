@@ -13,6 +13,7 @@ use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
+use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 use Tab;
 
@@ -70,8 +71,8 @@ final class PsInstallerService extends InstallerService
      */
     protected function executeInstallation(...$args): void
     {
+        MyParcelModule::registerHooks();
         $this->installDatabase();
-        $this->installHooks();
         $this->installTabs();
 
         parent::executeInstallation();
@@ -109,8 +110,6 @@ final class PsInstallerService extends InstallerService
 
     /**
      * @param  string $version
-     *
-     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     protected function migrateUp(string $version): void
     {
@@ -119,7 +118,7 @@ final class PsInstallerService extends InstallerService
         /**
          * Always register hooks, since the methods may have changed. PrestaShops checks if hook is already registered.
          */
-        $this->installHooks();
+        MyParcelModule::registerHooks();
     }
 
     private function installDatabase(): void
@@ -132,20 +131,6 @@ final class PsInstallerService extends InstallerService
             $instance = Pdk::get($migration);
 
             $instance->up();
-        }
-    }
-
-    /**
-     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
-     */
-    private function installHooks(): void
-    {
-        foreach (Pdk::get('moduleHooks') as $hook) {
-            if ($this->module->registerHook($hook)) {
-                continue;
-            }
-
-            throw new InstallationException(sprintf('Hook %s could not be registered.', $hook));
         }
     }
 

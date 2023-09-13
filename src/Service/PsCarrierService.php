@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
+use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 
 final class PsCarrierService implements PsCarrierServiceInterface
@@ -119,6 +120,65 @@ final class PsCarrierService implements PsCarrierServiceInterface
     }
 
     /**
+     * @param  int|PsCarrier $input
+     *
+     * @return PsCarrier
+     */
+    public function get($input): PsCarrier
+    {
+        if ($input instanceof PsCarrier) {
+            return $input;
+        }
+
+        return new PsCarrier($input);
+    }
+
+    /**
+     * @param  int|PsCarrier $input
+     *
+     * @return null|int|\Carrier
+     */
+    public function getId($input): int
+    {
+        return $input instanceof PsCarrier ? $input->id : $input;
+    }
+
+    /**
+     * @param  int|PsCarrier $input
+     *
+     * @return null|\MyParcelNL\Pdk\Carrier\Model\Carrier
+     */
+    public function getMyParcelCarrier($input): ?Carrier
+    {
+        $identifier = $this->getMyParcelCarrierIdentifier($input);
+
+        return $identifier ? new Carrier(['externalIdentifier' => $identifier]) : null;
+    }
+
+    /**
+     * @param  int|PsCarrier $input
+     *
+     * @return null|string
+     */
+    public function getMyParcelCarrierIdentifier($input): ?string
+    {
+        $psCarrierId = $this->getId($input);
+        $match       = $this->carrierMappingRepository->firstWhere('idCarrier', $psCarrierId);
+
+        return $match->myparcelCarrier ?? null;
+    }
+
+    /**
+     * @param  int|PsCarrier $input
+     *
+     * @return bool
+     */
+    public function isMyParcelCarrier($input): bool
+    {
+        return (bool) $this->getMyParcelCarrierIdentifier($input);
+    }
+
+    /**
      * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
@@ -129,5 +189,8 @@ final class PsCarrierService implements PsCarrierServiceInterface
 
         $this->createOrUpdateCarriers($carriers);
         $this->deleteUnusedCarriers($carriers);
+
+        // Refresh the hooks
+        MyParcelModule::registerHooks();
     }
 }
