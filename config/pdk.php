@@ -11,6 +11,7 @@ use MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Contract\InstallerServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Order\Contract\OrderStatusServiceInterface;
+use MyParcelNL\Pdk\App\Order\Contract\PdkOrderNoteRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\App\ShippingMethod\Contract\PdkShippingMethodRepositoryInterface;
@@ -27,6 +28,7 @@ use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Configuration\Service\Ps17ConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
@@ -36,6 +38,7 @@ use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsInstallerService;
 use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsMigrationService;
 use MyParcelNL\PrestaShop\Pdk\Language\Service\LanguageService;
 use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
+use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderNoteRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsPdkAccountRepository;
@@ -53,6 +56,7 @@ use MyParcelNL\PrestaShop\Pdk\Tax\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\PsRouterService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
+use MyParcelNL\PrestaShop\Service\PsOrderService;
 use Psr\Log\LoggerInterface;
 use function DI\get;
 use function DI\value;
@@ -74,6 +78,7 @@ return [
      */
     PdkAccountRepositoryInterface::class        => get(PsPdkAccountRepository::class),
     PdkCartRepositoryInterface::class           => get(PsPdkCartRepository::class),
+    PdkOrderNoteRepositoryInterface::class      => get(PsPdkOrderNoteRepository::class),
     PdkOrderRepositoryInterface::class          => get(PsPdkOrderRepository::class),
     PdkProductRepositoryInterface::class        => get(PdkProductRepository::class),
     PdkShippingMethodRepositoryInterface::class => get(PsShippingMethodRepository::class),
@@ -118,5 +123,6 @@ return [
      * Custom services
      */
     PsCarrierServiceInterface::class      => get(PsCarrierService::class),
+    PsOrderServiceInterface::class        => get(PsOrderService::class),
     PsRouterServiceInterface::class       => get(PsRouterService::class),
 ];
