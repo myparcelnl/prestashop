@@ -10,7 +10,7 @@
         :for="id"
         class="form-control-label">
         <span
-          v-if="isOptional"
+          v-if="!isOptional"
           class="text-danger"
           >*
         </span>
