@@ -95,7 +95,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
      */
     public function getProductSettings($identifier): ProductSettings
     {
-        return $this->retrieve('product_settings_' . $identifier, function () use ($identifier) {
+        return $this->retrieve("product_settings_$identifier", function () use ($identifier) {
             /** @var \MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings $psProductSettings */
             $psProductSettings = $this->psProductRepository->findOneBy(['idProduct' => $identifier]);
             $data              = $psProductSettings ? $psProductSettings->toArray() : [];
@@ -116,7 +116,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
             return $this->getProduct($identifier);
         }, $identifiers);
 
-        return (new PdkProductCollection($products));
+        return new PdkProductCollection($products);
     }
 
     /**
