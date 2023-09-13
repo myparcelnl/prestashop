@@ -2,20 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Gett\MyparcelBE\Module\Upgrade;
+namespace MyParcelNL\PrestaShop\Migration;
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
-use MyParcelNL\Sdk\src\Support\Collection;
+use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\PrestaShop\Database\Table;
 
-class Upgrade1_8_0 extends AbstractUpgrade
+final class Migration1_8_0 extends AbstractPsMigration
 {
-    private $carrierConfigurationTable;
+    public function down(): void
+    {
+        // do nothing
+    }
+
+    public function getVersion(): string
+    {
+        return '1.8.0';
+    }
 
     /**
      * @throws \PrestaShopDatabaseException
      */
-    public function upgrade(): void
+    public function up(): void
     {
         $this->addInsuranceOptionsEuForCarriers();
     }
@@ -27,19 +34,20 @@ class Upgrade1_8_0 extends AbstractUpgrade
      */
     private function addInsuranceOptionsEuForCarriers(): void
     {
-        $this->carrierConfigurationTable = Table::withPrefix(Table::TABLE_CARRIER_CONFIGURATION);
-        $configName                      = Constant::INSURANCE_CONFIGURATION_NAME;
+        $table      = Table::withPrefix('myparcelnl_carrier_configuration');
+        $configName = 'MYPARCELBE_INSURANCE';
 
-        $query   = <<<SQL
-SELECT DISTINCT id_carrier, name, value FROM $this->carrierConfigurationTable WHERE name LIKE '%$configName'
+        $query = <<<SQL
+SELECT DISTINCT `id_carrier`, `name`, `value` FROM `$table` WHERE name LIKE `%$configName`
 SQL;
+
         $records = new Collection($this->db->executeS($query));
 
         foreach ($records as $record) {
             $carrierId = (int) $record['id_carrier'];
 
-            $this->insertOption($carrierId, Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_EU, '0');
-            $this->insertOption($carrierId, 'return_' . Constant::INSURANCE_CONFIGURATION_MAX_AMOUNT_EU, '0');
+            $this->insertOption($carrierId, 'MYPARCELBE_INSURANCE_MAX_AMOUNT_EU', '0');
+            $this->insertOption($carrierId, 'return_' . 'MYPARCELBE_INSURANCE_MAX_AMOUNT_EU', '0');
         }
     }
 
@@ -48,14 +56,17 @@ SQL;
      * @param  string $optionName
      * @param  string $optionValue
      *
-     * @return bool
+     * @return void
      */
-    private function addOption(int $carrierId, string $optionName, string $optionValue): bool
+    private function addOption(int $carrierId, string $optionName, string $optionValue): void
     {
+        $table = $this->carrierConfigurationTable;
+
         $query = <<<SQL
-INSERT INTO $this->carrierConfigurationTable (id_carrier, name, value) VALUES ($carrierId, '$optionName', '$optionValue');
+INSERT INTO `$table` (id_carrier, name, value) VALUES (`$carrierId`, `$optionName`, `$optionValue`);
 SQL;
-        return $this->db->execute($query);
+
+        $this->db->execute($query);
     }
 
     /**
@@ -70,9 +81,11 @@ SQL;
      */
     private function insertOption(int $carrierId, string $optionName, string $optionValue): void
     {
-        if (! $this->optionExists($carrierId, $optionName)) {
-            $this->addOption($carrierId, $optionName, $optionValue);
+        if ($this->optionExists($carrierId, $optionName)) {
+            return;
         }
+
+        $this->addOption($carrierId, $optionName, $optionValue);
     }
 
     /**
@@ -84,9 +97,12 @@ SQL;
      */
     private function optionExists(int $carrierId, string $optionName): bool
     {
+        $table = $this->carrierConfigurationTable;
+
         $query = <<<SQL
-SELECT DISTINCT id_carrier, name, value FROM $this->carrierConfigurationTable WHERE id_carrier = $carrierId AND name = '$optionName'
+SELECT DISTINCT id_carrier, name, value FROM `$table` WHERE id_carrier = `$carrierId` AND name = `$optionName`
 SQL;
+
         return (new Collection($this->db->executeS($query)))->isNotEmpty();
     }
 }

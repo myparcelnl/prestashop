@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Hooks;
 
 use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
@@ -83,6 +83,7 @@ trait HasPdkCheckoutHooks
 
         //        $carrierName     = $carrierAdapter->getCarrierName($params['carrier']['id']);
         //        $carrier         = new Carrier(['name' => $carrierName]);
+
         $shippingAddress = $addressAdapter->fromAddress($this->context->cart->id_address_delivery);
         $billingAddress  = $addressAdapter->fromAddress($this->context->cart->id_address_invoice);
         $deliveryOptions = Frontend::renderDeliveryOptions($cartRepository->get($this->context->cart));

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Module\Hooks;
+namespace MyParcelNL\PrestaShop\Hooks;
 
 use CustomerMessage;
 use CustomerThread;

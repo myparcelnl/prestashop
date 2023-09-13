@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Module\Migration;
+namespace MyParcelNL\PrestaShop\Migration;
 
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;

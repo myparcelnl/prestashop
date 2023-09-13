@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Module\Migration;
+namespace MyParcelNL\PrestaShop\Migration;
 
 use DbQuery;
 use Exception;
@@ -13,7 +13,7 @@ use MyParcelNL\Pdk\Facade\Settings as SettingsFacade;
 use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
 use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
-use MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
@@ -64,11 +64,6 @@ final class Migration2_0_0 extends AbstractPsMigration
     private $orderShipmentRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Module\Installer\PsPdkUpgradeService
-     */
-    private $pdkUpgradeService;
-
-    /**
      * @var \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository
      */
     private $productSettingsRepository;
@@ -81,7 +76,6 @@ final class Migration2_0_0 extends AbstractPsMigration
     public function __construct(
         PsOrderDataRepository       $orderDataRepository,
         PsOrderShipmentRepository   $orderShipmentRepository,
-        PsPdkUpgradeService         $pdkUpgradeService,
         PdkSettingsRepository       $pdkSettingsRepository,
         PsProductSettingsRepository $productSettingsRepository
     ) {
@@ -89,7 +83,6 @@ final class Migration2_0_0 extends AbstractPsMigration
 
         $this->orderDataRepository       = $orderDataRepository;
         $this->orderShipmentRepository   = $orderShipmentRepository;
-        $this->pdkUpgradeService         = $pdkUpgradeService;
         $this->settingsRepository        = $pdkSettingsRepository;
         $this->productSettingsRepository = $productSettingsRepository;
     }
@@ -106,26 +99,22 @@ final class Migration2_0_0 extends AbstractPsMigration
 
     /**
      * @return void
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Doctrine\ORM\ORMException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShop\PrestaShop\Core\Foundation\Database\Exception
-     * @throws \PrestaShopException
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
+     * @throws \PrestaShopDatabaseException
      */
     public function up(): void
     {
         $this->createDatabaseMigrations();
-        $this->pdkUpgradeService->createPsCarriers();
         $this->migrateCarrierSettings();
         $this->migrateSettings();
         $this->migrateProductSettings();
         $this->migrateDeliveryOptions();
         $this->migrateOrderShipments();
 
-        /** @var \Doctrine\ORM\EntityManager $entityManager */
-        $entityManager = Pdk::get('ps.entityManager');
-
-        $entityManager->flush();
+        EntityManager::flush();
     }
 
     /**
@@ -160,7 +149,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         }
     }
 
-    private function createDatabaseMigrations()
+    private function createDatabaseMigrations(): void
     {
         /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */
         $migrations = Pdk::get(DatabaseMigrations::class);
@@ -403,7 +392,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         $query = new DbQuery();
         $query->select('id_order');
         $query->from('orders');
-        $query->where('id_cart = ' . $cartId);
+        $query->where("id_cart = $cartId");
 
         return $this->db->getValue($query);
     }
@@ -577,7 +566,7 @@ final class Migration2_0_0 extends AbstractPsMigration
     /**
      * @throws \PrestaShopDatabaseException
      */
-    private function migrateCarrierSettings()
+    private function migrateCarrierSettings(): void
     {
         $oldCarrierSettings  = $this->getCarrierSettings();
         $carrierNamesAndIds  = [];
@@ -626,7 +615,7 @@ final class Migration2_0_0 extends AbstractPsMigration
      * @throws \PrestaShopDatabaseException
      * @throws \Doctrine\ORM\ORMException
      */
-    private function migrateDeliveryOptions()
+    private function migrateDeliveryOptions(): void
     {
         $query = new DbQuery();
 
@@ -696,7 +685,7 @@ final class Migration2_0_0 extends AbstractPsMigration
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    private function migrateOrderShipments()
+    private function migrateOrderShipments(): void
     {
         $query = new DbQuery();
 
@@ -730,7 +719,7 @@ final class Migration2_0_0 extends AbstractPsMigration
      * @throws \PrestaShopDatabaseException
      * @throws \Doctrine\ORM\ORMException
      */
-    private function migrateProductSettings()
+    private function migrateProductSettings(): void
     {
         $query = new DbQuery();
 
@@ -746,7 +735,8 @@ final class Migration2_0_0 extends AbstractPsMigration
                 continue;
             }
 
-            $productsWithSettings[$oldProductSetting['id_product']][self::LEGACY_PRODUCT_SETTINGS_MAP[$oldProductSetting['name']]] = $oldProductSetting['value'];
+            $productsWithSettings[$oldProductSetting['id_product']][self::LEGACY_PRODUCT_SETTINGS_MAP[$oldProductSetting['name']]] =
+                $oldProductSetting['value'];
         }
 
         foreach ($productsWithSettings as $productId => $productSettings) {
@@ -799,6 +789,7 @@ final class Migration2_0_0 extends AbstractPsMigration
                 return Arr::get($array, $key)['value'] ?? null;
             }
         }
+
         return null;
     }
 
@@ -812,6 +803,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         $sameDayDeliveryCutoffTime = $this->searchForValue('sameDayDeliveryCutoffTime', $oldSettings) ?? '9:30';
         $dropOffDaysAsString       = $this->searchForValue('dropOffDays', $oldSettings) ?? '';
         $dropOffDays               = explode(',', $dropOffDaysAsString);
+
         return [
             'dropOffDays' => array_map(
                 function ($weekday) use (

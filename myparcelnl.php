@@ -6,12 +6,12 @@ declare(strict_types=1);
 use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Module\Hooks\HasPdkCheckoutHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\HasPdkOrderHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\HasPdkProductHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\HasPdkRenderHooks;
-use MyParcelNL\PrestaShop\Module\Hooks\HasPdkScriptHooks;
-use MyParcelNL\PrestaShop\Module\Service\ModuleService;
+use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPdkOrderHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPdkProductHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPdkRenderHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPdkScriptHooks;
+use MyParcelNL\PrestaShop\Service\ModuleService;
 use PrestaShopBundle\Exception\InvalidModuleException;
 use function MyParcelNL\PrestaShop\bootPdk;
 
@@ -112,7 +112,7 @@ class MyParcelNL extends CarrierModule
      */
     public function getOrderShippingCost($params, $shipping_cost)
     {
-        /** @var \MyParcelNL\PrestaShop\Module\Service\ModuleService $moduleService */
+        /** @var \MyParcelNL\PrestaShop\Service\ModuleService $moduleService */
         $moduleService = Pdk::get(ModuleService::class);
 
         return $moduleService->getOrderShippingCost($params, $shipping_cost);

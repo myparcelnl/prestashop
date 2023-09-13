@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Module\Service;
+namespace MyParcelNL\PrestaShop\Service;
 
 use Cart;
 
