@@ -8,6 +8,8 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsContext;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsController;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCustomerMessage;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsDbQuery;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsFileLogger;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsLanguage;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsLink;
@@ -38,6 +40,16 @@ final class Link extends LinkCore { }
 
 /** @see \Smarty */
 final class Smarty extends MockPsSmarty { }
+
+/** @see \DbCore */
+abstract class DbCore extends MockPsDb { }
+
+final class Db extends DbCore { }
+
+/** @see \DbQueryCore */
+abstract class DbQueryCore extends MockPsDbQuery { }
+
+final class DbQuery extends DbQueryCore { }
 
 ###
 # Modules

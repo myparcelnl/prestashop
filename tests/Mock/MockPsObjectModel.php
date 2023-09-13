@@ -34,9 +34,24 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
         }
     }
 
+    public static function getDefinition()
+    {
+        return [
+            'table' => self::getObjectModelIdentifier(),
+        ];
+    }
+
     public static function getRepositoryClassName(): string
     {
         return sprintf('%sRepository', static::class);
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getObjectModelIdentifier(): string
+    {
+        return Str::snake(Utils::classBasename(static::class));
     }
 
     /**
@@ -93,7 +108,7 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
             }
         }
 
-        $idKey = sprintf('id_%s', Str::snake(Utils::classBasename(static::class)));
+        $idKey = sprintf('id_%s', self::getObjectModelIdentifier());
 
         $this->attributes['id']   = $id;
         $this->attributes[$idKey] = $id;

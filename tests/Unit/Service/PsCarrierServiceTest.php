@@ -16,6 +16,7 @@ use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use Psr\Log\LoggerInterface;
 use RangePrice;
 use RangeWeight;
 use function MyParcelNL\Pdk\Tests\factory;
@@ -32,11 +33,19 @@ function createCarrierMappingsArray(Collection $carrierMappings): array
         ->map(function (array $item) {
             return Arr::except($item, ['created', 'updated']);
         })
-        ->toArray();
+        ->toArrayWithoutNull();
 }
 
 function doSnapshotTest(Collection $carrierMappings, Collection $psCarriers): void
 {
+    /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockLogger $logger */
+    $logger    = Pdk::get(LoggerInterface::class);
+    $errorLogs = array_filter($logger->getLogs(), static function (array $log) {
+        return 'error' === $log['level'];
+    });
+
+    expect($errorLogs)->toBe([]);
+
     assertMatchesJsonSnapshot(
         json_encode([
             'psCarriers'      => $psCarriers
@@ -50,7 +59,7 @@ function doSnapshotTest(Collection $carrierMappings, Collection $psCarriers): vo
                         'rangePrices'  => RangePrice::getRanges($id),
                     ]);
                 })
-                ->toArray(),
+                ->toArrayWithoutNull(),
             'carrierMappings' => createCarrierMappingsArray($carrierMappings),
         ])
     );
@@ -82,6 +91,8 @@ it('does not create duplicate carriers', function () {
 
     /** @var PsCarrierServiceInterface $service */
     $service = Pdk::get(PsCarrierServiceInterface::class);
+    $service->updateCarriers();
+    $service->updateCarriers();
     $service->updateCarriers();
     $service->updateCarriers();
 
