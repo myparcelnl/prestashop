@@ -10,7 +10,7 @@ use MyParcelNL\Pdk\Facade\Settings;
 use MyParcelNL\Pdk\Frontend\Service\FrontendRenderService;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 
-class PsFrontendRenderService extends FrontendRenderService
+final class PsFrontendRenderService extends FrontendRenderService
 {
     /**
      * @param  \MyParcelNL\Pdk\App\Cart\Model\PdkCart $cart

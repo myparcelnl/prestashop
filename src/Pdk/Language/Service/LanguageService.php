@@ -28,6 +28,6 @@ class LanguageService extends AbstractLanguageService
         $appInfo  = Pdk::getAppInfo();
         $language = $language ?? $this->getLanguage();
 
-        return sprintf("%sconfig/pdk/translations/%s.json", $appInfo['path'], $language);
+        return sprintf('%s/config/pdk/translations/%s.json', $appInfo->path, $language);
     }
 }

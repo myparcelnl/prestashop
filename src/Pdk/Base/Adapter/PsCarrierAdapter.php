@@ -13,18 +13,14 @@ final class PsCarrierAdapter
     /**
      * @param  int $psCarrierId
      *
-     * @return mixed|string
+     * @return string
      */
-    public function getCarrierName(int $psCarrierId)
+    public function getCarrierName(int $psCarrierId): string
     {
         /** @var \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository $carrierRepository */
         $carrierRepository = Pdk::get(PsCarrierMappingRepository::class);
-        $found             = $carrierRepository->findOneBy(['idCarrier' => $psCarrierId]);
+        $found             = $carrierRepository->findOneBy(['id_carrier' => $psCarrierId]);
 
-        if ($found) {
-            return $found->getMyparcelCarrier();
-        }
-
-        return Platform::get('defaultCarrier');
+        return $found->myparcelCarrier ?? Platform::get('defaultCarrier');
     }
 }
