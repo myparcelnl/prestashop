@@ -4,16 +4,39 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
-use BadMethodCallException;
+use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Sdk\src\Support\Str;
 
-abstract class BaseMock
+abstract class BaseMock implements Arrayable
 {
     /**
      * @var array
      */
     protected $attributes;
 
+    /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return array|mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        // Handle methods like Carrier::getCarriers(), Zone::getZones(), etc.
+        if (Str::startsWith($name, 'get') && substr($name, 3) === static::class . 's') {
+            return MockPsObjectModels::getByClass(static::class)
+                ->toArray();
+        }
+
+        return (new static())->$name(...$arguments);
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return null|$this|mixed
+     */
     public function __call($name, $arguments)
     {
         if (Str::startsWith($name, 'get')) {
@@ -22,7 +45,8 @@ abstract class BaseMock
             return $this->attributes[$attribute] ?? null;
         }
 
-        throw new BadMethodCallException("Method {$name} does not exist");
+        // If no matching attribute is found, return $this to silently ignore the call
+        return $this;
     }
 
     /**
@@ -54,6 +78,22 @@ abstract class BaseMock
     public function __set(string $name, $value): void
     {
         $this->attributes[$name] = $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->attributes;
     }
 
     /**

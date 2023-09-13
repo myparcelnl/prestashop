@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Tests\Factory;
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsClassFactoryInterface;
-use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntities;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use ObjectModel;
 
 /**
  * @template T of ObjectModel
- * @implements PsClassFactoryInterface<T>
+ * @implements PsObjectModelFactoryInterface<T>
  */
-abstract class AbstractPsClassFactory extends AbstractPsFactory implements PsClassFactoryInterface
+abstract class AbstractPsObjectModelFactory extends AbstractPsFactory implements PsObjectModelFactoryInterface
 {
     /**
      * @var array<string, T>
@@ -25,15 +25,19 @@ abstract class AbstractPsClassFactory extends AbstractPsFactory implements PsCla
      */
     public function make(): ObjectModel
     {
-        $class      = $this->getEntityClass();
+        $class      = $this->getObjectModelClass();
         $attributes = $this->resolveAttributes();
 
         $cacheKey = sprintf('%s::%s', $class, md5(json_encode($attributes)));
 
         if (! isset($this->cache[$cacheKey])) {
-            /** @var ObjectModel $created */
+            /** @var T $created */
             $created = new $class();
-            $created->hydrate($attributes);
+            $created->hydrate(
+                array_map(static function ($value) {
+                    return $value instanceof FactoryInterface ? $value->make() : $value;
+                }, $attributes)
+            );
 
             $this->cache[$cacheKey] = $created;
         }
@@ -46,10 +50,20 @@ abstract class AbstractPsClassFactory extends AbstractPsFactory implements PsCla
      */
     public function store(): ObjectModel
     {
-        return MockPsEntities::save($this->make());
+        $model = $this->make();
+
+        MockPsObjectModels::update($model);
+
+        return $model;
     }
 
-    abstract protected function getEntityClass(): string;
+    /**
+     * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
+     */
+    protected function createDefault(): FactoryInterface
+    {
+        return $this->withId($this->getNextId());
+    }
 
     /**
      * @return int
@@ -66,10 +80,12 @@ abstract class AbstractPsClassFactory extends AbstractPsFactory implements PsCla
      */
     protected function getNextId(string $key = null): int
     {
-        $key = $key ?? $this->getEntityClass();
+        $key = $key ?? $this->getObjectModelClass();
 
         return $this->state->getNextId($key);
     }
+
+    abstract protected function getObjectModelClass(): string;
 
     /**
      * @return array
@@ -80,14 +96,24 @@ abstract class AbstractPsClassFactory extends AbstractPsFactory implements PsCla
     }
 
     /**
-     * @param  string                              $key
-     * @param  ObjectModel|PsClassFactoryInterface $input
+     * @param  int $id
+     *
+     * @return self
+     */
+    protected function withId(int $id): self
+    {
+        return $this->with(['id' => $id]);
+    }
+
+    /**
+     * @param  string                                    $key
+     * @param  ObjectModel|PsObjectModelFactoryInterface $input
      *
      * @return self
      */
     protected function withModel(string $key, $input): self
     {
-        if ($input instanceof FactoryInterface) {
+        if ($input instanceof PsObjectModelFactoryInterface) {
             return $this->withModel($key, $input->make());
         }
 

@@ -4,35 +4,55 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Uses;
 
-use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
-use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
+use CarrierModule;
+use Configuration;
+use Exception;
+use MyParcelNL\Pdk\Base\Facade;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Tests\Factory\SharedFactoryState;
 use MyParcelNL\Pdk\Tests\Uses\UsesEachMockPdkInstance;
-use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
-use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
-use function DI\get;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
+use Zone;
+use function MyParcelNL\PrestaShop\psFactory;
 
-final class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
+class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
 {
     /**
-     * @throws \Exception
+     * @return void
      */
-    protected function setup(): void
+    protected function addDefaultData(): void
     {
-        MockPsPdkBootstrapper::create($this->getConfig());
+        try {
+            psFactory(Configuration::class)->make();
+
+            psFactory(Zone::class)
+                ->withName('Europe')
+                ->store();
+
+            psFactory(Zone::class)
+                ->withName('North America')
+                ->store();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
     }
 
-    /**
-     * @return array
-     */
-    private function getConfig(): array
+    protected function reset(): void
     {
-        return array_replace(
-            $this->config,
-            [
-                PdkOrderRepositoryInterface::class => get(PsPdkOrderRepository::class),
-                PdkProductRepositoryInterface::class => get(PdkProductRepository::class),
-            ]
-        );
+        if (Facade::getPdkInstance()) {
+            Pdk::get(SharedFactoryState::class)
+                ->reset();
+        }
+
+        parent::reset();
+    }
+
+    protected function setup(): void
+    {
+        MockPsPdkBootstrapper::boot('pest', 'Pest', '1.0.0', __DIR__ . '/../../', 'APP_URL');
+        MockPsModule::setInstance('pest', new CarrierModule());
+
+        $this->addDefaultData();
     }
 }

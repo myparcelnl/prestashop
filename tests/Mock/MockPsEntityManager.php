@@ -21,16 +21,19 @@ final class MockPsEntityManager implements StaticMockInterface
     /**
      * @param  class-string<ObjectModel> $entityName
      *
-     * @return \MyParcelNL\PrestaShop\Tests\Mock\MockPsRepository
+     * @return \MyParcelNL\PrestaShop\Tests\Mock\MockPsEntityRepository
      */
-    public function getRepository(string $entityName): MockPsRepository
+    public function getRepository(string $entityName): MockPsEntityRepository
     {
         if (! isset(self::$repositories[$entityName])) {
-            self::$repositories[$entityName] = new MockPsRepository($entityName);
+            self::$repositories[$entityName] = new MockPsEntityRepository($entityName);
         }
 
         return self::$repositories[$entityName];
     }
 
-    public function persist(): void {}
+    public function persist($entity): void
+    {
+        MockPsEntities::addOrUpdate($entity);
+    }
 }

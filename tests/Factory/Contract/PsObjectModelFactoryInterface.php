@@ -9,7 +9,7 @@ use ObjectModel;
 /**
  * @template T of ObjectModel
  */
-interface PsClassFactoryInterface extends PsFactoryInterface
+interface PsObjectModelFactoryInterface extends PsFactoryInterface
 {
     /**
      * @return T

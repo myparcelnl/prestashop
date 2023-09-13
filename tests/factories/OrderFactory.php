@@ -3,76 +3,75 @@
 declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
-use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsClassFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsClassFactoryInterface;
+use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
 
 /**
- * @method Order make()
- * @method OrderFactory withCarrierTaxRate(float $carrierTaxRate)
- * @method OrderFactory withConversionRate(float $conversionRate)
- * @method OrderFactory withCurrentState(int $currentState)
- * @method OrderFactory withDateAdd(string $dateAdd)
- * @method OrderFactory withDateUpd(string $dateUpd)
- * @method OrderFactory withDeliveryDate(string $deliveryDate)
- * @method OrderFactory withDeliveryNumber(int $deliveryNumber)
- * @method OrderFactory withGift(bool $gift)
- * @method OrderFactory withGiftMessage(string $giftMessage)
- * @method OrderFactory withId(int $id)
- * @method OrderFactory withIdAddressDelivery(int $idAddressDelivery)
- * @method OrderFactory withIdAddressInvoice(int $idAddressInvoice)
- * @method OrderFactory withIdCarrier(int $idCarrier)
- * @method OrderFactory withIdCart(int $idCart)
- * @method OrderFactory withIdCurrency(int $idCurrency)
- * @method OrderFactory withIdCustomer(int $idCustomer)
- * @method OrderFactory withIdLang(int $idLang)
- * @method OrderFactory withIdShop(int $idShop)
- * @method OrderFactory withIdShopGroup(int $idShopGroup)
- * @method OrderFactory withInvoiceDate(string $invoiceDate)
- * @method OrderFactory withInvoiceNumber(int $invoiceNumber)
- * @method OrderFactory withMobileTheme(bool $mobileTheme)
- * @method OrderFactory withModule(string $module)
- * @method OrderFactory withNote(string $note)
- * @method OrderFactory withPayment(string $payment)
- * @method OrderFactory withRecyclable(bool $recyclable)
- * @method OrderFactory withReference(string $reference)
- * @method OrderFactory withRoundMode(int $roundMode)
- * @method OrderFactory withRoundType(int $roundType)
- * @method OrderFactory withSecureKey(string $secureKey)
- * @method OrderFactory withTotalDiscounts(float $totalDiscounts)
- * @method OrderFactory withTotalDiscountsTaxExcl(float $totalDiscountsTaxExcl)
- * @method OrderFactory withTotalDiscountsTaxIncl(float $totalDiscountsTaxIncl)
- * @method OrderFactory withTotalPaid(float $totalPaid)
- * @method OrderFactory withTotalPaidReal(float $totalPaidReal)
- * @method OrderFactory withTotalPaidTaxExcl(float $totalPaidTaxExcl)
- * @method OrderFactory withTotalPaidTaxIncl(float $totalPaidTaxIncl)
- * @method OrderFactory withTotalProducts(float $totalProducts)
- * @method OrderFactory withTotalProductsWt(float $totalProductsWt)
- * @method OrderFactory withTotalShipping(float $totalShipping)
- * @method OrderFactory withTotalShippingTaxExcl(float $totalShippingTaxExcl)
- * @method OrderFactory withTotalShippingTaxIncl(float $totalShippingTaxIncl)
- * @method OrderFactory withTotalWrapping(float $totalWrapping)
- * @method OrderFactory withTotalWrappingTaxExcl(float $totalWrappingTaxExcl)
- * @method OrderFactory withTotalWrappingTaxIncl(float $totalWrappingTaxIncl)
- * @method OrderFactory withValid(bool $valid)
+ * @method self add()
+ * @method self withCarrierTaxRate(float $carrierTaxRate)
+ * @method self withConversionRate(float $conversionRate)
+ * @method self withCurrentState(int $currentState)
+ * @method self withDateAdd(string $dateAdd)
+ * @method self withDateUpd(string $dateUpd)
+ * @method self withDeliveryDate(string $deliveryDate)
+ * @method self withDeliveryNumber(int $deliveryNumber)
+ * @method self withGift(bool $gift)
+ * @method self withGiftMessage(string $giftMessage)
+ * @method self withIdAddressDelivery(int $idAddressDelivery)
+ * @method self withIdAddressInvoice(int $idAddressInvoice)
+ * @method self withIdCarrier(int $id_carrier)
+ * @method self withIdCart(int $id_cart)
+ * @method self withIdCurrency(int $idCurrency)
+ * @method self withIdCustomer(int $idCustomer)
+ * @method self withIdLang(int $idLang)
+ * @method self withIdShop(int $idShop)
+ * @method self withIdShopGroup(int $idShopGroup)
+ * @method self withInvoiceDate(string $invoiceDate)
+ * @method self withInvoiceNumber(int $invoiceNumber)
+ * @method self withMobileTheme(bool $mobileTheme)
+ * @method self withModule(string $module)
+ * @method self withNote(string $note)
+ * @method self withPayment(string $payment)
+ * @method self withRecyclable(bool $recyclable)
+ * @method self withReference(string $reference)
+ * @method self withRoundMode(int $roundMode)
+ * @method self withRoundType(int $roundType)
+ * @method self withSecureKey(string $secureKey)
+ * @method self withTotalDiscounts(float $totalDiscounts)
+ * @method self withTotalDiscountsTaxExcl(float $totalDiscountsTaxExcl)
+ * @method self withTotalDiscountsTaxIncl(float $totalDiscountsTaxIncl)
+ * @method self withTotalPaid(float $totalPaid)
+ * @method self withTotalPaidReal(float $totalPaidReal)
+ * @method self withTotalPaidTaxExcl(float $totalPaidTaxExcl)
+ * @method self withTotalPaidTaxIncl(float $totalPaidTaxIncl)
+ * @method self withTotalProducts(float $totalProducts)
+ * @method self withTotalProductsWt(float $totalProductsWt)
+ * @method self withTotalShipping(float $totalShipping)
+ * @method self withTotalShippingTaxExcl(float $totalShippingTaxExcl)
+ * @method self withTotalShippingTaxIncl(float $totalShippingTaxIncl)
+ * @method self withTotalWrapping(float $totalWrapping)
+ * @method self withTotalWrappingTaxExcl(float $totalWrappingTaxExcl)
+ * @method self withTotalWrappingTaxIncl(float $totalWrappingTaxIncl)
+ * @method self withValid(bool $valid)
  */
-final class OrderFactory extends AbstractPsClassFactory
+final class OrderFactory extends AbstractPsObjectModelFactory
 {
     /**
-     * @param  AddressDelivery|AddressDeliveryFactory $addressDelivery
+     * @param  \Address|\AddressFactory $addressDelivery
      *
      * @return self
      */
-    public function withAddressDelivery($addressDelivery): PsClassFactoryInterface
+    public function withAddressDelivery($addressDelivery): PsObjectModelFactoryInterface
     {
         return $this->withModel('addressDelivery', $addressDelivery);
     }
 
     /**
-     * @param  AddressInvoice|AddressInvoiceFactory $addressInvoice
+     * @param  \Address|\AddressFactory $addressInvoice
      *
      * @return self
      */
-    public function withAddressInvoice($addressInvoice): PsClassFactoryInterface
+    public function withAddressInvoice($addressInvoice): PsObjectModelFactoryInterface
     {
         return $this->withModel('addressInvoice', $addressInvoice);
     }
@@ -82,7 +81,7 @@ final class OrderFactory extends AbstractPsClassFactory
      *
      * @return self
      */
-    public function withCarrier($carrier): PsClassFactoryInterface
+    public function withCarrier($carrier): PsObjectModelFactoryInterface
     {
         return $this->withModel('carrier', $carrier);
     }
@@ -92,7 +91,7 @@ final class OrderFactory extends AbstractPsClassFactory
      *
      * @return self
      */
-    public function withCart($cart): PsClassFactoryInterface
+    public function withCart($cart): PsObjectModelFactoryInterface
     {
         return $this->withModel('cart', $cart);
     }
@@ -102,7 +101,7 @@ final class OrderFactory extends AbstractPsClassFactory
      *
      * @return self
      */
-    public function withCurrency($currency): PsClassFactoryInterface
+    public function withCurrency($currency): PsObjectModelFactoryInterface
     {
         return $this->withModel('currency', $currency);
     }
@@ -112,7 +111,7 @@ final class OrderFactory extends AbstractPsClassFactory
      *
      * @return self
      */
-    public function withCustomer($customer): PsClassFactoryInterface
+    public function withCustomer($customer): PsObjectModelFactoryInterface
     {
         return $this->withModel('customer', $customer);
     }
@@ -122,7 +121,7 @@ final class OrderFactory extends AbstractPsClassFactory
      *
      * @return self
      */
-    public function withLang($lang): PsClassFactoryInterface
+    public function withLang($lang): PsObjectModelFactoryInterface
     {
         return $this->withModel('lang', $lang);
     }
@@ -132,7 +131,7 @@ final class OrderFactory extends AbstractPsClassFactory
      *
      * @return self
      */
-    public function withShop($shop): PsClassFactoryInterface
+    public function withShop($shop): PsObjectModelFactoryInterface
     {
         return $this->withModel('shop', $shop);
     }
@@ -142,20 +141,22 @@ final class OrderFactory extends AbstractPsClassFactory
      *
      * @return self
      */
-    public function withShopGroup($shopGroup): PsClassFactoryInterface
+    public function withShopGroup($shopGroup): PsObjectModelFactoryInterface
     {
         return $this->withModel('shopGroup', $shopGroup);
     }
 
+    /**
+     * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
+     */
     protected function createDefault(): FactoryInterface
     {
-        return $this
-            ->withId($this->getNextId())
+        return parent::createDefault()
             ->withDateAdd(date('Y-m-d H:i:s'))
             ->withDateUpd(date('Y-m-d H:i:s'));
     }
 
-    protected function getEntityClass(): string
+    protected function getObjectModelClass(): string
     {
         return Order::class;
     }

@@ -7,12 +7,9 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 use Context;
 use DI\Container;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
-use MyParcelNL\PrestaShop\Tests\Mock\Concern\HasStaticFunctionMocks;
 
 abstract class MockPsModule extends BaseMock implements StaticMockInterface
 {
-    use HasStaticFunctionMocks;
-
     /**
      * @var array<string, self>
      */

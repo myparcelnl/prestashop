@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
-use MyParcelNL\Pdk\Base\Support\Arr;
+use ObjectModel;
 
-abstract class MockPsCustomerMessage extends MockPsEntity
+abstract class MockPsCustomerMessage extends ObjectModel
 {
-    protected static $messages = [];
-
+    /**
+     * @param  int $orderId
+     *
+     * @return array
+     */
     public static function getMessagesByOrderId(int $orderId): array
     {
-        return Arr::get(static::$messages, (string) $orderId, []);
+        return MockPsObjectModels::getByClass(static::class)
+            ->filter(static function (array $message) use ($orderId) {
+                return $message['id_order'] === $orderId;
+            })
+            ->all();
     }
 }

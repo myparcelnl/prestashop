@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
+use Configuration;
 use DI\ContainerBuilder;
 use Link;
-use MyParcelNL\PrestaShop\Tests\Mock\Concern\HasStaticFunctionMocks;
+use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 use Smarty;
-use function DI\autowire;
+use function DI\get;
 
-abstract class MockPsContext
+abstract class MockPsContext extends BaseMock implements StaticMockInterface
 {
-    use HasStaticFunctionMocks;
-
     protected static $instance;
 
     /**
@@ -31,6 +30,9 @@ abstract class MockPsContext
      */
     public $smarty;
 
+    /**
+     * @throws \Exception
+     */
     public function __construct()
     {
         $this->setupContainer();
@@ -48,6 +50,11 @@ abstract class MockPsContext
         return static::$instance;
     }
 
+    public static function reset(): void
+    {
+        self::$instance = null;
+    }
+
     /**
      * @return void
      * @throws \Exception
@@ -57,7 +64,9 @@ abstract class MockPsContext
         $builder = new ContainerBuilder();
 
         $builder->addDefinitions([
-            'doctrine.orm.entity_manager' => autowire(MockPsEntityManager::class),
+            'doctrine.orm.entity_manager'             => get(MockPsEntityManager::class),
+            'prestashop.adapter.legacy.configuration' => get(Configuration::class),
+            'ps.entityManager'                        => get(MockPsEntityManager::class),
         ]);
 
         $this->container = $builder->build();

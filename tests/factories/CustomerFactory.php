@@ -1,19 +1,12 @@
 <?php
 
-use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
-use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsClassFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
- * @method CustomerFactory withId(int $id)
  */
-final class CustomerFactory extends AbstractPsClassFactory
+final class CustomerFactory extends AbstractPsObjectModelFactory
 {
-    protected function createDefault(): FactoryInterface
-    {
-        return $this->withId($this->getNextId());
-    }
-
-    protected function getEntityClass(): string
+    protected function getObjectModelClass(): string
     {
         return Customer::class;
     }

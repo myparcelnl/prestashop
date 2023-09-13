@@ -2,20 +2,13 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
-use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsClassFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
- * @method ShopGroupFactory withId(int $id)
  */
-final class ShopGroupFactory extends AbstractPsClassFactory
+final class ShopGroupFactory extends AbstractPsObjectModelFactory
 {
-    protected function createDefault(): FactoryInterface
-    {
-        return $this->withId($this->getNextId());
-    }
-
-    protected function getEntityClass(): string
+    protected function getObjectModelClass(): string
     {
         return ShopGroup::class;
     }

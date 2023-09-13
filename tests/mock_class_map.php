@@ -1,42 +1,43 @@
 <?php
-/** @noinspection AutoloadingIssuesInspection,PhpIllegalPsrClassPathInspection */
+/** @noinspection AutoloadingIssuesInspection,PhpIllegalPsrClassPathInspection,LongInheritanceChainInspection,EmptyClassInspection */
 
 declare(strict_types=1);
 
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsCarrier;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsContext;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsController;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCustomerMessage;
-use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntity;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsFileLogger;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsLanguage;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsLink;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsOrder;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsRangeObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsSmarty;
 
-/** @see \ObjectModelCore */
-abstract class ObjectModelCore extends MockPsObjectModel { }
-
-/** @see \ObjectModel */
-abstract class ObjectModel extends ObjectModelCore { }
-
-/** @see \Context */
-final class Context extends MockPsContext { }
-
-/** @see \Smarty */
-final class Smarty extends MockPsSmarty { }
-
-/** @see \LinkCore */
-abstract class LinkCore extends MockPsLink { }
-
-/** @see \Link */
-final class Link extends LinkCore { }
+###
+# Core
+###
 
 /** @see \ConfigurationCore */
 abstract class ConfigurationCore extends MockPsConfiguration { }
 
-/** @see \Configuration */
 final class Configuration extends ConfigurationCore { }
+
+/** @see \ContextCore */
+abstract class ContextCore extends MockPsContext { }
+
+final class Context extends ContextCore { }
+
+/** @see \LinkCore */
+abstract class LinkCore extends MockPsLink { }
+
+final class Link extends LinkCore { }
+
+/** @see \Smarty */
+final class Smarty extends MockPsSmarty { }
 
 ###
 # Modules
@@ -45,11 +46,22 @@ final class Configuration extends ConfigurationCore { }
 /** @see \ModuleCore */
 abstract class ModuleCore extends MockPsModule { }
 
-/** @see \Module */
 abstract class Module extends ModuleCore { }
 
-/** @see \Module */
-abstract class CarrierModule extends Module { }
+/** @see \CarrierModule */
+abstract class CarrierModuleCore extends Module { }
+
+class CarrierModule extends CarrierModuleCore { }
+
+/** @see \FileLoggerCore */
+abstract class FileLoggerCore extends MockPsFileLogger { }
+
+final class FileLogger extends FileLoggerCore { }
+
+/** @see \LanguageCore */
+abstract class LanguageCore extends MockPsLanguage { }
+
+final class Language extends LanguageCore { }
 
 ###
 # Controllers
@@ -59,98 +71,104 @@ abstract class CarrierModule extends Module { }
 abstract class ControllerCore extends MockPsController { }
 
 /** @see \Controller */
-class Controller extends ControllerCore { }
+abstract class Controller extends ControllerCore { }
 
 /** @see \AdminControllerCore */
 abstract class AdminControllerCore extends Controller { }
 
-/** @see \AdminController */
 final class AdminController extends AdminControllerCore { }
 
+/** @see \FrontControllerCore */
+abstract class FrontControllerCore extends Controller { }
+
+final class FrontController extends FrontControllerCore { }
+
 ###
-# Entities
+# Object models
 ###
 
-/** @see \OrderCore */
-abstract class OrderCore extends MockPsOrder { }
+/** @see \ObjectModelCore */
+abstract class ObjectModelCore extends MockPsObjectModel { }
 
-/** @see \Order */
-final class Order extends OrderCore { }
+abstract class ObjectModel extends ObjectModelCore { }
 
-/** @see \AddressDeliveryCore */
-abstract class AddressDeliveryCore extends MockPsEntity { }
+/** @see \AddressCore */
+abstract class AddressCore extends ObjectModel { }
 
-/** @see \AddressDelivery */
-final class AddressDelivery extends AddressDeliveryCore { }
-
-/** @see \AddressInvoiceCore */
-abstract class AddressInvoiceCore extends MockPsEntity { }
-
-/** @see \AddressInvoice */
-final class AddressInvoice extends AddressInvoiceCore { }
+final class Address extends AddressCore { }
 
 /** @see \CarrierCore */
-abstract class CarrierCore extends MockPsEntity { }
+abstract class CarrierCore extends MockPsCarrier { }
 
-/** @see \Carrier */
 final class Carrier extends CarrierCore { }
 
 /** @see \CartCore */
-abstract class CartCore extends MockPsEntity { }
+abstract class CartCore extends ObjectModel { }
 
-/** @see \Cart */
 final class Cart extends CartCore { }
 
-/** @see \CurrencyCore */
-abstract class CurrencyCore extends MockPsEntity { }
+/** @see \CountryCore */
+abstract class CountryCore extends ObjectModel { }
 
-/** @see \Currency */
+final class Country extends CountryCore { }
+
+/** @see \CurrencyCore */
+abstract class CurrencyCore extends ObjectModel { }
+
 final class Currency extends CurrencyCore { }
 
 /** @see \CustomerCore */
-abstract class CustomerCore extends MockPsEntity { }
+abstract class CustomerCore extends ObjectModel { }
 
-/** @see \Customer */
 final class Customer extends CustomerCore { }
-
-/** @see \LangCore */
-abstract class LangCore extends MockPsEntity { }
-
-/** @see \Lang */
-final class Lang extends LangCore { }
-
-/** @see \ShopCore */
-abstract class ShopCore extends MockPsEntity { }
-
-/** @see \Shop */
-final class Shop extends ShopCore { }
-
-/** @see \ShopGroupCore */
-abstract class ShopGroupCore extends MockPsEntity { }
-
-/** @see \ShopGroup */
-final class ShopGroup extends ShopGroupCore { }
-
-/** @see \AddressCore */
-abstract class AddressCore extends MockPsEntity { }
-
-/** @see \Address */
-final class Address extends AddressCore { }
-
-/** @see \CountryCore */
-abstract class CountryCore extends MockPsEntity { }
-
-/** @see \Country */
-final class Country extends CountryCore { }
-
-/** @see \StateCore */
-abstract class StateCore extends MockPsEntity { }
-
-/** @see \State */
-final class State extends StateCore { }
 
 /** @see \CustomerMessageCore */
 abstract class CustomerMessageCore extends MockPsCustomerMessage { }
 
-/** @see \CustomerMessage */
 final class CustomerMessage extends CustomerMessageCore { }
+
+/** @see \GroupCore */
+abstract class GroupCore extends ObjectModel { }
+
+final class Group extends GroupCore { }
+
+/** @see \LangCore */
+abstract class LangCore extends ObjectModel { }
+
+final class Lang extends LangCore { }
+
+/** @see \OrderCore */
+abstract class OrderCore extends MockPsOrder { }
+
+final class Order extends OrderCore { }
+
+/** @see \RangePriceCore */
+abstract class RangePriceCore extends MockPsRangeObjectModel { }
+
+final class RangePrice extends RangePriceCore { }
+
+/** @see \RangeWeightCore */
+abstract class RangeWeightCore extends MockPsRangeObjectModel { }
+
+final class RangeWeight extends RangeWeightCore { }
+
+/** @see \ShopCore */
+abstract class ShopCore extends ObjectModel { }
+
+final class Shop extends ShopCore { }
+
+/** @see \ShopGroupCore */
+abstract class ShopGroupCore extends ObjectModel { }
+
+final class ShopGroup extends ShopGroupCore { }
+
+/** @see \StateCore */
+abstract class StateCore extends ObjectModel { }
+
+final class State extends StateCore { }
+
+/** @see \ZoneCore */
+abstract class ZoneCore extends ObjectModel { }
+
+/** @see \Zone */
+final class Zone extends ZoneCore { }

@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
-use MyParcelNL\PrestaShop\Tests\Mock\Concern\HasStaticFunctionMocks;
-
-abstract class MockPsLink
+abstract class MockPsLink extends BaseMock
 {
-    use HasStaticFunctionMocks;
-
     public function getAdminBaseLink(): string
     {
         return 'https://example.com/admin';

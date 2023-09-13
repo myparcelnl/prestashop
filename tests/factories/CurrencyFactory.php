@@ -1,19 +1,14 @@
 <?php
 
-use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
-use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsClassFactory;
+declare(strict_types=1);
+
+use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
- * @method CurrencyFactory withId(int $id)
  */
-final class CurrencyFactory extends AbstractPsClassFactory
+final class CurrencyFactory extends AbstractPsObjectModelFactory
 {
-    protected function createDefault(): FactoryInterface
-    {
-        return $this->withId($this->getNextId());
-    }
-
-    protected function getEntityClass(): string
+    protected function getObjectModelClass(): string
     {
         return Currency::class;
     }
