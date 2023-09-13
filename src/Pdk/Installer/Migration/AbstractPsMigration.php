@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Migration;
+namespace MyParcelNL\PrestaShop\Pdk\Installer\Migration;
 
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface;
 use PrestaShop\PrestaShop\Adapter\Entity\Db;
@@ -10,7 +10,7 @@ use PrestaShop\PrestaShop\Adapter\Entity\Db;
 abstract class AbstractPsMigration implements MigrationInterface
 {
     /**
-     * @var \PrestaShop\PrestaShop\Adapter\Entity\Db
+     * @var \Db
      */
     protected $db;
 

@@ -169,6 +169,10 @@ class PsPdkBootstrapper extends PdkBootstrapper
                 return Pdk::get('getPsService')('doctrine.orm.entity_manager');
             }),
 
+            'ps.tabRepository' => factory(function () {
+                return Pdk::get('getPsService')('prestashop.core.admin.tab.repository');
+            }),
+
             'ps.router' => factory(function () {
                 /** @var MyParcelNL $module */
                 $module    = Pdk::get('moduleInstance');

@@ -1,12 +1,8 @@
 <?php
 
-use Gett\MyparcelBE\Constant;
-use Gett\MyparcelBE\Database\Table;
+declare(strict_types=1);
 
-/**
- * @throws \PrestaShopDatabaseException
- */
-function upgrade_module_1_7_2(MyParcelBE $module): bool
+function upgrade_module_1_7_2($module): bool
 {
-    return $module->upgrade(Gett\MyparcelBE\Module\Upgrade\Upgrade1_7_2::class);
+    return \MyParcelNL\PrestaShop\Facade\Module::install();
 }

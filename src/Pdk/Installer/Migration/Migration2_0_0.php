@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Migration;
+namespace MyParcelNL\PrestaShop\Pdk\Installer\Migration;
 
 use DbQuery;
 use Exception;
@@ -21,11 +21,8 @@ use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 
 final class Migration2_0_0 extends AbstractPsMigration
 {
-    protected const         LEGACY_TABLE_CARRIER_CONFIGURATION = 'myparcelnl_carrier_configuration';
-    protected const         LEGACY_TABLE_DELIVERY_SETTINGS     = 'myparcelnl_delivery_settings';
-    protected const         LEGACY_TABLE_ORDER_LABEL           = 'myparcelnl_order_label';
-    protected const         LEGACY_TABLE_PRODUCT_CONFIGURATION = 'myparcelnl_product_configuration';
-    private const           LEGACY_PRODUCT_SETTINGS_MAP        = [
+    protected const LEGACY_TABLE_CARRIER_CONFIGURATION = AbstractLegacyPsMigration::LEGACY_TABLE_CARRIER_CONFIGURATION;
+    private const   LEGACY_PRODUCT_SETTINGS_MAP        = [
         'MYPARCELNL_PACKAGE_TYPE'       => 'packageType',
         'MYPARCELNL_CUSTOMS_ORIGIN'     => 'countryOfOrigin',
         'MYPARCELNL_CUSTOMS_CODE'       => 'customsCode',
@@ -36,22 +33,22 @@ final class Migration2_0_0 extends AbstractPsMigration
         'MYPARCELNL_ONLY_RECIPIENT'     => 'exportOnlyRecipient',
         'MYPARCELNL_AGE_CHECK'          => 'exportAgeCheck',
     ];
-    private const           OLD_CARRIERS                       = [
+    private const   OLD_CARRIERS                       = [
         'postnl',
         'dhlforyou',
         'dhlparcelconnect',
         'dhleuroplus',
     ];
-    private const           TRANSFORM_CAST_ARRAY               = 'array';
-    private const           TRANSFORM_CAST_BOOL                = 'bool';
-    private const           TRANSFORM_CAST_CENTS               = 'cents';
-    private const           TRANSFORM_CAST_FLOAT               = 'float';
-    private const           TRANSFORM_CAST_INT                 = 'int';
-    private const           TRANSFORM_CAST_STRING              = 'string';
-    private const           TRANSFORM_KEY_CAST                 = 'cast';
-    private const           TRANSFORM_KEY_SOURCE               = 'source';
-    private const           TRANSFORM_KEY_TARGET               = 'target';
-    private const           TRANSFORM_KEY_TRANSFORM            = 'transform';
+    private const   TRANSFORM_CAST_ARRAY               = 'array';
+    private const   TRANSFORM_CAST_BOOL                = 'bool';
+    private const   TRANSFORM_CAST_CENTS               = 'cents';
+    private const   TRANSFORM_CAST_FLOAT               = 'float';
+    private const   TRANSFORM_CAST_INT                 = 'int';
+    private const   TRANSFORM_CAST_STRING              = 'string';
+    private const   TRANSFORM_KEY_CAST                 = 'cast';
+    private const   TRANSFORM_KEY_SOURCE               = 'source';
+    private const   TRANSFORM_KEY_TARGET               = 'target';
+    private const   TRANSFORM_KEY_TRANSFORM            = 'transform';
 
     /**
      * @var \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository
@@ -89,7 +86,7 @@ final class Migration2_0_0 extends AbstractPsMigration
 
     public function down(): void
     {
-        // TODO: Implement down() method.
+        // do nothing
     }
 
     public function getVersion(): string
@@ -620,7 +617,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         $query = new DbQuery();
 
         $query->select('*');
-        $query->from(self::LEGACY_TABLE_DELIVERY_SETTINGS);
+        $query->from(AbstractLegacyPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS);
 
         $oldValues = $this->db->executeS($query);
 
@@ -690,7 +687,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         $query = new DbQuery();
 
         $query->select('*');
-        $query->from(self::LEGACY_TABLE_ORDER_LABEL);
+        $query->from(AbstractLegacyPsMigration::LEGACY_TABLE_ORDER_LABEL);
 
         $oldOrderLabels = $this->db->executeS($query);
 
@@ -724,7 +721,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         $query = new DbQuery();
 
         $query->select('*');
-        $query->from(self::LEGACY_TABLE_PRODUCT_CONFIGURATION);
+        $query->from(AbstractLegacyPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION);
 
         $oldProductSettings = $this->db->executeS($query);
 

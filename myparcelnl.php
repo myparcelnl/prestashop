@@ -152,27 +152,16 @@ class MyParcelNL extends CarrierModule
      */
     public function uninstall(): bool
     {
+        $success = true;
+
         try {
             Installer::uninstall($this);
         } catch (Throwable $e) {
             $this->_errors[] = $e->getMessage();
-            return false;
+            $success         = false;
         }
 
-        return parent::uninstall();
-    }
-
-    /**
-     * @param  class-string $class
-     *
-     * @return bool
-     */
-    public function upgrade(string $class): bool
-    {
-        /** @var \MyParcelNL\PrestaShop\Module\Upgrade\AbstractUpgrade $upgrade */
-        $upgrade = new $class($this);
-
-        return $upgrade->execute();
+        return parent::uninstall() && $success;
     }
 
     /**

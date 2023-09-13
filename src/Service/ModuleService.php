@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Service;
 
 use Cart;
+use MyParcelNL\Pdk\Facade\Installer;
+use MyParcelNL\Pdk\Facade\Logger;
+use Throwable;
 
 final class ModuleService
 {
@@ -82,5 +85,18 @@ final class ModuleService
         //        }
         //
         //        return $shippingCost + $myParcelCost;
+    }
+
+    public function install(): bool
+    {
+        try {
+            Installer::install();
+        } catch (Throwable $e) {
+            Logger::error('Failed to install module', ['exception' => $e]);
+
+            return false;
+        }
+
+        return true;
     }
 }
