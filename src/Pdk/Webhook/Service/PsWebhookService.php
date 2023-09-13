@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Webhook\Service;
 
 use Context;
 use MyParcelNL\Pdk\App\Webhook\Service\AbstractPdkWebhookService;

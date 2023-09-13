@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
+namespace MyParcelNL\PrestaShop\Pdk\ShippingMethod\Repository;
 
 use Carrier;
 use Context;

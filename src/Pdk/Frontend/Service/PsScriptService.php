@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Frontend\Service;
 
 use AdminControllerCore;
 use MyParcelNL\Pdk\Facade\Pdk;

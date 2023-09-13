@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
+namespace MyParcelNL\PrestaShop\Pdk\Account\Repository;
 
 use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Repository\AccountRepository;
@@ -52,6 +52,7 @@ final class PsPdkAccountRepository extends AbstractPdkAccountRepository
 
         if (! $account) {
             $this->configurationService->delete($key);
+
             return $account;
         }
 

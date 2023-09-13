@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Base\Service;
 
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 

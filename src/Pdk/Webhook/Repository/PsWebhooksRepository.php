@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Plugin\Repository;
+namespace MyParcelNL\PrestaShop\Pdk\Webhook\Repository;
 
 use MyParcelNL\Pdk\App\Webhook\Repository\AbstractPdkWebhooksRepository;
 use MyParcelNL\Pdk\Facade\Pdk;

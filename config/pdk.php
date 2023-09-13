@@ -29,30 +29,30 @@ use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Configuration\Service\Ps17ConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
+use MyParcelNL\PrestaShop\Pdk\Account\Repository\PsPdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
+use MyParcelNL\PrestaShop\Pdk\Api\Service\PsBackendEndpointService;
+use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
+use MyParcelNL\PrestaShop\Pdk\Base\Service\PsCronService;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
 use MyParcelNL\PrestaShop\Pdk\DeliveryOptions\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsFrontendRenderService;
+use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsScriptService;
+use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsViewService;
 use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsInstallerService;
 use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsMigrationService;
 use MyParcelNL\PrestaShop\Pdk\Language\Service\PsLanguageService;
 use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderNoteRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Api\PsBackendEndpointService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsPdkAccountRepository;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsShippingMethodRepository;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Repository\PsWebhooksRepository;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Service\OrderStatusService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsCronService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsFrontendEndpointService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsScriptService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsViewService;
-use MyParcelNL\PrestaShop\Pdk\Plugin\Service\PsWebhookService;
+use MyParcelNL\PrestaShop\Pdk\Order\Service\PsOrderStatusService;
 use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
+use MyParcelNL\PrestaShop\Pdk\ShippingMethod\Repository\PsShippingMethodRepository;
 use MyParcelNL\PrestaShop\Pdk\Tax\Service\PsTaxService;
+use MyParcelNL\PrestaShop\Pdk\Webhook\Repository\PsWebhooksRepository;
+use MyParcelNL\PrestaShop\Pdk\Webhook\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\PsRouterService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
@@ -91,7 +91,7 @@ return [
     DeliveryOptionsServiceInterface::class      => get(PsDeliveryOptionsService::class),
     FrontendRenderServiceInterface::class       => get(PsFrontendRenderService::class),
     LanguageServiceInterface::class             => get(PsLanguageService::class),
-    OrderStatusServiceInterface::class          => get(OrderStatusService::class),
+    OrderStatusServiceInterface::class          => get(PsOrderStatusService::class),
     TaxServiceInterface::class                  => get(PsTaxService::class),
     ViewServiceInterface::class                 => get(PsViewService::class),
     WeightServiceInterface::class               => get(PsWeightService::class),

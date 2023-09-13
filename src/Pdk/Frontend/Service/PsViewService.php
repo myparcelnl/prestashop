@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Plugin\Service;
+namespace MyParcelNL\PrestaShop\Pdk\Frontend\Service;
 
 use MyParcelNL\Pdk\Frontend\Service\AbstractViewService;
 use PrestaShop\PrestaShop\Adapter\Entity\Dispatcher;
