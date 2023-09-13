@@ -140,17 +140,16 @@ final class PsInstallerService extends InstallerService
      */
     private function installTabs(): void
     {
-        $languages = array_fill_keys(array_column(Language::getLanguages(), 'id_lang'), Pdk::getAppInfo()->title);
-
         /** @var \PrestaShopBundle\Entity\Repository\TabRepository $tabRepository */
         $tabRepository = Pdk::get('ps.tabRepository');
 
         $tab = new Tab();
 
         $tab->active     = 1;
-        $tab->class_name = 'AdminMyParcelNL';
-        $tab->name       = $languages;
-        $tab->id_parent  = $tabRepository->findOneIdByClassName('AdminParentShipping');
+        $tab->class_name = Pdk::get('legacyControllerSettings');
+        $tab->route_name = Pdk::get('routeNameSettings');
+        $tab->name       = array_fill_keys(array_column(Language::getLanguages(), 'id_lang'), Pdk::getAppInfo()->title);
+        $tab->id_parent  = $tabRepository->findOneIdByClassName(Pdk::get('sidebarParentClass'));
         $tab->module     = $this->module->name;
 
         if (! $tab->add()) {

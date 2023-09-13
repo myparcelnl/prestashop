@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Frontend\Service;
 
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Service\AbstractViewService;
 use PrestaShop\PrestaShop\Adapter\Entity\Dispatcher;
 use RuntimeException;
@@ -47,7 +48,7 @@ final class PsViewService extends AbstractViewService
      */
     public function isPluginSettingsPage(): bool
     {
-        return 'AdminModules' === $this->getPage();
+        return Pdk::get('legacyControllerSettings') === $this->getPage();
     }
 
     /**

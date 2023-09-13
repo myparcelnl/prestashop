@@ -6,6 +6,7 @@ declare(strict_types=1);
 use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutDeliveryOptionsHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkOrderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkProductHooks;
@@ -25,6 +26,7 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 class MyParcelNL extends CarrierModule
 {
+    use HasPdkCheckoutDeliveryOptionsHooks;
     use HasPdkCheckoutHooks;
     use HasPdkOrderHooks;
     use HasPdkProductHooks;
@@ -104,6 +106,21 @@ class MyParcelNL extends CarrierModule
         }
 
         return $module;
+    }
+
+    /**
+     * Redirects the "configure" button in the module list to the settings page.
+     *
+     * @return string
+     * @see \MyParcelNL\PrestaShop\Controller\SettingsController
+     */
+    public function getContent(): string
+    {
+        $link = $this->context->link->getAdminLink(Pdk::get('legacyControllerSettings'));
+
+        Tools::redirectAdmin($link);
+
+        return '';
     }
 
     /**

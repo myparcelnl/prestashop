@@ -61,19 +61,35 @@ class PsPdkBootstrapper extends PdkBootstrapper
                 'MyParcel-PrestaShop' => $version,
             ]),
 
-            'moduleTabName' => value('shipping_logistics'),
-
             'prestaShopVersionMin' => value('1.7.6'),
             'prestaShopVersionMax' => value('8.2.0'),
+
+            /**
+             * Tab in the modules list we want to show the module under.
+             */
+
+            'moduleTabName' => value('shipping_logistics'),
+
+            /**
+             * The name of the tab we want to show the settings page under.
+             */
+
+            'sidebarParentClass' => value('AdminParentShipping'),
 
             'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
 
             /**
-             * The symfony routes that are used by the pdk.
+             * The symfony routes that are used by the pdk. Must match the routes in config/routes.yml.
+             *
+             * @see config/routes.yml
              */
 
-            'routeNamePdk'      => value('myparcelnl_pdk'),
             'routeNameFrontend' => value('myparcelnl_frontend'),
+            'routeNamePdk'      => value('myparcelnl_pdk'),
+            'routeNameSettings' => value('myparcelnl_settings'),
+            'routeNameWebhook'  => value('myparcelnl_webhook'),
+
+            'legacyControllerSettings' => value('MyParcelNLAdminSettings'),
 
             'moduleInstance' => factory(static function (): Module {
                 $name = Pdk::getAppInfo()->name;

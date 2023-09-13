@@ -13,16 +13,6 @@ use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 trait HasPdkRenderHooks
 {
     /**
-     * Renders the module configuration page.
-     *
-     * @return string
-     */
-    public function getContent(): string
-    {
-        return Frontend::renderPluginSettings();
-    }
-
-    /**
      * Add columns to the order grid to render the order boxes in.
      *
      * @param  array $params
