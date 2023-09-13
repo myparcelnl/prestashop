@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop;
 
+use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Factory\PsFactoryFactory;
+use ObjectModel;
 
 /**
  * @return void
@@ -24,8 +26,8 @@ function bootPdk(): void
 }
 
 /**
- * @param  class-string<\ObjectModel> $class
- * @param  mixed                      ...$args
+ * @param  class-string<ObjectModel|EntityInterface> $class
+ * @param  mixed                                     ...$args
  *
  * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
  */

@@ -1,4 +1,5 @@
 <?php
+/** @noinspection ReturnTypeCanBeDeclaredInspection */
 
 declare(strict_types=1);
 
@@ -14,10 +15,10 @@ interface PsObjectModelFactoryInterface extends PsFactoryInterface
     /**
      * @return T
      */
-    public function make(): ObjectModel;
+    public function make();
 
     /**
      * @return T
      */
-    public function store(): ObjectModel;
+    public function store();
 }

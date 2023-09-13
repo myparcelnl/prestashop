@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
@@ -29,11 +28,6 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
  */
 final class CarrierFactory extends AbstractPsObjectModelFactory
 {
-    protected function createDefault(): FactoryInterface
-    {
-        return $this->withIdCarrier($this->getNextId());
-    }
-
     protected function getObjectModelClass(): string
     {
         return Carrier::class;

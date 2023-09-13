@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Tests\Factory;
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use ObjectModel;
@@ -12,51 +13,10 @@ use ObjectModel;
 /**
  * @template T of ObjectModel
  * @implements PsObjectModelFactoryInterface<T>
+ * @extends AbstractPsFactory<T>
  */
-abstract class AbstractPsObjectModelFactory extends AbstractPsFactory implements PsObjectModelFactoryInterface
+abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory implements PsObjectModelFactoryInterface
 {
-    /**
-     * @var array<string, T>
-     */
-    private $cache = [];
-
-    /**
-     * @return T
-     */
-    public function make(): ObjectModel
-    {
-        $class      = $this->getObjectModelClass();
-        $attributes = $this->resolveAttributes();
-
-        $cacheKey = sprintf('%s::%s', $class, md5(json_encode($attributes)));
-
-        if (! isset($this->cache[$cacheKey])) {
-            /** @var T $created */
-            $created = new $class();
-            $created->hydrate(
-                array_map(static function ($value) {
-                    return $value instanceof FactoryInterface ? $value->make() : $value;
-                }, $attributes)
-            );
-
-            $this->cache[$cacheKey] = $created;
-        }
-
-        return $this->cache[$cacheKey];
-    }
-
-    /**
-     * @return T
-     */
-    public function store(): ObjectModel
-    {
-        $model = $this->make();
-
-        MockPsObjectModels::update($model);
-
-        return $model;
-    }
-
     /**
      * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
      */
@@ -66,43 +26,45 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsFactory implements
     }
 
     /**
-     * @return int
+     * @param  string $class
+     * @param  array  $attributes
+     *
+     * @return T
      */
-    final protected function getId(): int
+    protected function createObject(string $class, array $attributes): ObjectModel
     {
-        return $this->attributes->get('id') ?? $this->getNextId();
+        /** @var T $created */
+        $created = new $class();
+        $created->hydrate(
+            array_map(static function ($value) {
+                return $value instanceof FactoryInterface ? $value->make() : $value;
+            }, $attributes)
+        );
+
+        return $created;
     }
 
     /**
-     * @param  string|null $key
-     *
-     * @return int
+     * @return string
      */
-    protected function getNextId(string $key = null): int
+    protected function getClass(): string
     {
-        $key = $key ?? $this->getObjectModelClass();
-
-        return $this->state->getNextId($key);
+        return $this->getObjectModelClass();
     }
 
+    /**
+     * @return class-string<T>
+     */
     abstract protected function getObjectModelClass(): string;
 
     /**
-     * @return array
-     */
-    protected function resolveAttributes(): array
-    {
-        return array_replace(parent::resolveAttributes(), ['id' => $this->getId()]);
-    }
-
-    /**
-     * @param  int $id
+     * @param  T $model
      *
-     * @return self
+     * @return void
      */
-    protected function withId(int $id): self
+    protected function save($model): void
     {
-        return $this->with(['id' => $id]);
+        MockPsObjectModels::update($model);
     }
 
     /**
@@ -113,7 +75,7 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsFactory implements
      */
     protected function withModel(string $key, $input): self
     {
-        if ($input instanceof PsObjectModelFactoryInterface) {
+        if ($input instanceof PsFactoryInterface) {
             return $this->withModel($key, $input->make());
         }
 
