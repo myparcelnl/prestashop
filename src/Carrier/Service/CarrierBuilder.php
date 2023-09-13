@@ -151,9 +151,7 @@ final class CarrierBuilder
 
         $psCarrier = $this->getExistingPsCarrier() ?? new PsCarrier();
 
-        $identifier = $this->myParcelCarrier->externalIdentifier;
-
-        $psCarrier->name                 = $identifier;
+        $psCarrier->name                 = $this->myParcelCarrier->human;
         $psCarrier->active               = (int) $this->myParcelCarrier->enabled;
         $psCarrier->id_reference         = $this->createCarrierIdReference();
         $psCarrier->deleted              = 0;
@@ -163,6 +161,8 @@ final class CarrierBuilder
         $psCarrier->range_behavior       = 1;
         $psCarrier->shipping_external    = true;
         $psCarrier->shipping_method      = 2;
+
+        // TODO: add logo
 
         foreach (PsLanguage::getLanguages() as $lang) {
             $psCarrier->delay[$lang['id_lang']] = Language::translate('carrier_delivery_time', $lang['iso_code']);
