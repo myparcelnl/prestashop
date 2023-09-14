@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Hooks;
 
-use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
+use Cart;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use Throwable;
 use Tools;
@@ -24,57 +26,51 @@ trait HasPdkCheckoutHooks
      */
     public function hookActionCarrierProcess(array $params): void
     {
-        $action    = Tools::getValue('action');
+        $action = Tools::getValue('action');
         $carrierId = Tools::getValue('delivery_option');
 
         if (('selectDeliveryOption' !== $action || empty($carrierId)) && ! Tools::isSubmit('confirmDeliveryOption')) {
             return;
         }
 
+        $this->saveDeliveryOptionsToCart($params['cart']);
+    }
+
+    /**
+     * @param  \Cart $cart
+     *
+     * @return void
+     */
+    private function saveDeliveryOptionsToCart(Cart $cart): void
+    {
         $options = Tools::getValue(Pdk::get('checkoutHiddenInputName'));
 
         if (! $options || '[]' === $options) {
             return;
         }
 
-        $cartId = $params['cart']->id ?? null;
-
-        try {
-            $pdkOrder = new PdkOrder(['deliveryOptions' => json_decode($options, true)]);
-
-            $this->saveOrderData($cartId, $pdkOrder);
-        } catch (Throwable $e) {
-            Logger::error(
-                'Failed to save order data',
-                [
-                    'exception' => $e,
-                    'options'   => $options,
-                    'cartId'    => $cartId,
-                ]
-            );
-        }
-    }
-
-    /**
-     * @param  int                                      $cartId
-     * @param  \MyParcelNL\Pdk\App\Order\Model\PdkOrder $order
-     *
-     * @return void
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
-     */
-    private function saveOrderData(int $cartId, PdkOrder $order): void
-    {
         /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
         $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
 
-        $cartDeliveryOptionsRepository->updateOrCreate(
-            [
-                'cartId' => $cartId,
-            ],
-            [
-                'data' => json_encode($order->toStorableArray()),
-            ]
-        );
+        try {
+            $deliveryOptions = new DeliveryOptions(json_decode($options, true));
+
+            $cartDeliveryOptionsRepository->updateOrCreate(
+                [
+                    'cartId' => $cart->id,
+                ],
+                [
+                    'data' => json_encode($deliveryOptions->toStorableArray()),
+                ]
+            );
+
+            EntityManager::flush();
+        } catch (Throwable $e) {
+            Logger::error('Failed to save delivery options to cart', [
+                'exception' => $e,
+                'options'   => $options,
+                'cartId'    => $cart->id,
+            ]);
+        }
     }
 }
