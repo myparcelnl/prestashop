@@ -11,6 +11,7 @@ use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShopBundle\Exception\InvalidModuleException;
@@ -90,6 +91,19 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'routeNameWebhook'  => value('myparcelnl_webhook'),
 
             'legacyControllerSettings' => value('MyParcelNLAdminSettings'),
+
+            /**
+             * Settings that are not available in the module.
+             */
+
+            'disabledSettings' => value([
+                CheckoutSettings::ID => [
+                    CheckoutSettings::ALLOWED_SHIPPING_METHODS,
+                    CheckoutSettings::DELIVERY_OPTIONS_CUSTOM_CSS,
+                    CheckoutSettings::DELIVERY_OPTIONS_POSITION,
+                    CheckoutSettings::USE_SEPARATE_ADDRESS_FIELDS,
+                ],
+            ]),
 
             'moduleInstance' => factory(static function (): Module {
                 $name = Pdk::getAppInfo()->name;
