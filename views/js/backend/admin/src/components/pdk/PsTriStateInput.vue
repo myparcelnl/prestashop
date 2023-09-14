@@ -1,10 +1,9 @@
 <template>
-  <div
+  <PdkRow
     v-test="[AdminComponent.TriStateInput, element]"
-    :class="config?.cssUtilities?.displayFlex"
-    class="row">
+    :class="config?.cssUtilities?.displayFlex">
     <div class="col-md-6">
-      <div class="row">
+      <PdkRow>
         <div class="col-4">
           <input
             v-model="model"
@@ -22,7 +21,6 @@
             :class="config?.cssUtilities?.displayFlex"
             :size="Size.ExtraSmall"
             :title="inheritElement?.label"
-            class="!mypa-float-none !mypa-ml-1"
             @click="inheritModel = !inheritModel">
             <div>
               <i
@@ -35,13 +33,13 @@
             <PdkCheckboxInput
               v-model="inheritModel"
               :element="{...inheritElement, label: undefined}"
-              class="mypa-sr-only"
+              class="sr-only"
               tabindex="-1" />
           </PdkButton>
         </div>
-      </div>
+      </PdkRow>
     </div>
-  </div>
+  </PdkRow>
 </template>
 
 <script lang="ts" setup>

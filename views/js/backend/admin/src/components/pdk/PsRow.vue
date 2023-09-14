@@ -1,19 +1,26 @@
 <template>
   <div
     v-test="AdminComponent.Row"
-    :class="{
-      'mypa-gap-4': !collapseGutters,
-    }"
-    class="mypa-cols-auto mypa-grid mypa-grid-flow-col">
+    :class="classes"
+    class="mypa-grid mypa-grid-flow-col">
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
+import {computed} from 'vue';
 import {AdminComponent} from '@myparcel-pdk/admin';
 
-defineProps<{
+const props = defineProps<{
   collapseGutters: boolean;
   columns?: number | string;
 }>();
+
+const classes = computed(() => {
+  return {
+    'mypa-gap-4': !props.collapseGutters,
+    'mypa-cols-auto': !props.columns,
+    'mypa-grid-cols-2': props.columns === 2,
+  };
+});
 </script>

@@ -1,15 +1,17 @@
 <template>
-  <div v-test="AdminComponent.SettingsDivider">
+  <div
+    v-test="AdminComponent.SettingsDivider"
+    class="mb-0 pb-0">
     <PdkHeading
       v-if="element.props.heading"
       :level="element.props.level"
-      class="bg-transparent card-header mt-3 mx-0">
+      class="card-header">
       {{ translate(element.props.heading) }}
     </PdkHeading>
 
     <p
       v-if="element.props.content && has(element.props.content)"
-      class="card-text"
+      class="card-block text-muted"
       v-text="translate(element.props.content)" />
   </div>
 </template>

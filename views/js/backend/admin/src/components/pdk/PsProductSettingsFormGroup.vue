@@ -1,8 +1,7 @@
 <template>
-  <div
+  <PdkRow
     v-show="element.isVisible"
-    v-test="[AdminComponent.FormGroup, element]"
-    class="row">
+    v-test="[AdminComponent.FormGroup, element]">
     <template v-if="isInteractive">
       <div class="col-md-6">
         <div class="form-group">
@@ -44,7 +43,7 @@
       class="col-12 mb-4">
       <slot />
     </div>
-  </div>
+  </PdkRow>
 </template>
 
 <script lang="ts" setup>

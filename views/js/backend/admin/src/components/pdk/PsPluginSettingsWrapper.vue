@@ -2,7 +2,7 @@
   <div
     v-test="AdminComponent.PluginSettingsWrapper"
     class="card row">
-    <div class="card-body col-sm-12 pdk-plugin-settings-wrapper">
+    <div class="card-body col-sm-12">
       <slot />
     </div>
   </div>

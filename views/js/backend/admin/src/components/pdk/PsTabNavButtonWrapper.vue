@@ -1,7 +1,7 @@
 <template>
   <ul
     v-test="AdminComponent.TabNavButtonWrapper"
-    class="nav nav-pills">
+    class="mb-2 nav nav-pills">
     <slot />
   </ul>
 </template>
