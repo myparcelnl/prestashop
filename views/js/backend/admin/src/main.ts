@@ -12,7 +12,6 @@ import {
   DefaultTableCol,
   DefaultTableRow,
   DefaultTimeInput,
-  DefaultTriStateInput,
 } from '@myparcel-pdk/admin-preset-default';
 import {
   Bootstrap4Box,
@@ -31,6 +30,7 @@ import {LogLevel, createPdkAdmin, type ElementInstance} from '@myparcel-pdk/admi
 import {
   PsDropdownButton,
   PsFormGroup,
+  PsProductSettingsFormGroup,
   PsIcon,
   PsPluginSettingsWrapper,
   PsRow,
@@ -41,6 +41,7 @@ import {
   PsToggleInput,
   PsMultiSelectInput,
   PsSelectInput,
+  PsTriStateInput,
 } from './components';
 
 // eslint-disable-next-line max-lines-per-function
@@ -84,7 +85,7 @@ window.onload = () => {
       PdkTextInput: Bootstrap4TextInput,
       PdkTimeInput: DefaultTimeInput,
       PdkToggleInput: PsToggleInput,
-      PdkTriStateInput: DefaultTriStateInput,
+      PdkTriStateInput: PsTriStateInput,
     },
 
     formConfig: {
@@ -99,6 +100,9 @@ window.onload = () => {
       productSettings: {
         form: {
           tag: 'div',
+        },
+        field: {
+          wrapper: PsProductSettingsFormGroup,
         },
       },
     },
