@@ -15,7 +15,7 @@
                     "id_zone": 2
                 }
             ],
-            "name": "postnl",
+            "name": "PostNL",
             "active": 1,
             "id_reference": 100,
             "deleted": 0,
@@ -142,7 +142,7 @@
                     "id_zone": 2
                 }
             ],
-            "name": "dhlforyou",
+            "name": "DHL For You",
             "active": 1,
             "id_reference": 900,
             "deleted": 0,
@@ -237,7 +237,7 @@
                     "id_zone": 2
                 }
             ],
-            "name": "dhleuroplus",
+            "name": "DHL Europlus",
             "active": 1,
             "id_reference": 110,
             "deleted": 0,
