@@ -6,9 +6,12 @@ namespace MyParcelNL\PrestaShop\Hooks;
 
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
+use MyParcelNL\Sdk\src\Support\Str;
 use Symfony\Component\HttpFoundation\Request;
 use Tools;
 
@@ -21,35 +24,7 @@ trait HasPdkProductHooks
      */
     public function hookActionProductUpdate(array $params): void
     {
-        $productId               = (int) $params['id_product'];
-        $postValues              = Tools::getAllValues();
-        $myparcelProductSettings = array_filter($postValues, static function ($key) {
-            return str_starts_with($key, 'myparcelnl');
-        }, ARRAY_FILTER_USE_KEY);
-
-        $productSettingsBody = [];
-
-        foreach ($myparcelProductSettings as $key => $value) {
-            $explodedKey                  = explode('-', $key);
-            $newKey                       = end($explodedKey);
-            $productSettingsBody[$newKey] = $value;
-        }
-
-        $request = new Request(
-            ['productId' => $productId],
-            ['action' => PdkBackendActions::UPDATE_PRODUCT_SETTINGS],
-            [],
-            [],
-            [],
-            [],
-            json_encode([
-                'data' => [
-                    'product_settings' => $productSettingsBody,
-                ],
-            ])
-        );
-
-        Actions::execute($request);
+        $this->saveProductSettings((int) $params['id_product']);
     }
 
     /**
@@ -61,18 +36,63 @@ trait HasPdkProductHooks
      */
     public function hookDisplayAdminProductsExtra(array $params): string
     {
-        /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $repository */
-        $repository          = Pdk::get(PdkProductRepositoryInterface::class);
-        $product             = $repository->getProduct($params['id_product']);
-        $productSettingsView = Frontend::renderProductSettings($product);
+        return $this->renderProductSettings((int) $params['id_product']);
+    }
 
-        $this->context->smarty->assign(
+    /**
+     * @param  int $idProduct
+     *
+     * @return string
+     */
+    private function renderProductSettings(int $idProduct): string
+    {
+        /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $repository */
+        $repository = Pdk::get(PdkProductRepositoryInterface::class);
+        $product    = $repository->getProduct($idProduct);
+
+        return Frontend::renderProductSettings($product);
+    }
+
+    /**
+     * @param  int $idProduct
+     *
+     * @return void
+     */
+    private function saveProductSettings(int $idProduct): void
+    {
+        $postValues = Tools::getAllValues();
+        $name       = Pdk::getAppInfo()->name;
+
+        $productSettings = array_filter($postValues, static function ($key) use ($name) {
+            return Str::startsWith((string) $key, $name);
+        }, ARRAY_FILTER_USE_KEY);
+
+        if (empty($productSettings)) {
+            return;
+        }
+
+        $requestBody = [];
+
+        foreach ($productSettings as $key => $value) {
+            $trimmedKey               = Arr::last(explode('-', $key));
+            $requestBody[$trimmedKey] = $value;
+        }
+
+        $request = new Request(
             [
-                'productSettingsView' => $productSettingsView,
-            ]
+                'action'    => PdkBackendActions::UPDATE_PRODUCT_SETTINGS,
+                'productId' => $idProduct,
+            ],
+            [],
+            [],
+            [],
+            [],
+            [],
+            json_encode(['data' => ['product_settings' => $requestBody]])
         );
 
-        // todo move to twig
-        return $this->display($this->name, 'views/templates/hook/product_settings.tpl');
+        Actions::execute($request);
+
+        EntityManager::flush();
     }
 }

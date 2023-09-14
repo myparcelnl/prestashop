@@ -1,1 +1,1 @@
-{$productSettingsView}
+{$content}
