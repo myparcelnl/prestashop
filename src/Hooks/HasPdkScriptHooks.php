@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Hooks;
 
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Facade\Settings;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
+use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 
 trait HasPdkScriptHooks
 {
@@ -39,6 +41,10 @@ trait HasPdkScriptHooks
         }
 
         $this->loadCoreScripts();
+
+        if (! Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID)) {
+            return;
+        }
 
         $this->loadDeliveryOptionsScripts();
     }
