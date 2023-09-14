@@ -8,6 +8,7 @@ use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use Order;
@@ -68,7 +69,7 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
      */
     public function getOrderData($orderOrId): array
     {
-        $fromOrder = $this->psOrderDataRepository->findOneBy(['idOrder' => $this->getOrderId($orderOrId)]);
+        $fromOrder = $this->psOrderDataRepository->findOneBy(['idOrder' => (int) $this->getOrderId($orderOrId)]);
 
         if (! $fromOrder) {
             return $this->getFromCart($this->get($orderOrId));
@@ -87,7 +88,7 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
     public function updateData($orderOrId, array $orderData): void
     {
         $this->psOrderDataRepository->updateOrCreate(
-            ['idOrder' => $this->getOrderId($orderOrId)],
+            ['idOrder' => (int) $this->getOrderId($orderOrId)],
             ['data' => json_encode($orderData)]
         );
     }
@@ -104,20 +105,17 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
     {
         $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['idCart' => $order->id_cart]);
 
-        $context = [
-            'cartId'  => $order->id_cart,
-            'orderId' => $order->id,
-        ];
-
         if ($fromCart) {
-            Logger::debug('Delivery options found in cart, saving to order', $context);
+            Logger::debug("[Order $order->id] Delivery options found in cart, saving to order");
         } else {
-            Logger::debug('No delivery options found in cart, saving empty order data to order', $context);
+            Logger::debug("[Order $order->id] Saving empty order data to order");
         }
 
         $deliveryOptions = $fromCart ? $fromCart->getData() : [];
 
         $this->updateData((string) $order->id, $deliveryOptions);
+
+        EntityManager::flush();
 
         return $deliveryOptions;
     }
