@@ -81,6 +81,8 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'logDirectory'          => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
             'carrierLogosDirectory' => value(sprintf('%sprivate/carrier-logos/', $path)),
 
+            'carrierLogoFileExtensions' => value(['.png', '.jpg']),
+
             /**
              * The symfony routes that are used by the pdk. Must match the routes in config/routes.yml.
              *

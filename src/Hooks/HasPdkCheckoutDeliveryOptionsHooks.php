@@ -9,6 +9,8 @@ use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Facade\Settings;
+use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use Throwable;
@@ -19,18 +21,13 @@ use Throwable;
 trait HasPdkCheckoutDeliveryOptionsHooks
 {
     /**
-     * @param $params
+     * @param  array $params
      *
      * @return false|string
      */
-    public function hookDisplayCarrierExtraContent($params)
+    public function hookDisplayBeforeCarrier(array $params)
     {
-        /** @var PsCarrierService $carrierService */
-        $carrierService = Pdk::get(PsCarrierService::class);
-
-        $psCarrierId = $params['carrier']['id'] ?? null;
-
-        if (! $carrierService->isMyParcelCarrier($psCarrierId)) {
+        if ($this->deliveryOptionsDisabled()) {
             return false;
         }
 
@@ -44,6 +41,43 @@ trait HasPdkCheckoutDeliveryOptionsHooks
     }
 
     /**
+     * @param  array $params
+     *
+     * @return false|string
+     */
+    public function hookDisplayCarrierExtraContent(array $params)
+    {
+        if ($this->deliveryOptionsDisabled()) {
+            return false;
+        }
+
+        /** @var PsCarrierService $carrierService */
+        $carrierService = Pdk::get(PsCarrierService::class);
+
+        $psCarrierId = $params['carrier']['id'] ?? null;
+
+        if (! $carrierService->isMyParcelCarrier($psCarrierId)) {
+            return false;
+        }
+
+        try {
+            return $this->renderCarrierData($params['carrier']['id']);
+        } catch (Throwable $e) {
+            Logger::error('Failed to render', ['exception' => $e, 'params' => $params]);
+
+            return false;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function deliveryOptionsDisabled(): bool
+    {
+        return ! Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
+    }
+
+    /**
      * @param  array $address
      *
      * @return string
@@ -54,14 +88,30 @@ trait HasPdkCheckoutDeliveryOptionsHooks
     }
 
     /**
+     * @param  int $carrierId
+     *
+     * @return string
+     */
+    private function renderCarrierData(int $carrierId): string
+    {
+        /** @var PsCarrierService $carrierService */
+        $carrierService = Pdk::get(PsCarrierService::class);
+
+        $this->context->smarty->setEscapeHtml(false);
+        $this->context->smarty->assign([
+            'carrier' => $carrierService->getMyParcelCarrierIdentifier($carrierId),
+        ]);
+
+        return $this->display($this->name, 'views/templates/hook/carrier_data.tpl');
+    }
+
+    /**
      * @return string
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
     private function renderDeliveryOptions(): string
     {
-        /** @var PsCarrierService $carrierService */
-        $carrierService = Pdk::get(PsCarrierService::class);
         /** @var PdkCartRepositoryInterface $cartRepository */
         $cartRepository = Pdk::get(PdkCartRepositoryInterface::class);
         /** @var \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter $addressAdapter */
@@ -70,12 +120,11 @@ trait HasPdkCheckoutDeliveryOptionsHooks
         $cart = $this->context->cart;
 
         $this->context->smarty->setEscapeHtml(false);
-
         $this->context->smarty->assign([
-            'carrier'         => $carrierService->getMyParcelCarrierIdentifier($cart->id_carrier),
+            'content'         => Frontend::renderDeliveryOptions($cartRepository->get($cart)),
             'shippingAddress' => $this->encodeAddress($addressAdapter->fromAddress($cart->id_address_delivery)),
             'billingAddress'  => $this->encodeAddress($addressAdapter->fromAddress($cart->id_address_invoice)),
-            'content'         => Frontend::renderDeliveryOptions($cartRepository->get($cart)),
+
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier_delivery_options.tpl');

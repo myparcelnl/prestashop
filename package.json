@@ -9,7 +9,7 @@
     "views/js/**/*"
   ],
   "scripts": {
-    "build": "yarn build:js && yarn translations:import && pdk-builder build",
+    "build": "yarn prebuild && pdk-builder build",
     "build:js": "nx run-many --output-style=stream --target=build --runner=cloud",
     "build:js:dev": "nx run-many --output-style=stream --target=build:dev",
     "build:js:dev:backend": "yarn build:js:dev --projects='backend-*'",
@@ -18,13 +18,15 @@
     "docker": "docker compose run --rm -it php",
     "docker:build": "docker build -t myparcelnl/woocommerce .",
     "docker:run": "docker run -it --rm -v $(pwd):/app myparcelnl/woocommerce",
+    "download:carrier-logos": "pdk-builder download-carrier-logos",
+    "prebuild": "run translations:import && run download:carrier-logos && yarn build:js",
     "prepare": "is-ci || husky install",
     "test": "nx run-many --output-style=stream --target=test",
     "test:coverage": "nx run-many --output-style=stream --target=test:coverage",
     "test:run": "nx run-many --output-style=stream --target=test:run",
-    "translations:import": "yarn pdk-builder translations",
-    "upgrade:js": "yarn pdk-builder upgrade \"@myparcel-pdk/*\" -vvv",
-    "upgrade:php": "yarn pdk-builder upgrade myparcelnl/pdk",
+    "translations:import": "pdk-builder translations",
+    "upgrade:js": "pdk-builder upgrade \"@myparcel-pdk/*\" -vvv",
+    "upgrade:php": "pdk-builder upgrade myparcelnl/pdk",
     "watch": "yarn build:js:dev --parallel=99 -- --watch",
     "watch:backend": "yarn build:js:dev:backend --parallel=99 -- --watch",
     "watch:frontend": "yarn build:js:dev:frontend --parallel=99 -- --watch",
@@ -53,6 +55,7 @@
     "@myparcel-eslint/eslint-config-prettier-typescript": "^1.2.0",
     "@myparcel-eslint/eslint-config-prettier-typescript-vue": "^1.2.0",
     "@myparcel-pdk/app-builder": "^1.0.0-alpha.1",
+    "@myparcel/sdk": "^3.0.0",
     "@myparcel/semantic-release-config": "^5.0.0",
     "@types/node": "^18.13.0",
     "@vue/tsconfig": "^0.4.0",
@@ -62,9 +65,11 @@
     "husky": "^8.0.3",
     "is-ci": "^3.0.1",
     "lint-staged": "^13.1.2",
+    "node-fetch": "^3.3.2",
     "nx": "^16.1.2",
     "nx-cloud": "^16.4.0",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "sharp": "^0.32.5"
   },
   "packageManager": "yarn@3.3.0",
   "volta": {

@@ -8,6 +8,7 @@ use Carrier as PsCarrier;
 use Context;
 use Group;
 use Language as PsLanguage;
+use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Language;
@@ -60,6 +61,7 @@ final class CarrierBuilder
     {
         $this->createCarrier();
 
+        $this->addCarrierImages();
         $this->addGroups();
         $this->addRanges();
         $this->addZones();
@@ -67,6 +69,22 @@ final class CarrierBuilder
         $this->addCarrierMapping();
 
         return $this->psCarrier;
+    }
+
+    /**
+     * @return void
+     */
+    private function addCarrierImages(): void
+    {
+        /** @var FileSystemInterface $fileSystem */
+        $fileSystem = Pdk::get(FileSystemInterface::class);
+
+        foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
+            $sourceFilename = Pdk::get('carrierLogosDirectory') . $this->myParcelCarrier->name . $fileExtension;
+            $destFilename   = _PS_SHIP_IMG_DIR_ . $this->psCarrier->id . $fileExtension;
+
+            $fileSystem->put($destFilename, $fileSystem->get($sourceFilename));
+        }
     }
 
     /**

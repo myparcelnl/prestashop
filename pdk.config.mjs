@@ -1,6 +1,7 @@
-const {PdkPlatformName, defineConfig} = require('@myparcel-pdk/app-builder');
+import {PdkPlatformName, defineConfig} from '@myparcel-pdk/app-builder';
+import {downloadCarrierLogos} from './private/downloadCarrierLogos.mjs';
 
-module.exports = defineConfig({
+export default defineConfig({
   name: 'prestashop',
   platformFolderName: `{{platform}}`,
   platforms: [PdkPlatformName.MyParcelNl, PdkPlatformName.MyParcelBe],
@@ -21,4 +22,12 @@ module.exports = defineConfig({
     // eslint-disable-next-line no-magic-numbers
     additionalSheet: 279275153,
   },
+
+  additionalCommands: [
+    {
+      name: 'download-carrier-logos',
+      description: 'Download carrier logos',
+      action: downloadCarrierLogos,
+    },
+  ],
 });

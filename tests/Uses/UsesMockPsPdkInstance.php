@@ -45,7 +45,11 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
         $fileSystem = Pdk::get(FileSystemInterface::class);
 
         foreach (Config::get('carriers') as $carrier) {
-            $fileSystem->put(sprintf('%s%s.png', Pdk::get('carrierLogosDirectory'), $carrier['name']), '[IMAGE]');
+            foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
+                $filename = Pdk::get('carrierLogosDirectory') . $carrier['name'] . $fileExtension;
+
+                $fileSystem->put($filename, '[IMAGE]');
+            }
         }
     }
 
