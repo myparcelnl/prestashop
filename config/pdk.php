@@ -7,7 +7,6 @@ use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
 use MyParcelNL\Pdk\App\Api\Contract\BackendEndpointServiceInterface;
 use MyParcelNL\Pdk\App\Api\Contract\FrontendEndpointServiceInterface;
 use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
-use MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Contract\InstallerServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Order\Contract\OrderStatusServiceInterface;
@@ -36,7 +35,6 @@ use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsCronService;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
-use MyParcelNL\PrestaShop\Pdk\DeliveryOptions\Service\PsDeliveryOptionsService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsFrontendRenderService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsScriptService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsViewService;
@@ -59,20 +57,8 @@ use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsOrderService;
 use Psr\Log\LoggerInterface;
 use function DI\get;
-use function DI\value;
 
 return [
-    /**
-     * The version of the delivery options in the checkout.
-     *
-     * @see https://github.com/myparcelnl/delivery-options/releases
-     */
-    'deliveryOptionsVersion' => value('5.7.3'),
-
-    'routeBackend'                              => value(Context::getContext()->link->getAdminBaseLink()),
-    'routeBackendPdk'                           => value('pdk'),
-    'routeBackendWebhook'                       => value('webhook'),
-
     /**
      * Repositories
      */
@@ -88,7 +74,6 @@ return [
      * Services
      */
     CronServiceInterface::class                 => get(PsCronService::class),
-    DeliveryOptionsServiceInterface::class      => get(PsDeliveryOptionsService::class),
     FrontendRenderServiceInterface::class       => get(PsFrontendRenderService::class),
     LanguageServiceInterface::class             => get(PsLanguageService::class),
     OrderStatusServiceInterface::class          => get(PsOrderStatusService::class),
