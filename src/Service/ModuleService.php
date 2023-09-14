@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Service;
 
 use Cart;
-use MyParcelNL;
+use Module;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -17,7 +17,7 @@ final class ModuleService
     /**
      * @return \MyParcelNL
      */
-    public function getInstance(): MyParcelNL
+    public function getInstance(): Module
     {
         return Pdk::get('moduleInstance');
     }
