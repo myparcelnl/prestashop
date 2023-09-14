@@ -64,6 +64,10 @@ class MyParcelNL extends CarrierModule
      */
     public function __construct()
     {
+        // Suppress deprecation warning from Pdk HasAttributes
+        // todo: find a better solution
+        error_reporting(error_reporting() & ~E_DEPRECATED);
+
         $this->name          = 'myparcelnl';
         $this->version       = $this->getVersionFromComposer();
         $this->author        = 'MyParcel';
