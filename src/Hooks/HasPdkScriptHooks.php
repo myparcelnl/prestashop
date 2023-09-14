@@ -19,6 +19,13 @@ trait HasPdkScriptHooks
      */
     public function hookDisplayBackOfficeHeader(): void
     {
+        /** @var \MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface $viewService */
+        $viewService = Pdk::get(ViewServiceInterface::class);
+
+        if (! $viewService->isAnyPdkPage()) {
+            return;
+        }
+
         /** @var ScriptServiceInterface $scriptService */
         $scriptService = Pdk::get(ScriptServiceInterface::class);
 
@@ -51,22 +58,23 @@ trait HasPdkScriptHooks
 
     private function loadCoreScripts(): void
     {
-        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout-core/lib/checkout-core.iife.js");
+        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout-core/lib/index.iife.js");
         $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-core/lib/style.css");
     }
 
     private function loadDeliveryOptionsScripts(): void
     {
-        $version = Pdk::get('deliveryOptionsVersion');
-
         $this->context->controller->registerJavascript(
             'myparcelnl-delivery-options',
-            sprintf('https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js', $version),
+            sprintf(
+                'https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js',
+                Pdk::get('deliveryOptionsVersion')
+            ),
             ['server' => 'remote', 'position' => 'head', 'priority' => 1]
         );
 
         $this->context->controller->addJS(
-            "{$this->_path}views/js/frontend/checkout-delivery-options/lib/checkout-delivery-options.iife.js"
+            "{$this->_path}views/js/frontend/checkout-delivery-options/lib/index.iife.js"
         );
         $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-delivery-options/lib/style.css");
     }

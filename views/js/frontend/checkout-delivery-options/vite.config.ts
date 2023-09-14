@@ -4,7 +4,7 @@ export default createViteConfig({
   build: {
     lib: {
       name: 'MyParcelPrestaShopCheckoutDeliveryOptions',
-      fileName: 'checkout-delivery-options',
+      fileName: 'index',
       entry: 'src/main.ts',
       formats: ['iife'],
     },

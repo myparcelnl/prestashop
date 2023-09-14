@@ -9,6 +9,7 @@ export default defineConfig((env) => ({
     emptyOutDir: false,
     lib: {
       entry: 'src/main.ts',
+      fileName: 'index',
       formats: ['iife'],
       name: 'MyParcelAdmin',
     },

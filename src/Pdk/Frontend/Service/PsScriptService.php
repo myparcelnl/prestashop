@@ -23,7 +23,7 @@ final class PsScriptService extends ScriptService
         );
 
         $controller->addCSS($path . 'views/js/backend/admin/lib/style.css');
-        $controller->addJS($path . 'views/js/backend/admin/lib/backend-admin.iife.js');
+        $controller->addJS($path . 'views/js/backend/admin/lib/index.iife.js');
     }
 
     /**
