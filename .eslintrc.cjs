@@ -37,7 +37,10 @@ module.exports = {
       },
     },
     {
-      files: ['./**/*.js', './**/*.cjs', './**/*.mjs'],
+      files: ['./**/*.js', './**/*.cjs', './**/*.mjs', './*.js', './*.cjs', './*.mjs'],
+      parserOptions: {
+        sourceType: 'module',
+      },
       extends: [
         '@myparcel-eslint/eslint-config-node',
         '@myparcel-eslint/eslint-config-esnext',
