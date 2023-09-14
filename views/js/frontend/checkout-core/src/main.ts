@@ -1,2 +1,5 @@
-import './assets/index.css';
-import './checkout';
+import {initialize} from './initialize';
+
+(() => {
+  initialize();
+})();

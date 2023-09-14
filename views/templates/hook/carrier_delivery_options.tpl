@@ -1,5 +1,5 @@
 {$content}
 <div
-        class="myparcelnl-address"
+        id="myparcelnl-address-data"
         data-shipping-address="{$shippingAddress}"
         data-billing-address="{$billingAddress}"></div>

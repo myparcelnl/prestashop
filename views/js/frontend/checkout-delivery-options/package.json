@@ -14,6 +14,7 @@
     "@myparcel-pdk/checkout": "^1.0.0-alpha.1"
   },
   "devDependencies": {
-    "@myparcel-prestashop/vite-config": "workspace:*"
+    "@myparcel-prestashop/vite-config": "workspace:*",
+    "@myparcel/delivery-options": "^5.9.3"
   }
 }
