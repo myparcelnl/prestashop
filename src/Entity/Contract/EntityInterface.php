@@ -15,3 +15,4 @@ interface EntityInterface extends Arrayable
      */
     public static function getTable(): string;
 }
+

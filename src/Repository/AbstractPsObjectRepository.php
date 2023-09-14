@@ -10,6 +10,7 @@ use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Contract\PsObjectRepositoryInterface;
 use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
+use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
 use MyParcelNL\Sdk\src\Support\Str;
 use Throwable;
 
@@ -149,6 +150,10 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
         foreach (array_replace($where, $values) as $key => $value) {
             $setter = sprintf('set%s', Str::studly($key));
             $entity->{$setter}($value);
+        }
+
+        if ($entity instanceof EntityWithTimestampsInterface) {
+            $entity->updateTimestamps();
         }
 
         $this->entityManager->persist($entity);

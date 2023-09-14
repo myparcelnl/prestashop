@@ -8,19 +8,20 @@ use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Entity\Concern\HasJsonData;
 use MyParcelNL\PrestaShop\Entity\Concern\HasTimestamps;
+use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
 
 /**
  * @ORM\Table
  * @ORM\Entity
  * @see \MyParcelNL\PrestaShop\Database\CreateOrderShipmentTableDatabaseMigration
  */
-final class MyparcelnlOrderShipment extends AbstractEntity
+final class MyparcelnlOrderShipment extends AbstractEntity implements EntityWithTimestampsInterface
 {
     use HasJsonData;
     use HasTimestamps;
 
     /**
-     * @var string
+     * @var int
      * @ORM\Column(name="order_id", type="integer")
      */
     private $orderId;
@@ -37,7 +38,7 @@ final class MyparcelnlOrderShipment extends AbstractEntity
         return Table::TABLE_ORDER_SHIPMENT;
     }
 
-    public function getOrderId(): string
+    public function getOrderId(): int
     {
         return $this->orderId;
     }
@@ -47,9 +48,9 @@ final class MyparcelnlOrderShipment extends AbstractEntity
         return $this->shipmentId;
     }
 
-    public function setOrderId(string $orderId): self
+    public function setOrderId($orderId): self
     {
-        $this->orderId = $orderId;
+        $this->orderId = (int) $orderId;
 
         return $this;
     }

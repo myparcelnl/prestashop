@@ -6,9 +6,10 @@ namespace MyParcelNL\PrestaShop\Entity\Concern;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
 
 /**
- * @ORM\HasLifeCycleCallbacks
+ * @see EntityWithTimestampsInterface
  */
 trait HasTimestamps
 {
@@ -24,39 +25,35 @@ trait HasTimestamps
      */
     private $dateUpd;
 
-    public function getDateAdd(): DateTime
+    public function getDateAdd(): ?DateTime
     {
         return $this->dateAdd;
     }
 
-    public function getDateUpd(): DateTime
+    public function getDateUpd(): ?DateTime
     {
         return $this->dateUpd;
     }
 
-    public function setDateAdd(DateTime $dateAdd): self
+    public function setDateAdd(DateTime $dateAdd): EntityWithTimestampsInterface
     {
         $this->dateAdd = $dateAdd;
 
         return $this;
     }
 
-    public function setDateUpd(DateTime $dateUpd): self
+    public function setDateUpd(DateTime $dateUpd): EntityWithTimestampsInterface
     {
         $this->dateUpd = $dateUpd;
 
         return $this;
     }
 
-    /**
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
-    public function updatedTimestamps(): void
+    public function updateTimestamps(): void
     {
         $this->setDateUpd(new DateTime());
 
-        if (! $this->getDateAdd()) {
+        if (null === $this->getDateAdd()) {
             $this->setDateAdd(new DateTime());
         }
     }

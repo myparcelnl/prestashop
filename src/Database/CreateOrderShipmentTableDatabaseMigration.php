@@ -22,10 +22,10 @@ final class CreateOrderShipmentTableDatabaseMigration extends AbstractDatabaseMi
     {
         $sql = (new CreateTableSqlBuilder($this->getTable()))
             ->id('order_id')
-            ->id('order_shipment')
+            ->id('shipment_id')
             ->column('data', 'TEXT NOT NULL')
             ->timestamps()
-            ->primary(['order_id', 'order_shipment']);
+            ->primary(['order_id', 'shipment_id']);
 
         $this->execute($sql);
     }

@@ -6,14 +6,18 @@ namespace MyParcelNL\PrestaShop\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Database\Table;
+use MyParcelNL\PrestaShop\Entity\Concern\HasTimestamps;
+use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
 
 /**
  * @ORM\Table()
  * @ORM\Entity()
  * @see \MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration
  */
-final class MyparcelnlCarrierMapping extends AbstractEntity
+final class MyparcelnlCarrierMapping extends AbstractEntity implements EntityWithTimestampsInterface
 {
+    use HasTimestamps;
+
     /**
      * @var int
      * @ORM\Id

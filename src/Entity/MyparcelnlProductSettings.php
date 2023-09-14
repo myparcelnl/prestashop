@@ -8,13 +8,14 @@ use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Entity\Concern\HasJsonData;
 use MyParcelNL\PrestaShop\Entity\Concern\HasTimestamps;
+use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
 
 /**
  * @ORM\Table
  * @ORM\Entity
  * @see \MyParcelNL\PrestaShop\Database\CreateProductSettingsTableDatabaseMigration
  */
-final class MyparcelnlProductSettings extends AbstractEntity
+final class MyparcelnlProductSettings extends AbstractEntity implements EntityWithTimestampsInterface
 {
     use HasJsonData;
     use HasTimestamps;

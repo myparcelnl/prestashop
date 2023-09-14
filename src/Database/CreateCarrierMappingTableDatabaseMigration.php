@@ -8,6 +8,9 @@ use MyParcelNL\PrestaShop\Database\Sql\CreateTableSqlBuilder;
 use MyParcelNL\PrestaShop\Database\Sql\DropTableSqlBuilder;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 
+/**
+ * @see MyparcelnlCarrierMapping
+ */
 final class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseMigration
 {
     public function down(): void
@@ -20,6 +23,7 @@ final class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseM
         $sql = (new CreateTableSqlBuilder($this->getTable()))
             ->id('carrier_id')
             ->column('myparcel_carrier', 'VARCHAR(32)')
+            ->timestamps()
             ->primary(['carrier_id', 'myparcel_carrier']);
 
         $this->execute($sql);

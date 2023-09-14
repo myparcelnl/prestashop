@@ -19,7 +19,7 @@ use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
-use Order;
+use Order as PsOrder;
 
 final class PsPdkOrderRepository extends AbstractPdkOrderRepository
 {
@@ -81,7 +81,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  string|int|Order $input
+     * @param  string|int|PsOrder $input
      *
      * @return \MyParcelNL\Pdk\App\Order\Model\PdkOrder
      * @throws \PrestaShopDatabaseException
@@ -167,7 +167,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
      *
      * @return \MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration
      */
-    protected function createCustomsDeclaration(Order $order, array $orderProducts): CustomsDeclaration
+    protected function createCustomsDeclaration(PsOrder $order, array $orderProducts): CustomsDeclaration
     {
         return new CustomsDeclaration([
             'invoice' => $order->invoice_number,
@@ -211,14 +211,14 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  \Order $order
+     * @param  \Order $psOrder
      *
      * @return \MyParcelNL\Pdk\Base\Support\Collection
      */
-    protected function getShipments(Order $order): Collection
+    protected function getShipments(PsOrder $psOrder): Collection
     {
         return $this->psOrderShipmentRepository
-            ->where('orderId', $order->id)
+            ->where('orderId', $psOrder->id)
             ->map(static function (MyparcelnlOrderShipment $shipment) {
                 return array_replace($shipment->getData(), [
                     'id'      => $shipment->getShipmentId(),

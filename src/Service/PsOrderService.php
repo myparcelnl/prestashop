@@ -111,13 +111,13 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
             Logger::debug("[Order $order->id] Saving empty order data to order");
         }
 
-        $deliveryOptions = $fromCart ? $fromCart->getData() : [];
+        $orderData = $fromCart ? ['deliveryOptions' => $fromCart->getData()] : [];
 
-        $this->updateData((string) $order->id, $deliveryOptions);
+        $this->updateData((string) $order->id, $orderData);
 
         EntityManager::flush();
 
-        return $deliveryOptions;
+        return $orderData;
     }
 
     /**
