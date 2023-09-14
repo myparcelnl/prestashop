@@ -19,12 +19,10 @@ usePdkCheckout().onInitialize(() => {
 
       const {carrier} = currentShippingMethod;
 
-      console.log('carrier', carrier);
-
       return {
         ...state.configuration.config,
         carrierSettings: {
-          [carrier]: configuration.config?.carrierSettings?.[carrier],
+          [carrier]: configuration.config?.carrierSettings?.[carrier] ?? {},
         },
       };
     },
@@ -39,8 +37,6 @@ usePdkCheckout().onInitialize(() => {
     if (newState.form.shippingMethod === oldState?.form.shippingMethod) {
       return;
     }
-
-    console.log('shipping method changed', newState.form.shippingMethod);
 
     updateDeliveryOptions();
   });

@@ -7,4 +7,5 @@ export const moveDeliveryOptionsForm = ($destination: JQuery): void => {
 
   $wrapper.hide();
   $destination.append($wrapper);
+  $wrapper.show();
 };
