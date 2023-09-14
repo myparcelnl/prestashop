@@ -45,13 +45,262 @@
                     "id": 4
                 }
             ]
+        },
+        {
+            "zones": [
+                {
+                    "active": 1,
+                    "name": "Europe",
+                    "id": 1,
+                    "id_zone": 1
+                },
+                {
+                    "active": 1,
+                    "name": "North America",
+                    "id": 2,
+                    "id_zone": 2
+                }
+            ],
+            "name": "PostNL",
+            "active": 1,
+            "id_reference": 1008123,
+            "deleted": 0,
+            "is_module": true,
+            "need_range": 1,
+            "range_behavior": 1,
+            "shipping_external": true,
+            "shipping_method": 2,
+            "id": 7,
+            "rangeWeights": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 7,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 9
+                }
+            ],
+            "rangePrices": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 7,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "zones": [
+                {
+                    "active": 1,
+                    "name": "Europe",
+                    "id": 1,
+                    "id_zone": 1
+                },
+                {
+                    "active": 1,
+                    "name": "North America",
+                    "id": 2,
+                    "id_zone": 2
+                }
+            ],
+            "name": "DHL For You",
+            "active": 1,
+            "id_reference": 900,
+            "deleted": 0,
+            "is_module": true,
+            "need_range": 1,
+            "range_behavior": 1,
+            "shipping_external": true,
+            "shipping_method": 2,
+            "id": 11,
+            "rangeWeights": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 11,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 13
+                }
+            ],
+            "rangePrices": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 11,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "zones": [
+                {
+                    "active": 1,
+                    "name": "Europe",
+                    "id": 1,
+                    "id_zone": 1
+                },
+                {
+                    "active": 1,
+                    "name": "North America",
+                    "id": 2,
+                    "id_zone": 2
+                }
+            ],
+            "name": "DHL For You",
+            "active": 1,
+            "id_reference": 900677,
+            "deleted": 0,
+            "is_module": true,
+            "need_range": 1,
+            "range_behavior": 1,
+            "shipping_external": true,
+            "shipping_method": 2,
+            "id": 15,
+            "rangeWeights": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 15,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 17
+                }
+            ],
+            "rangePrices": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 15,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "zones": [
+                {
+                    "active": 1,
+                    "name": "Europe",
+                    "id": 1,
+                    "id_zone": 1
+                },
+                {
+                    "active": 1,
+                    "name": "North America",
+                    "id": 2,
+                    "id_zone": 2
+                }
+            ],
+            "name": "DHL Parcel Connect",
+            "active": 1,
+            "id_reference": 100,
+            "deleted": 0,
+            "is_module": true,
+            "need_range": 1,
+            "range_behavior": 1,
+            "shipping_external": true,
+            "shipping_method": 2,
+            "id": 19,
+            "rangeWeights": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 19,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 21
+                }
+            ],
+            "rangePrices": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 19,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 20
+                }
+            ]
+        },
+        {
+            "zones": [
+                {
+                    "active": 1,
+                    "name": "Europe",
+                    "id": 1,
+                    "id_zone": 1
+                },
+                {
+                    "active": 1,
+                    "name": "North America",
+                    "id": 2,
+                    "id_zone": 2
+                }
+            ],
+            "name": "DHL Europlus",
+            "active": 1,
+            "id_reference": 110,
+            "deleted": 0,
+            "is_module": true,
+            "need_range": 1,
+            "range_behavior": 1,
+            "shipping_external": true,
+            "shipping_method": 2,
+            "id": 23,
+            "rangeWeights": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 23,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 25
+                }
+            ],
+            "rangePrices": [
+                {
+                    "id_lang": null,
+                    "id_shop": null,
+                    "id_carrier": 23,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 24
+                }
+            ]
         }
     ],
     "carrierMappings": [
         {
-            "idCarrier": 3,
-            "myparcelCarrier": "postnl",
-            "id": 6
+            "carrierId": 3,
+            "myparcelCarrier": "postnl"
+        },
+        {
+            "carrierId": 7,
+            "myparcelCarrier": "postnl:8123"
+        },
+        {
+            "carrierId": 11,
+            "myparcelCarrier": "dhlforyou"
+        },
+        {
+            "carrierId": 15,
+            "myparcelCarrier": "dhlforyou:677"
+        },
+        {
+            "carrierId": 19,
+            "myparcelCarrier": "dhlparcelconnect"
+        },
+        {
+            "carrierId": 23,
+            "myparcelCarrier": "dhleuroplus"
         }
     ]
 }

@@ -668,7 +668,7 @@ final class Migration2_0_0 extends AbstractPsMigration
 
             $this->orderDataRepository->updateOrCreate(
                 [
-                    'idOrder' => (string) $orderId,
+                    'orderId' => (string) $orderId,
                 ],
                 [
                     'data' => json_encode(['deliveryOptions' => $deliveryOptions]),
@@ -702,10 +702,10 @@ final class Migration2_0_0 extends AbstractPsMigration
 
             $this->orderShipmentRepository->updateOrCreate(
                 [
-                    'idShipment' => (int) $oldOrderLabel['id_label'],
+                    'shipmentId' => (int) $oldOrderLabel['id_label'],
                 ],
                 [
-                    'idOrder' => (string) $oldOrderLabel['id_order'],
+                    'orderId' => (string) $oldOrderLabel['id_order'],
                     'data'    => json_encode($shipment),
                 ]
             );
@@ -739,7 +739,7 @@ final class Migration2_0_0 extends AbstractPsMigration
         foreach ($productsWithSettings as $productId => $productSettings) {
             $this->productSettingsRepository->updateOrCreate(
                 [
-                    'idProduct' => (int) $productId,
+                    'productId' => (int) $productId,
                 ],
                 [
                     'data' => json_encode([

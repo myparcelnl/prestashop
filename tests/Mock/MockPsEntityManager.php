@@ -32,6 +32,11 @@ final class MockPsEntityManager implements StaticMockInterface
         return self::$repositories[$entityName];
     }
 
+    public function isOpen(): bool
+    {
+        return true;
+    }
+
     public function persist($entity): void
     {
         MockPsEntities::addOrUpdate($entity);

@@ -12,6 +12,7 @@ final class UsesMockPlugin extends UsesMockPsPdkInstance
 {
     /**
      * @return void
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     protected function setup(): void
     {

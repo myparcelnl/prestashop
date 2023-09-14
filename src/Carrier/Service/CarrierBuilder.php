@@ -6,14 +6,12 @@ namespace MyParcelNL\PrestaShop\Carrier\Service;
 
 use Carrier as PsCarrier;
 use Context;
-use Db;
 use Group;
 use Language as PsLanguage;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Language;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use ObjectModel;
 use RangePrice;
@@ -53,22 +51,22 @@ final class CarrierBuilder
     }
 
     /**
-     * @return void
+     * @return \Carrier
      * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    public function create(): void
+    public function create(): PsCarrier
     {
-        $this->psCarrier = $this->createCarrier();
+        $this->createCarrier();
 
         $this->addGroups();
         $this->addRanges();
         $this->addZones();
 
-        $this->psCarrier->update();
-
         $this->addCarrierMapping();
+
+        return $this->psCarrier;
     }
 
     /**
@@ -76,14 +74,12 @@ final class CarrierBuilder
      */
     private function addCarrierMapping(): void
     {
-        $this->carrierMappingRepository->updateOrCreate(
-            [
-                'myparcelCarrier' => $this->myParcelCarrier->externalIdentifier,
-            ],
-            [
-                'idCarrier' => (int) $this->psCarrier->id,
-            ]
-        );
+        $values = [
+            'carrierId'       => (int) $this->psCarrier->id,
+            'myparcelCarrier' => $this->myParcelCarrier->externalIdentifier,
+        ];
+
+        $this->carrierMappingRepository->updateOrCreate($values, $values);
     }
 
     /**
@@ -107,7 +103,11 @@ final class CarrierBuilder
     {
         /** @var RangeWeight|RangePrice $objectClass */
         foreach (self::RANGE_CLASSES as $objectClass) {
-            $this->deleteExistingRanges($objectClass);
+            $hasExistingRanges = $objectClass::getRanges($this->psCarrier->id);
+
+            if ($hasExistingRanges) {
+                continue;
+            }
 
             $instance = new $objectClass();
 
@@ -124,13 +124,13 @@ final class CarrierBuilder
      */
     private function addZones(): void
     {
-        $existingZones = Arr::pluck($this->psCarrier->getZones(), 'id_zone');
+        $existingZones = $this->psCarrier->getZones();
+
+        if ($existingZones) {
+            return;
+        }
 
         foreach (Zone::getZones() as $zone) {
-            if (in_array($zone['id_zone'], $existingZones, true)) {
-                continue;
-            }
-
             if ($this->psCarrier->addZone($zone['id_zone'])) {
                 continue;
             }
@@ -140,11 +140,11 @@ final class CarrierBuilder
     }
 
     /**
-     * @return PsCarrier
+     * @return void
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    private function createCarrier(): PsCarrier
+    private function createCarrier(): void
     {
         /** @var \MyParcelNL $module */
         $module = Pdk::get('moduleInstance');
@@ -162,15 +162,13 @@ final class CarrierBuilder
         $psCarrier->shipping_external    = true;
         $psCarrier->shipping_method      = 2;
 
-        // TODO: add logo
-
         foreach (PsLanguage::getLanguages() as $lang) {
             $psCarrier->delay[$lang['id_lang']] = Language::translate('carrier_delivery_time', $lang['iso_code']);
         }
 
         $this->updateOrAdd($psCarrier, (bool) $psCarrier->id);
 
-        return $psCarrier;
+        $this->psCarrier = $psCarrier;
     }
 
     /**
@@ -180,27 +178,7 @@ final class CarrierBuilder
     {
         $carrierId = str_pad((string) $this->myParcelCarrier->id, 3, '0');
 
-        return (int) ($carrierId . $this->myParcelCarrier->externalIdentifier);
-    }
-
-    /**
-     * @param  class-string<RangeWeight|RangePrice> $objectClass
-     *
-     * @return void
-     */
-    private function deleteExistingRanges(string $objectClass): void
-    {
-        $existing = $objectClass::getRanges($this->psCarrier->id);
-
-        if (! $existing) {
-            return;
-        }
-
-        $definition = $objectClass::getDefinition($objectClass);
-        $table      = Table::withPrefix($definition['table']);
-
-        Db::getInstance()
-            ->execute("DELETE FROM `$table` WHERE `id_carrier` = {$this->psCarrier->id}");
+        return (int) ($carrierId . $this->myParcelCarrier->subscriptionId);
     }
 
     /**
@@ -211,18 +189,13 @@ final class CarrierBuilder
         $mapping = $this->carrierMappingRepository
             ->findOneBy(['myparcelCarrier' => $this->myParcelCarrier->externalIdentifier]);
 
-        return $mapping ? new PsCarrier($mapping->idCarrier) : null;
-    }
+        if ($mapping) {
+            return new PsCarrier($mapping->getCarrierId());
+        }
 
-    /**
-     * @param  int    $id
-     * @param  string $class
-     *
-     * @return \ObjectModel
-     */
-    private function getOrCreateModel(int $id, string $class): ObjectModel
-    {
-        return new $class($id) ?? new $class();
+        $existingCarrier = PsCarrier::getCarrierByReference($this->createCarrierIdReference());
+
+        return $existingCarrier ?: null;
     }
 
     /**

@@ -35,7 +35,7 @@ final class PdkController extends AbstractAdminController
             return new Response($e->getMessage(), 400);
         }
 
-        $this->flushEntityManager();
+        EntityManager::flush();
 
         return $response;
     }
@@ -51,17 +51,5 @@ final class PdkController extends AbstractAdminController
         $request->query->remove(self::PRESTASHOP_TOKEN_PARAMETER);
 
         return $request;
-    }
-
-    /**
-     * @return void
-     */
-    private function flushEntityManager(): void
-    {
-        if (! EntityManager::isOpen()) {
-            return;
-        }
-
-        EntityManager::flush();
     }
 }

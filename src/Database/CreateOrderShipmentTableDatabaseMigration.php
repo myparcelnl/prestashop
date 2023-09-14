@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
+use MyParcelNL\PrestaShop\Database\Sql\CreateTableSqlBuilder;
+use MyParcelNL\PrestaShop\Database\Sql\DropTableSqlBuilder;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 
 /**
@@ -13,26 +15,17 @@ final class CreateOrderShipmentTableDatabaseMigration extends AbstractDatabaseMi
 {
     public function down(): void
     {
-        $table = $this->getTable();
-        $this->execute("DROP TABLE IF EXISTS `$table`");
+        $this->execute(new DropTableSqlBuilder($this->getTable()));
     }
 
     public function up(): void
     {
-        $table = $this->getTable();
-        $sql   = <<<SQL
-            CREATE TABLE IF NOT EXISTS `$table` (
-                `id`          INT AUTO_INCREMENT                                             NOT NULL,
-                `id_order`    INT                                                            NOT NULL,
-                `id_shipment` INT                                                            NOT NULL,
-                `data`        TEXT                                                           NOT NULL,
-                `created`     DATETIME DEFAULT CURRENT_TIMESTAMP                             NOT NULL,
-                `updated`     DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-                INDEX UNIQ_AF009CB98D9F6D38 (`id_order`),
-                UNIQUE INDEX UNIQ_A85FA67C5210CC49 (`id_shipment`),
-                PRIMARY KEY (`id`)
-            ) ENGINE={ENGINE} DEFAULT CHARSET=utf8;
-SQL;
+        $sql = (new CreateTableSqlBuilder($this->getTable()))
+            ->id('order_id')
+            ->id('order_shipment')
+            ->column('data', 'TEXT NOT NULL')
+            ->timestamps()
+            ->primary(['order_id', 'order_shipment']);
 
         $this->execute($sql);
     }
@@ -42,6 +35,6 @@ SQL;
      */
     private function getTable(): string
     {
-        return Table::withPrefix(MyparcelnlOrderShipment::getTable());
+        return MyparcelnlOrderShipment::getTable();
     }
 }

@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Database;
 use Db;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface;
 use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\PrestaShop\Database\Sql\Contract\SqlBuilderInterface;
 
 abstract class AbstractDatabaseMigration implements MigrationInterface
 {
@@ -16,22 +17,19 @@ abstract class AbstractDatabaseMigration implements MigrationInterface
     }
 
     /**
-     * @param  string $sql
+     * @param  string|\MyParcelNL\PrestaShop\Database\Sql\Contract\SqlBuilderInterface $sql
      *
      * @return void
      */
-    protected function execute(string $sql): void
+    protected function execute($sql): void
     {
-        $replacedSql = strtr($sql, [
-            '{ENGINE}' => _MYSQL_ENGINE_,
-        ]);
-
-        $trimmedSql = str_replace("\n", ' ', $replacedSql);
-        $trimmedSql = trim(preg_replace('/\s+/m', ' ', $trimmedSql));
+        if ($sql instanceof SqlBuilderInterface) {
+            $sql = $sql->build();
+        }
 
         Db::getInstance(_PS_USE_SQL_SLAVE_)
-            ->execute($trimmedSql);
+            ->execute($sql);
 
-        Logger::debug('Query executed', ['class' => static::class, 'sql' => $trimmedSql]);
+        Logger::debug('Query executed', ['class' => static::class, 'sql' => $sql]);
     }
 }

@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier as PsCarrier;
+use Context;
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\AccountSettings;
 use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 
@@ -33,89 +36,43 @@ final class PsCarrierService implements PsCarrierServiceInterface
     /**
      * @param  \MyParcelNL\Pdk\Carrier\Collection\CarrierCollection $carriers
      *
-     * @return void
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
      */
-    public function createOrUpdateCarriers(CarrierCollection $carriers): void
+    public function createOrUpdateCarriers(CarrierCollection $carriers): Collection
     {
-        $carriers->each(static function (Carrier $carrier): void {
-            $builder = new CarrierBuilder($carrier);
+        return (new Collection($carriers))->map(
+            static function (Carrier $carrier): PsCarrier {
+                $builder = new CarrierBuilder($carrier);
 
-            $builder->create();
-        });
+                Logger::info('Created carrier ' . $carrier->externalIdentifier);
 
-        Logger::debug(
-            'Created carriers',
-            [
-                'carriers' => $carriers
-                    ->pluck('externalIdentifier')
-                    ->toArray(),
-            ]
+                return $builder->create();
+            }
         );
     }
 
     /**
      * @return void
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
-    public function deleteCarriers(): void
+    public function disableCarriers(): void
     {
-        $mappings = $this->carrierMappingRepository->all();
+        $psCarriers = new Collection($this->getPsCarriers());
 
-        $mappings->each(function (MyparcelnlCarrierMapping $carrier): void {
-            $psCarrier = new PsCarrier($carrier->idCarrier);
+        $psCarriers->where('external_module_name', Pdk::getAppInfo()->name)
+            ->each(function (array $carrier): void {
+                $psCarrier = new PsCarrier($carrier['id_carrier']);
 
-            if (! $psCarrier->delete()) {
-                Logger::error('Failed to delete carrier', [
-                    'id'              => $carrier->idCarrier,
-                    'myParcelCarrier' => $carrier->myparcelCarrier,
-                ]);
+                $psCarrier->active = false;
 
-                return;
-            }
-
-            $this->carrierMappingRepository->delete($carrier);
-
-            Logger::debug('Deleted carrier', [
-                'id'              => $carrier->idCarrier,
-                'myParcelCarrier' => $carrier->myparcelCarrier,
-            ]);
-        });
-    }
-
-    /**
-     * @param $carriers
-     *
-     * @return void
-     */
-    public function deleteUnusedCarriers($carriers): void
-    {
-        // delete other carriers
-        $mappings = $this->carrierMappingRepository->all();
-
-        $mappings
-            ->filter(static function (MyparcelnlCarrierMapping $entity) use ($carriers): bool {
-                return ! $carriers->containsStrict('externalIdentifier', $entity->myparcelCarrier);
-            })
-            ->each(static function (MyparcelnlCarrierMapping $mapping): void {
-                $psCarrier = new PsCarrier($mapping->idCarrier);
-
-                $context = [
-                    'id'              => $mapping->idCarrier,
-                    'myParcelCarrier' => $mapping->myparcelCarrier,
-                ];
-
-                if (! $psCarrier->delete()) {
-                    Logger::error('Failed to delete carrier', $context);
+                if (! $psCarrier->softDelete()) {
+                    Logger::error("Failed to soft delete carrier {$carrier['id_carrier']}");
 
                     return;
                 }
 
-                Logger::debug('Deleted carrier', $context);
+                Logger::debug("Soft deleted carrier {$carrier['id_carrier']}");
             });
     }
 
@@ -163,9 +120,9 @@ final class PsCarrierService implements PsCarrierServiceInterface
     public function getMyParcelCarrierIdentifier($input): ?string
     {
         $psCarrierId = $this->getId($input);
-        $match       = $this->carrierMappingRepository->firstWhere('idCarrier', $psCarrierId);
+        $match       = $this->carrierMappingRepository->firstWhere('carrierId', $psCarrierId);
 
-        return $match->myparcelCarrier ?? null;
+        return $match ? $match->getMyparcelCarrier() : null;
     }
 
     /**
@@ -187,10 +144,54 @@ final class PsCarrierService implements PsCarrierServiceInterface
     {
         $carriers = AccountSettings::getCarriers();
 
-        $this->createOrUpdateCarriers($carriers);
-        $this->deleteUnusedCarriers($carriers);
+        $createdCarriers = $this->createOrUpdateCarriers($carriers);
+        $this->deleteUnusedCarriers($createdCarriers);
 
         // Refresh the hooks
         MyParcelModule::registerHooks();
+        EntityManager::flush();
+    }
+
+    /**
+     * @param  \MyParcelNL\Pdk\Base\Support\Collection $createdCarriers
+     *
+     * @return void
+     */
+    protected function deleteUnusedCarriers(Collection $createdCarriers): void
+    {
+        $psCarriers = new Collection($this->getPsCarriers());
+        $moduleName = Pdk::getAppInfo()->name;
+
+        $psCarriers
+            ->filter(function (array $carrier) use ($moduleName, $createdCarriers): bool {
+                return $carrier['external_module_name'] === $moduleName
+                    && ! $createdCarriers->contains('id', $carrier['id_carrier']);
+            })
+            ->each(static function (array $carrier): void {
+                $psCarrier = new PsCarrier($carrier['id_carrier']);
+
+                if (! $psCarrier->delete()) {
+                    Logger::error("Failed to delete carrier {$carrier['id_carrier']}");
+
+                    return;
+                }
+
+                Logger::debug("Deleted carrier {$carrier['id_carrier']}");
+            });
+    }
+
+    /**
+     * @return array
+     */
+    private function getPsCarriers(): array
+    {
+        return PsCarrier::getCarriers(
+            Context::getContext()->language->id,
+            false,
+            false,
+            null,
+            null,
+            PsCarrier::CARRIERS_MODULE
+        );
     }
 }

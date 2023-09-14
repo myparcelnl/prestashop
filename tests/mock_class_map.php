@@ -154,6 +154,11 @@ abstract class OrderCore extends MockPsOrder { }
 
 final class Order extends OrderCore { }
 
+/** @see \OrderStateCore */
+abstract class OrderStateCore extends MockPsObjectModel { }
+
+final class OrderState extends OrderStateCore { }
+
 /** @see \RangePriceCore */
 abstract class RangePriceCore extends MockPsRangeObjectModel { }
 

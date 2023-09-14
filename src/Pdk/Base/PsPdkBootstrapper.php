@@ -43,7 +43,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
         string $url
     ): array {
         return array_replace(
-            $this->getConfig($version, $name),
+            $this->getConfig($version, $name, $path),
             $this->resolvePrestaShopServices()
         );
     }
@@ -51,10 +51,11 @@ class PsPdkBootstrapper extends PdkBootstrapper
     /**
      * @param  string $version
      * @param  string $name
+     * @param  string $path
      *
      * @return array
      */
-    protected function getConfig(string $version, string $name): array
+    protected function getConfig(string $version, string $name, string $path): array
     {
         return [
             'userAgent' => value([
@@ -77,7 +78,8 @@ class PsPdkBootstrapper extends PdkBootstrapper
 
             'sidebarParentClass' => value('AdminParentShipping'),
 
-            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+            'logDirectory'          => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+            'carrierLogosDirectory' => value(sprintf('%sprivate/carrier-logos/', $path)),
 
             /**
              * The symfony routes that are used by the pdk. Must match the routes in config/routes.yml.

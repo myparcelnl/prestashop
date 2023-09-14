@@ -14,9 +14,4 @@ interface EntityInterface extends Arrayable
      * @return string
      */
     public static function getTable(): string;
-
-    /**
-     * @return int
-     */
-    public function getId(): int;
 }

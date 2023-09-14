@@ -4,26 +4,52 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Entity\Concern\HasJsonData;
+use MyParcelNL\PrestaShop\Entity\Concern\HasTimestamps;
 
 /**
- * @Doctrine\ORM\Mapping\Table()
- * @Doctrine\ORM\Mapping\Entity()
+ * @ORM\Table
+ * @ORM\Entity
  * @see \MyParcelNL\PrestaShop\Database\CreateOrderDataTableDatabaseMigration
  */
 final class MyparcelnlCartDeliveryOptions extends AbstractEntity
 {
     use HasJsonData;
+    use HasTimestamps;
 
     /**
      * @var int
-     * @Doctrine\ORM\Mapping\Column(type="integer", nullable=false, unique=true)
+     * @ORM\Id
+     * @ORM\Column(name="cart_id", type="integer")
      */
-    public $idCart;
+    private $cartId;
 
     public static function getTable(): string
     {
         return Table::TABLE_CART_DELIVERY_OPTIONS;
+    }
+
+    public function getCartId(): int
+    {
+        return $this->cartId;
+    }
+
+    public function setCartId(int $cartId): MyparcelnlCartDeliveryOptions
+    {
+        $this->cartId = $cartId;
+
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'cartId'  => $this->getCartId(),
+            'data'    => $this->getData(),
+            'dateAdd' => $this->getDateAdd(),
+            'dateUpd' => $this->getDateUpd(),
+        ];
     }
 }

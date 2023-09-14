@@ -97,7 +97,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
     {
         return $this->retrieve("product_settings_$identifier", function () use ($identifier) {
             /** @var \MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings $psProductSettings */
-            $psProductSettings = $this->psProductRepository->findOneBy(['idProduct' => $identifier]);
+            $psProductSettings = $this->psProductRepository->findOneBy(['productId' => $identifier]);
             $data              = $psProductSettings ? $psProductSettings->toArray() : [];
             $parameters        = json_decode($data['data'] ?? '', true);
 
@@ -127,7 +127,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
     {
         $this->productSettingsRepository->updateOrCreate(
             [
-                'idProduct' => (int) $product->externalIdentifier,
+                'productId' => (int) $product->externalIdentifier,
             ],
             [
                 'data' => json_encode($product->settings->toArray()),

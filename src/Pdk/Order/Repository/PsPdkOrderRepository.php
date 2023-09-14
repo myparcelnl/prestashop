@@ -148,8 +148,8 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
             $order->shipments->each(function (Shipment $shipment) use ($order) {
                 $this->psOrderShipmentRepository->updateOrCreate(
                     [
-                        'idOrder'    => $order->externalIdentifier,
-                        'idShipment' => $shipment->id,
+                        'orderId'    => $order->externalIdentifier,
+                        'shipmentId' => $shipment->id,
                     ],
                     [
                         'data' => json_encode($shipment->toStorableArray()),
@@ -218,11 +218,11 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     protected function getShipments(Order $order): Collection
     {
         return $this->psOrderShipmentRepository
-            ->where('idOrder', $order->id)
+            ->where('orderId', $order->id)
             ->map(static function (MyparcelnlOrderShipment $shipment) {
                 return array_replace($shipment->getData(), [
-                    'id'      => $shipment->idShipment,
-                    'orderId' => $shipment->idOrder,
+                    'id'      => $shipment->getShipmentId(),
+                    'orderId' => $shipment->getOrderId(),
                 ]);
             });
     }

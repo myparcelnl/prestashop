@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Factory;
 
-use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsEntityFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntities;
@@ -20,16 +19,6 @@ use MyParcelNL\Sdk\src\Support\Str;
 abstract class AbstractPsEntityFactory extends AbstractPsModelFactory implements PsEntityFactoryInterface
 {
     /**
-     * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
-     */
-    protected function createDefault(): FactoryInterface
-    {
-        return $this
-            ->withCreated('2020-01-01 08:00:00')
-            ->withUpdated('2020-01-02 12:00:00');
-    }
-
-    /**
      * @param  class-string<T> $class
      * @param  array           $attributes
      *
@@ -40,7 +29,8 @@ abstract class AbstractPsEntityFactory extends AbstractPsModelFactory implements
         $instance = new $class();
 
         foreach ($attributes as $key => $value) {
-            $instance->{Str::camel($key)} = $value;
+            $setter = sprintf('set%s', Str::studly($key));
+            $instance->{$setter}($value);
         }
 
         return $instance;

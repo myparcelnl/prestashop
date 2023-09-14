@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Factory;
 
-use Props\BadMethodCallException;
+use BadMethodCallException;
 
 /**
  * @template T
@@ -37,7 +37,6 @@ abstract class AbstractPsModelFactory extends AbstractPsFactory
 
     /**
      * @return T
-     * @throws \Exception
      */
     public function store()
     {
@@ -82,31 +81,12 @@ abstract class AbstractPsModelFactory extends AbstractPsFactory
     }
 
     /**
-     * @return array
-     */
-    protected function resolveAttributes(): array
-    {
-        return array_replace(parent::resolveAttributes(), ['id' => $this->getId()]);
-    }
-
-    /**
      * @param  T $model
      *
      * @return void
-     * @throws \Exception
      */
     protected function save($model): void
     {
         throw new BadMethodCallException('Not implemented');
-    }
-
-    /**
-     * @param  int $id
-     *
-     * @return self
-     */
-    protected function withId(int $id): self
-    {
-        return $this->with(['id' => $id]);
     }
 }

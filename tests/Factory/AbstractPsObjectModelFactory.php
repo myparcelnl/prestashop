@@ -18,6 +18,16 @@ use ObjectModel;
 abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory implements PsObjectModelFactoryInterface
 {
     /**
+     * @param  int $id
+     *
+     * @return self
+     */
+    public function withId(int $id): self
+    {
+        return $this->with(['id' => $id]);
+    }
+
+    /**
      * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
      */
     protected function createDefault(): FactoryInterface
@@ -56,6 +66,14 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      * @return class-string<T>
      */
     abstract protected function getObjectModelClass(): string;
+
+    /**
+     * @return array
+     */
+    protected function resolveAttributes(): array
+    {
+        return array_replace(parent::resolveAttributes(), ['id' => $this->getId()]);
+    }
 
     /**
      * @param  T $model

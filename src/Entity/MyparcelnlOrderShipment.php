@@ -4,32 +4,71 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Database\Table;
 use MyParcelNL\PrestaShop\Entity\Concern\HasJsonData;
+use MyParcelNL\PrestaShop\Entity\Concern\HasTimestamps;
 
 /**
- * @Doctrine\ORM\Mapping\Table()
- * @Doctrine\ORM\Mapping\Entity()
+ * @ORM\Table
+ * @ORM\Entity
  * @see \MyParcelNL\PrestaShop\Database\CreateOrderShipmentTableDatabaseMigration
  */
 final class MyparcelnlOrderShipment extends AbstractEntity
 {
     use HasJsonData;
+    use HasTimestamps;
 
     /**
      * @var string
-     * @Doctrine\ORM\Mapping\Column(type="string", nullable=false)
+     * @ORM\Column(name="order_id", type="integer")
      */
-    public $idOrder;
+    private $orderId;
 
     /**
      * @var int
-     * @Doctrine\ORM\Mapping\Column(type="integer", nullable=false, unique=true)
+     * @ORM\Id
+     * @ORM\Column(name="shipment_id", type="integer")
      */
-    public $idShipment;
+    private $shipmentId;
 
     public static function getTable(): string
     {
         return Table::TABLE_ORDER_SHIPMENT;
+    }
+
+    public function getOrderId(): string
+    {
+        return $this->orderId;
+    }
+
+    public function getShipmentId(): int
+    {
+        return $this->shipmentId;
+    }
+
+    public function setOrderId(string $orderId): self
+    {
+        $this->orderId = $orderId;
+
+        return $this;
+    }
+
+    public function setShipmentId(int $shipmentId): self
+    {
+        $this->shipmentId = $shipmentId;
+
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'orderId'    => $this->getOrderId(),
+            'shipmentId' => $this->getShipmentId(),
+            'data'       => $this->getData(),
+            'dateAdd'    => $this->getDateAdd(),
+            'dateUpd'    => $this->getDateUpd(),
+        ];
     }
 }

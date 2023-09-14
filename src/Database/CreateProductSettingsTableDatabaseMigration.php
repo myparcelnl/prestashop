@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
+use MyParcelNL\PrestaShop\Database\Sql\CreateTableSqlBuilder;
+use MyParcelNL\PrestaShop\Database\Sql\DropTableSqlBuilder;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 
 /**
@@ -13,24 +15,16 @@ final class CreateProductSettingsTableDatabaseMigration extends AbstractDatabase
 {
     public function down(): void
     {
-        $table = $this->getTable();
-        $this->execute("DROP TABLE IF EXISTS `$table`");
+        $this->execute(new DropTableSqlBuilder($this->getTable()));
     }
 
     public function up(): void
     {
-        $table = $this->getTable();
-        $sql   = <<<SQL
-            CREATE TABLE IF NOT EXISTS `$table` (
-                `id`         INT AUTO_INCREMENT                                             NOT NULL,
-                `id_product` INT                                                            NOT NULL,
-                `data`       TEXT                                                           NOT NULL,
-                `created`    DATETIME DEFAULT CURRENT_TIMESTAMP                             NOT NULL,
-                `updated`    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-                UNIQUE INDEX UNIQ_A2BF85F5DD7ADDD (`id_product`),
-                PRIMARY KEY (`id`)
-            ) ENGINE={ENGINE} DEFAULT CHARSET=utf8;
-SQL;
+        $sql = (new CreateTableSqlBuilder($this->getTable()))
+            ->id('product_id')
+            ->column('data')
+            ->primary(['product_id'])
+            ->timestamps();
 
         $this->execute($sql);
     }
@@ -40,6 +34,6 @@ SQL;
      */
     private function getTable(): string
     {
-        return Table::withPrefix(MyparcelnlProductSettings::getTable());
+        return MyparcelnlProductSettings::getTable();
     }
 }

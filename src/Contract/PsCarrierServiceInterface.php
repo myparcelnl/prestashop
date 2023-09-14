@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Contract;
 
 use Carrier as PsCarrier;
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 
@@ -13,21 +14,14 @@ interface PsCarrierServiceInterface
     /**
      * @param  \MyParcelNL\Pdk\Carrier\Collection\CarrierCollection $carriers
      *
-     * @return void
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
      */
-    public function createOrUpdateCarriers(CarrierCollection $carriers): void;
+    public function createOrUpdateCarriers(CarrierCollection $carriers): Collection;
 
     /**
      * @return void
      */
-    public function deleteCarriers(): void;
-
-    /**
-     * @param $carriers
-     *
-     * @return void
-     */
-    public function deleteUnusedCarriers($carriers): void;
+    public function disableCarriers(): void;
 
     /**
      * @param  int|PsCarrier $input

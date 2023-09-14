@@ -6,8 +6,9 @@ namespace MyParcelNL\PrestaShop\Tests\Uses;
 
 use CarrierModule;
 use Configuration;
-use Exception;
 use MyParcelNL\Pdk\Base\Facade;
+use MyParcelNL\Pdk\Base\FileSystemInterface;
+use MyParcelNL\Pdk\Facade\Config;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Tests\Factory\SharedFactoryState;
 use MyParcelNL\Pdk\Tests\Uses\UsesEachMockPdkInstance;
@@ -20,21 +21,31 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
 {
     /**
      * @return void
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     protected function addDefaultData(): void
     {
-        try {
-            psFactory(Configuration::class)->make();
+        psFactory(Configuration::class)->make();
 
-            psFactory(Zone::class)
-                ->withName('Europe')
-                ->store();
+        psFactory(Zone::class)
+            ->withName('Europe')
+            ->store();
 
-            psFactory(Zone::class)
-                ->withName('North America')
-                ->store();
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        psFactory(Zone::class)
+            ->withName('North America')
+            ->store();
+
+        /** @var FileSystemInterface $fileSystem */
+        $fileSystem = Pdk::get(FileSystemInterface::class);
+
+        $fileSystem->mkdir(_PS_SHIP_IMG_DIR_, true);
+        $fileSystem->mkdir(Pdk::get('carrierLogosDirectory'), true);
+
+        /** @var FileSystemInterface $fileSystem */
+        $fileSystem = Pdk::get(FileSystemInterface::class);
+
+        foreach (Config::get('carriers') as $carrier) {
+            $fileSystem->put(sprintf('%s%s.png', Pdk::get('carrierLogosDirectory'), $carrier['name']), '[IMAGE]');
         }
     }
 

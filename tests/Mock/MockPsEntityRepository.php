@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
+use MyParcelNL\Sdk\src\Support\Str;
 
 /**
  * @template T of EntityInterface
@@ -66,7 +67,8 @@ final class MockPsEntityRepository
             ->filter(
                 static function (object $object) use ($criteria) {
                     foreach ($criteria as $key => $value) {
-                        if ($object->{$key} === $value) {
+                        $getter = sprintf('get%s', Str::studly($key));
+                        if ($object->{$getter}() === $value) {
                             continue;
                         }
 

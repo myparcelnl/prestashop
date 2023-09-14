@@ -69,7 +69,7 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
      */
     public function getOrderData($orderOrId): array
     {
-        $fromOrder = $this->psOrderDataRepository->findOneBy(['idOrder' => (int) $this->getOrderId($orderOrId)]);
+        $fromOrder = $this->psOrderDataRepository->findOneBy(['orderId' => (int) $this->getOrderId($orderOrId)]);
 
         if (! $fromOrder) {
             return $this->getFromCart($this->get($orderOrId));
@@ -88,7 +88,7 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
     public function updateData($orderOrId, array $orderData): void
     {
         $this->psOrderDataRepository->updateOrCreate(
-            ['idOrder' => (int) $this->getOrderId($orderOrId)],
+            ['orderId' => (int) $this->getOrderId($orderOrId)],
             ['data' => json_encode($orderData)]
         );
     }
@@ -103,7 +103,7 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
      */
     private function getFromCart(Order $order): array
     {
-        $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['idCart' => $order->id_cart]);
+        $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['cartId' => $order->id_cart]);
 
         if ($fromCart) {
             Logger::debug("[Order $order->id] Delivery options found in cart, saving to order");

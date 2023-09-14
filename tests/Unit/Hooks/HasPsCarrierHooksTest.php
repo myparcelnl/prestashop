@@ -32,7 +32,7 @@ it('re-synchronises carrier id when it is updated', function () {
         ->store();
 
     psFactory(MyparcelnlCarrierMapping::class)
-        ->withIdCarrier(14)
+        ->withCarrierId(14)
         ->withMyparcelCarrier(Carrier::CARRIER_DPD_NAME)
         ->store();
 
@@ -50,5 +50,5 @@ it('re-synchronises carrier id when it is updated', function () {
         throw new Exception('No match found');
     }
 
-    expect($found->idCarrier)->toBe(15);
+    expect($found->getCarrierId())->toBe(15);
 });

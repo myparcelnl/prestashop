@@ -34,46 +34,6 @@
                     "delimiter1": "0",
                     "delimiter2": "10000",
                     "id": 5
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 8
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 10
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 20
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 26
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 32
                 }
             ],
             "rangePrices": [
@@ -84,46 +44,6 @@
                     "delimiter1": "0",
                     "delimiter2": "10000",
                     "id": 4
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 7
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 9
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 19
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 25
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 31
                 }
             ]
         },
@@ -151,74 +71,26 @@
             "range_behavior": 1,
             "shipping_external": true,
             "shipping_method": 2,
-            "id": 11,
-            "id_carrier": 11,
+            "id": 7,
+            "id_carrier": 7,
             "rangeWeights": [
                 {
                     "id_lang": null,
                     "id_shop": null,
-                    "id_carrier": 11,
+                    "id_carrier": 7,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 13
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 22
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 28
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 34
+                    "id": 9
                 }
             ],
             "rangePrices": [
                 {
                     "id_lang": null,
                     "id_shop": null,
-                    "id_carrier": 11,
+                    "id_carrier": 7,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 12
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 21
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 27
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 33
+                    "id": 8
                 }
             ]
         },
@@ -246,93 +118,42 @@
             "range_behavior": 1,
             "shipping_external": true,
             "shipping_method": 2,
-            "id": 15,
-            "id_carrier": 15,
+            "id": 11,
+            "id_carrier": 11,
             "rangeWeights": [
                 {
                     "id_lang": null,
                     "id_shop": null,
-                    "id_carrier": 15,
+                    "id_carrier": 11,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 17
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 15,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 24
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 15,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 30
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 15,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 36
+                    "id": 13
                 }
             ],
             "rangePrices": [
                 {
                     "id_lang": null,
                     "id_shop": null,
-                    "id_carrier": 15,
+                    "id_carrier": 11,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 16
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 15,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 23
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 15,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 29
-                },
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 15,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 35
+                    "id": 12
                 }
             ]
         }
     ],
     "carrierMappings": [
         {
-            "idCarrier": 3,
-            "myparcelCarrier": "postnl",
-            "id": 6
+            "carrierId": 3,
+            "myparcelCarrier": "postnl"
         },
         {
-            "idCarrier": 11,
-            "myparcelCarrier": "dhlforyou",
-            "id": 14
+            "carrierId": 7,
+            "myparcelCarrier": "dhlforyou"
         },
         {
-            "idCarrier": 15,
-            "myparcelCarrier": "dhleuroplus",
-            "id": 18
+            "carrierId": 11,
+            "myparcelCarrier": "dhleuroplus"
         }
     ]
 }

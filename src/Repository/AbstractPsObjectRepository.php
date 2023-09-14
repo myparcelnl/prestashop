@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Repository;
 
-use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Base\Support\Utils;
@@ -144,14 +143,12 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
         }
 
         if (! $entity) {
-            $entity          = $this->createEntity();
-            $entity->created = new DateTime();
+            $entity = $this->createEntity();
         }
 
-        $entity->updated = new DateTime();
-
         foreach (array_replace($where, $values) as $key => $value) {
-            $entity->{$key} = $value;
+            $setter = sprintf('set%s', Str::studly($key));
+            $entity->{$setter}($value);
         }
 
         $this->entityManager->persist($entity);

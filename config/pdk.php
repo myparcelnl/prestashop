@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Api\Contract\ClientAdapterInterface;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
+use MyParcelNL\Pdk\App\Action\Backend\Account\UpdateAccountAction;
 use MyParcelNL\Pdk\App\Api\Contract\BackendEndpointServiceInterface;
 use MyParcelNL\Pdk\App\Api\Contract\FrontendEndpointServiceInterface;
 use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
@@ -29,6 +30,7 @@ use MyParcelNL\PrestaShop\Configuration\Service\Ps17ConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Pdk\Account\Repository\PsPdkAccountRepository;
+use MyParcelNL\PrestaShop\Pdk\Action\Backend\Account\PsUpdateAccountAction;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
@@ -94,6 +96,11 @@ return [
      */
     PdkWebhookServiceInterface::class     => get(PsWebhookService::class),
     PdkWebhooksRepositoryInterface::class => get(PsWebhooksRepository::class),
+
+    /**
+     * Actions
+     */
+    UpdateAccountAction::class            => get(PsUpdateAccountAction::class),
 
     /**
      * Miscellaneous

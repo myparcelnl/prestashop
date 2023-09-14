@@ -10,6 +10,12 @@ use Zone;
 
 abstract class MockPsCarrier extends ObjectModel
 {
+    public const PS_CARRIERS_ONLY                           = 1;
+    public const CARRIERS_MODULE                            = 2;
+    public const CARRIERS_MODULE_NEED_RANGE                 = 3;
+    public const PS_CARRIERS_AND_CARRIER_MODULES_NEED_RANGE = 4;
+    public const ALL_CARRIERS                               = 5;
+
     public $attributes = [
         'zones' => [],
     ];

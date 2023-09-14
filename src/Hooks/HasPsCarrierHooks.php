@@ -56,7 +56,7 @@ trait HasPsCarrierHooks
         /** @var PsCarrierMappingRepository $carrierMappingRepository */
         $carrierMappingRepository = Pdk::get(PsCarrierMappingRepository::class);
 
-        $carrierMappingRepository->update(['idCarrier' => $newId], ['idCarrier' => $oldId]);
+        $carrierMappingRepository->update(['carrierId' => $newId], ['carrierId' => $oldId]);
 
         EntityManager::flush();
     }

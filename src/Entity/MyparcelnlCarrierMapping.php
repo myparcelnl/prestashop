@@ -4,29 +4,63 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Database\Table;
 
 /**
- * @Doctrine\ORM\Mapping\Table()
- * @Doctrine\ORM\Mapping\Entity()
+ * @ORM\Table()
+ * @ORM\Entity()
  * @see \MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration
  */
 final class MyparcelnlCarrierMapping extends AbstractEntity
 {
     /**
      * @var int
-     * @Doctrine\ORM\Mapping\Column(type="integer", nullable=false, unique=true)
+     * @ORM\Id
+     * @ORM\Column(name="carrier_id", type="integer", nullable=false, unique=true)
      */
-    public $idCarrier;
+    private $carrierId;
 
     /**
      * @var string
-     * @Doctrine\ORM\Mapping\Column(type="string", nullable=false, unique=true)
+     * @ORM\Column(name="myparcel_carrier", type="string", nullable=false, unique=true)
      */
-    public $myparcelCarrier;
+    private $myparcelCarrier;
 
     public static function getTable(): string
     {
         return Table::TABLE_CARRIER_MAPPING;
+    }
+
+    public function getCarrierId(): int
+    {
+        return $this->carrierId;
+    }
+
+    public function getMyparcelCarrier(): string
+    {
+        return $this->myparcelCarrier;
+    }
+
+    public function setCarrierId(int $carrierId): MyparcelnlCarrierMapping
+    {
+        $this->carrierId = $carrierId;
+
+        return $this;
+    }
+
+    public function setMyparcelCarrier(string $myparcelCarrier): MyparcelnlCarrierMapping
+    {
+        $this->myparcelCarrier = $myparcelCarrier;
+
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'carrierId'       => $this->getCarrierId(),
+            'myparcelCarrier' => $this->getMyparcelCarrier(),
+        ];
     }
 }

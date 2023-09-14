@@ -7,14 +7,21 @@ namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier as PsCarrier;
 use MyParcelNL\Pdk\Account\Model\Shop;
-use MyParcelNL\Pdk\Base\Support\Arr;
+use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Tests\Api\Response\ExampleAclResponse;
+use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetAccountsResponse;
+use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierConfigurationResponse;
+use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierOptionsResponse;
+use MyParcelNL\Pdk\Tests\Bootstrap\MockApi;
 use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
+use MyParcelNL\PrestaShop\Tests\Bootstrap\PsTestBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Psr\Log\LoggerInterface;
 use RangePrice;
@@ -24,17 +31,6 @@ use function MyParcelNL\Pdk\Tests\usesShared;
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 usesShared(new UsesMockPsPdkInstance());
-
-function createCarrierMappingsArray(Collection $carrierMappings): array
-{
-    expect($carrierMappings->all())->each->toHaveKeys(['created', 'updated']);
-
-    return (new Collection($carrierMappings->toArray()))
-        ->map(function (array $item) {
-            return Arr::except($item, ['created', 'updated']);
-        })
-        ->toArrayWithoutNull();
-}
 
 function doSnapshotTest(Collection $carrierMappings, Collection $psCarriers): void
 {
@@ -60,13 +56,23 @@ function doSnapshotTest(Collection $carrierMappings, Collection $psCarriers): vo
                     ]);
                 })
                 ->toArrayWithoutNull(),
-            'carrierMappings' => createCarrierMappingsArray($carrierMappings),
+            'carrierMappings' => $carrierMappings->toArray(),
         ])
     );
 }
 
 it('creates carriers on account update', function () {
     TestBootstrapper::hasAccount();
+    PsTestBootstrapper::hasCarrierImages();
+
+    MockApi::enqueue(
+        new ExampleGetAccountsResponse(),
+        new ExampleGetCarrierConfigurationResponse(),
+        new ExampleGetCarrierOptionsResponse(),
+        new ExampleAclResponse()
+    );
+
+    Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
 
     /** @var PsCarrierMappingRepository $repository */
     $repository      = Pdk::get(PsCarrierMappingRepository::class);
@@ -88,6 +94,8 @@ it('does not create duplicate carriers', function () {
             )
         )
         ->store();
+
+    PsTestBootstrapper::hasCarrierImages();
 
     /** @var PsCarrierServiceInterface $service */
     $service = Pdk::get(PsCarrierServiceInterface::class);

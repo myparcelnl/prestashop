@@ -7,13 +7,10 @@ namespace MyParcelNL\PrestaShop\Pdk\Account\Repository;
 use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Repository\AccountRepository;
 use MyParcelNL\Pdk\App\Account\Repository\AbstractPdkAccountRepository;
-use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
-use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
-use Throwable;
 
 final class PsPdkAccountRepository extends AbstractPdkAccountRepository
 {
@@ -57,14 +54,6 @@ final class PsPdkAccountRepository extends AbstractPdkAccountRepository
         }
 
         $this->configurationService->set($key, $account->toStorableArray());
-
-        try {
-            /** @var PsCarrierServiceInterface $carrierService */
-            $carrierService = Pdk::get(PsCarrierServiceInterface::class);
-            $carrierService->updateCarriers();
-        } catch (Throwable $e) {
-            Logger::error($e->getMessage());
-        }
 
         return $this->save(self::STORAGE_KEY_ACCOUNT, $account);
     }
