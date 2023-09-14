@@ -8,7 +8,6 @@ use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Base\Support\Utils;
-use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Contract\PsObjectRepositoryInterface;
 use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
@@ -156,7 +155,6 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
         }
 
         $this->entityManager->persist($entity);
-        Logger::debug(Utils::classBasename(__METHOD__) . ' – ' . $this->entity);
 
         return $entity;
     }
