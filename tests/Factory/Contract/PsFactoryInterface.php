@@ -11,7 +11,7 @@ interface PsFactoryInterface extends FactoryInterface
     /**
      * @param  array $data
      *
-     * @return self
+     * @return $this
      */
     public function with(array $data): self;
 }

@@ -20,7 +20,7 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     /**
      * @param  int $id
      *
-     * @return self
+     * @return $this
      */
     public function withId(int $id): self
     {
@@ -28,7 +28,7 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     }
 
     /**
-     * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
+     * @return $this
      */
     protected function createDefault(): FactoryInterface
     {
@@ -89,7 +89,7 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      * @param  string                                    $key
      * @param  ObjectModel|PsObjectModelFactoryInterface $input
      *
-     * @return self
+     * @return $this
      */
     protected function withModel(string $key, $input): self
     {

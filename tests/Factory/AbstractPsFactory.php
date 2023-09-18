@@ -32,7 +32,7 @@ abstract class AbstractPsFactory extends AbstractFactory implements PsFactoryInt
     /**
      * @param  array<string, mixed> $data
      *
-     * @return self
+     * @return $this
      */
     public function with(array $data): PsFactoryInterface
     {
