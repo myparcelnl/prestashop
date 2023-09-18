@@ -78,7 +78,27 @@ class PsPdkBootstrapper extends PdkBootstrapper
 
             'sidebarParentClass' => value('AdminParentShipping'),
 
-            'logDirectory'          => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+            /**
+             * The MyParcel column on the Orders page.
+             */
+
+            'orderColumnBefore' => value('actions'),
+
+            'orderColumnOptions' => value([
+                'sortable'  => false,
+                'clickable' => false,
+            ]),
+
+            /**
+             * Logging
+             */
+
+            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+
+            /**
+             * Carrier logos
+             */
+
             'carrierLogosDirectory' => value(sprintf('%sprivate/carrier-logos/', $path)),
 
             'carrierLogoFileExtensions' => value(['.png', '.jpg']),

@@ -7,13 +7,13 @@ namespace MyParcelNL\PrestaShop\Hooks;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Grid\Column\LabelsColumn;
+use MyParcelNL\PrestaShop\Grid\Column\MyParcelOrderColumn;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
 
 trait HasPdkRenderHooks
 {
     /**
-     * Add columns to the order grid to render the order boxes in.
+     * Add the "MyParcel" column to the order grid to render the order boxes in.
      *
      * @param  array $params
      *
@@ -24,24 +24,9 @@ trait HasPdkRenderHooks
         /** @var \PrestaShop\PrestaShop\Core\Grid\Definition\GridDefinitionInterface $definition */
         $definition = $params['definition'];
 
-        $appInfo = Pdk::getAppInfo();
-
         $definition
             ->getColumns()
-            ->addBefore(
-                'actions',
-                (new LabelsColumn($appInfo->name))
-                    ->setName($appInfo->title)
-            );
-
-        //        $bulkActions = $definition->getBulkActions();
-        //        foreach ($this->getBulkActionsMap() as $action => $data) {
-        //            $bulkActions->add(
-        //                (new IconBulkAction($action))
-        //                    ->setName(Language::translate($data['label']))
-        //                    ->setOptions(['icon' => $data['icon']])
-        //            );
-        //        }
+            ->addBefore(Pdk::get('orderColumnBefore'), new MyParcelOrderColumn());
     }
 
     /**
