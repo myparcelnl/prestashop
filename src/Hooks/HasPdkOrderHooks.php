@@ -20,14 +20,16 @@ trait HasPdkOrderHooks
      */
     public function hookActionObjectCustomerMessageAddAfter(array $params): void
     {
-        if ($params['object'] instanceof CustomerMessage) {
-            $message = $params['object'];
-            $thread  = new CustomerThread($message->id_customer_thread);
-
-            Actions::execute(PdkBackendActions::POST_ORDER_NOTES, [
-                'orderIds' => [$thread->id_order],
-            ]);
+        if (! $params['object'] instanceof CustomerMessage) {
+            return;
         }
+
+        $message = $params['object'];
+        $thread  = new CustomerThread($message->id_customer_thread);
+
+        Actions::execute(PdkBackendActions::POST_ORDER_NOTES, [
+            'orderIds' => [$thread->id_order],
+        ]);
     }
 
     /**
