@@ -24,6 +24,7 @@ import {
   bootstrap4Config,
 } from '@myparcel-pdk/admin-preset-bootstrap4';
 import {LogLevel, createPdkAdmin, type ElementInstance} from '@myparcel-pdk/admin';
+import {listenForBulkActions} from './functions/listenForBulkActions';
 import {
   PsDropdownButton,
   PsFormGroup,
@@ -129,6 +130,10 @@ window.onload = () => {
       const {form, name} = element;
 
       return `myparcelnl-${form.name}-${name}`;
+    },
+
+    onInitialized() {
+      listenForBulkActions();
     },
   });
 };

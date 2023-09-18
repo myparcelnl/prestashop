@@ -8,6 +8,7 @@ use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutDeliveryOptionsHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPdkOrderGridHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkOrderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkProductHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkRenderHooks;
@@ -28,6 +29,7 @@ class MyParcelNL extends CarrierModule
 {
     use HasPdkCheckoutDeliveryOptionsHooks;
     use HasPdkCheckoutHooks;
+    use HasPdkOrderGridHooks;
     use HasPdkOrderHooks;
     use HasPdkProductHooks;
     use HasPdkRenderHooks;

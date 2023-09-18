@@ -23,11 +23,11 @@ final class MyParcelOrderColumn extends AbstractColumn
      * Corresponds to the filename of the template that will be used for rendering the column.
      *
      * @return string
-     * @see /views/PrestaShop/Admin/Common/Grid/Columns/Content/order_box.html.twig
+     * @see /views/PrestaShop/Admin/Common/Grid/Columns/Content/order_grid_item.html.twig
      */
     public function getType(): string
     {
-        return 'order_box';
+        return 'order_grid_item';
     }
 
     /**

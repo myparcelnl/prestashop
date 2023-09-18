@@ -7,7 +7,10 @@ namespace MyParcelNL\PrestaShop\Hooks;
 use CustomerMessage;
 use CustomerThread;
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
+use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Actions;
+use MyParcelNL\Pdk\Facade\Frontend;
+use MyParcelNL\Pdk\Facade\Pdk;
 
 trait HasPdkOrderHooks
 {
@@ -25,5 +28,21 @@ trait HasPdkOrderHooks
                 'orderIds' => [$thread->id_order],
             ]);
         }
+    }
+
+    /**
+     * Renders the order box on a single order page.
+     *
+     * @param  array $params
+     *
+     * @return string
+     */
+    public function hookDisplayAdminOrderMain(array $params): string
+    {
+        /** @var PdkOrderRepositoryInterface $repository */
+        $repository = Pdk::get(PdkOrderRepositoryInterface::class);
+        $order      = $repository->get($params['id_order']);
+
+        return Frontend::renderOrderBox($order);
     }
 }
