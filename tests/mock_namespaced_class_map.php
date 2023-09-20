@@ -17,10 +17,3 @@ interface EntityInterface
     public function save(): void;
 }
 
-namespace PrestaShopBundle\Exception;
-
-use Exception;
-
-class InvalidModuleException extends Exception
-{
-}

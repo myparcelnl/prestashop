@@ -18,6 +18,7 @@ const PEST = true;
 require __DIR__ . '/../vendor/myparcelnl/pdk/tests/Pest.php';
 require __DIR__ . '/mock_namespaced_class_map.php';
 require __DIR__ . '/mock_class_map.php';
+require __DIR__ . '/mock_namespaced_class_map_after.php';
 
 const _PS_ROOT_DIR_     = '/var/www/html/';
 const _PS_CORE_DIR_     = _PS_ROOT_DIR_;
