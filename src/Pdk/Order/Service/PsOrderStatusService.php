@@ -25,4 +25,15 @@ class PsOrderStatusService implements OrderStatusServiceInterface
 
         return $array;
     }
+
+    /**
+     * @param  array  $orderIds
+     * @param  string $status
+     *
+     * @return void
+     */
+    public function updateStatus(array $orderIds, string $status): void
+    {
+        // TODO: Implement updateStatus() method.
+    }
 }
