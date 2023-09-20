@@ -139,6 +139,11 @@ abstract class CustomerMessageCore extends MockPsCustomerMessage { }
 
 final class CustomerMessage extends CustomerMessageCore { }
 
+/** @see \GenderCore */
+abstract class GenderCore extends ObjectModel { }
+
+final class Gender extends GenderCore { }
+
 /** @see \GroupCore */
 abstract class GroupCore extends ObjectModel { }
 
@@ -149,13 +154,18 @@ abstract class LangCore extends ObjectModel { }
 
 final class Lang extends LangCore { }
 
+/** @see \ManufacturerCore */
+abstract class ManufacturerCore extends ObjectModel { }
+
+final class Manufacturer extends ManufacturerCore { }
+
 /** @see \OrderCore */
 abstract class OrderCore extends MockPsOrder { }
 
 final class Order extends OrderCore { }
 
 /** @see \OrderStateCore */
-abstract class OrderStateCore extends MockPsObjectModel { }
+abstract class OrderStateCore extends ObjectModel { }
 
 final class OrderState extends OrderStateCore { }
 
@@ -168,6 +178,11 @@ final class RangePrice extends RangePriceCore { }
 abstract class RangeWeightCore extends MockPsRangeObjectModel { }
 
 final class RangeWeight extends RangeWeightCore { }
+
+/** @see \RiskCore */
+abstract class RiskCore extends ObjectModel { }
+
+final class Risk extends RiskCore { }
 
 /** @see \ShopCore */
 abstract class ShopCore extends ObjectModel { }
@@ -183,6 +198,16 @@ final class ShopGroup extends ShopGroupCore { }
 abstract class StateCore extends ObjectModel { }
 
 final class State extends StateCore { }
+
+/** @see \SupplierCore */
+abstract class SupplierCore extends ObjectModel { }
+
+final class Supplier extends SupplierCore { }
+
+/** @see \WarehouseCore */
+abstract class WarehouseCore extends ObjectModel { }
+
+final class Warehouse extends WarehouseCore { }
 
 /** @see \ZoneCore */
 abstract class ZoneCore extends ObjectModel { }
