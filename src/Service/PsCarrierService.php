@@ -136,9 +136,7 @@ final class PsCarrierService implements PsCarrierServiceInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @return void
      */
     public function updateCarriers(): void
     {
