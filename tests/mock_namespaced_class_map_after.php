@@ -7,9 +7,7 @@ namespace PrestaShopBundle\Exception;
 
 use Exception;
 
-class InvalidModuleException extends Exception
-{
-}
+class InvalidModuleException extends Exception { }
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 

@@ -6,16 +6,30 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Service;
 
 use Context;
 use MyParcelNL\Pdk\App\Order\Contract\OrderStatusServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use OrderState;
 
-class PsOrderStatusService implements OrderStatusServiceInterface
+final class PsOrderStatusService implements OrderStatusServiceInterface
 {
+    /**
+     * @var \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface
+     */
+    private $psOrderService;
+
+    /**
+     * @param  \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface $psOrderService
+     */
+    public function __construct(PsOrderServiceInterface $psOrderService)
+    {
+        $this->psOrderService = $psOrderService;
+    }
+
     /**
      * @return array
      */
     public function all(): array
     {
-        $orderStates = OrderState::getOrderStates((int) Context::getContext()->language->id);
+        $orderStates = OrderState::getOrderStates(Context::getContext()->language->id);
 
         $array = [];
 
@@ -34,6 +48,10 @@ class PsOrderStatusService implements OrderStatusServiceInterface
      */
     public function updateStatus(array $orderIds, string $status): void
     {
-        // TODO: Implement updateStatus() method.
+        foreach ($orderIds as $orderId) {
+            $psOrder = $this->psOrderService->get($orderId);
+
+            $psOrder->setCurrentState((int) $status);
+        }
     }
 }

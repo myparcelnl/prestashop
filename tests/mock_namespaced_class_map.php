@@ -16,4 +16,3 @@ interface EntityInterface
 
     public function save(): void;
 }
-
