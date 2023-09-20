@@ -77,6 +77,7 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
 
     protected function setup(): void
     {
+        MockPsPdkBootstrapper::setConfig($this->config);
         MockPsPdkBootstrapper::boot('pest', 'Pest', '1.0.0', __DIR__ . '/../../', 'APP_URL');
         MockPsModule::setInstance('pest', new CarrierModule());
 

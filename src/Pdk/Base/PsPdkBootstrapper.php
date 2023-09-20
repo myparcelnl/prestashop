@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Base;
 
 use Context;
 use DI\Definition\Helper\FactoryDefinitionHelper;
+use FileLogger;
 use Module;
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
@@ -15,6 +16,7 @@ use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShopBundle\Exception\InvalidModuleException;
+use Psr\Log\LogLevel;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\Config\FileLocator;
@@ -93,7 +95,18 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * Logging
              */
 
-            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+            'logDirectory' => value(sprintf('%svar/logs/%s', _PS_ROOT_DIR_, $name)),
+
+            'logLevelFilenameMap' => value([
+                LogLevel::DEBUG     => FileLogger::DEBUG,
+                LogLevel::INFO      => FileLogger::INFO,
+                LogLevel::NOTICE    => FileLogger::WARNING,
+                LogLevel::WARNING   => FileLogger::WARNING,
+                LogLevel::ERROR     => FileLogger::ERROR,
+                LogLevel::CRITICAL  => FileLogger::ERROR,
+                LogLevel::ALERT     => FileLogger::ERROR,
+                LogLevel::EMERGENCY => FileLogger::ERROR,
+            ]),
 
             /**
              * Carrier logos
