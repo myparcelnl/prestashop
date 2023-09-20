@@ -15,6 +15,7 @@
                     "id_zone": 2
                 }
             ],
+            "id": 2,
             "name": "PostNL",
             "active": 1,
             "id_reference": 100,
@@ -24,73 +25,20 @@
             "range_behavior": 1,
             "shipping_external": true,
             "shipping_method": 2,
-            "id": 3,
-            "id_carrier": 3,
             "rangeWeights": [
                 {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 5
-                }
-            ],
-            "rangePrices": [
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 3,
+                    "id_carrier": 2,
                     "delimiter1": "0",
                     "delimiter2": "10000",
                     "id": 4
                 }
-            ]
-        },
-        {
-            "zones": [
-                {
-                    "active": 1,
-                    "name": "Europe",
-                    "id": 1,
-                    "id_zone": 1
-                },
-                {
-                    "active": 1,
-                    "name": "North America",
-                    "id": 2,
-                    "id_zone": 2
-                }
-            ],
-            "name": "DHL For You",
-            "active": 1,
-            "id_reference": 900,
-            "deleted": 0,
-            "is_module": true,
-            "need_range": 1,
-            "range_behavior": 1,
-            "shipping_external": true,
-            "shipping_method": 2,
-            "id": 7,
-            "id_carrier": 7,
-            "rangeWeights": [
-                {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 7,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 9
-                }
             ],
             "rangePrices": [
                 {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 7,
+                    "id_carrier": 2,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 8
+                    "id": 3
                 }
             ]
         },
@@ -118,41 +66,32 @@
             "range_behavior": 1,
             "shipping_external": true,
             "shipping_method": 2,
-            "id": 11,
-            "id_carrier": 11,
+            "id": 6,
             "rangeWeights": [
                 {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
+                    "id_carrier": 6,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 13
+                    "id": 6
                 }
             ],
             "rangePrices": [
                 {
-                    "id_lang": null,
-                    "id_shop": null,
-                    "id_carrier": 11,
+                    "id_carrier": 6,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 12
+                    "id": 6
                 }
             ]
         }
     ],
     "carrierMappings": [
         {
-            "carrierId": 3,
+            "carrierId": 2,
             "myparcelCarrier": "postnl"
         },
         {
-            "carrierId": 7,
-            "myparcelCarrier": "dhlforyou"
-        },
-        {
-            "carrierId": 11,
+            "carrierId": 6,
             "myparcelCarrier": "dhleuroplus"
         }
     ]
