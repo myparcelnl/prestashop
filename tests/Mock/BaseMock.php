@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL\Pdk\Base\Contract\Arrayable;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
 
 abstract class BaseMock implements Arrayable
@@ -42,7 +43,7 @@ abstract class BaseMock implements Arrayable
         if (Str::startsWith($name, 'get')) {
             $attribute = Str::snake(substr($name, 3));
 
-            return $this->attributes[$attribute] ?? null;
+            return $this->getAttribute($attribute);
         }
 
         // If no matching attribute is found, return $this to silently ignore the call
@@ -56,7 +57,7 @@ abstract class BaseMock implements Arrayable
      */
     public function __get(string $name)
     {
-        return $this->attributes[$name] ?? null;
+        return $this->getAttribute($name);
     }
 
     /**
@@ -66,7 +67,7 @@ abstract class BaseMock implements Arrayable
      */
     public function __isset($name): bool
     {
-        return isset($this->attributes[$name]);
+        return null !== $this->getAttribute($name);
     }
 
     /**
@@ -77,7 +78,18 @@ abstract class BaseMock implements Arrayable
      */
     public function __set(string $name, $value): void
     {
-        $this->attributes[$name] = $value;
+        $this->setAttribute($name, $value);
+    }
+
+    /**
+     * @param  string $key
+     * @param  null   $default
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $key, $default = null)
+    {
+        return Arr::get($this->attributes, $key, $default);
     }
 
     /**
@@ -86,6 +98,19 @@ abstract class BaseMock implements Arrayable
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    /**
+     * @param  string $key
+     * @param  mixed  $value
+     *
+     * @return $this
+     */
+    public function setAttribute(string $key, $value): self
+    {
+        $this->attributes[$key] = $value;
+
+        return $this;
     }
 
     /**
@@ -103,6 +128,8 @@ abstract class BaseMock implements Arrayable
      */
     protected function fill(array $attributes): void
     {
-        $this->attributes = $attributes;
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
+        }
     }
 }

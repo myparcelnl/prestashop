@@ -10,7 +10,7 @@ use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 abstract class MockItems implements StaticMockInterface
 {
     /**
-     * @var Collection
+     * @var Collection<Collection>
      */
     private static $items;
 
@@ -21,13 +21,14 @@ abstract class MockItems implements StaticMockInterface
      */
     public static function add(object $object): bool
     {
-        $all = static::all();
+        $class   = get_class($object);
+        $byClass = self::getByClass($class);
 
-        if ($all->has($object->id)) {
+        if ($byClass->has($object->id)) {
             return false;
         }
 
-        $object->id = self::getId($object);
+        $object->id = self::getOrCreateId($object);
 
         static::update($object);
 
@@ -45,7 +46,7 @@ abstract class MockItems implements StaticMockInterface
     }
 
     /**
-     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     * @return Collection<Collection>
      */
     public static function all(): Collection
     {
@@ -68,14 +69,17 @@ abstract class MockItems implements StaticMockInterface
     }
 
     /**
-     * @param  int $id
+     * @param  string $class
+     * @param  int    $id
      *
      * @return null|object
      */
-    public static function get(int $id): ?object
+    public static function get(string $class, int $id): ?object
     {
-        return static::all()
-            ->get($id);
+        return static::getByClass($class)
+            ->first(function (object $item) use ($id) {
+                return $item->id === $id;
+            });
     }
 
     /**
@@ -86,8 +90,7 @@ abstract class MockItems implements StaticMockInterface
     public static function getByClass(string $class): Collection
     {
         return static::all()
-            ->whereInstanceOf($class)
-            ->values();
+            ->get($class, new Collection());
     }
 
     public static function reset(): void
@@ -102,7 +105,14 @@ abstract class MockItems implements StaticMockInterface
      */
     public static function update(object $entity): bool
     {
-        static::all()
+        $class = get_class($entity);
+        $all   = static::all();
+
+        if (! $all->has($class)) {
+            $all->put($class, new Collection());
+        }
+
+        $all->get($class)
             ->put($entity->id, $entity);
 
         return true;
@@ -113,15 +123,14 @@ abstract class MockItems implements StaticMockInterface
      *
      * @return int
      */
-    protected static function getId(object $object): int
+    protected static function getOrCreateId(object $object): int
     {
         if (isset($object->id)) {
             return $object->id;
         }
 
-        $count = self::all()
-            ->count();
+        $byClass = self::getByClass(get_class($object));
 
-        return $count + 1;
+        return $byClass->count() + 1;
     }
 }

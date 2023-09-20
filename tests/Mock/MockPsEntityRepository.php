@@ -35,13 +35,7 @@ final class MockPsEntityRepository
      */
     public function find($id, $lockMode = null, $lockVersion = null): ?object
     {
-        $entry = MockPsEntities::get($id);
-
-        if (! $entry instanceof $this->entity) {
-            return null;
-        }
-
-        return $entry;
+        return MockPsEntities::get($this->entity, $id);
     }
 
     /**

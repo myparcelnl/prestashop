@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
+use Carrier;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use ObjectModel;
 use Zone;
 
+/**
+ * @method static Carrier[] getCarriers()
+ */
 abstract class MockPsCarrier extends ObjectModel
 {
     public const PS_CARRIERS_ONLY                           = 1;
@@ -19,6 +23,25 @@ abstract class MockPsCarrier extends ObjectModel
     public $attributes = [
         'zones' => [],
     ];
+
+    /**
+     * @param  int      $reference
+     * @param  null|int $id_lang
+     *
+     * @return \Carrier
+     * @see \CarrierCore::getCarrierByReference()
+     */
+    public static function getCarrierByReference(int $reference, int $id_lang = null): ?Carrier
+    {
+        $found = Arr::first(
+            static::getCarriers(),
+            static function (array $carrier) use ($reference) {
+                return $carrier['id_reference'] === $reference;
+            }
+        );
+
+        return $found ? new Carrier($found['id'], $id_lang) : null;
+    }
 
     /**
      * @param  int $idZone

@@ -210,7 +210,10 @@ abstract class WarehouseCore extends ObjectModel { }
 final class Warehouse extends WarehouseCore { }
 
 /** @see \ZoneCore */
-abstract class ZoneCore extends ObjectModel { }
+abstract class ZoneCore extends ObjectModel
+{
+    protected $hasCustomIdKey = true;
+}
 
 /** @see \Zone */
 final class Zone extends ZoneCore { }

@@ -10,6 +10,8 @@ use PrestaShop\PrestaShop\Core\Foundation\Database\EntityInterface;
 
 abstract class MockPsObjectModel extends BaseMock implements EntityInterface
 {
+    protected $hasCustomIdKey = false;
+
     /**
      * @param  null|int $id
      * @param  null|int $id_lang
@@ -18,29 +20,32 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      */
     public function __construct(?int $id = null, ?int $id_lang = null, ?int $id_shop = null, ?int $translator = null)
     {
-        $this->setId($id);
+        $this->updateId($id);
 
-        $this->attributes['id_lang'] = $id_lang;
-        $this->attributes['id_shop'] = $id_shop;
+        $this->setAttribute('id_lang', $id_lang);
+        $this->setAttribute('id_shop', $id_shop);
 
         if ($id) {
-            $existing = MockPsObjectModels::get($id);
-
-            if (! $existing instanceof static) {
-                return;
-            }
+            /** @var $this $existing */
+            $existing = MockPsObjectModels::get(static::class, $id);
 
             $this->hydrate($existing->toArray());
         }
     }
 
-    public static function getDefinition()
+    /**
+     * @return string[]
+     */
+    public static function getDefinition(): array
     {
         return [
             'table' => self::getObjectModelIdentifier(),
         ];
     }
 
+    /**
+     * @return string
+     */
     public static function getRepositoryClassName(): string
     {
         return sprintf('%sRepository', static::class);
@@ -65,16 +70,32 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
         return MockPsObjectModels::add($this);
     }
 
+    /**
+     * @return void
+     */
     public function delete(): void
     {
-        MockPsObjectModels::delete($this->attributes['id']);
+        MockPsObjectModels::delete($this->getId());
     }
 
+    /**
+     * @return null|int
+     */
+    public function getId(): ?int
+    {
+        return $this->getAttribute('id');
+    }
+
+    /**
+     * @param  array $keyValueData
+     *
+     * @return void
+     */
     public function hydrate(array $keyValueData): void
     {
         $this->fill($keyValueData);
 
-        $this->setId();
+        $this->updateId();
     }
 
     public function save(): void
@@ -94,23 +115,60 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    public function withId(int $id): self
+    {
+        return $this->updateId($id);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAdditionalIdKey(): string
+    {
+        return sprintf('id_%s', self::getObjectModelIdentifier());
+    }
+
+    /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    protected function setId(int $id): self
+    {
+        $this->setAttribute('id', $id);
+
+        return $this->hasCustomIdKey ? $this->setAdditionalId($id) : $this;
+    }
+
+    /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    private function setAdditionalId(int $id): MockPsObjectModel
+    {
+        $idKey = $this->getAdditionalIdKey();
+
+        return $this->setAttribute($idKey, $id);
+    }
+
+    /**
      * @param  null|int $id
      *
-     * @return void
+     * @return $this
      */
-    private function setId(?int $id = null): void
+    private function updateId(?int $id = null): self
     {
-        if (! $id) {
-            $id = $this->attributes['id'] ?? null;
+        $id = $id ?? $this->getId();
 
-            if (! $id) {
-                return;
-            }
+        if (! $id) {
+            return $this;
         }
 
-        $idKey = sprintf('id_%s', self::getObjectModelIdentifier());
-
-        $this->attributes['id']   = $id;
-        $this->attributes[$idKey] = $id;
+        return $this->setId($id);
     }
 }

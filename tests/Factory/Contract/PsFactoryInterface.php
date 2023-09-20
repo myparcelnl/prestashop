@@ -9,6 +9,13 @@ use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 interface PsFactoryInterface extends FactoryInterface
 {
     /**
+     * @param  string $key
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $key);
+
+    /**
      * @param  array $data
      *
      * @return $this

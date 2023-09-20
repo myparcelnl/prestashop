@@ -7,16 +7,55 @@ namespace MyParcelNL\PrestaShop\Tests\Factory;
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
+use MyParcelNL\Sdk\src\Support\Str;
 use ObjectModel;
 
 /**
  * @template T of ObjectModel
+ * @method self withDateAdd(string $dateAdd)
+ * @method self withDateUpd(string $dateUpd)
+ * @method self withDeleted(bool $deleted)
  * @implements PsObjectModelFactoryInterface<T>
  * @extends AbstractPsFactory<T>
  */
 abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory implements PsObjectModelFactoryInterface
 {
+    /**
+     * @var PsObjectModelFactoryInterface[]
+     */
+    private $additionalModelsToStore = [];
+
+    /**
+     * @var null|int
+     */
+    private $id;
+
+    /**
+     * @param  null|int $id
+     */
+    public function __construct(?int $id = null)
+    {
+        $this->id = $id;
+
+        parent::__construct();
+    }
+
+    /**
+     * @return T
+     */
+    public function store(): ObjectModel
+    {
+        $result = parent::store();
+
+        foreach ($this->additionalModelsToStore as $modelToStore) {
+            $modelToStore->store();
+        }
+
+        return $result;
+    }
+
     /**
      * @param  int $id
      *
@@ -28,11 +67,35 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     }
 
     /**
+     * @param  string $attribute
+     * @param  mixed  $value
+     * @param  array  $attributes
+     *
+     * @return \MyParcelNL\PrestaShop\Tests\Factory\AbstractPsFactory
+     */
+    protected function addAttribute(string $attribute, $value, array $attributes = []): AbstractPsFactory
+    {
+        if (Str::startsWith($attribute, 'id_')) {
+            return $this->withModel(Str::after($attribute, 'id_'), $value, $attributes);
+        }
+
+        if ($value instanceof PsObjectModelFactoryInterface || $value instanceof MockPsObjectModel) {
+            return $this->withModel($attribute, $value, $attributes);
+        }
+
+        return parent::addAttribute($attribute, $value);
+    }
+
+    /**
      * @return $this
      */
     protected function createDefault(): FactoryInterface
     {
-        return $this->withId($this->getNextId());
+        return $this
+            ->withId($this->id ?? $this->getNextId())
+            ->withDeleted(false)
+            ->withDateAdd('2023-01-01 00:00:00')
+            ->withDateUpd('2023-01-01 00:00:00');
     }
 
     /**
@@ -86,19 +149,45 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     }
 
     /**
-     * @param  string                                    $key
-     * @param  ObjectModel|PsObjectModelFactoryInterface $input
+     * @param  string                                        $key
+     * @param  int|ObjectModel|PsObjectModelFactoryInterface $input
+     * @param  array                                         $attributes
      *
      * @return $this
      */
-    protected function withModel(string $key, $input): self
+    protected function withModel(string $key, $input, array $attributes = []): self
     {
-        if ($input instanceof PsFactoryInterface) {
-            return $this->withModel($key, $input->make());
+        if (is_int($input)) {
+            $model = Str::after($key, 'id_');
+
+            return $this->withModel($model, MockPsObjectModels::get($model, $input), $attributes);
         }
 
-        $idKey = sprintf('id_%s', $key);
+        if ($input instanceof PsFactoryInterface) {
+            $this->additionalModelsToStore[] = $input;
 
-        return $this->with([$idKey => $input]);
+            $model = $input
+                ->with($attributes)
+                ->make();
+
+            return $this->withModel($key, $model);
+        }
+
+        $idKey = sprintf('id_%s', Str::snake($key));
+
+        return $this->with([$idKey => $input->id]);
+    }
+
+    /**
+     * @param  string                                        $key
+     * @param  int|ObjectModel|PsObjectModelFactoryInterface $input
+     * @param  array                                         $attributes
+     * @param  string                                        $foreignKey
+     *
+     * @return $this
+     */
+    protected function withRelation(string $key, $input, array $attributes, string $foreignKey): self
+    {
+        return $this->withModel($key, $input, array_replace($attributes, [$foreignKey => $this->getId()]));
     }
 }

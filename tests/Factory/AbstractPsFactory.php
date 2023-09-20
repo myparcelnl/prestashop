@@ -23,10 +23,20 @@ abstract class AbstractPsFactory extends AbstractFactory implements PsFactoryInt
             $attribute = Str::snake(Str::after($name, 'with'));
             $value     = $arguments[0];
 
-            return $this->with([$attribute => $value]);
+            return $this->addAttribute($attribute, $value, $arguments[1] ?? []);
         }
 
         throw new BadMethodCallException(sprintf('Method %s does not exist', $name));
+    }
+
+    /**
+     * @param  string $key
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $key)
+    {
+        return $this->attributes->get($key);
     }
 
     /**
@@ -39,5 +49,16 @@ abstract class AbstractPsFactory extends AbstractFactory implements PsFactoryInt
         $this->attributes = $this->attributes->merge($data);
 
         return $this;
+    }
+
+    /**
+     * @param  string $attribute
+     * @param  mixed  $value
+     *
+     * @return $this
+     */
+    protected function addAttribute(string $attribute, $value): self
+    {
+        return $this->with([$attribute => $value]);
     }
 }

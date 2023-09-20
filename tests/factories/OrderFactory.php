@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
 
 /**
+ * @see \OrderCore
  * @method self add()
- * @method self withCarrierTaxRate(float $carrierTaxRate)
+ * @method self withCarrier(int|Carrier|CarrierFactory $carrier, array $attributes = [])
+ * @method self withCart(int|Cart|CartFactory $cart, array $attributes = [])
  * @method self withConversionRate(float $conversionRate)
+ * @method self withCurrency(int|Currency|CurrencyFactory $currency, array $attributes = [])
  * @method self withCurrentState(int $currentState)
+ * @method self withCustomer(int|Customer|CustomerFactory $customer, array $attributes = [])
  * @method self withDateAdd(string $dateAdd)
  * @method self withDateUpd(string $dateUpd)
  * @method self withDeliveryDate(string $deliveryDate)
@@ -28,6 +31,7 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
  * @method self withIdShopGroup(int $idShopGroup)
  * @method self withInvoiceDate(string $invoiceDate)
  * @method self withInvoiceNumber(int $invoiceNumber)
+ * @method self withLang(int|Lang|LangFactory $lang, array $attributes = [])
  * @method self withMobileTheme(bool $mobileTheme)
  * @method self withModule(string $module)
  * @method self withNote(string $note)
@@ -37,6 +41,8 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
  * @method self withRoundMode(int $roundMode)
  * @method self withRoundType(int $roundType)
  * @method self withSecureKey(string $secureKey)
+ * @method self withShop(int|Shop|ShopFactory $shop, array $attributes = [])
+ * @method self withShopGroup(int|ShopGroup|ShopGroupFactory $shopGroup, array $attributes = [])
  * @method self withTotalDiscounts(float $totalDiscounts)
  * @method self withTotalDiscountsTaxExcl(float $totalDiscountsTaxExcl)
  * @method self withTotalDiscountsTaxIncl(float $totalDiscountsTaxIncl)
@@ -57,93 +63,25 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
 final class OrderFactory extends AbstractPsObjectModelFactory
 {
     /**
-     * @param  \Address|\AddressFactory $addressDelivery
+     * @param  int|Address|AddressFactory $input
+     * @param  array                      $attributes
      *
-     * @return self
+     * @return $this
      */
-    public function withAddressDelivery($addressDelivery): PsObjectModelFactoryInterface
+    public function withAddressDelivery($input, array $attributes = []): self
     {
-        return $this->withModel('addressDelivery', $addressDelivery);
+        return $this->withRelation('address_delivery', $input, $attributes, 'id_customer');
     }
 
     /**
-     * @param  \Address|\AddressFactory $addressInvoice
+     * @param  int|Address|AddressFactory $input
+     * @param  array                      $attributes
      *
-     * @return self
+     * @return $this
      */
-    public function withAddressInvoice($addressInvoice): PsObjectModelFactoryInterface
+    public function withAddressInvoice($input, array $attributes = []): self
     {
-        return $this->withModel('addressInvoice', $addressInvoice);
-    }
-
-    /**
-     * @param  Carrier|CarrierFactory $carrier
-     *
-     * @return self
-     */
-    public function withCarrier($carrier): PsObjectModelFactoryInterface
-    {
-        return $this->withModel('carrier', $carrier);
-    }
-
-    /**
-     * @param  Cart|CartFactory $cart
-     *
-     * @return self
-     */
-    public function withCart($cart): PsObjectModelFactoryInterface
-    {
-        return $this->withModel('cart', $cart);
-    }
-
-    /**
-     * @param  Currency|CurrencyFactory $currency
-     *
-     * @return self
-     */
-    public function withCurrency($currency): PsObjectModelFactoryInterface
-    {
-        return $this->withModel('currency', $currency);
-    }
-
-    /**
-     * @param  Customer|CustomerFactory $customer
-     *
-     * @return self
-     */
-    public function withCustomer($customer): PsObjectModelFactoryInterface
-    {
-        return $this->withModel('customer', $customer);
-    }
-
-    /**
-     * @param  Lang|LangFactory $lang
-     *
-     * @return self
-     */
-    public function withLang($lang): PsObjectModelFactoryInterface
-    {
-        return $this->withModel('lang', $lang);
-    }
-
-    /**
-     * @param  Shop|ShopFactory $shop
-     *
-     * @return self
-     */
-    public function withShop($shop): PsObjectModelFactoryInterface
-    {
-        return $this->withModel('shop', $shop);
-    }
-
-    /**
-     * @param  ShopGroup|ShopGroupFactory $shopGroup
-     *
-     * @return self
-     */
-    public function withShopGroup($shopGroup): PsObjectModelFactoryInterface
-    {
-        return $this->withModel('shopGroup', $shopGroup);
+        return $this->withRelation('address_invoice', $input, $attributes, 'id_customer');
     }
 
     /**
@@ -152,8 +90,15 @@ final class OrderFactory extends AbstractPsObjectModelFactory
     protected function createDefault(): FactoryInterface
     {
         return parent::createDefault()
-            ->withDateAdd(date('Y-m-d H:i:s'))
-            ->withDateUpd(date('Y-m-d H:i:s'));
+            ->withAddressDelivery(1)
+            ->withAddressInvoice(2)
+            ->withCarrier(1)
+            ->withCart(1)
+            ->withCurrency(1)
+            ->withCustomer(1)
+            ->withLang(1)
+            ->withShop(1)
+            ->withShopGroup(1);
     }
 
     protected function getObjectModelClass(): string

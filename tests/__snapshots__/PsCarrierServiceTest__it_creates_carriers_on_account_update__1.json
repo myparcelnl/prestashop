@@ -15,8 +15,7 @@
                     "id_zone": 2
                 }
             ],
-            "id": 2,
-            "name": "DHL Parcel Connect",
+            "name": "PostNL",
             "active": 1,
             "id_reference": 100,
             "deleted": 0,
@@ -25,20 +24,21 @@
             "range_behavior": 1,
             "shipping_external": true,
             "shipping_method": 2,
+            "id": 1,
             "rangeWeights": [
                 {
-                    "id_carrier": 2,
+                    "id_carrier": 1,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 4
+                    "id": 1
                 }
             ],
             "rangePrices": [
                 {
-                    "id_carrier": 2,
+                    "id_carrier": 1,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 3
+                    "id": 1
                 }
             ]
         },
@@ -57,42 +57,88 @@
                     "id_zone": 2
                 }
             ],
-            "name": "DHL Europlus",
+            "name": "DHL For You",
             "active": 1,
-            "id_reference": 110,
+            "id_reference": 900,
             "deleted": 0,
             "is_module": true,
             "need_range": 1,
             "range_behavior": 1,
             "shipping_external": true,
             "shipping_method": 2,
-            "id": 6,
+            "id": 2,
             "rangeWeights": [
                 {
-                    "id_carrier": 6,
+                    "id_carrier": 2,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 6
+                    "id": 2
                 }
             ],
             "rangePrices": [
                 {
-                    "id_carrier": 6,
+                    "id_carrier": 2,
                     "delimiter1": "0",
                     "delimiter2": "10000",
-                    "id": 6
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "zones": [
+                {
+                    "active": 1,
+                    "name": "Europe",
+                    "id": 1,
+                    "id_zone": 1
+                },
+                {
+                    "active": 1,
+                    "name": "North America",
+                    "id": 2,
+                    "id_zone": 2
+                }
+            ],
+            "name": "DHL For You",
+            "active": 1,
+            "id_reference": 9008123,
+            "deleted": 0,
+            "is_module": true,
+            "need_range": 1,
+            "range_behavior": 1,
+            "shipping_external": true,
+            "shipping_method": 2,
+            "id": 3,
+            "rangeWeights": [
+                {
+                    "id_carrier": 3,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 3
+                }
+            ],
+            "rangePrices": [
+                {
+                    "id_carrier": 3,
+                    "delimiter1": "0",
+                    "delimiter2": "10000",
+                    "id": 3
                 }
             ]
         }
     ],
     "carrierMappings": [
         {
-            "carrierId": 2,
+            "carrierId": 1,
             "myparcelCarrier": "postnl"
         },
         {
-            "carrierId": 6,
-            "myparcelCarrier": "dhleuroplus"
+            "carrierId": 2,
+            "myparcelCarrier": "dhlforyou"
+        },
+        {
+            "carrierId": 3,
+            "myparcelCarrier": "dhlforyou:8123"
         }
     ]
 }

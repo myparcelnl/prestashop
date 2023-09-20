@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
+ * @see \CarrierCore
  * @method self withIdCarrier(int $id)
- * @method self withIdReference(int $id)
  * @method self withName(string $name)
  * @method self withUrl(string $url)
  * @method self withActive(int $active)
@@ -28,6 +29,23 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
  */
 final class CarrierFactory extends AbstractPsObjectModelFactory
 {
+    /**
+     * Defined manually to avoid this being treated as the id of a class.
+     *
+     * @param  int $id
+     *
+     * @return self
+     */
+    public function withIdReference(int $id): self
+    {
+        return $this->with(['id_reference' => $id]);
+    }
+
+    protected function createDefault(): FactoryInterface
+    {
+        return $this->withActive(1);
+    }
+
     protected function getObjectModelClass(): string
     {
         return Carrier::class;

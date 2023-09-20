@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
+use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
@@ -21,15 +22,17 @@ it('creates a valid pdk order', function (OrderFactory $orderFactory) {
     /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
     $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
 
-    $psOrder  = $orderFactory->store();
-    $pdkOrder = $orderRepository->get($psOrder);
+    /** @var Order $psOrder */
+    $psOrder = $orderFactory->store();
 
-    $array = $pdkOrder->toArrayWithoutNull();
+    $pdkOrder = $orderRepository->get($psOrder);
 
     assertMatchesJsonSnapshot(
         json_encode(
-            Arr::except($array, ['deliveryOptions.carrier.capabilities', 'deliveryOptions.carrier.returnCapabilities']),
-            JSON_PRETTY_PRINT
+            Arr::except(
+                $pdkOrder->toArrayWithoutNull(),
+                ['deliveryOptions.carrier.capabilities', 'deliveryOptions.carrier.returnCapabilities']
+            )
         )
     );
 })->with([
@@ -37,3 +40,15 @@ it('creates a valid pdk order', function (OrderFactory $orderFactory) {
         return psFactory(Order::class);
     },
 ]);
+
+it('creates a pdk order from order id', function () {
+    /** @var Order $psOrder */
+    $psOrder = psFactory(Order::class)->store();
+
+    /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
+    $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
+
+    $pdkOrder = $orderRepository->get($psOrder->id);
+
+    expect($pdkOrder)->toBeInstanceOf(PdkOrder::class);
+});
