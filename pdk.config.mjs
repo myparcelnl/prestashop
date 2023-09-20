@@ -30,4 +30,6 @@ export default defineConfig({
       action: downloadCarrierLogos,
     },
   ],
+
+  composerCommand: 'docker compose run --rm -T php composer',
 });
