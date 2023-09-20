@@ -131,6 +131,6 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
             return (string) $orderOrId->id;
         }
 
-        return $orderOrId;
+        return (string) $orderOrId;
     }
 }
