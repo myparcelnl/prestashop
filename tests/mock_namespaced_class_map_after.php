@@ -20,3 +20,9 @@ namespace PrestaShopBundle\Controller\Admin;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class FrameworkBundleAdminController extends AbstractController { }
+
+namespace PrestaShop\PrestaShop\Core\Grid\Column;
+
+use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
+
+class AbstractColumn extends BaseMock { }
