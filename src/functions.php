@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpTooManyParametersInspection */
 
 declare(strict_types=1);
 
@@ -6,6 +7,7 @@ namespace MyParcelNL\PrestaShop;
 
 use MyParcelNL\Pdk\Base\Pdk;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
+use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
 
 if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {
     /**
@@ -27,6 +29,13 @@ if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {
         string $url,
         string $mode = Pdk::MODE_PRODUCTION
     ): void {
-        PsPdkBootstrapper::boot($name, $title, $version, $path, $url, $mode);
+        // TODO: find a way to make this work without having this in production code
+        if (! defined('PEST')) {
+            PsPdkBootstrapper::boot(...func_get_args());
+
+            return;
+        }
+
+        MockPsPdkBootstrapper::boot(...func_get_args());
     }
 }

@@ -22,6 +22,9 @@
     "psr-4": {
       "MyParcelNL\\PrestaShop\\": "src/"
     },
+    "files": [
+      "src/functions.php"
+    ],
     "classmap": [
       "myparcelnl.php",
       "controllers"
