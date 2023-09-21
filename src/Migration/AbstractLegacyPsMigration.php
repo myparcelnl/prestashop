@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Installer\Migration;
+namespace MyParcelNL\PrestaShop\Migration;
 
 use Db;
 use DbQuery;

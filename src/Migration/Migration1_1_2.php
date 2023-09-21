@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Pdk\Installer\Migration;
+namespace MyParcelNL\PrestaShop\Migration;
 
 final class Migration1_1_2 extends AbstractLegacyPsMigration
 {
