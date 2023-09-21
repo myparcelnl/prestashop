@@ -25,11 +25,16 @@ const _PS_CORE_DIR_     = _PS_ROOT_DIR_;
 const _PS_MODULE_DIR_   = _PS_CORE_DIR_ . 'modules/';
 const _PS_SHIP_IMG_DIR_ = _PS_CORE_DIR_ . 's/';
 
-const _DB_PREFIX_    = 'ps_';
-const _MYSQL_ENGINE_ = 'InnoDB';
-const _PS_MODE_DEV_  = false;
-const _PS_VERSION_   = '8.0.0';
+const _DB_PREFIX_        = 'ps_';
+const _MYSQL_ENGINE_     = 'InnoDB';
+const _PS_MODE_DEV_      = false;
+const _PS_VERSION_       = '8.0.0';
+const _PS_USE_SQL_SLAVE_ = false;
 
 usesShared(new ClearContainerCache())->in(__DIR__);
 
 uses(TestCase::class)->in(__DIR__);
+
+uses()
+    ->group('migrations')
+    ->in(__DIR__ . '/Unit/Migration');

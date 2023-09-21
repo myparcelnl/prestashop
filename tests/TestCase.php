@@ -11,6 +11,7 @@ use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Mock\MockItems;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsContext;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntities;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntityManager;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
@@ -27,6 +28,7 @@ class TestCase extends PdkTestCase
             MockItems::class,
             MockPsConfiguration::class,
             MockPsContext::class,
+            MockPsDb::class,
             MockPsEntities::class,
             MockPsEntityManager::class,
             MockPsModule::class,

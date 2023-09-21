@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
+use MyParcelNL\Pdk\Base\Support\Arr;
+
 /** @see \DbQueryCore */
 abstract class MockPsDbQuery extends BaseMock
 {
@@ -14,12 +16,34 @@ abstract class MockPsDbQuery extends BaseMock
 
     public function __call($name, $arguments)
     {
-        return $this->add(__METHOD__, func_get_args());
+        return $this->add($name, $arguments);
     }
 
     public function build(): string
     {
-        return json_encode($this->query);
+        $select = Arr::first($this->query, static function ($item) {
+            return 'select' === $item['type'];
+        });
+
+        $table = Arr::first($this->query, static function ($item) {
+            return 'from' === $item['type'];
+        });
+
+        $wheres = Arr::where($this->query, static function ($item) {
+            return 'where' === $item['type'];
+        });
+
+        $query = sprintf(
+            'SELECT %s FROM %s',
+            implode(', ', $select['args'] ?? []),
+            implode(', ', $table['args'] ?? [])
+        );
+
+        if (! empty($wheres)) {
+            $query .= sprintf(' WHERE %s', implode(' AND ', Arr::flatten(Arr::pluck($wheres, 'args'))));
+        }
+
+        return $query;
     }
 
     public function getQuery(): array
