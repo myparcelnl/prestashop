@@ -12,6 +12,13 @@ use OrderState;
  */
 abstract class MockPsOrder extends ObjectModel
 {
+    protected $hasCustomIdKey = true;
+
+    protected static function getTable(): string
+    {
+        return 'orders';
+    }
+
     public function getCurrentOrderState(): ?OrderState
     {
         $state = $this->getAttribute('current_state');

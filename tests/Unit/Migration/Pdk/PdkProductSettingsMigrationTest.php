@@ -3,11 +3,11 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Migration\V2_0_0_Pdk;
+namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use function MyParcelNL\Pdk\Tests\usesShared;
 
 usesShared(new UsesMockPsPdkInstance());
 
-it('migrates plugin settings', function () {})->skip();
+it('migrates product settings to pdk', function () {})->skip();

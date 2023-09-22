@@ -49,7 +49,7 @@ final class Migration1_6_0 extends AbstractLegacyPsMigration
             ];
         }
 
-        $this->insert($table, $newRecords);
+        $this->insertRows($table, $newRecords);
     }
 
     /**
@@ -60,7 +60,7 @@ final class Migration1_6_0 extends AbstractLegacyPsMigration
     private function addInsuranceOptionsForCarriers(): void
     {
         $table   = $this->getCarrierConfigurationTable();
-        $records = $this->getAll($table, function (DbQuery $query) {
+        $records = $this->getAllRows($table, function (DbQuery $query) {
             $query->where('name like %MYPARCELNL_INSURANCE_');
         });
 
@@ -94,6 +94,6 @@ final class Migration1_6_0 extends AbstractLegacyPsMigration
             ];
         }
 
-        $this->insert($table, $newRecords);
+        $this->insertRows($table, $newRecords);
     }
 }

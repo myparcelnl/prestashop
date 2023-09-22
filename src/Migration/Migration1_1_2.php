@@ -41,7 +41,7 @@ SQL;
             ];
         }
 
-        $this->insert($table, $newRecords);
+        $this->insertRows($table, $newRecords);
     }
 
     /**

@@ -34,12 +34,15 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
+     * @param $class
+     * @param $field
+     *
      * @return string[]
      */
-    public static function getDefinition(): array
+    public static function getDefinition($class, $field = null): array
     {
         return [
-            'table' => self::getObjectModelIdentifier(),
+            'table' => static::getTable(),
         ];
     }
 
@@ -60,6 +63,14 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
+     * @return string
+     */
+    protected static function getTable(): string
+    {
+        return self::getObjectModelIdentifier();
+    }
+
+    /**
      * @param  bool $auto_date
      * @param  bool $null_values
      *
@@ -67,6 +78,8 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      */
     public function add(bool $auto_date = true, bool $null_values = false): bool
     {
+        MockPsDb::insertRow(static::getTable(), $this->getStorable());
+
         return MockPsObjectModels::add($this);
     }
 
@@ -75,6 +88,8 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      */
     public function delete(): void
     {
+        MockPsDb::deleteRows(static::getTable(), $this->getStorable());
+
         MockPsObjectModels::delete($this->getId());
     }
 
@@ -109,6 +124,8 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      */
     public function update($null_values = false): bool
     {
+        MockPsDb::updateRow(static::getTable(), $this->getStorable());
+
         MockPsObjectModels::update($this);
 
         return true;
@@ -130,6 +147,16 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     protected function getAdditionalIdKey(): string
     {
         return sprintf('id_%s', self::getObjectModelIdentifier());
+    }
+
+    /**
+     * @return array
+     */
+    protected function getStorable(): array
+    {
+        $key = $this->hasCustomIdKey ? $this->getAdditionalIdKey() : 'id';
+
+        return array_replace($this->getAttributes(), [$key => $this->getId()]);
     }
 
     /**

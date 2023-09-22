@@ -3,12 +3,11 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Migration\V2_0_0_Pdk;
+namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
-use MyParcelNL\PrestaShop\Migration\Migration2_0_0;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use function MyParcelNL\Pdk\Tests\usesShared;
@@ -16,7 +15,7 @@ use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 usesShared(new UsesMockPsPdkInstance());
 
-it('migrates carriers and their settings', function () {
+it('migrates carriers and their settings to pdk', function () {
     MockPsDb::insertRows(AbstractLegacyPsMigration::LEGACY_TABLE_CARRIER_CONFIGURATION, [
         ['id_carrier' => 48, 'name' => 'carrierType', 'value' => 'postnl'],
         ['id_carrier' => 48, 'name' => 'dropOffDays', 'value' => null],
@@ -119,8 +118,24 @@ it('migrates carriers and their settings', function () {
         ['id_carrier' => 49, 'name' => 'return_MYPARCELNL_INSURANCE_MAX_AMOUNT_EU', 'value' => '214'],
     ], 'id_configuration');
 
-    /** @var \MyParcelNL\PrestaShop\Migration\Migration2_0_0 $migration */
-    $migration = Pdk::get(Migration2_0_0::class);
+    /** @var \MyParcelNL\PrestaShop\Migration\Pdk\PdkSettingsMigration $migration */
+    $migration = Pdk::get(PdkSettingsMigration::class);
+    $migration->up();
+
+    /** @var SettingsRepositoryInterface $settingsRepository */
+    $settingsRepository = Pdk::get(SettingsRepositoryInterface::class);
+    $allSettings        = $settingsRepository->all();
+
+    assertMatchesJsonSnapshot(
+        json_encode($allSettings->toArrayWithoutNull())
+    );
+})->skip();
+
+it('migrates plugin settings to pdk', function () {
+    // todo
+
+    /** @var \MyParcelNL\PrestaShop\Migration\Pdk\PdkSettingsMigration $migration */
+    $migration = Pdk::get(PdkSettingsMigration::class);
     $migration->up();
 
     /** @var SettingsRepositoryInterface $settingsRepository */

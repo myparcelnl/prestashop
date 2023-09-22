@@ -142,10 +142,12 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      * @param  T $model
      *
      * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     protected function save($model): void
     {
-        MockPsObjectModels::update($model);
+        $model->update();
     }
 
     /**

@@ -12,7 +12,6 @@ use Module;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Database\DatabaseMigrations;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 use Tab;
@@ -123,13 +122,9 @@ final class PsInstallerService extends InstallerService
 
     private function installDatabase(): void
     {
-        /** @var \MyParcelNL\PrestaShop\Database\DatabaseMigrations $migrations */
-        $migrations = Pdk::get(DatabaseMigrations::class);
-
-        foreach ($migrations->get() as $migration) {
+        foreach (Pdk::get('databaseMigrationClasses') as $migration) {
             /** @var \MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface $instance */
             $instance = Pdk::get($migration);
-
             $instance->up();
         }
     }

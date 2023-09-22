@@ -34,6 +34,19 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
 
     /**
      * @param  string $table
+     * @param  array  $where
+     *
+     * @return void
+     */
+    public static function deleteRows(string $table, array $where): void
+    {
+        $tableData = self::$database[$table] ?? [];
+
+        self::$database[$table] = self::resolveWhere($tableData, $where);
+    }
+
+    /**
+     * @param  string $table
      * @param  array  $row
      *
      * @return void
@@ -89,6 +102,39 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     }
 
     /**
+     * @param  string $table
+     * @param  array  $data
+     *
+     * @return void
+     */
+    public static function updateRow(string $table, array $data): void
+    {
+        self::deleteRows($table, $data);
+        self::insertRow($table, $data);
+    }
+
+    /**
+     * @param  array $tableData
+     * @param  array $where
+     *
+     * @return array
+     */
+    private static function resolveWhere(array $tableData, array $where): array
+    {
+        return Arr::where($tableData, static function (array $item) use ($where) {
+            foreach ($where as $key => $value) {
+                if ($item[$key] === $value) {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    /**
      * @param  string|\DbQuery $query
      *
      * @return bool
@@ -118,6 +164,19 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     }
 
     /**
+     * @param  DbQuery|string $query
+     *
+     * @return mixed
+     * @throws \PrestaShopException
+     */
+    public function getValue($query)
+    {
+        $result = $this->resolveQuery($query);
+
+        return Arr::first(array_values(Arr::first($result)));
+    }
+
+    /**
      * @param $query
      *
      * @return void
@@ -138,6 +197,22 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param  null|string $where
+     *
+     * @return array|null
+     */
+    protected function resolveWhereString(?string $where): ?array
+    {
+        if (! $where) {
+            return null;
+        }
+
+        preg_match_all('/(\w+)\s*=\s*(\w+)/', $where, $matches);
+
+        return array_combine($matches[1], $matches[2]);
     }
 
     /**
@@ -216,18 +291,14 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
 
         $columns = $matches[1];
         $table   = $matches[2];
-        $where   = $matches[3] ?? null;
+        $where   = $this->resolveWhereString($matches[3] ?? null);
 
         $tableData = self::$database[$table] ?? [];
 
         if (empty($where)) {
             $data = $tableData;
-            // get only requested columns
-
         } else {
-            $data = Arr::where($tableData, function (array $item) use ($where) {
-                return true;
-            });
+            $data = self::resolveWhere($tableData, $where);
         }
 
         if (empty($columns) || '*' === $columns) {
