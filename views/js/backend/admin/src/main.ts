@@ -4,7 +4,6 @@ import {
   DefaultCurrencyInput,
   DefaultHeading,
   DefaultLink,
-  DefaultLoader,
   DefaultNumberInput,
   DefaultTable,
   DefaultTableCol,
@@ -22,11 +21,13 @@ import {
   Bootstrap4Notification,
   Bootstrap4TextInput,
   bootstrap4Config,
+  Bootstrap4Loader,
+  Bootstrap4ShipmentLabelWrapper,
+  Bootstrap4DropdownButton,
 } from '@myparcel-pdk/admin-preset-bootstrap4';
 import {LogLevel, createPdkAdmin, type ElementInstance} from '@myparcel-pdk/admin';
 import {listenForBulkActions} from './functions/listenForBulkActions';
 import {
-  PsDropdownButton,
   PsFormGroup,
   PsProductSettingsFormGroup,
   PsIcon,
@@ -60,13 +61,13 @@ window.onload = () => {
       PdkCol: Bootstrap4Col,
       PdkCurrencyInput: DefaultCurrencyInput,
       PdkDropOffInput: PsDropoffInput,
-      PdkDropdownButton: PsDropdownButton,
+      PdkDropdownButton: Bootstrap4DropdownButton,
       PdkFormGroup: PsFormGroup,
       PdkHeading: DefaultHeading,
       PdkIcon: PsIcon,
       PdkImage: Bootstrap4Image,
       PdkLink: DefaultLink,
-      PdkLoader: DefaultLoader,
+      PdkLoader: Bootstrap4Loader,
       PdkModal: Bootstrap4Modal,
       PdkMultiSelectInput: PsMultiSelectInput,
       PdkNotification: Bootstrap4Notification,
@@ -77,6 +78,7 @@ window.onload = () => {
       PdkRow: PsRow,
       PdkSelectInput: PsSelectInput,
       PdkSettingsDivider: PsSettingsDivider,
+      PdkShipmentLabelWrapper: Bootstrap4ShipmentLabelWrapper,
       PdkTabNavButton: PsTabNavButton,
       PdkTabNavButtonWrapper: PsTabNavButtonWrapper,
       PdkTable: DefaultTable,
@@ -109,9 +111,13 @@ window.onload = () => {
     },
 
     cssUtilities: {
-      animationSpin: 'mypa-spinner',
-      whitespaceNoWrap: 'whitespace-nowrap',
-      displayFlex: 'd-flex justify-content-between',
+      ...bootstrap4Config.cssUtilities,
+      // We have bootstrap 4 and tailwind classes (prefixed with mypa-) in the same project. Prefer bootstrap 4 classes.
+      animationLoading: 'mypa-loading',
+      animationSpin: 'mypa-spin',
+      cursorDefault: 'mypa-cursor-default',
+      cursorPointer: 'mypa-cursor-pointer',
+      whitespaceNoWrap: 'mypa-whitespace-nowrap',
     },
 
     logLevel: LogLevel.Debug,

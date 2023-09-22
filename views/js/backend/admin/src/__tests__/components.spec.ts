@@ -1,6 +1,5 @@
 import {executePdkComponentTests} from '@myparcel-pdk/admin-component-tests';
 import {
-  PsDropdownButton,
   PsFormGroup,
   PsIcon,
   PsToggleInput,
@@ -12,7 +11,6 @@ import {
 } from '../components';
 
 executePdkComponentTests({
-  DropdownButton: PsDropdownButton,
   FormGroup: PsFormGroup,
   Icon: PsIcon,
   PluginSettingsWrapper: PsPluginSettingsWrapper,

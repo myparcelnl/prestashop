@@ -1,7 +1,5 @@
 export {default as PsCheckboxInput} from './PsCheckboxInput.vue';
 
-export {default as PsDropdownButton} from './PsDropdownButton.vue';
-
 export {default as PsDropoffInput} from './PsDropoffInput.vue';
 
 export {default as PsFormGroup} from './PsFormGroup.vue';
