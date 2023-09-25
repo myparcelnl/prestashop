@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
-use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 
 final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
 {
@@ -15,17 +16,22 @@ final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
     private $orderShipmentRepository;
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository $orderShipmentRepository
+     * @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface
      */
-    public function __construct(PsOrderShipmentRepository $orderShipmentRepository)
+    private $pdkOrderRepository;
+
+    /**
+     * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $pdkOrderRepository
+     */
+    public function __construct(PdkOrderRepositoryInterface $pdkOrderRepository)
     {
         parent::__construct();
-        $this->orderShipmentRepository = $orderShipmentRepository;
+        $this->pdkOrderRepository = $pdkOrderRepository;
     }
 
     /**
+     * @return void
      * @throws \PrestaShopDatabaseException
-     * @throws \Doctrine\ORM\ORMException
      */
     public function up(): void
     {
@@ -33,8 +39,8 @@ final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
     }
 
     /**
+     * @return void
      * @throws \PrestaShopDatabaseException
-     * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
     private function migrateOrderShipments(): void
@@ -42,23 +48,28 @@ final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
         $orderLabels = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_ORDER_LABEL);
 
         $orderLabels->each(function (array $orderLabel) {
-            $orderId = $orderLabel['id_order'];
+            $orderId    = $orderLabel['id_order'] ?? null;
+            $shipmentId = $orderLabel['id_label'] ?? null;
 
-            $this->orderShipmentRepository->updateOrCreate(
-                [
-                    'shipmentId' => (int) $orderLabel['id_label'],
-                ],
-                [
-                    'orderId' => (string) $orderId,
-                    'data'    => json_encode([
-                        'id'                  => $orderLabel['id_label'] ?? null,
-                        'orderId'             => $orderId,
-                        'referenceIdentifier' => $orderId,
-                        'barcode'             => $orderLabel['barcode'] ?? null,
-                        'status'              => $orderLabel['status'] ?? null,
-                    ]),
-                ]
-            );
+            $pdkOrder = $this->pdkOrderRepository->get($orderId);
+
+            if (! $pdkOrder->externalIdentifier) {
+                Logger::info("Order $orderId was not found");
+
+                return;
+            }
+
+            if ($pdkOrder->shipments->containsStrict('id', $shipmentId)) {
+                Logger::info("Shipment $shipmentId was already migrated for order $orderId");
+
+                return;
+            }
+
+            $shipment = $pdkOrder->createShipment();
+
+            $shipment->id      = (int) $shipmentId;
+            $shipment->barcode = $orderLabel['barcode'];
+            $shipment->status  = $orderLabel['status'];
         });
     }
 }

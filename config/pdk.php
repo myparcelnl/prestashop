@@ -29,6 +29,15 @@ use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Configuration\Service\Ps17ConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
+use MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration;
+use MyParcelNL\PrestaShop\Database\CreateCartDeliveryOptionsTableDatabaseMigration;
+use MyParcelNL\PrestaShop\Database\CreateOrderDataTableDatabaseMigration;
+use MyParcelNL\PrestaShop\Database\CreateOrderShipmentTableDatabaseMigration;
+use MyParcelNL\PrestaShop\Database\CreateProductSettingsTableDatabaseMigration;
+use MyParcelNL\PrestaShop\Migration\Pdk\PdkDeliveryOptionsMigration;
+use MyParcelNL\PrestaShop\Migration\Pdk\PdkOrderShipmentsMigration;
+use MyParcelNL\PrestaShop\Migration\Pdk\PdkProductSettingsMigration;
+use MyParcelNL\PrestaShop\Migration\Pdk\PdkSettingsMigration;
 use MyParcelNL\PrestaShop\Pdk\Account\Repository\PsPdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Action\Backend\Account\PsUpdateAccountAction;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
@@ -59,8 +68,31 @@ use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsOrderService;
 use Psr\Log\LoggerInterface;
 use function DI\get;
+use function DI\value;
 
 return [
+    'defaultCutoffTime'        => value('17:00'),
+    'defaultCutoffTimeSameDay' => value('10:00'),
+
+    /**
+     * Migrations
+     */
+
+    'databaseMigrationClasses' => value([
+        CreateCarrierMappingTableDatabaseMigration::class,
+        CreateCartDeliveryOptionsTableDatabaseMigration::class,
+        CreateOrderDataTableDatabaseMigration::class,
+        CreateOrderShipmentTableDatabaseMigration::class,
+        CreateProductSettingsTableDatabaseMigration::class,
+    ]),
+
+    'pdkMigrationClasses'                       => value([
+        PdkDeliveryOptionsMigration::class,
+        PdkOrderShipmentsMigration::class,
+        PdkProductSettingsMigration::class,
+        PdkSettingsMigration::class,
+    ]),
+
     /**
      * Repositories
      */
