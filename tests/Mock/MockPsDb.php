@@ -6,11 +6,6 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use DbQuery;
 use MyParcelNL\Pdk\Base\Support\Arr;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 use MyParcelNL\Sdk\src\Concerns\HasInstance;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -18,17 +13,10 @@ use Throwable;
 
 abstract class MockPsDb extends BaseMock implements StaticMockInterface
 {
-    public const ENTITY_LIST = [
-        MyparcelnlCarrierMapping::class,
-        MyparcelnlCartDeliveryOptions::class,
-        MyparcelnlOrderData::class,
-        MyparcelnlOrderShipment::class,
-        MyparcelnlProductSettings::class,
-    ];
     use HasInstance;
 
     /**
-     * @var array<string, array>
+     * @var array<string, array>[]
      */
     private static $database = [];
 
@@ -43,6 +31,14 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
         $tableData = self::$database[$table] ?? [];
 
         self::$database[$table] = self::resolveWhere($tableData, $where);
+    }
+
+    /**
+     * @return array<string, array>[]
+     */
+    public static function getDatabase(): array
+    {
+        return self::$database;
     }
 
     /**
@@ -79,7 +75,7 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
                 $row[$incrementingIdColumn] = $i++;
             }
 
-            MockPsDb::insertRow($table, $row);
+            self::insertRow($table, $row);
         }
     }
 
@@ -227,27 +223,6 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     }
 
     /**
-     * @param $table
-     *
-     * @return string
-     */
-    private function getEntityOrObjectModel($table): string
-    {
-        $class    = Str::studly($table);
-        $entities = self::ENTITY_LIST;
-
-        foreach ($entities as $entity) {
-            if (! Str::endsWith($entity, $class)) {
-                continue;
-            }
-
-            return $entity;
-        }
-
-        return $class;
-    }
-
-    /**
      * @param  string $queryString
      *
      * @return void
@@ -263,18 +238,14 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     {
         preg_match('/INSERT INTO (?:IF NOT EXISTS )?`?(\w+)`? \((.+)\) VALUES \((.+)\)$/i', $queryString, $matches);
 
-        $table   = $matches[1];
-        $columns = $matches[2];
-        $values  = $matches[3];
+        [, $table, $columns, $values] = $matches;
 
         $columns = array_map('trim', explode(',', $columns));
         $values  = array_map('trim', explode(',', $values));
 
-        $entity = $this->getEntityOrObjectModel($table);
-
         $data = array_combine($columns, $values);
 
-        MockPsDb::insertRow($table, $data);
+        self::insertRow($table, $data);
     }
 
     /**
@@ -289,16 +260,16 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
 
         $matches = array_map('trim', $matches);
 
-        $columns = $matches[1];
-        $table   = $matches[2];
-        $where   = $this->resolveWhereString($matches[3] ?? null);
+        [, $columns, $table, $where] = $matches;
+
+        $wheres = $this->resolveWhereString($where);
 
         $tableData = self::$database[$table] ?? [];
 
-        if (empty($where)) {
+        if (empty($wheres)) {
             $data = $tableData;
         } else {
-            $data = self::resolveWhere($tableData, $where);
+            $data = self::resolveWhere($tableData, $wheres);
         }
 
         if (empty($columns) || '*' === $columns) {
