@@ -110,7 +110,10 @@ abstract class AddressCore extends ObjectModel { }
 final class Address extends AddressCore { }
 
 /** @see \CarrierCore */
-abstract class CarrierCore extends MockPsCarrier { }
+abstract class CarrierCore extends MockPsCarrier
+{
+    protected $hasCustomIdKey = true;
+}
 
 final class Carrier extends CarrierCore { }
 
