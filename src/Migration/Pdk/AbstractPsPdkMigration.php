@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
 
 abstract class AbstractPsPdkMigration extends AbstractLegacyPsMigration
@@ -15,6 +16,6 @@ abstract class AbstractPsPdkMigration extends AbstractLegacyPsMigration
 
     public function getVersion(): string
     {
-        return '2.0.0';
+        return Pdk::get('pdkMigrationVersion');
     }
 }

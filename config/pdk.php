@@ -78,6 +78,8 @@ return [
      * Migrations
      */
 
+    'pdkMigrationVersion' => value('2.0.0-alpha.0'),
+
     'databaseMigrationClasses' => value([
         CreateCarrierMappingTableDatabaseMigration::class,
         CreateCartDeliveryOptionsTableDatabaseMigration::class,
@@ -87,10 +89,10 @@ return [
     ]),
 
     'pdkMigrationClasses'                       => value([
+        PdkSettingsMigration::class,
+        PdkProductSettingsMigration::class,
         PdkDeliveryOptionsMigration::class,
         PdkOrderShipmentsMigration::class,
-        PdkProductSettingsMigration::class,
-        PdkSettingsMigration::class,
     ]),
 
     /**
