@@ -37,6 +37,11 @@ final class Migration1_4_0 extends AbstractLegacyPsMigration
         'wrongPostalCodeCity'   => 'MYPARCELNL_WRONG_POSTAL_CODE_CITY_TITLE',
     ];
 
+    /**
+     * @var \MyParcelNL\Pdk\Base\Support\Collection
+     */
+    private $carrierRows;
+
     public function down(): void
     {
         // do nothing
@@ -52,6 +57,8 @@ final class Migration1_4_0 extends AbstractLegacyPsMigration
      */
     public function up(): void
     {
+        $this->carrierRows = $this->getAllRows($this->getCarrierConfigurationTable());
+
         $this->changeCarrierConfigurationValueColumnTypeToText();
         $this->migrateCarrierTitlesToCheckoutConfiguration();
     }
@@ -67,7 +74,7 @@ final class Migration1_4_0 extends AbstractLegacyPsMigration
         $table = $this->getCarrierConfigurationTable();
         $query = "ALTER TABLE `$table` MODIFY value TEXT;";
 
-        $this->db->execute($query);
+        $this->execute($query);
     }
 
     /**
@@ -84,6 +91,23 @@ final class Migration1_4_0 extends AbstractLegacyPsMigration
     }
 
     /**
+     * @param  string $carrierName
+     *
+     * @return null|int
+     */
+    private function getPrestaShopCarrierId(string $carrierName): ?int
+    {
+        $matchingCarrier = $this->carrierRows
+            ->where('name', 'carrierType')
+            ->where('value', $carrierName)
+            ->first();
+
+        return $matchingCarrier['id_carrier'] ?? null
+            ? (int) $matchingCarrier['id_carrier']
+            : null;
+    }
+
+    /**
      * Migrates CarrierSettings strings to CheckoutSettings. Values are determined as follows:
      * - Value from default carrier (if filled)
      * - Value from any other carrier (if filled)
@@ -94,23 +118,21 @@ final class Migration1_4_0 extends AbstractLegacyPsMigration
      */
     private function migrateCarrierTitlesToCheckoutConfiguration(): void
     {
+        $existingConfigurations = $this->getAllRows('configuration');
+
         $table          = $this->getCarrierConfigurationTable();
         $defaultCarrier = Platform::get('defaultCarrier');
 
-        $prestashopCarrierId = CarrierService::getPrestaShopCarrierId($defaultCarrier);
+        $prestashopCarrierId = $this->getPrestaShopCarrierId($defaultCarrier);
 
-        $carrierConfigurationRows = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_CARRIER_CONFIGURATION);
-
-        $anyCarrierNonEmpty = $carrierConfigurationRows
+        $anyCarrierNonEmpty = $this->carrierRows
             ->whereIn('name', array_keys(self::CARRIER_CHECKOUT_SETTINGS_MAP))
             ->where('value', '!=', '');
 
-        $defaultCarrierNonEmpty = $carrierConfigurationRows->where('id_carrier', $prestashopCarrierId);
+        $defaultCarrierNonEmpty = $this->carrierRows->where('id_carrier', $prestashopCarrierId);
 
         $newConfigurations            = [];
         $oldCarrierConfigurationNames = [];
-
-        $existingConfigurations = $this->getAllRows('configuration');
 
         foreach (self::CARRIER_CHECKOUT_SETTINGS_MAP as $oldKey => $newKey) {
             $valueFromDefaultCarrier = $this->getFirstValue($defaultCarrierNonEmpty, $oldKey);
@@ -132,6 +154,6 @@ final class Migration1_4_0 extends AbstractLegacyPsMigration
         }
 
         $this->insertRows('configuration', $newConfigurations);
-        $this->deleteWhere($table, 'name', $oldCarrierConfigurationNames);
+        //        $this->deleteWhere($table, 'name', $oldCarrierConfigurationNames);
     }
 }

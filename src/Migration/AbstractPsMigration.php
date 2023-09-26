@@ -8,6 +8,8 @@ use Db;
 use DbQuery;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationInterface;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Facade\Logger;
+use Throwable;
 
 abstract class AbstractPsMigration implements MigrationInterface
 {
@@ -33,7 +35,19 @@ abstract class AbstractPsMigration implements MigrationInterface
         $valuesString = implode("', '", $values);
         $query        = "DELETE FROM `$table` WHERE `$column` IN ('$valuesString')";
 
-        $this->db->execute($query);
+        $this->execute($query);
+    }
+
+    /**
+     * @param  string|\DbQuery $query
+     *
+     * @return mixed
+     */
+    protected function execute($query)
+    {
+        return $this->withErrorHandling(function () use ($query) {
+            $this->db->execute($query);
+        });
     }
 
     /**
@@ -71,18 +85,23 @@ abstract class AbstractPsMigration implements MigrationInterface
         $query->from($table);
         $query->where($where);
 
-        return $this->db->getValue($query) ?: null;
+        return $this->withErrorHandling(function () use ($query) {
+            return $this->db->getValue($query);
+        });
     }
 
     /**
      * @param  string|DbQuery $query
      *
      * @return \MyParcelNL\Pdk\Base\Support\Collection
-     * @throws \PrestaShopDatabaseException
      */
     protected function getRows($query): Collection
     {
-        return new Collection($this->db->executeS($query));
+        $rows = $this->withErrorHandling(function () use ($query) {
+            return $this->db->executeS($query);
+        });
+
+        return new Collection($rows ?? []);
     }
 
     /**
@@ -91,10 +110,34 @@ abstract class AbstractPsMigration implements MigrationInterface
      * @param  bool   $useReplace
      *
      * @return void
-     * @throws \PrestaShopDatabaseException
      */
     protected function insertRows(string $table, array $records, bool $useReplace = true): void
     {
-        $this->db->insert($table, $records, false, false, $useReplace ? Db::REPLACE : Db::INSERT);
+        $this->withErrorHandling(function () use ($useReplace, $records, $table) {
+            $this->db->insert($table, $records, false, false, $useReplace ? Db::REPLACE : Db::INSERT);
+        });
+    }
+
+    /**
+     * @template T
+     * @param  callable<T> $callback
+     *
+     * @return T
+     */
+    protected function withErrorHandling(callable $callback)
+    {
+        try {
+            return $callback();
+        } catch (Throwable $e) {
+            Logger::error(
+                '[Migration] Failed to execute query',
+                [
+                    'message'   => $e->getMessage(),
+                    'migration' => static::class,
+                ]
+            );
+        }
+
+        return null;
     }
 }

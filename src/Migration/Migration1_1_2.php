@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration;
 
+use DbQuery;
+
 final class Migration1_1_2 extends AbstractLegacyPsMigration
 {
     public function getVersion(): string
@@ -13,21 +15,21 @@ final class Migration1_1_2 extends AbstractLegacyPsMigration
 
     /**
      * @return void
-     * @throws \PrestaShopDatabaseException
      */
     public function up(): void
     {
-        $table      = $this->getCarrierConfigurationTable();
-        $moduleName = 'myparcelnl';
+        $query = new DbQuery();
 
-        $query = <<<SQL
-SELECT `carrier.*` FROM `carrier` AS `carrier`
-  LEFT JOIN `$table` 
-    AS config 
-    ON `carrier.id_carrier` = `config.id_carrier` AND `config.name` = 'carrierType'
-WHERE `carrier.external_module_name` = `$moduleName`
-AND `config.id_configuration` IS NULL
-SQL;
+        $query
+            ->select('carrier.*')
+            ->from('carrier', 'carrier')
+            ->leftJoin(
+                self::LEGACY_TABLE_CARRIER_CONFIGURATION,
+                'config',
+                "`carrier.id_carrier` = `config.id_carrier` AND `config.name` = 'carrierType'"
+            )
+            ->where('`carrier.external_module_name` = \'myparcelnl\'')
+            ->where('`config.id_configuration` IS NULL');
 
         $records = $this->getRows($query);
 
@@ -41,7 +43,7 @@ SQL;
             ];
         }
 
-        $this->insertRows($table, $newRecords);
+        $this->insertRows(self::LEGACY_TABLE_CARRIER_CONFIGURATION, $newRecords);
     }
 
     /**

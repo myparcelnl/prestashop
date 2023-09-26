@@ -26,7 +26,6 @@ final class Migration1_6_0 extends AbstractLegacyPsMigration
      * For all carriers in PrestaShop adds the 'insurance Belgium' setting and sets it to true.
      *
      * @return void
-     * @throws \PrestaShopDatabaseException
      */
     private function addInsuranceBelgiumForCarriers(): void
     {

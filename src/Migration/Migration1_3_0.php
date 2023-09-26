@@ -15,8 +15,8 @@ final class Migration1_3_0 extends AbstractLegacyPsMigration
     {
         $table = $this->getDeliverySettingsTable();
 
-        $query = "alter table `$table` add column `extra_options` text;";
+        $query = "ALTER TABLE `$table` ADD COLUMN `extra_options` text;";
 
-        $this->db->execute($query);
+        $this->execute($query);
     }
 }

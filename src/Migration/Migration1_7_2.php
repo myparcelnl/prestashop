@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration;
 
-use MyParcelNL\Pdk\Facade\Logger;
-use Throwable;
-
 final class Migration1_7_2 extends AbstractLegacyPsMigration
 {
     public function getVersion(): string
@@ -18,12 +15,8 @@ final class Migration1_7_2 extends AbstractLegacyPsMigration
     {
         $table = $this->getOrderLabelTable();
 
-        try {
-            $query = "ALTER TABLE `$table` ADD COLUMN `is_return` tinyint;";
+        $query = "ALTER TABLE `$table` ADD COLUMN `is_return` tinyint;";
 
-            $this->db->execute($query);
-        } catch (Throwable $e) {
-            Logger::error($e->getMessage());
-        }
+        $this->execute($query);
     }
 }
