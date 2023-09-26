@@ -7,6 +7,12 @@ namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 use Carrier;
 use Context;
 use Db;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\DocParser;
+use Doctrine\Common\Annotations\PsrCachedReader;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Language;
 use Module;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
@@ -14,6 +20,7 @@ use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tab;
 
 final class PsInstallerService extends InstallerService
@@ -24,14 +31,16 @@ final class PsInstallerService extends InstallerService
     private $module;
 
     /**
-     * @param ...$args
+     * @param  mixed ...$args
      *
      * @return void
+     * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     public function install(...$args): void
     {
         $this->setModule($args);
+        $this->prepareEntityManager();
         parent::install($args);
     }
 
@@ -54,11 +63,13 @@ final class PsInstallerService extends InstallerService
      * @param  mixed ...$args
      *
      * @return void
+     * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     public function uninstall(...$args): void
     {
         $this->setModule($args);
+        $this->prepareEntityManager();
         parent::uninstall($args);
     }
 
@@ -120,6 +131,16 @@ final class PsInstallerService extends InstallerService
         MyParcelModule::registerHooks();
     }
 
+    /**
+     * @param  null|string $version
+     *
+     * @return void
+     */
+    protected function updateInstalledVersion(?string $version): void
+    {
+        // do nothing
+    }
+
     private function installDatabase(): void
     {
         foreach (Pdk::get('databaseMigrationClasses') as $migration) {
@@ -149,6 +170,32 @@ final class PsInstallerService extends InstallerService
 
         if (! $tab->add()) {
             throw new InstallationException('Failed to add tab');
+        }
+    }
+
+    /**
+     * @return void
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     */
+    private function prepareEntityManager(): void
+    {
+        $appInfo = Pdk::getAppInfo();
+
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = Pdk::get('ps.entityManager');
+
+        $driverChain = $entityManager
+            ->getConfiguration()
+            ->getMetadataDriverImpl();
+
+        $docParser = new DocParser();
+        $reader    = new AnnotationReader($docParser);
+        $reader    = new PsrCachedReader($reader, new ArrayAdapter());
+
+        $driver = new AnnotationDriver($reader, ["{$appInfo->path}src/Entity"]);
+
+        if ($driverChain instanceof MappingDriverChain) {
+            $driverChain->addDriver($driver, 'MyParcelNL\PrestaShop\Entity');
         }
     }
 
