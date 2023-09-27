@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutDeliveryOptionsHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutHooks;
@@ -158,16 +159,10 @@ class MyParcelNL extends CarrierModule
      */
     public function install(): bool
     {
-        $success = parent::install();
-
-        try {
-            Installer::install($this);
-        } catch (Throwable $e) {
-            $this->_errors[] = $e->getMessage();
-            $success         = false;
-        }
-
-        return $success;
+        return parent::install()
+            && $this->withErrorHandling(function () {
+                Installer::install($this);
+            });
     }
 
     /**
@@ -175,16 +170,10 @@ class MyParcelNL extends CarrierModule
      */
     public function uninstall(): bool
     {
-        $success = true;
-
-        try {
-            Installer::uninstall($this);
-        } catch (Throwable $e) {
-            $this->_errors[] = $e->getMessage();
-            $success         = false;
-        }
-
-        return parent::uninstall() && $success;
+        return $this->withErrorHandling(function () {
+                Installer::uninstall($this);
+            })
+            && parent::uninstall();
     }
 
     /**
@@ -210,5 +199,24 @@ class MyParcelNL extends CarrierModule
         $composerData = json_decode(file_get_contents($filename), true);
 
         return $composerData['version'];
+    }
+
+    /**
+     * @param  callable $callback
+     *
+     * @return bool
+     */
+    private function withErrorHandling(callable $callback): bool
+    {
+        try {
+            $callback();
+
+            return true;
+        } catch (Throwable $e) {
+            Logger::error("An error occurred: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
+            $this->_errors[] = $e->getMessage();
+
+            return false;
+        }
     }
 }
