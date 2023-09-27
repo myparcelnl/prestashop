@@ -72,6 +72,7 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
     /** @var \MyParcelNL\PrestaShop\Migration\Pdk\PdkOrderShipmentsMigration $migration */
     $migration = Pdk::get(PdkOrderShipmentsMigration::class);
     $migration->up();
+    $migration->up(); // done twice to test that it doesn't migrate shipments with the same id twice
 
     $pdkOrder         = $pdkOrderRepository->get(1);
     $psOrderShipments = $psOrderShipmentRepository
@@ -157,7 +158,6 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
                 'date_upd'        => '2023-04-06 14:31:25',
             ],
             [
-
                 'id_order'        => 1,
                 'id_order_label'  => 3,
                 'status'          => 'pending - registered',
