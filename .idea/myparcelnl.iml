@@ -386,6 +386,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-message" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
       <excludeFolder url="file://$MODULE_DIR$/upgrade" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/myparcelnl/pdk" />
       <excludePattern pattern="lib" />
       <excludePattern pattern="dist" />
       <excludePattern pattern="cache" />
