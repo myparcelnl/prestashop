@@ -20,10 +20,10 @@ require __DIR__ . '/mock_namespaced_class_map.php';
 require __DIR__ . '/mock_class_map.php';
 require __DIR__ . '/mock_namespaced_class_map_after.php';
 
-const _PS_ROOT_DIR_     = '/var/www/html/';
+const _PS_ROOT_DIR_     = '/var/www/html';
 const _PS_CORE_DIR_     = _PS_ROOT_DIR_;
-const _PS_MODULE_DIR_   = _PS_CORE_DIR_ . 'modules/';
-const _PS_SHIP_IMG_DIR_ = _PS_CORE_DIR_ . 's/';
+const _PS_MODULE_DIR_   = _PS_CORE_DIR_ . '/modules/';
+const _PS_SHIP_IMG_DIR_ = _PS_CORE_DIR_ . '/s/';
 
 const _DB_PREFIX_        = 'ps_';
 const _MYSQL_ENGINE_     = 'InnoDB';

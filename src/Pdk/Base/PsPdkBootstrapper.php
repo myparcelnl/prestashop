@@ -95,7 +95,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * Logging
              */
 
-            'logDirectory' => value(sprintf('%svar/logs/%s', _PS_ROOT_DIR_, $name)),
+            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
 
             'logLevelFilenameMap' => value([
                 LogLevel::DEBUG     => FileLogger::DEBUG,
