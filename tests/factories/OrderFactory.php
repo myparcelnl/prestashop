@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use function MyParcelNL\PrestaShop\psFactory;
 
 /**
  * @see \OrderCore
@@ -67,6 +68,7 @@ final class OrderFactory extends AbstractPsObjectModelFactory
      * @param  array                      $attributes
      *
      * @return $this
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     public function withAddressDelivery($input, array $attributes = []): self
     {
@@ -78,6 +80,7 @@ final class OrderFactory extends AbstractPsObjectModelFactory
      * @param  array                      $attributes
      *
      * @return $this
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     public function withAddressInvoice($input, array $attributes = []): self
     {
@@ -86,19 +89,20 @@ final class OrderFactory extends AbstractPsObjectModelFactory
 
     /**
      * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     protected function createDefault(): FactoryInterface
     {
         return parent::createDefault()
-            ->withAddressDelivery(1)
-            ->withAddressInvoice(2)
-            ->withCarrier(1)
-            ->withCart(1)
-            ->withCurrency(1)
-            ->withCustomer(1)
-            ->withLang(1)
-            ->withShop(1)
-            ->withShopGroup(1);
+            ->withAddressDelivery(psFactory(Address::class, 1))
+            ->withAddressInvoice(psFactory(Address::class, 2))
+            ->withIdCarrier(1)
+            ->withIdCart(1)
+            ->withIdCurrency(1)
+            ->withIdCustomer(1)
+            ->withIdLang(1)
+            ->withIdShop(1)
+            ->withIdShopGroup(1);
     }
 
     protected function getObjectModelClass(): string

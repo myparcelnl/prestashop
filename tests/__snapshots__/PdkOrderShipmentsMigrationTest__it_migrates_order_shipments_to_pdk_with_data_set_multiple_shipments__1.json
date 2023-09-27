@@ -3,10 +3,11 @@
         "orderId": "1",
         "multiCollo": false,
         "updated": "2099-01-01 00:00:00",
-        "id": 12000,
+        "id": 12004,
         "referenceIdentifier": "1",
         "barcode": "3SMYPA1234567",
         "carrier": {
+            "externalIdentifier": "postnl",
             "id": 1,
             "name": "postnl",
             "human": "PostNL",
@@ -52,11 +53,19 @@
         "hidden": false,
         "isReturn": false,
         "partnerTrackTraces": [],
+        "physicalProperties": {
+            "weight": 0
+        },
         "price": {
             "amount": 0,
             "currency": "EUR"
         },
-        "recipient": [],
+        "recipient": {
+            "address1": "Antareslaan 31",
+            "city": "Hoofddorp",
+            "postalCode": "2132JE",
+            "person": "Felicia Parcel"
+        },
         "sender": [],
         "status": 0
     },
@@ -64,10 +73,11 @@
         "orderId": "1",
         "multiCollo": false,
         "updated": "2099-01-01 00:00:00",
-        "id": 12002,
+        "id": 12006,
         "referenceIdentifier": "1",
         "barcode": "3SMYPA1234567",
         "carrier": {
+            "externalIdentifier": "postnl",
             "id": 1,
             "name": "postnl",
             "human": "PostNL",
@@ -113,11 +123,19 @@
         "hidden": false,
         "isReturn": false,
         "partnerTrackTraces": [],
+        "physicalProperties": {
+            "weight": 0
+        },
         "price": {
             "amount": 0,
             "currency": "EUR"
         },
-        "recipient": [],
+        "recipient": {
+            "address1": "Antareslaan 31",
+            "city": "Hoofddorp",
+            "postalCode": "2132JE",
+            "person": "Felicia Parcel"
+        },
         "sender": [],
         "status": 0
     }

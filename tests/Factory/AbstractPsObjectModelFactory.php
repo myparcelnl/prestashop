@@ -11,6 +11,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use MyParcelNL\Sdk\src\Support\Str;
 use ObjectModel;
+use function MyParcelNL\PrestaShop\psFactory;
 
 /**
  * @template T of ObjectModel
@@ -72,6 +73,7 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      * @param  array  $attributes
      *
      * @return \MyParcelNL\PrestaShop\Tests\Factory\AbstractPsFactory
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     protected function addAttribute(string $attribute, $value, array $attributes = []): AbstractPsFactory
     {
@@ -156,13 +158,22 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      * @param  array                                         $attributes
      *
      * @return $this
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     protected function withModel(string $key, $input, array $attributes = []): self
     {
         if (is_int($input)) {
-            $model = Str::after($key, 'id_');
+            $class         = Str::after($key, 'id_');
+            $existingModel = MockPsObjectModels::get($class, $input);
 
-            return $this->withModel($model, MockPsObjectModels::get($model, $input), $attributes);
+            if ($existingModel) {
+                return $this->withModel($class, $existingModel, $attributes);
+            }
+
+            /** @var PsObjectModelFactoryInterface $factory */
+            $factory = psFactory(Str::studly($class), $input);
+
+            return $this->withModel($class, $factory, $attributes);
         }
 
         if ($input instanceof PsFactoryInterface) {
@@ -187,6 +198,7 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      * @param  string                                        $foreignKey
      *
      * @return $this
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     protected function withRelation(string $key, $input, array $attributes, string $foreignKey): self
     {

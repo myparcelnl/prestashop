@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use function MyParcelNL\PrestaShop\psFactory;
 
 /**
  * @see \CustomerCore
@@ -46,18 +47,19 @@ final class CustomerFactory extends AbstractPsObjectModelFactory
 {
     /**
      * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
     protected function createDefault(): FactoryInterface
     {
         return parent::createDefault()
             ->withFirstname('Felicia')
             ->withLastname('Parcel')
-            ->withDefaultGroup(1)
-            ->withGender(1)
-            ->withLang(1)
-            ->withRisk(1)
-            ->withShop(1)
-            ->withShopGroup(1);
+            ->withDefaultGroup(psFactory(Group::class, 1))
+            ->withIdGender(1)
+            ->withIdLang(1)
+            ->withIdRisk(1)
+            ->withIdShop(1)
+            ->withIdShopGroup(1);
     }
 
     protected function getObjectModelClass(): string

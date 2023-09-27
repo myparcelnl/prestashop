@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use DateTime;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
@@ -21,34 +22,78 @@ use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 usesShared(new UsesMockPsPdkInstance());
 
 it('migrates order shipments to pdk', function (array $orderLabels) {
-    psFactory(Order::class)->store();
-
-    MockPsDb::insertRows(
-        AbstractLegacyPsMigration::LEGACY_TABLE_ORDER_LABEL,
-        array_map(function (array $orderLabel) {
-            return array_merge(['id_order' => 1], $orderLabel);
-        }, $orderLabels),
-        'id_order_label'
-    );
-
-    /** @var \MyParcelNL\PrestaShop\Migration\Pdk\PdkOrderShipmentsMigration $migration */
-    $migration = Pdk::get(PdkOrderShipmentsMigration::class);
-    $migration->up();
-
     /** @var PdkOrderRepositoryInterface $pdkOrderRepository */
     $pdkOrderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
     /** @var PsOrderShipmentRepository $psOrderShipmentRepository */
     $psOrderShipmentRepository = Pdk::get(PsOrderShipmentRepository::class);
 
-    $pdkOrder = $pdkOrderRepository->get(1);
+    psFactory(Order::class)
+        ->withIdCart(20)
+        ->store();
 
-    $allPsOrderShipments  = $psOrderShipmentRepository->all();
-    $firstPsOrderShipment = $allPsOrderShipments->first();
+    MockPsDb::insertRows(AbstractLegacyPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS, [
+        [
+            'id_cart'           => 20,
+            'delivery_settings' => json_encode([
+                'carrier'         => '',
+                'date'            => '',
+                'deliveryType'    => 'standard',
+                'packageType'     => 'package',
+                'isPickup'        => false,
+                'pickupLocation'  => null,
+                'shipmentOptions' => [
+                    'age_check'         => null,
+                    'extra_assurance'   => null,
+                    'hide_sender'       => null,
+                    'insurance'         => null,
+                    'label_description' => null,
+                    'large_format'      => null,
+                    'only_recipient'    => null,
+                    'return'            => null,
+                    'same_day_delivery' => null,
+                    'signature'         => null,
+                ],
+            ]),
+            'extra_options'     => json_encode([
+                'labelAmount'        => 1,
+                'digitalStampWeight' => 0,
+            ]),
+        ],
+    ], 'id_delivery_setting');
 
-    expect($firstPsOrderShipment->getShipmentId())
-        ->toBe($orderLabels[0]['id_label'])
-        ->and($firstPsOrderShipment->getOrderId())
-        ->toBe(1);
+    MockPsDb::insertRows(AbstractLegacyPsMigration::LEGACY_TABLE_ORDER_LABEL, $orderLabels, 'id_order_label');
+
+    $psOrderShipments = $psOrderShipmentRepository
+        ->where('orderId', 1)
+        ->values();
+
+    expect($psOrderShipments->count())->toBe(0);
+
+    /** @var \MyParcelNL\PrestaShop\Migration\Pdk\PdkOrderShipmentsMigration $migration */
+    $migration = Pdk::get(PdkOrderShipmentsMigration::class);
+    $migration->up();
+
+    $pdkOrder         = $pdkOrderRepository->get(1);
+    $psOrderShipments = $psOrderShipmentRepository
+        ->where('orderId', 1)
+        ->values();
+
+    $matchingOrderLabels = array_values(
+        Arr::where($orderLabels, function (array $item) {
+            return 1 === $item['id_order'];
+        })
+    );
+
+    foreach ($matchingOrderLabels as $index => $orderLabel) {
+        $orderShipment = $psOrderShipments->offsetGet($index);
+
+        expect($orderShipment->getOrderId())
+            ->toBe(1)
+            ->and($orderShipment->getShipmentId())
+            ->toBe($orderLabel['id_label']);
+    }
+
+    expect($psOrderShipments->count())->toBe(count($matchingOrderLabels));
 
     assertMatchesJsonSnapshot(
         json_encode(
@@ -72,8 +117,8 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
                 'status'          => 'pending - concept',
                 'id_label'        => 10000,
                 'new_order_state' => '',
-                'barcode'         => '',
-                'track_link'      => '',
+                'barcode'         => '3SMYPA1234567',
+                'track_link'      => 'https://myparcel.me/track-trace/3SMYPA1234567/2132JE/NL',
                 'payment_url'     => '',
                 'is_return'       => 0,
                 'date_add'        => '2023-04-04 16:15:52',
@@ -85,11 +130,10 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
     'multiple shipments' => [
         'input' => [
             [
-
                 'id_order'        => 1,
                 'id_order_label'  => 1,
                 'status'          => 'pending - registered',
-                'id_label'        => 12000,
+                'id_label'        => 12004,
                 'new_order_state' => 1,
                 'barcode'         => '3SMYPA1234567',
                 'track_link'      => 'https://myparcel.me/track-trace/3SMYPA1234567/2132JE/NL',
@@ -99,11 +143,11 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
                 'date_upd'        => '2023-04-06 14:31:25',
             ],
             [
-                // does not belong to order 1
-                'id_order'        => 2,
+                // belongs to nonexistent order, should be skipped
+                'id_order'        => 124992,
                 'id_order_label'  => 2,
                 'status'          => 'pending - registered',
-                'id_label'        => 12001,
+                'id_label'        => 12005,
                 'new_order_state' => 1,
                 'barcode'         => '3SMYPA1234567',
                 'track_link'      => 'https://myparcel.me/track-trace/3SMYPA1234567/2132JE/NL',
@@ -117,7 +161,7 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
                 'id_order'        => 1,
                 'id_order_label'  => 3,
                 'status'          => 'pending - registered',
-                'id_label'        => 12002,
+                'id_label'        => 12006,
                 'new_order_state' => 1,
                 'barcode'         => '3SMYPA1234567',
                 'track_link'      => 'https://myparcel.me/track-trace/3SMYPA1234567/2132JE/NL',

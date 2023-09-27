@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use Throwable;
 
 final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
 {
@@ -47,29 +49,41 @@ final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
     {
         $orderLabels = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_ORDER_LABEL);
 
-        $orderLabels->each(function (array $orderLabel) {
-            $orderId    = $orderLabel['id_order'] ?? null;
-            $shipmentId = $orderLabel['id_label'] ?? null;
+        $ordersToUpdate = $orderLabels->reduce(function (
+            PdkOrderCollection $carry,
+            array              $orderLabel
+        ): PdkOrderCollection {
+            $orderId = $orderLabel['id_order'] ?? null;
 
-            $pdkOrder = $this->pdkOrderRepository->get($orderId);
+            try {
+                $pdkOrder = $this->pdkOrderRepository->get($orderId);
+            } catch (Throwable $e) {
+                Logger::error("Order $orderId was not found", ['exception' => $e]);
 
-            if (! $pdkOrder->externalIdentifier) {
-                Logger::info("Order $orderId was not found");
-
-                return;
+                return $carry;
             }
+
+            $shipmentId = $orderLabel['id_label'] ?? null;
 
             if ($pdkOrder->shipments->containsStrict('id', $shipmentId)) {
                 Logger::info("Shipment $shipmentId was already migrated for order $orderId");
 
-                return;
+                return $carry;
             }
 
             $shipment = $pdkOrder->createShipment();
 
-            $shipment->id      = (int) $shipmentId;
+            $shipment->id      = $shipmentId;
             $shipment->barcode = $orderLabel['barcode'];
             $shipment->status  = $orderLabel['status'];
-        });
+
+            $pdkOrder->shipments->push($shipment);
+
+            $carry->put($pdkOrder->externalIdentifier, $pdkOrder);
+
+            return $carry;
+        }, new PdkOrderCollection());
+
+        $this->pdkOrderRepository->updateMany($ordersToUpdate->values());
     }
 }

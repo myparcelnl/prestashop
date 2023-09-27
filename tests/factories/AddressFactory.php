@@ -46,12 +46,12 @@ final class AddressFactory extends AbstractPsObjectModelFactory
             ->withAddress1('Antareslaan 31')
             ->withFirstname('Meredith')
             ->withLastname('Mailbox')
-            ->withCountry(1)
-            ->withCustomer(1)
-            ->withManufacturer(1)
-            ->withState(1)
-            ->withSupplier(1)
-            ->withWarehouse(1);
+            ->withIdCountry(1)
+            ->withIdCustomer(1)
+            ->withIdManufacturer(1)
+            ->withIdState(1)
+            ->withIdSupplier(1)
+            ->withIdWarehouse(1);
     }
 
     protected function getObjectModelClass(): string
