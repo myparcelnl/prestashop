@@ -73,7 +73,7 @@ final class PsAddressAdapter
             'address1'   => $address->address1,
             'address2'   => $address->address2,
             'postalCode' => $address->postcode,
-            'person'     => sprintf('%s %s', $address->firstname, $address->lastname),
+            'person'     => trim(sprintf('%s %s', $address->firstname, $address->lastname)),
             'phone'      => $address->phone,
             'region'     => $country->iso_code === Platform::get('localCountry')
                 ? null
@@ -82,14 +82,14 @@ final class PsAddressAdapter
     }
 
     /**
-     * @param  \PrestaShop\PrestaShop\Adapter\Entity\Customer $customer
+     * @param  \Customer $customer
      *
      * @return string[]
      */
     private function createFromCustomer(Customer $customer): array
     {
         return [
-            'person' => "$customer->firstname $customer->lastname",
+            'person' => trim("$customer->firstname $customer->lastname"),
             'email'  => $customer->email,
         ];
     }
