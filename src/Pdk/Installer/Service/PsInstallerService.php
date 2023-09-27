@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 
 use Carrier;
 use Context;
+use Currency;
 use Db;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\DocParser;
@@ -40,7 +41,7 @@ final class PsInstallerService extends InstallerService
     public function install(...$args): void
     {
         $this->setModule($args);
-        $this->prepareEntityManager();
+        $this->preparePrestaShop();
         parent::install($args);
     }
 
@@ -69,7 +70,7 @@ final class PsInstallerService extends InstallerService
     public function uninstall(...$args): void
     {
         $this->setModule($args);
-        $this->prepareEntityManager();
+        $this->preparePrestaShop();
         parent::uninstall($args);
     }
 
@@ -174,6 +175,20 @@ final class PsInstallerService extends InstallerService
     }
 
     /**
+     * PrestaShop throws an error during install because context->currency is undefined.
+     *
+     * @return void
+     * @todo See if this can be done in a better way (preferably not at all)
+     */
+    private function prepareContext(): void
+    {
+        /** @var \Context $context */
+        $context = Context::getContext();
+
+        $context->currency = $context->currency ?? new Currency(1);
+    }
+
+    /**
      * @return void
      * @throws \Doctrine\Common\Annotations\AnnotationException
      */
@@ -197,6 +212,18 @@ final class PsInstallerService extends InstallerService
         if ($driverChain instanceof MappingDriverChain) {
             $driverChain->addDriver($driver, 'MyParcelNL\PrestaShop\Entity');
         }
+    }
+
+    /**
+     * Do some preparations that are missing in the installation flow of PrestaShop.
+     *
+     * @return void
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     */
+    private function preparePrestaShop(): void
+    {
+        $this->prepareContext();
+        $this->prepareEntityManager();
     }
 
     /**
