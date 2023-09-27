@@ -1,26 +1,47 @@
 {
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultBase": "main",
   "npmScope": "myparcel-prestashop",
   "workspaceLayout": {
     "appsDir": "views",
     "libsDir": "views"
   },
+  "namedInputs": {
+    "production": [
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/tsconfig.build.json",
+      "{workspaceRoot}/views/js/vite-config/index.cjs",
+      "{workspaceRoot}/yarn.lock",
+      "{projectRoot}/*.config.*",
+      "{projectRoot}/package.json",
+      "{projectRoot}/src/**/*",
+      "{projectRoot}/tsconfig.build.json",
+      "!{projectRoot}/**/*.spec.ts",
+      "!{projectRoot}/**/__tests__/**/*"
+    ],
+    "test": [
+      "production",
+      "{projectRoot}/**/*.spec.ts",
+      "{projectRoot}/**/__tests__/**/*"
+    ]
+  },
   "targetDefaults": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/lib"
-      ]
+      "inputs": ["production"],
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/lib"]
     },
     "build:dev": {
-      "dependsOn": [
-        "^build:dev"
-      ],
-      "outputs": [
-        "{projectRoot}/lib"
-      ]
+      "inputs": ["production"],
+      "dependsOn": ["^build:dev"],
+      "outputs": ["{projectRoot}/lib"]
+    },
+    "test:run": {
+      "inputs": ["test"]
+    },
+    "test:coverage": {
+      "inputs": ["test"],
+      "outputs": ["{projectRoot}/coverage"]
     }
   },
   "tasksRunnerOptions": {
@@ -29,7 +50,9 @@
       "options": {
         "cacheableOperations": [
           "build",
-          "build:dev"
+          "build:dev",
+          "test:run",
+          "test:coverage"
         ],
         "parallel": 10
       }
@@ -37,9 +60,7 @@
     "cloud": {
       "runner": "@nrwl/nx-cloud",
       "options": {
-        "cacheableOperations": [
-          "build"
-        ],
+        "cacheableOperations": ["build", "test:coverage"],
         "parallel": 10,
         "accessToken": "MzNmZGMyNzktM2YwOS00MzMzLThjMjctY2Q4ZjEwZWUwNGRifHJlYWQtd3JpdGU="
       }

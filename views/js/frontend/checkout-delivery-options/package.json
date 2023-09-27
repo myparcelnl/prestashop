@@ -6,9 +6,9 @@
   "scripts": {
     "build": "run ws:build \"$(pwd)\"",
     "build:dev": "run ws:build:dev \"$(pwd)\"",
-    "dev": "run ws:dev \"$(pwd)\"",
     "test": "run ws:test \"$(pwd)\"",
-    "test:watch": "run ws:test:watch \"$(pwd)\""
+    "test:coverage": "run ws:test:coverage \"$(pwd)\"",
+    "test:run": "run ws:test:run \"$(pwd)\""
   },
   "dependencies": {
     "@myparcel-pdk/checkout": "^1.0.0-alpha.1"

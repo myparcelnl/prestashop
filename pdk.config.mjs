@@ -8,7 +8,7 @@ export default defineConfig({
   source: [
     '!**/node_modules/**',
     'vendor/**/*',
-    'views/js/**/lib/**/*',
+    'views/js/**/dist/**/*',
     'config/**/*',
     'src/**/*',
     'CONTRIBUTING.md',

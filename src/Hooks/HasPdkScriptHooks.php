@@ -58,8 +58,8 @@ trait HasPdkScriptHooks
 
     private function loadCoreScripts(): void
     {
-        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout-core/lib/index.iife.js");
-        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-core/lib/style.css");
+        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout-core/dist/index.iife.js");
+        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-core/dist/style.css");
     }
 
     private function loadDeliveryOptionsScripts(): void
@@ -74,8 +74,8 @@ trait HasPdkScriptHooks
         );
 
         $this->context->controller->addJS(
-            "{$this->_path}views/js/frontend/checkout-delivery-options/lib/index.iife.js"
+            "{$this->_path}views/js/frontend/checkout-delivery-options/dist/index.iife.js"
         );
-        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-delivery-options/lib/style.css");
+        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-delivery-options/dist/style.css");
     }
 }

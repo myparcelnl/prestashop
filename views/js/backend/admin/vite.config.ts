@@ -1,20 +1,17 @@
-import {defineConfig} from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
+import {createViteConfig} from '@myparcel-prestashop/vite-config';
 
 /**
  * @see https://vitejs.dev/config/
  */
-export default defineConfig((env) => ({
+export default createViteConfig({
   build: {
-    emptyOutDir: false,
     lib: {
       entry: 'src/main.ts',
       fileName: 'index',
       formats: ['iife'],
       name: 'MyParcelAdmin',
     },
-    minify: env.mode !== 'development',
-    outDir: 'lib',
     rollupOptions: {
       external: ['vue'],
       output: {
@@ -25,19 +22,7 @@ export default defineConfig((env) => ({
         },
       },
     },
-    sourcemap: env.mode === 'development',
-  },
-
-  define: {
-    'process.env': {},
   },
 
   plugins: [vue()],
-
-  test: {
-    coverage: {
-      reporter: ['text', 'clover'],
-    },
-    environment: 'happy-dom',
-  },
-}));
+});

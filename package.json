@@ -9,7 +9,8 @@
     "views/js/**/*"
   ],
   "scripts": {
-    "build": "yarn prebuild && pdk-builder build",
+    "prebuild": "run translations:import && run download:carrier-logos",
+    "build": "run prebuild && run build:js",
     "build:js": "nx run-many --output-style=stream --target=build --runner=cloud",
     "build:js:dev": "nx run-many --output-style=stream --target=build:dev",
     "build:js:dev:backend": "yarn build:js:dev --projects='backend-*'",
@@ -19,7 +20,6 @@
     "docker:build": "docker build -t myparcelnl/woocommerce .",
     "docker:run": "docker run -it --rm -v $(pwd):/app myparcelnl/woocommerce",
     "download:carrier-logos": "pdk-builder download-carrier-logos",
-    "prebuild": "run translations:import && run download:carrier-logos && yarn build:js",
     "prepare": "is-ci || husky install",
     "test": "nx run-many --output-style=stream --target=test",
     "test:coverage": "nx run-many --output-style=stream --target=test:coverage",
