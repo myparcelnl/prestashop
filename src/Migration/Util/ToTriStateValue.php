@@ -1,12 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MyParcelNL\PrestaShop\Migration\Util;
+
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Types\Contract\TriStateServiceInterface;
+use MyParcelNL\Pdk\Types\Service\TriStateService;
 
 final class ToTriStateValue extends TransformValue
 {
-    public function __construct()
+    /**
+     * @var string
+     */
+    private $type;
+
+    public function __construct(string $type = TriStateService::TYPE_COERCED)
     {
         parent::__construct([$this, 'convert']);
+
+        $this->type = $type;
     }
 
     /**
@@ -16,8 +29,20 @@ final class ToTriStateValue extends TransformValue
      */
     protected function convert($value)
     {
-        $triStateService = Pdk::get(TriStateServiceInterface::class);
+        /** @var TriStateServiceInterface $service */
+        $service = Pdk::get(TriStateServiceInterface::class);
 
-        return $triStateService->cast($value);
+        switch ($this->type) {
+            case TriStateService::TYPE_COERCED:
+                return $service->coerce($value);
+
+            case TriStateService::TYPE_STRICT:
+                return $service->cast($value);
+
+            case TriStateService::TYPE_STRING:
+                return $service->coerceString($value);
+        }
+
+        return $value;
     }
 }

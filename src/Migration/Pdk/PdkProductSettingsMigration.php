@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use Generator;
+use MyParcelNL\Pdk\Base\Service\CountryCodes;
+use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\Settings\Model\ProductSettings;
+use MyParcelNL\Pdk\Types\Service\TriStateService;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
+use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
+use MyParcelNL\PrestaShop\Migration\Util\ToPackageTypeName;
+use MyParcelNL\PrestaShop\Migration\Util\ToTriStateValue;
+use MyParcelNL\PrestaShop\Migration\Util\TransformValue;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
+use MyParcelNL\Sdk\src\Support\Collection;
 
 final class PdkProductSettingsMigration extends AbstractPsPdkMigration
 {
-    private const LEGACY_PRODUCT_SETTINGS_MAP = [
-        'MYPARCELNL_PACKAGE_TYPE'       => 'packageType',
-        'MYPARCELNL_CUSTOMS_ORIGIN'     => 'countryOfOrigin',
-        'MYPARCELNL_CUSTOMS_CODE'       => 'customsCode',
-        'MYPARCELNL_INSURANCE'          => 'exportInsurance',
-        'MYPARCELNL_SIGNATURE_REQUIRED' => 'exportSignature',
-        'MYPARCELNL_RETURN_PACKAGE'     => 'exportReturn',
-        'MYPARCELNL_PACKAGE_FORMAT'     => 'exportLargeFormat',
-        'MYPARCELNL_ONLY_RECIPIENT'     => 'exportOnlyRecipient',
-        'MYPARCELNL_AGE_CHECK'          => 'exportAgeCheck',
-    ];
-
     /**
      * @var \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository
      */
@@ -45,7 +44,6 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
 
     /**
      * @return void
-     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      */
     public function up(): void
@@ -54,36 +52,115 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
     }
 
     /**
-     * @throws \PrestaShopDatabaseException
+     * @return \Generator<\MyParcelNL\PrestaShop\Migration\Util\MigratableValue>
+     */
+    private function getProductSettingsTransformationMap(): Generator
+    {
+        yield new MigratableValue(
+            'MYPARCELNL_PACKAGE_TYPE',
+            ProductSettings::PACKAGE_TYPE,
+            new ToPackageTypeName(TriStateService::INHERIT)
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_AGE_CHECK',
+            ProductSettings::EXPORT_AGE_CHECK,
+            new ToTriStateValue()
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_RECIPIENT_ONLY',
+            ProductSettings::EXPORT_ONLY_RECIPIENT,
+            new ToTriStateValue()
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_RETURN_PACKAGE',
+            ProductSettings::EXPORT_RETURN,
+            new ToTriStateValue()
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_SIGNATURE_REQUIRED',
+            ProductSettings::EXPORT_SIGNATURE,
+            new ToTriStateValue()
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_INSURANCE',
+            ProductSettings::EXPORT_INSURANCE,
+            new ToTriStateValue()
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_PACKAGE_FORMAT',
+            ProductSettings::EXPORT_LARGE_FORMAT,
+            new TransformValue(function ($value) {
+                switch ((int) $value) {
+                    case 1:
+                        return TriStateService::DISABLED;
+
+                    case 2:
+                        return TriStateService::ENABLED;
+
+                    default:
+                        return TriStateService::INHERIT;
+                }
+            })
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_CUSTOMS_CODE',
+            ProductSettings::CUSTOMS_CODE,
+            new ToTriStateValue(TriStateService::TYPE_STRING)
+        );
+
+        yield new MigratableValue(
+            'MYPARCELNL_CUSTOMS_ORIGIN',
+            ProductSettings::COUNTRY_OF_ORIGIN,
+            new TransformValue(function ($value) {
+                // Assume the user did not intend to set Afghanistan as the country of origin. It's the default value
+                // that is saved whenever the user saves any product, even without opening the module settings.
+                if (CountryCodes::CC_AF === $value) {
+                    return TriStateService::INHERIT;
+                }
+
+                return in_array($value, CountryCodes::ALL, true)
+                    ? $value
+                    : TriStateService::INHERIT;
+            })
+        );
+    }
+
+    /**
+     * @return void
      * @throws \Doctrine\ORM\ORMException
+     * @throws \PrestaShopDatabaseException
      */
     private function migrateProductSettings(): void
     {
-        $oldProductSettings = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION);
+        $allRows       = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION);
+        $rowsByProduct = $allRows->groupBy('id_product');
 
-        $productsWithSettings = [];
+        $rowsByProduct->each(function (Collection $rows, int $productId) {
+            if ($this->productSettingsRepository->findOneBy(['productId' => $productId])) {
+                Logger::info("Product settings for product $productId already exist, skipping");
 
-        foreach ($oldProductSettings as $oldProductSetting) {
-            if (! array_key_exists($oldProductSetting['name'], self::LEGACY_PRODUCT_SETTINGS_MAP)) {
-                continue;
+                return;
             }
 
-            $productsWithSettings[$oldProductSetting['id_product']][self::LEGACY_PRODUCT_SETTINGS_MAP[$oldProductSetting['name']]] =
-                $oldProductSetting['value'];
-        }
+            $oldSettings = $rows
+                ->pluck('value', 'name')
+                ->toArrayWithoutNull();
 
-        foreach ($productsWithSettings as $productId => $productSettings) {
-            $this->productSettingsRepository->updateOrCreate(
-                [
-                    'productId' => (int) $productId,
-                ],
-                [
-                    'data' => json_encode([
-                        'id'   => 'product',
-                        'data' => $productSettings,
-                    ]),
-                ]
-            );
-        }
+            $newSettings = $this->valueMigrator->transform($oldSettings, $this->getProductSettingsTransformationMap());
+
+            $this->productSettingsRepository->create([
+                'productId' => $productId,
+                'data'      => json_encode(['settings' => $newSettings]),
+            ]);
+        });
+
+        EntityManager::flush();
     }
 }

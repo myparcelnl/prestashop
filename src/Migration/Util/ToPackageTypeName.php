@@ -1,23 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MyParcelNL\PrestaShop\Migration\Util;
+
+use MyParcelNL\Pdk\Base\Support\Utils;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 
 final class ToPackageTypeName extends TransformValue
 {
-    public function __construct()
+    /**
+     * @var mixed
+     */
+    private $defaultValue;
+
+    /**
+     * @param  mixed $defaultValue
+     */
+    public function __construct($defaultValue = DeliveryOptions::DEFAULT_PACKAGE_TYPE_NAME)
     {
-        parent::__construct(static function ($value) {
-            if (is_numeric($value)) {
-                if (in_array((int) $value, DeliveryOptions::PACKAGE_TYPES_IDS, true)) {
-                    return array_flip(DeliveryOptions::PACKAGE_TYPES_NAMES_IDS_MAP)[$value];
-                }
+        parent::__construct([$this, 'convert']);
+        $this->defaultValue = $defaultValue;
+    }
 
-                return DeliveryOptions::DEFAULT_PACKAGE_TYPE_NAME;
-            }
-
-            return in_array($value, DeliveryOptions::PACKAGE_TYPES_NAMES, true)
-                ? $value
-                : DeliveryOptions::DEFAULT_PACKAGE_TYPE_NAME;
-        });
+    /**
+     * @param  mixed $value
+     *
+     * @return mixed
+     */
+    protected function convert($value)
+    {
+        return Utils::convertToName($value, DeliveryOptions::PACKAGE_TYPES_NAMES_IDS_MAP) ?? $this->defaultValue;
     }
 }
+

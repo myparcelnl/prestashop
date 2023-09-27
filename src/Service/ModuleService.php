@@ -114,6 +114,7 @@ final class ModuleService
     /**
      * @return void
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
+     * @noinspection PhpUnused
      */
     public function registerHooks(): void
     {

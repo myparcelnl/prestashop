@@ -15,6 +15,7 @@ use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
+use MyParcelNL\Sdk\src\Support\Arr;
 use Product;
 
 class PdkProductRepository extends AbstractPdkPdkProductRepository
@@ -68,7 +69,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
      */
     public function getProduct($identifier): PdkProduct
     {
-        return $this->retrieve('product_' . $identifier, function () use ($identifier) {
+        return $this->retrieve((string) $identifier, function () use ($identifier) {
             $psProduct = new Product($identifier);
             $translate = static function (array $strings) {
                 return $strings[Context::getContext()->language->id] ?? $strings[1] ?? reset($strings);
@@ -95,14 +96,12 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
      */
     public function getProductSettings($identifier): ProductSettings
     {
-        return $this->retrieve("product_settings_$identifier", function () use ($identifier) {
-            /** @var \MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings $psProductSettings */
-            $psProductSettings = $this->psProductRepository->findOneBy(['productId' => $identifier]);
-            $data              = $psProductSettings ? $psProductSettings->toArray() : [];
-            $parameters        = json_decode($data['data'] ?? '', true);
+        /** @var \MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings $psProductSettings */
+        $psProductSettings = $this->productSettingsRepository->findOneBy(['productId' => $identifier]);
 
-            return new ProductSettings($parameters);
-        });
+        $array = $psProductSettings ? $psProductSettings->toArray() : [];
+
+        return new ProductSettings(Arr::get($array, 'data.settings', []));
     }
 
     /**
@@ -130,9 +129,19 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
                 'productId' => (int) $product->externalIdentifier,
             ],
             [
-                'data' => json_encode($product->settings->toArray()),
+                'data' => json_encode($product->toStorableArray()),
             ]
         );
+
+        $this->save($product->externalIdentifier, $product);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getKeyPrefix(): string
+    {
+        return 'product_';
     }
 
     /**

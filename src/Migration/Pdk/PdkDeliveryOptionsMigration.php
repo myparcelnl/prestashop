@@ -12,6 +12,8 @@ use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
+use MyParcelNL\PrestaShop\Migration\Util\ToDeliveryTypeName;
+use MyParcelNL\PrestaShop\Migration\Util\ToPackageTypeName;
 use MyParcelNL\PrestaShop\Migration\Util\TransformValue;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 
@@ -67,25 +69,8 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
             })
         );
 
-        yield new MigratableValue(
-            'deliveryType',
-            DeliveryOptions::DELIVERY_TYPE,
-            new TransformValue(function ($value) {
-                return in_array($value, DeliveryOptions::DELIVERY_TYPES_NAMES, true)
-                    ? $value
-                    : DeliveryOptions::DEFAULT_DELIVERY_TYPE_NAME;
-            })
-        );
-
-        yield new MigratableValue(
-            'packageType',
-            DeliveryOptions::PACKAGE_TYPE,
-            new TransformValue(function ($value) {
-                return in_array($value, DeliveryOptions::PACKAGE_TYPES_NAMES, true)
-                    ? $value
-                    : DeliveryOptions::DEFAULT_PACKAGE_TYPE_NAME;
-            })
-        );
+        yield new MigratableValue('deliveryType', DeliveryOptions::DELIVERY_TYPE, new ToDeliveryTypeName());
+        yield new MigratableValue('packageType', DeliveryOptions::PACKAGE_TYPE, new ToPackageTypeName());
 
         yield new MigratableValue(
             'date',

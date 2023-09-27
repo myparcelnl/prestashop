@@ -175,6 +175,14 @@ abstract class OrderStateCore extends ObjectModel
 
 final class OrderState extends OrderStateCore { }
 
+/** @see \ProductCore */
+abstract class ProductCore extends ObjectModel
+{
+    protected $hasCustomIdKey = true;
+}
+
+final class Product extends ProductCore { }
+
 /** @see \RangePriceCore */
 abstract class RangePriceCore extends MockPsRangeObjectModel { }
 

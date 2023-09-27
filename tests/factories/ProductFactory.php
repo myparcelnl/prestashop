@@ -2,14 +2,26 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
+ * @see \ProductCore
+ * @method self withName(array $names)
  */
-final class LangFactory extends AbstractPsObjectModelFactory
+final class ProductFactory extends AbstractPsObjectModelFactory
 {
+    protected function createDefault(): FactoryInterface
+    {
+        return parent::createDefault()
+            ->withName([
+                1 => 'Test product',
+                2 => 'Test product 2',
+            ]);
+    }
+
     protected function getObjectModelClass(): string
     {
-        return Lang::class;
+        return Product::class;
     }
 }

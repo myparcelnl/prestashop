@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Util;
 
-final class TransformValue implements ValueModifierInterface
+class TransformValue implements ValueModifierInterface
 {
     /**
      * @var callable-string|callable
