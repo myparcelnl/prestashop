@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
+use InvalidArgumentException;
 use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
@@ -53,7 +54,13 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
             return $input;
         }
 
-        return new Order((int) $input);
+        $psOrder = new Order((int) $input);
+
+        if (! $psOrder->id) {
+            throw new InvalidArgumentException("Order with id $input not found");
+        }
+
+        return $psOrder;
     }
 
     /**

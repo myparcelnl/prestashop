@@ -29,6 +29,12 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
             /** @var $this $existing */
             $existing = MockPsObjectModels::get(static::class, $id);
 
+            if (! $existing) {
+                $this->setId(null);
+
+                return;
+            }
+
             $this->hydrate($existing->toArray());
         }
     }
@@ -160,11 +166,11 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
-     * @param  int $id
+     * @param  null|int $id
      *
      * @return $this
      */
-    protected function setId(int $id): self
+    protected function setId(?int $id): self
     {
         $this->setAttribute('id', $id);
 
@@ -172,11 +178,11 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
-     * @param  int $id
+     * @param  null|int $id
      *
      * @return $this
      */
-    private function setAdditionalId(int $id): MockPsObjectModel
+    private function setAdditionalId(?int $id): MockPsObjectModel
     {
         $idKey = $this->getAdditionalIdKey();
 
