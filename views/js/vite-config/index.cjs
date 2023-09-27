@@ -10,11 +10,14 @@ const createDefaultConfig = (env) => {
   const isDev = env.mode === 'development';
 
   return {
-    plugins: [customTsConfig()],
     build: {
       minify: !isDev,
       sourcemap: isDev,
     },
+    define: {
+      'process.env': {},
+    },
+    plugins: [customTsConfig()],
     test: {
       coverage: {
         reporter: ['text', 'clover'],
