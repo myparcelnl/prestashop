@@ -16,7 +16,6 @@ use MyParcelNL\PrestaShop\Hooks\HasPdkRenderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkScriptHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsCarrierHooks;
 use MyParcelNL\PrestaShop\Service\ModuleService;
-use PrestaShopBundle\Exception\InvalidModuleException;
 use function MyParcelNL\PrestaShop\bootPdk;
 
 defined('_PS_VERSION_') or exit();
@@ -97,22 +96,6 @@ class MyParcelNL extends CarrierModule
             'min' => Pdk::get('prestaShopVersionMin'),
             'max' => Pdk::get('prestaShopVersionMax'),
         ];
-    }
-
-    /**
-     * @return self
-     * @deprecated use Pdk::get('moduleInstance')
-     */
-    public static function getModule(): self
-    {
-        /** @var self|false $module */
-        $module = Module::getInstanceByName(self::MODULE_NAME);
-
-        if (! $module) {
-            throw new InvalidModuleException('Failed to get module instance');
-        }
-
-        return $module;
     }
 
     /**
