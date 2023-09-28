@@ -27,7 +27,7 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
     private $productSettingsRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Migration\Util\PsConfigurationDataMigrator
+     * @var DataMigrator
      */
     private $valueMigrator;
 
@@ -44,6 +44,7 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
 
     /**
      * @return void
+     * @throws \Doctrine\ORM\ORMException
      * @throws \PrestaShopDatabaseException
      */
     public function up(): void

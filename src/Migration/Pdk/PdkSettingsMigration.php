@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use DbQuery;
 use Generator;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -19,23 +20,14 @@ use MyParcelNL\Pdk\Settings\Model\LabelSettings;
 use MyParcelNL\Pdk\Settings\Model\OrderSettings;
 use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
+use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
-use MyParcelNL\PrestaShop\Migration\Util\PsConfigurationDataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\TransformValue;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
-use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
-use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
-use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 use Throwable;
 
 final class PdkSettingsMigration extends AbstractPsPdkMigration
 {
-    private const OLD_CARRIERS        = [
-        'postnl',
-        'dhlforyou',
-        'dhlparcelconnect',
-        'dhleuroplus',
-    ];
     private const WEEKDAY_SETTING_MAP = [
         'sundayCutoffTime',
         'mondayCutoffTime',
@@ -47,51 +39,25 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
     ];
 
     /**
-     * @var \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository
-     */
-    private $orderDataRepository;
-
-    /**
-     * @var \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository
-     */
-    private $orderShipmentRepository;
-
-    /**
      * @var \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository
      */
     private $pdkSettingsRepository;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository
-     */
-    private $productSettingsRepository;
-
-    /**
-     * @var \MyParcelNL\PrestaShop\Migration\Util\PsConfigurationDataMigrator
+     * @var \MyParcelNL\PrestaShop\Migration\Util\DataMigrator
      */
     private $valueMigrator;
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository              $orderDataRepository
-     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository          $orderShipmentRepository
      * @param  \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository $pdkSettingsRepository
-     * @param  \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository        $productSettingsRepository
-     * @param  \MyParcelNL\PrestaShop\Migration\Util\PsConfigurationDataMigrator    $valueMigrator
+     * @param  \MyParcelNL\PrestaShop\Migration\Util\DataMigrator                   $valueMigrator
      */
-    public function __construct(
-        PsOrderDataRepository       $orderDataRepository,
-        PsOrderShipmentRepository   $orderShipmentRepository,
-        PdkSettingsRepository       $pdkSettingsRepository,
-        PsProductSettingsRepository $productSettingsRepository,
-        PsConfigurationDataMigrator $valueMigrator
-    ) {
+    public function __construct(PdkSettingsRepository $pdkSettingsRepository, DataMigrator $valueMigrator)
+    {
         parent::__construct();
 
-        $this->orderDataRepository       = $orderDataRepository;
-        $this->orderShipmentRepository   = $orderShipmentRepository;
-        $this->pdkSettingsRepository     = $pdkSettingsRepository;
-        $this->productSettingsRepository = $productSettingsRepository;
-        $this->valueMigrator             = $valueMigrator;
+        $this->pdkSettingsRepository = $pdkSettingsRepository;
+        $this->valueMigrator         = $valueMigrator;
     }
 
     public function up(): void
@@ -269,46 +235,36 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
      */
     private function getMigratedCarrierSettings(): SettingsModelCollection
     {
-        $oldCarrierSettings  = $this->getAllRows($this->getCarrierConfigurationTable());
-        $carrierNamesAndIds  = [];
-        $transformedSettings = [];
+        $oldCarrierSettings = $this->getAllRows(self::LEGACY_TABLE_CARRIER_CONFIGURATION);
 
-        foreach ($oldCarrierSettings as $setting) {
-            if (! isset($setting['id_carrier'], $setting['name'], $setting['value'])) {
-                continue;
-            }
-
-            $id_carrier = $setting['id_carrier'];
-            $name       = $setting['name'];
-            $value      = $setting['value'];
-
-            if (! isset($transformedSettings[$id_carrier])) {
-                $transformedSettings[$id_carrier] = [];
-            }
-
-            if ('carrierType' === $name) {
-                $carrierNamesAndIds[$value] = $id_carrier;
-            }
-
-            $transformedSettings[$id_carrier][] = $setting;
-        }
-
-        $oldCarrierSettings = [];
-
-        foreach ($carrierNamesAndIds as $name => $id_carrier) {
-            $oldCarrierSettings[$name] = $transformedSettings[$id_carrier];
-        }
+        $carriers = $oldCarrierSettings->where('name', 'carrierType')
+            ->pluck('value', 'id_carrier');
 
         $newCarrierSettings = new SettingsModelCollection();
 
-        foreach (self::OLD_CARRIERS as $carrier) {
-            $settings    = $oldCarrierSettings[$carrier] ?? [];
-            $transformed = $this->valueMigrator->transform($settings, $this->getCarrierSettingsTransformationMap());
+        $carriers->each(
+            function (string $carrierName, int $psCarrierId) use ($newCarrierSettings, $oldCarrierSettings) {
+                $oldSettings = $oldCarrierSettings
+                    ->where('id_carrier', $psCarrierId)
+                    ->pluck('value', 'name')
+                    ->toArray();
 
-            $transformed['dropOffPossibilities'] = $this->transformDropOffPossibilities($settings);
+                $migratedSettings = $this->valueMigrator->transform(
+                    $oldSettings,
+                    $this->getCarrierSettingsTransformationMap()
+                );
 
-            $newCarrierSettings->put($carrier, $transformed);
-        }
+                $newDropOffPossibilities = $this->transformDropOffPossibilities($oldSettings);
+
+                $newCarrierSettings->put(
+                    $carrierName,
+                    array_merge(
+                        $migratedSettings,
+                        [CarrierSettings::DROP_OFF_POSSIBILITIES => $newDropOffPossibilities]
+                    )
+                );
+            }
+        );
 
         return $newCarrierSettings;
     }
@@ -479,21 +435,17 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
      */
     private function transformDropOffPossibilities(array $oldSettings): array
     {
-        $dropOffDaysAsString = $this->valueMigrator->getValue('dropOffDays', $oldSettings, '');
+        $dropOffDaysAsString = Arr::get($oldSettings, 'dropOffDays') ?? '';
         $dropOffDays         = explode(',', $dropOffDaysAsString);
 
-        $sameDayDeliveryCutoffTime = $this->valueMigrator->getValue(
-            'sameDayDeliveryCutoffTime',
-            $oldSettings,
-            Pdk::get('defaultCutoffTimeSameDay')
-        );
+        $sameDayCutoffTime = Arr::get($oldSettings, 'sameDayDeliveryCutoffTime', Pdk::get('defaultCutoffTimeSameDay'));
 
         return [
             'dropOffDays' => array_map(
-                function (int $weekday) use ($oldSettings, $sameDayDeliveryCutoffTime, $dropOffDays) {
-                    $cutoffTime = $this->valueMigrator->getValue(
-                        self::WEEKDAY_SETTING_MAP[$weekday],
+                static function (int $weekday) use ($oldSettings, $sameDayCutoffTime, $dropOffDays) {
+                    $cutoffTime = Arr::get(
                         $oldSettings,
+                        self::WEEKDAY_SETTING_MAP[$weekday],
                         Pdk::get('defaultCutoffTime')
                     );
 
@@ -501,7 +453,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
                         'weekday'           => $weekday,
                         'dispatch'          => in_array((string) $weekday, $dropOffDays, true),
                         'cutoffTime'        => $cutoffTime,
-                        'sameDayCutoffTime' => $sameDayDeliveryCutoffTime,
+                        'sameDayCutoffTime' => $sameDayCutoffTime,
                     ];
                 },
                 array_keys(self::WEEKDAY_SETTING_MAP)
