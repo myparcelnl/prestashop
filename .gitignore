@@ -8,6 +8,7 @@ docker-compose.override.yml
 *.log.*
 *.tgz
 *.zip
+coverage.xml
 
 coverage/
 dist/
