@@ -6,6 +6,5 @@
       "@myparcel-prestashop/backend-*": ["./views/js/backend/*/src"]
     }
   },
-  "include": ["./**/*"],
-  "exclude": ["**/*.snap"]
+  "include": ["./**/*"]
 }

@@ -20,9 +20,8 @@
   "devDependencies": {
     "@myparcel-pdk/admin-component-tests": "^1.0.0-alpha.1",
     "@vitejs/plugin-vue": "^4.0.0",
-    "@vue/tsconfig": "^0.1.3",
     "autoprefixer": "^10.4.14",
-    "happy-dom": "^12.0.0",
+    "happy-dom": "^12.2.1",
     "postcss": "^8.4.21",
     "rollup-plugin-analyzer": "^4.0.0",
     "sass": "^1.58.2",
