@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "vendor/bin/pest",
-    "test:coverage": "php -dpcov.enabled=1 vendor/bin/pest --coverage-clover=coverage.xml --coverage-html=coverage"
+    "test:coverage": "php -dpcov.enabled=1 vendor/bin/pest --coverage-clover=clover.xml --coverage-html=coverage"
   },
   "config": {
     "prepend-autoloader": false,

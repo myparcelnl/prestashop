@@ -8,7 +8,7 @@ docker-compose.override.yml
 *.log.*
 *.tgz
 *.zip
-coverage.xml
+clover.xml
 
 coverage/
 dist/
