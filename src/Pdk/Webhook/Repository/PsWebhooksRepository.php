@@ -10,19 +10,19 @@ use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\Pdk\Webhook\Collection\WebhookSubscriptionCollection;
 use MyParcelNL\Pdk\Webhook\Model\WebhookSubscription;
 use MyParcelNL\Pdk\Webhook\Repository\WebhookSubscriptionRepository;
-use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 
 class PsWebhooksRepository extends AbstractPdkWebhooksRepository
 {
     /**
-     * @var \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface
+     * @var \MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface
      */
     private $configurationService;
 
     public function __construct(
-        StorageInterface              $storage,
-        WebhookSubscriptionRepository $subscriptionRepository,
-        ConfigurationServiceInterface $configurationService
+        StorageInterface                $storage,
+        WebhookSubscriptionRepository   $subscriptionRepository,
+        PsConfigurationServiceInterface $configurationService
     ) {
         parent::__construct($storage, $subscriptionRepository);
         $this->configurationService = $configurationService;

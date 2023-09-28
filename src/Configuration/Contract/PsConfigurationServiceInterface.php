@@ -10,7 +10,7 @@ use PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint;
  * This is an interface for PrestaShop's configuration service as they currently have multiple legacy implementations
  * and there will be a new one in PrestaShop 8.
  */
-interface ConfigurationServiceInterface
+interface PsConfigurationServiceInterface
 {
     /**
      * Delete a configuration entry.

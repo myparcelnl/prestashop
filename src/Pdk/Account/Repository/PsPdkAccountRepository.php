@@ -10,28 +10,28 @@ use MyParcelNL\Pdk\App\Account\Repository\AbstractPdkAccountRepository;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
-use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 
 final class PsPdkAccountRepository extends AbstractPdkAccountRepository
 {
     private const STORAGE_KEY_ACCOUNT = 'data_account';
 
     /**
-     * @var \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface
+     * @var \MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface
      */
     private $configurationService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                           $storage
-     * @param  \MyParcelNL\Pdk\Account\Repository\AccountRepository                        $accountRepository
-     * @param  \MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface               $settingsRepository
-     * @param  \MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface $configurationService
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                             $storage
+     * @param  \MyParcelNL\Pdk\Account\Repository\AccountRepository                          $accountRepository
+     * @param  \MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface                 $settingsRepository
+     * @param  \MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface $configurationService
      */
     public function __construct(
-        StorageInterface              $storage,
-        AccountRepository             $accountRepository,
-        SettingsRepositoryInterface   $settingsRepository,
-        ConfigurationServiceInterface $configurationService
+        StorageInterface                $storage,
+        AccountRepository               $accountRepository,
+        SettingsRepositoryInterface     $settingsRepository,
+        PsConfigurationServiceInterface $configurationService
     ) {
         parent::__construct($storage, $accountRepository, $settingsRepository);
         $this->configurationService = $configurationService;

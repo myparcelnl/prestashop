@@ -25,8 +25,8 @@ use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
-use MyParcelNL\PrestaShop\Configuration\Contract\ConfigurationServiceInterface;
-use MyParcelNL\PrestaShop\Configuration\Service\Ps17ConfigurationService;
+use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Configuration\Service\Ps17PsConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration;
@@ -123,32 +123,31 @@ return [
     FrontendEndpointServiceInterface::class     => get(PsFrontendEndpointService::class),
     BackendEndpointServiceInterface::class      => get(PsBackendEndpointService::class),
 
-    ConfigurationServiceInterface::class  => get(Ps17ConfigurationService::class),
-
     /**
      * Webhooks
      */
-    PdkWebhookServiceInterface::class     => get(PsWebhookService::class),
-    PdkWebhooksRepositoryInterface::class => get(PsWebhooksRepository::class),
+    PdkWebhookServiceInterface::class           => get(PsWebhookService::class),
+    PdkWebhooksRepositoryInterface::class       => get(PsWebhooksRepository::class),
 
     /**
      * Actions
      */
-    UpdateAccountAction::class            => get(PsUpdateAccountAction::class),
+    UpdateAccountAction::class                  => get(PsUpdateAccountAction::class),
 
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class         => get(Guzzle7ClientAdapter::class),
-    InstallerServiceInterface::class      => get(PsInstallerService::class),
-    LoggerInterface::class                => get(PsLogger::class),
-    MigrationServiceInterface::class      => get(PsMigrationService::class),
-    ScriptServiceInterface::class         => get(PsScriptService::class),
+    ClientAdapterInterface::class               => get(Guzzle7ClientAdapter::class),
+    InstallerServiceInterface::class            => get(PsInstallerService::class),
+    LoggerInterface::class                      => get(PsLogger::class),
+    MigrationServiceInterface::class            => get(PsMigrationService::class),
+    ScriptServiceInterface::class               => get(PsScriptService::class),
 
     /**
      * Custom services
      */
-    PsCarrierServiceInterface::class      => get(PsCarrierService::class),
-    PsOrderServiceInterface::class        => get(PsOrderService::class),
-    PsRouterServiceInterface::class       => get(PsRouterService::class),
+    PsConfigurationServiceInterface::class      => get(Ps17PsConfigurationService::class),
+    PsCarrierServiceInterface::class            => get(PsCarrierService::class),
+    PsOrderServiceInterface::class              => get(PsOrderService::class),
+    PsRouterServiceInterface::class             => get(PsRouterService::class),
 ];
