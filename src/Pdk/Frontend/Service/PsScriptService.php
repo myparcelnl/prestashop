@@ -10,6 +10,15 @@ use MyParcelNL\Pdk\Frontend\Service\ScriptService;
 
 final class PsScriptService extends ScriptService
 {
+    public const LIB_VUE_DEMI = 'vue-demi';
+    public const LIB_VUE      = 'vue';
+
+    /**
+     * @param  \AdminControllerCore $controller
+     * @param  string               $path
+     *
+     * @return void
+     */
     public function addForAdminHeader(AdminControllerCore $controller, string $path): void
     {
         $this->addVue($controller, Pdk::get('vueVersion'));
@@ -27,6 +36,30 @@ final class PsScriptService extends ScriptService
     }
 
     /**
+     * @param  string $package
+     * @param  string $version
+     *
+     * @return null|string
+     */
+    public function getCdnUrl(string $package, string $version): ?string
+    {
+        switch ($package) {
+            case self::LIB_VUE:
+                $isVue3 = version_compare($version, '3.0.0', '>=');
+                $file   = $isVue3 ? 'vue.global' : 'vue';
+
+                return $this->createCdnUrl(self::LIB_VUE, $version, Pdk::isDevelopment() ? "$file.js" : "$file.min.js");
+
+            case self::LIB_VUE_DEMI:
+                $filename = Pdk::isDevelopment() ? 'index.iife.js' : 'index.iife.min.js';
+
+                return $this->createCdnUrl(self::LIB_VUE_DEMI, $version, $filename);
+        }
+
+        return null;
+    }
+
+    /**
      * @param  \AdminControllerCore $controller
      * @param  string               $version
      *
@@ -34,11 +67,7 @@ final class PsScriptService extends ScriptService
      */
     protected function addVue(AdminControllerCore $controller, string $version): void
     {
-        $isVue3   = version_compare($version, '3.0.0', '>=');
-        $file     = $isVue3 ? 'vue.global' : 'vue';
-        $filename = Pdk::isDevelopment() ? "$file.js" : "$file.min.js";
-
-        $controller->addJS($this->createCdnUrl('vue', $version, $filename), false);
+        $controller->addJS($this->getCdnUrl(self::LIB_VUE, $version), false);
     }
 
     /**
@@ -49,8 +78,6 @@ final class PsScriptService extends ScriptService
      */
     protected function addVueDemi(AdminControllerCore $controller, string $version): void
     {
-        $filename = Pdk::isDevelopment() ? 'index.iife.js' : 'index.iife.min.js';
-
-        $controller->addJS($this->createCdnUrl('vue-demi', $version, $filename), false);
+        $controller->addJS($this->getCdnUrl(self::LIB_VUE_DEMI, $version), false);
     }
 }
