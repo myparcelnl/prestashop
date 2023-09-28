@@ -4,7 +4,7 @@
   "npmScope": "myparcel-prestashop",
   "workspaceLayout": {
     "appsDir": "views",
-    "libsDir": "views"
+    "distsDir": "views"
   },
   "namedInputs": {
     "production": [
@@ -29,12 +29,12 @@
     "build": {
       "inputs": ["production"],
       "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/lib"]
+      "outputs": ["{projectRoot}/dist"]
     },
     "build:dev": {
       "inputs": ["production"],
       "dependsOn": ["^build:dev"],
-      "outputs": ["{projectRoot}/lib"]
+      "outputs": ["{projectRoot}/dist"]
     },
     "test:run": {
       "inputs": ["test"]
