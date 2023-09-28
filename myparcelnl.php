@@ -164,13 +164,7 @@ class MyParcelNL extends CarrierModule
      */
     private function getBaseUrl(): string
     {
-        // todo
         return $this->context->link->getAdminLink('AdminModules');
-        //            [
-        //                'configure'   => $this->name,
-        //                'tab_module'  => $this->tab,
-        //                'module_name' => $this->name,
-        //            ]
     }
 
     /**
