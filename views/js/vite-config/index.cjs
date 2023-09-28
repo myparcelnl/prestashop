@@ -14,16 +14,14 @@ const createDefaultConfig = (env) => {
       minify: !isDev,
       sourcemap: isDev,
     },
-    define: {
-      'process.env': {},
-    },
     plugins: [customTsConfig()],
     test: {
+      passWithNoTests: true,
       coverage: {
+        all: true,
+        enabled: false,
         reporter: ['text', 'clover'],
       },
-      environment: 'happy-dom',
-      passWithNoTests: true,
     },
   };
 };

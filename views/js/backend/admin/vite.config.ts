@@ -5,24 +5,31 @@ import {createViteConfig} from '@myparcel-prestashop/vite-config';
  * @see https://vitejs.dev/config/
  */
 export default createViteConfig({
+  plugins: [vue()],
+
   build: {
     lib: {
-      entry: 'src/main.ts',
+      name: 'MyParcelPrestaShopAdmin',
       fileName: 'index',
+      entry: 'src/main.ts',
       formats: ['iife'],
-      name: 'MyParcelAdmin',
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'vue-demi'],
       output: {
         globals: {
           vue: 'Vue',
-          pinia: 'Pinia',
-          '@tanstack/vue-query': 'VueQuery',
+          'vue-demi': 'VueDemi',
         },
       },
     },
   },
 
-  plugins: [vue()],
+  define: {
+    'process.env': {},
+  },
+
+  test: {
+    environment: 'happy-dom',
+  },
 });
