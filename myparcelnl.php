@@ -37,26 +37,6 @@ class MyParcelNL extends CarrierModule
     use HasPsCarrierHooks;
 
     /**
-     * @deprecated
-     */
-    public const MODULE_NAME = 'myparcelnl';
-    /**
-     * @deprecated
-     */
-    public const TRANSLATION_DOMAIN = 'Modules.MyParcelNL.Admin';
-
-    /**
-     * * @deprecated
-     */
-    public $baseUrl;
-
-    /**
-     * @var int
-     * @deprecated
-     */
-    public $id_carrier;
-
-    /**
      * @var int
      */
     private $installSuccess = 1;
