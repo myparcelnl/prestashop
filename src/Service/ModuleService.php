@@ -112,6 +112,14 @@ final class ModuleService
     }
 
     /**
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return Module::isEnabled($this->getInstance()->name);
+    }
+
+    /**
      * @return void
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      * @noinspection PhpUnused
