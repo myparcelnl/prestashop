@@ -1,7 +1,8 @@
+import {type MyParcel} from '@myparcel/delivery-options';
 import {useCarrierData} from './useCarrierData';
 
 export interface ShippingMethod {
-  carrier: string;
+  carrier: MyParcel.CarrierIdentifier;
   input: JQuery;
   row: JQuery;
   value: string;

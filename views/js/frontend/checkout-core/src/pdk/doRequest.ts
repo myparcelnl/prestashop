@@ -1,4 +1,9 @@
-export const doRequest = async (endpoint: any) => {
+import {type FrontendEndpointResponse} from '@myparcel-pdk/checkout-core';
+import {type FrontendEndpoint, type FrontendPdkEndpointObject} from '@myparcel-pdk/checkout-common';
+
+export const doRequest = async <E extends FrontendEndpoint>(
+  endpoint: FrontendPdkEndpointObject[E] & {baseUrl: string},
+): Promise<FrontendEndpointResponse<E>> => {
   const query = new URLSearchParams(endpoint.parameters).toString();
 
   const response = await window.fetch(`${endpoint.baseUrl}/${endpoint.path}?${query}`, {
@@ -7,7 +12,7 @@ export const doRequest = async (endpoint: any) => {
   });
 
   if (response.ok) {
-    return response;
+    return response as FrontendEndpointResponse<E>;
   }
 
   throw new Error('Request failed');

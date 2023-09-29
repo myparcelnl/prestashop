@@ -1,7 +1,8 @@
+import {type ShippingMethod} from '@myparcel-prestashop/frontend-checkout-core';
+import {type DeliveryOptionsStoreState} from '@myparcel-pdk/checkout';
 import {getDefaultDeliveryOptionsConfig} from './getDefaultDeliveryOptionsConfig';
 
-// @ts-expect-error todo
-export const toggleDeliveryOptions = (shippingMethod) => {
+export const toggleDeliveryOptions = (shippingMethod: ShippingMethod): Partial<DeliveryOptionsStoreState> => {
   if (!shippingMethod) {
     return {enabled: false};
   }

@@ -1,5 +1,7 @@
+import {type MyParcel} from '@myparcel/delivery-options';
+
 interface CarrierData {
-  carrier: string;
+  carrier: MyParcel.CarrierIdentifier;
   row: JQuery;
 }
 
