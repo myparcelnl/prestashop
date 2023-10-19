@@ -881,8 +881,8 @@ __metadata:
   linkType: hard
 
 "@myparcel-pdk/app-builder@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.44
-  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-alpha.44"
+  version: 1.0.0-alpha.45
+  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-alpha.45"
   dependencies:
     "@edielemoine/google-docs-importer": ^1.1.1
     "@yarnpkg/parsers": ^3.0.0-rc.48.1
@@ -896,7 +896,7 @@ __metadata:
     supports-color: ^9.3.1
   bin:
     pdk-builder: ./bin/index.js
-  checksum: b83cadfeab8e1b9aebcf5be85e7096f5252574de6bac5c40de440bc185612e72a8dd29f82435c6503ebf159812675444cb3a3fabe439aee628c541f163f975ac
+  checksum: 5c15f0cf72aa97d9b10ae6d22a31f81e9ae23746041e14b6c010c65410b5a93b1219f308c447e99cb5fcf8cd3e539499428553e732ac7aa9729df3b3fc415d1b
   languageName: node
   linkType: hard
 
@@ -1040,6 +1040,7 @@ __metadata:
     array.prototype.flatmap: ^1.3.1
     eslint: ^8.44.0
     eslint-plugin-sort-exports: ^0.8.0
+    fast-glob: ^3.3.1
     husky: ^8.0.3
     is-ci: ^3.0.1
     lint-staged: ^13.1.2
@@ -5419,7 +5420,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.12, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0":
+"fast-glob@npm:^3.2.12, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0, fast-glob@npm:^3.3.1":
   version: 3.3.1
   resolution: "fast-glob@npm:3.3.1"
   dependencies:
