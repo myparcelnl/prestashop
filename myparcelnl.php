@@ -37,11 +37,6 @@ class MyParcelNL extends CarrierModule
     use HasPsCarrierHooks;
 
     /**
-     * @var int
-     */
-    private $installSuccess = 1;
-
-    /**
      * @throws \Throwable
      */
     public function __construct()
