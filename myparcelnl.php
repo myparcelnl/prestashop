@@ -37,6 +37,11 @@ class MyParcelNL extends CarrierModule
     use HasPsCarrierHooks;
 
     /**
+     * @var bool
+     */
+    private $hasPdk;
+
+    /**
      * @throws \Throwable
      */
     public function __construct()
@@ -51,26 +56,17 @@ class MyParcelNL extends CarrierModule
         $this->author_uri    = 'https://myparcel.nl';
         $this->need_instance = 1;
         $this->bootstrap     = true;
-        $this->displayName   = 'MyParcel';
+        $this->displayName   = 'MyParcelNL';
         $this->description   = 'MyParcel';
 
         parent::__construct();
 
-        bootPdk(
-            $this->name,
-            $this->displayName,
-            $this->version,
-            $this->getLocalPath(),
-            $this->getBaseUrl(),
-            _PS_MODE_DEV_ ? PdkInstance::MODE_DEVELOPMENT : PdkInstance::MODE_PRODUCTION
-        );
-
-        $this->tab = Pdk::get('moduleTabName');
-
-        $this->ps_versions_compliancy = [
-            'min' => Pdk::get('prestaShopVersionMin'),
-            'max' => Pdk::get('prestaShopVersionMax'),
-        ];
+        try {
+            $this->setup();
+        } catch (Throwable $e) {
+            $this->_errors[] = sprintf('Failed to instantiate module: %s', $e->getMessage());
+            $this->hasPdk    = false;
+        }
     }
 
     /**
@@ -81,6 +77,10 @@ class MyParcelNL extends CarrierModule
      */
     public function getContent(): string
     {
+        if (! $this->hasPdk) {
+            return '';
+        }
+
         $link = $this->context->link->getAdminLink(Pdk::get('legacyControllerSettings'));
 
         Tools::redirectAdmin($link);
@@ -96,6 +96,10 @@ class MyParcelNL extends CarrierModule
      */
     public function getOrderShippingCost($params, $shipping_cost)
     {
+        if (! $this->hasPdk) {
+            return 0;
+        }
+
         /** @var \MyParcelNL\PrestaShop\Service\ModuleService $moduleService */
         $moduleService = Pdk::get(ModuleService::class);
 
@@ -117,10 +121,11 @@ class MyParcelNL extends CarrierModule
      */
     public function install(): bool
     {
-        return parent::install()
-            && $this->withErrorHandling(function () {
-                Installer::install($this);
-            });
+        if (! $this->hasPdk) {
+            return false;
+        }
+
+        return parent::install() && $this->withErrorHandling(function () { Installer::install($this); });
     }
 
     /**
@@ -128,10 +133,7 @@ class MyParcelNL extends CarrierModule
      */
     public function uninstall(): bool
     {
-        return $this->withErrorHandling(function () {
-                Installer::uninstall($this);
-            })
-            && parent::uninstall();
+        return $this->withErrorHandling(function () { Installer::uninstall($this); }) && parent::uninstall();
     }
 
     /**
@@ -154,19 +156,49 @@ class MyParcelNL extends CarrierModule
     }
 
     /**
-     * @param  callable $callback
+     * @return void
+     * @throws \Exception
+     */
+    private function setup(): void
+    {
+        bootPdk(
+            $this->name,
+            $this->displayName,
+            $this->version,
+            $this->getLocalPath(),
+            $this->getBaseUrl(),
+            _PS_MODE_DEV_ ? PdkInstance::MODE_DEVELOPMENT : PdkInstance::MODE_PRODUCTION
+        );
+
+        $this->tab = Pdk::get('moduleTabName');
+
+        $this->ps_versions_compliancy = [
+            'min' => Pdk::get('prestaShopVersionMin'),
+            'max' => Pdk::get('prestaShopVersionMax'),
+        ];
+
+        $this->hasPdk = true;
+    }
+
+    /**
+     * @param  callable    $callback
+     * @param  null|string $message
      *
      * @return bool
      */
-    private function withErrorHandling(callable $callback): bool
+    private function withErrorHandling(callable $callback, ?string $message = null): bool
     {
+        if (! $this->hasPdk) {
+            return false;
+        }
+
         try {
             $callback();
 
             return true;
         } catch (Throwable $e) {
             Logger::error("An error occurred: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
-            $this->_errors[] = $e->getMessage();
+            $this->_errors[] = $message ?? $e->getMessage();
 
             return false;
         }
