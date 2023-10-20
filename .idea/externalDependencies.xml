@@ -6,7 +6,6 @@
     <plugin id="com.kalessil.phpStorm.phpInspectionsEA" />
     <plugin id="com.pestphp.pest-intellij" />
     <plugin id="de.espend.idea.php.annotation" />
-    <plugin id="fr.adrienbrault.idea.symfony2plugin" />
     <plugin id="org.jetbrains.plugins.vue" />
   </component>
 </project>

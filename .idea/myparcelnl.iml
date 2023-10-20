@@ -387,12 +387,36 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
       <excludeFolder url="file://$MODULE_DIR$/upgrade" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/myparcelnl/pdk" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/fidry/console" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/humbug/php-scoper" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/jetbrains/phpstorm-stubs" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/nikic/php-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/event-dispatcher-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/filesystem" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/finder" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/polyfill-intl-grapheme" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/polyfill-intl-normalizer" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/polyfill-php81" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/symfony/string" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/thecodingmachine/safe" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache/php-scoper/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludePattern pattern="lib" />
       <excludePattern pattern="dist" />
       <excludePattern pattern="cache" />
       <excludePattern pattern="coverage" />
       <excludePattern pattern=".yarn" />
     </content>
+    <content url="file://$MODULE_DIR$/dist" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
