@@ -1,5 +1,6 @@
 {
     "externalIdentifier": "1",
+    "referenceIdentifier": "PrestaShop: 1",
     "deliveryOptions": {
         "carrier": {
             "id": 1,
@@ -44,7 +45,9 @@
         "weight": 0
     },
     "physicalProperties": {
-        "weight": 0
+        "initialWeight": 0,
+        "manualWeight": -1,
+        "totalWeight": 0
     },
     "lines": [],
     "exported": false,

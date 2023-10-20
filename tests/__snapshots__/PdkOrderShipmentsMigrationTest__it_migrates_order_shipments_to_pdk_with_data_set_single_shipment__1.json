@@ -54,7 +54,9 @@
         "isReturn": false,
         "partnerTrackTraces": [],
         "physicalProperties": {
-            "weight": 0
+            "initialWeight": 0,
+            "manualWeight": -1,
+            "totalWeight": 0
         },
         "price": {
             "amount": 0,
