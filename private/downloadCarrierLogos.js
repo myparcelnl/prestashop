@@ -1,7 +1,7 @@
 import {FetchClient, GetCarriers, createPublicSdk} from '@myparcel/sdk';
+import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
-import fetch from 'node-fetch';
 import sharp from 'sharp';
 
 // eslint-disable-next-line no-underscore-dangle

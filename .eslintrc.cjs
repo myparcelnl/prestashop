@@ -37,7 +37,7 @@ module.exports = {
       },
     },
     {
-      files: ['./**/*.js', './**/*.cjs', './**/*.mjs', './*.js', './*.cjs', './*.mjs'],
+      files: ['*.js', '*.cjs', '*.mjs'],
       parserOptions: {
         sourceType: 'module',
       },

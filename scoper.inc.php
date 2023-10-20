@@ -6,7 +6,7 @@ use Isolated\Symfony\Component\Finder\Finder;
 
 // For more see: https://github.com/humbug/php-scoper/blob/master/docs/configuration.md
 return [
-    'prefix'  => 'MyParcelNL',
+    'prefix'  => '_MyParcelNL' . bin2hex(random_bytes(8)),
     'finders' => [
         Finder::create()
             ->append([

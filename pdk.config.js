@@ -5,10 +5,10 @@ import {
   executePromises,
   getPlatformDistPath,
 } from '@myparcel-pdk/app-builder';
-import {downloadCarrierLogos} from './private/downloadCarrierLogos.mjs';
+import {downloadCarrierLogos} from './private/downloadCarrierLogos.js';
 import fs from 'fs';
-import path from 'path';
 import glob from 'fast-glob';
+import path from 'path';
 
 export default defineConfig({
   name: 'prestashop',
@@ -16,6 +16,8 @@ export default defineConfig({
   platforms: [PdkPlatformName.MyParcelNl, PdkPlatformName.MyParcelBe],
   source: [
     '!**/node_modules/**',
+    // Exclude autoload.php to regenerate it with a new hash
+    '!.cache/build/vendor/autoload.php',
     '.cache/build/composer.json',
     '.cache/build/config/**/*',
     '.cache/build/controllers/**/*',
@@ -25,7 +27,9 @@ export default defineConfig({
     '.cache/build/vendor/**/*',
     'mails/**/*',
     'private/carrier-logos/**/*',
+    'views/PrestaShop/**/*',
     'views/js/**/dist/**/*',
+    'views/templates/**/*',
     'CONTRIBUTING.md',
     'LICENSE.txt',
     'README.md',
@@ -76,13 +80,6 @@ export default defineConfig({
           ],
           {stdio: 'inherit'},
         );
-
-        await executeCommand(
-          args.context,
-          'composer',
-          ['dump-autoload', '--working-dir=.cache/build', '--classmap-authoritative'],
-          {stdio: 'inherit'},
-        );
       }
 
       debug('Finished prefixing build files.');
@@ -112,11 +109,37 @@ export default defineConfig({
             }),
           );
 
-          await fs.promises.rm(`${platformDistPath}/.cache`, {recursive: true});
+          if (!args.dryRun) {
+            await fs.promises.rm(`${platformDistPath}/.cache`, {recursive: true});
+          }
         }),
       );
 
       debug('Copied scoped build files to root.');
+    },
+
+    async afterTransform(args) {
+      const {config, debug, env} = args.context;
+
+      await Promise.all(
+        config.platforms.map(async (platform) => {
+          debug(`Dumping composer autoloader for platform ${platform}...`);
+
+          const distPath = getPlatformDistPath({...args.context, platform});
+          const relativeDistPath = path.relative(env.cwd, distPath);
+
+          if (!args.dryRun) {
+            await executeCommand(
+              args.context,
+              'composer',
+              ['dump-autoload', `--working-dir=${relativeDistPath}`, '--classmap-authoritative'],
+              {stdio: 'inherit'},
+            );
+          }
+        }),
+      );
+
+      debug('Dumped composer autoloader for all platforms.');
     },
   },
 });
