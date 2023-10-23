@@ -24,10 +24,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup
-        with:
-          composer-flags: --no-dev
-
       - uses: ./.github/actions/build
         id: build
         with:

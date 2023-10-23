@@ -1,10 +1,25 @@
 name: 'Create build'
 description: ''
 
+inputs:
+  php-scoper-version:
+    description: 'PHP Scoper Version'
+    required: true
+
+outputs:
+  token:
+    description: 'GitHub Token'
+    value: ${{ steps.credentials.outputs.token }}
+
+  image:
+    description: 'Docker image to use'
+    value: ${{ steps.setup.outputs.image }}
+
 runs:
   using: composite
   steps:
     - uses: ./.github/actions/setup
+      id: setup
       with:
         composer-flags: --no-dev
 
