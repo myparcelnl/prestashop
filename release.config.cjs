@@ -28,7 +28,7 @@ module.exports = {
     addReleaseNotesGeneratorPlugin({header: path.resolve(__dirname, `private/semantic-release/header-${branch}.md`)}),
     addChangelogPlugin(),
     addExecPlugin({
-      prepareCmd: 'yarn pdk-builder release --version ${nextRelease.version} -vvv',
+      prepareCmd: `yarn pdk-builder release --root-command "${process.env.PDK_ROOT_COMMAND}" --version $\{nextRelease.version} -vvv`,
     }),
     addGitHubPlugin({
       assets: [
