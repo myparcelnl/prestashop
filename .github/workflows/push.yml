@@ -17,8 +17,6 @@ jobs:
 
   build:
     runs-on: ubuntu-22.04
-    needs:
-      - test
     steps:
       - uses: actions/checkout@v3
         with:
@@ -34,18 +32,20 @@ jobs:
         #language=sh
         run: |
           version=$(npm pkg get version | sed 's/"//g')
-          releaseVersion="$version-${{ github.sha }}"
+          commitsSinceTag=$(git log --oneline v$version.. | wc -l)
+          releaseVersion="$version-$commitsSinceTag"
 
           echo "version=$releaseVersion" >> $GITHUB_OUTPUT
 
       - uses: ./.github/actions/release
         id: release
         with:
-          image: ${{ steps.build.outputs.image }}
           version: ${{ steps.version.outputs.version }}
+          image: ${{ steps.build.outputs.image }}
 
   rebase-prs:
     needs:
       - test
+      - build
     uses: ./.github/workflows/rebase-prs.yml
     secrets: inherit
