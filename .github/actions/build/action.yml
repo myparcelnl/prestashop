@@ -4,6 +4,10 @@ description: ''
 runs:
   using: composite
   steps:
+    - uses: ./.github/actions/setup
+      with:
+        composer-flags: --no-dev
+
     - name: 'Cache php-scoper'
       uses: actions/cache@v3
       id: php-scoper-cache
@@ -35,15 +39,6 @@ runs:
       with:
         path: .cache/build
         key: compiled-php-${{ hashFiles('**/composer.json', '**/composer.lock', 'src/**/*', 'config/**/*', '*.php') }}
-
-    - name: 'Build frontend'
-      shell: bash
-      #language=sh
-      run: |
-        yarn nx run-many \
-          --output-style=static \
-          --runner=cloud \
-          --target=build
 
     - name: 'Build frontend'
       shell: bash

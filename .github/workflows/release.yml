@@ -31,10 +31,6 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.credentials.outputs.token }}
 
-      - uses: ./.github/actions/setup
-        with:
-          composer-flags: --no-dev
-
       - uses: ./.github/actions/build
         with:
           php-scoper-version: ${{ vars.PHP_SCOPER_VERSION }}
