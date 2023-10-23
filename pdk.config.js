@@ -17,14 +17,14 @@ export default defineConfig({
   source: [
     '!**/node_modules/**',
     // Exclude autoload.php to regenerate it with a new hash
-    '!.cache/build/vendor/autoload.php',
-    '.cache/build/composer.json',
-    '.cache/build/config/**/*',
-    '.cache/build/controllers/**/*',
-    '.cache/build/myparcelnl.php',
-    '.cache/build/src/**/*',
-    '.cache/build/upgrade/**/*',
-    '.cache/build/vendor/**/*',
+    '!.tmp/build/vendor/autoload.php',
+    '.tmp/build/composer.json',
+    '.tmp/build/config/**/*',
+    '.tmp/build/controllers/**/*',
+    '.tmp/build/myparcelnl.php',
+    '.tmp/build/src/**/*',
+    '.tmp/build/upgrade/**/*',
+    '.tmp/build/vendor/**/*',
     'mails/**/*',
     'private/carrier-logos/**/*',
     'views/PrestaShop/**/*',
@@ -60,7 +60,7 @@ export default defineConfig({
 
       debug('Prefixing build files...');
 
-      if (fs.existsSync('.cache/build/composer.json')) {
+      if (fs.existsSync('.tmp/build/composer.json')) {
         debug('Build files already exist, skipping prefixing.');
         return;
       }
@@ -71,9 +71,9 @@ export default defineConfig({
           'php',
           [
             '-d memory_limit=-1',
-            '.cache/php-scoper/vendor/bin/php-scoper',
+            '.tmp/php-scoper/vendor/bin/php-scoper',
             'add-prefix',
-            '--output-dir=.cache/build',
+            '--output-dir=.tmp/build',
             '--force',
             '--no-ansi',
             '--no-interaction',
@@ -95,12 +95,12 @@ export default defineConfig({
         config.platforms.map(async (platform) => {
           const platformDistPath = getPlatformDistPath({config, env, platform});
 
-          const files = glob.sync('.cache/build/**/*', {cwd: platformDistPath});
+          const files = glob.sync('.tmp/build/**/*', {cwd: platformDistPath});
 
           await Promise.all(
             files.map(async (file) => {
               const oldPath = `${platformDistPath}/${file}`;
-              const newPath = oldPath.replace('.cache/build/', '');
+              const newPath = oldPath.replace('.tmp/build/', '');
 
               if (!args.dryRun) {
                 await fs.promises.mkdir(path.dirname(newPath), {recursive: true});
@@ -110,7 +110,7 @@ export default defineConfig({
           );
 
           if (!args.dryRun) {
-            await fs.promises.rm(`${platformDistPath}/.cache`, {recursive: true});
+            await fs.promises.rm(`${platformDistPath}/.tmp`, {recursive: true});
           }
         }),
       );

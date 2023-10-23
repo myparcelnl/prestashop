@@ -27,7 +27,7 @@ runs:
       uses: actions/cache@v3
       id: php-scoper-cache
       with:
-        path: .cache/php-scoper
+        path: .tmp/php-scoper
         key: php-scoper-${{ inputs.php-scoper-version }}
 
     - name: 'Install php-scoper'
@@ -35,10 +35,10 @@ runs:
       shell: bash
       # language=sh
       run: |
-        mkdir -p .cache/php-scoper
+        mkdir -p .tmp/php-scoper
 
         docker run \
-          --volume $PWD/.cache/php-scoper:/app \
+          --volume $PWD/.tmp/php-scoper:/app \
           ${{ steps.setup.outputs.image }} \
           composer require \
           --no-interaction \
@@ -52,7 +52,7 @@ runs:
       uses: actions/cache@v3
       id: compiled-php-cache
       with:
-        path: .cache/build
+        path: .tmp/build
         key: compiled-php-${{ hashFiles('**/composer.json', '**/composer.lock', 'src/**/*', 'config/**/*', '*.php') }}
 
     - name: 'Build frontend'
