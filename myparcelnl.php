@@ -50,23 +50,30 @@ class MyParcelNL extends CarrierModule
         // todo: find a better solution
         error_reporting(error_reporting() & ~E_DEPRECATED);
 
-        $this->name          = 'myparcelnl';
-        $this->version       = $this->getVersionFromComposer();
-        $this->author        = 'MyParcel';
-        $this->author_uri    = 'https://myparcel.nl';
-        $this->need_instance = 1;
-        $this->bootstrap     = true;
-        $this->displayName   = 'MyParcelNL';
-        $this->description   = 'MyParcel';
+        $this->name                   = 'myparcelnl';
+        $this->version                = $this->getVersionFromComposer();
+        $this->author                 = 'MyParcel';
+        $this->author_uri             = 'https://myparcel.nl';
+        $this->need_instance          = 1;
+        $this->bootstrap              = true;
+        $this->displayName            = 'MyParcelNL';
+        $this->description            = 'MyParcel';
+        $this->tab                    = 'shipping_logistics';
+        $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => '8.2.0'];
 
         parent::__construct();
 
-        try {
-            $this->setup();
-        } catch (Throwable $e) {
-            $this->_errors[] = sprintf('Failed to instantiate module: %s', $e->getMessage());
-            $this->hasPdk    = false;
-        }
+        $this->withErrorHandling(
+            [$this, 'setup'],
+            sprintf('Failed to instantiate %s', $this->displayName),
+            function (Throwable $e) {
+                $this->hasPdk = false;
+
+                if ($this->active) {
+                    $this->uninstall();
+                }
+            }
+        );
     }
 
     /**
@@ -125,7 +132,10 @@ class MyParcelNL extends CarrierModule
             return false;
         }
 
-        return parent::install() && $this->withErrorHandling(function () { Installer::install($this); });
+        return parent::install()
+            && $this->withErrorHandling(function () {
+                Installer::install($this);
+            });
     }
 
     /**
@@ -133,7 +143,14 @@ class MyParcelNL extends CarrierModule
      */
     public function uninstall(): bool
     {
-        return $this->withErrorHandling(function () { Installer::uninstall($this); }) && parent::uninstall();
+        if (! $this->hasPdk) {
+            return parent::uninstall();
+        }
+
+        return $this->withErrorHandling(function () {
+                Installer::uninstall($this);
+            })
+            && parent::uninstall();
     }
 
     /**
@@ -170,35 +187,40 @@ class MyParcelNL extends CarrierModule
             _PS_MODE_DEV_ ? PdkInstance::MODE_DEVELOPMENT : PdkInstance::MODE_PRODUCTION
         );
 
-        $this->tab = Pdk::get('moduleTabName');
-
-        $this->ps_versions_compliancy = [
-            'min' => Pdk::get('prestaShopVersionMin'),
-            'max' => Pdk::get('prestaShopVersionMax'),
-        ];
-
         $this->hasPdk = true;
     }
 
     /**
-     * @param  callable    $callback
-     * @param  null|string $message
+     * @param  callable      $callback
+     * @param  null|string   $message
+     * @param  null|callable $failureCallback
      *
      * @return bool
      */
-    private function withErrorHandling(callable $callback, ?string $message = null): bool
-    {
-        if (! $this->hasPdk) {
-            return false;
-        }
-
+    private function withErrorHandling(
+        callable  $callback,
+        ?string   $message = null,
+        ?callable $failureCallback = null
+    ): bool {
         try {
             $callback();
 
             return true;
         } catch (Throwable $e) {
-            Logger::error("An error occurred: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
-            $this->_errors[] = $message ?? $e->getMessage();
+            if ($this->hasPdk) {
+                Logger::error("An error occurred: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
+            }
+
+            $this->_errors[] = sprintf(
+                '<hr>%s: %s<br><br><b>Stack trace:</b><br><code>%s</code>',
+                $message ?? 'Error',
+                $e->getMessage(),
+                str_replace("\n", '<br>', $e->getTraceAsString())
+            );
+
+            if ($failureCallback) {
+                $failureCallback($e);
+            }
 
             return false;
         }

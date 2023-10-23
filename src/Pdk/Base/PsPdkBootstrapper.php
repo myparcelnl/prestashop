@@ -65,15 +65,6 @@ class PsPdkBootstrapper extends PdkBootstrapper
                 'MyParcel-PrestaShop' => $version,
             ]),
 
-            'prestaShopVersionMin' => value('1.7.6'),
-            'prestaShopVersionMax' => value('8.2.0'),
-
-            /**
-             * Tab in the modules list we want to show the module under.
-             */
-
-            'moduleTabName' => value('shipping_logistics'),
-
             /**
              * The name of the tab we want to show the settings page under.
              */
