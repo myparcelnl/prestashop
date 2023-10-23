@@ -43,4 +43,5 @@ jobs:
       - uses: ./.github/actions/release
         id: release
         with:
+          image: ${{ steps.build.outputs.image }}
           version: ${{ steps.version.outputs.version }}
