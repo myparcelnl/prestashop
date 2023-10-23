@@ -1,0 +1,16 @@
+[
+    "displayBeforeCarrier",
+    "displayCarrierExtraContent",
+    "actionCarrierProcess",
+    "actionOrderGridDefinitionModifier",
+    "actionOrderGridPresenterModifier",
+    "actionObjectCustomerMessageAddAfter",
+    "displayAdminOrderMain",
+    "actionProductUpdate",
+    "displayAdminProductsExtra",
+    "displayAdminAfterHeader",
+    "displayAdminEndContent",
+    "displayBackOfficeHeader",
+    "displayHeader",
+    "actionCarrierUpdate"
+]
