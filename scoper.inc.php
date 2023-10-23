@@ -36,6 +36,7 @@ return [
     'exclude-namespaces' => [
         // Exclude global namespace
         '/^$/',
+        'Composer',
         'MyParcelNL',
         'PrestaShop',
         'PrestaShopBundle',
