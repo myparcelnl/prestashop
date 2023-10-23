@@ -36,6 +36,8 @@ jobs:
           composer-flags: --no-dev
 
       - uses: ./.github/actions/build
+        with:
+          php-scoper-version: ${{ vars.PHP_SCOPER_VERSION }}
 
       - uses: myparcelnl/actions/semantic-release@v3
         id: release
