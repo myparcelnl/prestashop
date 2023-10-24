@@ -26,7 +26,7 @@ const createDefaultConfig = (env) => {
   };
 };
 
-/** @type createViteConfig {import('@myparcel-woocommerce/vite-config').createViteConfig} */
+/** @type createViteConfig {import('@myparcel-prestashop/vite-config').createViteConfig} */
 const createViteConfig = (config) => async (env) => {
   let resolvedConfig = config ?? {};
 
