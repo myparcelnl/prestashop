@@ -23,6 +23,7 @@ use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tab;
+use Tools;
 
 final class PsInstallerService extends InstallerService
 {
@@ -83,8 +84,11 @@ final class PsInstallerService extends InstallerService
     protected function executeInstallation(...$args): void
     {
         MyParcelModule::registerHooks();
+
         $this->installDatabase();
         $this->installTabs();
+
+        Tools::clearSf2Cache();
 
         parent::executeInstallation();
     }
@@ -170,7 +174,7 @@ final class PsInstallerService extends InstallerService
         $tab->module     = $this->module->name;
 
         if (! $tab->add()) {
-            throw new InstallationException('Failed to add tab');
+            throw new InstallationException("Failed to add tab $tab->name");
         }
     }
 
