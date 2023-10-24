@@ -7,6 +7,7 @@ use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutDeliveryOptionsHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkOrderGridHooks;
@@ -66,7 +67,7 @@ class MyParcelNL extends CarrierModule
         $this->withErrorHandling(
             [$this, 'setup'],
             sprintf('Failed to instantiate %s', $this->displayName),
-            function (Throwable $e) {
+            function () {
                 $this->hasPdk = false;
 
                 if ($this->active) {
@@ -74,6 +75,16 @@ class MyParcelNL extends CarrierModule
                 }
             }
         );
+    }
+
+    /**
+     * @param  bool $force_all
+     *
+     * @return bool
+     */
+    public function enable($force_all = false): bool
+    {
+        return parent::enable($force_all) && $this->withErrorHandling([MyParcelModule::class, 'registerHooks']);
     }
 
     /**
@@ -211,12 +222,16 @@ class MyParcelNL extends CarrierModule
                 Logger::error("An error occurred: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
             }
 
-            $this->_errors[] = sprintf(
-                '<hr>%s: %s<br><br><b>Stack trace:</b><br><code>%s</code>',
+            $formattedMessage = sprintf(
+                "%s: %s\n\nStack trace:\n%s",
                 $message ?? 'Error',
                 $e->getMessage(),
-                str_replace("\n", '<br>', $e->getTraceAsString())
+                $e->getTraceAsString()
             );
+
+            PrestaShopLogger::addLog($formattedMessage, PrestaShopLogger::LOG_SEVERITY_LEVEL_ERROR);
+
+            $this->_errors[] = str_replace("\n", '<br>', $formattedMessage);
 
             if ($failureCallback) {
                 $failureCallback($e);
