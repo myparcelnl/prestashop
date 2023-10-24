@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 use Isolated\Symfony\Component\Finder\Finder;
 
-// For more see: https://github.com/humbug/php-scoper/blob/master/docs/configuration.md
+/**
+ * Prefixes source files. Vendor files are prefixed with scoper.vendor.inc.php. This is to speed up the scoping process
+ * as there is no need to re-scope vendor files on every run.
+ *
+ * @see https://github.com/humbug/php-scoper/blob/master/docs/configuration.md
+ */
 return [
-    'prefix'  => '_MyParcelNL' . bin2hex(random_bytes(8)),
+    'prefix' => '_MyParcelNL',
+
     'finders' => [
         Finder::create()
             ->append([
@@ -16,29 +22,19 @@ return [
         Finder::create()
             ->files()
             ->in(['src', 'config', 'controllers', 'upgrade']),
-        Finder::create()
-            ->files()
-            ->ignoreVCS(true)
-            ->notName('/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.lock/')
-            ->exclude([
-                'test',
-                'tests',
-                'Tests',
-                'vendor-bin',
-            ])
-            ->in('vendor'),
-    ],
-
-    'exclude-files' => [
-        'vendor/php-di/php-di/src/Compiler/Template.php',
     ],
 
     'exclude-namespaces' => [
         // Exclude global namespace
         '/^$/',
+
         'Composer',
         'MyParcelNL',
+
+        // Provided by PrestaShop
         'PrestaShop',
         'PrestaShopBundle',
+        'Doctrine',
+        'Symfony',
     ],
 ];
