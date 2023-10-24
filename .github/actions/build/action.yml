@@ -51,13 +51,13 @@ runs:
     - name: 'Cache scoped source php'
       uses: actions/cache@v3
       with:
-        path: .tmp/scoped-src/
-        key: scoped-php-src-${{ 'src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
+        path: .tmp/scoped/source
+        key: scoped-php-src-${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
 
     - name: 'Cache scoped vendor php'
       uses: actions/cache@v3
       with:
-        path: .tmp/scoped-vendor
+        path: .tmp/scoped/vendor
         key: scoped-php-vendor-${{ hashFiles('**/composer.json', '**/composer.lock', 'scoper.inc.php', 'scoper.vendor.inc.php') }}
 
     - name: 'Build frontend'
