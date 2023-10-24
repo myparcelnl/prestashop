@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\PrestaShop\Tests\Mock\MockPrestaShopLogger;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCarrier;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsContext;
@@ -74,6 +75,11 @@ final class FileLogger extends FileLoggerCore { }
 abstract class LanguageCore extends MockPsLanguage { }
 
 final class Language extends LanguageCore { }
+
+/** @see \PrestaShopLoggerCore */
+abstract class PrestaShopLoggerCore extends MockPrestaShopLogger { }
+
+final class PrestaShopLogger extends PrestaShopLoggerCore { }
 
 ###
 # Controllers
