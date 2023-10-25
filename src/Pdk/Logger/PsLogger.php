@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Logger;
 
 use FileLogger;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
+use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Logger\AbstractLogger;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -56,9 +57,12 @@ final class PsLogger extends AbstractLogger
      */
     public function log($level, $message, array $context = []): void
     {
-        $logger = $this->getLogger($level);
+        $logger      = $this->getLogger($level);
+        $fullMessage = empty($context)
+            ? $message
+            : $message . "\n" . json_encode(Utils::filterNull($context), JSON_PRETTY_PRINT);
 
-        $logger->log($message, $this->mapLevel($level));
+        $logger->log($fullMessage, $this->mapLevel($level));
     }
 
     /**
