@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use DateTime;
 use DbQuery;
 use Generator;
 use MyParcelNL\Pdk\Base\Support\Arr;
@@ -11,7 +12,6 @@ use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings as SettingsFacade;
-use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
 use MyParcelNL\Pdk\Settings\Model\AccountSettings;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
@@ -22,6 +22,7 @@ use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
+use MyParcelNL\PrestaShop\Migration\Util\ToPackageTypeName;
 use MyParcelNL\PrestaShop\Migration\Util\TransformValue;
 use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
 use Throwable;
@@ -70,6 +71,12 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
      */
     private function getCarrierSettingsTransformationMap(): Generator
     {
+        yield new MigratableValue(
+            'MYPARCELNL_PACKAGE_TYPE',
+            CarrierSettings::DEFAULT_PACKAGE_TYPE,
+            new ToPackageTypeName()
+        );
+
         yield new MigratableValue(
             'MYPARCELNL_AGE_CHECK',
             CarrierSettings::EXPORT_AGE_CHECK,
@@ -149,6 +156,24 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
         );
 
         yield new MigratableValue(
+            'priceMondayDelivery',
+            CarrierSettings::PRICE_DELIVERY_TYPE_MONDAY,
+            new CastValue(CastValue::CAST_CENTS)
+        );
+
+        yield new MigratableValue(
+            'allowSaturdayDelivery',
+            CarrierSettings::ALLOW_SATURDAY_DELIVERY,
+            new CastValue(CastValue::CAST_BOOL)
+        );
+
+        yield new MigratableValue(
+            'priceSaturdayDelivery',
+            CarrierSettings::PRICE_DELIVERY_TYPE_SATURDAY,
+            new CastValue(CastValue::CAST_CENTS)
+        );
+
+        yield new MigratableValue(
             'allowMorningDelivery',
             CarrierSettings::ALLOW_MORNING_DELIVERY,
             new CastValue(CastValue::CAST_BOOL)
@@ -213,6 +238,12 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
          */
 
         yield new MigratableValue(
+            'return_MYPARCELNL_PACKAGE_TYPE',
+            CarrierSettings::EXPORT_RETURN_PACKAGE_TYPE,
+            new ToPackageTypeName()
+        );
+
+        yield new MigratableValue(
             'return_MYPARCELNL_PACKAGE_FORMAT',
             CarrierSettings::EXPORT_RETURN_LARGE_FORMAT,
             new CastValue(CastValue::CAST_BOOL)
@@ -225,48 +256,41 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
      */
     private function getConfigurationRows(): Collection
     {
-        return $this->getAllRows('configuration', function (DbQuery $query) {
-            $query->where('name LIKE "myparcelnl_%"');
-        });
+        return $this
+            ->getAllRows('configuration', function (DbQuery $query) {
+                $query->where('name LIKE "myparcelnl_%"');
+            })
+            ->pluck('value', 'name');
     }
 
     /**
+     * @return array
      * @throws \PrestaShopDatabaseException
      */
-    private function getMigratedCarrierSettings(): SettingsModelCollection
+    private function getMigratedCarrierSettings(): array
     {
         $oldCarrierSettings = $this->getAllRows(self::LEGACY_TABLE_CARRIER_CONFIGURATION);
 
-        $carriers = $oldCarrierSettings->where('name', 'carrierType')
-            ->pluck('value', 'id_carrier');
+        return $oldCarrierSettings
+            ->where('name', 'carrierType')
+            ->where('value', '!=', null)
+            ->reduce(function (array $carry, array $item) use ($oldCarrierSettings): array {
+                $carrierName = $item['value'];
 
-        $newCarrierSettings = new SettingsModelCollection();
-
-        $carriers->each(
-            function (string $carrierName, int $psCarrierId) use ($newCarrierSettings, $oldCarrierSettings) {
                 $oldSettings = $oldCarrierSettings
-                    ->where('id_carrier', $psCarrierId)
-                    ->pluck('value', 'name')
-                    ->toArray();
+                    ->where('id_carrier', $item['id_carrier'])
+                    ->pluck('value', 'name');
 
-                $migratedSettings = $this->valueMigrator->transform(
-                    $oldSettings,
-                    $this->getCarrierSettingsTransformationMap()
+                $carry[$carrierName] = array_replace(
+                    $this->valueMigrator->transform($oldSettings, $this->getCarrierSettingsTransformationMap()),
+                    [
+                        CarrierSettings::ALLOW_DELIVERY_OPTIONS => ! empty($oldSettings['dropOffDays']),
+                        CarrierSettings::DROP_OFF_POSSIBILITIES => $this->transformDropOffPossibilities($oldSettings),
+                    ]
                 );
 
-                $newDropOffPossibilities = $this->transformDropOffPossibilities($oldSettings);
-
-                $newCarrierSettings->put(
-                    $carrierName,
-                    array_merge(
-                        $migratedSettings,
-                        [CarrierSettings::DROP_OFF_POSSIBILITIES => $newDropOffPossibilities]
-                    )
-                );
-            }
-        );
-
-        return $newCarrierSettings;
+                return $carry;
+            }, []);
     }
 
     /**
@@ -275,12 +299,10 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
      */
     private function getMigratedSettings(): array
     {
-        $oldSettings = $this->getConfigurationRows();
-        $newSettings = $this->valueMigrator->transform($oldSettings, $this->getSettingsTransformationMap());
+        $oldConfiguration = $this->getConfigurationRows();
+        $newSettings      = $this->valueMigrator->transform($oldConfiguration, $this->getSettingsTransformationMap());
 
-        $newSettings[CarrierSettings::ID] = $this->getMigratedCarrierSettings();
-
-        return $newSettings;
+        return array_replace($newSettings, [CarrierSettings::ID => $this->getMigratedCarrierSettings()]);
     }
 
     /**
@@ -317,19 +339,19 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
         yield new MigratableValue(
             'MYPARCELNL_LABEL_CREATED_ORDER_STATUS',
             implode('.', [OrderSettings::ID, OrderSettings::STATUS_ON_LABEL_CREATE]),
-            new CastValue(CastValue::CAST_INT)
+            new CastValue(CastValue::CAST_TRI_STATE)
         );
 
         yield new MigratableValue(
             'MYPARCELNL_LABEL_SCANNED_ORDER_STATUS',
             implode('.', [OrderSettings::ID, OrderSettings::STATUS_WHEN_LABEL_SCANNED]),
-            new CastValue(CastValue::CAST_INT)
+            new CastValue(CastValue::CAST_TRI_STATE)
         );
 
         yield new MigratableValue(
             'MYPARCELNL_DELIVERED_ORDER_STATUS',
             implode('.', [OrderSettings::ID, OrderSettings::STATUS_WHEN_DELIVERED]),
-            new CastValue(CastValue::CAST_INT)
+            new CastValue(CastValue::CAST_TRI_STATE)
         );
 
         /*
@@ -339,14 +361,19 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
         yield new MigratableValue(
             'MYPARCELNL_LABEL_DESCRIPTION',
             implode('.', [LabelSettings::ID, LabelSettings::DESCRIPTION]),
-            new CastValue(CastValue::CAST_STRING)
+            new TransformValue(function ($value): string {
+                return strtr((string) $value, [
+                    '{order.id}'        => '[ORDER_ID]',
+                    '{order.reference}' => '[ORDER_ID]',
+                ]);
+            })
         );
 
         yield new MigratableValue(
             'MYPARCELNL_LABEL_SIZE',
             implode('.', [LabelSettings::ID, LabelSettings::FORMAT]),
             new TransformValue(function ($value): string {
-                return 'A6' === $value ? LabelSettings::FORMAT_A6 : LabelSettings::FORMAT_A4;
+                return 'a6' === strtolower($value) ? LabelSettings::FORMAT_A6 : LabelSettings::FORMAT_A4;
             })
         );
 
@@ -411,16 +438,20 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
     /**
      * @return void
+     * @throws \PrestaShopDatabaseException
      */
     private function migrateSettings(): void
     {
+        $defaults               = SettingsFacade::getDefaults();
+        $defaultCarrierSettings = Arr::get($defaults, CarrierSettings::ID, []);
+
+        $migratedSettings        = $this->getMigratedSettings();
+        $migratedCarrierSettings = Arr::get($migratedSettings, CarrierSettings::ID, []);
+
         try {
-            $settings = new Settings(
-                array_replace_recursive(
-                    SettingsFacade::getDefaults(),
-                    $this->getMigratedSettings()
-                )
-            );
+            $settings = new Settings(array_replace($defaults, $migratedSettings, [
+                CarrierSettings::ID => array_replace($defaultCarrierSettings, $migratedCarrierSettings),
+            ]));
 
             $this->pdkSettingsRepository->storeAllSettings($settings);
         } catch (Throwable $e) {
@@ -429,35 +460,45 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
     }
 
     /**
-     * @param  array $oldSettings
+     * @param  \MyParcelNL\Pdk\Base\Support\Collection $oldSettings
      *
      * @return array
+     * @throws \Exception
      */
-    private function transformDropOffPossibilities(array $oldSettings): array
+    private function transformDropOffPossibilities(Collection $oldSettings): array
     {
-        $dropOffDaysAsString = Arr::get($oldSettings, 'dropOffDays') ?? '';
+        $exceptions = json_decode($oldSettings->get('cutoff_exceptions') ?: '[]', true);
+
+        $dropOffDaysAsString = $oldSettings->get('dropOffDays', '');
         $dropOffDays         = explode(',', $dropOffDaysAsString);
 
-        $sameDayCutoffTime = Arr::get($oldSettings, 'sameDayDeliveryCutoffTime', Pdk::get('defaultCutoffTimeSameDay'));
+        $sameDayCutoffTime = $oldSettings->get('sameDayDeliveryCutoffTime', Pdk::get('defaultCutoffTimeSameDay'));
 
         return [
             'dropOffDays' => array_map(
                 static function (int $weekday) use ($oldSettings, $sameDayCutoffTime, $dropOffDays) {
-                    $cutoffTime = Arr::get(
-                        $oldSettings,
-                        self::WEEKDAY_SETTING_MAP[$weekday],
-                        Pdk::get('defaultCutoffTime')
-                    );
+                    $cutoffTime = $oldSettings->get(self::WEEKDAY_SETTING_MAP[$weekday]);
 
                     return [
                         'weekday'           => $weekday,
                         'dispatch'          => in_array((string) $weekday, $dropOffDays, true),
-                        'cutoffTime'        => $cutoffTime,
+                        'cutoffTime'        => $cutoffTime ? "$cutoffTime:00" : Pdk::get('defaultCutoffTime'),
                         'sameDayCutoffTime' => $sameDayCutoffTime,
                     ];
                 },
                 array_keys(self::WEEKDAY_SETTING_MAP)
             ),
+
+            'dropOffDaysDeviations' => array_map(static function ($item, $key) {
+                $dateTime = DateTime::createFromFormat('d-m-Y', $key)
+                    ->setTime(0, 0);
+
+                return [
+                    'date'       => $dateTime,
+                    'cutoffTime' => $item['cutoff'] ?? null,
+                    'dispatch'   => array_key_exists('nodispatch', $item) ? ! $item['nodispatch'] : null,
+                ];
+            }, $exceptions, array_keys($exceptions)),
         ];
     }
 }
