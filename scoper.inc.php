@@ -36,5 +36,6 @@ return [
         'PrestaShopBundle',
         'Doctrine',
         'Symfony',
+        'GuzzleHttp',
     ],
 ];
