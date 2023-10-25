@@ -62,7 +62,7 @@ final class MyparcelnlOrderShipment extends AbstractEntity implements EntityWith
         return $this;
     }
 
-    public function toArray(): array
+    public function toArray(?int $flags = null): array
     {
         return [
             'orderId'    => $this->getOrderId(),

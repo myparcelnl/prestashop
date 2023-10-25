@@ -60,7 +60,7 @@ final class MyparcelnlCarrierMapping extends AbstractEntity implements EntityWit
         return $this;
     }
 
-    public function toArray(): array
+    public function toArray(?int $flags = null): array
     {
         return [
             'carrierId'       => $this->getCarrierId(),

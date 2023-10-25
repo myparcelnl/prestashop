@@ -44,7 +44,7 @@ final class MyparcelnlCartDeliveryOptions extends AbstractEntity implements Enti
         return $this;
     }
 
-    public function toArray(): array
+    public function toArray(?int $flags = null): array
     {
         return [
             'cartId'  => $this->getCartId(),

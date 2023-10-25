@@ -44,7 +44,7 @@ final class MyparcelnlProductSettings extends AbstractEntity implements EntityWi
         return $this;
     }
 
-    public function toArray(): array
+    public function toArray(?int $flags = null): array
     {
         return [
             'productId' => $this->getProductId(),
