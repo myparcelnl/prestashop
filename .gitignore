@@ -3,6 +3,7 @@
 docker-compose.override.yml
 
 *.tmp
+*.cache
 .eslintcache
 *.log
 *.log.*
