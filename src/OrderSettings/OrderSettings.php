@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Gett\MyparcelBE\OrderSettings;
 
-use Configuration;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromDefaultExportSettingsAdapter;
 use Gett\MyparcelBE\DeliveryOptions\DefaultExportSettingsRepository;
 use Gett\MyparcelBE\DeliveryOptions\DeliveryOptionsMerger;
@@ -13,6 +12,8 @@ use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\WeightService;
+use MyParcelNL\Pdk\Base\Factory\PdkFactory;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
 class OrderSettings
@@ -78,12 +79,15 @@ class OrderSettings
     public function getExtraOptions(): ExtraOptions
     {
         if (! $this->extraOptions) {
+            PdkFactory::create();
+            $weightService = Pdk::get(WeightService::class);
+
             $extraOptions       = DeliverySettingsRepository::getExtraOptionsByCartId($this->order->getIdCart());
             $this->extraOptions = new ExtraOptions([
                 'labelAmount'        => $extraOptions->getLabelAmount(),
                 'digitalStampWeight' =>
                     $extraOptions->getDigitalStampWeight()
-                    ?? WeightService::convertToDigitalStamp(min($this->getOrderWeight(), 2000)),
+                    ?? $weightService->convertToDigitalStamp(min($this->getOrderWeight(), 2000)),
             ]);
         }
 
@@ -116,8 +120,11 @@ class OrderSettings
      */
     public function getOrderWeight(): int
     {
+        PdkFactory::create();
+        $weightService = Pdk::get(WeightService::class);
+
         if (! $this->orderWeight) {
-            $this->orderWeight = WeightService::convertToGrams($this->order->getTotalWeight());
+            $this->orderWeight = $weightService->convertToGrams($this->order->getTotalWeight());
         }
 
         return $this->orderWeight;
