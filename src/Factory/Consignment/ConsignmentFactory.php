@@ -4,7 +4,6 @@ namespace Gett\MyparcelBE\Factory\Consignment;
 
 use BadMethodCallException;
 use Configuration;
-use DateTime;
 use Exception;
 use Gett\MyparcelBE\Adapter\DeliveryOptionsFromOrderAdapter;
 use Gett\MyparcelBE\Carrier\PackageTypeCalculator;
@@ -169,6 +168,7 @@ class ConsignmentFactory
      */
     private function setBaseData(): void
     {
+        $weightService = new WeightService();
         $floatWeight = $this->orderObject->getTotalWeight();
         $this->consignment
             ->setApiKey(Configuration::get(Constant::API_KEY_CONFIGURATION_NAME))
@@ -177,7 +177,7 @@ class ConsignmentFactory
             ->setDeliveryDate($this->getDeliveryDate())
             ->setDeliveryType($this->getDeliveryType())
             ->setLabelDescription($this->getFormattedLabelDescription())
-            ->setTotalWeight(WeightService::convertToGrams($floatWeight));
+            ->setTotalWeight($weightService->convertToGrams($floatWeight));
     }
 
     /**
