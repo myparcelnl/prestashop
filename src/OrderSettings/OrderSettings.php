@@ -12,8 +12,6 @@ use Gett\MyparcelBE\DeliverySettings\ExtraOptions;
 use Gett\MyparcelBE\Label\LabelOptionsResolver;
 use Gett\MyparcelBE\Model\Core\Order;
 use Gett\MyparcelBE\Service\WeightService;
-use MyParcelNL\Pdk\Base\Factory\PdkFactory;
-use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
 class OrderSettings
@@ -79,8 +77,7 @@ class OrderSettings
     public function getExtraOptions(): ExtraOptions
     {
         if (! $this->extraOptions) {
-            PdkFactory::create();
-            $weightService = Pdk::get(WeightService::class);
+            $weightService = new WeightService();
 
             $extraOptions       = DeliverySettingsRepository::getExtraOptionsByCartId($this->order->getIdCart());
             $this->extraOptions = new ExtraOptions([
@@ -120,8 +117,7 @@ class OrderSettings
      */
     public function getOrderWeight(): int
     {
-        PdkFactory::create();
-        $weightService = Pdk::get(WeightService::class);
+        $weightService = new WeightService();
 
         if (! $this->orderWeight) {
             $this->orderWeight = $weightService->convertToGrams($this->order->getTotalWeight());
