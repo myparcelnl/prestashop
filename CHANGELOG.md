@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.0](https://github.com/myparcelnl/prestashop/compare/v1.8.2...v1.9.0) (2023-10-30)
+
+
+### :sparkles: New Features
+
+* add extra insurance options for be ([#212](https://github.com/myparcelnl/prestashop/issues/212)) ([8522446](https://github.com/myparcelnl/prestashop/commit/8522446d416db7bdee86d41f3321e0537664e8f6))
+
+
+### :bug: Bug Fixes
+
+* fix error on order overview ([#227](https://github.com/myparcelnl/prestashop/issues/227)) ([8524c0e](https://github.com/myparcelnl/prestashop/commit/8524c0e86ae5f4852e5b4ffb89ba253a8e01a157))
+
 ### [1.8.2](https://github.com/myparcelnl/prestashop/compare/v1.8.1...v1.8.2) (2023-02-27)
 
 
