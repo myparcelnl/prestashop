@@ -6,6 +6,7 @@ const PREFIX_BILLING = `${AddressType.Billing}_`;
 const PREFIX_SHIPPING = `${AddressType.Shipping}_`;
 const createName = (name: string) => `[name="${name}"]`;
 
+// eslint-disable-next-line max-lines-per-function
 export const initialize = (): void => {
   createPdkCheckout({
     doRequest,
@@ -47,8 +48,7 @@ export const initialize = (): void => {
 
     getFormData,
 
-    hasAddressType(addressType: AddressType) {
-      // TODO
+    hasAddressType() {
       return true;
     },
 

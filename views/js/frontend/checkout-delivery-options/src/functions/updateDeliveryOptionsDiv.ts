@@ -3,7 +3,7 @@ import {toggleDeliveryOptions} from './toggleDeliveryOptions';
 import {moveDeliveryOptionsForm} from './moveDeliveryOptionsForm';
 import {getCurrentShippingMethod} from './getCurrentShippingMethod';
 
-export const updateDeliveryOptions = (): void => {
+export const updateDeliveryOptionsDiv = (): void => {
   const deliveryOptionsStore = useDeliveryOptionsStore();
   const currentShippingMethod = getCurrentShippingMethod();
 
@@ -11,9 +11,9 @@ export const updateDeliveryOptions = (): void => {
     return;
   }
 
-  const {row} = getCurrentShippingMethod();
+  const newState = toggleDeliveryOptions(currentShippingMethod);
 
-  void deliveryOptionsStore.set(toggleDeliveryOptions(currentShippingMethod));
+  void deliveryOptionsStore.set(newState);
 
-  moveDeliveryOptionsForm(row);
+  moveDeliveryOptionsForm(currentShippingMethod.row);
 };

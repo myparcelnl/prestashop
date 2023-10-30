@@ -15,7 +15,7 @@ export const useCarrierData = (): CarrierData[] => {
   const dataFields = document.querySelectorAll('.myparcelnl-carrier-data');
 
   dataFields.forEach((dataField) => {
-    const carrier = dataField?.getAttribute('data-carrier') ?? '';
+    const carrier = (dataField?.getAttribute('data-carrier') ?? '') as MyParcel.CarrierIdentifier;
 
     data.push({
       carrier,

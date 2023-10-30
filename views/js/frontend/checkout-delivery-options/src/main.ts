@@ -1,14 +1,15 @@
 import {
-  initializeCheckoutDeliveryOptions,
   usePdkCheckout,
   useCheckoutStore,
+  initializeCheckoutDeliveryOptions,
   StoreListener,
 } from '@myparcel-pdk/checkout';
-import {getDefaultDeliveryOptionsConfig, updateDeliveryOptions} from './functions';
+import {getDefaultDeliveryOptionsConfig, updateDeliveryOptionsDiv} from './functions';
 
 usePdkCheckout().onInitialize(() => {
   initializeCheckoutDeliveryOptions({
     updateDeliveryOptions(state) {
+      // @ts-expect-error todo
       const currentShippingMethod = window.MyParcelPdk.utils.getCurrentShippingMethod();
 
       if (!currentShippingMethod) {
@@ -31,13 +32,13 @@ usePdkCheckout().onInitialize(() => {
   const checkoutStore = useCheckoutStore();
 
   getDefaultDeliveryOptionsConfig();
-  updateDeliveryOptions();
+  updateDeliveryOptionsDiv();
 
   checkoutStore.on(StoreListener.Update, (newState, oldState) => {
     if (newState.form.shippingMethod === oldState?.form.shippingMethod) {
       return;
     }
 
-    updateDeliveryOptions();
+    updateDeliveryOptionsDiv();
   });
 });
