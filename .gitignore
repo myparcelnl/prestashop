@@ -29,7 +29,6 @@ views/**/tsconfig.json
 !.idea/php-docker-settings.xml
 !.idea/php-test-framework.xml
 !.idea/php.xml
-!.idea/phpspec.xml
 !.idea/phpunit.xml
 !.idea/prettier.xml
 !.idea/sqldialects.xml
