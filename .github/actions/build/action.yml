@@ -23,6 +23,16 @@ runs:
       with:
         composer-flags: --no-dev
 
+    - name: 'Build frontend'
+      shell: bash
+      #language=sh
+      run: |
+        yarn nx run-many \
+          --output-style=static \
+          --runner=cloud \
+          --target=build
+
+    # The scoper is installed and run in pdk.config.js
     - name: 'Cache php-scoper'
       uses: actions/cache@v3
       id: php-scoper-cache
@@ -30,24 +40,6 @@ runs:
         path: .tmp/php-scoper
         key: php-scoper-${{ inputs.php-scoper-version }}
 
-    - name: 'Install php-scoper'
-      if: steps.php-scoper-cache.outputs.cache-hit != 'true'
-      shell: bash
-      # language=sh
-      run: |
-        mkdir -p .tmp/php-scoper
-
-        docker run \
-          --volume $PWD/.tmp/php-scoper:/app \
-          ${{ steps.setup.outputs.image }} \
-          composer require \
-          --no-interaction \
-          --no-plugins \
-          --no-progress \
-          --no-scripts \
-          "humbug/php-scoper:${{ inputs.php-scoper-version }}"
-
-    # The scoper is run in pdk.config.js
     - name: 'Cache scoped source php'
       uses: actions/cache@v3
       with:
@@ -59,12 +51,3 @@ runs:
       with:
         path: .tmp/scoped/vendor
         key: scoped-php-vendor-${{ hashFiles('**/composer.json', '**/composer.lock', 'scoper.inc.php', 'scoper.vendor.inc.php') }}
-
-    - name: 'Build frontend'
-      shell: bash
-      #language=sh
-      run: |
-        yarn nx run-many \
-          --output-style=static \
-          --runner=cloud \
-          --target=build
