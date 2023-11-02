@@ -6,10 +6,17 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use Context;
 use DI\Container;
+use Hook;
+use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 
 abstract class MockPsModule extends BaseMock implements StaticMockInterface
 {
+    /**
+     * @var string[]
+     */
+    protected static $hooks = [];
+
     /**
      * @var array<string, self>
      */
@@ -66,5 +73,36 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
     public function getContainer(): Container
     {
         return $this->container;
+    }
+
+    /**
+     * @see \Module::registerHook()
+     */
+    public function registerHook($hookName, $shopList = null): bool
+    {
+        $hooks = Utils::toArray($hookName);
+
+        return array_reduce($hooks, static function (bool $carry, string $hook) {
+            $instance       = new Hook();
+            $instance->name = $hook;
+
+            return $carry && MockPsObjectModels::add($instance);
+        }, true);
+    }
+
+    /**
+     * @see \Module::unregisterHook()
+     */
+    public function unregisterHook($input, $shop_list = null): bool
+    {
+        return MockPsObjectModels::getByClass(Hook::class)
+            ->filter(static function (Hook $hook) use ($input) {
+                return is_numeric($input)
+                    ? $hook->id === (int) $input
+                    : $hook->name === $input;
+            })
+            ->reduce(static function (bool $carry, Hook $hook) {
+                return $carry && $hook->delete();
+            }, true);
     }
 }
