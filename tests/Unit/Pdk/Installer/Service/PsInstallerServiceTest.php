@@ -9,13 +9,33 @@ namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPlugin;
 use MyParcelNL\Sdk\src\Support\Collection;
 use Tab;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
 
+const MYPARCEL_TABLES = [
+    'ps_myparcelnl_carrier_mapping',
+    'ps_myparcelnl_cart_delivery_options',
+    'ps_myparcelnl_order_data',
+    'ps_myparcelnl_order_shipment',
+    'ps_myparcelnl_product_settings',
+];
+
 usesShared(new UsesMockPlugin());
+
+it('executes database migrations', function () {
+    /** @var \MyParcelNL $module */
+    $module = Pdk::get('moduleInstance');
+
+    expect(MockPsDb::getDatabase())->not->toHaveKeys(MYPARCEL_TABLES);
+
+    Installer::install($module);
+
+    expect(MockPsDb::getDatabase())->toHaveKeys(MYPARCEL_TABLES);
+});
 
 it('installs tabs', function () {
     /** @var \MyParcelNL $module */
