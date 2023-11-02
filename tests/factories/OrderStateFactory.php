@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithLang;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithOrderState;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
 
 /**
  * @method $this withColor(string $color)
- * @method $this withDeleted(int $deleted)
  * @method $this withDelivery(int $delivery)
  * @method $this withHidden(int $hidden)
- * @method $this withIdLang(int $idLang)
- * @method $this withIdOrderState(int $idOrderState)
  * @method $this withInvoice(int $invoice)
- * @method $this withLang(int|Lang|LangFactory $lang)
  * @method $this withLogable(int $logable)
  * @method $this withModuleName(string $moduleName)
  * @method $this withName(string $name)
- * @method $this withOrderState(int|OrderState|OrderStateFactory $orderState)
  * @method $this withPaid(int $paid)
  * @method $this withPdfDelivery(int $pdfDelivery)
  * @method $this withPdfInvoice(int $pdfInvoice)
@@ -26,7 +24,7 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
  * @method $this withTemplate(string $template)
  * @method $this withUnremovable(int $unremovable)
  */
-final class OrderStateFactory extends AbstractPsObjectModelFactory
+final class OrderStateFactory extends AbstractPsObjectModelFactory implements WithSoftDeletes, WithLang, WithOrderState
 {
     protected function createDefault(): FactoryInterface
     {

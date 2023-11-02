@@ -4,36 +4,31 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCountry;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCustomer;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithManufacturer;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithState;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSupplier;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithWarehouse;
 
 /**
  * @see \AddressCore
- * @method self withAddress1(string $address1)
- * @method self withAddress2(string $address2)
- * @method self withAlias(string $alias)
- * @method self withCity(string $city)
- * @method self withCompany(string $company)
- * @method self withCountry(int|Country|CountryFactory $country)
- * @method self withCustomer(int|Customer|CustomerFactory $customer)
- * @method self withDni(string $dni)
- * @method self withFirstname(string $firstname)
- * @method self withIdCountry(int $idCountry)
- * @method self withIdCustomer(int $idCustomer)
- * @method self withIdManufacturer(int $idManufacturer)
- * @method self withIdState(int $idState)
- * @method self withIdSupplier(int $idSupplier)
- * @method self withIdWarehouse(int $idWarehouse)
- * @method self withLastname(string $lastname)
- * @method self withManufacturer(int|Manufacturer|ManufacturerFactory $manufacturer)
- * @method self withOther(string $other)
- * @method self withPhone(string $phone)
- * @method self withPhoneMobile(string $phoneMobile)
- * @method self withPostcode(string $postcode)
- * @method self withState(int|State|StateFactory $state)
- * @method self withSupplier(int|Supplier|SupplierFactory $supplier)
- * @method self withVatNumber(string $vatNumber)
- * @method self withWarehouse(int|Warehouse|WarehouseFactory $warehouse)
+ * @method $this withAddress1(string $address1)
+ * @method $this withAddress2(string $address2)
+ * @method $this withAlias(string $alias)
+ * @method $this withCity(string $city)
+ * @method $this withCompany(string $company)
+ * @method $this withDni(string $dni)
+ * @method $this withFirstname(string $firstname)
+ * @method $this withLastname(string $lastname)
+ * @method $this withOther(string $other)
+ * @method $this withPhone(string $phone)
+ * @method $this withPhoneMobile(string $phoneMobile)
+ * @method $this withPostcode(string $postcode)
+ * @method $this withVatNumber(string $vatNumber)
  */
-final class AddressFactory extends AbstractPsObjectModelFactory
+final class AddressFactory extends AbstractPsObjectModelFactory implements WithCountry, WithCustomer, WithManufacturer,
+                                                                           WithState, WithSupplier, WithWarehouse
 {
     /**
      * @return $this

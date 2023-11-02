@@ -4,30 +4,31 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCarrier;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
 
 /**
  * @see \CarrierCore
- * @method self withIdCarrier(int $id)
- * @method self withName(string $name)
- * @method self withUrl(string $url)
- * @method self withActive(int $active)
- * @method self withDeleted(int $deleted)
- * @method self withShippingHandling(int $shippingHandling)
- * @method self withRangeBehavior(int $rangeBehavior)
- * @method self withIsModule(int $isModule)
- * @method self withIsFree(int $isFree)
- * @method self withShippingExternal(int $shippingExternal)
- * @method self withNeedRange(int $needRange)
- * @method self withExternalModuleName(string $externalModuleName)
- * @method self withShippingMethod(string $shippingMethod)
- * @method self withPosition(int $position)
- * @method self withMaxWidth(int $maxWidth)
- * @method self withMaxHeight(int $maxHeight)
- * @method self withMaxDepth(int $maxDepth)
- * @method self withMaxWeight(int $maxWeight)
- * @method self withGrade(int $grade)
+ * @method $this withName(string $name)
+ * @method $this withUrl(string $url)
+ * @method $this withActive(int $active)
+ * @method $this withShippingHandling(int $shippingHandling)
+ * @method $this withRangeBehavior(int $rangeBehavior)
+ * @method $this withIsModule(int $isModule)
+ * @method $this withIsFree(int $isFree)
+ * @method $this withShippingExternal(int $shippingExternal)
+ * @method $this withNeedRange(int $needRange)
+ * @method $this withExternalModuleName(string $externalModuleName)
+ * @method $this withShippingMethod(string $shippingMethod)
+ * @method $this withPosition(int $position)
+ * @method $this withMaxWidth(int $maxWidth)
+ * @method $this withMaxHeight(int $maxHeight)
+ * @method $this withMaxDepth(int $maxDepth)
+ * @method $this withMaxWeight(int $maxWeight)
+ * @method $this withGrade(int $grade)
  */
-final class CarrierFactory extends AbstractPsObjectModelFactory
+final class CarrierFactory extends AbstractPsObjectModelFactory implements WithTimestamps, WithSoftDeletes, WithCarrier
 {
     /**
      * Defined manually to avoid this being treated as the id of a class.

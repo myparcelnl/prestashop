@@ -7,6 +7,8 @@ namespace MyParcelNL\PrestaShop\Tests\Factory;
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -15,9 +17,7 @@ use function MyParcelNL\PrestaShop\psFactory;
 
 /**
  * @template T of ObjectModel
- * @method self withDateAdd(string $dateAdd)
- * @method self withDateUpd(string $dateUpd)
- * @method self withDeleted(bool $deleted)
+ * @method $this withId(int $id)
  * @implements PsObjectModelFactoryInterface<T>
  * @extends AbstractPsFactory<T>
  */
@@ -44,6 +44,11 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     }
 
     /**
+     * @return class-string<T>
+     */
+    abstract protected function getObjectModelClass(): string;
+
+    /**
      * @return T
      */
     public function store(): ObjectModel
@@ -55,16 +60,6 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
         }
 
         return $result;
-    }
-
-    /**
-     * @param  int $id
-     *
-     * @return $this
-     */
-    public function withId(int $id): self
-    {
-        return $this->with(['id' => $id]);
     }
 
     /**
@@ -93,11 +88,20 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      */
     protected function createDefault(): FactoryInterface
     {
-        return $this
-            ->withId($this->id ?? $this->getNextId())
-            ->withDeleted(false)
-            ->withDateAdd('2023-01-01 00:00:00')
-            ->withDateUpd('2023-01-01 00:00:00');
+        $factory = $this
+            ->withId($this->id ?? $this->getNextId());
+
+        if ($factory instanceof WithTimestamps) {
+            $factory
+                ->withDateAdd('2023-01-01 00:00:00')
+                ->withDateUpd('2023-01-01 00:00:00');
+        }
+
+        if ($factory instanceof WithSoftDeletes) {
+            $factory->withDeleted(false);
+        }
+
+        return $factory;
     }
 
     /**
@@ -126,11 +130,6 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     {
         return $this->getObjectModelClass();
     }
-
-    /**
-     * @return class-string<T>
-     */
-    abstract protected function getObjectModelClass(): string;
 
     /**
      * @return array

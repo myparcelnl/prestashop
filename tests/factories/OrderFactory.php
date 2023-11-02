@@ -4,64 +4,58 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCarrier;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCart;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCurrency;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCustomer;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithLang;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShop;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShopGroup;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
 use function MyParcelNL\PrestaShop\psFactory;
 
 /**
  * @see \OrderCore
- * @method self add()
- * @method self withCarrier(int|Carrier|CarrierFactory $carrier, array $attributes = [])
- * @method self withCart(int|Cart|CartFactory $cart, array $attributes = [])
- * @method self withConversionRate(float $conversionRate)
- * @method self withCurrency(int|Currency|CurrencyFactory $currency, array $attributes = [])
- * @method self withCurrentState(int $currentState)
- * @method self withCustomer(int|Customer|CustomerFactory $customer, array $attributes = [])
- * @method self withDateAdd(string $dateAdd)
- * @method self withDateUpd(string $dateUpd)
- * @method self withDeliveryDate(string $deliveryDate)
- * @method self withDeliveryNumber(int $deliveryNumber)
- * @method self withGift(bool $gift)
- * @method self withGiftMessage(string $giftMessage)
- * @method self withIdAddressDelivery(int $idAddressDelivery)
- * @method self withIdAddressInvoice(int $idAddressInvoice)
- * @method self withIdCarrier(int $id_carrier)
- * @method self withIdCart(int $id_cart)
- * @method self withIdCurrency(int $idCurrency)
- * @method self withIdCustomer(int $idCustomer)
- * @method self withIdLang(int $idLang)
- * @method self withIdShop(int $idShop)
- * @method self withIdShopGroup(int $idShopGroup)
- * @method self withInvoiceDate(string $invoiceDate)
- * @method self withInvoiceNumber(int $invoiceNumber)
- * @method self withLang(int|Lang|LangFactory $lang, array $attributes = [])
- * @method self withMobileTheme(bool $mobileTheme)
- * @method self withModule(string $module)
- * @method self withNote(string $note)
- * @method self withPayment(string $payment)
- * @method self withRecyclable(bool $recyclable)
- * @method self withReference(string $reference)
- * @method self withRoundMode(int $roundMode)
- * @method self withRoundType(int $roundType)
- * @method self withSecureKey(string $secureKey)
- * @method self withShop(int|Shop|ShopFactory $shop, array $attributes = [])
- * @method self withShopGroup(int|ShopGroup|ShopGroupFactory $shopGroup, array $attributes = [])
- * @method self withTotalDiscounts(float $totalDiscounts)
- * @method self withTotalDiscountsTaxExcl(float $totalDiscountsTaxExcl)
- * @method self withTotalDiscountsTaxIncl(float $totalDiscountsTaxIncl)
- * @method self withTotalPaid(float $totalPaid)
- * @method self withTotalPaidReal(float $totalPaidReal)
- * @method self withTotalPaidTaxExcl(float $totalPaidTaxExcl)
- * @method self withTotalPaidTaxIncl(float $totalPaidTaxIncl)
- * @method self withTotalProducts(float $totalProducts)
- * @method self withTotalProductsWt(float $totalProductsWt)
- * @method self withTotalShipping(float $totalShipping)
- * @method self withTotalShippingTaxExcl(float $totalShippingTaxExcl)
- * @method self withTotalShippingTaxIncl(float $totalShippingTaxIncl)
- * @method self withTotalWrapping(float $totalWrapping)
- * @method self withTotalWrappingTaxExcl(float $totalWrappingTaxExcl)
- * @method self withTotalWrappingTaxIncl(float $totalWrappingTaxIncl)
- * @method self withValid(bool $valid)
+ * @method $this add()
+ * @method $this withConversionRate(float $conversionRate)
+ * @method $this withCurrentState(int $currentState)
+ * @method $this withDeliveryDate(string $deliveryDate)
+ * @method $this withDeliveryNumber(int $deliveryNumber)
+ * @method $this withGift(bool $gift)
+ * @method $this withGiftMessage(string $giftMessage)
+ * @method $this withIdAddressDelivery(int $idAddressDelivery)
+ * @method $this withIdAddressInvoice(int $idAddressInvoice)
+ * @method $this withInvoiceDate(string $invoiceDate)
+ * @method $this withInvoiceNumber(int $invoiceNumber)
+ * @method $this withMobileTheme(bool $mobileTheme)
+ * @method $this withModule(string $module)
+ * @method $this withNote(string $note)
+ * @method $this withPayment(string $payment)
+ * @method $this withRecyclable(bool $recyclable)
+ * @method $this withReference(string $reference)
+ * @method $this withRoundMode(int $roundMode)
+ * @method $this withRoundType(int $roundType)
+ * @method $this withSecureKey(string $secureKey)
+ * @method $this withTotalDiscounts(float $totalDiscounts)
+ * @method $this withTotalDiscountsTaxExcl(float $totalDiscountsTaxExcl)
+ * @method $this withTotalDiscountsTaxIncl(float $totalDiscountsTaxIncl)
+ * @method $this withTotalPaid(float $totalPaid)
+ * @method $this withTotalPaidReal(float $totalPaidReal)
+ * @method $this withTotalPaidTaxExcl(float $totalPaidTaxExcl)
+ * @method $this withTotalPaidTaxIncl(float $totalPaidTaxIncl)
+ * @method $this withTotalProducts(float $totalProducts)
+ * @method $this withTotalProductsWt(float $totalProductsWt)
+ * @method $this withTotalShipping(float $totalShipping)
+ * @method $this withTotalShippingTaxExcl(float $totalShippingTaxExcl)
+ * @method $this withTotalShippingTaxIncl(float $totalShippingTaxIncl)
+ * @method $this withTotalWrapping(float $totalWrapping)
+ * @method $this withTotalWrappingTaxExcl(float $totalWrappingTaxExcl)
+ * @method $this withTotalWrappingTaxIncl(float $totalWrappingTaxIncl)
+ * @method $this withValid(bool $valid)
  */
-final class OrderFactory extends AbstractPsObjectModelFactory
+final class OrderFactory extends AbstractPsObjectModelFactory implements WithShop, WithShopGroup, WithLang,
+                                                                         WithCustomer, WithCurrency, WithCart,
+                                                                         WithCarrier, WithTimestamps
 {
     /**
      * @param  int|Address|AddressFactory $input

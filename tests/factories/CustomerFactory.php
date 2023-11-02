@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithGender;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithLang;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithRisk;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShop;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShopGroup;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
 use function MyParcelNL\PrestaShop\psFactory;
 
 /**
@@ -13,19 +19,11 @@ use function MyParcelNL\PrestaShop\psFactory;
  * @method $this withBirthday(string $birthday)
  * @method $this withCompany(string $company)
  * @method $this withDefaultGroup(int|Group|GroupFactory $defaultGroup)
- * @method $this withDeleted(bool $deleted)
  * @method $this withEmail(string $email)
  * @method $this withFirstname(string $firstname)
- * @method $this withGender(int|Gender|GenderFactory $gender)
  * @method $this withIdDefaultGroup(int $idDefaultGroup)
- * @method $this withIdGender(int $idGender)
- * @method $this withIdLang(int $idLang)
- * @method $this withIdRisk(int $idRisk)
- * @method $this withIdShop(int $idShop)
- * @method $this withIdShopGroup(int $idShopGroup)
  * @method $this withIpRegistrationNewsletter(string $ipRegistrationNewsletter)
  * @method $this withIsGuest(bool $isGuest)
- * @method $this withLang(int|Lang|LangFactory $lang)
  * @method $this withLastPasswdGen(string $lastPasswdGen)
  * @method $this withLastname(string $lastname)
  * @method $this withMaxPaymentDays(int $maxPaymentDays)
@@ -35,15 +33,13 @@ use function MyParcelNL\PrestaShop\psFactory;
  * @method $this withOptin(bool $optin)
  * @method $this withOutstandingAllowAmount(float $outstandingAllowAmount)
  * @method $this withPasswd(string $passwd)
- * @method $this withRisk(int|Risk|RiskFactory $risk)
  * @method $this withSecureKey(string $secureKey)
- * @method $this withShop(int|Shop|ShopFactory $shop)
- * @method $this withShopGroup(int|ShopGroup|ShopGroupFactory $shopGroup)
  * @method $this withShowPublicPrices(int $showPublicPrices)
  * @method $this withSiret(string $siret)
  * @method $this withWebsite(string $website)
  */
-final class CustomerFactory extends AbstractPsObjectModelFactory
+final class CustomerFactory extends AbstractPsObjectModelFactory implements WithShop, WithShopGroup, WithLang, WithRisk,
+                                                                            WithGender, WithSoftDeletes
 {
     /**
      * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface

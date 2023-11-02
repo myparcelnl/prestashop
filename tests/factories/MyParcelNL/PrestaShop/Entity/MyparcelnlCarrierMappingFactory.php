@@ -8,8 +8,8 @@ use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsEntityFactory;
 
 /**
- * @method self withCarrierId(int $carrierId)
- * @method self withMyparcelCarrier(string $myparcelCarrier)
+ * @method $this withCarrierId(int $carrierId)
+ * @method $this withMyparcelCarrier(string $myparcelCarrier)
  */
 final class MyparcelnlCarrierMappingFactory extends AbstractPsEntityFactory
 {

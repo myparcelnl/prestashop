@@ -3,20 +3,19 @@
 declare(strict_types=1);
 
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSupplier;
 
 /**
  * @see \SupplierCore
- * @method self withActive(bool $active)
- * @method self withDescription(string|array $description)
- * @method self withIdSupplier(int $idSupplier)
- * @method self withLinkRewrite(string $linkRewrite)
- * @method self withMetaDescription(string|array $metaDescription)
- * @method self withMetaKeywords(string|array $metaKeywords)
- * @method self withMetaTitle(string|array $metaTitle)
- * @method self withName(string $name)
- * @method self withSupplier(Supplier|SupplierFactory $supplier)
+ * @method $this withActive(bool $active)
+ * @method $this withDescription(string|array $description)
+ * @method $this withLinkRewrite(string $linkRewrite)
+ * @method $this withMetaDescription(string|array $metaDescription)
+ * @method $this withMetaKeywords(string|array $metaKeywords)
+ * @method $this withMetaTitle(string|array $metaTitle)
+ * @method $this withName(string $name)
  */
-final class SupplierFactory extends AbstractPsObjectModelFactory
+final class SupplierFactory extends AbstractPsObjectModelFactory implements WithSupplier
 {
     protected function getObjectModelClass(): string
     {

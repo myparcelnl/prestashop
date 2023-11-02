@@ -8,11 +8,11 @@ use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsEntityFactory;
 
 /**
- * @method self withId(int $id)
- * @method self withCartId(int $cartId)
- * @method self withData(string $data)
- * @method self withDateAdd(string $dateAdd)
- * @method self withDateUpd(string $dateUpd)
+ * @method $this withId(int $id)
+ * @method $this withCartId(int $cartId)
+ * @method $this withData(string $data)
+ * @method $this withDateAdd(string $dateAdd)
+ * @method $this withDateUpd(string $dateUpd)
  */
 final class MyparcelnlCartDeliveryOptionsFactory extends AbstractPsEntityFactory
 {

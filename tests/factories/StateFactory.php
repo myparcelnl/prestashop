@@ -4,37 +4,17 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCountry;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithZone;
 
 /**
  * @see \StateCore
- * @method self withIdCountry(int $idCountry)
- * @method self withIdZone(int $idZone)
- * @method self withIsoCode(string $isoCode)
- * @method self withName(string $name)
- * @method self withActive(bool $active)
+ * @method $this withIsoCode(string $isoCode)
+ * @method $this withName(string $name)
+ * @method $this withActive(bool $active)
  */
-final class StateFactory extends AbstractPsObjectModelFactory
+final class StateFactory extends AbstractPsObjectModelFactory implements WithCountry, WithZone
 {
-    /**
-     * @param  Country|\CountryFactory $country
-     *
-     * @return $this
-     */
-    public function withCountry($country): self
-    {
-        return $this->withModel('country', $country);
-    }
-
-    /**
-     * @param  Zone|\ZoneFactory $zone
-     *
-     * @return $this
-     */
-    public function withZone($zone): self
-    {
-        return $this->withModel('zone', $zone);
-    }
-
     /**
      * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
      */

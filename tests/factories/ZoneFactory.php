@@ -6,9 +6,8 @@ use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
- * @method self withIdZone(int $idZone)
- * @method self withName(string $name)
- * @method self withActive(int $active)
+ * @method $this withName(string $name)
+ * @method $this withActive(int $active)
  */
 final class ZoneFactory extends AbstractPsObjectModelFactory
 {

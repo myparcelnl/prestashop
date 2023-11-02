@@ -13,11 +13,13 @@ use MyParcelNL\Sdk\src\Support\Str;
  * @template T of \MyParcelNL\PrestaShop\Entity\Contract\EntityInterface
  * @implements PsObjectModelFactoryInterface<T>
  * @extends AbstractPsFactory<T>
- * @method self withCreated(string $created)
- * @method self withUpdated(string $updated)
+ * @method $this withCreated(string $created)
+ * @method $this withUpdated(string $updated)
  */
 abstract class AbstractPsEntityFactory extends AbstractPsModelFactory implements PsEntityFactoryInterface
 {
+    abstract protected function getEntityClass(): string;
+
     /**
      * @param  class-string<T> $class
      * @param  array           $attributes
@@ -40,8 +42,6 @@ abstract class AbstractPsEntityFactory extends AbstractPsModelFactory implements
     {
         return $this->getEntityClass();
     }
-
-    abstract protected function getEntityClass(): string;
 
     /**
      * @param  T $model

@@ -3,16 +3,15 @@
 declare(strict_types=1);
 
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithGroup;
+use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
 
 /**
- * @method self withIdGroup(int $idGroup)
- * @method self withReduction(float $reduction)
- * @method self withPriceDisplayMethod(int $priceDisplayMethod)
- * @method self withShowPrices(int $showPrices)
- * @method self withDateAdd(string $dateAdd)
- * @method self withDateUpd(string $dateUpd)
+ * @method $this withReduction(float $reduction)
+ * @method $this withPriceDisplayMethod(int $priceDisplayMethod)
+ * @method $this withShowPrices(int $showPrices)
  */
-final class GroupFactory extends AbstractPsObjectModelFactory
+final class GroupFactory extends AbstractPsObjectModelFactory implements WithTimestamps, WithGroup
 {
     protected function getObjectModelClass(): string
     {

@@ -7,7 +7,7 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
  * @see \ProductCore
- * @method self withName(array $names)
+ * @method $this withName(array $names)
  */
 final class ProductFactory extends AbstractPsObjectModelFactory
 {
