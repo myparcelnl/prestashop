@@ -72,7 +72,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
     $deliveryOptionsArray = $order->deliveryOptions->toStorableArray();
 
     $fullResult = array_replace_recursive([
-        DeliveryOptions::CARRIER          => Platform::get('defaultCarrier'),
+        DeliveryOptions::CARRIER          => ['externalIdentifier' => Platform::get('defaultCarrier')],
         DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
         DeliveryOptions::LABEL_AMOUNT     => 1,
         DeliveryOptions::PACKAGE_TYPE     => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,
@@ -99,7 +99,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER => Carrier::CARRIER_POSTNL_NAME,
+                DeliveryOptions::CARRIER => ['externalIdentifier' => Carrier::CARRIER_POSTNL_NAME],
             ],
         ],
 
@@ -112,7 +112,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER       => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                DeliveryOptions::CARRIER       => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
                 DeliveryOptions::DATE          => '2077-04-07 00:00:00',
                 DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_MORNING_NAME,
             ],
@@ -127,7 +127,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
             ],
 
             'result' => [
-                DeliveryOptions::CARRIER      => Carrier::CARRIER_POSTNL_NAME,
+                DeliveryOptions::CARRIER      => ['externalIdentifier' => Carrier::CARRIER_POSTNL_NAME],
                 DeliveryOptions::LABEL_AMOUNT => 5,
             ],
         ],
@@ -151,9 +151,8 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
                 DeliveryOptions::SHIPMENT_OPTIONS => [
-                    // ShipmentOptions::LABEL_DESCRIPTION => 'hello',
                     ShipmentOptions::INSURANCE         => 2000,
                     ShipmentOptions::AGE_CHECK         => TriStateService::ENABLED,
                     ShipmentOptions::HIDE_SENDER       => TriStateService::ENABLED,
@@ -185,9 +184,8 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
                 DeliveryOptions::SHIPMENT_OPTIONS => [
-                    // ShipmentOptions::LABEL_DESCRIPTION => 'hello',
                     ShipmentOptions::INSURANCE         => 0,
                     ShipmentOptions::AGE_CHECK         => TriStateService::DISABLED,
                     ShipmentOptions::HIDE_SENDER       => TriStateService::DISABLED,
@@ -221,7 +219,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER         => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                DeliveryOptions::CARRIER         => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
                 DeliveryOptions::PICKUP_LOCATION => [
                     'boxNumber'       => 'box_number',
                     'cc'              => 'cc',
