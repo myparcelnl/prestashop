@@ -1,14 +1,11 @@
 {
     "1": {
-        "id_lang": null,
-        "id_shop": null,
         "active": 1,
         "class_name": "MyParcelNLAdminSettings",
         "route_name": "myparcelnl_settings",
         "name": {
             "1": "MyParcelNL"
         },
-        "id_parent": null,
         "module": "myparcelnl",
         "id": 1
     }

@@ -164,6 +164,11 @@ abstract class GroupCore extends ObjectModel { }
 
 final class Group extends GroupCore { }
 
+/** @see \HookCore */
+abstract class HookCore extends ObjectModel { }
+
+final class Hook extends HookCore { }
+
 /** @see \LangCore */
 abstract class LangCore extends ObjectModel { }
 

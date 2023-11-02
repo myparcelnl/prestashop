@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Arr;
+use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Sdk\src\Support\Str;
 
 class BaseMock implements Arrayable
@@ -120,7 +121,13 @@ class BaseMock implements Arrayable
      */
     public function toArray(?int $flags = null): array
     {
-        return $this->attributes;
+        $attributes = $flags & Arrayable::SKIP_NULL ? Utils::filterNull($this->attributes) : $this->attributes;
+
+        return array_map(static function ($value) use ($flags) {
+            return $value instanceof Arrayable
+                ? $value->toArray($flags)
+                : $value;
+        }, $attributes);
     }
 
     /**

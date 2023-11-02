@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
+use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Foundation\Database\EntityInterface;
@@ -35,7 +36,7 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
                 return;
             }
 
-            $this->hydrate($existing->toArray());
+            $this->hydrate($existing->toArray(Arrayable::SKIP_NULL));
         }
     }
 
