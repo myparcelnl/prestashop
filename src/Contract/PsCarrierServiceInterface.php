@@ -9,7 +9,10 @@ use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 
-interface PsCarrierServiceInterface
+/**
+ * @extends \MyParcelNL\PrestaShop\Contract\PsSpecificObjectModelServiceInterface<PsCarrier>
+ */
+interface PsCarrierServiceInterface extends PsSpecificObjectModelServiceInterface
 {
     /**
      * @param  \MyParcelNL\Pdk\Carrier\Collection\CarrierCollection $carriers
@@ -24,18 +27,11 @@ interface PsCarrierServiceInterface
     public function disableCarriers(): void;
 
     /**
-     * @param  int|PsCarrier $input
+     * @param  int $reference
      *
-     * @return PsCarrier
+     * @return null|PsCarrier
      */
-    public function get($input): PsCarrier;
-
-    /**
-     * @param  int|PsCarrier $input
-     *
-     * @return null|int|\Carrier
-     */
-    public function getId($input): int;
+    public function getByReference(int $reference): ?PsCarrier;
 
     /**
      * @param  int|PsCarrier $input
@@ -50,6 +46,11 @@ interface PsCarrierServiceInterface
      * @return null|string
      */
     public function getMyParcelCarrierIdentifier($input): ?string;
+
+    /**
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     */
+    public function getPsCarriers(): Collection;
 
     /**
      * @param  int|PsCarrier $input

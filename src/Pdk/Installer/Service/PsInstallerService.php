@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 
-use Carrier;
 use Context;
 use Currency;
-use Db;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\DocParser;
 use Doctrine\Common\Annotations\PsrCachedReader;
@@ -17,8 +15,12 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Language;
 use Module;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
+use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -31,6 +33,33 @@ final class PsInstallerService extends InstallerService
      * @var \MyParcelNL
      */
     private $module;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface
+     */
+    private $psCarrierService;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface
+     */
+    private $psObjectModelService;
+
+    /**
+     * @param  \MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface    $settingsRepository
+     * @param  \MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface $migrationService
+     * @param  \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface        $psCarrierService
+     * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface    $psObjectModelService
+     */
+    public function __construct(
+        SettingsRepositoryInterface   $settingsRepository,
+        MigrationServiceInterface     $migrationService,
+        PsCarrierServiceInterface     $psCarrierService,
+        PsObjectModelServiceInterface $psObjectModelService
+    ) {
+        parent::__construct($settingsRepository, $migrationService);
+        $this->psCarrierService     = $psCarrierService;
+        $this->psObjectModelService = $psObjectModelService;
+    }
 
     /**
      * @param  mixed ...$args
@@ -79,7 +108,6 @@ final class PsInstallerService extends InstallerService
      * @param  mixed ...$args
      *
      * @return void
-     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     protected function executeInstallation(...$args): void
     {
@@ -88,9 +116,9 @@ final class PsInstallerService extends InstallerService
         $this->installDatabase();
         $this->installTabs();
 
-        Tools::clearSf2Cache();
-
         parent::executeInstallation();
+
+        Tools::clearSf2Cache();
     }
 
     /**
@@ -98,8 +126,6 @@ final class PsInstallerService extends InstallerService
      *
      * @return void
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     protected function executeUninstallation(...$args): void
     {
@@ -134,6 +160,8 @@ final class PsInstallerService extends InstallerService
          * Always register hooks, since the methods may have changed. PrestaShops checks if hook is already registered.
          */
         MyParcelModule::registerHooks();
+
+        Tools::clearSf2Cache();
     }
 
     /**
@@ -157,14 +185,14 @@ final class PsInstallerService extends InstallerService
 
     /**
      * @return void
-     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     private function installTabs(): void
     {
         /** @var \PrestaShopBundle\Entity\Repository\TabRepository $tabRepository */
         $tabRepository = Pdk::get('ps.tabRepository');
 
-        $tab = new Tab();
+        $existing = $tabRepository->findOneByClassName(Pdk::get('legacyControllerSettings'));
+        $tab      = $existing ?? $this->psObjectModelService->create(Tab::class);
 
         $tab->active     = 1;
         $tab->class_name = Pdk::get('legacyControllerSettings');
@@ -173,9 +201,7 @@ final class PsInstallerService extends InstallerService
         $tab->id_parent  = $tabRepository->findOneIdByClassName(Pdk::get('sidebarParentClass'));
         $tab->module     = $this->module->name;
 
-        if (! $tab->add()) {
-            throw new InstallationException("Failed to add tab $tab->name");
-        }
+        $this->psObjectModelService->updateOrAdd($tab);
     }
 
     /**
@@ -189,7 +215,7 @@ final class PsInstallerService extends InstallerService
         /** @var \Context $context */
         $context = Context::getContext();
 
-        $context->currency = $context->currency ?? new Currency(1);
+        $context->currency = $context->currency ?? $this->psObjectModelService->create(Currency::class, 1);
     }
 
     /**
@@ -232,27 +258,16 @@ final class PsInstallerService extends InstallerService
 
     /**
      * @return void
-     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     private function uninstallCarriers(): void
     {
-        $carriers = Carrier::getCarriers(Context::getContext()->language->id);
-        $result   = true;
+        $result = $this->psCarrierService
+            ->getPsCarriers()
+            ->filter(function (array $carrier) {
+                return $carrier['external_module_name'] === $this->module->name;
+            });
 
-        /** @var \Carrier $carrier */
-        foreach ($carriers as $carrier) {
-            if ($carrier['external_module_name'] !== $this->module->name) {
-                continue;
-            }
-
-            $result &= $carrier->softDelete();
-        }
-
-        if (! $result) {
-            throw new InstallationException('Failed to delete carriers');
-        }
+        $this->psCarrierService->deleteMany($result);
     }
 
     /**
@@ -272,15 +287,11 @@ final class PsInstallerService extends InstallerService
 
     /**
      * @return void
-     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     private function uninstallTabs(): void
     {
-        $result = Db::getInstance()
-            ->delete('tab', sprintf('module = "%s"', pSQL($this->module->name)));
+        $moduleTabs = Tab::getCollectionFromModule($this->module->name);
 
-        if (! $result) {
-            throw new InstallationException('Failed to delete module tabs');
-        }
+        $this->psObjectModelService->deleteMany(Tab::class, $moduleTabs);
     }
 }

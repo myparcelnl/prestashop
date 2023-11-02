@@ -13,8 +13,9 @@ use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Language;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
-use ObjectModel;
 use RangePrice;
 use RangeWeight;
 use RuntimeException;
@@ -22,10 +23,7 @@ use Zone;
 
 final class CarrierBuilder
 {
-    private const RANGE_CLASSES = [
-        RangePrice::class,
-        RangeWeight::class,
-    ];
+    private const RANGE_CLASSES = [RangePrice::class, RangeWeight::class];
 
     /**
      * @var \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository
@@ -43,19 +41,29 @@ final class CarrierBuilder
     private $psCarrier;
 
     /**
+     * @var \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface
+     */
+    private $psCarrierService;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface
+     */
+    private $psObjectModelService;
+
+    /**
      * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $myParcelCarrier
      */
     public function __construct(Carrier $myParcelCarrier)
     {
         $this->myParcelCarrier          = $myParcelCarrier;
         $this->carrierMappingRepository = Pdk::get(PsCarrierMappingRepository::class);
+        $this->psObjectModelService     = Pdk::get(PsObjectModelServiceInterface::class);
+        $this->psCarrierService         = Pdk::get(PsCarrierServiceInterface::class);
     }
 
     /**
      * @return \Carrier
      * @throws \Doctrine\ORM\ORMException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     public function create(): PsCarrier
     {
@@ -114,8 +122,6 @@ final class CarrierBuilder
 
     /**
      * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     private function addRanges(): void
     {
@@ -127,13 +133,13 @@ final class CarrierBuilder
                 continue;
             }
 
-            $instance = new $objectClass();
+            $instance = $this->psObjectModelService->create($objectClass);
 
             $instance->id_carrier = $this->psCarrier->id;
             $instance->delimiter1 = '0';
             $instance->delimiter2 = '10000';
 
-            $this->updateOrAdd($instance);
+            $this->psObjectModelService->updateOrAdd($instance);
         }
     }
 
@@ -159,15 +165,13 @@ final class CarrierBuilder
 
     /**
      * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     private function createCarrier(): void
     {
         /** @var \MyParcelNL $module */
         $module = Pdk::get('moduleInstance');
 
-        $psCarrier = $this->getExistingPsCarrier() ?? new PsCarrier();
+        $psCarrier = $this->getExistingPsCarrier() ?? $this->psCarrierService->create();
 
         $psCarrier->name                 = $this->myParcelCarrier->human;
         $psCarrier->active               = (int) $this->myParcelCarrier->enabled;
@@ -184,7 +188,7 @@ final class CarrierBuilder
             $psCarrier->delay[$lang['id_lang']] = Language::translate('carrier_delivery_time', $lang['iso_code']);
         }
 
-        $this->updateOrAdd($psCarrier, (bool) $psCarrier->id);
+        $this->psCarrierService->updateOrAdd($psCarrier);
 
         $this->psCarrier = $psCarrier;
     }
@@ -204,32 +208,14 @@ final class CarrierBuilder
      */
     private function getExistingPsCarrier(): ?PsCarrier
     {
-        $mapping = $this->carrierMappingRepository
-            ->findOneBy(['myparcelCarrier' => $this->myParcelCarrier->externalIdentifier]);
+        $mapping = $this->carrierMappingRepository->findOneBy([
+            'myparcelCarrier' => $this->myParcelCarrier->externalIdentifier,
+        ]);
 
         if ($mapping) {
-            return new PsCarrier($mapping->getCarrierId());
+            return $this->psCarrierService->get($mapping->getCarrierId());
         }
 
-        $existingCarrier = PsCarrier::getCarrierByReference($this->createCarrierIdReference());
-
-        return $existingCarrier ?: null;
-    }
-
-    /**
-     * @param  \ObjectModel $model
-     * @param  bool         $existing
-     *
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    private function updateOrAdd(ObjectModel $model, bool $existing = false): void
-    {
-        $result = $existing ? $model->update() : $model->add();
-
-        if (! $result) {
-            throw new RuntimeException(sprintf('Could not %s %s', $existing ? 'update' : 'create', get_class($model)));
-        }
+        return $this->psCarrierService->getByReference($this->createCarrierIdReference());
     }
 }

@@ -14,11 +14,16 @@ use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 
-final class PsCarrierService implements PsCarrierServiceInterface
+/**
+ * @template T of PsCarrier
+ * @extends \MyParcelNL\PrestaShop\Service\PsSpecificObjectModelService<T>
+ */
+final class PsCarrierService extends PsSpecificObjectModelService implements PsCarrierServiceInterface
 {
     /**
      * @var \MyParcelNL\Pdk\Account\Repository\ShopCarrierConfigurationRepository
@@ -26,11 +31,15 @@ final class PsCarrierService implements PsCarrierServiceInterface
     private $carrierMappingRepository;
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository $carrierMappingRepository
+     * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface $psObjectModelService
+     * @param  \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository  $psCarrierMappingRepository
      */
-    public function __construct(PsCarrierMappingRepository $carrierMappingRepository)
-    {
-        $this->carrierMappingRepository = $carrierMappingRepository;
+    public function __construct(
+        PsObjectModelServiceInterface $psObjectModelService,
+        PsCarrierMappingRepository    $psCarrierMappingRepository
+    ) {
+        parent::__construct($psObjectModelService);
+        $this->carrierMappingRepository = $psCarrierMappingRepository;
     }
 
     /**
@@ -58,11 +67,11 @@ final class PsCarrierService implements PsCarrierServiceInterface
      */
     public function disableCarriers(): void
     {
-        $psCarriers = new Collection($this->getPsCarriers());
+        $psCarriers = $this->getPsCarriers();
 
         $psCarriers->where('external_module_name', Pdk::getAppInfo()->name)
             ->each(function (array $carrier): void {
-                $psCarrier = new PsCarrier($carrier['id_carrier']);
+                $psCarrier = $this->get($carrier['id_carrier']);
 
                 $psCarrier->active = false;
 
@@ -77,27 +86,13 @@ final class PsCarrierService implements PsCarrierServiceInterface
     }
 
     /**
-     * @param  int|PsCarrier $input
+     * @param  int $reference
      *
-     * @return PsCarrier
+     * @return null|PsCarrier
      */
-    public function get($input): PsCarrier
+    public function getByReference(int $reference): ?PsCarrier
     {
-        if ($input instanceof PsCarrier) {
-            return $input;
-        }
-
-        return new PsCarrier($input);
-    }
-
-    /**
-     * @param  int|PsCarrier $input
-     *
-     * @return null|int|\Carrier
-     */
-    public function getId($input): int
-    {
-        return $input instanceof PsCarrier ? $input->id : $input;
+        return PsCarrier::getCarrierByReference($reference) ?: null;
     }
 
     /**
@@ -126,6 +121,23 @@ final class PsCarrierService implements PsCarrierServiceInterface
     }
 
     /**
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     */
+    public function getPsCarriers(): Collection
+    {
+        return new Collection(
+            PsCarrier::getCarriers(
+                Context::getContext()->language->id,
+                false,
+                false,
+                null,
+                null,
+                PsCarrier::CARRIERS_MODULE
+            )
+        );
+    }
+
+    /**
      * @param  int|PsCarrier $input
      *
      * @return bool
@@ -137,6 +149,7 @@ final class PsCarrierService implements PsCarrierServiceInterface
 
     /**
      * @return void
+     * @throws \PrestaShopException
      */
     public function updateCarriers(): void
     {
@@ -154,10 +167,11 @@ final class PsCarrierService implements PsCarrierServiceInterface
      * @param  \MyParcelNL\Pdk\Base\Support\Collection $createdCarriers
      *
      * @return void
+     * @throws \PrestaShopException
      */
     protected function deleteUnusedCarriers(Collection $createdCarriers): void
     {
-        $psCarriers = new Collection($this->getPsCarriers());
+        $psCarriers = $this->getPsCarriers();
         $moduleName = Pdk::getAppInfo()->name;
 
         $psCarriers
@@ -165,31 +179,13 @@ final class PsCarrierService implements PsCarrierServiceInterface
                 return $carrier['external_module_name'] === $moduleName
                     && ! $createdCarriers->contains('id', $carrier['id_carrier']);
             })
-            ->each(static function (array $carrier): void {
-                $psCarrier = new PsCarrier($carrier['id_carrier']);
-
-                if (! $psCarrier->delete()) {
-                    Logger::error("Failed to delete carrier {$carrier['id_carrier']}");
-
-                    return;
-                }
-
-                Logger::debug("Deleted carrier {$carrier['id_carrier']}");
+            ->each(function (array $carrier): void {
+                $this->delete($carrier['id_carrier']);
             });
     }
 
-    /**
-     * @return array
-     */
-    private function getPsCarriers(): array
+    protected function getClass(): string
     {
-        return PsCarrier::getCarriers(
-            Context::getContext()->language->id,
-            false,
-            false,
-            null,
-            null,
-            PsCarrier::CARRIERS_MODULE
-        );
+        return PsCarrier::class;
     }
 }

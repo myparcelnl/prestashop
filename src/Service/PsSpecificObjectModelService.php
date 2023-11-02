@@ -1,0 +1,100 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MyParcelNL\PrestaShop\Service;
+
+use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsSpecificObjectModelServiceInterface;
+use ObjectModel;
+
+/**
+ * @template T of \ObjectModel
+ */
+abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServiceInterface
+{
+    /**
+     * @var \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface
+     */
+    private $psObjectModelService;
+
+    /**
+     * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface $psObjectModelService
+     */
+    public function __construct(PsObjectModelServiceInterface $psObjectModelService)
+    {
+        $this->psObjectModelService = $psObjectModelService;
+    }
+
+    /**
+     * @return class-string<T>
+     */
+    abstract protected function getClass(): string;
+
+    /**
+     * @param  null|int $id
+     *
+     * @return T
+     */
+    public function create(?int $id = null): ObjectModel
+    {
+        return $this->psObjectModelService->create($this->getClass(), $id);
+    }
+
+    /**
+     * @param  int|T $input
+     * @param  bool  $soft
+     *
+     * @return bool
+     */
+    public function delete($input, bool $soft = false): bool
+    {
+        return $this->psObjectModelService->delete($this->getClass(), $input, $soft);
+    }
+
+    public function deleteMany($input, bool $soft = false): bool
+    {
+        return $this->psObjectModelService->deleteMany($this->getClass(), $input, $soft);
+    }
+
+    /**
+     * @param  int|T $input
+     *
+     * @return bool
+     */
+    public function exists($input): bool
+    {
+        return $this->psObjectModelService->exists($this->getClass(), $input);
+    }
+
+    /**
+     * @param  int|T $input
+     *
+     * @return T
+     */
+    public function get($input): ObjectModel
+    {
+        return $this->psObjectModelService->get($this->getClass(), $input);
+    }
+
+    /**
+     * @param  int|T $input
+     *
+     * @return null|int
+     */
+    public function getId($input): ?int
+    {
+        return $this->psObjectModelService->getId($this->getClass(), $input);
+    }
+
+    /**
+     * @param  \T        $model
+     * @param  null|bool $existing
+     *
+     * @return \T
+     */
+    public function updateOrAdd(ObjectModel $model, ?bool $existing = null): ObjectModel
+    {
+        return $this->psObjectModelService->updateOrAdd($model, $existing);
+    }
+}

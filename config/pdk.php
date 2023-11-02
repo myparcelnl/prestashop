@@ -28,12 +28,14 @@ use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Configuration\Service\Ps17PsConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateCartDeliveryOptionsTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateOrderDataTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateOrderShipmentTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateProductSettingsTableDatabaseMigration;
+use MyParcelNL\PrestaShop\Migration\Pdk\PdkCarrierMigration;
 use MyParcelNL\PrestaShop\Migration\Pdk\PdkDeliveryOptionsMigration;
 use MyParcelNL\PrestaShop\Migration\Pdk\PdkOrderShipmentsMigration;
 use MyParcelNL\PrestaShop\Migration\Pdk\PdkProductSettingsMigration;
@@ -65,6 +67,7 @@ use MyParcelNL\PrestaShop\Pdk\Webhook\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\PsRouterService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
+use MyParcelNL\PrestaShop\Service\PsObjectModelService;
 use MyParcelNL\PrestaShop\Service\PsOrderService;
 use Psr\Log\LoggerInterface;
 use function DI\get;
@@ -89,6 +92,7 @@ return [
     ]),
 
     'pdkMigrationClasses'                       => value([
+        PdkCarrierMigration::class,
         PdkSettingsMigration::class,
         PdkProductSettingsMigration::class,
         PdkDeliveryOptionsMigration::class,
@@ -146,8 +150,9 @@ return [
     /**
      * Custom services
      */
-    PsConfigurationServiceInterface::class      => get(Ps17PsConfigurationService::class),
     PsCarrierServiceInterface::class            => get(PsCarrierService::class),
+    PsConfigurationServiceInterface::class      => get(Ps17PsConfigurationService::class),
+    PsObjectModelServiceInterface::class        => get(PsObjectModelService::class),
     PsOrderServiceInterface::class              => get(PsOrderService::class),
     PsRouterServiceInterface::class             => get(PsRouterService::class),
 ];
