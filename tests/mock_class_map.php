@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPrestaShopLogger;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCarrier;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
@@ -51,6 +52,11 @@ final class Db extends DbCore { }
 abstract class DbQueryCore extends MockPsDbQuery { }
 
 final class DbQuery extends DbQueryCore { }
+
+/** @see \ToolsCore */
+abstract class ToolsCore extends BaseMock { }
+
+final class Tools extends ToolsCore { }
 
 ###
 # Modules
@@ -223,6 +229,11 @@ final class State extends StateCore { }
 abstract class SupplierCore extends ObjectModel { }
 
 final class Supplier extends SupplierCore { }
+
+/** @see \TabCore */
+abstract class TabCore extends ObjectModel { }
+
+final class Tab extends TabCore { }
 
 /** @see \WarehouseCore */
 abstract class WarehouseCore extends ObjectModel { }

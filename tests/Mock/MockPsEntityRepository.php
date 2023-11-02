@@ -11,7 +11,7 @@ use MyParcelNL\Sdk\src\Support\Str;
 /**
  * @template T of EntityInterface
  */
-final class MockPsEntityRepository
+class MockPsEntityRepository
 {
     /**
      * @var class-string<T>

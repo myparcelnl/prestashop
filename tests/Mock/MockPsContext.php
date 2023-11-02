@@ -66,6 +66,7 @@ abstract class MockPsContext extends BaseMock implements StaticMockInterface
         $builder->addDefinitions([
             'doctrine.orm.entity_manager'             => get(MockPsEntityManager::class),
             'prestashop.adapter.legacy.configuration' => get(Configuration::class),
+            'prestashop.core.admin.tab.repository'    => get(MockPsTabRepository::class),
             'ps.entityManager'                        => get(MockPsEntityManager::class),
         ]);
 

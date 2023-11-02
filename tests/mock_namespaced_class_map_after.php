@@ -26,3 +26,13 @@ namespace PrestaShop\PrestaShop\Core\Grid\Column;
 use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
 
 class AbstractColumn extends BaseMock { }
+
+namespace Doctrine\Common\Annotations;
+
+use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
+
+class DocParser extends BaseMock { }
+
+class AnnotationReader extends BaseMock { }
+
+class PsrCachedReader extends BaseMock { }

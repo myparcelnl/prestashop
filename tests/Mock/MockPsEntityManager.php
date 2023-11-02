@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 use ObjectModel;
 
-final class MockPsEntityManager implements StaticMockInterface
+final class MockPsEntityManager extends BaseMock implements StaticMockInterface
 {
     private static $repositories = [];
 
@@ -16,7 +16,12 @@ final class MockPsEntityManager implements StaticMockInterface
         self::$repositories = [];
     }
 
-    public function flush(): void {}
+    public function flush(): void { }
+
+    public function getConfiguration()
+    {
+        return new BaseMock();
+    }
 
     /**
      * @param  class-string<ObjectModel> $entityName

@@ -8,6 +8,8 @@
     "php": ">=7.2.0"
   },
   "require-dev": {
+    "doctrine/doctrine-bundle": "^2.3",
+    "doctrine/orm": "^2.7",
     "guzzlehttp/guzzle": "^7.4",
     "pestphp/pest": "^1.22",
     "spatie/pest-plugin-snapshots": "^1.1.0"

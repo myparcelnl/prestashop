@@ -8,7 +8,7 @@ use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Str;
 
-abstract class BaseMock implements Arrayable
+class BaseMock implements Arrayable
 {
     /**
      * @var array
