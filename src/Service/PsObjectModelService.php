@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
+use MyParcelNL\Pdk\Base\Support\Arr;
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use ObjectModel;
+use PrestaShopCollection;
 use RuntimeException;
 
 final class PsObjectModelService implements PsObjectModelServiceInterface
@@ -49,9 +52,19 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
      */
     public function deleteMany(string $class, $input, bool $soft = false): bool
     {
-        return array_reduce($input, function (bool $success, $id) use ($class, $soft): bool {
-            return $success && $this->delete($class, $id, $soft);
-        }, true);
+        if ($input instanceof PrestaShopCollection) {
+            $array = $input->getResults();
+        } else {
+            $array = Arr::wrap($input instanceof Collection ? $input->all() : $input);
+        }
+
+        return array_reduce(
+            $array,
+            function (bool $success, $id) use ($class, $soft): bool {
+                return $success && $this->delete($class, $id, $soft);
+            },
+            true
+        );
     }
 
     public function exists(string $class, $input): bool

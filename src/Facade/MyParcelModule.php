@@ -9,7 +9,6 @@ use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\PrestaShop\Service\ModuleService;
 
 /**
- * @method static bool install()
  * @method static MyParcelNL getInstance()
  * @method static void registerHooks()
  * @see \MyParcelNL\PrestaShop\Service\ModuleService

@@ -29,9 +29,9 @@ interface PsObjectModelServiceInterface
 
     /**
      * @template T of ObjectModel
-     * @param  T|class-string<T>                                        $class
-     * @param  (int|T)[]|\MyParcelNL\Pdk\Base\Support\Collection<int|T> $input
-     * @param  bool                                                     $soft
+     * @param  T|class-string<T>                                                              $class
+     * @param  (int|T)[]|\MyParcelNL\Pdk\Base\Support\Collection<int|T>|\PrestaShopCollection $input
+     * @param  bool                                                                           $soft
      *
      * @return bool
      */

@@ -71,20 +71,20 @@ class MyParcelNL extends CarrierModule
                 $this->hasPdk = false;
 
                 if ($this->active) {
-                    $this->uninstall();
+                    $this->disable();
                 }
             }
         );
     }
 
     /**
-     * @param  bool $force_all
+     * @param  bool $forceAll
      *
      * @return bool
      */
-    public function enable($force_all = false): bool
+    public function enable($forceAll = false): bool
     {
-        return parent::enable($force_all) && $this->withErrorHandling([MyParcelModule::class, 'registerHooks']);
+        return parent::enable($forceAll) && $this->withErrorHandling([MyParcelModule::class, 'registerHooks']);
     }
 
     /**

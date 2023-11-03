@@ -22,11 +22,6 @@ interface PsCarrierServiceInterface extends PsSpecificObjectModelServiceInterfac
     public function createOrUpdateCarriers(CarrierCollection $carriers): Collection;
 
     /**
-     * @return void
-     */
-    public function disableCarriers(): void;
-
-    /**
      * @param  int $reference
      *
      * @return null|PsCarrier

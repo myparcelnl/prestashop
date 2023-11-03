@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Configuration\Service;
 
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
+use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint;
 
 /**
@@ -39,11 +40,17 @@ final class Ps17PsConfigurationService implements PsConfigurationServiceInterfac
      * @param                                                                          $default
      * @param  \PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint|null $shopConstraint
      *
-     * @return null|array|mixed
+     * @return mixed
      */
     public function get(string $key, $default = null, ShopConstraint $shopConstraint = null)
     {
-        return json_decode($this->configurationService->get($key, $default, $shopConstraint) ?? '', true);
+        $value = $this->configurationService->get($key, $default, $shopConstraint);
+
+        if (is_string($value) && Str::startsWith($value, ['{', '['])) {
+            return json_decode($value, true);
+        }
+
+        return $value;
     }
 
     /**

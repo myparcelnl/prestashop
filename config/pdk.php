@@ -20,6 +20,7 @@ use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhooksRepositoryInterface;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
+use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
@@ -53,6 +54,7 @@ use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsScriptService;
 use MyParcelNL\PrestaShop\Pdk\Frontend\Service\PsViewService;
 use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsInstallerService;
 use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsMigrationService;
+use MyParcelNL\PrestaShop\Pdk\Installer\Service\PsPreInstallService;
 use MyParcelNL\PrestaShop\Pdk\Language\Service\PsLanguageService;
 use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderNoteRepository;
@@ -70,6 +72,7 @@ use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsObjectModelService;
 use MyParcelNL\PrestaShop\Service\PsOrderService;
 use Psr\Log\LoggerInterface;
+use function DI\factory;
 use function DI\get;
 use function DI\value;
 
@@ -142,17 +145,25 @@ return [
      * Miscellaneous
      */
     ClientAdapterInterface::class               => get(Guzzle7ClientAdapter::class),
-    InstallerServiceInterface::class            => get(PsInstallerService::class),
     LoggerInterface::class                      => get(PsLogger::class),
     MigrationServiceInterface::class            => get(PsMigrationService::class),
     ScriptServiceInterface::class               => get(PsScriptService::class),
 
+    InstallerServiceInterface::class       => factory(function () {
+        /** @var \MyParcelNL\PrestaShop\Pdk\Installer\Service\PsPreInstallService $preInstallService */
+        $preInstallService = Pdk::get(PsPreInstallService::class);
+
+        $preInstallService->prepare();
+
+        return Pdk::get(PsInstallerService::class);
+    }),
+
     /**
      * Custom services
      */
-    PsCarrierServiceInterface::class            => get(PsCarrierService::class),
-    PsConfigurationServiceInterface::class      => get(Ps17PsConfigurationService::class),
-    PsObjectModelServiceInterface::class        => get(PsObjectModelService::class),
-    PsOrderServiceInterface::class              => get(PsOrderService::class),
-    PsRouterServiceInterface::class             => get(PsRouterService::class),
+    PsCarrierServiceInterface::class       => get(PsCarrierService::class),
+    PsConfigurationServiceInterface::class => get(Ps17PsConfigurationService::class),
+    PsObjectModelServiceInterface::class   => get(PsObjectModelService::class),
+    PsOrderServiceInterface::class         => get(PsOrderService::class),
+    PsRouterServiceInterface::class        => get(PsRouterService::class),
 ];

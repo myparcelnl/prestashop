@@ -4,14 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 
-use Context;
-use Currency;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\DocParser;
-use Doctrine\Common\Annotations\PsrCachedReader;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use Carrier as PsCarrier;
 use Language;
 use Module;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
@@ -19,13 +12,12 @@ use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tab;
-use Tools;
 
 final class PsInstallerService extends InstallerService
 {
@@ -65,13 +57,11 @@ final class PsInstallerService extends InstallerService
      * @param  mixed ...$args
      *
      * @return void
-     * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     public function install(...$args): void
     {
         $this->setModule($args);
-        $this->preparePrestaShop();
         parent::install($args);
     }
 
@@ -100,7 +90,6 @@ final class PsInstallerService extends InstallerService
     public function uninstall(...$args): void
     {
         $this->setModule($args);
-        $this->preparePrestaShop();
         parent::uninstall($args);
     }
 
@@ -117,8 +106,7 @@ final class PsInstallerService extends InstallerService
         $this->installTabs();
 
         parent::executeInstallation();
-
-        Tools::clearSf2Cache();
+        // Tools::clearSf2Cache();
     }
 
     /**
@@ -142,11 +130,29 @@ final class PsInstallerService extends InstallerService
     }
 
     /**
+     * Get the pdk installed version. If it does not exist yet, check if the api key is set. This is necessary because PrestaShop does not properly keep track of the installed version. Not even when upgrading, so we have to do it ourselves.
+     *
      * @return null|string
      */
     protected function getInstalledVersion(): ?string
     {
-        return $this->module->database_version ?? parent::getInstalledVersion();
+        $installedVersion = parent::getInstalledVersion();
+
+        if ($installedVersion) {
+            return $installedVersion;
+        }
+
+        /** @var PsConfigurationServiceInterface $configuration */
+        $configuration = Pdk::get(PsConfigurationServiceInterface::class);
+
+        $apiKey = $configuration->get('MYPARCELNL_API_KEY');
+
+        if ($apiKey) {
+            // Pre-2.0.0
+            return '1.999.0';
+        }
+
+        return null;
     }
 
     /**
@@ -160,8 +166,6 @@ final class PsInstallerService extends InstallerService
          * Always register hooks, since the methods may have changed. PrestaShops checks if hook is already registered.
          */
         MyParcelModule::registerHooks();
-
-        Tools::clearSf2Cache();
     }
 
     /**
@@ -205,69 +209,17 @@ final class PsInstallerService extends InstallerService
     }
 
     /**
-     * PrestaShop throws an error during install because context->currency is undefined.
-     *
-     * @return void
-     * @todo See if this can be done in a better way (preferably not at all)
-     */
-    private function prepareContext(): void
-    {
-        /** @var \Context $context */
-        $context = Context::getContext();
-
-        $context->currency = $context->currency ?? $this->psObjectModelService->create(Currency::class, 1);
-    }
-
-    /**
-     * @return void
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     */
-    private function prepareEntityManager(): void
-    {
-        $appInfo = Pdk::getAppInfo();
-
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = Pdk::get('ps.entityManager');
-
-        $driverChain = $entityManager
-            ->getConfiguration()
-            ->getMetadataDriverImpl();
-
-        $docParser = new DocParser();
-        $reader    = new AnnotationReader($docParser);
-        $reader    = new PsrCachedReader($reader, new ArrayAdapter());
-
-        $driver = new AnnotationDriver($reader, ["{$appInfo->path}src/Entity"]);
-
-        if ($driverChain instanceof MappingDriverChain) {
-            $driverChain->addDriver($driver, 'MyParcelNL\PrestaShop\Entity');
-        }
-    }
-
-    /**
-     * Do some preparations that are missing in the installation flow of PrestaShop.
-     *
-     * @return void
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     */
-    private function preparePrestaShop(): void
-    {
-        $this->prepareContext();
-        $this->prepareEntityManager();
-    }
-
-    /**
      * @return void
      */
     private function uninstallCarriers(): void
     {
         $result = $this->psCarrierService
             ->getPsCarriers()
-            ->filter(function (array $carrier) {
-                return $carrier['external_module_name'] === $this->module->name;
+            ->filter(function (PsCarrier $carrier) {
+                return $carrier->external_module_name === $this->module->name;
             });
 
-        $this->psCarrierService->deleteMany($result);
+        $this->psCarrierService->deleteMany($result, true);
     }
 
     /**

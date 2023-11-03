@@ -454,6 +454,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
             ]));
 
             $this->pdkSettingsRepository->storeAllSettings($settings);
+            Logger::debug('Migrated settings');
         } catch (Throwable $e) {
             Logger::error('Failed to migrate settings', ['exception' => $e]);
         }

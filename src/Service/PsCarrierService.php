@@ -61,31 +61,6 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     }
 
     /**
-     * @return void
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    public function disableCarriers(): void
-    {
-        $psCarriers = $this->getPsCarriers();
-
-        $psCarriers->where('external_module_name', Pdk::getAppInfo()->name)
-            ->each(function (array $carrier): void {
-                $psCarrier = $this->get($carrier['id_carrier']);
-
-                $psCarrier->active = false;
-
-                if (! $psCarrier->softDelete()) {
-                    Logger::error("Failed to soft delete carrier {$carrier['id_carrier']}");
-
-                    return;
-                }
-
-                Logger::debug("Soft deleted carrier {$carrier['id_carrier']}");
-            });
-    }
-
-    /**
      * @param  int $reference
      *
      * @return null|PsCarrier
@@ -121,20 +96,22 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     }
 
     /**
-     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     * @return \MyParcelNL\Pdk\Base\Support\Collection<PsCarrier>
      */
     public function getPsCarriers(): Collection
     {
-        return new Collection(
-            PsCarrier::getCarriers(
-                Context::getContext()->language->id,
-                false,
-                false,
-                null,
-                null,
-                PsCarrier::CARRIERS_MODULE
-            )
+        $carrierArray = PsCarrier::getCarriers(
+            Context::getContext()->language->id,
+            false,
+            false,
+            null,
+            null,
+            PsCarrier::CARRIERS_MODULE
         );
+
+        return (new Collection($carrierArray))->map(function (array $item) {
+            return new PsCarrier($item['id_carrier']);
+        });
     }
 
     /**
@@ -149,7 +126,6 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
 
     /**
      * @return void
-     * @throws \PrestaShopException
      */
     public function updateCarriers(): void
     {
@@ -167,7 +143,6 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
      * @param  \MyParcelNL\Pdk\Base\Support\Collection $createdCarriers
      *
      * @return void
-     * @throws \PrestaShopException
      */
     protected function deleteUnusedCarriers(Collection $createdCarriers): void
     {
@@ -175,12 +150,13 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
         $moduleName = Pdk::getAppInfo()->name;
 
         $psCarriers
-            ->filter(function (array $carrier) use ($moduleName, $createdCarriers): bool {
-                return $carrier['external_module_name'] === $moduleName
-                    && ! $createdCarriers->contains('id', $carrier['id_carrier']);
+            ->filter(function (PsCarrier $psCarrier) use ($moduleName, $createdCarriers): bool {
+                $isOurs = $psCarrier->external_module_name === $moduleName;
+
+                return $isOurs && ! $createdCarriers->contains('id', $this->getId($psCarrier));
             })
-            ->each(function (array $carrier): void {
-                $this->delete($carrier['id_carrier']);
+            ->each(function (PsCarrier $psCarrier): void {
+                $this->delete($psCarrier, true);
             });
     }
 
