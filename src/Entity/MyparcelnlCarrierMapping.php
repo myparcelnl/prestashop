@@ -13,8 +13,9 @@ use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
  * @ORM\Table()
  * @ORM\Entity()
  * @see \MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration
+ * @final
  */
-final class MyparcelnlCarrierMapping extends AbstractEntity implements EntityWithTimestampsInterface
+class MyparcelnlCarrierMapping extends AbstractEntity implements EntityWithTimestampsInterface
 {
     use HasTimestamps;
 

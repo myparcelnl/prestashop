@@ -14,8 +14,9 @@ use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
  * @ORM\Table
  * @ORM\Entity
  * @see \MyParcelNL\PrestaShop\Database\CreateOrderDataTableDatabaseMigration
+ * @final
  */
-final class MyparcelnlCartDeliveryOptions extends AbstractEntity implements EntityWithTimestampsInterface
+class MyparcelnlCartDeliveryOptions extends AbstractEntity implements EntityWithTimestampsInterface
 {
     use HasJsonData;
     use HasTimestamps;
