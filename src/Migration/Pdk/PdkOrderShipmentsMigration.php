@@ -81,6 +81,8 @@ final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
 
             $carry->put($pdkOrder->externalIdentifier, $pdkOrder);
 
+            Logger::debug("Migrated shipment $shipmentId for order $orderId");
+
             return $carry;
         }, new PdkOrderCollection());
 

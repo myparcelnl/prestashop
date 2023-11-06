@@ -44,9 +44,9 @@ interface PsSpecificObjectModelServiceInterface
     /**
      * @param  int|ObjectModel $input
      *
-     * @return T
+     * @return null|T
      */
-    public function get($input): ObjectModel;
+    public function get($input): ?ObjectModel;
 
     /**
      * @param  int|T $input

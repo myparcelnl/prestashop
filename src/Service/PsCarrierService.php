@@ -53,7 +53,7 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
             static function (Carrier $carrier): PsCarrier {
                 $builder = new CarrierBuilder($carrier);
 
-                Logger::info('Created carrier ' . $carrier->externalIdentifier);
+                Logger::debug('Created carrier ' . $carrier->externalIdentifier);
 
                 return $builder->create();
             }

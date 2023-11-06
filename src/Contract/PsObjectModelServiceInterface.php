@@ -9,6 +9,15 @@ use ObjectModel;
 interface PsObjectModelServiceInterface
 {
     /**
+     * @param  \ObjectModel $model
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function add(ObjectModel $model): bool;
+
+    /**
      * @template T of ObjectModel
      * @param  T|class-string<T> $class
      * @param  null|int|T        $input
@@ -51,9 +60,9 @@ interface PsObjectModelServiceInterface
      * @param  T|class-string<T> $class
      * @param  int|T             $input
      *
-     * @return T
+     * @return null|T
      */
-    public function get(string $class, $input): ObjectModel;
+    public function get(string $class, $input): ?ObjectModel;
 
     /**
      * @template T of ObjectModel
@@ -63,6 +72,15 @@ interface PsObjectModelServiceInterface
      * @return null|int
      */
     public function getId(string $class, $input): ?int;
+
+    /**
+     * @param  \ObjectModel $model
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function update(ObjectModel $model): bool;
 
     /**
      * @template T of ObjectModel

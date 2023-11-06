@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
+use InvalidArgumentException;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
@@ -90,6 +91,11 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
      */
     public function get($input): PdkOrder
     {
+        if (! $this->psOrderService->exists($input)) {
+            throw new InvalidArgumentException('Order not found');
+        }
+
+        /** @var \Order $psOrder */
         $psOrder = $this->psOrderService->get($input);
 
         return $this->retrieve((string) $psOrder->id, function () use ($psOrder) {
@@ -143,7 +149,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     public function updateMany(PdkOrderCollection $collection): PdkOrderCollection
     {
         $collection->each(function (PdkOrder $order) {
-            $this->psOrderService->updateData((string) $order->externalIdentifier, $order->toStorableArray());
+            $this->psOrderService->updateOrderData((string) $order->externalIdentifier, $order->toStorableArray());
 
             $order->shipments->each(function (Shipment $shipment) use ($order) {
                 $this->psOrderShipmentRepository->updateOrCreate(

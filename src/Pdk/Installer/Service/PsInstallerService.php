@@ -8,8 +8,10 @@ use Carrier as PsCarrier;
 use Language;
 use Module;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
+use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
+use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
@@ -18,9 +20,12 @@ use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 use Tab;
+use Tools;
 
 final class PsInstallerService extends InstallerService
 {
+    private const VERSION_PRE_PDK = '1.999.0';
+
     /**
      * @var \MyParcelNL
      */
@@ -84,7 +89,6 @@ final class PsInstallerService extends InstallerService
      * @param  mixed ...$args
      *
      * @return void
-     * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     public function uninstall(...$args): void
@@ -106,7 +110,7 @@ final class PsInstallerService extends InstallerService
         $this->installTabs();
 
         parent::executeInstallation();
-        // Tools::clearSf2Cache();
+        Tools::clearSf2Cache();
     }
 
     /**
@@ -148,8 +152,7 @@ final class PsInstallerService extends InstallerService
         $apiKey = $configuration->get('MYPARCELNL_API_KEY');
 
         if ($apiKey) {
-            // Pre-2.0.0
-            return '1.999.0';
+            return self::VERSION_PRE_PDK;
         }
 
         return null;
@@ -166,6 +169,10 @@ final class PsInstallerService extends InstallerService
          * Always register hooks, since the methods may have changed. PrestaShops checks if hook is already registered.
          */
         MyParcelModule::registerHooks();
+
+        if ($this->getInstalledVersion() === self::VERSION_PRE_PDK) {
+            Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
+        }
     }
 
     /**

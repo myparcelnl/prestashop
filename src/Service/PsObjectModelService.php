@@ -14,6 +14,27 @@ use RuntimeException;
 
 final class PsObjectModelService implements PsObjectModelServiceInterface
 {
+    /**
+     * @param  \ObjectModel $model
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function add(ObjectModel $model): bool
+    {
+        $class   = get_class($model);
+        $success = $model->add();
+
+        if ($success) {
+            Logger::debug("Created $class with id $model->id");
+        } else {
+            Logger::error("Failed to create $class");
+        }
+
+        return (bool) $success;
+    }
+
     public function create(string $class, $input = null): ObjectModel
     {
         return $input ? new $class($input) : new $class();
@@ -33,6 +54,7 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
             Logger::error("Failed to delete $modelText: does not exist");
         }
 
+        /** @var ObjectModel $model */
         $model = $this->get($class, $input);
 
         if ($soft ? $model->softDelete() : $model->delete()) {
@@ -69,12 +91,26 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
 
     public function exists(string $class, $input): bool
     {
-        return (bool) $this->get($class, $input)->id;
+        $model = $this->get($class, $input);
+
+        return $model && $model->id;
     }
 
-    public function get(string $class, $input): ObjectModel
+    public function get(string $class, $input): ?ObjectModel
     {
-        return $this->isModel($class, $input) ? $input : $this->create($class, $input);
+        if ($this->isModel($class, $input)) {
+            return $input;
+        }
+
+        $id = $this->getId($class, $input);
+
+        if ($id) {
+            $model = new $class($id);
+
+            return $this->exists($class, $model) ? $model : null;
+        }
+
+        return null;
     }
 
     public function getId(string $class, $input): ?int
@@ -87,13 +123,34 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
     }
 
     /**
+     * @param  \ObjectModel $model
+     *
+     * @return bool
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function update(ObjectModel $model): bool
+    {
+        $class   = get_class($model);
+        $success = $model->update();
+
+        if ($success) {
+            Logger::debug("Updated $class with id $model->id");
+        } else {
+            Logger::error("Failed to update $class with id $model->id");
+        }
+
+        return (bool) $success;
+    }
+
+    /**
      * @throws \PrestaShopException
      * @throws \PrestaShopDatabaseException
      */
     public function updateOrAdd(ObjectModel $model, ?bool $existing = null): ObjectModel
     {
         $exists = $existing ?? (bool) $model->id;
-        $result = $exists ? $model->update() : $model->add();
+        $result = $exists ? $this->update($model) : $this->add($model);
 
         if (! $result) {
             throw new RuntimeException(sprintf('Could not %s %s', $exists ? 'update' : 'create', get_class($model)));

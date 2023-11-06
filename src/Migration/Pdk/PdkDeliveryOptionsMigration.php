@@ -6,8 +6,10 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Generator;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
@@ -49,6 +51,9 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
     public function up(): void
     {
         $this->migrateDeliveryOptions();
+
+        // Done to avoid constraint errors in the next migration, which also involves the order_data table.
+        EntityManager::flush();
     }
 
     /**
@@ -112,6 +117,8 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
             $orderId = $this->getDbValue('orders', 'id_order', "id_cart = $cartId");
 
             if (! $orderId) {
+                Logger::info("No order found for cart $cartId");
+
                 return;
             }
 
@@ -128,6 +135,8 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
                     'data' => json_encode(['deliveryOptions' => $newDeliveryOptions]),
                 ]
             );
+
+            Logger::debug("Migrated delivery options for order $orderId");
         });
     }
 

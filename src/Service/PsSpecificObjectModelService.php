@@ -70,9 +70,9 @@ abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServ
     /**
      * @param  int|T $input
      *
-     * @return T
+     * @return null|T
      */
-    public function get($input): ObjectModel
+    public function get($input): ?ObjectModel
     {
         return $this->psObjectModelService->get($this->getClass(), $input);
     }

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
-use InvalidArgumentException;
-use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Facade\Logger;
-use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
+use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use Order;
 
-final class PsOrderService extends Repository implements PsOrderServiceInterface
+/**
+ * @template T of Order
+ * @extends \MyParcelNL\PrestaShop\Service\PsSpecificObjectModelService<T>
+ */
+final class PsOrderService extends PsSpecificObjectModelService implements PsOrderServiceInterface
 {
     /**
      * @var \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository
@@ -27,117 +29,90 @@ final class PsOrderService extends Repository implements PsOrderServiceInterface
     private $psOrderDataRepository;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                        $storage
+     * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface     $psObjectModelService
      * @param  \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository
      * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository           $psOrderDataRepository
      */
     public function __construct(
-        MemoryCacheStorage              $storage,
+        PsObjectModelServiceInterface   $psObjectModelService,
         PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository,
         PsOrderDataRepository           $psOrderDataRepository
     ) {
-        parent::__construct($storage);
+        parent::__construct($psObjectModelService);
         $this->psCartDeliveryOptionsRepository = $psCartDeliveryOptionsRepository;
         $this->psOrderDataRepository           = $psOrderDataRepository;
-    }
-
-    /**
-     * @param  string|int|Order $input
-     *
-     * @return \Order
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    public function get($input): Order
-    {
-        if ($input instanceof Order) {
-            return $input;
-        }
-
-        $psOrder = new Order((int) $input);
-
-        if (! $psOrder->id) {
-            throw new InvalidArgumentException("Order with id $input not found");
-        }
-
-        return $psOrder;
     }
 
     /**
      * In PrestaShop, the delivery options are stored in the cart, not in the order. So we need to get them from the
      * cart if they are not present in the order yet.
      *
-     * @param  string|int|Order $orderOrId
+     * @param  string|int|Order $input
      *
      * @return array
      * @throws \Doctrine\ORM\ORMException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
-    public function getOrderData($orderOrId): array
+    public function getOrderData($input): array
     {
-        $fromOrder = $this->psOrderDataRepository->findOneBy(['orderId' => (int) $this->getOrderId($orderOrId)]);
+        if (! $this->exists($input)) {
+            return [];
+        }
+
+        $fromOrder = $this->psOrderDataRepository->findOneBy(['orderId' => $this->getId($input)]);
 
         if (! $fromOrder) {
-            return $this->getFromCart($this->get($orderOrId));
+            return $this->getFromCart($input);
         }
 
         return $fromOrder->getData();
     }
 
     /**
-     * @param  string|int|Order $orderOrId
+     * @param  string|int|Order $input
      * @param  array            $orderData
      *
      * @return void
      * @throws \Doctrine\ORM\ORMException
      */
-    public function updateData($orderOrId, array $orderData): void
+    public function updateOrderData($input, array $orderData): void
     {
         $this->psOrderDataRepository->updateOrCreate(
-            ['orderId' => (int) $this->getOrderId($orderOrId)],
+            ['orderId' => $this->getId($input)],
             ['data' => json_encode($orderData)]
         );
+    }
+
+    protected function getClass(): string
+    {
+        return Order::class;
     }
 
     /**
      * Get the delivery options from the cart and save it to the order.
      *
-     * @param  \Order $order
+     * @param  string|int|Order $input
      *
      * @return array
      * @throws \Doctrine\ORM\ORMException
      */
-    private function getFromCart(Order $order): array
+    private function getFromCart($input): array
     {
+        $order    = $this->get($input);
+        $id       = $this->getId($order);
         $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['cartId' => $order->id_cart]);
 
         if ($fromCart) {
-            Logger::debug("[Order $order->id] Delivery options found in cart, saving to order");
+            Logger::debug("[Order $id] Delivery options found in cart, saving to order");
         } else {
-            Logger::debug("[Order $order->id] Saving empty order data to order");
+            Logger::debug("[Order $id] Saving empty order data to order");
         }
 
         $orderData = $fromCart ? ['deliveryOptions' => $fromCart->getData()] : [];
 
-        $this->updateData((string) $order->id, $orderData);
+        $this->updateOrderData($order, $orderData);
 
         EntityManager::flush();
 
         return $orderData;
-    }
-
-    /**
-     * @param  string|int|Order $orderOrId
-     *
-     * @return string
-     */
-    private function getOrderId($orderOrId): string
-    {
-        if ($orderOrId instanceof Order) {
-            return (string) $orderOrId->id;
-        }
-
-        return (string) $orderOrId;
     }
 }

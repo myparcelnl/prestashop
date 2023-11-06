@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Service;
 
 use Cart;
 use Module;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 
@@ -114,10 +115,11 @@ final class ModuleService
 
         foreach (Pdk::get('moduleHooks') as $hook) {
             if ($instance->registerHook($hook)) {
+                Logger::debug("Hook $hook registered");
                 continue;
             }
 
-            throw new InstallationException(sprintf('Hook %s could not be registered.', $hook));
+            throw new InstallationException(sprintf('Hook %s could not be registered', $hook));
         }
     }
 }

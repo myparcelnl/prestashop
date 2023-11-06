@@ -20,6 +20,11 @@ final class PsEntityManagerService
         $this->entityManager = Pdk::get('ps.entityManager');
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Throwable
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
     public function flush(): void
     {
         if (! $this->entityManager->isOpen()) {
