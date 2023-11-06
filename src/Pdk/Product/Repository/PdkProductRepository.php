@@ -9,10 +9,8 @@ use MyParcelNL\Pdk\App\Order\Collection\PdkProductCollection;
 use MyParcelNL\Pdk\App\Order\Model\PdkProduct;
 use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkPdkProductRepository;
 use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
-use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
-use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -28,12 +26,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
     /**
      * @var \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository
      */
-    private $productSettingsRepository;
-
-    /**
-     * @var \Doctrine\ORM\EntityRepository
-     */
-    private $psProductRepository;
+    private $psProductSettingsRepository;
 
     /**
      * @var \MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService
@@ -53,13 +46,9 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
         CurrencyServiceInterface    $currencyService
     ) {
         parent::__construct($storage);
-        $this->weightService             = $weightService;
-        $this->productSettingsRepository = $productSettingsRepository;
-        $this->currencyService           = $currencyService;
-
-        /** @var \Doctrine\ORM\EntityManager $entityManager */
-        $entityManager             = Pdk::get('ps.entityManager');
-        $this->psProductRepository = $entityManager->getRepository(MyparcelnlProductSettings::class);
+        $this->weightService               = $weightService;
+        $this->psProductSettingsRepository = $productSettingsRepository;
+        $this->currencyService             = $currencyService;
     }
 
     /**
@@ -97,7 +86,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
     public function getProductSettings($identifier): ProductSettings
     {
         /** @var \MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings $psProductSettings */
-        $psProductSettings = $this->productSettingsRepository->findOneBy(['productId' => $identifier]);
+        $psProductSettings = $this->psProductSettingsRepository->findOneBy(['productId' => $identifier]);
 
         $array = $psProductSettings ? $psProductSettings->toArray() : [];
 
@@ -124,7 +113,7 @@ class PdkProductRepository extends AbstractPdkPdkProductRepository
      */
     public function update(PdkProduct $product): void
     {
-        $this->productSettingsRepository->updateOrCreate(
+        $this->psProductSettingsRepository->updateOrCreate(
             [
                 'productId' => (int) $product->externalIdentifier,
             ],
