@@ -97,6 +97,7 @@ final class PsOrderService extends PsSpecificObjectModelService implements PsOrd
      */
     private function getFromCart($input): array
     {
+        /** @var Order $order */
         $order    = $this->get($input);
         $id       = $this->getId($order);
         $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['cartId' => $order->id_cart]);
