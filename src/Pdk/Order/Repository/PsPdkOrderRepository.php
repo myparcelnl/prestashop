@@ -12,8 +12,6 @@ use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderRepository;
 use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Base\Support\Collection;
-use MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration;
-use MyParcelNL\Pdk\Shipment\Model\CustomsDeclarationItem;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
@@ -230,7 +228,8 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
                     'id'      => $shipment->getShipmentId(),
                     'orderId' => $shipment->getOrderId(),
                 ]);
-            });
+            })
+            ->values();
     }
 
     /**
