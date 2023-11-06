@@ -52,5 +52,6 @@ class PdkSettingsRepository extends AbstractSettingsRepository
         }
 
         $this->configurationService->set($key, $value);
+        $this->save($key, $value);
     }
 }

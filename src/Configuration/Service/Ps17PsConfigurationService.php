@@ -74,6 +74,8 @@ final class Ps17PsConfigurationService implements PsConfigurationServiceInterfac
      */
     public function set(string $key, $value, ShopConstraint $shopConstraint = null): void
     {
-        $this->configurationService->set($key, json_encode($value), $shopConstraint);
+        $storableValue = is_scalar($value) ? $value : json_encode($value);
+
+        $this->configurationService->set($key, $storableValue, $shopConstraint);
     }
 }
