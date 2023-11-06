@@ -1,4 +1,3 @@
-import {globalLogger} from '@myparcel-pdk/admin-core';
 import {AdminAction, useActionStore} from '@myparcel-pdk/admin';
 
 const BULK_ACTION_PREFIX = 'myparcelnl';
@@ -11,15 +10,20 @@ const BULK_ACTION_MAP = Object.freeze({
 });
 
 export const listenForBulkActions = (): void => {
+  if (!document.querySelector('.js-bulk-actions-btn')) {
+    return;
+  }
+
   Object.entries(BULK_ACTION_MAP).forEach(([key, action]) => {
     const button = document.querySelector<HTMLElement>(`.${BULK_ACTION_PREFIX}-${key}`);
 
     if (!button) {
-      globalLogger.error(`Could not find bulk action button for ${key}`);
+      // eslint-disable-next-line no-console
+      console.error(`Could not find bulk action button for ${key}`);
       return;
     }
 
-    button.addEventListener('click', (event) => {
+    button.addEventListener('click', () => {
       const actionStore = useActionStore();
 
       const orderCheckboxes = document.querySelectorAll<HTMLInputElement>('.js-bulk-action-checkbox:checked');
