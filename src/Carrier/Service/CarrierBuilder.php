@@ -173,19 +173,21 @@ final class CarrierBuilder
 
         $psCarrier = $this->getExistingPsCarrier() ?? $this->psCarrierService->create();
 
-        $psCarrier->name                 = $this->myParcelCarrier->human;
+        $psCarrier->name                 = $psCarrier->name ?? $this->myParcelCarrier->human;
         $psCarrier->active               = (int) $this->myParcelCarrier->enabled;
         $psCarrier->id_reference         = $this->createCarrierIdReference();
         $psCarrier->deleted              = 0;
         $psCarrier->external_module_name = $module->name;
         $psCarrier->is_module            = true;
-        $psCarrier->need_range           = 1;
-        $psCarrier->range_behavior       = 1;
+        $psCarrier->need_range           = false;
         $psCarrier->shipping_external    = true;
         $psCarrier->shipping_method      = 2;
 
         foreach (PsLanguage::getLanguages() as $lang) {
-            $psCarrier->delay[$lang['id_lang']] = Language::translate('carrier_delivery_time', $lang['iso_code']);
+            $existingString = $psCarrier->delay[$lang['id_lang']] ?? null;
+            $newString      = Language::translate('carrier_delivery_time', $lang['iso_code']);
+
+            $psCarrier->delay[$lang['id_lang']] = $existingString ?? $newString;
         }
 
         $this->psCarrierService->updateOrAdd($psCarrier);
