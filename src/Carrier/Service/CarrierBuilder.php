@@ -176,10 +176,11 @@ final class CarrierBuilder
         $psCarrier->name                 = $psCarrier->name ?? $this->myParcelCarrier->human;
         $psCarrier->active               = (int) $this->myParcelCarrier->enabled;
         $psCarrier->id_reference         = $this->createCarrierIdReference();
-        $psCarrier->deleted              = 0;
+        $psCarrier->deleted              = false;
         $psCarrier->external_module_name = $module->name;
         $psCarrier->is_module            = true;
-        $psCarrier->need_range           = false;
+        $psCarrier->need_range           = true;
+        $psCarrier->range_behavior       = true;
         $psCarrier->shipping_external    = true;
         $psCarrier->shipping_method      = 2;
 
