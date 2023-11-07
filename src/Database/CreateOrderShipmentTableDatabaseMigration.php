@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
+use MyParcelNL\PrestaShop\Database\Sql\CreateIndexSqlBuilder;
 use MyParcelNL\PrestaShop\Database\Sql\CreateTableSqlBuilder;
 use MyParcelNL\PrestaShop\Database\Sql\DropTableSqlBuilder;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
@@ -25,9 +26,13 @@ final class CreateOrderShipmentTableDatabaseMigration extends AbstractDatabaseMi
             ->id('shipment_id')
             ->column('data', 'TEXT NOT NULL')
             ->timestamps()
-            ->primary(['order_id', 'shipment_id']);
+            ->primary(['shipment_id']);
 
         $this->execute($sql);
+
+        $indexSql = (new CreateIndexSqlBuilder($this->getTable()))->index('order_id', ['order_id']);
+
+        $this->execute($indexSql);
     }
 
     /**

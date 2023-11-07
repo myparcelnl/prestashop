@@ -24,7 +24,8 @@ final class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseM
             ->id('carrier_id')
             ->column('myparcel_carrier', 'VARCHAR(32)')
             ->timestamps()
-            ->primary(['carrier_id', 'myparcel_carrier']);
+            ->primary(['carrier_id'])
+            ->unique(['myparcel_carrier']);
 
         $this->execute($sql);
     }

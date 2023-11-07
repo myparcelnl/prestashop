@@ -16,6 +16,11 @@ final class CreateTableSqlBuilder extends SqlBuilder
      */
     private $primary = [];
 
+    /**
+     * @var array
+     */
+    private $unique = [];
+
     public function build(): string
     {
         $rows = array_map(static function ($column) {
@@ -33,8 +38,12 @@ final class CreateTableSqlBuilder extends SqlBuilder
             $string .= sprintf(', PRIMARY KEY (%s)', implode(', ', $this->primary));
         }
 
+        if (! empty($this->unique)) {
+            $string .= sprintf(', UNIQUE KEY (%s)', implode(', ', $this->unique));
+        }
+
         return sprintf(
-            'CREATE TABLE if NOT EXISTS `%s` (%s) ENGINE=%s DEFAULT CHARSET=utf8;',
+            'CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=%s DEFAULT CHARSET=utf8;',
             $this->getTable(),
             $string,
             $this->getEngine()
@@ -94,5 +103,17 @@ final class CreateTableSqlBuilder extends SqlBuilder
         return $this
             ->column('date_add', 'DATETIME')
             ->column('date_upd', 'DATETIME');
+    }
+
+    /**
+     * @param  array $keys
+     *
+     * @return $this
+     */
+    public function unique(array $keys): self
+    {
+        $this->unique = $keys;
+
+        return $this;
     }
 }
