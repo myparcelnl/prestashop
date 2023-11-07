@@ -32,6 +32,18 @@ abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServ
     abstract protected function getClass(): string;
 
     /**
+     * @param  \T $model
+     *
+     * @return \T
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function add(ObjectModel $model): bool
+    {
+        return $this->psObjectModelService->add($model);
+    }
+
+    /**
      * @param  null|int $id
      *
      * @return T
@@ -85,6 +97,18 @@ abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServ
     public function getId($input): ?int
     {
         return $this->psObjectModelService->getId($this->getClass(), $input);
+    }
+
+    /**
+     * @param  \T $model
+     *
+     * @return \T
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function update(ObjectModel $model): bool
+    {
+        return $this->psObjectModelService->update($model);
     }
 
     /**

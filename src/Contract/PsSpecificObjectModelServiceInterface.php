@@ -12,6 +12,15 @@ use ObjectModel;
 interface PsSpecificObjectModelServiceInterface
 {
     /**
+     * @param  \T $model
+     *
+     * @return \T
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function add(ObjectModel $model): bool;
+
+    /**
      * @param  null|int $id
      *
      * @return T
@@ -54,4 +63,13 @@ interface PsSpecificObjectModelServiceInterface
      * @return null|int
      */
     public function getId($input): ?int;
+
+    /**
+     * @param  \T $model
+     *
+     * @return \T
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function update(ObjectModel $model): bool;
 }
