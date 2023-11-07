@@ -19,7 +19,7 @@ final class CreateIndexSqlBuilder extends SqlBuilder
     public function build(): string
     {
         return sprintf(
-            'CREATE INDEX `%s` ON `%s` (%s);',
+            'CREATE INDEX IF NOT EXISTS `%s` ON `%s` (%s);',
             $this->index,
             $this->getTable(),
             implode(', ', $this->columns)
@@ -28,7 +28,7 @@ final class CreateIndexSqlBuilder extends SqlBuilder
 
     public function index(string $name, array $columns): self
     {
-        $this->index = $name;
+        $this->index   = $name;
         $this->columns = $columns;
 
         return $this;
