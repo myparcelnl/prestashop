@@ -105,13 +105,11 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
                     'externalIdentifier'  => $psOrder->id,
                     'shippingAddress'     => $this->addressAdapter->fromOrder($psOrder, 'shipping'),
                     'billingAddress'      => $this->addressAdapter->fromOrder($psOrder, 'billing'),
-                    'physicalProperties'  => $this->getPhysicalProperties($orderProducts),
                     'shipments'           => $this->getShipments($psOrder),
                     'referenceIdentifier' => "PrestaShop: $psOrder->id",
                     'shipmentPrice'       => $this->currencyService->convertToCents($psOrder->total_shipping_tax_incl),
                     'shipmentVat'         => $this->currencyService->convertToCents($psOrder->total_shipping_tax_excl),
                     'lines'               => $this->createOrderLines($orderProducts),
-                    'customsDeclaration'  => $this->createCustomsDeclaration($psOrder, $orderProducts),
                     'invoiceId'           => $psOrder->id,
                     'invoiceDate'         => $psOrder->date_add,
                     'paymentMethod'       => $psOrder->payment,
@@ -166,29 +164,6 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  \Order $order
-     * @param  array  $orderProducts
-     *
-     * @return \MyParcelNL\Pdk\Shipment\Model\CustomsDeclaration
-     */
-    protected function createCustomsDeclaration(PsOrder $order, array $orderProducts): CustomsDeclaration
-    {
-        return new CustomsDeclaration([
-            'invoice' => $order->invoice_number,
-            'items'   => array_map(function (array $product) {
-                $pdkProduct = $this->productRepository->getProduct($product['id_product']);
-
-                return CustomsDeclarationItem::fromProduct($pdkProduct, [
-                    'amount'    => $product['product_quantity'] ?? 1,
-                    'itemValue' => [
-                        'amount' => $this->currencyService->convertToCents($product['product_price_wt'] ?? 0),
-                    ],
-                ]);
-            }, array_values($orderProducts)),
-        ]);
-    }
-
-    /**
      * @param  array $orderProducts
      *
      * @return array|array[]
@@ -197,7 +172,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     {
         return array_map(function (array $product) {
             return [
-                'quantity'      => $this->currencyService->convertToCents($product['product_quantity'] ?? 0),
+                'quantity'      => $product['product_quantity'] ?? 1,
                 'price'         => $this->currencyService->convertToCents($product['product_price'] ?? 0),
                 'priceAfterVat' => $this->currencyService->convertToCents($product['product_price_wt'] ?? 0),
                 'product'       => $this->productRepository->getProduct($product['product_id']),
@@ -230,23 +205,5 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
                 ]);
             })
             ->values();
-    }
-
-    /**
-     * @param  array $orderProducts
-     *
-     * @return int[]
-     */
-    private function getPhysicalProperties(array $orderProducts): array
-    {
-        $weight = 0;
-
-        foreach ($orderProducts as $product) {
-            $weight += (float) $product['product_weight'] * $product['product_quantity'];
-        }
-
-        return [
-            'weight' => $this->weightService->convertToGrams($weight),
-        ];
     }
 }

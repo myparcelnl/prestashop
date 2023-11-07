@@ -11,7 +11,7 @@ it('creates sql', function () {
     $builder->index('index_123', ['column1', 'column2']);
 
     $result = <<<SQL
-CREATE INDEX `index_123` ON `table` (column1, column2);
+CREATE INDEX `index_123` ON `ps_table` (column1, column2);
 SQL;
 
     expect($builder->build())->toEqual($result);

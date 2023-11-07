@@ -72,7 +72,14 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
     $deliveryOptionsArray = $order->deliveryOptions->toStorableArray();
 
     $fullResult = array_replace_recursive([
-        DeliveryOptions::CARRIER          => ['externalIdentifier' => Platform::get('defaultCarrier')],
+        DeliveryOptions::CARRIER          => [
+            'externalIdentifier' => Platform::get('defaultCarrier'),
+            'enabled'            => false,
+            'isDefault'          => true,
+            'optional'           => false,
+            'primary'            => false,
+            'type'               => 'main',
+        ],
         DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
         DeliveryOptions::LABEL_AMOUNT     => 1,
         DeliveryOptions::PACKAGE_TYPE     => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,

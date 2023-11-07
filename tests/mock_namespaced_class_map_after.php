@@ -36,3 +36,15 @@ class DocParser extends BaseMock { }
 class AnnotationReader extends BaseMock { }
 
 class PsrCachedReader extends BaseMock { }
+
+namespace Doctrine\ORM\Mapping\Driver;
+
+use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
+
+class AnnotationDriver extends BaseMock { }
+
+namespace Symfony\Component\Cache\Adapter;
+
+use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
+
+class ArrayAdapter extends BaseMock { }

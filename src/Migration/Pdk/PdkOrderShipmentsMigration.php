@@ -77,8 +77,6 @@ final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
             $shipment->barcode = $orderLabel['barcode'];
             $shipment->status  = $orderLabel['status'];
 
-            $pdkOrder->shipments->push($shipment);
-
             $carry->put($pdkOrder->externalIdentifier, $pdkOrder);
 
             Logger::debug("Migrated shipment $shipmentId for order $orderId");

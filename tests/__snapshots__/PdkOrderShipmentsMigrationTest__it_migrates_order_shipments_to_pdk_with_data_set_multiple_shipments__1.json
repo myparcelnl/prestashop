@@ -1,110 +1,100 @@
 [
-  {
-    "orderId": "1",
-    "multiCollo": false,
-    "updated": "2099-01-01 00:00:00",
-    "id": 12004,
-    "referenceIdentifier": "1",
-    "barcode": "3SMYPA1234567",
-    "carrier": {
-      "externalIdentifier": "postnl"
+    {
+        "orderId": "1",
+        "multiCollo": false,
+        "updated": "2099-01-01 00:00:00",
+        "id": 12004,
+        "referenceIdentifier": "1",
+        "barcode": "3SMYPA1234567",
+        "carrier": {
+            "enabled": false,
+            "externalIdentifier": "postnl",
+            "isDefault": true,
+            "optional": false,
+            "primary": false,
+            "type": "main"
+        },
+        "delayed": false,
+        "delivered": false,
+        "deliveryOptions": {
+            "carrier": {
+                "enabled": false,
+                "externalIdentifier": "postnl",
+                "isDefault": true,
+                "optional": false,
+                "primary": false,
+                "type": "main"
+            },
+            "labelAmount": 1,
+            "shipmentOptions": {
+                "insurance": -1,
+                "ageCheck": -1,
+                "hideSender": -1,
+                "largeFormat": -1,
+                "onlyRecipient": -1,
+                "return": -1,
+                "sameDayDelivery": -1,
+                "signature": -1
+            },
+            "deliveryType": "standard",
+            "packageType": "package"
+        },
+        "hidden": false,
+        "isReturn": false,
+        "partnerTrackTraces": [],
+        "price": {
+            "amount": 0,
+            "currency": "EUR"
+        },
+        "status": 0
     },
-    "customsDeclaration": {
-      "contents": 1,
-      "items": [],
-      "weight": 0
-    },
-    "delayed": false,
-    "delivered": false,
-    "deliveryOptions": {
-      "carrier": {
-        "externalIdentifier": "postnl"
-      },
-      "labelAmount": 1,
-      "shipmentOptions": {
-        "insurance": -1,
-        "ageCheck": -1,
-        "hideSender": -1,
-        "largeFormat": -1,
-        "onlyRecipient": -1,
-        "return": -1,
-        "sameDayDelivery": -1,
-        "signature": -1
-      },
-      "deliveryType": "standard",
-      "packageType": "package"
-    },
-    "hidden": false,
-    "isReturn": false,
-    "partnerTrackTraces": [],
-    "physicalProperties": {
-      "weight": 0
-    },
-    "price": {
-      "amount": 0,
-      "currency": "EUR"
-    },
-    "recipient": {
-      "address1": "Antareslaan 31",
-      "city": "Hoofddorp",
-      "postalCode": "2132JE",
-      "person": "Felicia Parcel"
-    },
-    "sender": [],
-    "status": 0
-  },
-  {
-    "orderId": "1",
-    "multiCollo": false,
-    "updated": "2099-01-01 00:00:00",
-    "id": 12006,
-    "referenceIdentifier": "1",
-    "barcode": "3SMYPA1234567",
-    "carrier": {
-      "externalIdentifier": "postnl"
-    },
-    "customsDeclaration": {
-      "contents": 1,
-      "items": [],
-      "weight": 0
-    },
-    "delayed": false,
-    "delivered": false,
-    "deliveryOptions": {
-      "carrier": {
-        "externalIdentifier": "postnl"
-      },
-      "labelAmount": 1,
-      "shipmentOptions": {
-        "insurance": -1,
-        "ageCheck": -1,
-        "hideSender": -1,
-        "largeFormat": -1,
-        "onlyRecipient": -1,
-        "return": -1,
-        "sameDayDelivery": -1,
-        "signature": -1
-      },
-      "deliveryType": "standard",
-      "packageType": "package"
-    },
-    "hidden": false,
-    "isReturn": false,
-    "partnerTrackTraces": [],
-    "physicalProperties": {
-      "weight": 0
-    },
-    "price": {
-      "amount": 0,
-      "currency": "EUR"
-    },
-    "recipient": {
-      "address1": "Antareslaan 31",
-      "city": "Hoofddorp",
-      "postalCode": "2132JE",
-      "person": "Felicia Parcel"
-    },
-    "sender": [],
-    "status": 0
-  }
+    {
+        "orderId": "1",
+        "multiCollo": false,
+        "updated": "2099-01-01 00:00:00",
+        "id": 12006,
+        "referenceIdentifier": "1",
+        "barcode": "3SMYPA1234567",
+        "carrier": {
+            "enabled": false,
+            "externalIdentifier": "postnl",
+            "isDefault": true,
+            "optional": false,
+            "primary": false,
+            "type": "main"
+        },
+        "delayed": false,
+        "delivered": false,
+        "deliveryOptions": {
+            "carrier": {
+                "enabled": false,
+                "externalIdentifier": "postnl",
+                "isDefault": true,
+                "optional": false,
+                "primary": false,
+                "type": "main"
+            },
+            "labelAmount": 1,
+            "shipmentOptions": {
+                "insurance": -1,
+                "ageCheck": -1,
+                "hideSender": -1,
+                "largeFormat": -1,
+                "onlyRecipient": -1,
+                "return": -1,
+                "sameDayDelivery": -1,
+                "signature": -1
+            },
+            "deliveryType": "standard",
+            "packageType": "package"
+        },
+        "hidden": false,
+        "isReturn": false,
+        "partnerTrackTraces": [],
+        "price": {
+            "amount": 0,
+            "currency": "EUR"
+        },
+        "status": 0
+    }
 ]

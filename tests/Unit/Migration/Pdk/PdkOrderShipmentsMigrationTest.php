@@ -79,11 +79,9 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
         ->where('orderId', 1)
         ->values();
 
-    $matchingOrderLabels = array_values(
-        Arr::where($orderLabels, function (array $item) {
-            return 1 === $item['id_order'];
-        })
-    );
+    $matchingOrderLabels = array_values(Arr::where($orderLabels, function (array $item) {
+        return 1 === $item['id_order'];
+    }));
 
     foreach ($matchingOrderLabels as $index => $orderLabel) {
         $orderShipment = $psOrderShipments->offsetGet($index);
