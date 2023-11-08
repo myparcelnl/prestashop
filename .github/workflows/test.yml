@@ -63,7 +63,7 @@ jobs:
         shell: bash
         #language=sh
         run: |
-          docker run \
+          docker run -t \
             --volume $PWD:/app \
             ${{ steps.setup.outputs.image }} \
             php -dpcov.enabled=1 \
