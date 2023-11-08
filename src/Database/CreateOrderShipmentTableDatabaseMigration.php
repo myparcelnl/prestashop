@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Database;
 
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Database\Sql\CreateIndexSqlBuilder;
 use MyParcelNL\PrestaShop\Database\Sql\CreateTableSqlBuilder;
 use MyParcelNL\PrestaShop\Database\Sql\DropTableSqlBuilder;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
+use Throwable;
 
 /**
  * @see \MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment
@@ -30,9 +32,13 @@ final class CreateOrderShipmentTableDatabaseMigration extends AbstractDatabaseMi
 
         $this->execute($sql);
 
-        $indexSql = (new CreateIndexSqlBuilder($this->getTable()))->index('order_id', ['order_id']);
+        try {
+            $indexSql = (new CreateIndexSqlBuilder($this->getTable()))->index('order_id', ['order_id']);
 
-        $this->execute($indexSql);
+            $this->execute($indexSql);
+        } catch (Throwable $e) {
+            Logger::error('Could not create index.', ['error' => $e->getMessage(), 'class' => self::class]);
+        }
     }
 
     /**
