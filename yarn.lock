@@ -849,8 +849,8 @@ __metadata:
   linkType: hard
 
 "@myparcel-pdk/app-builder@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.63
-  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-alpha.63"
+  version: 1.0.0-alpha.64
+  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-alpha.64"
   dependencies:
     "@edielemoine/google-docs-importer": "npm:^1.1.1"
     "@yarnpkg/parsers": "npm:^3.0.0-rc.48.1"
@@ -865,7 +865,7 @@ __metadata:
     supports-color: "npm:^9.3.1"
   bin:
     pdk-builder: ./bin/index.js
-  checksum: 4a9f1755e43c3473b2ac13f24e64955ccb828b7c1c918c83db3fc1a3fd3fde055dd5add4e2ef95ec09070212802a9ea4fcdaeeae6ad68cd89436a1a9a60462b4
+  checksum: 666ed737400c5cdfe9b158c7712d5ebd365c5302af2036fd0595790c7bd6df7ede0694bb1aeff50ad24b807fdd229f1c0a3e431b397a89798c56a7fbdce23eeb
   languageName: node
   linkType: hard
 
@@ -878,24 +878,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/checkout-delivery-options@npm:^1.0.0-alpha.40":
-  version: 1.0.0-alpha.40
-  resolution: "@myparcel-pdk/checkout-delivery-options@npm:1.0.0-alpha.40"
+"@myparcel-pdk/checkout-delivery-options@npm:^1.0.0-alpha.41":
+  version: 1.0.0-alpha.41
+  resolution: "@myparcel-pdk/checkout-delivery-options@npm:1.0.0-alpha.41"
   dependencies:
     "@myparcel-pdk/checkout-common": "npm:^1.0.0-alpha.9"
     "@myparcel-pdk/delivery-options": "npm:^1.0.0-alpha.12"
     "@myparcel/delivery-options": "npm:^5.7.2"
     "@myparcel/ts-utils": "npm:^1.9.0"
-  checksum: ef27b026bf536f4d5f7c373f6c1fa4e2d7ef056903b860274370732147032f465c9d82cf45ea2f418a3b1a553995214affd851e8e8b8b7887592ce7eb17febd5
+  checksum: 7fe6ba0fb2968bb82fe7cf90e40d5ff3638223ef81da38d1565e7dd6ab7ebd1495ecc66fe81f8dceabb71c21ae6d3993f015dfa1c6befe3d9f92dfe7af64ee0a
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/checkout-separate-address-fields@npm:^1.0.0-alpha.40":
-  version: 1.0.0-alpha.40
-  resolution: "@myparcel-pdk/checkout-separate-address-fields@npm:1.0.0-alpha.40"
+"@myparcel-pdk/checkout-separate-address-fields@npm:^1.0.0-alpha.41":
+  version: 1.0.0-alpha.41
+  resolution: "@myparcel-pdk/checkout-separate-address-fields@npm:1.0.0-alpha.41"
   dependencies:
     "@myparcel-pdk/checkout-common": "npm:^1.0.0-alpha.9"
-  checksum: 5ccc710fa6fa44ac19f8022789c424997bd9cc58c721bce85582716b61dd50978398c5de7deecdd6e7ad0a324bb00fcf69c95863ed4973c7057777db7326ee0b
+  checksum: b48ee1e08954547a04a7b749509b5843f2719c8c97db931609868e3b7882aff7b14ec71521a2dd3f60270618106d0f53daa5ad9ae310e1d4f4e526e0a6466890
   languageName: node
   linkType: hard
 
@@ -909,15 +909,15 @@ __metadata:
   linkType: hard
 
 "@myparcel-pdk/checkout@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.77
-  resolution: "@myparcel-pdk/checkout@npm:1.0.0-alpha.77"
+  version: 1.0.0-alpha.78
+  resolution: "@myparcel-pdk/checkout@npm:1.0.0-alpha.78"
   dependencies:
     "@myparcel-pdk/checkout-common": "npm:^1.0.0-alpha.9"
-    "@myparcel-pdk/checkout-delivery-options": "npm:^1.0.0-alpha.40"
-    "@myparcel-pdk/checkout-separate-address-fields": "npm:^1.0.0-alpha.40"
+    "@myparcel-pdk/checkout-delivery-options": "npm:^1.0.0-alpha.41"
+    "@myparcel-pdk/checkout-separate-address-fields": "npm:^1.0.0-alpha.41"
     "@myparcel-pdk/checkout-tax-fields": "npm:^1.0.0-alpha.41"
     "@myparcel-pdk/common": "npm:^1.0.0-alpha.58"
-  checksum: bc87bbd430d4db045dbc5b44f8a8df65e0600168beb88048cd26cb97d4c1c52072f299495b834a69defaadb45892498f07c34813b7e1a972ae51e5dea625c41b
+  checksum: fba15e5f486f8f7877273672bad0a30d0bfa5d130a49ca2db3c4e57bd7d92b3b62ff3b8c9f38e13d808a7df3e24cd3ceeefb3cf76cdee7a6e7049062e15f149c
   languageName: node
   linkType: hard
 
