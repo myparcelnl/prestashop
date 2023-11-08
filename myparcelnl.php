@@ -16,7 +16,7 @@ use MyParcelNL\PrestaShop\Hooks\HasPdkProductHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkRenderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkScriptHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsCarrierHooks;
-use MyParcelNL\PrestaShop\Service\ModuleService;
+use MyParcelNL\PrestaShop\Hooks\HasPsShippingCostHooks;
 use function MyParcelNL\PrestaShop\bootPdk;
 
 defined('_PS_VERSION_') or exit();
@@ -36,6 +36,7 @@ class MyParcelNL extends CarrierModule
     use HasPdkRenderHooks;
     use HasPdkScriptHooks;
     use HasPsCarrierHooks;
+    use HasPsShippingCostHooks;
 
     /**
      * @var bool
@@ -104,34 +105,6 @@ class MyParcelNL extends CarrierModule
         Tools::redirectAdmin($link);
 
         return '';
-    }
-
-    /**
-     * @param  \Cart $params
-     * @param  \int  $shipping_cost
-     *
-     * @return float|int
-     */
-    public function getOrderShippingCost($params, $shipping_cost)
-    {
-        if (! $this->hasPdk) {
-            return 0;
-        }
-
-        /** @var \MyParcelNL\PrestaShop\Service\ModuleService $moduleService */
-        $moduleService = Pdk::get(ModuleService::class);
-
-        return $moduleService->getOrderShippingCost($params, $shipping_cost);
-    }
-
-    /**
-     * @param  \Cart $params
-     *
-     * @return bool
-     */
-    public function getOrderShippingCostExternal($params): bool
-    {
-        return true;
     }
 
     /**
