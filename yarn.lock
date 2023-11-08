@@ -945,6 +945,7 @@ __metadata:
     "@myparcel-pdk/admin-preset-default": "npm:^1.0.0-alpha.36"
     "@myparcel/ts-utils": "npm:^1.7.0"
     "@vitejs/plugin-vue": "npm:^4.0.0"
+    "@vitest/coverage-v8": "npm:^0.34.0"
     "@vueuse/core": "npm:^10.1.2"
     autoprefixer: "npm:^10.4.14"
     happy-dom: "npm:^12.2.1"
@@ -2522,7 +2523,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:>= 0.30.0 < 1":
+"@vitest/coverage-v8@npm:>= 0.30.0 < 1, @vitest/coverage-v8@npm:^0.34.0":
   version: 0.34.6
   resolution: "@vitest/coverage-v8@npm:0.34.6"
   dependencies:
