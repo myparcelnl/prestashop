@@ -1,58 +1,58 @@
 {
-    "1": {
-        "name": "displayBeforeCarrier",
-        "id": 1
-    },
-    "2": {
-        "name": "displayCarrierExtraContent",
-        "id": 2
-    },
-    "3": {
-        "name": "actionCarrierProcess",
-        "id": 3
-    },
-    "4": {
-        "name": "actionOrderGridDefinitionModifier",
-        "id": 4
-    },
-    "5": {
-        "name": "actionOrderGridPresenterModifier",
-        "id": 5
-    },
-    "6": {
-        "name": "actionObjectCustomerMessageAddAfter",
-        "id": 6
-    },
-    "7": {
-        "name": "displayAdminOrderMain",
-        "id": 7
-    },
-    "8": {
-        "name": "actionProductUpdate",
-        "id": 8
-    },
-    "9": {
-        "name": "displayAdminProductsExtra",
-        "id": 9
-    },
-    "10": {
-        "name": "displayAdminAfterHeader",
-        "id": 10
-    },
-    "11": {
-        "name": "displayAdminEndContent",
-        "id": 11
-    },
-    "12": {
-        "name": "displayBackOfficeHeader",
-        "id": 12
-    },
-    "13": {
-        "name": "displayHeader",
-        "id": 13
-    },
-    "14": {
-        "name": "actionCarrierUpdate",
-        "id": 14
-    }
+  "1": {
+    "name": "displayBeforeCarrier",
+    "id": 1
+  },
+  "2": {
+    "name": "displayCarrierExtraContent",
+    "id": 2
+  },
+  "3": {
+    "name": "actionCarrierProcess",
+    "id": 3
+  },
+  "4": {
+    "name": "actionOrderGridDefinitionModifier",
+    "id": 4
+  },
+  "5": {
+    "name": "actionOrderGridPresenterModifier",
+    "id": 5
+  },
+  "6": {
+    "name": "actionObjectCustomerMessageAddAfter",
+    "id": 6
+  },
+  "7": {
+    "name": "displayAdminOrderMain",
+    "id": 7
+  },
+  "8": {
+    "name": "actionProductUpdate",
+    "id": 8
+  },
+  "9": {
+    "name": "displayAdminProductsExtra",
+    "id": 9
+  },
+  "10": {
+    "name": "displayAdminAfterHeader",
+    "id": 10
+  },
+  "11": {
+    "name": "displayAdminEndContent",
+    "id": 11
+  },
+  "12": {
+    "name": "displayBackOfficeHeader",
+    "id": 12
+  },
+  "13": {
+    "name": "displayHeader",
+    "id": 13
+  },
+  "14": {
+    "name": "actionCarrierUpdate",
+    "id": 14
+  }
 }

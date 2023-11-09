@@ -74,11 +74,6 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
     $fullResult = array_replace_recursive([
         DeliveryOptions::CARRIER          => [
             'externalIdentifier' => Platform::get('defaultCarrier'),
-            'enabled'            => false,
-            'isDefault'          => true,
-            'optional'           => false,
-            'primary'            => false,
-            'type'               => 'main',
         ],
         DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
         DeliveryOptions::LABEL_AMOUNT     => 1,

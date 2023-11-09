@@ -1,58 +1,58 @@
 {
-    "externalIdentifier": "1",
-    "referenceIdentifier": "PrestaShop: 1",
-    "deliveryOptions": {
-        "carrier": {
-            "id": 1,
-            "name": "postnl",
-            "human": "PostNL",
-            "enabled": false,
-            "isDefault": true,
-            "optional": false,
-            "primary": false,
-            "type": "main"
-        },
-        "labelAmount": 1,
-        "shipmentOptions": {
-            "insurance": -1,
-            "ageCheck": -1,
-            "hideSender": -1,
-            "largeFormat": -1,
-            "onlyRecipient": -1,
-            "return": -1,
-            "sameDayDelivery": -1,
-            "signature": -1
-        },
-        "deliveryType": "standard",
-        "packageType": "package"
+  "externalIdentifier": "1",
+  "referenceIdentifier": "PrestaShop: 1",
+  "deliveryOptions": {
+    "carrier": {
+      "id": 1,
+      "name": "postnl",
+      "human": "PostNL",
+      "enabled": true,
+      "isDefault": true,
+      "optional": false,
+      "primary": false,
+      "type": "main"
     },
-    "billingAddress": {
-        "address1": "Antareslaan 31",
-        "city": "Hoofddorp",
-        "postalCode": "2132JE",
-        "person": "Felicia Parcel"
+    "labelAmount": 1,
+    "shipmentOptions": {
+      "insurance": -1,
+      "ageCheck": -1,
+      "hideSender": -1,
+      "largeFormat": -1,
+      "onlyRecipient": -1,
+      "return": -1,
+      "sameDayDelivery": -1,
+      "signature": -1
     },
-    "shippingAddress": {
-        "address1": "Antareslaan 31",
-        "city": "Hoofddorp",
-        "postalCode": "2132JE",
-        "person": "Felicia Parcel"
-    },
-    "shipments": [],
-    "physicalProperties": {
-        "initialWeight": 0,
-        "manualWeight": -1,
-        "totalWeight": 0
-    },
-    "lines": [],
-    "exported": false,
-    "shipmentPrice": 0,
-    "shipmentPriceAfterVat": 0,
-    "shipmentVat": 0,
-    "orderPrice": 0,
-    "orderPriceAfterVat": 0,
-    "orderVat": 0,
-    "totalPrice": 0,
-    "totalVat": 0,
-    "totalPriceAfterVat": 0
+    "deliveryType": "standard",
+    "packageType": "package"
+  },
+  "billingAddress": {
+    "address1": "Antareslaan 31",
+    "city": "Hoofddorp",
+    "postalCode": "2132JE",
+    "person": "Felicia Parcel"
+  },
+  "shippingAddress": {
+    "address1": "Antareslaan 31",
+    "city": "Hoofddorp",
+    "postalCode": "2132JE",
+    "person": "Felicia Parcel"
+  },
+  "shipments": [],
+  "physicalProperties": {
+    "initialWeight": 0,
+    "manualWeight": -1,
+    "totalWeight": 0
+  },
+  "lines": [],
+  "exported": false,
+  "shipmentPrice": 0,
+  "shipmentPriceAfterVat": 0,
+  "shipmentVat": 0,
+  "orderPrice": 0,
+  "orderPriceAfterVat": 0,
+  "orderVat": 0,
+  "totalPrice": 0,
+  "totalVat": 0,
+  "totalPriceAfterVat": 0
 }
