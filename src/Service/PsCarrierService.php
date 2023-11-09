@@ -6,15 +6,20 @@ namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier as PsCarrier;
 use Context;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\AccountSettings;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Facade\Settings;
+use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
+use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
+use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
@@ -40,6 +45,32 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     ) {
         parent::__construct($psObjectModelService);
         $this->carrierMappingRepository = $psCarrierMappingRepository;
+    }
+
+    /**
+     * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $carrier
+     *
+     * @return bool
+     */
+    public function carrierIsActive(Carrier $carrier): bool
+    {
+        if (! $carrier->enabled) {
+            return false;
+        }
+
+        $deliveryOptionsEnabled = Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
+
+        if (! $deliveryOptionsEnabled) {
+            return false;
+        }
+
+        $settings = Settings::get($carrier->externalIdentifier, CarrierSettings::ID);
+
+        $allowDeliveryOptions = Arr::get($settings, CarrierSettings::ALLOW_DELIVERY_OPTIONS);
+        $allowPickupLocations = Arr::get($settings, CarrierSettings::ALLOW_PICKUP_LOCATIONS);
+
+        return Arr::get($settings, CarrierSettings::DELIVERY_OPTIONS_ENABLED)
+            && ($allowDeliveryOptions || $allowPickupLocations);
     }
 
     /**
@@ -90,9 +121,24 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     public function getMyParcelCarrierIdentifier($input): ?string
     {
         $psCarrierId = $this->getId($input);
-        $match       = $this->carrierMappingRepository->firstWhere('carrierId', $psCarrierId);
+        $match       = $this->carrierMappingRepository->firstWhere(MyparcelnlCarrierMapping::CARRIER_ID, $psCarrierId);
 
         return $match ? $match->getMyparcelCarrier() : null;
+    }
+
+    /**
+     * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $myParcelCarrier
+     *
+     * @return null|\Carrier
+     */
+    public function getPsCarrier(Carrier $myParcelCarrier): ?PsCarrier
+    {
+        $match = $this->carrierMappingRepository->firstWhere(
+            MyparcelnlCarrierMapping::MYPARCEL_CARRIER,
+            $myParcelCarrier->externalIdentifier
+        );
+
+        return $match ? $this->get($match->getCarrierId()) : null;
     }
 
     /**

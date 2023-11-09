@@ -51,7 +51,9 @@ it('re-synchronises carrier id and logo when it is updated', function () {
     ]);
 
     /** @var MyparcelnlCarrierMapping $found */
-    $found = $carrierMappingRepository->findOneBy(['myparcelCarrier' => Carrier::CARRIER_DPD_NAME]);
+    $found = $carrierMappingRepository->findOneBy([
+        MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_DPD_NAME,
+    ]);
 
     if (null === $found) {
         throw new Exception('No match found');

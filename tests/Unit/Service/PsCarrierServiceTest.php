@@ -6,12 +6,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier as PsCarrier;
-use MyParcelNL\Pdk\Account\Collection\ShopCollection;
-use MyParcelNL\Pdk\Account\Model\Shop;
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
-use MyParcelNL\Pdk\Carrier\Collection\CarrierCollectionFactory;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Carrier\Model\CarrierFactory;
 use MyParcelNL\Pdk\Facade\Actions;
@@ -21,7 +18,6 @@ use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetAccountsResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierConfigurationResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierOptionsResponse;
 use MyParcelNL\Pdk\Tests\Bootstrap\MockApi;
-use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
@@ -33,19 +29,11 @@ use RangeWeight;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
+use function MyParcelNL\PrestaShop\setupAccountAndCarriers;
+use function MyParcelNL\PrestaShop\setupCarrierActiveSettings;
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 usesShared(new UsesMockPsPdkInstance());
-
-function setupAccountAndCarriers(CarrierCollectionFactory $factory): Collection
-{
-    TestBootstrapper::hasAccount(
-        TestBootstrapper::API_KEY_VALID,
-        factory(ShopCollection::class)->push(factory(Shop::class)->withCarriers($factory))
-    );
-
-    return new Collection($factory->make());
-}
 
 function doSnapshotTest(Collection $carrierMappings, Collection $psCarriers): void
 {
@@ -241,3 +229,15 @@ it('uses existing carrier if reference id matches', function (CarrierFactory $fa
             ->withSubscriptionId(8123);
     },
 ]);
+
+it('enables carriers based on settings', function (array $settings, bool $result) {
+    setupCarrierActiveSettings($settings)->store();
+
+    /** @var PsCarrierServiceInterface $service */
+    $service = Pdk::get(PsCarrierServiceInterface::class);
+    $service->updateCarriers();
+
+    $psCarrier = new PsCarrier(12);
+
+    expect($psCarrier->active)->toBe($result);
+})->with('carrierActiveSettings');

@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Hooks;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use Throwable;
@@ -83,7 +84,10 @@ trait HasPsCarrierHooks
         /** @var PsCarrierMappingRepository $carrierMappingRepository */
         $carrierMappingRepository = Pdk::get(PsCarrierMappingRepository::class);
 
-        $carrierMappingRepository->update(['carrierId' => $newId], ['carrierId' => $oldId]);
+        $carrierMappingRepository->update(
+            [MyparcelnlCarrierMapping::CARRIER_ID => $newId],
+            [MyparcelnlCarrierMapping::CARRIER_ID => $oldId]
+        );
 
         EntityManager::flush();
     }

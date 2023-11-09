@@ -69,7 +69,11 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
         }
 
         $oldCarriers->each(function (array $item) {
-            Logger::debug("Migrating carrier \"{$item['myparcelCarrier']}\" with id \"{$item['carrierId']}\"");
+            $name = $item[MyparcelnlCarrierMapping::MYPARCEL_CARRIER];
+            $id   = $item[MyparcelnlCarrierMapping::CARRIER_ID];
+
+            Logger::debug("Migrating carrier \"$name\" with id \"$id\"");
+
             $this->psCarrierMappingRepository->create($item);
         });
 
@@ -115,7 +119,9 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
                 return $carry;
             }
 
-            return $carry->push(['myparcelCarrier' => $name, 'carrierId' => $id]);
+            return $carry->push(
+                [MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $name, MyparcelnlCarrierMapping::CARRIER_ID => $id]
+            );
         }, new Collection());
     }
 

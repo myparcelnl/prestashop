@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
+use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
+use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use Throwable;
 
 class PdkSettingsRepository extends AbstractSettingsRepository
 {
@@ -53,5 +59,71 @@ class PdkSettingsRepository extends AbstractSettingsRepository
 
         $this->configurationService->set($key, $value);
         $this->save($key, $value);
+    }
+
+    /**
+     * @param  SettingsModelCollection $settings
+     *
+     * @return void
+     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
+     */
+    public function storeSettings($settings): void
+    {
+        parent::storeSettings($settings);
+
+        if ($settings->id !== CarrierSettings::ID) {
+            return;
+        }
+
+        $this->onUpdateCarrierSettings($settings);
+    }
+
+    /**
+     * @param  \MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection $collection
+     *
+     * @return void
+     */
+    private function onUpdateCarrierSettings(SettingsModelCollection $collection): void
+    {
+        $collection->each(function (CarrierSettings $settings, string $carrierIdentifier) {
+            try {
+                $this->updatePsCarrier($carrierIdentifier);
+            } catch (Throwable $e) {
+                Logger::error('Failed to update carrier', ['carrier' => $carrierIdentifier, 'exception' => $e]);
+            }
+        });
+    }
+
+    /**
+     * Toggle carrier active state based on settings.
+     *
+     * @param  string $carrierIdentifier
+     *
+     * @return void
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    private function updatePsCarrier(string $carrierIdentifier): void
+    {
+        /** @var \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface $carrierService */
+        $carrierService = Pdk::get(PsCarrierServiceInterface::class);
+
+        $carrier = new Carrier(['externalIdentifier' => $carrierIdentifier]);
+
+        $psCarrier = $carrierService->getPsCarrier($carrier);
+
+        if (! $psCarrier) {
+            return;
+        }
+
+        $newActive = $carrierService->carrierIsActive($carrier);
+
+        /** @noinspection PhpCastIsUnnecessaryInspection */
+        if ((bool) $psCarrier->active === $newActive) {
+            return;
+        }
+
+        $psCarrier->active = $newActive;
+        $psCarrier->update();
     }
 }

@@ -15,6 +15,7 @@ use MyParcelNL\Pdk\Facade\Language;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
+use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use RangePrice;
 use RangeWeight;
@@ -101,8 +102,8 @@ final class CarrierBuilder
     private function addCarrierMapping(): void
     {
         $values = [
-            'carrierId'       => (int) $this->psCarrier->id,
-            'myparcelCarrier' => $this->myParcelCarrier->externalIdentifier,
+            MyparcelnlCarrierMapping::CARRIER_ID       => (int) $this->psCarrier->id,
+            MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
         ];
 
         $this->carrierMappingRepository->updateOrCreate($values, $values);
@@ -174,7 +175,7 @@ final class CarrierBuilder
         $psCarrier = $this->getExistingPsCarrier() ?? $this->psCarrierService->create();
 
         $psCarrier->name                 = $psCarrier->name ?? $this->myParcelCarrier->human;
-        $psCarrier->active               = (int) $this->myParcelCarrier->enabled;
+        $psCarrier->active               = $this->psCarrierService->carrierIsActive($this->myParcelCarrier);
         $psCarrier->id_reference         = $this->createCarrierIdReference();
         $psCarrier->deleted              = false;
         $psCarrier->external_module_name = $module->name;
@@ -212,7 +213,7 @@ final class CarrierBuilder
     private function getExistingPsCarrier(): ?PsCarrier
     {
         $mapping = $this->carrierMappingRepository->findOneBy([
-            'myparcelCarrier' => $this->myParcelCarrier->externalIdentifier,
+            MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
         ]);
 
         if ($mapping) {

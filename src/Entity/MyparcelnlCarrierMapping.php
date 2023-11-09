@@ -19,6 +19,9 @@ class MyparcelnlCarrierMapping extends AbstractEntity implements EntityWithTimes
 {
     use HasTimestamps;
 
+    public const CARRIER_ID       = 'carrierId';
+    public const MYPARCEL_CARRIER = 'myparcelCarrier';
+
     /**
      * @var int
      * @ORM\Id
@@ -64,8 +67,8 @@ class MyparcelnlCarrierMapping extends AbstractEntity implements EntityWithTimes
     public function toArray(?int $flags = null): array
     {
         return [
-            'carrierId'       => $this->getCarrierId(),
-            'myparcelCarrier' => $this->getMyparcelCarrier(),
+            self::CARRIER_ID       => $this->getCarrierId(),
+            self::MYPARCEL_CARRIER => $this->getMyparcelCarrier(),
         ];
     }
 }

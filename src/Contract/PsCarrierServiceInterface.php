@@ -15,6 +15,13 @@ use MyParcelNL\Pdk\Carrier\Model\Carrier;
 interface PsCarrierServiceInterface extends PsSpecificObjectModelServiceInterface
 {
     /**
+     * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $carrier
+     *
+     * @return bool
+     */
+    public function carrierIsActive(Carrier $carrier): bool;
+
+    /**
      * @param  \MyParcelNL\Pdk\Carrier\Collection\CarrierCollection $carriers
      *
      * @return \MyParcelNL\Pdk\Base\Support\Collection
@@ -41,6 +48,13 @@ interface PsCarrierServiceInterface extends PsSpecificObjectModelServiceInterfac
      * @return null|string
      */
     public function getMyParcelCarrierIdentifier($input): ?string;
+
+    /**
+     * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $myParcelCarrier
+     *
+     * @return null|\Carrier
+     */
+    public function getPsCarrier(Carrier $myParcelCarrier): ?PsCarrier;
 
     /**
      * @return \MyParcelNL\Pdk\Base\Support\Collection

@@ -62,9 +62,18 @@ it('migrates carriers to pdk', function (
             'MYPARCELNL_BPOST'     => '24',
         ],
         'expected'      => [
-            ['carrierId' => 21, 'myparcelCarrier' => Carrier::CARRIER_POSTNL_NAME],
-            ['carrierId' => 22, 'myparcelCarrier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
-            ['carrierId' => 24, 'myparcelCarrier' => Carrier::CARRIER_BPOST_NAME],
+            [
+                MyparcelnlCarrierMapping::CARRIER_ID       => 21,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_NAME,
+            ],
+            [
+                MyparcelnlCarrierMapping::CARRIER_ID       => 22,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+            ],
+            [
+                MyparcelnlCarrierMapping::CARRIER_ID       => 24,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_BPOST_NAME,
+            ],
         ],
     ],
 
@@ -93,7 +102,10 @@ it('migrates carriers to pdk', function (
             'MYPARCELNL_POSTNL' => '21',
         ],
         'expected'      => [
-            ['carrierId' => 40, 'myparcelCarrier' => Carrier::CARRIER_POSTNL_NAME],
+            [
+                MyparcelnlCarrierMapping::CARRIER_ID       => 40,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_NAME,
+            ],
         ],
     ],
 ]);
