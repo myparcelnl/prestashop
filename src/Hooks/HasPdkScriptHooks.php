@@ -43,26 +43,16 @@ trait HasPdkScriptHooks
         /** @var \MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface $viewService */
         $viewService = Pdk::get(ViewServiceInterface::class);
 
-        if (! $viewService->isCheckoutPage()) {
+        $deliveryOptionsEnabled = Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
+
+        if (! $deliveryOptionsEnabled || ! $viewService->isCheckoutPage()) {
             return;
         }
 
-        $this->loadCoreScripts();
-
-        if (! Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID)) {
-            return;
-        }
-
-        $this->loadDeliveryOptionsScripts();
+        $this->loadCheckoutScripts();
     }
 
-    private function loadCoreScripts(): void
-    {
-        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout-core/dist/index.iife.js");
-        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-core/dist/style.css");
-    }
-
-    private function loadDeliveryOptionsScripts(): void
+    private function loadCheckoutScripts(): void
     {
         $this->context->controller->registerJavascript(
             'myparcelnl-delivery-options',
@@ -73,9 +63,7 @@ trait HasPdkScriptHooks
             ['server' => 'remote', 'position' => 'head', 'priority' => 1]
         );
 
-        $this->context->controller->addJS(
-            "{$this->_path}views/js/frontend/checkout-delivery-options/dist/index.iife.js"
-        );
-        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout-delivery-options/dist/style.css");
+        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout/dist/index.iife.js");
+        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout/dist/style.css");
     }
 }

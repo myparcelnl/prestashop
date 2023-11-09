@@ -5,7 +5,7 @@
     "incremental": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "preserveValueImports": false,
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client", "jquery"]
   },
   "exclude": ["./**/__tests__/*", "./**/*.spec.*"]
 }

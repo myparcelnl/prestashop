@@ -1,5 +1,5 @@
-import {type FrontendEndpointResponse} from '@myparcel-pdk/checkout-core';
 import {type FrontendEndpoint, type FrontendPdkEndpointObject} from '@myparcel-pdk/checkout-common';
+import {type FrontendEndpointResponse} from '@myparcel-pdk/checkout';
 
 export const doRequest = async <E extends FrontendEndpoint>(
   endpoint: FrontendPdkEndpointObject[E] & {baseUrl: string},

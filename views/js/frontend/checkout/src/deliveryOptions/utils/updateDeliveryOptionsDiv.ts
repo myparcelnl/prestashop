@@ -1,7 +1,7 @@
 import {useDeliveryOptionsStore} from '@myparcel-pdk/checkout';
+import {getCurrentShippingMethod} from '../../utils';
 import {toggleDeliveryOptions} from './toggleDeliveryOptions';
 import {moveDeliveryOptionsForm} from './moveDeliveryOptionsForm';
-import {getCurrentShippingMethod} from './getCurrentShippingMethod';
 
 export const updateDeliveryOptionsDiv = (): void => {
   const deliveryOptionsStore = useDeliveryOptionsStore();

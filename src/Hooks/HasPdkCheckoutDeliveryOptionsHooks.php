@@ -124,7 +124,6 @@ trait HasPdkCheckoutDeliveryOptionsHooks
             'content'         => Frontend::renderDeliveryOptions($cartRepository->get($cart)),
             'shippingAddress' => $this->encodeAddress($addressAdapter->fromAddress($cart->id_address_delivery)),
             'billingAddress'  => $this->encodeAddress($addressAdapter->fromAddress($cart->id_address_invoice)),
-
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier_delivery_options.tpl');

@@ -3,7 +3,6 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPrestaShopLogger;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCarrier;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
@@ -20,6 +19,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsOrder;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsRangeObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsSmarty;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsTools;
 
 ###
 # Core
@@ -54,7 +54,7 @@ abstract class DbQueryCore extends MockPsDbQuery { }
 final class DbQuery extends DbQueryCore { }
 
 /** @see \ToolsCore */
-abstract class ToolsCore extends BaseMock { }
+abstract class ToolsCore extends MockPsTools { }
 
 final class Tools extends ToolsCore { }
 

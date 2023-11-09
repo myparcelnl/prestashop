@@ -1,26 +1,14 @@
-import {type MyParcel} from '@myparcel/delivery-options';
+import {type StoredShippingMethodData} from '../types';
 import {useCarrierData} from './useCarrierData';
-
-export interface ShippingMethod {
-  carrier: MyParcel.CarrierIdentifier;
-  input: JQuery;
-  row: JQuery;
-  value: string;
-}
-
-type StoredShippingMethodData = {
-  shippingMethodName: string;
-  shippingMethods: ShippingMethod[];
-};
 
 const data: StoredShippingMethodData = {
   shippingMethodName: '',
   shippingMethods: [],
 };
 
-const getShippingMethods = (): void => {
+export const useShippingMethodData = (): StoredShippingMethodData => {
   if (data.shippingMethods.length) {
-    return;
+    return data;
   }
 
   const carrierData = useCarrierData();
@@ -39,10 +27,6 @@ const getShippingMethods = (): void => {
       input: $checkbox,
     });
   });
-};
-
-export const useShippingMethodData = (): StoredShippingMethodData => {
-  getShippingMethods();
 
   return data;
 };

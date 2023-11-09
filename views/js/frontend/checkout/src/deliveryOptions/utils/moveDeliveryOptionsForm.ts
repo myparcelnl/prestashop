@@ -1,5 +1,7 @@
+import {getDeliveryOptionsWrapper} from './getDeliveryOptionsWrapper';
+
 export const moveDeliveryOptionsForm = ($destination: JQuery): void => {
-  const $wrapper = jQuery('#mypa-delivery-options-wrapper');
+  const $wrapper = getDeliveryOptionsWrapper();
 
   if (!$wrapper) {
     return;
@@ -7,5 +9,4 @@ export const moveDeliveryOptionsForm = ($destination: JQuery): void => {
 
   $wrapper.hide();
   $destination.append($wrapper);
-  $wrapper.show();
 };

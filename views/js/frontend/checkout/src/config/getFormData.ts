@@ -1,5 +1,5 @@
 import {PdkField, AddressType, AddressField, type PdkCheckoutConfigInput} from '@myparcel-pdk/checkout';
-import {useAddressData, useShippingMethodData} from '../functions';
+import {useAddressData, useShippingMethodData} from '../utils';
 
 export const getFormData: PdkCheckoutConfigInput['getFormData'] = () => {
   const {shippingMethodName} = useShippingMethodData();

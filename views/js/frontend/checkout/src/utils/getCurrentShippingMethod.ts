@@ -1,5 +1,6 @@
 import {PdkField, useCheckoutStore} from '@myparcel-pdk/checkout';
-import {type ShippingMethod, useShippingMethodData} from './useShippingMethodData';
+import {type ShippingMethod} from '../types';
+import {useShippingMethodData} from './useShippingMethodData';
 
 export const getCurrentShippingMethod = (): ShippingMethod | undefined => {
   const checkoutStore = useCheckoutStore();

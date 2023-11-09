@@ -1,5 +1,5 @@
-import {type ShippingMethod} from '@myparcel-prestashop/frontend-checkout-core';
 import {type DeliveryOptionsStoreState} from '@myparcel-pdk/checkout';
+import {type ShippingMethod} from '../../index';
 import {getDefaultDeliveryOptionsConfig} from './getDefaultDeliveryOptionsConfig';
 
 export const toggleDeliveryOptions = (shippingMethod: ShippingMethod): Partial<DeliveryOptionsStoreState> => {

@@ -961,24 +961,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@myparcel-prestashop/frontend-checkout-core@workspace:views/js/frontend/checkout-core":
+"@myparcel-prestashop/frontend-checkout@workspace:views/js/frontend/checkout":
   version: 0.0.0-use.local
-  resolution: "@myparcel-prestashop/frontend-checkout-core@workspace:views/js/frontend/checkout-core"
+  resolution: "@myparcel-prestashop/frontend-checkout@workspace:views/js/frontend/checkout"
   dependencies:
     "@myparcel-pdk/checkout": "npm:^1.0.0-alpha.1"
     "@myparcel-prestashop/vite-config": "workspace:*"
     "@types/jquery": "npm:^3.5.16"
     vite: "npm:^4.1.2"
-  languageName: unknown
-  linkType: soft
-
-"@myparcel-prestashop/frontend-checkout-delivery-options@workspace:views/js/frontend/checkout-delivery-options":
-  version: 0.0.0-use.local
-  resolution: "@myparcel-prestashop/frontend-checkout-delivery-options@workspace:views/js/frontend/checkout-delivery-options"
-  dependencies:
-    "@myparcel-pdk/checkout": "npm:^1.0.0-alpha.1"
-    "@myparcel-prestashop/vite-config": "workspace:*"
-    "@myparcel/delivery-options": "npm:^5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -1086,25 +1076,6 @@ __metadata:
     vue-click-outside: "npm:^1.1.0"
     vue-fa: "npm:^2.0.1"
   checksum: 075afc30515ccbd2d3a2bd5a693b546c1aa6b6c00310e457df71b6465c9c4dd9cd17b18d368626d5ac191fb2faa46ac10ae4ca0ac50b99676e380ad42c7ae39e
-  languageName: node
-  linkType: hard
-
-"@myparcel/delivery-options@npm:^5.9.3":
-  version: 5.10.0
-  resolution: "@myparcel/delivery-options@npm:5.10.0"
-  dependencies:
-    "@fortawesome/free-solid-svg-icons": "npm:^5.15.4"
-    "@myparcel/js-sdk": "npm:^2.0.3"
-    core-js: "npm:^3.26.0"
-    custom-event-polyfill: "npm:^1.0.7"
-    is-ci: "npm:^3.0.1"
-    lodash-es: "npm:^4.17.21"
-    raw-loader: "npm:^4.0.2"
-    vue: "npm:~2.6.13"
-    vue-async-computed: "npm:^3.9.0"
-    vue-click-outside: "npm:^1.1.0"
-    vue-fa: "npm:^2.0.1"
-  checksum: ef07de0c3dc3a4c85a1e0f342a6146474bd9d1caf8d9ca8cb3d72266e1f064b3ce6086060cc4bdbcc2c48e39bab35657adf228416bd0a0e9ed105d2fa7d31b79
   languageName: node
   linkType: hard
 

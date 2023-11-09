@@ -13,6 +13,9 @@ const createDefaultConfig = (env) => {
     build: {
       minify: !isDev,
       sourcemap: isDev,
+      rollupOptions: {
+        external: ['vite', 'vitest'],
+      },
     },
     plugins: [customTsConfig()],
     test: {

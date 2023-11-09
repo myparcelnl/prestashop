@@ -24,7 +24,7 @@ final class PsFrontendRenderService extends FrontendRenderService
         $context   = $this->contextService->createContexts([Context::ID_CHECKOUT], ['cart' => $cart]);
 
         return sprintf(
-            '<div id="mypa-delivery-options-wrapper" data-context="%s">%s<div id="myparcel-delivery-options"></div></div>',
+            '<div id="mypa-delivery-options-wrapper" class="mb-1" data-context="%s"><div class="card-block bg-faded">%s<div id="myparcel-delivery-options"></div></div></div>',
             $this->encodeContext($context),
             $customCss ? sprintf('<style>%s</style>', $customCss) : ''
         );

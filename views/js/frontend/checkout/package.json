@@ -1,5 +1,5 @@
 {
-  "name": "@myparcel-prestashop/frontend-checkout-delivery-options",
+  "name": "@myparcel-prestashop/frontend-checkout",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@myparcel-prestashop/vite-config": "workspace:*",
-    "@myparcel/delivery-options": "^5.9.3"
+    "@types/jquery": "^3.5.16",
+    "vite": "^4.1.2"
   }
 }
