@@ -1,7 +1,13 @@
 import {useDeliveryOptionsStore, type DeliveryOptionsConfiguration} from '@myparcel-pdk/checkout';
 
-export const getDefaultDeliveryOptionsConfig = (): DeliveryOptionsConfiguration => {
-  const deliveryOptionsStore = useDeliveryOptionsStore();
+let configuration: DeliveryOptionsConfiguration | undefined;
 
-  return deliveryOptionsStore.state.configuration;
+export const getDefaultDeliveryOptionsConfig = (): DeliveryOptionsConfiguration => {
+  if (!configuration) {
+    const deliveryOptionsStore = useDeliveryOptionsStore();
+
+    configuration = deliveryOptionsStore.state.configuration;
+  }
+
+  return configuration;
 };
