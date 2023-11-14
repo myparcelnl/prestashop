@@ -6,14 +6,8 @@
     class="form-group row">
     <template v-if="isInteractive">
       <label
-        :class="{required: !isOptional}"
         :for="id"
         class="form-control-label">
-        <span
-          v-if="!isOptional"
-          class="text-danger"
-          >*
-        </span>
         <slot name="label">
           {{ element.label }}
         </slot>
