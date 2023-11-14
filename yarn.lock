@@ -791,10 +791,10 @@ __metadata:
   linkType: hard
 
 "@myparcel-pdk/admin-component-tests@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.125
-  resolution: "@myparcel-pdk/admin-component-tests@npm:1.0.0-alpha.125"
+  version: 1.0.0-alpha.128
+  resolution: "@myparcel-pdk/admin-component-tests@npm:1.0.0-alpha.128"
   dependencies:
-    "@myparcel-pdk/admin": "npm:^1.0.0-alpha.121"
+    "@myparcel-pdk/admin": "npm:^1.0.0-alpha.124"
     "@myparcel/vue-form-builder": "npm:^1.0.0-alpha.1"
     "@pinia/testing": "npm:>= 0.1.0 < 1"
     "@vitest/coverage-v8": "npm:>= 0.30.0 < 1"
@@ -804,36 +804,36 @@ __metadata:
     vitest: "npm:^0.34.3"
   peerDependencies:
     vue: ^3
-  checksum: 1c5af00e5591baad77f8c1e9b7b0cc0017683b2c7d2bc2535751f0b771cc26b052299b0066cad8da7fe5f22603f358a4753970b3872e40c257aad171e5c7e723
+  checksum: a7826dd99a180db2be34fa1b7d0071d78ea89e5f927c78e8f783898c5f14929aafa149c539df9d5539d7b2cbbe6f6e4d4871496fb776ab52ae0858a83ccb5554
   languageName: node
   linkType: hard
 
 "@myparcel-pdk/admin-preset-bootstrap4@npm:^1.0.0-alpha.1":
-  version: 1.0.0-alpha.124
-  resolution: "@myparcel-pdk/admin-preset-bootstrap4@npm:1.0.0-alpha.124"
+  version: 1.0.0-alpha.127
+  resolution: "@myparcel-pdk/admin-preset-bootstrap4@npm:1.0.0-alpha.127"
   dependencies:
-    "@myparcel-pdk/admin": "npm:^1.0.0-alpha.121"
+    "@myparcel-pdk/admin": "npm:^1.0.0-alpha.124"
     "@myparcel/ts-utils": "npm:^1.9.0"
     vue: "npm:^3.3.0"
-  checksum: a931df0488ce4f76be822466007994cae805b7e9e5136f3a08a21bdf5161db95ba78baf65b401cc5051a6ebd1c56d462342d34f3a2f20dbc1b80313c0f74b712
+  checksum: 5e61d7c002dd54dea23277f3ef07aecd5542d0ae5ebdd4683d075fc0fa8453e8eb9cbb13197eaec1c519650a8377c698d52e6c727c984276af62acddeec0776c
   languageName: node
   linkType: hard
 
 "@myparcel-pdk/admin-preset-default@npm:^1.0.0-alpha.36":
-  version: 1.0.0-alpha.121
-  resolution: "@myparcel-pdk/admin-preset-default@npm:1.0.0-alpha.121"
+  version: 1.0.0-alpha.124
+  resolution: "@myparcel-pdk/admin-preset-default@npm:1.0.0-alpha.124"
   dependencies:
-    "@myparcel-pdk/admin": "npm:^1.0.0-alpha.121"
+    "@myparcel-pdk/admin": "npm:^1.0.0-alpha.124"
     "@myparcel/ts-utils": "npm:^1.9.0"
     "@vueuse/core": "npm:^10.0.0"
     vue: "npm:^3.3.0"
-  checksum: 34d98b23a6ad362b6615ad813d455542e0eb6ae59e990bd6db320d6b7c00a41fc4878b6486402e4803567407bae646152ef1d180c8cd472d640077bd6ff82723
+  checksum: 31471d3ee1ab49eb596045c942558e98ae6aaa928b69f186b851d571095508c8a791930d3acbd505c6128ed87532a9e19ea59cdb3647c192d23e1808007e396d
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/admin@npm:^1.0.0-alpha.1, @myparcel-pdk/admin@npm:^1.0.0-alpha.121":
-  version: 1.0.0-alpha.121
-  resolution: "@myparcel-pdk/admin@npm:1.0.0-alpha.121"
+"@myparcel-pdk/admin@npm:^1.0.0-alpha.1, @myparcel-pdk/admin@npm:^1.0.0-alpha.124":
+  version: 1.0.0-alpha.124
+  resolution: "@myparcel-pdk/admin@npm:1.0.0-alpha.124"
   dependencies:
     "@myparcel-pdk/common": "npm:^1.0.0-alpha.58"
     "@myparcel/sdk": "npm:^3.0.0"
@@ -844,7 +844,7 @@ __metadata:
     lodash-unified: "npm:^1.0.3"
     pinia: "npm:^2.0.0"
     vue: "npm:^3.3.0"
-  checksum: 8a8b690736bb58bfbf8b0801c0f506ff388c00fcbd8c7af16f2f16416596fe4b2760c9fb6d7c5366d5e8bbeb55b8cca2daff143d3c1c4fb09cc3f954e9c472f6
+  checksum: 3bb0dfa0c84d9734a8cc4c86d3007969faf99549e6d84a6bdf767adb09b8a28a89279d63f6bce1ff63d4a5a8eb798ff4b285d93085b130b7c4c17843ad492793
   languageName: node
   linkType: hard
 
