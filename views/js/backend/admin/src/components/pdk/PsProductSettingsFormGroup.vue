@@ -1,10 +1,11 @@
 <template>
-  <PdkRow
+  <div
     v-show="element.isVisible"
-    v-test="[AdminComponent.FormGroup, element]">
+    v-test="[AdminComponent.FormGroup, element]"
+    class="row">
     <template v-if="isInteractive">
       <div class="col-md-6">
-        <div class="form-group">
+        <div class="form-group px-2">
           <label
             :for="id"
             class="form-control-label">
@@ -40,10 +41,10 @@
 
     <div
       v-else
-      class="col-12 mb-4">
+      class="col-12">
       <slot />
     </div>
-  </PdkRow>
+  </div>
 </template>
 
 <script lang="ts" setup>
