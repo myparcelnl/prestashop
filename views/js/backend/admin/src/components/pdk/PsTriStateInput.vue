@@ -1,45 +1,41 @@
 <template>
-  <PdkRow
+  <div
     v-test="[AdminComponent.TriStateInput, element]"
-    :class="config?.cssUtilities?.displayFlex">
-    <div class="col-md-6">
-      <PdkRow>
-        <div class="col-4">
-          <input
-            v-model="model"
-            :name="id"
-            type="hidden" />
+    class="row">
+    <div class="col-4">
+      <input
+        v-model="model"
+        :name="id"
+        type="hidden" />
 
-          <PdkToggleInput
-            v-model="toggleModel"
-            :class="config?.cssUtilities?.marginYAuto"
-            :element="toggleElement" />
-        </div>
-
-        <div class="col-2">
-          <PdkButton
-            :class="config?.cssUtilities?.displayFlex"
-            :size="Size.ExtraSmall"
-            :title="inheritElement?.label"
-            @click="inheritModel = !inheritModel">
-            <div>
-              <i
-                :class="config?.cssUtilities?.marginYAuto"
-                class="material-icons"
-                role="none"
-                v-text="inheritModel ? 'lock' : 'lock_open'" />
-            </div>
-
-            <PdkCheckboxInput
-              v-model="inheritModel"
-              :element="{...inheritElement, label: undefined}"
-              class="sr-only"
-              tabindex="-1" />
-          </PdkButton>
-        </div>
-      </PdkRow>
+      <PdkToggleInput
+        v-model="toggleModel"
+        :class="config?.cssUtilities?.marginYAuto"
+        :element="toggleElement" />
     </div>
-  </PdkRow>
+
+    <div class="col-2">
+      <PdkButton
+        :class="config?.cssUtilities?.displayFlex"
+        :size="Size.ExtraSmall"
+        :title="inheritElement?.label"
+        @click="inheritModel = !inheritModel">
+        <div>
+          <i
+            :class="config?.cssUtilities?.marginYAuto"
+            class="material-icons"
+            role="none"
+            v-text="inheritModel ? 'lock' : 'lock_open'" />
+        </div>
+
+        <PdkCheckboxInput
+          v-model="inheritModel"
+          :element="{...inheritElement, label: undefined}"
+          class="sr-only"
+          tabindex="-1" />
+      </PdkButton>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
