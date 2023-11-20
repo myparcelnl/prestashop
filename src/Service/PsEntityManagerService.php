@@ -36,7 +36,7 @@ final class PsEntityManagerService
         try {
             $this->entityManager->flush();
         } catch (Throwable $e) {
-            Logger::error('Failed to flush entity manager', ['exception' => $e]);
+            Logger::error('Failed to flush entity manager', ['trace' => $e->getTrace()]);
 
             throw $e;
         }
