@@ -149,7 +149,7 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
      */
     public function updateOrAdd(ObjectModel $model, ?bool $existing = null): ObjectModel
     {
-        $exists = $existing ?? (bool) $model->id;
+        $exists = $existing ?? $this->exists(get_class($model), $model);
         $result = $exists ? $this->update($model) : $this->add($model);
 
         if (! $result) {
