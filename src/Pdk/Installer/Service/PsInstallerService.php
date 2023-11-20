@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 
 use Carrier as PsCarrier;
-use Language;
 use Module;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
@@ -107,7 +106,6 @@ final class PsInstallerService extends InstallerService
         MyParcelModule::registerHooks();
 
         $this->installDatabase();
-        $this->installTabs();
 
         parent::executeInstallation();
         Tools::clearSf2Cache();
@@ -125,7 +123,6 @@ final class PsInstallerService extends InstallerService
 
         $this->uninstallCarriers();
         $this->uninstallHooks();
-        $this->uninstallTabs();
 
         // Delete account manually because prestashop removes config values on uninstall
         /** @var PdkAccountRepositoryInterface $accountRepository */
@@ -192,27 +189,6 @@ final class PsInstallerService extends InstallerService
             $instance = Pdk::get($migration);
             $instance->up();
         }
-    }
-
-    /**
-     * @return void
-     */
-    private function installTabs(): void
-    {
-        /** @var \PrestaShopBundle\Entity\Repository\TabRepository $tabRepository */
-        $tabRepository = Pdk::get('ps.tabRepository');
-
-        $existing = $tabRepository->findOneByClassName(Pdk::get('legacyControllerSettings'));
-        $tab      = $existing ?? $this->psObjectModelService->create(Tab::class);
-
-        $tab->active     = 1;
-        $tab->class_name = Pdk::get('legacyControllerSettings');
-        $tab->route_name = Pdk::get('routeNameSettings');
-        $tab->name       = array_fill_keys(array_column(Language::getLanguages(), 'id_lang'), Pdk::getAppInfo()->title);
-        $tab->id_parent  = $tabRepository->findOneIdByClassName(Pdk::get('sidebarParentClass'));
-        $tab->module     = $this->module->name;
-
-        $this->psObjectModelService->updateOrAdd($tab);
     }
 
     /**

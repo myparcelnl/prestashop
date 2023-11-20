@@ -63,6 +63,8 @@ class MyParcelNL extends CarrierModule
         $this->tab                    = 'shipping_logistics';
         $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => '8.2.0'];
 
+        $this->registerTabs();
+
         parent::__construct();
 
         $this->withErrorHandling(
@@ -154,6 +156,28 @@ class MyParcelNL extends CarrierModule
         $composerData = json_decode(file_get_contents($filename), true);
 
         return $composerData['version'];
+    }
+
+    /**
+     * @return void
+     */
+    private function registerTabs(): void
+    {
+        $translatedName = [];
+
+        foreach (Language::getLanguages() as $lang) {
+            $translatedName[$lang['locale']] = $this->displayName;
+        }
+
+        $this->tabs = [
+            [
+                'name'              => $translatedName,
+                'route_name'        => "{$this->name}_settings",
+                'class_name'        => MyParcelNLAdminSettingsController::class,
+                'visible'           => true,
+                'parent_class_name' => $this->tab,
+            ],
+        ];
     }
 
     /**
