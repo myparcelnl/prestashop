@@ -101,12 +101,15 @@ final class CarrierBuilder
      */
     private function addCarrierMapping(): void
     {
-        $values = [
-            MyparcelnlCarrierMapping::CARRIER_ID       => (int) $this->psCarrier->id,
-            MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
-        ];
-
-        $this->carrierMappingRepository->updateOrCreate($values, $values);
+        $this->carrierMappingRepository->updateOrCreate(
+            [
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
+            ],
+            [
+                MyparcelnlCarrierMapping::CARRIER_ID       => (int) $this->psCarrier->id,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
+            ]
+        );
     }
 
     /**
