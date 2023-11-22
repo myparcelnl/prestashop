@@ -179,7 +179,6 @@ final class CarrierBuilder
 
         $psCarrier->name                 = $psCarrier->name ?? $this->myParcelCarrier->human;
         $psCarrier->active               = $this->psCarrierService->carrierIsActive($this->myParcelCarrier);
-        $psCarrier->id_reference         = $this->createCarrierIdReference();
         $psCarrier->deleted              = false;
         $psCarrier->external_module_name = $module->name;
         $psCarrier->is_module            = true;
@@ -201,16 +200,6 @@ final class CarrierBuilder
     }
 
     /**
-     * @return int
-     */
-    private function createCarrierIdReference(): int
-    {
-        $carrierId = str_pad((string) $this->myParcelCarrier->id, 3, '0');
-
-        return (int) ($carrierId . $this->myParcelCarrier->subscriptionId);
-    }
-
-    /**
      * @return null|\Carrier
      */
     private function getExistingPsCarrier(): ?PsCarrier
@@ -223,6 +212,6 @@ final class CarrierBuilder
             return $this->psCarrierService->get($mapping->getCarrierId());
         }
 
-        return $this->psCarrierService->getByReference($this->createCarrierIdReference());
+        return null;
     }
 }

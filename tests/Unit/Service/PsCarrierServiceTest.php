@@ -10,7 +10,6 @@ use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
-use MyParcelNL\Pdk\Carrier\Model\CarrierFactory;
 use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleAclResponse;
@@ -188,47 +187,6 @@ it('updates existing carrier if mapping already exists', function () {
             'name'         => 'This Is DhLForYou',
         ]);
 });
-
-it('uses existing carrier if reference id matches', function (CarrierFactory $factory) {
-    setupAccountAndCarriers(factory(CarrierCollection::class)->push($factory));
-
-    $carrier = $factory->make();
-
-    /** @see \MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder::createCarrierIdReference() */
-    $referenceId = (int) (str_pad((string) $carrier->id, 3, '0') . $carrier->subscriptionId);
-
-    psFactory(PsCarrier::class)
-        ->withIdReference($referenceId)
-        ->store();
-
-    /** @var PsCarrierServiceInterface $service */
-    $service = Pdk::get(PsCarrierServiceInterface::class);
-    $service->updateCarriers();
-
-    $psCarriers = new Collection(PsCarrier::getCarriers(0));
-
-    expect($psCarriers->count())
-        ->toBe(1)
-        ->and($psCarriers->first())
-        ->toHaveKeysAndValues([
-            'id'           => 1,
-            'id_reference' => $referenceId,
-            'name'         => $carrier->human,
-        ]);
-})->with([
-    'only id' => function () {
-        return factory(Carrier::class)
-            ->fromPostNL()
-            ->withHuman('Carrier');
-    },
-
-    'id and subscription id' => function () {
-        return factory(Carrier::class)
-            ->fromDhlForYou()
-            ->withHuman('Carrier')
-            ->withSubscriptionId(8123);
-    },
-]);
 
 it('enables carriers based on settings', function (array $settings, bool $result) {
     setupCarrierActiveSettings($settings)->store();
