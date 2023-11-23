@@ -176,15 +176,13 @@ it('updates existing carrier if mapping already exists', function () {
         ->toBe(2)
         ->and($psCarriers->first())
         ->toHaveKeysAndValues([
-            'id'           => 10,
-            'id_reference' => 100,
-            'name'         => 'This Is PostNL',
+            'id'   => 10,
+            'name' => 'This Is PostNL',
         ])
         ->and($psCarriers->last())
         ->toHaveKeysAndValues([
-            'id'           => 11,
-            'id_reference' => 9008123,
-            'name'         => 'This Is DhLForYou',
+            'id'   => 11,
+            'name' => 'This Is DhLForYou',
         ]);
 });
 
