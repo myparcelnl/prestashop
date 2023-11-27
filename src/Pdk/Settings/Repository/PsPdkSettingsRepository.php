@@ -9,13 +9,13 @@ use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
-use MyParcelNL\Pdk\Settings\Repository\AbstractSettingsRepository;
+use MyParcelNL\Pdk\Settings\Repository\AbstractPdkSettingsRepository;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use Throwable;
 
-class PdkSettingsRepository extends AbstractSettingsRepository
+final class PsPdkSettingsRepository extends AbstractPdkSettingsRepository
 {
     /**
      * @var \MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface

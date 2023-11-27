@@ -24,7 +24,7 @@ use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
 use MyParcelNL\PrestaShop\Migration\Util\ToPackageTypeName;
 use MyParcelNL\PrestaShop\Migration\Util\TransformValue;
-use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
+use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PsPdkSettingsRepository;
 use Throwable;
 
 final class PdkSettingsMigration extends AbstractPsPdkMigration
@@ -40,7 +40,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
     ];
 
     /**
-     * @var \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository
+     * @var \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PsPdkSettingsRepository
      */
     private $pdkSettingsRepository;
 
@@ -50,10 +50,10 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
     private $valueMigrator;
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository $pdkSettingsRepository
-     * @param  \MyParcelNL\PrestaShop\Migration\Util\DataMigrator                   $valueMigrator
+     * @param  \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PsPdkSettingsRepository $pdkSettingsRepository
+     * @param  \MyParcelNL\PrestaShop\Migration\Util\DataMigrator                     $valueMigrator
      */
-    public function __construct(PdkSettingsRepository $pdkSettingsRepository, DataMigrator $valueMigrator)
+    public function __construct(PsPdkSettingsRepository $pdkSettingsRepository, DataMigrator $valueMigrator)
     {
         parent::__construct();
 

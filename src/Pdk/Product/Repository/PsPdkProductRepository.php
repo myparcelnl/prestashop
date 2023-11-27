@@ -16,7 +16,7 @@ use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 use MyParcelNL\Sdk\src\Support\Arr;
 use Product;
 
-class PdkProductRepository extends AbstractPdkPdkProductRepository
+class PsPdkProductRepository extends AbstractPdkPdkProductRepository
 {
     /**
      * @var \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface

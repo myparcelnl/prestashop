@@ -26,7 +26,7 @@ use MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
-use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Configuration\Service\Ps17PsConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
@@ -63,8 +63,8 @@ use MyParcelNL\PrestaShop\Pdk\Logger\PsLogger;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderNoteRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository;
 use MyParcelNL\PrestaShop\Pdk\Order\Service\PsOrderStatusService;
-use MyParcelNL\PrestaShop\Pdk\Product\Repository\PdkProductRepository;
-use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PdkSettingsRepository;
+use MyParcelNL\PrestaShop\Pdk\Product\Repository\PsPdkProductRepository;
+use MyParcelNL\PrestaShop\Pdk\Settings\Repository\PsPdkSettingsRepository;
 use MyParcelNL\PrestaShop\Pdk\ShippingMethod\Repository\PsShippingMethodRepository;
 use MyParcelNL\PrestaShop\Pdk\Tax\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Pdk\Webhook\Repository\PsWebhooksRepository;
@@ -114,9 +114,9 @@ return [
     PdkCartRepositoryInterface::class           => get(PsPdkCartRepository::class),
     PdkOrderNoteRepositoryInterface::class      => get(PsPdkOrderNoteRepository::class),
     PdkOrderRepositoryInterface::class          => get(PsPdkOrderRepository::class),
-    PdkProductRepositoryInterface::class        => get(PdkProductRepository::class),
+    PdkProductRepositoryInterface::class        => get(PsPdkProductRepository::class),
     PdkShippingMethodRepositoryInterface::class => get(PsShippingMethodRepository::class),
-    SettingsRepositoryInterface::class          => get(PdkSettingsRepository::class),
+    PdkSettingsRepositoryInterface::class       => get(PsPdkSettingsRepository::class),
 
     /**
      * Services
