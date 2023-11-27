@@ -21,14 +21,6 @@ class MyparcelnlAudit extends AbstractEntity implements EntityWithCreatedTimesta
     use HasJsonData;
     use HasCreatedTimestamps;
 
-    // * @property null|string              $id
-    // * @property array                    $arguments
-    // * @property string                   $type
-    // * @property null|string              $action
-    // * @property null|class-string<Model> $model
-    // * @property null|string              $modelIdentifier
-    // * @property null|\DateTime           $created
-
     /**
      * @var string
      * @ORM\Column(name="action", type="string")
@@ -37,6 +29,7 @@ class MyparcelnlAudit extends AbstractEntity implements EntityWithCreatedTimesta
 
     /**
      * @var string
+     * @ORM\Id
      * @ORM\Column(name="id", type="string")
      */
     private $id;
@@ -76,6 +69,26 @@ class MyparcelnlAudit extends AbstractEntity implements EntityWithCreatedTimesta
     public function getModelIdentifier(): string
     {
         return $this->modelIdentifier;
+    }
+
+    public function setAction(string $action): void
+    {
+        $this->action = $action;
+    }
+
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function setModel(string $model): void
+    {
+        $this->model = $model;
+    }
+
+    public function setModelIdentifier(string $modelIdentifier): void
+    {
+        $this->modelIdentifier = $modelIdentifier;
     }
 
     public function toArray(?int $flags = null): array

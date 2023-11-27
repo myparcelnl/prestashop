@@ -18,7 +18,9 @@ use MyParcelNL\Pdk\App\ShippingMethod\Contract\PdkShippingMethodRepositoryInterf
 use MyParcelNL\Pdk\App\Tax\Contract\TaxServiceInterface;
 use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhooksRepositoryInterface;
+use MyParcelNL\Pdk\Audit\Contract\AuditServiceInterface;
 use MyParcelNL\Pdk\Audit\Contract\PdkAuditRepositoryInterface;
+use MyParcelNL\Pdk\Audit\Service\AuditService;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -121,6 +123,7 @@ return [
     /**
      * Services
      */
+    AuditServiceInterface::class                => get(AuditService::class),
     CronServiceInterface::class                 => get(PsCronService::class),
     FrontendRenderServiceInterface::class       => get(PsFrontendRenderService::class),
     LanguageServiceInterface::class             => get(PsLanguageService::class),

@@ -25,6 +25,7 @@ final class CreateAuditTableDatabaseMigration extends AbstractDatabaseMigration
     {
         $sql = (new CreateTableSqlBuilder($this->getTable()))
             ->column('id', 'VARCHAR(36) NOT NULL')
+            ->column('action', 'VARCHAR(255) NOT NULL')
             ->column('data')
             ->column('model', 'VARCHAR(255) NOT NULL')
             ->column('model_identifier', 'VARCHAR(255) NOT NULL')

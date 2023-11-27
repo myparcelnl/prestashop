@@ -56,7 +56,7 @@ final class PsPdkAuditRepository extends Repository implements PdkAuditRepositor
             'action'          => $audit->action,
             'model'           => $audit->model,
             'modelIdentifier' => $audit->modelIdentifier,
-            'data'            => $audit->arguments,
+            'data'            => json_encode($audit->arguments),
             'dateAdd'         => $audit->created,
         ]);
 
