@@ -35,7 +35,7 @@ class PsWebhooksRepository extends AbstractPdkWebhooksRepository
 
     public function getHashedUrl(): ?string
     {
-        return $this->configurationService->get(Pdk::get('settingKeyWebhookHash'));
+        return $this->configurationService->get(Pdk::get('settingKeyWebhookHash')) ?: null;
     }
 
     public function remove(string $hook): void
