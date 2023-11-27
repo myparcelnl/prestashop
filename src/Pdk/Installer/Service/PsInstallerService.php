@@ -12,7 +12,7 @@ use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
@@ -41,16 +41,16 @@ final class PsInstallerService extends InstallerService
     private $psObjectModelService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface    $settingsRepository
+     * @param  \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface $settingsRepository
      * @param  \MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface $migrationService
      * @param  \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface        $psCarrierService
      * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface    $psObjectModelService
      */
     public function __construct(
-        SettingsRepositoryInterface   $settingsRepository,
-        MigrationServiceInterface     $migrationService,
-        PsCarrierServiceInterface     $psCarrierService,
-        PsObjectModelServiceInterface $psObjectModelService
+        PdkSettingsRepositoryInterface $settingsRepository,
+        MigrationServiceInterface      $migrationService,
+        PsCarrierServiceInterface      $psCarrierService,
+        PsObjectModelServiceInterface  $psObjectModelService
     ) {
         parent::__construct($settingsRepository, $migrationService);
         $this->psCarrierService     = $psCarrierService;

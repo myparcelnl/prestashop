@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Carrier as PsCarrier;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
@@ -189,8 +189,8 @@ it('migrates settings to pdk', function () {
     $migration = Pdk::get(PdkSettingsMigration::class);
     $migration->up();
 
-    /** @var SettingsRepositoryInterface $settingsRepository */
-    $settingsRepository = Pdk::get(SettingsRepositoryInterface::class);
+    /** @var PdkSettingsRepositoryInterface $settingsRepository */
+    $settingsRepository = Pdk::get(PdkSettingsRepositoryInterface::class);
 
     $settings = $settingsRepository
         ->all()

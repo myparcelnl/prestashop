@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Settings\Repository;
 
 use Carrier as PsCarrier;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\setupCarrierActiveSettings;
@@ -19,7 +19,7 @@ it('updates carrier active state when carrier settings are edited', function (ar
     $settingsModel = setupCarrierActiveSettings($settings)->make();
 
     /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockSettingsRepository $repository */
-    $repository = Pdk::get(SettingsRepositoryInterface::class);
+    $repository = Pdk::get(PdkSettingsRepositoryInterface::class);
     $repository->storeAllSettings($settingsModel);
 
     $psCarrier = new PsCarrier(12);

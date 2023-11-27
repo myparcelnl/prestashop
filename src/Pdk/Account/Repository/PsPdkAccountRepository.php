@@ -8,7 +8,7 @@ use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Repository\AccountRepository;
 use MyParcelNL\Pdk\App\Account\Repository\AbstractPdkAccountRepository;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 
@@ -24,13 +24,13 @@ final class PsPdkAccountRepository extends AbstractPdkAccountRepository
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                             $storage
      * @param  \MyParcelNL\Pdk\Account\Repository\AccountRepository                          $accountRepository
-     * @param  \MyParcelNL\Pdk\Settings\Contract\SettingsRepositoryInterface                 $settingsRepository
+     * @param  \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface              $settingsRepository
      * @param  \MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface $configurationService
      */
     public function __construct(
         StorageInterface                $storage,
         AccountRepository               $accountRepository,
-        SettingsRepositoryInterface     $settingsRepository,
+        PdkSettingsRepositoryInterface  $settingsRepository,
         PsConfigurationServiceInterface $configurationService
     ) {
         parent::__construct($storage, $accountRepository, $settingsRepository);
