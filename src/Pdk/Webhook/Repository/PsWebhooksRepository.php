@@ -41,9 +41,10 @@ class PsWebhooksRepository extends AbstractPdkWebhooksRepository
     public function remove(string $hook): void
     {
         $items = $this->getAll();
+
         $this->store(
             $items->filter(function (WebhookSubscription $item) use ($hook) {
-                return $item->getHook() !== $hook;
+                return $item->hook !== $hook;
             })
         );
     }
