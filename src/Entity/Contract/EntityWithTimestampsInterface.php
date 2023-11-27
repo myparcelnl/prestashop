@@ -6,15 +6,9 @@ namespace MyParcelNL\PrestaShop\Entity\Contract;
 
 use DateTime;
 
-interface EntityWithTimestampsInterface extends EntityInterface
+interface EntityWithTimestampsInterface extends EntityWithCreatedTimestampsInterface
 {
-    public function getDateAdd(): ?DateTime;
-
     public function getDateUpd(): ?DateTime;
 
-    public function setDateAdd(DateTime $dateAdd): self;
-
     public function setDateUpd(DateTime $dateUpd): self;
-
-    public function updateTimestamps(): void;
 }

@@ -18,6 +18,7 @@ use MyParcelNL\Pdk\App\ShippingMethod\Contract\PdkShippingMethodRepositoryInterf
 use MyParcelNL\Pdk\App\Tax\Contract\TaxServiceInterface;
 use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhookServiceInterface;
 use MyParcelNL\Pdk\App\Webhook\Contract\PdkWebhooksRepositoryInterface;
+use MyParcelNL\Pdk\Audit\Contract\PdkAuditRepositoryInterface;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -31,6 +32,7 @@ use MyParcelNL\PrestaShop\Configuration\Service\Ps17PsConfigurationService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
+use MyParcelNL\PrestaShop\Database\CreateAuditTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateCartDeliveryOptionsTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateOrderDataTableDatabaseMigration;
@@ -46,6 +48,7 @@ use MyParcelNL\PrestaShop\Pdk\Action\Backend\Account\PsUpdateAccountAction;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
+use MyParcelNL\PrestaShop\Pdk\Audit\Repository\PsPdkAuditRepository;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsCronService;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
@@ -87,6 +90,7 @@ return [
     'pdkMigrationVersion' => value('2.0.0-alpha.0'),
 
     'databaseMigrationClasses' => value([
+        CreateAuditTableDatabaseMigration::class,
         CreateCarrierMappingTableDatabaseMigration::class,
         CreateCartDeliveryOptionsTableDatabaseMigration::class,
         CreateOrderDataTableDatabaseMigration::class,
@@ -106,6 +110,7 @@ return [
      * Repositories
      */
     PdkAccountRepositoryInterface::class        => get(PsPdkAccountRepository::class),
+    PdkAuditRepositoryInterface::class          => get(PsPdkAuditRepository::class),
     PdkCartRepositoryInterface::class           => get(PsPdkCartRepository::class),
     PdkOrderNoteRepositoryInterface::class      => get(PsPdkOrderNoteRepository::class),
     PdkOrderRepositoryInterface::class          => get(PsPdkOrderRepository::class),

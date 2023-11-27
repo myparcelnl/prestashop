@@ -71,6 +71,14 @@ final class CreateTableSqlBuilder extends SqlBuilder
     }
 
     /**
+     * @return $this
+     */
+    public function createdTimestamps(): self
+    {
+        return $this->column('date_add', 'DATETIME');
+    }
+
+    /**
      * @param  string $name
      *
      * @return $this
@@ -101,7 +109,7 @@ final class CreateTableSqlBuilder extends SqlBuilder
     public function timestamps(): self
     {
         return $this
-            ->column('date_add', 'DATETIME')
+            ->createdTimestamps()
             ->column('date_upd', 'DATETIME');
     }
 

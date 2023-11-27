@@ -9,15 +9,12 @@ use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
 
 /**
- * @see EntityWithTimestampsInterface
+ * @see \MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface
+ * @see \MyParcelNL\PrestaShop\Entity\Concern\HasCreatedTimestamps
  */
 trait HasTimestamps
 {
-    /**
-     * @var \DateTime
-     * @ORM\Column(type="datetime")
-     */
-    private $dateAdd;
+    use HasCreatedTimestamps;
 
     /**
      * @var \DateTime
@@ -25,21 +22,9 @@ trait HasTimestamps
      */
     private $dateUpd;
 
-    public function getDateAdd(): ?DateTime
-    {
-        return $this->dateAdd;
-    }
-
     public function getDateUpd(): ?DateTime
     {
         return $this->dateUpd;
-    }
-
-    public function setDateAdd(DateTime $dateAdd): EntityWithTimestampsInterface
-    {
-        $this->dateAdd = $dateAdd;
-
-        return $this;
     }
 
     public function setDateUpd(DateTime $dateUpd): EntityWithTimestampsInterface
@@ -53,8 +38,10 @@ trait HasTimestamps
     {
         $this->setDateUpd(new DateTime());
 
-        if (null === $this->getDateAdd()) {
-            $this->setDateAdd(new DateTime());
+        if ($this->getDateAdd() !== null) {
+            return;
         }
+
+        $this->setDateAdd(new DateTime());
     }
 }
