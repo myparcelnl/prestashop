@@ -62,7 +62,7 @@ final class PsPdkSettingsRepository extends AbstractPdkSettingsRepository
     }
 
     /**
-     * @param  SettingsModelCollection $settings
+     * @param  SettingsModelCollection|\MyParcelNL\Pdk\Settings\Model\AbstractSettingsModel $settings
      *
      * @return void
      * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException

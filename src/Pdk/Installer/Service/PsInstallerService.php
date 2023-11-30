@@ -6,13 +6,13 @@ namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 
 use Carrier as PsCarrier;
 use Module;
-use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Model\AccountSettings;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
@@ -124,9 +124,11 @@ final class PsInstallerService extends InstallerService
         $this->uninstallHooks();
 
         // Delete account manually because prestashop removes config values on uninstall
-        /** @var PdkAccountRepositoryInterface $accountRepository */
-        $accountRepository = Pdk::get(PdkAccountRepositoryInterface::class);
-        $accountRepository->store(null);
+        /** @var \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface $accountRepository */
+        $accountRepository = Pdk::get(PdkSettingsRepositoryInterface::class);
+        $accountRepository->storeSettings(new AccountSettings());
+
+        Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
     }
 
     /**
