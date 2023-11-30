@@ -7,10 +7,6 @@ inputs:
     required: true
 
 outputs:
-  token:
-    description: 'GitHub Token'
-    value: ${{ steps.credentials.outputs.token }}
-
   image:
     description: 'Docker image to use'
     value: ${{ steps.setup.outputs.image }}
@@ -22,18 +18,6 @@ runs:
       id: setup
       with:
         composer-flags: --no-dev
-
-    - name: 'Import translations'
-      shell: bash
-      #language=sh
-      run: |
-        yarn run translations:import
-
-    - name: 'Download carrier logos'
-      shell: bash
-      #language=sh
-      run: |
-        yarn run download:carrier-logos
 
     - name: 'Build frontend'
       shell: bash

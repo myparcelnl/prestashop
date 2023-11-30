@@ -24,3 +24,15 @@ runs:
     - uses: myparcelnl/actions/yarn-install@v3
       with:
         node-version: 18
+
+    - name: 'Import translations'
+      shell: bash
+      #language=sh
+      run: |
+        yarn translations:import
+
+    - name: 'Download carrier logos'
+      shell: bash
+      #language=sh
+      run: |
+        yarn download:carrier-logos
