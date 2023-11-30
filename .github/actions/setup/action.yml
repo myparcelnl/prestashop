@@ -23,7 +23,7 @@ runs:
 
     - uses: myparcelnl/actions/yarn-install@v3
       with:
-        node-version: 18
+        node-version: 20
 
     - name: 'Import translations'
       shell: bash
