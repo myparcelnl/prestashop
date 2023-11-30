@@ -68,7 +68,7 @@ final class PsPdkOrderNoteRepository extends AbstractPdkOrderNoteRepository
 
             $customerNotes = (new Collection($messages))
                 ->map(function (array $customerNote) use ($order) {
-                    $author = '0' === ($customerNote['id_employee'] ?? '0')
+                    $author = ($customerNote['id_employee'] ?? '0') === '0'
                         ? OrderNote::AUTHOR_CUSTOMER
                         : OrderNote::AUTHOR_WEBSHOP;
 
@@ -106,17 +106,17 @@ final class PsPdkOrderNoteRepository extends AbstractPdkOrderNoteRepository
     }
 
     /**
-     * @param  null|string        $date
-     * @param  \DateTimeImmutable $fallback
+     * @param  null|string             $date
+     * @param  null|\DateTimeImmutable $fallback
      *
      * @return string
      */
-    private function getDate(?string $date, DateTimeImmutable $fallback): string
+    private function getDate(?string $date, ?DateTimeImmutable $fallback = null): string
     {
         try {
             $resolvedDate = new DateTimeImmutable($date);
         } catch (Throwable $e) {
-            $resolvedDate = $fallback;
+            $resolvedDate = $fallback ?? new DateTimeImmutable();
         }
 
         return $resolvedDate->format(Pdk::get('defaultDateFormat'));
