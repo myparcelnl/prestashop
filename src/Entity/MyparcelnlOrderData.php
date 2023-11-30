@@ -22,6 +22,12 @@ class MyparcelnlOrderData extends AbstractEntity implements EntityWithTimestamps
     use HasJsonData;
 
     /**
+     * @var string
+     * @ORM\Column(name="notes", type="text")
+     */
+    private $notes;
+
+    /**
      * @var int
      * @ORM\Id
      * @ORM\Column(name="order_id", type="integer")
@@ -33,9 +39,29 @@ class MyparcelnlOrderData extends AbstractEntity implements EntityWithTimestamps
         return Table::TABLE_ORDER_DATA;
     }
 
+    /**
+     * @return array
+     */
+    public function getNotes(): array
+    {
+        return $this->notes ? json_decode($this->notes, true) : [];
+    }
+
     public function getOrderId(): int
     {
         return $this->orderId;
+    }
+
+    /**
+     * @param  string $notes
+     *
+     * @return $this
+     */
+    public function setNotes(string $notes): self
+    {
+        $this->notes = $notes;
+
+        return $this;
     }
 
     /**
@@ -55,6 +81,7 @@ class MyparcelnlOrderData extends AbstractEntity implements EntityWithTimestamps
         return [
             'orderId' => $this->getOrderId(),
             'data'    => $this->getData(),
+            'notes'   => $this->getNotes(),
         ];
     }
 }

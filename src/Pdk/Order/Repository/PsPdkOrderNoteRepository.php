@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 use CustomerMessage;
 use DateTimeImmutable;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderNoteCollection;
+use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrderNote;
 use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderNoteRepository;
@@ -15,23 +16,34 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Fulfilment\Model\OrderNote;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
+use RuntimeException;
 use Throwable;
 
 final class PsPdkOrderNoteRepository extends AbstractPdkOrderNoteRepository
 {
+    /**
+     * @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface
+     */
+    private $pdkOrderRepository;
+
     /**
      * @var \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface
      */
     private $psOrderService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface       $storage
-     * @param  \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface $psOrderService
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface              $storage
+     * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $pdkOrderRepository
+     * @param  \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface        $psOrderService
      */
-    public function __construct(StorageInterface $storage, PsOrderServiceInterface $psOrderService)
-    {
+    public function __construct(
+        StorageInterface            $storage,
+        PdkOrderRepositoryInterface $pdkOrderRepository,
+        PsOrderServiceInterface     $psOrderService
+    ) {
         parent::__construct($storage);
-        $this->psOrderService = $psOrderService;
+        $this->psOrderService     = $psOrderService;
+        $this->pdkOrderRepository = $pdkOrderRepository;
     }
 
     /**
@@ -60,10 +72,10 @@ final class PsPdkOrderNoteRepository extends AbstractPdkOrderNoteRepository
      */
     public function getFromOrder(PdkOrder $order): PdkOrderNoteCollection
     {
-        $data = $this->psOrderService->getOrderData($order->externalIdentifier);
+        $notes = $this->psOrderService->getOrderNotes($order->externalIdentifier);
 
-        return $this->retrieve($order->externalIdentifier, function () use ($data, $order) {
-            $collection = new PdkOrderNoteCollection($data['notes'] ?? []);
+        return $this->retrieve($order->externalIdentifier, function () use ($notes, $order) {
+            $collection = new PdkOrderNoteCollection($notes ?? []);
             $messages   = CustomerMessage::getMessagesByOrderId($order->externalIdentifier);
 
             $customerNotes = (new Collection($messages))
@@ -92,9 +104,39 @@ final class PsPdkOrderNoteRepository extends AbstractPdkOrderNoteRepository
         });
     }
 
+    /**
+     * @param  \MyParcelNL\Pdk\App\Order\Model\PdkOrderNote $note
+     *
+     * @return void
+     * @throws \Exception
+     */
     public function update(PdkOrderNote $note): void
     {
-        // TODO: Implement update() method.
+        if (! $note->orderIdentifier) {
+            throw new RuntimeException('Order identifier is missing');
+        }
+
+        $this->updateMany(new PdkOrderNoteCollection([$note]));
+    }
+
+    /**
+     * @param  \MyParcelNL\Pdk\App\Order\Collection\PdkOrderNoteCollection $notes
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function updateMany(PdkOrderNoteCollection $notes): void
+    {
+        $pdkOrder      = $this->pdkOrderRepository->get($notes->first()->orderIdentifier);
+        $existingNotes = $this->getFromOrder($pdkOrder);
+
+        /** @var PdkOrderNoteCollection $mergedNotes */
+        $mergedNotes = $existingNotes->mergeByKey($notes, 'externalIdentifier');
+
+        $this->psOrderService->updateOrderNotes($pdkOrder->externalIdentifier, $mergedNotes->toStorableArray());
+
+        // Invalidate cache
+        $this->storage->delete($this->getKeyPrefix() . $pdkOrder->externalIdentifier);
     }
 
     /**

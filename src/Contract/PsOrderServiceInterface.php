@@ -26,6 +26,13 @@ interface PsOrderServiceInterface extends PsSpecificObjectModelServiceInterface
     public function getOrderData($input): array;
 
     /**
+     * @param  string|int|T $input
+     *
+     * @return array
+     */
+    public function getOrderNotes($input): array;
+
+    /**
      * @param  string|int|Order $input
      * @param  array            $orderData
      *
@@ -33,4 +40,12 @@ interface PsOrderServiceInterface extends PsSpecificObjectModelServiceInterface
      * @throws \Doctrine\ORM\ORMException
      */
     public function updateOrderData($input, array $orderData): void;
+
+    /**
+     * @param  string|int|Order $input
+     * @param  array            $notes
+     *
+     * @return void
+     */
+    public function updateOrderNotes($input, array $notes): void;
 }

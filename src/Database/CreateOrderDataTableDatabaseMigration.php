@@ -23,6 +23,7 @@ final class CreateOrderDataTableDatabaseMigration extends AbstractDatabaseMigrat
         $sql = (new CreateTableSqlBuilder($this->getTable()))
             ->id('order_id')
             ->column('data')
+            ->column('notes', 'TEXT', true)
             ->timestamps()
             ->primary(['order_id']);
 

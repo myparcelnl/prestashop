@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
+use InvalidArgumentException;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
@@ -69,6 +70,26 @@ final class PsOrderService extends PsSpecificObjectModelService implements PsOrd
 
     /**
      * @param  string|int|Order $input
+     *
+     * @return array
+     */
+    public function getOrderNotes($input): array
+    {
+        if (! $this->exists($input)) {
+            return [];
+        }
+
+        $fromOrder = $this->psOrderDataRepository->findOneBy(['orderId' => $this->getId($input)]);
+
+        if (! $fromOrder) {
+            throw new InvalidArgumentException('Order could not be found');
+        }
+
+        return $fromOrder->getNotes();
+    }
+
+    /**
+     * @param  string|int|Order $input
      * @param  array            $orderData
      *
      * @return void
@@ -79,6 +100,21 @@ final class PsOrderService extends PsSpecificObjectModelService implements PsOrd
         $this->psOrderDataRepository->updateOrCreate(
             ['orderId' => $this->getId($input)],
             ['data' => json_encode($orderData)]
+        );
+    }
+
+    /**
+     * @param  string|int|Order $input
+     * @param  array            $notes
+     *
+     * @return void
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function updateOrderNotes($input, array $notes): void
+    {
+        $this->psOrderDataRepository->updateOrCreate(
+            ['orderId' => $this->getId($input)],
+            ['notes' => json_encode($notes)]
         );
     }
 
