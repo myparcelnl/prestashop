@@ -5,7 +5,7 @@
   "type": "prestashop-module",
   "require": {
     "myparcelnl/pdk": "^2.0.0",
-    "php": ">=7.2.0"
+    "php": ">=7.4.0"
   },
   "require-dev": {
     "guzzlehttp/guzzle": "^7.4",
