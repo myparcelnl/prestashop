@@ -18,7 +18,6 @@ use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
-use Tab;
 use Tools;
 
 final class PsInstallerService extends InstallerService
@@ -172,16 +171,6 @@ final class PsInstallerService extends InstallerService
         }
     }
 
-    /**
-     * @param  null|string $version
-     *
-     * @return void
-     */
-    protected function updateInstalledVersion(?string $version): void
-    {
-        // do nothing
-    }
-
     private function installDatabase(): void
     {
         foreach (Pdk::get('databaseMigrationClasses') as $migration) {
@@ -218,15 +207,5 @@ final class PsInstallerService extends InstallerService
 
             throw new InstallationException(sprintf('Hook %s could not be unregistered.', $hook));
         }
-    }
-
-    /**
-     * @return void
-     */
-    private function uninstallTabs(): void
-    {
-        $moduleTabs = Tab::getCollectionFromModule($this->module->name);
-
-        $this->psObjectModelService->deleteMany(Tab::class, $moduleTabs);
     }
 }
