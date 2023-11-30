@@ -373,7 +373,9 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
             'MYPARCELNL_LABEL_SIZE',
             implode('.', [LabelSettings::ID, LabelSettings::FORMAT]),
             new TransformValue(function ($value): string {
-                return 'a6' === strtolower($value) ? LabelSettings::FORMAT_A6 : LabelSettings::FORMAT_A4;
+                return is_string($value) && strtolower($value) === 'a6'
+                    ? LabelSettings::FORMAT_A6
+                    : LabelSettings::FORMAT_A4;
             })
         );
 
