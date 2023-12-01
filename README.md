@@ -11,5 +11,7 @@ Voor de handleiding en meer informatie, zie onze [PrestaShop plugin handleiding]
 
 We're not actively developing the v1.x module anymore. We've rewritten the entire module from scratch, using the [MyParcel Plugin Development Kit]. The new module supports PrestaShop 8 and Php 7.4 through 8.2 (and onwards). See the [pinned issue] for more information on the changes and how to install the beta version.
 
-[PrestaShop plugin handleiding]: https://developer.myparcel.nl/nl/documentatie/11.prestashop.html
 [MyParcel Developer Portal]: https://developer.myparcel.nl
+[MyParcel Plugin Development Kit]: https://developer.myparcel.nl/documentation/52.pdk/
+[PrestaShop plugin handleiding]: https://developer.myparcel.nl/nl/documentatie/11.prestashop.html
+[pinned issue]: https://github.com/myparcelnl/prestashop/issues/226
