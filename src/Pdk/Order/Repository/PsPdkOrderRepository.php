@@ -10,7 +10,6 @@ use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
 use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderRepository;
 use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
-use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
@@ -18,6 +17,7 @@ use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
+use MyParcelNL\PrestaShop\Service\PsProductService;
 use Order as PsOrder;
 
 final class PsPdkOrderRepository extends AbstractPdkOrderRepository
@@ -48,35 +48,35 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     private $psOrderShipmentRepository;
 
     /**
-     * @var \MyParcelNL\Pdk\Base\Contract\WeightServiceInterface
+     * @var \MyParcelNL\PrestaShop\Service\PsProductService
      */
-    private $weightService;
+    private PsProductService $psProductService;
 
     /**
      * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                       $storage
      * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository      $psOrderShipmentRepository
      * @param  \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface           $currencyService
      * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $productRepository
-     * @param  \MyParcelNL\Pdk\Base\Contract\WeightServiceInterface             $weightService
      * @param  \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter         $addressAdapter
      * @param  \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface          $psOrderService
+     * @param  \MyParcelNL\PrestaShop\Service\PsProductService                  $psProductService
      */
     public function __construct(
         MemoryCacheStorage            $storage,
         PsOrderShipmentRepository     $psOrderShipmentRepository,
         CurrencyServiceInterface      $currencyService,
         PdkProductRepositoryInterface $productRepository,
-        WeightServiceInterface        $weightService,
         PsAddressAdapter              $addressAdapter,
-        PsOrderServiceInterface       $psOrderService
+        PsOrderServiceInterface       $psOrderService,
+        PsProductService              $psProductService
     ) {
         parent::__construct($storage);
         $this->psOrderShipmentRepository = $psOrderShipmentRepository;
         $this->currencyService           = $currencyService;
         $this->productRepository         = $productRepository;
-        $this->weightService             = $weightService;
         $this->addressAdapter            = $addressAdapter;
         $this->psOrderService            = $psOrderService;
+        $this->psProductService          = $psProductService;
     }
 
     /**
@@ -98,7 +98,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
 
         return $this->retrieve((string) $psOrder->id, function () use ($psOrder) {
             $orderData     = $this->psOrderService->getOrderData($psOrder);
-            $orderProducts = $psOrder->getProducts() ?: [];
+            $orderProducts = new Collection($psOrder->getProducts() ?: []);
 
             return new PdkOrder(
                 array_replace([
@@ -164,21 +164,26 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
-     * @param  array $orderProducts
+     * @param  \MyParcelNL\Pdk\Base\Support\Collection $orderProducts
      *
      * @return array|array[]
      */
-    protected function createOrderLines(array $orderProducts): array
+    protected function createOrderLines(Collection $orderProducts): array
     {
-        return array_map(function (array $product) {
-            return [
-                'quantity'      => $product['product_quantity'] ?? 1,
-                'price'         => $this->currencyService->convertToCents($product['product_price'] ?? 0),
-                'priceAfterVat' => $this->currencyService->convertToCents($product['product_price_wt'] ?? 0),
-                'product'       => $this->productRepository->getProduct($product['product_id']),
-                'vatRate'       => $product['tax_rate'],
-            ];
-        }, array_values($orderProducts));
+        return $orderProducts
+            ->filter(function (array $product) {
+                return $this->psProductService->exists($product['id_product'] ?? 0);
+            })
+            ->map(function (array $product) {
+                return [
+                    'quantity'      => $product['product_quantity'] ?? 1,
+                    'price'         => $this->currencyService->convertToCents($product['product_price'] ?? 0),
+                    'priceAfterVat' => $this->currencyService->convertToCents($product['product_price_wt'] ?? 0),
+                    'product'       => $this->productRepository->getProduct($product['product_id'] ?? 0),
+                    'vatRate'       => $product['tax_rate'] ?? 0,
+                ];
+            })
+            ->toArrayWithoutNull();
     }
 
     /**
