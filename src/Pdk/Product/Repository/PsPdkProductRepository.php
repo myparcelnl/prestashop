@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Product\Repository;
 
 use Context;
+use InvalidArgumentException;
 use MyParcelNL\Pdk\App\Order\Collection\PdkProductCollection;
 use MyParcelNL\Pdk\App\Order\Model\PdkProduct;
 use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkPdkProductRepository;
 use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
+use MyParcelNL\PrestaShop\Service\PsProductService;
 use MyParcelNL\Sdk\src\Support\Arr;
-use Product;
+use Product as PsProduct;
 
 class PsPdkProductRepository extends AbstractPdkPdkProductRepository
 {
@@ -22,6 +25,11 @@ class PsPdkProductRepository extends AbstractPdkPdkProductRepository
      * @var \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface
      */
     private $currencyService;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Service\PsProductService
+     */
+    private PsProductService $psProductService;
 
     /**
      * @var \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository
@@ -37,17 +45,20 @@ class PsPdkProductRepository extends AbstractPdkPdkProductRepository
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface             $storage
      * @param  \MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService       $weightService
      * @param  \MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository $productSettingsRepository
+     * @param  \MyParcelNL\PrestaShop\Service\PsProductService               $psProductService
      * @param  \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface        $currencyService
      */
     public function __construct(
         StorageInterface            $storage,
         PsWeightService             $weightService,
         PsProductSettingsRepository $productSettingsRepository,
+        PsProductService            $psProductService,
         CurrencyServiceInterface    $currencyService
     ) {
         parent::__construct($storage);
         $this->weightService               = $weightService;
         $this->psProductSettingsRepository = $productSettingsRepository;
+        $this->psProductService            = $psProductService;
         $this->currencyService             = $currencyService;
     }
 
@@ -58,21 +69,28 @@ class PsPdkProductRepository extends AbstractPdkPdkProductRepository
      */
     public function getProduct($identifier): PdkProduct
     {
+        if (! $this->psProductService->exists($identifier)) {
+            Logger::error("Product with id $identifier not found");
+            throw new InvalidArgumentException('Product not found');
+        }
+
         return $this->retrieve((string) $identifier, function () use ($identifier) {
-            $psProduct = new Product($identifier);
+            /** @var PsProduct $psProduct */
+            $psProduct = $this->psProductService->get($identifier);
+
             $translate = static function (array $strings) {
-                return $strings[Context::getContext()->language->id] ?? $strings[1] ?? reset($strings);
+                return $strings[Context::getContext()->language->id] ?? $strings[1] ?? Arr::last($strings);
             };
 
             return new PdkProduct([
                 'externalIdentifier' => $psProduct->id,
-                'name'               => $translate($psProduct->name),
-                'weight'             => $this->weightService->convertToGrams($psProduct->weight),
+                'name'               => $translate($psProduct->name ?? []),
+                'weight'             => $this->weightService->convertToGrams($psProduct->weight ?? 0),
                 'settings'           => $this->getProductSettings($identifier),
                 'isDeliverable'      => $this->isDeliverable($psProduct),
                 'price'              => [
                     'currency' => Context::getContext()->currency->iso_code,
-                    'amount'   => $this->currencyService->convertToCents($psProduct->price),
+                    'amount'   => $this->currencyService->convertToCents($psProduct->price ?? 0),
                 ],
             ]);
         });
@@ -138,7 +156,7 @@ class PsPdkProductRepository extends AbstractPdkPdkProductRepository
      *
      * @return bool
      */
-    private function isDeliverable(Product $psProduct): bool
+    private function isDeliverable(PsProduct $psProduct): bool
     {
         return $psProduct->available_for_order
             && $psProduct->active
