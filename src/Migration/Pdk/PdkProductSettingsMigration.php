@@ -143,7 +143,7 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
         $allRows       = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION);
         $rowsByProduct = $allRows->groupBy('id_product');
 
-        $rowsByProduct->each(function (Collection $rows, int $productId) {
+        $rowsByProduct->each(function (Collection $rows, $productId) {
             if ($this->productSettingsRepository->findOneBy(['productId' => $productId])) {
                 Logger::info("Product settings for product $productId already exist, skipping");
 
@@ -157,7 +157,7 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
             $newSettings = $this->valueMigrator->transform($oldSettings, $this->getProductSettingsTransformationMap());
 
             $this->productSettingsRepository->create([
-                'productId' => $productId,
+                'productId' => (int) $productId,
                 'data'      => json_encode(['settings' => $newSettings]),
             ]);
         });
