@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.0](https://github.com/myparcelnl/prestashop/compare/v1.9.0...v1.10.0) (2024-01-02)
+
+
+### :sparkles: New Features
+
+* add digital stamp weight range ([#233](https://github.com/myparcelnl/prestashop/issues/233)) ([1286abf](https://github.com/myparcelnl/prestashop/commit/1286abfbdc5a7fa5a39bfffc71c1e9ce6c09c881))
+
 ## [1.9.0](https://github.com/myparcelnl/prestashop/compare/v1.8.2...v1.9.0) (2023-10-30)
 
 
