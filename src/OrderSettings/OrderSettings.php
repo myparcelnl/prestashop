@@ -16,6 +16,29 @@ use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
 class OrderSettings
 {
+    private const DIGITAL_STAMP_WEIGHT_RANGES = [
+        [
+            'min'     => 0,
+            'max'     => 20,
+            'average' => 15,
+        ],
+        [
+            'min'     => 20,
+            'max'     => 50,
+            'average' => 35,
+        ],
+        [
+            'min'     => 50,
+            'max'     => 350,
+            'average' => 200,
+        ],
+        [
+            'min'     => 350,
+            'max'     => 2000,
+            'average' => 1175,
+        ],
+    ];
+
     /**
      * @var null|\MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
      */
@@ -84,7 +107,10 @@ class OrderSettings
                 'labelAmount'        => $extraOptions->getLabelAmount(),
                 'digitalStampWeight' =>
                     $extraOptions->getDigitalStampWeight()
-                    ?? $weightService->convertToDigitalStamp(min($this->getOrderWeight(), 2000)),
+                    ?? $weightService->convertToDigitalStamp(
+                        min($this->getOrderWeight(), 2000),
+                        self::DIGITAL_STAMP_WEIGHT_RANGES
+                    ),
             ]);
         }
 
