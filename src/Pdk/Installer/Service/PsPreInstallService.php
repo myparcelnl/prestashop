@@ -64,7 +64,10 @@ final class PsPreInstallService
 
         $docParser = new DocParser();
         $reader    = new AnnotationReader($docParser);
-        $reader    = new PsrCachedReader($reader, new ArrayAdapter());
+
+        if (class_exists(PsrCachedReader::class)) {
+            $reader = new PsrCachedReader($reader, new ArrayAdapter());
+        }
 
         $driver = new AnnotationDriver($reader, ["{$appInfo->path}src/Entity"]);
 

@@ -47,6 +47,7 @@ use MyParcelNL\PrestaShop\Migration\Pdk\PdkProductSettingsMigration;
 use MyParcelNL\PrestaShop\Migration\Pdk\PdkSettingsMigration;
 use MyParcelNL\PrestaShop\Pdk\Account\Repository\PsPdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Action\Backend\Account\PsUpdateAccountAction;
+use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle5ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
@@ -80,6 +81,15 @@ use Psr\Log\LoggerInterface;
 use function DI\factory;
 use function DI\get;
 use function DI\value;
+
+$comparePsVersion = '1.8.0';
+$currentPsVersion = constant('_PS_VERSION_');
+if (version_compare($currentPsVersion, $comparePsVersion, '<')) {
+    $guzzleAdapter = Guzzle5ClientAdapter::class;
+} else {
+    $guzzleAdapter = Guzzle7ClientAdapter::class;
+}
+
 
 return [
     'defaultCutoffTime'        => value('17:00'),
@@ -152,7 +162,7 @@ return [
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class               => get(Guzzle7ClientAdapter::class),
+    ClientAdapterInterface::class               => get($guzzleAdapter),
     LoggerInterface::class                      => get(PsLogger::class),
     MigrationServiceInterface::class            => get(PsMigrationService::class),
     ScriptServiceInterface::class               => get(PsScriptService::class),
