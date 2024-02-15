@@ -84,12 +84,12 @@ use function DI\value;
 
 $comparePsVersion = '1.8.0';
 $currentPsVersion = constant('_PS_VERSION_');
+
 if (version_compare($currentPsVersion, $comparePsVersion, '<')) {
     $guzzleAdapter = Guzzle5ClientAdapter::class;
 } else {
     $guzzleAdapter = Guzzle7ClientAdapter::class;
 }
-
 
 return [
     'defaultCutoffTime'        => value('17:00'),
