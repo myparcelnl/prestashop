@@ -82,15 +82,6 @@ use function DI\factory;
 use function DI\get;
 use function DI\value;
 
-$comparePsVersion = '1.8.0';
-$currentPsVersion = constant('_PS_VERSION_');
-
-if (version_compare($currentPsVersion, $comparePsVersion, '<')) {
-    $guzzleAdapter = Guzzle5ClientAdapter::class;
-} else {
-    $guzzleAdapter = Guzzle7ClientAdapter::class;
-}
-
 return [
     'defaultCutoffTime'        => value('17:00'),
     'defaultCutoffTimeSameDay' => value('10:00'),
@@ -162,7 +153,17 @@ return [
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class               => get($guzzleAdapter),
+    ClientAdapterInterface::class               => factory(function () {
+        $comparePsVersion = '1.8.0';
+        $currentPsVersion = constant('_PS_VERSION_');
+
+        if (version_compare($currentPsVersion, $comparePsVersion, '<')) {
+            return get(Guzzle5ClientAdapter::class);
+        }
+
+        return get(Guzzle7ClientAdapter::class);
+    }),
+
     LoggerInterface::class                      => get(PsLogger::class),
     MigrationServiceInterface::class            => get(PsMigrationService::class),
     ScriptServiceInterface::class               => get(PsScriptService::class),
