@@ -20,20 +20,8 @@ vendor/
 views/**/tsconfig.json
 
 # Intellij
-.idea/*.xml
-!.idea/codeception.xml
-!.idea/externalDependencies.xml
-!.idea/jsLibraryMappings.xml
-!.idea/misc.xml
-!.idea/modules.xml
-!.idea/php-docker-settings.xml
-!.idea/php-test-framework.xml
-!.idea/php.xml
-!.idea/phpunit.xml
-!.idea/prettier.xml
-!.idea/sqldialects.xml
-!.idea/vcs.xml
-!.idea/workspace.xml
+.idea/deployment.xml
+.idea/phpspec.xml
 
 # Yarn
 .pnp.*
