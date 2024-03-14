@@ -154,19 +154,12 @@ return [
      * Miscellaneous
      */
     ClientAdapterInterface::class               => factory(function () {
-        $comparePsVersion = '1.8.0';
-        $currentPsVersion = constant('_PS_VERSION_');
-
-        if (version_compare($currentPsVersion, $comparePsVersion, '<')) {
-            return get(Guzzle5ClientAdapter::class);
-        }
-
-        return get(Guzzle7ClientAdapter::class);
+        return _PS_VERSION_ >= 8 ? Pdk::get(Guzzle7ClientAdapter::class) : Pdk::get(Guzzle5ClientAdapter::class);
     }),
 
-    LoggerInterface::class                      => get(PsLogger::class),
-    MigrationServiceInterface::class            => get(PsMigrationService::class),
-    ScriptServiceInterface::class               => get(PsScriptService::class),
+    LoggerInterface::class           => get(PsLogger::class),
+    MigrationServiceInterface::class => get(PsMigrationService::class),
+    ScriptServiceInterface::class    => get(PsScriptService::class),
 
     InstallerServiceInterface::class       => factory(function () {
         /** @var \MyParcelNL\PrestaShop\Pdk\Installer\Service\PsPreInstallService $preInstallService */
