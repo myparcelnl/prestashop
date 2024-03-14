@@ -2,6 +2,7 @@
 
 docker-compose.override.yml
 
+.nx
 *.tmp
 *.cache
 .eslintcache

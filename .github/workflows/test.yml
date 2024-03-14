@@ -13,15 +13,10 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: 'Run frontend tests'
-        shell: bash
-        #language=sh
-        run: |
-          yarn nx run-many \
-            --output-style=static \
-            --runner=cloud \
-            --parallel=1 \
-            --target=test:coverage
+      - uses: myparcelnl/actions/nx-run-many@v4
+        with:
+          target: 'test:coverage'
+          args: '--parallel=1'
 
       - name: 'Move coverage files'
         shell: bash
