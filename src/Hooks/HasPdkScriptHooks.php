@@ -6,9 +6,10 @@ namespace MyParcelNL\PrestaShop\Hooks;
 
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings;
-use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
+use MyParcelNL\PrestaShop\Script\Service\PsBackendScriptService;
+use MyParcelNL\PrestaShop\Script\Service\PsFrontendScriptService;
 
 trait HasPdkScriptHooks
 {
@@ -26,13 +27,13 @@ trait HasPdkScriptHooks
             return;
         }
 
-        /** @var ScriptServiceInterface $scriptService */
-        $scriptService = Pdk::get(ScriptServiceInterface::class);
+        /** @var \MyParcelNL\PrestaShop\Script\Service\PsBackendScriptService $scriptService */
+        $scriptService = Pdk::get(PsBackendScriptService::class);
 
-        /** @var \AdminControllerCore $controller */
+        /** @var \AdminController $controller */
         $controller = $this->context->controller;
 
-        $scriptService->addForAdminHeader($controller, $this->_path);
+        $scriptService->register($controller, $this->_path);
     }
 
     /**
@@ -40,30 +41,21 @@ trait HasPdkScriptHooks
      */
     public function hookDisplayHeader(): void
     {
+        $deliveryOptionsEnabled = Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
+
         /** @var \MyParcelNL\Pdk\Frontend\Contract\ViewServiceInterface $viewService */
         $viewService = Pdk::get(ViewServiceInterface::class);
-
-        $deliveryOptionsEnabled = Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
 
         if (! $deliveryOptionsEnabled || ! $viewService->isCheckoutPage()) {
             return;
         }
 
-        $this->loadCheckoutScripts();
-    }
+        /** @var \MyParcelNL\PrestaShop\Script\Service\PsFrontendScriptService $scriptService */
+        $scriptService = Pdk::get(PsFrontendScriptService::class);
 
-    private function loadCheckoutScripts(): void
-    {
-        $this->context->controller->registerJavascript(
-            'myparcelnl-delivery-options',
-            sprintf(
-                'https://unpkg.com/@myparcel/delivery-options@%s/dist/myparcel.js',
-                Pdk::get('deliveryOptionsVersion')
-            ),
-            ['server' => 'remote', 'position' => 'head', 'priority' => 1]
-        );
+        /** @var \FrontController $controller */
+        $controller = $this->context->controller;
 
-        $this->context->controller->addJS("{$this->_path}views/js/frontend/checkout/dist/index.iife.js");
-        $this->context->controller->addCSS("{$this->_path}views/js/frontend/checkout/dist/style.css");
+        $scriptService->register($controller, $this->_path);
     }
 }

@@ -8,10 +8,10 @@ import {
 import {
   updateDeliveryOptions,
   getDefaultDeliveryOptionsConfig,
-  updateDeliveryOptionsDiv,
   onShippingMethodChange,
   onDeliveryOptionsOutputChange,
   showDeliveryOptionsForm,
+  updateDeliveryOptionsDiv,
 } from './deliveryOptions';
 
 export const initializeDeliveryOptions = (): void => {
@@ -26,12 +26,5 @@ export const initializeDeliveryOptions = (): void => {
   checkoutStore.on(StoreListener.Update, onShippingMethodChange);
   deliveryOptionsStore.on(StoreListener.Update, onDeliveryOptionsOutputChange);
 
-  window.prestashop.on(
-    'updatedDeliveryForm',
-    debounce((...args) => {
-      console.warn('updatedDeliveryForm', args);
-
-      showDeliveryOptionsForm();
-    }, 300),
-  );
+  window.prestashop.on('updatedDeliveryForm', debounce(showDeliveryOptionsForm, 300));
 };

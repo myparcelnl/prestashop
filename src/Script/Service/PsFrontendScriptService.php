@@ -8,7 +8,7 @@ use FrontController;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Script\Contract\PsScriptServiceInterface;
 
-final class PsFrontendScriptService extends AbstractPsScriptService implements PsScriptServiceInterface
+final class PsFrontendScriptService extends PsScriptService implements PsScriptServiceInterface
 {
     /**
      * @param  \FrontController $controller
@@ -20,9 +20,8 @@ final class PsFrontendScriptService extends AbstractPsScriptService implements P
     {
         $appInfo = Pdk::getAppInfo();
 
-        $deliveryOptions = $appInfo->name . '-delivery-options';
-        // $deliveryOptionsUrl = sprintf('https://unpkg.com/@myparcel/delivery-options@%s', 'beta');
-        $deliveryOptionsUrl = 'http://127.0.0.1:8081';
+        $deliveryOptions    = $appInfo->name . '-delivery-options';
+        $deliveryOptionsUrl = sprintf('https://unpkg.com/@myparcel/delivery-options@%s', 'beta');
 
         $this->addStyle($controller, $deliveryOptions, "$deliveryOptionsUrl/dist/style.css");
         $this->addScript($controller, $deliveryOptions, "$deliveryOptionsUrl/dist/myparcel.js");

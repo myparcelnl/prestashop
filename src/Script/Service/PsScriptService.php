@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Script\Service;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Service\ScriptService;
 
-abstract class AbstractPsScriptService extends ScriptService
+class PsScriptService extends ScriptService
 {
     protected const LIB_VUE_DEMI = 'vue-demi';
     protected const LIB_VUE      = 'vue';
