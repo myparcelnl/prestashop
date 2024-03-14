@@ -8,7 +8,7 @@ use AdminController;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Script\Contract\PsScriptServiceInterface;
 
-final class PsBackendScriptService extends AbstractPsScriptService implements PsScriptServiceInterface
+final class PsBackendScriptService extends PsScriptService implements PsScriptServiceInterface
 {
     /**
      * @param  \AdminController $controller

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Frontend\Service;
 
+use Dispatcher;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Service\AbstractViewService;
-use PrestaShop\PrestaShop\Adapter\Entity\Dispatcher;
 use RuntimeException;
 
 final class PsViewService extends AbstractViewService

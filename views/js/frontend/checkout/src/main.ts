@@ -1,5 +1,3 @@
 import {initialize} from './initialize';
 
-(() => {
-  initialize();
-})();
+initialize();

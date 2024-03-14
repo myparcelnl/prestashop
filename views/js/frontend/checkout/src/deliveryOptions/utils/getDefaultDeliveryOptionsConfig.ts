@@ -1,8 +1,9 @@
-import {useDeliveryOptionsStore, type DeliveryOptionsConfiguration} from '@myparcel-pdk/checkout';
+import {useDeliveryOptionsStore} from '@myparcel-pdk/checkout';
+import {type InputDeliveryOptionsConfiguration} from '@myparcel/delivery-options';
 
-let configuration: DeliveryOptionsConfiguration | undefined;
+let configuration: InputDeliveryOptionsConfiguration | undefined;
 
-export const getDefaultDeliveryOptionsConfig = (): DeliveryOptionsConfiguration => {
+export const getDefaultDeliveryOptionsConfig = (): InputDeliveryOptionsConfiguration => {
   if (!configuration) {
     const deliveryOptionsStore = useDeliveryOptionsStore();
 

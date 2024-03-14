@@ -2,19 +2,17 @@ const isDeliveryStep = () => document.querySelector('#checkout-delivery-step.js-
 
 export const pdkCheckoutInitialize = (): Promise<void> => {
   return new Promise((resolve) => {
-    document.addEventListener('DOMContentLoaded', (): void => {
-      if (isDeliveryStep()) {
-        resolve();
+    if (isDeliveryStep()) {
+      resolve();
+      return;
+    }
+
+    window.prestashop.on('changedCheckoutStep', () => {
+      if (!isDeliveryStep()) {
         return;
       }
 
-      window.prestashop.on('changedCheckoutStep', () => {
-        if (!isDeliveryStep()) {
-          return;
-        }
-
-        resolve();
-      });
+      resolve();
     });
   });
 };
