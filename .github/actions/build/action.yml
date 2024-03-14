@@ -19,14 +19,9 @@ runs:
       with:
         composer-flags: --no-dev
 
-    - name: 'Build frontend'
-      shell: bash
-      #language=sh
-      run: |
-        yarn nx run-many \
-          --output-style=static \
-          --runner=cloud \
-          --target=build
+    - uses: myparcelnl/actions/nx-run-many@v4
+      with:
+        target: 'build'
 
     # The scoper is installed and run in pdk.config.js
     - name: 'Cache php-scoper'

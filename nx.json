@@ -4,7 +4,7 @@
   "npmScope": "myparcel-prestashop",
   "workspaceLayout": {
     "appsDir": "views",
-    "distsDir": "views"
+    "libsDir": "views"
   },
   "namedInputs": {
     "production": [
@@ -55,14 +55,6 @@
           "test:coverage"
         ],
         "parallel": 10
-      }
-    },
-    "cloud": {
-      "runner": "@nrwl/nx-cloud",
-      "options": {
-        "cacheableOperations": ["build", "test:coverage"],
-        "parallel": 10,
-        "accessToken": "MzNmZGMyNzktM2YwOS00MzMzLThjMjctY2Q4ZjEwZWUwNGRifHJlYWQtd3JpdGU="
       }
     }
   }
