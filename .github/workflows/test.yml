@@ -15,6 +15,7 @@ jobs:
 
       - uses: myparcelnl/actions/nx-run-many@v4
         with:
+          prefix: 'yarn'
           target: 'test:coverage'
           args: '--parallel=1'
 
