@@ -13,39 +13,39 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsEntityFactory;
  */
 final class MyparcelnlCarrierMappingFactory extends AbstractPsEntityFactory
 {
-    public function fromBpost(int $subscriptionId = null): self
+    public function fromBpost(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_BPOST_NAME, $subscriptionId);
+        return $this->fromCarrier(Carrier::CARRIER_BPOST_NAME, $contractId);
     }
 
-    public function fromDhlEuroplus(int $subscriptionId = null): self
+    public function fromDhlEuroplus(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_EUROPLUS_NAME, $subscriptionId);
+        return $this->fromCarrier(Carrier::CARRIER_DHL_EUROPLUS_NAME, $contractId);
     }
 
-    public function fromDhlForYou(int $subscriptionId = null): self
+    public function fromDhlForYou(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_FOR_YOU_NAME, $subscriptionId);
+        return $this->fromCarrier(Carrier::CARRIER_DHL_FOR_YOU_NAME, $contractId);
     }
 
-    public function fromDhlParcelConnect(int $subscriptionId = null): self
+    public function fromDhlParcelConnect(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME, $subscriptionId);
+        return $this->fromCarrier(Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME, $contractId);
     }
 
-    public function fromDpd(int $subscriptionId = null): self
+    public function fromDpd(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DPD_NAME, $subscriptionId);
+        return $this->fromCarrier(Carrier::CARRIER_DPD_NAME, $contractId);
     }
 
-    public function fromPostNL(int $subscriptionId = null): self
+    public function fromPostNL(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_POSTNL_NAME, $subscriptionId);
+        return $this->fromCarrier(Carrier::CARRIER_POSTNL_NAME, $contractId);
     }
 
-    public function fromUps(int $subscriptionId = null): self
+    public function fromUps(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_UPS_NAME, $subscriptionId);
+        return $this->fromCarrier(Carrier::CARRIER_UPS_NAME, $contractId);
     }
 
     protected function getEntityClass(): string
@@ -55,13 +55,13 @@ final class MyparcelnlCarrierMappingFactory extends AbstractPsEntityFactory
 
     /**
      * @param  string   $name
-     * @param  null|int $subscriptionId
+     * @param  null|int $contractId
      *
      * @return $this
      */
-    private function fromCarrier(string $name, ?int $subscriptionId): self
+    private function fromCarrier(string $name, ?int $contractId): self
     {
-        $identifier = $subscriptionId ? "$name:$subscriptionId" : $name;
+        $identifier = $contractId ? "$name:$contractId" : $name;
 
         return $this->withMyparcelCarrier($identifier);
     }

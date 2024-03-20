@@ -74,7 +74,7 @@ it('creates carriers on account update', function () {
                 ->withHuman('PostNL'),
             factory(Carrier::class)
                 ->fromDhlForYou()
-                ->withSubscriptionId(8123)
+                ->withContractId(8123)
                 ->withHuman('Dhl custom'),
             factory(Carrier::class)
                 ->fromDhlForYou()
@@ -84,9 +84,10 @@ it('creates carriers on account update', function () {
 
     $carrierOptions = $carriers->map(function (Carrier $carrier) {
         return [
-            'carrier_id'      => $carrier->id,
-            'enabled'         => (int) $carrier->enabled,
-            'subscription_id' => $carrier->subscriptionId,
+            'id'         => $carrier->contractId ?? $carrier->id,
+            'carrier_id' => $carrier->id,
+            'enabled'    => (int) $carrier->enabled,
+            'type'       => $carrier->type,
         ];
     });
 
@@ -118,7 +119,7 @@ it('does not create duplicate carriers', function () {
             factory(Carrier::class)
                 ->withName('postnl')
                 ->withId(12)
-                ->withSubscriptionId(23)
+                ->withContractId(23)
         )
     );
 
@@ -160,7 +161,7 @@ it('updates existing carrier if mapping already exists', function () {
                 ->withHuman('This Is PostNL'),
             factory(Carrier::class)
                 ->fromDhlForYou()
-                ->withSubscriptionId(8123)
+                ->withContractId(8123)
                 ->withHuman('This Is DhLForYou')
         )
     );

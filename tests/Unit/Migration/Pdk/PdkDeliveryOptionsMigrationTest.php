@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
-use MyParcelNL\Pdk\Base\Support\Arr;
+use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Platform;
@@ -71,27 +71,32 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
     $order                = $orderRepository->get(1);
     $deliveryOptionsArray = $order->deliveryOptions->toStorableArray();
 
-    $fullResult = array_replace_recursive([
-        DeliveryOptions::CARRIER          => [
-            'externalIdentifier' => Platform::get('defaultCarrier'),
-        ],
-        DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
-        DeliveryOptions::LABEL_AMOUNT     => 1,
-        DeliveryOptions::PACKAGE_TYPE     => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,
-        DeliveryOptions::SHIPMENT_OPTIONS => [
-            ShipmentOptions::AGE_CHECK         => TriStateService::INHERIT,
-            ShipmentOptions::DIRECT_RETURN     => TriStateService::INHERIT,
-            ShipmentOptions::HIDE_SENDER       => TriStateService::INHERIT,
-            ShipmentOptions::INSURANCE         => TriStateService::INHERIT,
-            ShipmentOptions::LARGE_FORMAT      => TriStateService::INHERIT,
-            ShipmentOptions::ONLY_RECIPIENT    => TriStateService::INHERIT,
-            ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::INHERIT,
-            ShipmentOptions::SIGNATURE         => TriStateService::INHERIT,
-        ],
-    ], $result);
+    $finalShipmentOptions = Utils::filterNull(array_replace([
+        ShipmentOptions::AGE_CHECK         => TriStateService::INHERIT,
+        ShipmentOptions::DIRECT_RETURN     => TriStateService::INHERIT,
+        ShipmentOptions::HIDE_SENDER       => TriStateService::INHERIT,
+        ShipmentOptions::INSURANCE         => TriStateService::INHERIT,
+        ShipmentOptions::LABEL_DESCRIPTION => TriStateService::INHERIT,
+        ShipmentOptions::LARGE_FORMAT      => TriStateService::INHERIT,
+        ShipmentOptions::ONLY_RECIPIENT    => TriStateService::INHERIT,
+        ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::INHERIT,
+        ShipmentOptions::SIGNATURE         => TriStateService::INHERIT,
+        ShipmentOptions::TRACKED           => TriStateService::INHERIT,
+    ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
 
-    // TODO: re-add label description when https://github.com/myparcelnl/pdk/pull/201 is live
-    expect(Arr::except($deliveryOptionsArray, 'shipmentOptions.labelDescription'))->toEqual($fullResult);
+    $fullResult = array_replace(
+        array_replace([
+            DeliveryOptions::CARRIER       => [
+                'externalIdentifier' => Platform::get('defaultCarrier'),
+            ],
+            DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::LABEL_AMOUNT  => 1,
+            DeliveryOptions::PACKAGE_TYPE  => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,
+        ], $result),
+        [DeliveryOptions::SHIPMENT_OPTIONS => $finalShipmentOptions]
+    );
+
+    expect($deliveryOptionsArray)->toEqual($fullResult);
 })
     ->with([
         'defaults' => [
@@ -163,6 +168,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
                     ShipmentOptions::DIRECT_RETURN     => TriStateService::ENABLED,
                     ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::ENABLED,
                     ShipmentOptions::SIGNATURE         => TriStateService::ENABLED,
+                    ShipmentOptions::LABEL_DESCRIPTION => 'hello',
                 ],
             ],
         ],
@@ -196,6 +202,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
                     ShipmentOptions::DIRECT_RETURN     => TriStateService::DISABLED,
                     ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::DISABLED,
                     ShipmentOptions::SIGNATURE         => TriStateService::DISABLED,
+                    ShipmentOptions::LABEL_DESCRIPTION => 'hello',
                 ],
             ],
         ],
@@ -252,7 +259,11 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
                 'digitalStampWeight' => 'unknown',
             ],
 
-            // Use defaults
-            'result'            => [],
+            // Use defaults but remove label description
+            'result'            => [
+                DeliveryOptions::SHIPMENT_OPTIONS => [
+                    ShipmentOptions::LABEL_DESCRIPTION => null,
+                ],
+            ],
         ],
     ]);
