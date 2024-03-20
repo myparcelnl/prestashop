@@ -2,6 +2,14 @@ name: 'Create build'
 description: ''
 
 inputs:
+  node-version:
+    description: 'Node version to use for installing yarn dependencies.'
+    required: true
+
+  php-version:
+    description: 'PHP version to use for installing composer dependencies.'
+    required: true
+
   php-scoper-version:
     description: 'PHP Scoper Version'
     required: true
@@ -17,6 +25,8 @@ runs:
     - uses: ./.github/actions/setup
       id: setup
       with:
+        node-version: ${{ inputs.node-version }}
+        php-version: ${{ inputs.php-version }}
         composer-flags: --no-dev
 
     - uses: myparcelnl/actions/nx-run-many@v4
@@ -26,20 +36,20 @@ runs:
 
     # The scoper is installed and run in pdk.config.js
     - name: 'Cache php-scoper'
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: php-scoper-cache
       with:
         path: .tmp/php-scoper
         key: php-scoper-${{ inputs.php-scoper-version }}
 
     - name: 'Cache scoped source php'
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tmp/scoped/source
         key: scoped-php-src-${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
 
     - name: 'Cache scoped vendor php'
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tmp/scoped/vendor
         key: scoped-php-vendor-${{ hashFiles('**/composer.json', '**/composer.lock', 'scoper.inc.php', 'scoper.vendor.inc.php') }}

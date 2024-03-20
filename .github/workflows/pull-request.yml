@@ -20,18 +20,20 @@ jobs:
     needs:
       - test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - uses: ./.github/actions/build
         id: build
         with:
+          node-version: ${{ vars.NODE_VERSION }}
+          php-version: ${{ vars.PHP_VERSION }}
           php-scoper-version: ${{ vars.PHP_SCOPER_VERSION }}
 
       - name: 'Determine version'
         id: version
-        #language=sh
+        #language=bash
         run: |
           version=$(npm pkg get version | sed 's/"//g') 
           releaseVersion="$version-${{ github.event.pull_request.number}}"

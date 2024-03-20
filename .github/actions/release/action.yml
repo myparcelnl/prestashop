@@ -15,7 +15,7 @@ runs:
   steps:
     - name: 'Create release packages'
       shell: bash
-      #language=sh
+      #language=bash
       run: |
         yarn pdk-builder release \
           --version ${{ inputs.version }} \
@@ -23,7 +23,7 @@ runs:
           -v
 
     - name: 'Upload build artifacts'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-${{ inputs.version }}
         path: |

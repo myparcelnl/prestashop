@@ -2,6 +2,14 @@ name: 'Setup'
 description: 'Install dependencies'
 
 inputs:
+  node-version:
+    description: 'Node version to use for installing yarn dependencies.'
+    required: true
+
+  php-version:
+    description: 'PHP version to use for installing composer dependencies.'
+    required: true
+
   composer-flags:
     description: 'Flags to use when installing composer dependencies.'
     required: false
@@ -15,24 +23,24 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: myparcelnl/actions/composer-install@v3
+    - uses: myparcelnl/actions/composer-install@v4
       id: composer
       with:
-        php-version: 7.4
+        php-version: ${{ inputs.php-version }}
         flags: ${{ inputs.composer-flags }}
 
-    - uses: myparcelnl/actions/yarn-install@v3
+    - uses: myparcelnl/actions/yarn-install@v4
       with:
-        node-version: 20
+        node-version: ${{ inputs.node-version }}
 
     - name: 'Import translations'
       shell: bash
-      #language=sh
+      #language=bash
       run: |
         yarn translations:import
 
     - name: 'Download carrier logos'
       shell: bash
-      #language=sh
+      #language=bash
       run: |
         yarn download:carrier-logos
