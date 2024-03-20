@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2cc9f5b9b6557cc61d3cf912580e0c69",
+    "content-hash": "7d3ad1cf3308030ac52bc1af3298b55f",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -138,16 +138,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "2.31.2",
+            "version": "2.33.2",
             "source": {
                 "type": "git",
-                "url": "git@github.com:myparcelnl/pdk.git",
-                "reference": "c3805bb3d6ad00b4004be091f85dd5194523dd34"
+                "url": "https://github.com/myparcelnl/pdk.git",
+                "reference": "f14a19ab7c5791dc1d6e4c26619cac039993dc7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/c3805bb3d6ad00b4004be091f85dd5194523dd34",
-                "reference": "c3805bb3d6ad00b4004be091f85dd5194523dd34",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/f14a19ab7c5791dc1d6e4c26619cac039993dc7e",
+                "reference": "f14a19ab7c5791dc1d6e4c26619cac039993dc7e",
                 "shasum": ""
             },
             "require": {
@@ -167,7 +167,7 @@
                 "pestphp/pest": ">= 1",
                 "phpdocumentor/reflection-docblock": "^5",
                 "phpstan/phpstan": ">= 1",
-                "rector/rector": "^0.18",
+                "rector/rector": "^0.19",
                 "spatie/pest-plugin-snapshots": ">= 1",
                 "symfony/console": "*"
             },
@@ -189,7 +189,11 @@
             ],
             "description": "MyParcel Plugin Development Kit",
             "homepage": "https://myparcel.nl",
-            "time": "2023-11-27T10:55:45+00:00"
+            "support": {
+                "issues": "https://github.com/myparcelnl/pdk/issues",
+                "source": "https://github.com/myparcelnl/pdk/tree/v2.33.2"
+            },
+            "time": "2024-03-13T16:03:48+00:00"
         },
         {
             "name": "myparcelnl/sdk",
@@ -4559,7 +4563,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2.0"
+        "php": ">=7.4.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"
