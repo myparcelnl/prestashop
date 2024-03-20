@@ -2,7 +2,7 @@
 
 [![Latest stable release](https://img.shields.io/github/v/release/myparcelnl/prestashop?labelColor=white&label=Latest%20release)](https://github.com/myparcelnl/prestashop/releases/latest)
 [![Latest beta release](https://img.shields.io/github/v/release/myparcelnl/prestashop?filter=*-beta.*)](https://myparcelnl.github.io/github-release-linker?repo=myparcelnl/prestashop&tag=beta)
-![Supported PrestaShop Version](https://img.shields.io/badge/Prestashop-%3E%3D8.0-gray?labelColor=DF0067&logo=prestashop)
+![Supported PrestaShop Version](https://img.shields.io/badge/Prestashop-%3E%3D1.7.8.0-gray?labelColor=DF0067&logo=prestashop)
 ![Supported PHP Version](https://img.shields.io/badge/PHP-%3E=7.4-B0B3D6?labelColor=white&logo=php)
 
 ## ⚠️ Preface️ ⚠️
@@ -21,10 +21,12 @@ This module allows you to seamlessly integrate [the MyParcel services] into your
 
 ## Requirements
 
-- PrestaShop 8.0 or higher
+- PrestaShop 1.7.8.0 or higher (including 8.0 and up)
 - PHP 7.4 or higher
 
 For the manual and more information, check out our [PrestaShop module guide] on the [MyParcel Developer Portal]. Do note this is the manual for the stable version of the module. We are working on a new manual for the v2.0.0 release.
+
+> :warning: Older 1.7.x versions may work, but are not officially tested or supported.
 
 [Bug report for v2.0.0-beta.x form]: https://github.com/myparcelnl/prestashop/issues/new?labels=pdk&template=ZZ-BUG-REPORT-v2.yml
 [MyParcel Developer Portal]: https://developer.myparcel.nl
