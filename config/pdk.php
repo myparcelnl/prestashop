@@ -47,6 +47,7 @@ use MyParcelNL\PrestaShop\Migration\Pdk\PdkProductSettingsMigration;
 use MyParcelNL\PrestaShop\Migration\Pdk\PdkSettingsMigration;
 use MyParcelNL\PrestaShop\Pdk\Account\Repository\PsPdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Action\Backend\Account\PsUpdateAccountAction;
+use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle5ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
@@ -152,10 +153,13 @@ return [
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class               => get(Guzzle7ClientAdapter::class),
-    LoggerInterface::class                      => get(PsLogger::class),
-    MigrationServiceInterface::class            => get(PsMigrationService::class),
-    ScriptServiceInterface::class               => get(PsScriptService::class),
+    ClientAdapterInterface::class               => factory(function () {
+        return _PS_VERSION_ >= 8 ? Pdk::get(Guzzle7ClientAdapter::class) : Pdk::get(Guzzle5ClientAdapter::class);
+    }),
+
+    LoggerInterface::class           => get(PsLogger::class),
+    MigrationServiceInterface::class => get(PsMigrationService::class),
+    ScriptServiceInterface::class    => get(PsScriptService::class),
 
     InstallerServiceInterface::class       => factory(function () {
         /** @var \MyParcelNL\PrestaShop\Pdk\Installer\Service\PsPreInstallService $preInstallService */
