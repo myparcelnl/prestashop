@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0-beta.2](https://github.com/myparcelnl/prestashop/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2024-03-20)
+
+
+### :bug: Bug Fixes
+
+* **migration:** fix type error in product settings migration ([a7a32b2](https://github.com/myparcelnl/prestashop/commit/a7a32b26c8e2397bcb95bb1022952e975fbe2344)), closes [#235](https://github.com/myparcelnl/prestashop/issues/235)
+* **products:** improve handling of nonexistent products ([#229](https://github.com/myparcelnl/prestashop/issues/229)) ([efd8483](https://github.com/myparcelnl/prestashop/commit/efd84832d21985cf1fc4aa7d290c918ad9ef1dca)), closes [#228](https://github.com/myparcelnl/prestashop/issues/228)
+
+
+### :sparkles: New Features
+
+* **deps:** upgrade @myparcel-pdk/* ([2c88f49](https://github.com/myparcelnl/prestashop/commit/2c88f49689d7d0038f99251b0360ccfeb7779349))
+* **deps:** upgrade myparcelnl/pdk to v2.33.2 ([1bd9d5d](https://github.com/myparcelnl/prestashop/commit/1bd9d5d9da24d8ea3da7692b36bb702bc4d32e75))
+* support prestashop 1.7 ([#239](https://github.com/myparcelnl/prestashop/issues/239)) ([b16926c](https://github.com/myparcelnl/prestashop/commit/b16926c1bc1bbe80ac42a313598fe5754e134ca9)), closes [#232](https://github.com/myparcelnl/prestashop/issues/232)
+* upgrade to delivery options v6.x ([35d2b05](https://github.com/myparcelnl/prestashop/commit/35d2b059f7839a167b0e3f3db924b141ea0bd116))
+
 ## [2.0.0-beta.1](https://github.com/myparcelnl/prestashop/compare/v1.8.1...v2.0.0-beta.1) (2023-11-30)
 
 
