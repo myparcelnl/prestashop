@@ -18,18 +18,17 @@ final class PsBackendScriptService extends PsScriptService implements PsScriptSe
      */
     public function register($controller, string $path): void
     {
+        /** use new-theme */
+        $themeCss = sprintf('%s%s/themes/new-theme/public/theme.css', __PS_BASE_URI__, $controller->admin_webpath);
+        $controller->addCSS($themeCss, 'all', 1);
+
         $this->addVue($controller, Pdk::get('vueVersion'));
         $this->addVueDemi($controller, Pdk::get('vueDemiVersion'));
 
-        /** use new-theme */
-        $controller->addCSS(
-            sprintf('%s%s/themes/new-theme/public/theme.css', __PS_BASE_URI__, $controller->admin_webpath),
-            'all',
-            1
-        );
+        $adminPath = "{$path}views/js/backend/admin";
 
-        $controller->addCSS("{$path}views/js/backend/admin/dist/style.css");
-        $controller->addJS("{$path}views/js/backend/admin/dist/index.iife.js");
+        $controller->addCSS("$adminPath/dist/style.css");
+        $controller->addJS("$adminPath/dist/index.iife.js");
     }
 
     /**

@@ -22,10 +22,9 @@ class PsScriptService extends ScriptService
     {
         switch ($package) {
             case self::LIB_VUE:
-                $isVue3 = version_compare($version, '3.0.0', '>=');
-                $file   = $isVue3 ? 'vue.global' : 'vue';
+                $filename = Pdk::isDevelopment() ? 'vue.global.js' : 'vue.global.min.js';
 
-                return $this->createCdnUrl(self::LIB_VUE, $version, Pdk::isDevelopment() ? "$file.js" : "$file.min.js");
+                return $this->createCdnUrl(self::LIB_VUE, $version, "dist/$filename");
 
             case self::LIB_VUE_DEMI:
                 $filename = Pdk::isDevelopment() ? 'index.iife.js' : 'index.iife.min.js';
