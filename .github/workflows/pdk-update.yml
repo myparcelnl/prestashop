@@ -4,6 +4,8 @@ on:
   repository_dispatch:
     types: [pdk-update]
 
+  workflow_dispatch:
+
 jobs:
   prepare:
     runs-on: ubuntu-22.04
@@ -23,11 +25,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           #language=javascript
           script: |
-            const { data } = await github.pulls.list({
+            const { data } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              state: 'open',
-              per_page: 100
+              state: 'open'
             });
 
             return data.map(pr => ({
