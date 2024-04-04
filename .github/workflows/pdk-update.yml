@@ -1,0 +1,45 @@
+name: 'On PDK update'
+
+on:
+  repository_dispatch:
+    types: [pdk-update]
+
+jobs:
+  prepare:
+    runs-on: ubuntu-22.04
+    outputs:
+      pr-data: ${{ steps.list.outputs.result }}
+    steps:
+      - uses: myparcelnl/actions/setup-app-credentials@v4
+        id: credentials
+        with:
+          app-id: ${{ secrets.MYPARCEL_APP_ID }}
+          private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
+
+      - name: 'Get pull requests'
+        id: list
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          #language=javascript
+          script: |
+            const { data } = await github.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            return data.map(pr => ({
+              number: pr.number,
+              ref: pr.head.ref
+            }));
+
+  trigger:
+    uses: ./.github/workflows/pull-request.yml
+    strategy:
+      matrix:
+        pr: ${{ fromJson(needs.prepare.outputs.pr-data) }}
+    with:
+      ref: ${{ matrix.pr.ref }}
+      number: ${{ matrix.pr.number }}

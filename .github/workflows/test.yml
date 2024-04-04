@@ -2,6 +2,11 @@ name: '🧪 Run tests'
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        description: 'Ref to run on'
+        type: string
+        required: false
 
 jobs:
   test-frontend:
@@ -10,6 +15,8 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.head_ref || github.ref }}
 
       - uses: ./.github/actions/setup
         with:
@@ -47,6 +54,8 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.head || github.head_ref || github.ref }}
 
       - name: 'Cache coverage'
         uses: actions/cache@v4

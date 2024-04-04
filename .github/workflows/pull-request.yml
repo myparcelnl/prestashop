@@ -6,14 +6,24 @@ on:
       - alpha
       - beta
 
+  workflow_call:
+    inputs:
+      number:
+        type: string
+
+      ref:
+        type: string
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: "${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || inputs.number }}"
   cancel-in-progress: true
 
 jobs:
   test:
     uses: ./.github/workflows/test.yml
     secrets: inherit
+    with:
+      ref: ${{ inputs.ref || github.ref }}
 
   build:
     runs-on: ubuntu-22.04
@@ -22,6 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.ref || github.ref }}
           persist-credentials: false
 
       - uses: ./.github/actions/build
@@ -43,5 +54,6 @@ jobs:
       - uses: ./.github/actions/release
         id: release
         with:
+          command: 'prerelease'
           image: ${{ steps.build.outputs.image }}
           version: ${{ steps.version.outputs.version }}
