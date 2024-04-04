@@ -6,16 +6,11 @@ on:
       - alpha
       - beta
 
-  workflow_call:
-    inputs:
-      number:
-        type: string
-
-      ref:
-        type: string
+  repository_dispatch:
+    types: [trigger-pr-build]
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || inputs.number }}"
+  group: "${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.event.client_payload.number }}"
   cancel-in-progress: true
 
 jobs:
@@ -23,7 +18,7 @@ jobs:
     uses: ./.github/workflows/test.yml
     secrets: inherit
     with:
-      ref: ${{ inputs.ref || github.ref }}
+      ref: ${{ github.event.client_payload.ref || github.ref }}
 
   build:
     runs-on: ubuntu-22.04
@@ -32,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.ref }}
+          ref: ${{ github.event.client_payload.ref || github.ref }}
           persist-credentials: false
 
       - uses: ./.github/actions/build

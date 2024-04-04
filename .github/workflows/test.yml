@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.head_ref || github.ref }}
+          ref: ${{ inputs.ref || github.ref }}
 
       - uses: ./.github/actions/setup
         with:
@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.head || github.head_ref || github.ref }}
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: 'Cache coverage'
         uses: actions/cache@v4

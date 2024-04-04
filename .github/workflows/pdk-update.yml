@@ -4,8 +4,6 @@ on:
   repository_dispatch:
     types: [pdk-update]
 
-  workflow_dispatch:
-
 jobs:
   prepare:
     runs-on: ubuntu-22.04
@@ -37,11 +35,20 @@ jobs:
             }));
 
   trigger:
-    uses: ./.github/workflows/pull-request.yml
     needs: prepare
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         pr: ${{ fromJson(needs.prepare.outputs.pr-data) }}
-    with:
-      ref: ${{ matrix.pr.ref }}
-      number: ${{ matrix.pr.number }}
+    steps:
+      - uses: myparcelnl/actions/get-github-token@v4
+        id: token
+        with:
+          app-id: ${{ secrets.MYPARCEL_APP_ID }}
+          private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
+
+      - uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ steps.token.outputs.token }}
+          event-type: trigger-pr-build
+          client-payload: ${{ toJson(matrix.pr) }}
