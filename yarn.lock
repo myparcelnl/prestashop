@@ -902,10 +902,11 @@ __metadata:
   linkType: hard
 
 "@myparcel-pdk/app-builder@npm:^1.0.0-beta.1":
-  version: 1.0.0-beta.2
-  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-beta.2"
+  version: 1.0.0-beta.3
+  resolution: "@myparcel-pdk/app-builder@npm:1.0.0-beta.3"
   dependencies:
     "@edielemoine/google-docs-importer": "npm:^1.1.1"
+    "@myparcel/ts-utils": "npm:^1.9.0"
     "@yarnpkg/parsers": "npm:^3.0.0-rc.48.1"
     archiver: "npm:^5.3.1"
     chalk: "npm:^5.2.0"
@@ -918,7 +919,7 @@ __metadata:
     supports-color: "npm:^9.3.1"
   bin:
     pdk-builder: ./bin/index.js
-  checksum: c6b187ccb7bad82c69239dca8659d7236b818b40e433532e9808b497000ca43f02ea2046587da3dbd05b8944a863f04ca30b521780290073b6867145d6a38ea5
+  checksum: 2fa8c614e1752ade5a5c9d8bafecaa4c86d04aec1d5680adf02cd508dde566a5a2d2d00f62167a732b0311ee2d3939f2d89f2670642e427248d057a18448e298
   languageName: node
   linkType: hard
 
@@ -3833,9 +3834,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001538, caniuse-lite@npm:^1.0.30001539":
-  version: 1.0.30001540
-  resolution: "caniuse-lite@npm:1.0.30001540"
-  checksum: f5071207aa5d3bb5584d2d7d90a37103562d792df9e407e6dc1c64857ef25444420c7dd3e0bec53f7365c9dcbaab471135b246f5a39027078722c05aa1049405
+  version: 1.0.30001605
+  resolution: "caniuse-lite@npm:1.0.30001605"
+  checksum: ceb96a0ecfdaee6510c00aebaaa63db20aaeafab03450d4e3b214e009cb632f87385a70c299cdd1ca4c17e1473883d8fa2051c5b2d083a454338c0c779b25cbc
   languageName: node
   linkType: hard
 
