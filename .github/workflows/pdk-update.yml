@@ -38,6 +38,7 @@ jobs:
 
   trigger:
     uses: ./.github/workflows/pull-request.yml
+    needs: prepare
     strategy:
       matrix:
         pr: ${{ fromJson(needs.prepare.outputs.pr-data) }}
