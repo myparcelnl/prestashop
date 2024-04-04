@@ -9,31 +9,7 @@ use MyParcelNL\Pdk\Frontend\Service\ScriptService;
 
 class PsScriptService extends ScriptService
 {
-    protected const LIB_VUE_DEMI = 'vue-demi';
-    protected const LIB_VUE      = 'vue';
-
-    /**
-     * @param  string $package
-     * @param  string $version
-     *
-     * @return null|string
-     */
-    public function getCdnUrl(string $package, string $version): ?string
-    {
-        switch ($package) {
-            case self::LIB_VUE:
-                $filename = Pdk::isDevelopment() ? 'vue.global.js' : 'vue.global.min.js';
-
-                return $this->createCdnUrl(self::LIB_VUE, $version, "dist/$filename");
-
-            case self::LIB_VUE_DEMI:
-                $filename = Pdk::isDevelopment() ? 'index.iife.js' : 'index.iife.min.js';
-
-                return $this->createCdnUrl(self::LIB_VUE_DEMI, $version, $filename);
-        }
-
-        return null;
-    }
+    protected const LIB_VUE = 'vue';
 
     /**
      * @param  string $version
@@ -42,16 +18,8 @@ class PsScriptService extends ScriptService
      */
     protected function getVueCdnUrl(string $version): ?string
     {
-        return $this->getCdnUrl(self::LIB_VUE, $version);
-    }
+        $filename = Pdk::isDevelopment() ? 'vue.global.js' : 'vue.global.min.js';
 
-    /**
-     * @param  string $version
-     *
-     * @return null|string
-     */
-    protected function getVueDemiCdnUrl(string $version): ?string
-    {
-        return $this->getCdnUrl(self::LIB_VUE_DEMI, $version);
+        return $this->createCdnUrl(self::LIB_VUE, $version, "dist/$filename");
     }
 }
