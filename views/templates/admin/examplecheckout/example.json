@@ -1,0 +1,1226 @@
+{
+  "data": {
+    "delivery": [
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "08:00:00",
+            "end": "12:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 1000
+            },
+            "price_comment": "morning",
+            "comment": "",
+            "type": 1
+          },
+          {
+            "start": "14:45:00",
+            "end": "17:15:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 0
+            },
+            "price_comment": "standard",
+            "comment": "",
+            "type": 2
+          },
+          {
+            "start": "18:00:00",
+            "end": "22:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 125
+            },
+            "price_comment": "avond",
+            "comment": "",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "date": "2118-08-02",
+        "time": [
+          {
+            "start": "08:00:00",
+            "end": "12:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 1000
+            },
+            "price_comment": "morning",
+            "comment": "",
+            "type": 1
+          },
+          {
+            "start": "15:00:00",
+            "end": "17:30:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 0
+            },
+            "price_comment": "standard",
+            "comment": "",
+            "type": 2
+          },
+          {
+            "start": "18:00:00",
+            "end": "22:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 125
+            },
+            "price_comment": "avond",
+            "comment": "",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "date": "2118-08-03",
+        "time": [
+          {
+            "start": "08:00:00",
+            "end": "12:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 1000
+            },
+            "price_comment": "morning",
+            "comment": "",
+            "type": 1
+          },
+          {
+            "start": "14:45:00",
+            "end": "17:15:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 0
+            },
+            "price_comment": "standard",
+            "comment": "",
+            "type": 2
+          },
+          {
+            "start": "18:00:00",
+            "end": "22:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 125
+            },
+            "price_comment": "avond",
+            "comment": "",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "date": "2118-08-04",
+        "time": [
+          {
+            "start": "08:00:00",
+            "end": "12:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 1000
+            },
+            "price_comment": "morning",
+            "comment": "",
+            "type": 1
+          },
+          {
+            "start": "14:45:00",
+            "end": "17:15:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 0
+            },
+            "price_comment": "standard",
+            "comment": "",
+            "type": 2
+          },
+          {
+            "start": "18:00:00",
+            "end": "22:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 125
+            },
+            "price_comment": "avond",
+            "comment": "",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "date": "2118-08-05",
+        "time": [
+          {
+            "start": "08:00:00",
+            "end": "12:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 1000
+            },
+            "price_comment": "morning",
+            "comment": "",
+            "type": 1
+          },
+          {
+            "start": "15:00:00",
+            "end": "17:30:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 0
+            },
+            "price_comment": "standard",
+            "comment": "",
+            "type": 2
+          },
+          {
+            "start": "18:00:00",
+            "end": "22:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 125
+            },
+            "price_comment": "avond",
+            "comment": "",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "date": "2118-08-06",
+        "time": [
+          {
+            "start": "15:00:00",
+            "end": "17:30:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 0
+            },
+            "price_comment": "standard",
+            "comment": "",
+            "type": 2
+          }
+        ]
+      },
+      {
+        "date": "2118-08-09",
+        "time": [
+          {
+            "start": "08:00:00",
+            "end": "12:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 1000
+            },
+            "price_comment": "morning",
+            "comment": "",
+            "type": 1
+          },
+          {
+            "start": "14:45:00",
+            "end": "17:15:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 0
+            },
+            "price_comment": "standard",
+            "comment": "",
+            "type": 2
+          },
+          {
+            "start": "18:00:00",
+            "end": "22:00:00",
+            "price": {
+              "currency": "EUR",
+              "amount": 125
+            },
+            "price_comment": "avond",
+            "comment": "",
+            "type": 3
+          }
+        ]
+      }
+    ],
+    "pickup": [
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          },
+          {
+            "start": "08:30:00",
+            "type": 5,
+            "price": {
+              "amount": 125,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Staples Office Centre",
+        "street": "Jacobus Spijkerdreef",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "08:30:00",
+        "price": 125,
+        "price_comment": "retailexpress",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "09:00-18:30"
+          ],
+          "tuesday": [
+            "09:00-18:30"
+          ],
+          "wednesday": [
+            "09:00-18:30"
+          ],
+          "thursday": [
+            "09:00-18:30"
+          ],
+          "friday": [
+            "09:00-18:30"
+          ],
+          "saturday": [
+            "09:00-17:00"
+          ],
+          "sunday": []
+        },
+        "distance": "1798",
+        "location_code": "173187"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Primera Sanders",
+        "street": "Polderplein",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "11:00-18:00"
+          ],
+          "tuesday": [
+            "09:00-18:00"
+          ],
+          "wednesday": [
+            "09:00-18:00"
+          ],
+          "thursday": [
+            "09:00-18:00"
+          ],
+          "friday": [
+            "09:00-21:00"
+          ],
+          "saturday": [
+            "09:00-17:00"
+          ],
+          "sunday": [
+            "12:00-17:00"
+          ]
+        },
+        "distance": "1696",
+        "location_code": "176227"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "pax shop",
+        "street": "Paxlaan",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-22:00"
+          ],
+          "tuesday": [
+            "08:00-22:00"
+          ],
+          "wednesday": [
+            "08:00-22:00"
+          ],
+          "thursday": [
+            "08:00-22:00"
+          ],
+          "friday": [
+            "08:00-22:00"
+          ],
+          "saturday": [
+            "08:00-22:00"
+          ],
+          "sunday": [
+            "10:00-22:00"
+          ]
+        },
+        "distance": "2728",
+        "location_code": "205604"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "GAMMA Hoofddorp",
+        "street": "Noordmeerstraat",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "09:00-21:00"
+          ],
+          "tuesday": [
+            "09:00-21:00"
+          ],
+          "wednesday": [
+            "09:00-21:00"
+          ],
+          "thursday": [
+            "09:00-21:00"
+          ],
+          "friday": [
+            "09:00-21:00"
+          ],
+          "saturday": [
+            "09:00-18:00"
+          ],
+          "sunday": [
+            "12:00-17:00"
+          ]
+        },
+        "distance": "2782",
+        "location_code": "167536"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Karwei Hoofddorp",
+        "street": "Noordmeerstraat",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "09:00-21:00"
+          ],
+          "tuesday": [
+            "09:00-21:00"
+          ],
+          "wednesday": [
+            "09:00-21:00"
+          ],
+          "thursday": [
+            "09:00-21:00"
+          ],
+          "friday": [
+            "09:00-21:00"
+          ],
+          "saturday": [
+            "09:00-18:00"
+          ],
+          "sunday": []
+        },
+        "distance": "2925",
+        "location_code": "171963"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Bruna",
+        "street": "Markenburg",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "11:00-18:00"
+          ],
+          "tuesday": [
+            "09:00-18:00"
+          ],
+          "wednesday": [
+            "09:00-18:00"
+          ],
+          "thursday": [
+            "09:00-18:00"
+          ],
+          "friday": [
+            "09:00-20:00"
+          ],
+          "saturday": [
+            "09:00-17:30"
+          ],
+          "sunday": []
+        },
+        "distance": "3251",
+        "location_code": "161807"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Primera Sanders Skagerhof",
+        "street": "Skagerrak",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:30-18:00"
+          ],
+          "tuesday": [
+            "08:30-18:00"
+          ],
+          "wednesday": [
+            "08:30-18:00"
+          ],
+          "thursday": [
+            "08:30-18:00"
+          ],
+          "friday": [
+            "08:30-18:00"
+          ],
+          "saturday": [
+            "08:30-17:00"
+          ],
+          "sunday": []
+        },
+        "distance": "3270",
+        "location_code": "173804"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Deen Aalsmeer",
+        "street": "Molenpad",
+        "number": "",
+        "postal_code": "",
+        "city": "Aalsmeer",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-21:00"
+          ],
+          "tuesday": [
+            "08:00-21:00"
+          ],
+          "wednesday": [
+            "08:00-21:00"
+          ],
+          "thursday": [
+            "08:00-21:00"
+          ],
+          "friday": [
+            "08:00-21:00"
+          ],
+          "saturday": [
+            "08:00-21:00"
+          ],
+          "sunday": [
+            "12:00-18:00"
+          ]
+        },
+        "distance": "3500",
+        "location_code": "205498"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Coop",
+        "street": "Werf",
+        "number": "",
+        "postal_code": "",
+        "city": "Rijsenhout",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-19:00"
+          ],
+          "tuesday": [
+            "08:00-19:00"
+          ],
+          "wednesday": [
+            "08:00-19:00"
+          ],
+          "thursday": [
+            "08:00-19:00"
+          ],
+          "friday": [
+            "08:00-20:00"
+          ],
+          "saturday": [
+            "08:00-18:00"
+          ],
+          "sunday": [
+            "14:00-18:00"
+          ]
+        },
+        "distance": "3567",
+        "location_code": "171368"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Bruna (982)",
+        "street": "Zijdstraat",
+        "number": "",
+        "postal_code": "",
+        "city": "Aalsmeer",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-17:00"
+          ],
+          "tuesday": [
+            "08:00-17:00"
+          ],
+          "wednesday": [
+            "08:00-17:00"
+          ],
+          "thursday": [
+            "08:00-17:00"
+          ],
+          "friday": [
+            "08:00-17:00"
+          ],
+          "saturday": [
+            "08:00-17:00"
+          ],
+          "sunday": []
+        },
+        "distance": "3621",
+        "location_code": "162062"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "AKO",
+        "street": "Muiderbos",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "09:00-18:00"
+          ],
+          "tuesday": [
+            "09:00-18:00"
+          ],
+          "wednesday": [
+            "09:00-18:00"
+          ],
+          "thursday": [
+            "09:00-18:00"
+          ],
+          "friday": [
+            "09:00-18:00"
+          ],
+          "saturday": [
+            "09:00-17:00"
+          ],
+          "sunday": []
+        },
+        "distance": "4292",
+        "location_code": "163365"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Service Point Schiphol Plaza",
+        "street": "Schiphol Boulevard",
+        "number": "",
+        "postal_code": "",
+        "city": "Schiphol",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "07:00-22:00"
+          ],
+          "tuesday": [
+            "07:00-22:00"
+          ],
+          "wednesday": [
+            "07:00-22:00"
+          ],
+          "thursday": [
+            "07:00-22:00"
+          ],
+          "friday": [
+            "07:00-22:00"
+          ],
+          "saturday": [
+            "07:00-22:00"
+          ],
+          "sunday": [
+            "07:00-22:00"
+          ]
+        },
+        "distance": "4352",
+        "location_code": "176688"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Bruna Genderenplein",
+        "street": "Genderenplein",
+        "number": "",
+        "postal_code": "",
+        "city": "Hoofddorp",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "09:00-18:00"
+          ],
+          "tuesday": [
+            "09:00-18:00"
+          ],
+          "wednesday": [
+            "09:00-18:00"
+          ],
+          "thursday": [
+            "09:00-18:00"
+          ],
+          "friday": [
+            "09:00-21:00"
+          ],
+          "saturday": [
+            "09:00-17:00"
+          ],
+          "sunday": []
+        },
+        "distance": "5072",
+        "location_code": "161766"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          },
+          {
+            "start": "08:30:00",
+            "type": 5,
+            "price": {
+              "amount": 125,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Bruna",
+        "street": "De Symfonie",
+        "number": "",
+        "postal_code": "",
+        "city": "Nieuw-Vennep",
+        "cc": "NL",
+        "start_time": "08:30:00",
+        "price": 125,
+        "price_comment": "retailexpress",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-18:00"
+          ],
+          "tuesday": [
+            "08:00-18:00"
+          ],
+          "wednesday": [
+            "08:00-18:00"
+          ],
+          "thursday": [
+            "08:00-18:00"
+          ],
+          "friday": [
+            "08:00-21:00"
+          ],
+          "saturday": [
+            "08:00-17:00"
+          ],
+          "sunday": []
+        },
+        "distance": "5911",
+        "location_code": "161943"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Hoogvliet",
+        "street": "Aalsmeerderweg",
+        "number": "",
+        "postal_code": "",
+        "city": "Aalsmeer",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-20:00"
+          ],
+          "tuesday": [
+            "08:00-20:00"
+          ],
+          "wednesday": [
+            "08:00-20:00"
+          ],
+          "thursday": [
+            "08:00-21:00"
+          ],
+          "friday": [
+            "08:00-21:00"
+          ],
+          "saturday": [
+            "08:00-20:00"
+          ],
+          "sunday": [
+            "12:00-18:00"
+          ]
+        },
+        "distance": "5584",
+        "location_code": "176736"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Gamma",
+        "street": "Lakenblekerstraat",
+        "number": "",
+        "postal_code": "",
+        "city": "Aalsmeer",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "09:00-21:00"
+          ],
+          "tuesday": [
+            "09:00-21:00"
+          ],
+          "wednesday": [
+            "09:00-21:00"
+          ],
+          "thursday": [
+            "09:00-21:00"
+          ],
+          "friday": [
+            "09:00-21:00"
+          ],
+          "saturday": [
+            "09:00-18:00"
+          ],
+          "sunday": []
+        },
+        "distance": "6055",
+        "location_code": "167146"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Primera",
+        "street": "Poldermeesterplein",
+        "number": "",
+        "postal_code": "",
+        "city": "Aalsmeer",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "12:00-18:00"
+          ],
+          "tuesday": [
+            "08:30-18:00"
+          ],
+          "wednesday": [
+            "08:30-18:00"
+          ],
+          "thursday": [
+            "08:30-18:00"
+          ],
+          "friday": [
+            "08:30-20:00"
+          ],
+          "saturday": [
+            "08:30-17:00"
+          ],
+          "sunday": []
+        },
+        "distance": "6153",
+        "location_code": "155133"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Albert Heijn",
+        "street": "Händelplein",
+        "number": "",
+        "postal_code": "",
+        "city": "Nieuw-Vennep",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-21:00"
+          ],
+          "tuesday": [
+            "08:00-21:00"
+          ],
+          "wednesday": [
+            "08:00-21:00"
+          ],
+          "thursday": [
+            "08:00-21:00"
+          ],
+          "friday": [
+            "08:00-21:00"
+          ],
+          "saturday": [
+            "08:00-21:00"
+          ],
+          "sunday": [
+            "12:00-18:00"
+          ]
+        },
+        "distance": "6389",
+        "location_code": "162066"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Hoogvliet",
+        "street": "Kalslagerring",
+        "number": "",
+        "postal_code": "",
+        "city": "Nieuw-Vennep",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "08:00-20:00"
+          ],
+          "tuesday": [
+            "08:00-20:00"
+          ],
+          "wednesday": [
+            "08:00-20:00"
+          ],
+          "thursday": [
+            "08:00-20:00"
+          ],
+          "friday": [
+            "08:00-21:00"
+          ],
+          "saturday": [
+            "08:00-20:00"
+          ],
+          "sunday": [
+            "12:00-18:00"
+          ]
+        },
+        "distance": "6779",
+        "location_code": "203353"
+      },
+      {
+        "date": "2118-08-01",
+        "time": [
+          {
+            "start": "15:00:00",
+            "type": 4,
+            "price": {
+              "amount": 0,
+              "currency": "EUR"
+            }
+          }
+        ],
+        "location": "Dio drogist",
+        "street": "Einsteinstraat",
+        "number": "",
+        "postal_code": "",
+        "city": "Kudelstaart",
+        "cc": "NL",
+        "start_time": "15:00:00",
+        "price": 0,
+        "price_comment": "retail",
+        "comment": "",
+        "phone_number": "",
+        "opening_hours": {
+          "monday": [
+            "09:00-18:00"
+          ],
+          "tuesday": [
+            "09:00-18:00"
+          ],
+          "wednesday": [
+            "09:00-18:00"
+          ],
+          "thursday": [
+            "09:00-18:00"
+          ],
+          "friday": [
+            "09:00-18:00"
+          ],
+          "saturday": [
+            "09:00-16:30"
+          ],
+          "sunday": []
+        },
+        "distance": "6840",
+        "location_code": "162913"
+      }
+    ]
+  }
+}
