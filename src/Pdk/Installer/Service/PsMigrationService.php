@@ -11,7 +11,7 @@ use MyParcelNL\PrestaShop\Migration\Migration1_4_0;
 use MyParcelNL\PrestaShop\Migration\Migration1_6_0;
 use MyParcelNL\PrestaShop\Migration\Migration1_7_2;
 use MyParcelNL\PrestaShop\Migration\Migration1_8_0;
-use MyParcelNL\PrestaShop\Migration\Migration2_0_0;
+use MyParcelNL\PrestaShop\Migration\Migration4_0_0;
 
 final class PsMigrationService implements MigrationServiceInterface
 {
@@ -27,7 +27,7 @@ final class PsMigrationService implements MigrationServiceInterface
             Migration1_6_0::class,
             Migration1_7_2::class,
             Migration1_8_0::class,
-            Migration2_0_0::class,
+            Migration4_0_0::class,
         ];
     }
 }

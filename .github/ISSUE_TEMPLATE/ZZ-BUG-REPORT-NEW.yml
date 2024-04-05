@@ -1,5 +1,5 @@
-name: 'Bug report for v2.0.0-beta.x'
-description: 'This form is for reporting bugs in the beta version of the plugin. If you are using version 1.x, please choose "Bug report" instead.'
+name: 'Bug report for v4.0.0-beta.x'
+description: 'This form is for reporting bugs in the beta version of the plugin. If you are using an older version, please choose "Bug report" instead.'
 title: '[BETA]: '
 labels: ['pdk']
 
@@ -9,14 +9,14 @@ body:
       value: |
         **⚠️ Note: ⚠️**
 
-        This form is for reporting bugs in the beta version of the plugin (>= v2.0.0-beta.x). If you are using version 1.x, please use the [regular bug report form](https://github.com/myparcelnl/prestashop/issues/new?labels=bug&template=BUG-REPORT.yml) instead.
+        This form is for reporting bugs in the beta version of the plugin (>= v4.0.0-beta.x). If you are using an older version, please use the [regular bug report form](https://github.com/myparcelnl/prestashop/issues/new?labels=bug&template=BUG-REPORT.yml) instead.
 
   - type: checkboxes
     id: version-check
     attributes:
       label: 'Version check'
       options:
-        - label: 'My version of the plugin is v2.0.0-beta.0 or above.'
+        - label: 'My version of the plugin is v4.0.0-beta.0 or above.'
           required: true
 
   - type: markdown

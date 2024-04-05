@@ -90,7 +90,7 @@ return [
      * Migrations
      */
 
-    'pdkMigrationVersion' => value('2.0.0-alpha.0'),
+    'pdkMigrationVersion' => value('4.0.0-alpha.0'),
 
     'databaseMigrationClasses' => value([
         CreateAuditTableDatabaseMigration::class,

@@ -14,13 +14,13 @@ use function MyParcelNL\Pdk\Tests\usesShared;
 
 usesShared(new UsesMockPsPdkInstance());
 
-it('runs database and pdk migrations on upgrade to 2.0.0', function () {
+it('runs database and pdk migrations on upgrade to 4.0.0', function () {
     $reset = mockPdkProperties([
         'databaseMigrationClasses' => [MockMigration::class],
         'pdkMigrationClasses'      => [MockMigration::class],
     ]);
 
-    $migration = Pdk::get(Migration2_0_0::class);
+    $migration = Pdk::get(Migration4_0_0::class);
     $migration->up();
 
     /** @var \MyParcelNL\PrestaShop\Tests\Bootstrap\MockMigration $mockMigration */

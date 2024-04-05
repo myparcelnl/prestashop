@@ -8,7 +8,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\Pdk\AbstractPsPdkMigration;
 
-final class Migration2_0_0 extends AbstractPsPdkMigration
+final class Migration4_0_0 extends AbstractPsPdkMigration
 {
     public function up(): void
     {
