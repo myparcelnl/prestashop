@@ -3,14 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [1.10.0](https://github.com/myparcelnl/prestashop/compare/v1.9.0...v1.10.0) (2024-01-02)
+## [3.10.0](https://github.com/myparcelnl/prestashop/compare/v3.9.0...v3.10.0) (2024-01-02)
 
 
 ### :sparkles: New Features
 
 * add digital stamp weight range ([#233](https://github.com/myparcelnl/prestashop/issues/233)) ([1286abf](https://github.com/myparcelnl/prestashop/commit/1286abfbdc5a7fa5a39bfffc71c1e9ce6c09c881))
 
-## [1.9.0](https://github.com/myparcelnl/prestashop/compare/v1.8.2...v1.9.0) (2023-10-30)
+## [3.9.0](https://github.com/myparcelnl/prestashop/compare/v3.8.2...v3.9.0) (2023-10-30)
 
 
 ### :sparkles: New Features
@@ -22,21 +22,21 @@ All notable changes to this project will be documented in this file. See
 
 * fix error on order overview ([#227](https://github.com/myparcelnl/prestashop/issues/227)) ([8524c0e](https://github.com/myparcelnl/prestashop/commit/8524c0e86ae5f4852e5b4ffb89ba253a8e01a157))
 
-### [1.8.2](https://github.com/myparcelnl/prestashop/compare/v1.8.1...v1.8.2) (2023-02-27)
+### [3.8.2](https://github.com/myparcelnl/prestashop/compare/v3.8.1...v3.8.2) (2023-02-27)
 
 
 ### :bug: Bug Fixes
 
 * fix opening pdf in new window ([#216](https://github.com/myparcelnl/prestashop/issues/216)) ([f28a95f](https://github.com/myparcelnl/prestashop/commit/f28a95f610f0b9da90ff03c3ca9b2b5974e15d09)), closes [#213](https://github.com/myparcelnl/prestashop/issues/213)
 
-### [1.8.1](https://github.com/myparcelnl/prestashop/compare/v1.8.0...v1.8.1) (2023-02-08)
+### [3.8.1](https://github.com/myparcelnl/prestashop/compare/v3.8.0...v3.8.1) (2023-02-08)
 
 
 ### :bug: Bug Fixes
 
 * fix fatal error in weight service ([3b0eb49](https://github.com/myparcelnl/prestashop/commit/3b0eb498bdf6f4e92c4d74be73af1ffc3134f8ab)), closes [#209](https://github.com/myparcelnl/prestashop/issues/209)
 
-## [1.8.0](https://github.com/myparcelnl/prestashop/compare/v1.7.2...v1.8.0) (2023-02-06)
+## [3.8.0](https://github.com/myparcelnl/prestashop/compare/v3.7.2...v3.8.0) (2023-02-06)
 
 
 ### :bug: Bug Fixes
@@ -49,7 +49,7 @@ All notable changes to this project will be documented in this file. See
 
 * add insurance options for eu shipments ([#206](https://github.com/myparcelnl/prestashop/issues/206)) ([e934728](https://github.com/myparcelnl/prestashop/commit/e934728f09272dd880562269f3db86ecbd70896b))
 
-### [1.7.2](https://github.com/myparcelnl/prestashop/compare/v1.7.1...v1.7.2) (2022-12-06)
+### [3.7.2](https://github.com/myparcelnl/prestashop/compare/v3.7.1...v3.7.2) (2022-12-06)
 
 
 ### :bug: Bug Fixes
@@ -57,7 +57,7 @@ All notable changes to this project will be documented in this file. See
 * **modal:** show package options ([#200](https://github.com/myparcelnl/prestashop/issues/200)) ([b376131](https://github.com/myparcelnl/prestashop/commit/b37613151a3c81604965cf092b66e4ce7d78d254))
 * **shipments:** distinguish return labels correctly ([#201](https://github.com/myparcelnl/prestashop/issues/201)) ([917df89](https://github.com/myparcelnl/prestashop/commit/917df892ec4ec486f8e280e0a58668362fce1dd4))
 
-### [1.7.1](https://github.com/myparcelnl/prestashop/compare/v1.7.0...v1.7.1) (2022-11-10)
+### [3.7.1](https://github.com/myparcelnl/prestashop/compare/v3.7.0...v3.7.1) (2022-11-10)
 
 
 ### :bug: Bug Fixes
@@ -67,7 +67,7 @@ All notable changes to this project will be documented in this file. See
 * fix package type selection ([#197](https://github.com/myparcelnl/prestashop/issues/197)) ([0bdba0c](https://github.com/myparcelnl/prestashop/commit/0bdba0c83db19728231c71314784c235619d1c89)), closes [#186](https://github.com/myparcelnl/prestashop/issues/186)
 * update barcode after printing ([#198](https://github.com/myparcelnl/prestashop/issues/198)) ([b60f464](https://github.com/myparcelnl/prestashop/commit/b60f464fc9ee5578bc92888e32528a2de86378b9))
 
-## [1.7.0](https://github.com/myparcelnl/prestashop/compare/v1.6.3...v1.7.0) (2022-08-08)
+## [3.7.0](https://github.com/myparcelnl/prestashop/compare/v3.6.3...v3.7.0) (2022-08-08)
 
 
 ### :sparkles: New Features
@@ -87,21 +87,21 @@ All notable changes to this project will be documented in this file. See
 * fix multicollo label refresh ([#183](https://github.com/myparcelnl/prestashop/issues/183)) ([44fac82](https://github.com/myparcelnl/prestashop/commit/44fac829881f86a7c772c62a5766223d04e2fc2d))
 * fix type error on ordering ([#169](https://github.com/myparcelnl/prestashop/issues/169)) ([7b33545](https://github.com/myparcelnl/prestashop/commit/7b33545d411b417d1c359d79ce62163e7b3cfb08))
 
-### [1.6.3](https://github.com/myparcelnl/prestashop/compare/v1.6.2...v1.6.3) (2022-07-15)
+### [3.6.3](https://github.com/myparcelnl/prestashop/compare/v3.6.2...v3.6.3) (2022-07-15)
 
 
 ### :bug: Bug Fixes
 
 * correct date when exporting label ([#180](https://github.com/myparcelnl/prestashop/issues/180)) ([51c42a8](https://github.com/myparcelnl/prestashop/commit/51c42a885f8e46e5f87ff684b74a5694bc6fa94f))
 
-### [1.6.2](https://github.com/myparcelnl/prestashop/compare/v1.6.1...v1.6.2) (2022-06-27)
+### [3.6.2](https://github.com/myparcelnl/prestashop/compare/v3.6.1...v3.6.2) (2022-06-27)
 
 
 ### :bug: Bug Fixes
 
 * retain pickup point and insurance during checkout ([#172](https://github.com/myparcelnl/prestashop/issues/172)) ([9a62786](https://github.com/myparcelnl/prestashop/commit/9a62786f09306c9ffdc64349d12269002b0e48e5))
 
-### [1.6.1](https://github.com/myparcelnl/prestashop/compare/v1.6.0...v1.6.1) (2022-06-13)
+### [3.6.1](https://github.com/myparcelnl/prestashop/compare/v3.6.0...v3.6.1) (2022-06-13)
 
 
 ### :bug: Bug Fixes
@@ -109,7 +109,7 @@ All notable changes to this project will be documented in this file. See
 * allow checkout with insurance for all carriers ([#159](https://github.com/myparcelnl/prestashop/issues/159)) ([c617db4](https://github.com/myparcelnl/prestashop/commit/c617db4e989e0e8cb7c80feb7c6b1edf8c8e7fbb))
 * show ordergrid with left joined carrier table ([#157](https://github.com/myparcelnl/prestashop/issues/157)) ([c641ec6](https://github.com/myparcelnl/prestashop/commit/c641ec6eb4bdb9dbdeab6106ba13728821d70ae9))
 
-## [1.6.0](https://github.com/myparcelnl/prestashop/compare/v1.5.5...v1.6.0) (2022-06-02)
+## [3.6.0](https://github.com/myparcelnl/prestashop/compare/v3.5.5...v3.6.0) (2022-06-02)
 
 
 ### :bug: Bug Fixes
@@ -124,21 +124,21 @@ All notable changes to this project will be documented in this file. See
 * allow insurance from nl to be ([#150](https://github.com/myparcelnl/prestashop/issues/150)) ([b9334bc](https://github.com/myparcelnl/prestashop/commit/b9334bcc1b251a4be7a3bf4d6eca25478930eaf2))
 * distribute weight over multiple labels ([#145](https://github.com/myparcelnl/prestashop/issues/145)) ([90902b6](https://github.com/myparcelnl/prestashop/commit/90902b629bbfebbe9f569a2ae619ed58f4635f6e))
 
-### [1.5.5](https://github.com/myparcelnl/prestashop/compare/v1.5.4...v1.5.5) (2022-05-17)
+### [3.5.5](https://github.com/myparcelnl/prestashop/compare/v3.5.4...v3.5.5) (2022-05-17)
 
 
 ### :bug: Bug Fixes
 
 * fix error on exporting labels ([#154](https://github.com/myparcelnl/prestashop/issues/154)) ([d4bb21c](https://github.com/myparcelnl/prestashop/commit/d4bb21c678ee1a2cee21a3ec2db484203d1b8596)), closes [#151](https://github.com/myparcelnl/prestashop/issues/151)
 
-### [1.5.4](https://github.com/myparcelnl/prestashop/compare/v1.5.3...v1.5.4) (2022-04-22)
+### [3.5.4](https://github.com/myparcelnl/prestashop/compare/v3.5.3...v3.5.4) (2022-04-22)
 
 
 ### :bug: Bug Fixes
 
 * fix type errors caused by unsuccessful queries ([#135](https://github.com/myparcelnl/prestashop/issues/135)) ([5d45762](https://github.com/myparcelnl/prestashop/commit/5d457624eb7840588f79830dce017c7d3b694940))
 
-### [1.5.3](https://github.com/myparcelnl/prestashop/compare/v1.5.2...v1.5.3) (2022-04-19)
+### [3.5.3](https://github.com/myparcelnl/prestashop/compare/v3.5.2...v3.5.3) (2022-04-19)
 
 
 ### :bug: Bug Fixes
@@ -149,21 +149,21 @@ All notable changes to this project will be documented in this file. See
 * only send status change email if status actually changed ([#124](https://github.com/myparcelnl/prestashop/issues/124)) ([cb06ff1](https://github.com/myparcelnl/prestashop/commit/cb06ff1f2453e671503f3a3cf0681bc855ea29b5))
 * resolve scripts to paths based on site url ([#134](https://github.com/myparcelnl/prestashop/issues/134)) ([a102ea3](https://github.com/myparcelnl/prestashop/commit/a102ea3771db43b46aae60345a6afe2a88b6bfa5))
 
-### [1.5.2](https://github.com/myparcelnl/prestashop/compare/v1.5.1...v1.5.2) (2022-04-12)
+### [3.5.2](https://github.com/myparcelnl/prestashop/compare/v3.5.1...v3.5.2) (2022-04-12)
 
 
 ### :bug: Bug Fixes
 
 * retain pickup point during checkout ([#136](https://github.com/myparcelnl/prestashop/issues/136)) ([9c620e8](https://github.com/myparcelnl/prestashop/commit/9c620e84d4292a680ddd243380943ad6a8da5c26))
 
-### [1.5.1](https://github.com/myparcelnl/prestashop/compare/v1.5.0...v1.5.1) (2022-03-24)
+### [3.5.1](https://github.com/myparcelnl/prestashop/compare/v3.5.0...v3.5.1) (2022-03-24)
 
 
 ### :bug: Bug Fixes
 
 * symfony route error on upgrading to 1.5.0 ([#131](https://github.com/myparcelnl/prestashop/issues/131)) ([28602ca](https://github.com/myparcelnl/prestashop/commit/28602ca776cdc5e47fbe06839021b8b501feea93)), closes [#129](https://github.com/myparcelnl/prestashop/issues/129)
 
-## [1.5.0](https://github.com/myparcelnl/prestashop/compare/v1.4.1...v1.5.0) (2022-03-22)
+## [3.5.0](https://github.com/myparcelnl/prestashop/compare/v3.4.1...v3.5.0) (2022-03-22)
 
 
 ### :bug: Bug Fixes
@@ -177,14 +177,14 @@ All notable changes to this project will be documented in this file. See
 
 * improve entire admin backoffice ([#104](https://github.com/myparcelnl/prestashop/issues/104)) ([167a1d3](https://github.com/myparcelnl/prestashop/commit/167a1d36e503fcb71d1a4c8d5fb6e659319116f1))
 
-### [1.4.1](https://github.com/myparcelnl/prestashop/compare/v1.4.0...v1.4.1) (2021-12-21)
+### [3.4.1](https://github.com/myparcelnl/prestashop/compare/v3.4.0...v3.4.1) (2021-12-21)
 
 
 ### :bug: Bug Fixes
 
 * fix accessibility error on getInstance in some cases ([#102](https://github.com/myparcelnl/prestashop/issues/102)) ([83b982c](https://github.com/myparcelnl/prestashop/commit/83b982cefea1eb48929803aaf873ba3cac652717)), closes [#101](https://github.com/myparcelnl/prestashop/issues/101)
 
-## [1.4.0](https://github.com/myparcelnl/prestashop/compare/v1.3.0...v1.4.0) (2021-12-20)
+## [3.4.0](https://github.com/myparcelnl/prestashop/compare/v3.3.0...v3.4.0) (2021-12-20)
 
 
 ### :sparkles: New Features
@@ -213,7 +213,7 @@ All notable changes to this project will be documented in this file. See
 * use correct table reference ([#76](https://github.com/myparcelnl/prestashop/issues/76)) ([79de1eb](https://github.com/myparcelnl/prestashop/commit/79de1eb50506701a8d8f852e15ab04f0c7470906))
 * use rest of world countries from SDK ([2bbd0fa](https://github.com/myparcelnl/prestashop/commit/2bbd0fab7d26b0d4baf237b58cc590fba95a8a15))
 
-## [1.3.0](https://github.com/myparcelnl/prestashop/compare/v1.2.0...v1.3.0) (2021-11-11)
+## [3.3.0](https://github.com/myparcelnl/prestashop/compare/v3.2.0...v3.3.0) (2021-11-11)
 
 
 ### :sparkles: New Features
@@ -241,7 +241,7 @@ All notable changes to this project will be documented in this file. See
 * shipment status order for digital stamp ([20dbf91](https://github.com/myparcelnl/prestashop/commit/20dbf91613f42924c1956bf4825a92a84c8a49e1))
 * update orderlabel status during export ([03a7690](https://github.com/myparcelnl/prestashop/commit/03a7690b0b3a7173c7c1408f494679c4cc27a63c))
 
-## [1.2.0](https://github.com/myparcelnl/prestashop/compare/v1.1.3...v1.2.0) (2021-10-04)
+## [3.2.0](https://github.com/myparcelnl/prestashop/compare/v3.1.3...v3.2.0) (2021-10-04)
 
 
 ### :sparkles: New Features
@@ -258,7 +258,7 @@ All notable changes to this project will be documented in this file. See
 * no order found error ([b8a6eea](https://github.com/myparcelnl/prestashop/commit/b8a6eea1bf899981d976ba3c802e684b2128eb1f)), closes [#7](https://github.com/myparcelnl/prestashop/issues/7)
 * open new tab and request inline pdf correctly according to setting ([1f1d154](https://github.com/myparcelnl/prestashop/commit/1f1d1545158a28ff1ed406c1b2b2fed27e60faf5))
 
-### [1.1.2](https://github.com/myparcelnl/prestashop/compare/v1.1.3...v1.1.2) (2021-09-30)
+### [3.1.2](https://github.com/myparcelnl/prestashop/compare/v3.1.3...v3.1.2) (2021-09-30)
 
 
 ### :sparkles: New Features
@@ -272,7 +272,7 @@ All notable changes to this project will be documented in this file. See
 * no order found error ([3a7e68c](https://github.com/myparcelnl/prestashop/commit/3a7e68c94fa18a53413b55544bc0a5097d16fd31)), closes [#7](https://github.com/myparcelnl/prestashop/issues/7)
 * open new tab and request inline pdf correctly according to setting ([3ce9d87](https://github.com/myparcelnl/prestashop/commit/3ce9d87a1792f1a6d1aec68aa3bca129b5c297d9))
 
-### [1.1.3](https://github.com/myparcelnl/prestashop/compare/v1.1.2...v1.1.3) (2021-09-01)
+### [3.1.3](https://github.com/myparcelnl/prestashop/compare/v3.1.2...v3.1.3) (2021-09-01)
 
 
 ### :bug: Bug Fixes
@@ -280,14 +280,14 @@ All notable changes to this project will be documented in this file. See
 * export ROW and EU shipments ([50cb1e7](https://github.com/myparcelnl/prestashop/commit/50cb1e76d9bc2d40cdea37277efdbcec2a39282e))
 * use default HS code and country of origin for products that lack them ([a3b5da0](https://github.com/myparcelnl/prestashop/commit/a3b5da025a8744bd364cc5237f1c3379b8362ce4))
 
-### [1.1.2](https://github.com/myparcelnl/prestashop/compare/v1.1.1...v1.1.2) (2021-08-19)
+### [3.1.2](https://github.com/myparcelnl/prestashop/compare/v3.1.1...v3.1.2) (2021-08-19)
 
 
 ### :bug: Bug Fixes
 
 * missing carrier type for upgrades ([caff3c9](https://github.com/myparcelnl/prestashop/commit/caff3c93d20be2a6713da0df76191fe1ca05a137))
 
-### [1.1.1](https://github.com/myparcelnl/prestashop/compare/v1.1.0...v1.1.1) (2021-08-17)
+### [3.1.1](https://github.com/myparcelnl/prestashop/compare/v3.1.0...v3.1.1) (2021-08-17)
 
 
 ### :sparkles: New Features
@@ -332,7 +332,7 @@ All notable changes to this project will be documented in this file. See
 * use the track trace link which is already known in the order ([198b0b4](https://github.com/myparcelnl/prestashop/commit/198b0b4bfa7c5e4563c452e34eb2a435a85165fb))
 * webhook not changing order status ([aae145f](https://github.com/myparcelnl/prestashop/commit/aae145f77755ee88c9b8a68616e00194cf8e7920))
 
-## [1.1.0](https://github.com/myparcelnl/prestashop/compare/v1.0.7...v1.1.0) (2021-05-28)
+## [3.1.0](https://github.com/myparcelnl/prestashop/compare/v3.0.7...v3.1.0) (2021-05-28)
 
 
 ### :sparkles: New Features
@@ -344,7 +344,7 @@ All notable changes to this project will be documented in this file. See
 
 * remove search ([5b0bc01](https://github.com/myparcelnl/prestashop/commit/5b0bc01e2e9ec4f4448638087a2fb176cf8266a3))
 
-### [1.0.7](https://github.com/myparcelnl/prestashop/compare/v1.0.6...v1.0.7) (2021-05-21)
+### [3.0.7](https://github.com/myparcelnl/prestashop/compare/v3.0.6...v3.0.7) (2021-05-21)
 
 
 ### :bug: Bug Fixes
@@ -357,36 +357,36 @@ All notable changes to this project will be documented in this file. See
 * remove comments ([bbb9333](https://github.com/myparcelnl/prestashop/commit/bbb9333bc257c4f877a5b78bbefbe3835bbcdf6e))
 * remove variable, add method getShippingoption ([01a8557](https://github.com/myparcelnl/prestashop/commit/01a8557940b4305282584a94da7f314c45974186))
 
-### [1.0.6](https://github.com/myparcelnl/prestashop/compare/v1.0.5...v1.0.6) (2021-05-14)
+### [3.0.6](https://github.com/myparcelnl/prestashop/compare/v3.0.5...v3.0.6) (2021-05-14)
 
 
 ### :bug: Bug Fixes
 
 * add pSQL in query ([fcf7a6c](https://github.com/myparcelnl/prestashop/commit/fcf7a6c391413413f3b216e6bb376a1fe68a4553))
 
-### [1.0.5](https://github.com/myparcelnl/prestashop/compare/v1.0.4...v1.0.5) (2021-05-07)
+### [3.0.5](https://github.com/myparcelnl/prestashop/compare/v3.0.4...v3.0.5) (2021-05-07)
 
 
 ### :sparkles: New Features
 
 * upgrade to 4.0.0 ([18caea0](https://github.com/myparcelnl/prestashop/commit/18caea01efce310c15d113d55557ac1bb2e046fc))
 
-### [1.0.4](https://github.com/myparcelnl/prestashop/compare/v1.0.3...v1.0.4) (2021-04-30)
+### [3.0.4](https://github.com/myparcelnl/prestashop/compare/v3.0.3...v3.0.4) (2021-04-30)
 
 
 ### :bug: Bug Fixes
 
 * LabelsColumn defaults ([9132bb5](https://github.com/myparcelnl/prestashop/commit/9132bb5fd76bfd40cc64952e54a11dcc61daa9c5))
-* order label column for PS v1.7.7.3+ ([a321b94](https://github.com/myparcelnl/prestashop/commit/a321b94fff0cef5a36a31310fb8215cfabf2bc0c))
+* order label column for ...v3.7.7.3+ ([a321b94](https://github.com/myparcelnl/prestashop/commit/a321b94fff0cef5a36a31310fb8215cfabf2bc0c))
 
-### [1.0.3](https://github.com/myparcelnl/prestashop/compare/v1.0.2...v1.0.3) (2021-04-08)
+### [3.0.3](https://github.com/myparcelnl/prestashop/compare/v3.0.2...v3.0.3) (2021-04-08)
 
 
 ### :bug: Bug Fixes
 
 * **build:** do rename on each job ([78b585f](https://github.com/myparcelnl/prestashop/commit/78b585fdf5f2a94b3ab8f13c0a814a4d193582b5))
 
-### [1.0.2](https://github.com/myparcelnl/prestashop/compare/v1.0.1...v1.0.2) (2021-04-08)
+### [3.0.2](https://github.com/myparcelnl/prestashop/compare/v3.0.1...v3.0.2) (2021-04-08)
 
 
 ### :sparkles: New Features
@@ -403,6 +403,6 @@ All notable changes to this project will be documented in this file. See
 * **build:** replace be to nl ([db5a1ac](https://github.com/myparcelnl/prestashop/commit/db5a1ac04e9edd24fcab610fa46023d622de3052))
 * use ps generated url ([8515606](https://github.com/myparcelnl/prestashop/commit/85156063959ef0f48c063e5cd32d26677898957c))
 
-### [1.0.1](https://github.com/myparcelnl/prestashop/compare/v1.0.0...v1.0.1) (2021-03-25)
+### [3.0.1](https://github.com/myparcelnl/prestashop/compare/v3.0.0...v3.0.1) (2021-03-25)
 
 ## 1.0.0 (2021-01-28)

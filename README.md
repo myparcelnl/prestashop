@@ -11,6 +11,21 @@ Voor de handleiding en meer informatie, zie onze [PrestaShop plugin handleiding]
 
 We're not actively developing the v1.x module anymore. We've rewritten the entire module from scratch, using the [MyParcel Plugin Development Kit]. The new module supports PrestaShop 8 and Php 7.4 through 8.2 (and onwards). See the [pinned issue] for more information on the changes and how to install the beta version.
 
+## Versions
+
+The 1.7 module was initially considered a completely standalone module from the old 1.6 version, and released as version 1.0. This has caused some confusion among users as well as our developers and support team. This will also be able to cause issues in the future when we release new versions that include migrations based on the previously installed version of the module.
+
+To avoid this, we've decided to update the versioning of the module. The new versioning is as follows:
+
+| PrestaShop version | Module version | New module version |
+|--------------------|----------------|--------------------|
+| 1.6                | 1.x            | 1.x (unchanged)    |
+| 1.6                | 2.x            | 2.x (unchanged)    |
+| 1.7                | 1.x            | 3.x                |
+| 1.7.x & 8.x        | 2.x            | 4.x                |
+
+We chose to only update [the changelog](./CHANGELOG.md), the repository tags and not touch anything else, to avoid any potential issues with the module's users and further confusion. We've also merged the history of the old 1.6 module into this repository. This way, anyone interested can see the full history of the module in one place. We've been using semantic version since version 3.2.0 (previously 1.2.0) and we will continue to do so, just with the updated versioning.
+
 [MyParcel Developer Portal]: https://developer.myparcel.nl
 [MyParcel Plugin Development Kit]: https://developer.myparcel.nl/documentation/52.pdk/
 [PrestaShop plugin handleiding]: https://developer.myparcel.nl/nl/documentatie/11.prestashop.html

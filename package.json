@@ -1,6 +1,6 @@
 {
   "name": "@myparcel/prestashop-module",
-  "version": "1.10.0",
+  "version": "3.10.0",
   "private": true,
   "repository": "github:myparcelnl/prestashop",
   "license": "MIT",
