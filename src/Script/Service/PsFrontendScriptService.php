@@ -10,6 +10,9 @@ use MyParcelNL\PrestaShop\Script\Contract\PsScriptServiceInterface;
 
 final class PsFrontendScriptService extends PsScriptService implements PsScriptServiceInterface
 {
+    private const HANDLE_DELIVERY_OPTIONS = 'myparcelnl-delivery-options';
+    private const HANDLE_CHECKOUT         = 'myparcelnl-checkout';
+
     /**
      * @param  \FrontController $controller
      * @param  string           $path
@@ -18,16 +21,13 @@ final class PsFrontendScriptService extends PsScriptService implements PsScriptS
      */
     public function register($controller, string $path): void
     {
-        $appInfo = Pdk::getAppInfo();
+        $this->addStyle($controller, self::HANDLE_DELIVERY_OPTIONS, Pdk::get('deliveryOptionsCdnUrlCss'));
+        $this->addScript($controller, self::HANDLE_DELIVERY_OPTIONS, Pdk::get('deliveryOptionsCdnUrlJs'));
 
-        $deliveryOptions    = $appInfo->name . '-delivery-options';
-        $deliveryOptionsUrl = sprintf('https://unpkg.com/@myparcel/delivery-options@%s', 'beta');
+        $checkoutPath = "{$path}views/js/frontend/checkout";
 
-        $this->addStyle($controller, $deliveryOptions, "$deliveryOptionsUrl/dist/style.css");
-        $this->addScript($controller, $deliveryOptions, "$deliveryOptionsUrl/dist/myparcel.js");
-
-        $this->addLocalScript($controller, 'checkout', "{$path}views/js/frontend/checkout/dist/index.iife.js");
-        $this->addLocalStyle($controller, 'checkout', "{$path}views/js/frontend/checkout/dist/style.css");
+        $this->addLocalScript($controller, self::HANDLE_CHECKOUT, "$checkoutPath/dist/index.iife.js");
+        $this->addLocalStyle($controller, self::HANDLE_CHECKOUT, "$checkoutPath/dist/style.css");
     }
 
     /**
