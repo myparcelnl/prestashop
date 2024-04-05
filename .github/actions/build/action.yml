@@ -31,7 +31,6 @@ runs:
 
     - uses: myparcelnl/actions/nx-run-many@v4
       with:
-        prefix: 'yarn'
         target: 'build'
 
     # The scoper is installed and run in pdk.config.js

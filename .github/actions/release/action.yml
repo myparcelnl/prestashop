@@ -24,7 +24,6 @@ runs:
       run: |
         yarn pdk-builder ${{ inputs.command }} \
           --version ${{ inputs.version }} \
-          -vvv \
           --root-command="docker run -t --user $(id -u):$(id -g) -v $PWD:/app -w /app ${{ inputs.image }}" \
           -v
 
