@@ -27,7 +27,6 @@ final class PsFrontendScriptService extends PsScriptService implements PsScriptS
         $checkoutPath = "{$path}views/js/frontend/checkout";
 
         $this->addLocalScript($controller, self::HANDLE_CHECKOUT, "$checkoutPath/dist/index.iife.js");
-        $this->addLocalStyle($controller, self::HANDLE_CHECKOUT, "$checkoutPath/dist/style.css");
     }
 
     /**
