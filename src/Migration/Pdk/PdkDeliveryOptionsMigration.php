@@ -112,18 +112,22 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
     {
         $oldValues = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS);
 
-        $oldValues->each(function (array $row) {
+        $oldValues->each(function ($row) {
+            if (! is_array($row)) {
+                return;
+            }
+
             $cartId  = json_decode((string) ($row['id_cart'] ?? ''), true);
             $orderId = $this->getDbValue('orders', 'id_order', "id_cart = $cartId");
 
-            if (! $cartId || ! $orderId) {
+            if (! $orderId) {
                 Logger::info("No order found for cart $cartId");
 
                 return;
             }
 
-            $deliverySettings = json_decode($row['delivery_settings'] ?? '', true) ?? [];
-            $extraOptions     = json_decode($row['extra_options'] ?? '', true) ?? [];
+            $deliverySettings = json_decode($row['delivery_settings'] ?? '', true);
+            $extraOptions     = json_decode($row['extra_options'] ?? '', true);
 
             $newDeliveryOptions = $this->transformDeliveryOptions(array_merge($deliverySettings, $extraOptions));
 
