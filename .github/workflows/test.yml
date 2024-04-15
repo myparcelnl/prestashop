@@ -18,18 +18,27 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.ref }}
 
-      - uses: ./.github/actions/setup
+      - name: 'Cache coverage'
+        uses: actions/cache@v4
+        id: coverage-cache
+        with:
+          path: coverage
+          key: coverage-${{ hashFiles('**/package.json', '**/yarn.lock', 'views/**/*') }}
+
+      - uses: myparcelnl/actions/pdk-setup-frontend@v4
+        if: steps.coverage-cache.outputs.cache-hit != 'true'
         with:
           node-version: ${{ vars.NODE_VERSION }}
-          php-version: ${{ vars.PHP_VERSION }}
 
-      - uses: myparcelnl/actions/nx-run-many@v4
+      - name: 'Run frontend tests'
+        if: steps.coverage-cache.outputs.cache-hit != 'true'
+        uses: myparcelnl/actions/nx-run-many@v4
         with:
-          prefix: 'yarn'
           target: 'test:coverage'
           args: '--parallel=1'
 
       - name: 'Move coverage files'
+        if: steps.coverage-cache.outputs.cache-hit != 'true'
         shell: bash
         #language=bash
         run: |
@@ -64,26 +73,16 @@ jobs:
           path: coverage
           key: coverage-${{ hashFiles('**/composer.json', '**/composer.lock', 'src/**/*', 'tests/**/*') }}
 
-      - uses: ./.github/actions/setup
-        if: steps.coverage-cache.outputs.cache-hit != 'true'
+      - uses: myparcelnl/actions/pdk-setup@v4
         id: setup
         with:
           node-version: ${{ vars.NODE_VERSION }}
           php-version: ${{ vars.PHP_VERSION }}
 
-      - name: 'Run backend tests'
+      - uses: myparcelnl/actions/composer-pest@v4
         if: steps.coverage-cache.outputs.cache-hit != 'true'
-        shell: bash
-        #language=bash
-        run: |
-          docker run -t \
-            --volume $PWD:/app \
-            ${{ steps.setup.outputs.image }} \
-            php -dpcov.enabled=1 \
-            vendor/bin/pest \
-              --colors=always \
-              --coverage-clover=clover.xml \
-              --no-interaction
+        with:
+          image: ${{ steps.setup.outputs.image }}
 
       - name: 'Move coverage file'
         if: steps.coverage-cache.outputs.cache-hit != 'true'

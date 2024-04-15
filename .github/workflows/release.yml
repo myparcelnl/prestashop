@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
 jobs:
@@ -32,11 +32,13 @@ jobs:
           token: ${{ steps.credentials.outputs.token }}
 
       - uses: ./.github/actions/build
+        id: build
         with:
           node-version: ${{ vars.NODE_VERSION }}
           php-version: ${{ vars.PHP_VERSION }}
           php-scoper-version: ${{ vars.PHP_SCOPER_VERSION }}
 
+      # The pdk-builder release step is run in release.config.cjs
       - uses: myparcelnl/actions/semantic-release@v4
         id: release
         env:
@@ -45,18 +47,8 @@ jobs:
           token: ${{ steps.credentials.outputs.token }}
           write-summary: true
 
-  rebase-develop:
-    uses: ./.github/workflows/rebase.yml
-    secrets: inherit
-    needs: release
-    if: always() && github.ref == 'refs/heads/main'
-    with:
-      base: 'main'
-      target: 'develop'
-      force: true
-
   rebase-prs:
     needs:
       - release
-      - rebase-develop
     uses: ./.github/workflows/rebase-prs.yml
+    secrets: inherit

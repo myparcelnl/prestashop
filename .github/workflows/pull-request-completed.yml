@@ -9,7 +9,7 @@ on:
       - '⚙️ On pull request'
 
 jobs:
-  pr-post-artifacts:
+  post-pr-artifacts:
     runs-on: ubuntu-22.04
     steps:
       - uses: myparcelnl/actions/pr-post-artifacts@v4
