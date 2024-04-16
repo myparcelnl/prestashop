@@ -51,6 +51,7 @@
     "*": {
       "id": "*",
       "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
       "allowEveningDelivery": true,
       "allowMondayDelivery": true,
       "allowMorningDelivery": true,
@@ -139,12 +140,12 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0,
-      "showDeliveryDay": true
+      "priceSignature": 0
     },
     "postnl": {
       "id": "postnl",
       "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
       "allowEveningDelivery": true,
       "allowMondayDelivery": true,
       "allowMorningDelivery": true,
@@ -250,12 +251,12 @@
       "priceOnlyRecipient": 99,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 59,
-      "showDeliveryDay": true
+      "priceSignature": 59
     },
     "dpd": {
       "id": "dpd",
       "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
       "allowEveningDelivery": true,
       "allowMondayDelivery": true,
       "allowMorningDelivery": true,
@@ -344,12 +345,12 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0,
-      "showDeliveryDay": true
+      "priceSignature": 0
     },
     "ups": {
       "id": "ups",
       "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
       "allowEveningDelivery": true,
       "allowMondayDelivery": true,
       "allowMorningDelivery": true,
@@ -438,12 +439,12 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0,
-      "showDeliveryDay": true
+      "priceSignature": 0
     },
     "dhlforyou": {
       "id": "dhlforyou",
       "allowDeliveryOptions": false,
+      "allowStandardDelivery": false,
       "allowEveningDelivery": false,
       "allowMondayDelivery": false,
       "allowMorningDelivery": false,
@@ -532,12 +533,12 @@
       "priceOnlyRecipient": 90,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 40,
-      "showDeliveryDay": true
+      "priceSignature": 40
     },
     "dhlparcelconnect": {
       "id": "dhlparcelconnect",
       "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
       "allowEveningDelivery": true,
       "allowMondayDelivery": true,
       "allowMorningDelivery": true,
@@ -626,12 +627,12 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0,
-      "showDeliveryDay": true
+      "priceSignature": 0
     },
     "dhleuroplus": {
       "id": "dhleuroplus",
       "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
       "allowEveningDelivery": true,
       "allowMondayDelivery": true,
       "allowMorningDelivery": true,
@@ -720,8 +721,7 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0,
-      "showDeliveryDay": true
+      "priceSignature": 0
     }
   }
 }
