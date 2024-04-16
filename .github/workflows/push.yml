@@ -29,7 +29,6 @@ jobs:
           node-version: ${{ vars.NODE_VERSION }}
           php-version: ${{ vars.PHP_VERSION }}
           composer-flags: '--no-dev'
-          php-scoper-version: ${{ vars.PHP_SCOPER_VERSION }}
 
       - uses: myparcelnl/actions/pdk-prerelease-push@v4
         with:
