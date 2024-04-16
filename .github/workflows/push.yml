@@ -34,6 +34,7 @@ jobs:
       - uses: myparcelnl/actions/pdk-prerelease-push@v4
         with:
           image: ${{ steps.build.outputs.image }}
+          source-hash: ${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
 
   rebase-prs:
     needs:
