@@ -112,7 +112,11 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
     {
         $oldValues = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS);
 
-        $oldValues->each(function (array $row) {
+        $oldValues->each(function ($row) {
+            if (! is_array($row)) {
+                return;
+            }
+
             $cartId  = json_decode((string) ($row['id_cart'] ?? ''), true);
             $orderId = $this->getDbValue('orders', 'id_order', "id_cart = $cartId");
 
