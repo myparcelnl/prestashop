@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Entity\Concern;
+namespace MyParcelNL\PrestaShop\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @TODO Move to \MyParcelNL\PrestaShop\Entity\Concern namespace when possible.
+ * @see  https://github.com/myparcelnl/prestashop/issues/242
+ */
 trait HasJsonData
 {
     /**

@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\PrestaShop\Entity\Concern;
+namespace MyParcelNL\PrestaShop\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use MyParcelNL\PrestaShop\Entity\Contract\EntityWithCreatedTimestampsInterface;
 
 /**
- * @see \MyParcelNL\PrestaShop\Entity\Contract\EntityWithCreatedTimestampsInterface
+ * @TODO Move to \MyParcelNL\PrestaShop\Entity\Concern namespace when possible.
+ * @see  https://github.com/myparcelnl/prestashop/issues/242
+ * @see  \MyParcelNL\PrestaShop\Entity\EntityWithCreatedTimestampsInterface
  */
 trait HasCreatedTimestamps
 {

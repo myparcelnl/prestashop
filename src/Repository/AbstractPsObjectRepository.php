@@ -9,13 +9,13 @@ use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Contract\PsObjectRepositoryInterface;
-use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
-use MyParcelNL\PrestaShop\Entity\Contract\EntityWithTimestampsInterface;
+use MyParcelNL\PrestaShop\Entity\EntityInterface;
+use MyParcelNL\PrestaShop\Entity\EntityWithTimestampsInterface;
 use MyParcelNL\Sdk\src\Support\Str;
 use Throwable;
 
 /**
- * @template T of \MyParcelNL\PrestaShop\Entity\Contract\EntityInterface
+ * @template T of \MyParcelNL\PrestaShop\Entity\EntityInterface
  */
 abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
 {
@@ -68,7 +68,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
     }
 
     /**
-     * @param  \MyParcelNL\PrestaShop\Entity\Contract\EntityInterface $entity
+     * @param  \MyParcelNL\PrestaShop\Entity\EntityInterface $entity
      *
      * @return void
      * @throws \Doctrine\ORM\Exception\ORMException
