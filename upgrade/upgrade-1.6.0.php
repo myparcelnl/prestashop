@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\PrestaShop\Facade\MyParcelModule;
+
+/**
+ * @see \MyParcelNL\PrestaShop\Pdk\Installer\Service\PsInstallerService::install
+ */
 function upgrade_module_1_6_0($module): bool
 {
-    return \MyParcelNL\PrestaShop\Facade\MyParcelModule::install();
+    return MyParcelModule::install($module);
 }
