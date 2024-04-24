@@ -8,7 +8,7 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 use Carrier as PsCarrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use function MyParcelNL\Pdk\Tests\usesShared;
@@ -27,7 +27,7 @@ it('migrates settings to pdk', function () {
         ->store();
 
     MockPsDb::insertRows(
-        AbstractLegacyPsMigration::LEGACY_TABLE_CARRIER_CONFIGURATION,
+        AbstractPsMigration::LEGACY_TABLE_CARRIER_CONFIGURATION,
         [
             // Carrier 4
             ['id_carrier' => 4, 'name' => 'carrierType', 'value' => 'postnl'],
