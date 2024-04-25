@@ -8,6 +8,8 @@ namespace MyParcelNL\PrestaShop;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPlugin;
 use Throwable;
+use function expect;
+use function it;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
@@ -29,4 +31,21 @@ it('installs and uninstalls module', function () {
         ->not->toThrow(Throwable::class)
         ->and($module->uninstall())
         ->not->toThrow(Throwable::class);
+});
+
+it('enables and disables module', function () {
+    /** @var \MyParcelNL $module */
+    $module = Pdk::get('moduleInstance');
+
+    expect($module->enable())
+        ->not->toThrow(Throwable::class)
+        ->and($module->disable())
+        ->not->toThrow(Throwable::class);
+});
+
+it('calls getContent method', function () {
+    /** @var \MyParcelNL $module */
+    $module = Pdk::get('moduleInstance');
+
+    expect($module->getContent())->toEqual('');
 });
