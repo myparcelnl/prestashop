@@ -4,32 +4,38 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
-use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
-
 /**
  * @see \Configuration
+ * @see \PrestaShop\PrestaShop\Adapter\Configuration
  */
-abstract class MockPsConfiguration extends BaseMock implements StaticMockInterface
+class MockPsConfiguration extends DbMock
 {
-    private static $configuration = [];
-
     public static function get(string $key, $default = null)
     {
-        return self::$configuration[$key] ?? $default;
+        $first = self::firstWhere(['name' => $key]);
+
+        return $first['value'] ?? $default;
     }
 
-    public static function reset(): void
+    public static function remove(string $key): void
     {
-        self::$configuration = [];
+        self::deleteRows(['name' => $key]);
     }
 
     public static function set(string $key, $value): void
     {
-        self::$configuration[$key] = $value;
+        self::updateRow(['name' => $key, 'value' => $value]);
     }
 
-    public static function setMany(array $configuration): void
+    public static function setMany(array $configurations): void
     {
-        self::$configuration = $configuration;
+        foreach ($configurations as $key => $value) {
+            self::set($key, $value);
+        }
+    }
+
+    protected static function getTableName(): string
+    {
+        return 'configuration';
     }
 }

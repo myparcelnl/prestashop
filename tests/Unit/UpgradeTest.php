@@ -8,12 +8,15 @@ namespace MyParcelNL\PrestaShop;
 
 use MyParcelNL\Pdk\Base\Concern\PdkInterface;
 use MyParcelNL\Pdk\Base\Model\AppInfo;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
+use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Tests\Mock\MockMyParcelNL;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use function expect;
 use function MyParcelNL\Pdk\Tests\usesShared;
 
@@ -21,7 +24,7 @@ usesShared(new UsesMockPsPdkInstance());
 
 function runUpgradeSuccessfully(string $newVersion): void
 {
-    /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockSettingsRepository $settingsRepository */
+    /** @var \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PsPdkSettingsRepository $settingsRepository */
     $settingsRepository = Pdk::get(PdkSettingsRepositoryInterface::class);
 
     $result = runUpgrade($newVersion);
@@ -53,7 +56,7 @@ function runUpgrade(string $newVersion): bool
 }
 
 it('runs upgrade with previous version saved', function (string $previousVersion, string $newVersion) {
-    /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockSettingsRepository $settingsRepository */
+    /** @var \MyParcelNL\PrestaShop\Pdk\Settings\Repository\PsPdkSettingsRepository $settingsRepository */
     $settingsRepository = Pdk::get(PdkSettingsRepositoryInterface::class);
     $settingsRepository->store(Pdk::get('settingKeyInstalledVersion'), $previousVersion);
 
@@ -62,25 +65,21 @@ it('runs upgrade with previous version saved', function (string $previousVersion
     ['3.0.0', '4.0.0'],
 ]);
 
-it('runs upgrade with old api key saved', function (string $previousVersion, string $newVersion) {
-    /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockSettingsRepository $settingsRepository */
-    $settingsRepository = Pdk::get(PdkSettingsRepositoryInterface::class);
-    $settingsRepository->store('MYPARCELNL_API_KEY', $previousVersion);
-
-    runUpgradeSuccessfully($newVersion);
-})->with([
-    ['3.0.0', '4.0.0'],
-]);
-
-it('catches errors on upgrade', function () {
+it('runs upgrade with (invalid) old api key saved', function () {
     /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockLogger $logger */
     $logger = Pdk::get(LoggerInterface::class);
+    /** @var \MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface $configuration */
+    $configuration = Pdk::get(PsConfigurationServiceInterface::class);
 
-    expect(runUpgrade('4.0.0'))
-        ->toBeFalse()
-        ->and($logger->getLogs()[0])
-        ->toHaveKeysAndValues([
-            'level'   => 'error',
-            'message' => '[PDK]: Failed to install module',
-        ]);
+    $configuration->set('MYPARCELNL_API_KEY', 'invalid-api-key');
+
+    runUpgradeSuccessfully('4.0.0');
+
+    $firstWarningLog = Arr::first($logger->getLogs(), function (array $log) {
+        return $log['level'] === LogLevel::WARNING;
+    });
+
+    expect($firstWarningLog)->toHaveKeysAndValues([
+        'message' => '[PDK]: Existing API key is invalid',
+    ]);
 });
