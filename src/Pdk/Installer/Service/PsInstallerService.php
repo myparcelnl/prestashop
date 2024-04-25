@@ -10,7 +10,6 @@ use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Actions;
-use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\Pdk\Settings\Model\AccountSettings;
@@ -18,7 +17,6 @@ use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
-use Throwable;
 use Tools;
 
 final class PsInstallerService extends InstallerService
@@ -140,9 +138,7 @@ final class PsInstallerService extends InstallerService
         /** @var PsConfigurationServiceInterface $configuration */
         $configuration = Pdk::get(PsConfigurationServiceInterface::class);
 
-        $apiKey = $configuration->get('MYPARCELNL_API_KEY');
-
-        if ($apiKey) {
+        if ($configuration->get('MYPARCELNL_API_KEY')) {
             return self::VERSION_PRE_PDK;
         }
 
@@ -160,19 +156,6 @@ final class PsInstallerService extends InstallerService
          * Always register hooks, since the methods may have changed. PrestaShop checks if hook is already registered.
          */
         MyParcelModule::registerHooks();
-
-        if ($this->getInstalledVersion() !== self::VERSION_PRE_PDK) {
-            return;
-        }
-
-        try {
-            /**
-             * When migrating to the pdk, trigger the update account action to get the correct account settings.
-             */
-            Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
-        } catch (Throwable $e) {
-            Logger::info('Existing API key is invalid', ['exception' => $e]);
-        }
     }
 
     private function installDatabase(): void
