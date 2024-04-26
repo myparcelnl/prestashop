@@ -18,7 +18,7 @@ use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\Pdk\Settings\Model\SettingsFactory;
 use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
-use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
+use MyParcelNL\PrestaShop\Entity\EntityInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Tests\Factory\PsFactoryFactory;
 use ObjectModel;

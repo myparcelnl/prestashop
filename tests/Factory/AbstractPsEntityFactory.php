@@ -10,7 +10,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntities;
 use MyParcelNL\Sdk\src\Support\Str;
 
 /**
- * @template T of \MyParcelNL\PrestaShop\Entity\Contract\EntityInterface
+ * @template T of \MyParcelNL\PrestaShop\Entity\EntityInterface
  * @implements PsObjectModelFactoryInterface<T>
  * @extends AbstractPsFactory<T>
  * @method $this withCreated(string $created)

@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Tests\Factory;
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException;
-use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
+use MyParcelNL\PrestaShop\Entity\EntityInterface;
 use ObjectModel;
 use Throwable;
 

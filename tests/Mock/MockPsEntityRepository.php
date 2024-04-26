@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL\Pdk\Base\Support\Collection;
-use MyParcelNL\PrestaShop\Entity\Contract\EntityInterface;
+use MyParcelNL\PrestaShop\Entity\EntityInterface;
 use MyParcelNL\Sdk\src\Support\Str;
 
 /**

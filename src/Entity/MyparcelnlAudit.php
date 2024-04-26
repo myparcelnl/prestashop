@@ -6,9 +6,6 @@ namespace MyParcelNL\PrestaShop\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use MyParcelNL\PrestaShop\Database\Table;
-use MyParcelNL\PrestaShop\Entity\Concern\HasCreatedTimestamps;
-use MyParcelNL\PrestaShop\Entity\Concern\HasJsonData;
-use MyParcelNL\PrestaShop\Entity\Contract\EntityWithCreatedTimestampsInterface;
 
 /**
  * @ORM\Table
