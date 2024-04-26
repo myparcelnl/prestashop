@@ -14,7 +14,7 @@ use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Shipment\Model\ShipmentOptions;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\Pdk\Types\Service\TriStateService;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Order as PsOrder;
@@ -28,7 +28,7 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
         psFactory(PsOrder::class)->withIdCart(20),
     ]))->store();
 
-    MockPsDb::insertRows(AbstractLegacyPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS, [
+    MockPsDb::insertRows(AbstractPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS, [
         [
             'id_cart'           => 20,
             'delivery_settings' => json_encode(

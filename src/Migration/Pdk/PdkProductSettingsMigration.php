@@ -10,7 +10,7 @@ use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Types\Service\TriStateService;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
 use MyParcelNL\PrestaShop\Migration\Util\ToPackageTypeName;
@@ -140,7 +140,7 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
      */
     private function migrateProductSettings(): void
     {
-        $allRows       = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION);
+        $allRows       = $this->getAllRows(AbstractPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION);
         $rowsByProduct = $allRows->groupBy('id_product');
 
         $rowsByProduct->each(function (Collection $rows, $productId) {

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 
-abstract class AbstractPsPdkMigration extends AbstractLegacyPsMigration
+abstract class AbstractPsPdkMigration extends AbstractPsMigration
 {
     public function down(): void
     {

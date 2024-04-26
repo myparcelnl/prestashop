@@ -10,7 +10,7 @@ use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
@@ -31,7 +31,7 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
         ->withIdCart(20)
         ->store();
 
-    MockPsDb::insertRows(AbstractLegacyPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS, [
+    MockPsDb::insertRows(AbstractPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS, [
         [
             'id_cart'           => 20,
             'delivery_settings' => json_encode([
@@ -61,7 +61,7 @@ it('migrates order shipments to pdk', function (array $orderLabels) {
         ],
     ], 'id_delivery_setting');
 
-    MockPsDb::insertRows(AbstractLegacyPsMigration::LEGACY_TABLE_ORDER_LABEL, $orderLabels, 'id_order_label');
+    MockPsDb::insertRows(AbstractPsMigration::LEGACY_TABLE_ORDER_LABEL, $orderLabels, 'id_order_label');
 
     $psOrderShipments = $psOrderShipmentRepository
         ->where('orderId', 1)

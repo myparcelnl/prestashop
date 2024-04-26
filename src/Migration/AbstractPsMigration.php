@@ -13,6 +13,11 @@ use Throwable;
 
 abstract class AbstractPsMigration implements MigrationInterface
 {
+    public const LEGACY_TABLE_ORDER_LABEL           = 'myparcelnl_order_label';
+    public const LEGACY_TABLE_CARRIER_CONFIGURATION = 'myparcelnl_carrier_configuration';
+    public const LEGACY_TABLE_DELIVERY_SETTINGS     = 'myparcelnl_delivery_settings';
+    public const LEGACY_TABLE_PRODUCT_CONFIGURATION = 'myparcelnl_product_configuration';
+
     /**
      * @var \Db
      */

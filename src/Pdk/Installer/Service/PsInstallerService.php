@@ -15,7 +15,6 @@ use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\Pdk\Settings\Model\AccountSettings;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
-use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
 use Tools;
@@ -35,25 +34,17 @@ final class PsInstallerService extends InstallerService
     private $psCarrierService;
 
     /**
-     * @var \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface
-     */
-    private $psObjectModelService;
-
-    /**
      * @param  \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface $settingsRepository
      * @param  \MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface $migrationService
      * @param  \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface        $psCarrierService
-     * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface    $psObjectModelService
      */
     public function __construct(
         PdkSettingsRepositoryInterface $settingsRepository,
         MigrationServiceInterface      $migrationService,
-        PsCarrierServiceInterface      $psCarrierService,
-        PsObjectModelServiceInterface  $psObjectModelService
+        PsCarrierServiceInterface      $psCarrierService
     ) {
         parent::__construct($settingsRepository, $migrationService);
-        $this->psCarrierService     = $psCarrierService;
-        $this->psObjectModelService = $psObjectModelService;
+        $this->psCarrierService = $psCarrierService;
     }
 
     /**
@@ -147,9 +138,7 @@ final class PsInstallerService extends InstallerService
         /** @var PsConfigurationServiceInterface $configuration */
         $configuration = Pdk::get(PsConfigurationServiceInterface::class);
 
-        $apiKey = $configuration->get('MYPARCELNL_API_KEY');
-
-        if ($apiKey) {
+        if ($configuration->get('MYPARCELNL_API_KEY')) {
             return self::VERSION_PRE_PDK;
         }
 
@@ -164,13 +153,9 @@ final class PsInstallerService extends InstallerService
         parent::migrateUp($version);
 
         /**
-         * Always register hooks, since the methods may have changed. PrestaShops checks if hook is already registered.
+         * Always register hooks, since the methods may have changed. PrestaShop checks if hook is already registered.
          */
         MyParcelModule::registerHooks();
-
-        if ($this->getInstalledVersion() === self::VERSION_PRE_PDK) {
-            Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
-        }
     }
 
     private function installDatabase(): void

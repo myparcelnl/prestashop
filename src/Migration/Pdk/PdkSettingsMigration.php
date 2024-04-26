@@ -19,6 +19,7 @@ use MyParcelNL\Pdk\Settings\Model\CustomsSettings;
 use MyParcelNL\Pdk\Settings\Model\LabelSettings;
 use MyParcelNL\Pdk\Settings\Model\OrderSettings;
 use MyParcelNL\Pdk\Settings\Model\Settings;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
@@ -269,7 +270,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
      */
     private function getMigratedCarrierSettings(): array
     {
-        $oldCarrierSettings = $this->getAllRows(self::LEGACY_TABLE_CARRIER_CONFIGURATION);
+        $oldCarrierSettings = $this->getAllRows(AbstractPsMigration::LEGACY_TABLE_CARRIER_CONFIGURATION);
 
         return $oldCarrierSettings
             ->where('name', 'carrierType')
