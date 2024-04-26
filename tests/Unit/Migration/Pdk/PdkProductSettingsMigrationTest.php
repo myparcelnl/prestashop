@@ -10,7 +10,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Types\Service\TriStateService;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Product;
@@ -28,7 +28,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
         ->store();
 
     MockPsDb::insertRows(
-        AbstractLegacyPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION,
+        AbstractPsMigration::LEGACY_TABLE_PRODUCT_CONFIGURATION,
         $productConfigurations,
         'id_configuration'
     );

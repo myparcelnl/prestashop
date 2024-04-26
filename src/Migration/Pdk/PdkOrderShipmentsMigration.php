@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Logger;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use Throwable;
 
 final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
@@ -47,7 +47,7 @@ final class PdkOrderShipmentsMigration extends AbstractPsPdkMigration
      */
     private function migrateOrderShipments(): void
     {
-        $orderLabels = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_ORDER_LABEL);
+        $orderLabels = $this->getAllRows(AbstractPsMigration::LEGACY_TABLE_ORDER_LABEL);
 
         $ordersToUpdate = $orderLabels->reduce(function (
             PdkOrderCollection $carry,

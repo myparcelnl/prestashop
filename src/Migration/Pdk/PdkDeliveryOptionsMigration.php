@@ -10,7 +10,7 @@ use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
-use MyParcelNL\PrestaShop\Migration\AbstractLegacyPsMigration;
+use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
@@ -110,7 +110,7 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
      */
     private function migrateDeliveryOptions(): void
     {
-        $oldValues = $this->getAllRows(AbstractLegacyPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS);
+        $oldValues = $this->getAllRows(AbstractPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS);
 
         $oldValues->each(function ($row) {
             if (! is_array($row)) {

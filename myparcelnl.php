@@ -142,20 +142,20 @@ class MyParcelNL extends CarrierModule
     /**
      * @return string
      */
-    private function getBaseUrl(): string
-    {
-        return $this->context->link->getAdminLink('AdminModules');
-    }
-
-    /**
-     * @return string
-     */
-    private function getVersionFromComposer(): string
+    protected function getVersionFromComposer(): string
     {
         $filename     = __DIR__ . '/composer.json';
         $composerData = json_decode(file_get_contents($filename), true);
 
         return $composerData['version'];
+    }
+
+    /**
+     * @return string
+     */
+    private function getBaseUrl(): string
+    {
+        return $this->context->link->getAdminLink('AdminModules');
     }
 
     /**
