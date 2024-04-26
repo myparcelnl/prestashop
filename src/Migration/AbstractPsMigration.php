@@ -98,12 +98,14 @@ abstract class AbstractPsMigration implements MigrationInterface
     /**
      * @param  string|DbQuery $query
      *
-     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     * @return \MyParcelNL\Pdk\Base\Support\Collection – Collection of associative arrays
      */
     protected function getRows($query): Collection
     {
         $rows = $this->withErrorHandling(function () use ($query) {
-            return $this->db->executeS($query);
+            $result = $this->db->executeS($query);
+
+            return is_array($result) ? $result : [];
         });
 
         return new Collection($rows ?? []);

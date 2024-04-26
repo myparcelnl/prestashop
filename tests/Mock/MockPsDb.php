@@ -9,6 +9,8 @@ use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 use MyParcelNL\Sdk\src\Concerns\HasInstance;
 use MyParcelNL\Sdk\src\Support\Str;
+use PDOStatement;
+use PrestaShopException;
 use Throwable;
 
 abstract class MockPsDb extends BaseMock implements StaticMockInterface
@@ -172,15 +174,20 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     }
 
     /**
-     * @param  string|\DbQuery $query
+     * Executes a query.
+     *
+     * @param  string|DbQuery $sql
+     * @param  bool           $useCache
      *
      * @return bool
      * @noinspection BadExceptionsProcessingInspection
+     * @noinspection PhpMissingParamTypeInspection
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function execute($query): bool
+    public function execute($sql, $useCache = true): bool
     {
         try {
-            $this->executeS($query);
+            $this->executeS($sql);
 
             return true;
         } catch (Throwable $e) {
@@ -189,16 +196,21 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     }
 
     /**
-     * @param  string|\DbQuery $query
+     * Executes return the result of $sql as array.
      *
-     * @return array
+     * @param  string|DbQuery $sql   Query to execute
+     * @param  bool           $array Return an array instead of a result object (deprecated since 1.5.0.1, use query method instead)
+     * @param  bool           $useCache
+     *
+     * @return array|bool|PDOStatement|resource|null – preserving the original return type
      * @throws \PrestaShopException
+     * @noinspection PhpMissingParamTypeInspection
+     * @noinspection PhpUnusedParameterInspection
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function executeS($query): array
+    public function executeS($sql, $array = true, $useCache = true)
     {
-        $query = $this->resolveQuery($query);
-
-        return $query ?? [];
+        return $this->resolveQuery($sql);
     }
 
     /**
@@ -215,13 +227,22 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     }
 
     /**
-     * @param $query
+     * @param  string|\DbQuery $query
      *
-     * @return void
+     * @return array|null|false
      * @throws \PrestaShopException
      */
-    public function resolveQuery($query): ?array
+    protected function resolveQuery($query)
     {
+        // These two cases can be used to test unhappy flows, as the real DbQuery can throw errors and return something other than array|null
+        if (! $query) {
+            throw new PrestaShopException('Invalid query');
+        }
+
+        if ('false' === $query) {
+            return false;
+        }
+
         $queryString = $this->createQueryString($query);
 
         if (Str::startsWith(strtolower($queryString), 'select')) {
@@ -272,7 +293,7 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     }
 
     /**
-     * @param $query
+     * @param  string|\DbQuery $query
      *
      * @return string
      * @throws \PrestaShopException
@@ -315,7 +336,7 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
      */
     private function resolveSelect(string $queryString): array
     {
-        // parse the parts of the select query, where the table name and the where clause
+        // parse the parts of the select query, find the table name and the where clause
         preg_match('/SELECT\s+(.*?)\s+FROM\s+(.*?)(\s+WHERE\s+(.*?)\s*)?$/i', $queryString, $matches);
 
         $matches = array_map('trim', $matches);
