@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL;
 
-final class MockMyParcelNL extends MyParcelNL
+class MockMyParcelNL extends MyParcelNL
 {
     /**
      * @var string|null
