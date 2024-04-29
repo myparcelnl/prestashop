@@ -67,12 +67,27 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
         static::$instances[$name] = $instance;
     }
 
+    public function disable(): bool
+    {
+        return true;
+    }
+
+    public function enable(): bool
+    {
+        return true;
+    }
+
     /**
      * @return \DI\Container
      */
     public function getContainer(): Container
     {
         return $this->container;
+    }
+
+    public function install(): bool
+    {
+        return true;
     }
 
     /**
@@ -88,6 +103,11 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
 
             return $carry && MockPsObjectModels::add($instance);
         }, true);
+    }
+
+    public function uninstall(): bool
+    {
+        return true;
     }
 
     /**

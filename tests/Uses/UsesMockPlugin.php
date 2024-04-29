@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Tests\Uses;
 
 use MyParcelNL;
+use MyParcelNL\PrestaShop\Tests\Mock\MockMyParcelNL;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
 
 final class UsesMockPlugin extends UsesMockPsPdkInstance
@@ -19,7 +20,7 @@ final class UsesMockPlugin extends UsesMockPsPdkInstance
             require_once __DIR__ . '/../../myparcelnl.php';
         }
 
-        $module = new MyParcelNL();
+        $module = new MockMyParcelNL();
 
         MockPsModule::setInstance($module->name, $module);
 
