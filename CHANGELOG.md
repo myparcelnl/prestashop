@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0-beta.3](https://github.com/myparcelnl/prestashop/compare/v4.0.0-beta.2...v4.0.0-beta.3) (2024-05-01)
+
+
+### :bug: Bug Fixes
+
+* **checkout:** remove missing style.css error ([a382771](https://github.com/myparcelnl/prestashop/commit/a382771709dbeac2b148d8b6224c8d8ec4280b6a))
+* fix namespace error when installing module ([#246](https://github.com/myparcelnl/prestashop/issues/246)) ([cf3c9e4](https://github.com/myparcelnl/prestashop/commit/cf3c9e4b9b0f27b92101525b301e87f0fbbd9d7a)), closes [#242](https://github.com/myparcelnl/prestashop/issues/242)
+* **install:** fix upgrading from older versions ([#245](https://github.com/myparcelnl/prestashop/issues/245)) ([ae3b626](https://github.com/myparcelnl/prestashop/commit/ae3b6267774fafd28cd1d4c192b70583ab31ef9b)), closes [#243](https://github.com/myparcelnl/prestashop/issues/243)
+* **migration:** fix errors when invalid db data is returned ([#252](https://github.com/myparcelnl/prestashop/issues/252)) ([00bc56e](https://github.com/myparcelnl/prestashop/commit/00bc56ef4c3bc1d9da93f6ba49757a42399704b7))
+* **migration:** prevent $row must be array but bool supplied during installation ([#241](https://github.com/myparcelnl/prestashop/issues/241)) ([b655806](https://github.com/myparcelnl/prestashop/commit/b655806e5f4876abc0c552f81576b0f8f878d8e3))
+
+
+### :sparkles: New Features
+
+* **deps:** upgrade @myparcel-pdk/* ([86a1c1c](https://github.com/myparcelnl/prestashop/commit/86a1c1cfe8cdafe307f03b78659a9a9642e15e04))
+* **deps:** upgrade myparcelnl/pdk to v2.36.2 ([a1a9a57](https://github.com/myparcelnl/prestashop/commit/a1a9a576ab2d52ee9d9dfb0300d21112f7502940))
+* update to latest delivery options ([#240](https://github.com/myparcelnl/prestashop/issues/240)) ([82064fa](https://github.com/myparcelnl/prestashop/commit/82064fa9bf82e68fc95da73d3e3bd69b734f922b))
+
 ## [4.0.0-beta.2](https://github.com/myparcelnl/prestashop/compare/v4.0.0-beta.1...v4.0.0-beta.2) (2024-03-20)
 
 ### :bug: Bug Fixes
