@@ -57,6 +57,22 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
     }
 
     /**
+     * @param  mixed $input
+     *
+     * @return array
+     */
+    private function decodeArray($input): array
+    {
+        if (! $input || ! is_string($input)) {
+            return [];
+        }
+
+        $decoded = json_decode($input, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
      * @return \Generator<MigratableValue>
      */
     private function getDeliveryOptionsTransformationMap(): Generator
@@ -112,12 +128,8 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
     {
         $oldValues = $this->getAllRows(AbstractPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS);
 
-        $oldValues->each(function ($row) {
-            if (! is_array($row)) {
-                return;
-            }
-
-            $cartId  = json_decode((string) ($row['id_cart'] ?? ''), true);
+        $oldValues->each(function (array $row) {
+            $cartId  = $row['id_cart'] ?? 0;
             $orderId = $this->getDbValue('orders', 'id_order', "id_cart = $cartId");
 
             if (! $orderId) {
@@ -126,8 +138,8 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
                 return;
             }
 
-            $deliverySettings = json_decode($row['delivery_settings'] ?? '', true);
-            $extraOptions     = json_decode($row['extra_options'] ?? '', true);
+            $deliverySettings = $this->decodeArray($row['delivery_settings'] ?? null);
+            $extraOptions     = $this->decodeArray($row['extra_options'] ?? null);
 
             $newDeliveryOptions = $this->transformDeliveryOptions(array_merge($deliverySettings, $extraOptions));
 

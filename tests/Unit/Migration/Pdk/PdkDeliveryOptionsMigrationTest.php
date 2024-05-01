@@ -23,7 +23,24 @@ use function MyParcelNL\PrestaShop\psFactory;
 
 usesShared(new UsesMockPsPdkInstance());
 
-it('migrates delivery options to pdk', function (array $deliverySettings, array $extraOptions, array $result) {
+/**
+ * JSON encodes input if it's an array, merging it with given default values. Otherwise, just returns input.
+ *
+ * @param  mixed $input
+ * @param  array $defaults
+ *
+ * @return false|mixed|string
+ */
+function toJsonWithDefaults($input, array $defaults)
+{
+    if (! is_array($input)) {
+        return $input;
+    }
+
+    return json_encode(array_replace_recursive($defaults, $input));
+}
+
+it('migrates delivery options to pdk', function ($deliverySettings, $extraOptions, array $result) {
     (new FactoryCollection([
         psFactory(PsOrder::class)->withIdCart(20),
     ]))->store();
@@ -31,34 +48,30 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
     MockPsDb::insertRows(AbstractPsMigration::LEGACY_TABLE_DELIVERY_SETTINGS, [
         [
             'id_cart'           => 20,
-            'delivery_settings' => json_encode(
-                array_replace_recursive([
-                    'carrier'         => '',
-                    'date'            => '',
-                    'deliveryType'    => 'standard',
-                    'packageType'     => 'package',
-                    'isPickup'        => false,
-                    'pickupLocation'  => null,
-                    'shipmentOptions' => [
-                        'age_check'         => null,
-                        'extra_assurance'   => null,
-                        'hide_sender'       => null,
-                        'insurance'         => null,
-                        'label_description' => null,
-                        'large_format'      => null,
-                        'only_recipient'    => null,
-                        'return'            => null,
-                        'same_day_delivery' => null,
-                        'signature'         => null,
-                    ],
-                ], $deliverySettings)
-            ),
-            'extra_options'     => json_encode(
-                array_replace([
-                    'labelAmount'        => 1,
-                    'digitalStampWeight' => 0,
-                ], $extraOptions)
-            ),
+            'delivery_settings' => toJsonWithDefaults($deliverySettings, [
+                'carrier'         => '',
+                'date'            => '',
+                'deliveryType'    => 'standard',
+                'packageType'     => 'package',
+                'isPickup'        => false,
+                'pickupLocation'  => null,
+                'shipmentOptions' => [
+                    'age_check'         => null,
+                    'extra_assurance'   => null,
+                    'hide_sender'       => null,
+                    'insurance'         => null,
+                    'label_description' => null,
+                    'large_format'      => null,
+                    'only_recipient'    => null,
+                    'return'            => null,
+                    'same_day_delivery' => null,
+                    'signature'         => null,
+                ],
+            ]),
+            'extra_options'     => toJsonWithDefaults($extraOptions, [
+                'labelAmount'        => 1,
+                'digitalStampWeight' => 0,
+            ]),
         ],
     ], 'id_delivery_setting');
 
@@ -265,5 +278,23 @@ it('migrates delivery options to pdk', function (array $deliverySettings, array 
                     ShipmentOptions::LABEL_DESCRIPTION => null,
                 ],
             ],
+        ],
+
+        'invalid value in delivery settings' => [
+            'delivery_settings' => null,
+            'extra_options'     => [],
+
+            // Use defaults but remove label description
+            'result'            => [
+                DeliveryOptions::SHIPMENT_OPTIONS => [
+                    ShipmentOptions::LABEL_DESCRIPTION => null,
+                ],
+            ],
+        ],
+
+        'invalid value in extra options' => [
+            'delivery_settings' => [],
+            'extra_options'     => false,
+            'result'            => [],
         ],
     ]);
