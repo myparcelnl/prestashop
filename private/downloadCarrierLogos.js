@@ -1,4 +1,6 @@
+/* eslint-disable no-magic-numbers,id-length */
 import {FetchClient, GetCarriers, createPublicSdk} from '@myparcel/sdk';
+import chalk from 'chalk';
 import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
@@ -22,9 +24,11 @@ export const downloadCarrierLogos = async ({debug}) => {
 
       const response = await fetch(imageUrl);
 
+      debug(`Downloading logo for ${chalk.blueBright(carrier.name)}`);
+
       if (!response.ok) {
         // eslint-disable-next-line no-console
-        debug(`Could not download image for ${carrier.name}`);
+        debug(chalk.redBright(`Could not download logo for ${carrier.name}`));
         return;
       }
 

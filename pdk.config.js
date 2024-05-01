@@ -26,6 +26,10 @@ export default defineConfig({
 
   rootCommand: 'docker compose run --rm -T php',
 
+  hooks: {
+    beforeCopy: ({context}) => downloadCarrierLogos(context),
+  },
+
   additionalCommands: [
     {
       name: 'download-carrier-logos',

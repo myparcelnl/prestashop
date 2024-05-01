@@ -3,6 +3,7 @@ module.exports = {
   root: true,
   env: {
     jquery: true,
+    es6: true,
   },
   overrides: [
     {
