@@ -26,7 +26,7 @@
     "test:coverage": "nx run-many --output-style=stream --target=test:coverage",
     "test:run": "nx run-many --output-style=stream --target=test:run",
     "translations:import": "pdk-builder translations",
-    "upgrade": "run upgrade:js && run upgrade:php",
+    "upgrade": "pdk-builder upgrade-self && pdk-builder upgrade-all",
     "upgrade:js": "pdk-builder upgrade \"@myparcel-pdk/*\"",
     "upgrade:php": "pdk-builder upgrade myparcelnl/pdk",
     "watch": "run build:js:dev --parallel=99 -- --watch",
