@@ -18,8 +18,8 @@
 
         <small
           v-if="element.props?.description && has(element.props.description)"
-          class="form-text text-muted">
-          {{ translate(element.props.description) }}
+          class="form-text text-muted"
+          v-html="translate(element.props.description)">
         </small>
 
         <div
