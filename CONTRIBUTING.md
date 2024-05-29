@@ -14,7 +14,7 @@
 Install composer dependencies with Docker:
 
 ```shell
-docker compose up --rm -it php
+docker compose up php
 ```
 
 Install yarn dependencies:
