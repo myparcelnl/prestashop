@@ -37,7 +37,27 @@ Follow our [Developer Guide for contributing to MyParcel repositories].
 
 ### Test your changes
 
-#### Easiest method
+#### Automated tests
+
+You should always run the automated tests.
+
+To run the frontend tests:
+
+```shell
+yarn test:run
+```
+
+To run the PHP tests:
+
+```shell
+docker compose run php composer test
+```
+
+These will also be run automatically on GitHub when you create a pull request and must pass before your changes can be merged.
+
+#### Manual testing
+
+##### Using a local PrestaShop instance
 
 This is only sufficient if you're running PrestaShop locally and your source directory is inside your `modules` folder. If this is not the case, continue to [the next section](#using-a-remote-prestashop-instance).
 
@@ -53,7 +73,7 @@ Or run this to monitor your changes and rebuild automatically:
 yarn watch
 ```
 
-#### Using a remote PrestaShop instance
+##### Using a remote PrestaShop instance
 
 Build module files:
 
