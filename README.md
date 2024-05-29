@@ -28,6 +28,10 @@ For the manual and more information, check out our [PrestaShop module guide] on 
 
 > :warning: Older 1.7.x versions may work, but are not officially tested or supported.
 
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Versions
 
 The 1.7 module was initially considered a completely standalone module from the old 1.6 version, and released as version 1.0. This has caused some confusion among users as well as our developers and support team. This will also be able to cause issues in the future when we release new versions that include migrations based on the previously installed version of the module.
