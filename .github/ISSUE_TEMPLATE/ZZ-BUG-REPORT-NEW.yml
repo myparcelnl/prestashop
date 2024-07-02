@@ -26,7 +26,15 @@ body:
         whether your issue might be a [duplicate of an existing one](https://github.com/myparcelnl/prestashop/issues) before submitting.
 
   - type: input
-    id: wp-version
+    id: myparcel-version
+    attributes:
+      label: 'MyParcelNL version'
+      description: 'Which version of the MyParcelNL beta module are you using?'
+      placeholder: 'v4.0.0-beta.3'
+    validations:
+      required: true
+  - type: input
+    id: ps-version
     attributes:
       label: 'PrestaShop version'
       description: 'Which PrestaShop version are you using?'
