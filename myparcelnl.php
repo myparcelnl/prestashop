@@ -216,7 +216,19 @@ class MyParcelNL extends CarrierModule
             return true;
         } catch (Throwable $e) {
             if ($this->hasPdk) {
-                Logger::error("An error occurred: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
+                $previous = $e->getPrevious();
+
+                Logger::error($e->getMessage(), [
+                    'file'     => $e->getFile(),
+                    'line'     => $e->getLine(),
+                    'trace'    => $e->getTrace(),
+                    'previous' => [
+                        'message' => $previous->getMessage(),
+                        'file'    => $previous->getFile(),
+                        'line'    => $previous->getLine(),
+                        'trace'   => $previous->getTrace(),
+                    ],
+                ]);
             }
 
             $formattedMessage = sprintf(
