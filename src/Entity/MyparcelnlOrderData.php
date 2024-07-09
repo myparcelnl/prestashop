@@ -20,7 +20,7 @@ class MyparcelnlOrderData extends AbstractEntity implements EntityWithTimestamps
 
     /**
      * @var string
-     * @ORM\Column(name="notes", type="text")
+     * @ORM\Column(name="notes", type="text", nullable=true)
      */
     private $notes;
 
