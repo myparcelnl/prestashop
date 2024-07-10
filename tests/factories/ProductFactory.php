@@ -7,7 +7,12 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
  * @see \ProductCore
+ * @method $this withIsActive(bool $isActive)
+ * @method $this withIsAvailableForOrder(bool $isAvailableForOrder)
+ * @method $this withIsVirtual(bool $isVirtual)
  * @method $this withName(array $names)
+ * @method $this withPrice(int $price)
+ * @method $this withWeight(float|string $weight)
  */
 final class ProductFactory extends AbstractPsObjectModelFactory
 {
@@ -17,7 +22,10 @@ final class ProductFactory extends AbstractPsObjectModelFactory
             ->withName([
                 1 => 'Test product',
                 2 => 'Test product 2',
-            ]);
+            ])
+            ->withIsActive(true)
+            ->withIsAvailableForOrder(true)
+            ->withIsVirtual(false);
     }
 
     protected function getObjectModelClass(): string
