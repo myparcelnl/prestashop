@@ -218,17 +218,22 @@ class MyParcelNL extends CarrierModule
             if ($this->hasPdk) {
                 $previous = $e->getPrevious();
 
-                Logger::error($e->getMessage(), [
-                    'file'     => $e->getFile(),
-                    'line'     => $e->getLine(),
-                    'trace'    => $e->getTrace(),
-                    'previous' => [
+                $context = [
+                    'file'  => $e->getFile(),
+                    'line'  => $e->getLine(),
+                    'trace' => $e->getTrace(),
+                ];
+
+                if ($previous) {
+                    $context['previous'] = [
                         'message' => $previous->getMessage(),
                         'file'    => $previous->getFile(),
                         'line'    => $previous->getLine(),
                         'trace'   => $previous->getTrace(),
-                    ],
-                ]);
+                    ];
+                }
+
+                Logger::error($e->getMessage(), $context);
             }
 
             $formattedMessage = sprintf(
