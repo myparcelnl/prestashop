@@ -36,6 +36,7 @@ jobs:
           source-hash: ${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
 
   rebase-prs:
+    if: always()
     needs:
       - test
       - build
