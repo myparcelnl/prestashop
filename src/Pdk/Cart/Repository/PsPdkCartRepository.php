@@ -11,6 +11,7 @@ use MyParcelNL\Pdk\App\Cart\Model\PdkCart;
 use MyParcelNL\Pdk\App\Cart\Repository\AbstractPdkCartRepository;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
+use PrestaShop\PrestaShop\Adapter\Entity\Country;
 
 class PsPdkCartRepository extends AbstractPdkCartRepository
 {
@@ -56,7 +57,7 @@ class PsPdkCartRepository extends AbstractPdkCartRepository
                 'orderVat'              => '',
                 'shippingMethod'        => [
                     'shippingAddress' => [
-                        'cc'         => $address->country,
+                        'cc'         => Country::getIsoById($address->id_country),
                         'postalCode' => $address->postcode,
                         'fullStreet' => $address->address1,
                     ],
