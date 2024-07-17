@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Util;
 
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Psr\Log\LoggerInterface;
@@ -26,7 +27,7 @@ test('gets value', function () {
     expect($result)->toBe('other_value');
 });
 
-test('migrates value', function () {
+test('migrates value', function (string $inputType) {
     /** @var \MyParcelNL\PrestaShop\Migration\Util\DataMigrator $migrator */
     $migrator = Pdk::get(DataMigrator::class);
 
@@ -50,18 +51,28 @@ test('migrates value', function () {
         ),
     ];
 
-    $result = $migrator->transform([
+    $input = [
         'key'         => 'value',
         'other_key'   => '123',
         'another_key' => 'another_value',
-    ], $transformationMap);
+    ];
+
+    $result = $migrator->transform(
+        'collection' === $inputType
+            ? new Collection($input)
+            : $input,
+        $transformationMap
+    );
 
     expect($result)->toBe([
         'new_key'             => 'new_value',
         'some_key'            => 123,
         'new_key_not_present' => '',
     ]);
-});
+})->with([
+    'array',
+    'collection',
+]);
 
 test('handles invalid input', function () {
     /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockLogger $logger */
