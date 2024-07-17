@@ -85,7 +85,7 @@ class PsPdkProductRepository extends AbstractPdkPdkProductRepository
             return new PdkProduct([
                 'externalIdentifier' => $psProduct->id,
                 'name'               => $translate($psProduct->name ?? []),
-                'weight'             => $this->weightService->convertToGrams($psProduct->weight ?? 0),
+                'weight'             => $this->weightService->convertToGrams((float) ($psProduct->weight ?? 0)),
                 'settings'           => $this->getProductSettings($identifier),
                 'isDeliverable'      => $this->isDeliverable($psProduct),
                 'price'              => [

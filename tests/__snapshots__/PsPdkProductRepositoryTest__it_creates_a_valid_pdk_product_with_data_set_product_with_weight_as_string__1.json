@@ -1,0 +1,30 @@
+{
+  "externalIdentifier": "1",
+  "isDeliverable": false,
+  "name": "Test product",
+  "price": {
+    "amount": 0,
+    "currency": "EUR"
+  },
+  "weight": 234,
+  "length": 0,
+  "width": 0,
+  "height": 0,
+  "settings": {
+    "id": "product",
+    "countryOfOrigin": -1,
+    "customsCode": -1,
+    "disableDeliveryOptions": -1,
+    "dropOffDelay": -1,
+    "exportAgeCheck": -1,
+    "exportHideSender": -1,
+    "exportInsurance": -1,
+    "exportLargeFormat": -1,
+    "exportOnlyRecipient": -1,
+    "exportReturn": -1,
+    "exportSignature": -1,
+    "fitInDigitalStamp": -1,
+    "fitInMailbox": -1,
+    "packageType": -1
+  }
+}
