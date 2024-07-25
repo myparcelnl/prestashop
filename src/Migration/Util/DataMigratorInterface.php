@@ -16,10 +16,10 @@ interface DataMigratorInterface
     public function getValue(string $key, array $data, $default = null);
 
     /**
-     * @param  array $input
-     * @param        $map
+     * @param  array|\MyParcelNL\Pdk\Base\Support\Collection $input
+     * @param  \Iterator<MigratableValue>|MigratableValue[]  $map
      *
      * @return array
      */
-    public function transform(array $input, $map): array;
+    public function transform($input, $map): array;
 }

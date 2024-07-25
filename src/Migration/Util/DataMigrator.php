@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Util;
 
-use Iterator;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
 
@@ -24,7 +23,7 @@ class DataMigrator implements DataMigratorInterface
 
     /**
      * @param  array|\MyParcelNL\Pdk\Base\Support\Collection $input
-     * @param  Iterator<MigratableValue>|MigratableValue[]   $map
+     * @param  \Iterator<MigratableValue>|MigratableValue[]  $map
      *
      * @return array
      */
