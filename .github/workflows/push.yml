@@ -34,8 +34,14 @@ jobs:
           app-id: ${{ secrets.MYPARCEL_APP_ID }}
           private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
           image: ${{ steps.build.outputs.image }}
-          source-hash: ${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
-
+          source-files: |
+            src/**/*
+            config/**/*
+            controllers/**/*
+            upgrade/**/*
+            myparcelnl.php
+            scoper.inc.php
+  
   rebase-prs:
     uses: ./.github/workflows/rebase-prs.yml
     secrets: inherit

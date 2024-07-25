@@ -35,7 +35,13 @@ jobs:
         with:
           php-version: ${{ vars.PHP_VERSION }}
           php-scoper-version: ${{ vars.PHP_SCOPER_VERSION }}
-          source-hash: ${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
+          source-files: |
+            src/**/*
+            config/**/*
+            controllers/**/*
+            upgrade/**/*
+            myparcelnl.php
+            scoper.inc.php
 
       - uses: ./.github/actions/build
         id: build

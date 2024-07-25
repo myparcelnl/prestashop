@@ -42,4 +42,10 @@ jobs:
           private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
           image: ${{ steps.build.outputs.image }}
           pr-number: ${{ github.event.client_payload.number || github.event.pull_request.number }}
-          source-hash: ${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
+          source-files: |
+            src/**/*
+            config/**/*
+            controllers/**/*
+            upgrade/**/*
+            myparcelnl.php
+            scoper.inc.php

@@ -27,7 +27,13 @@ jobs:
         with:
           js-pdk-ref: ${{ inputs.js-pdk-ref }}
           php-pdk-ref: ${{ inputs.php-pdk-ref }}
-          source-hash: ${{ hashFiles('src/**/*', 'config/**/*', 'controllers/**/*', 'upgrade/**/*', 'myparcelnl.php', 'scoper.inc.php') }}
+          source-files: |
+            src/**/*
+            config/**/*
+            controllers/**/*
+            upgrade/**/*
+            myparcelnl.php
+            scoper.inc.php
 
       - name: 'Build frontend'
         uses: myparcelnl/actions/nx-run-many@v4
