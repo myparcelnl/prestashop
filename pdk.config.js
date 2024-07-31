@@ -1,5 +1,6 @@
 import {PdkPlatformName, defineConfig} from '@myparcel-pdk/app-builder';
 import {downloadCarrierLogos} from './private/downloadCarrierLogos.js';
+import {spawnSync} from 'node:child_process';
 
 export default defineConfig({
   name: 'prestashop',
@@ -27,7 +28,20 @@ export default defineConfig({
   rootCommand: 'docker compose run --rm -T php',
 
   hooks: {
-    beforeCopy: ({context}) => downloadCarrierLogos(context),
+    /**
+     * Download carrier logos and build the frontend.
+     */
+    async beforeCopy({context}) {
+      await downloadCarrierLogos(context);
+
+      const buffer = spawnSync('yarn', ['nx', 'run-many', '--target=build', '--output-style=stream'], {
+        stdio: 'inherit',
+      });
+
+      if (buffer.error) {
+        throw buffer.error;
+      }
+    },
   },
 
   additionalCommands: [
