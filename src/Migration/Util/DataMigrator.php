@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Migration\Util;
 
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Facade\Logger;
 
 class DataMigrator implements DataMigratorInterface
 {
@@ -31,6 +32,18 @@ class DataMigrator implements DataMigratorInterface
     {
         if ($input instanceof Collection) {
             $input = $input->toArray();
+        }
+
+        if (! is_array($input)) {
+            Logger::warning(
+                sprintf(
+                    '%s expects an array or Collection as input, got %s instead.',
+                    __METHOD__,
+                    gettype($input)
+                )
+            );
+
+            return [];
         }
 
         $newSettings = [];
