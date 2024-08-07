@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c34a90796a9ed2129a3832392563f012",
+    "content-hash": "804299ccbd6da6903072bc50f327fb95",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -138,16 +138,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "2.36.2",
+            "version": "2.42.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "c38376af5756e089f213ca8474362e136a0953ca"
+                "reference": "d66aad800be08a97d10dff61ea751c2b89887fbe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/c38376af5756e089f213ca8474362e136a0953ca",
-                "reference": "c38376af5756e089f213ca8474362e136a0953ca",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/d66aad800be08a97d10dff61ea751c2b89887fbe",
+                "reference": "d66aad800be08a97d10dff61ea751c2b89887fbe",
                 "shasum": ""
             },
             "require": {
@@ -167,7 +167,7 @@
                 "pestphp/pest": ">= 1",
                 "phpdocumentor/reflection-docblock": "^5",
                 "phpstan/phpstan": ">= 1",
-                "rector/rector": "^0.19",
+                "rector/rector": ">= 1",
                 "spatie/pest-plugin-snapshots": ">= 1",
                 "symfony/console": "*"
             },
@@ -191,9 +191,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v2.36.2"
+                "source": "https://github.com/myparcelnl/pdk/tree/v2.42.0"
             },
-            "time": "2024-04-22T12:13:40+00:00"
+            "time": "2024-08-05T16:05:20+00:00"
         },
         {
             "name": "myparcelnl/sdk",
