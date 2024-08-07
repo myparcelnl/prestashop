@@ -140,7 +140,9 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0
     },
     "postnl": {
       "id": "postnl",
@@ -251,7 +253,9 @@
       "priceOnlyRecipient": 99,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 59
+      "priceSignature": 59,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0
     },
     "dpd": {
       "id": "dpd",
@@ -345,7 +349,9 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0
     },
     "ups": {
       "id": "ups",
@@ -439,7 +445,9 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0
     },
     "dhlforyou": {
       "id": "dhlforyou",
@@ -533,7 +541,9 @@
       "priceOnlyRecipient": 90,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 40
+      "priceSignature": 40,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0
     },
     "dhlparcelconnect": {
       "id": "dhlparcelconnect",
@@ -627,7 +637,9 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0
     },
     "dhleuroplus": {
       "id": "dhleuroplus",
@@ -721,7 +733,9 @@
       "priceOnlyRecipient": 0,
       "pricePackageTypeDigitalStamp": 0,
       "pricePackageTypeMailbox": 0,
-      "priceSignature": 0
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0
     }
   }
 }
