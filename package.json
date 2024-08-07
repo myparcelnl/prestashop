@@ -21,7 +21,7 @@
     "docker:build": "docker build -t myparcelnl/prestashop .",
     "docker:run": "docker run -it --rm -v $(pwd):/app myparcelnl/prestashop",
     "download:carrier-logos": "pdk-builder download-carrier-logos",
-    "prepare": "is-ci || husky install",
+    "prepare": "is-ci || husky",
     "test": "nx run-many --output-style=stream --target=test",
     "test:coverage": "nx run-many --output-style=stream --target=test:coverage",
     "test:run": "nx run-many --output-style=stream --target=test:run",
