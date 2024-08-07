@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0-beta.4](https://github.com/myparcelnl/prestashop/compare/v4.0.0-beta.3...v4.0.0-beta.4) (2024-08-07)
+
+
+### :bug: Bug Fixes
+
+* **cart:** use correct value for country ([#263](https://github.com/myparcelnl/prestashop/issues/263)) ([7fb25cc](https://github.com/myparcelnl/prestashop/commit/7fb25cc23b9fbbf100d7de9d7c7bc006ef15042f))
+* fix error when exception has no previous exception ([#260](https://github.com/myparcelnl/prestashop/issues/260)) ([68f051f](https://github.com/myparcelnl/prestashop/commit/68f051ff0f6b847ad21f99879866da0a0e6e8efa))
+* **migration:** fix type error when input is not an array ([#262](https://github.com/myparcelnl/prestashop/issues/262)) ([d40d6df](https://github.com/myparcelnl/prestashop/commit/d40d6df6c953134975a6fa7143befb59c40f2f9e))
+* **orders:** fix error when weight is a string ([#261](https://github.com/myparcelnl/prestashop/issues/261)) ([9e844a2](https://github.com/myparcelnl/prestashop/commit/9e844a274d14cb27082f6beca9303ba9b8288751)), closes [#256](https://github.com/myparcelnl/prestashop/issues/256)
+* prevent integrity constraint violation for notes column ([#259](https://github.com/myparcelnl/prestashop/issues/259)) ([53c5eab](https://github.com/myparcelnl/prestashop/commit/53c5eab599a42e0b243d5201be14a3d7d72c404c))
+
+
+### :sparkles: New Features
+
+* **deps:** upgrade @myparcel-pdk/* ([687ecb3](https://github.com/myparcelnl/prestashop/commit/687ecb393da0ca6da1257ecfed06d7fe91700884))
+* **deps:** upgrade myparcelnl/pdk to v2.42.0 ([d3f1a78](https://github.com/myparcelnl/prestashop/commit/d3f1a78bcf87a8ef767628ebaa89d82910e9bd09))
+* **frontend:** allow html in form descriptions ([#257](https://github.com/myparcelnl/prestashop/issues/257)) ([1251164](https://github.com/myparcelnl/prestashop/commit/125116454f3f6db7f2da3e428f9907ea1a780246))
+* **logging:** improve logging output ([861e713](https://github.com/myparcelnl/prestashop/commit/861e71373b85b8ee4ffcfc29c5c9038e6264dd1a))
+
 ## [4.0.0-beta.3](https://github.com/myparcelnl/prestashop/compare/v4.0.0-beta.2...v4.0.0-beta.3) (2024-05-01)
 
 
