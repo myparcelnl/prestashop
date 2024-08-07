@@ -8,9 +8,7 @@ declare(strict_types=1);
  * @see https://pestphp.com/docs/underlying-test-case#testspestphp
  */
 
-use MyParcelNL\Pdk\Tests\Uses\ClearContainerCache;
 use MyParcelNL\PrestaShop\Tests\TestCase;
-use function MyParcelNL\Pdk\Tests\usesShared;
 
 /** @see \MyParcelNL\PrestaShop\bootPdk() */
 const PEST = true;
@@ -30,8 +28,6 @@ const _MYSQL_ENGINE_     = 'InnoDB';
 const _PS_MODE_DEV_      = false;
 const _PS_VERSION_       = '8.0.0';
 const _PS_USE_SQL_SLAVE_ = false;
-
-usesShared(new ClearContainerCache())->in(__DIR__);
 
 uses(TestCase::class)->in(__DIR__);
 
