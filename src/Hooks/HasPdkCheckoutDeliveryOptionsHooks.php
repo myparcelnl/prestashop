@@ -34,7 +34,10 @@ trait HasPdkCheckoutDeliveryOptionsHooks
         try {
             return $this->renderDeliveryOptions();
         } catch (Throwable $e) {
-            Logger::error('Failed to render delivery options', ['exception' => $e, 'params' => $params]);
+            Logger::error('Failed to render delivery options', [
+                'exception' => $e->getMessage(),
+                'params'    => $params,
+            ]);
 
             return false;
         }

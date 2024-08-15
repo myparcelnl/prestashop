@@ -16,7 +16,6 @@ final class PsFrontendRenderService extends FrontendRenderService
      * @param  \MyParcelNL\Pdk\App\Cart\Model\PdkCart $cart
      *
      * @return string
-     * @throws \MyParcelNL\Pdk\Base\Exception\InvalidCastException
      */
     public function renderDeliveryOptions(PdkCart $cart): string
     {

@@ -72,7 +72,8 @@ use MyParcelNL\PrestaShop\Pdk\Tax\Service\PsTaxService;
 use MyParcelNL\PrestaShop\Pdk\Webhook\Repository\PsWebhooksRepository;
 use MyParcelNL\PrestaShop\Pdk\Webhook\Service\PsWebhookService;
 use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
-use MyParcelNL\PrestaShop\Router\Service\PsRouterService;
+use MyParcelNL\PrestaShop\Router\Service\Ps17RouterService;
+use MyParcelNL\PrestaShop\Router\Service\Ps8RouterService;
 use MyParcelNL\PrestaShop\Script\Service\PsScriptService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsObjectModelService;
@@ -81,6 +82,7 @@ use Psr\Log\LoggerInterface;
 use function DI\factory;
 use function DI\get;
 use function DI\value;
+use function MyParcelNL\PrestaShop\psVersionFactory;
 
 return [
     'defaultCutoffTime'        => value('17:00'),
@@ -153,9 +155,10 @@ return [
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class               => factory(function () {
-        return _PS_VERSION_ >= 8 ? Pdk::get(Guzzle7ClientAdapter::class) : Pdk::get(Guzzle5ClientAdapter::class);
-    }),
+    ClientAdapterInterface::class               => psVersionFactory([
+        ['class' => Guzzle7ClientAdapter::class, 'version' => 8],
+        ['class' => Guzzle5ClientAdapter::class],
+    ]),
 
     LoggerInterface::class           => get(PsLogger::class),
     MigrationServiceInterface::class => get(PsMigrationService::class),
@@ -177,5 +180,8 @@ return [
     PsConfigurationServiceInterface::class => get(Ps17PsConfigurationService::class),
     PsObjectModelServiceInterface::class   => get(PsObjectModelService::class),
     PsOrderServiceInterface::class         => get(PsOrderService::class),
-    PsRouterServiceInterface::class        => get(PsRouterService::class),
+    PsRouterServiceInterface::class        => psVersionFactory([
+        ['class' => Ps8RouterService::class, 'version' => 8],
+        ['class' => Ps17RouterService::class],
+    ]),
 ];
