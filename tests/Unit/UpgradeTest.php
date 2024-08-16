@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
+use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Tests\Mock\MockMyParcelNL;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
@@ -37,8 +38,6 @@ function runUpgradeSuccessfully(string $newVersion): void
 
 function runUpgrade(string $newVersion): bool
 {
-    require_once sprintf('%s/../../upgrade/upgrade-%s.php', __DIR__, $newVersion);
-
     /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockPdk $pdk */
     $pdk = Pdk::get(PdkInterface::class);
     /**
@@ -50,9 +49,7 @@ function runUpgrade(string $newVersion): bool
 
     MockPsModule::setInstance($moduleInstance->name, $moduleInstance);
 
-    $replacedVersion = str_replace('.', '_', $newVersion);
-
-    return call_user_func("upgrade_module_$replacedVersion", $moduleInstance);
+    return MyParcelModule::install($moduleInstance);
 }
 
 it('runs upgrade with previous version saved', function (string $previousVersion, string $newVersion) {
