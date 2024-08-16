@@ -11,7 +11,7 @@ class MockMyParcelNL extends MyParcelNL
     /**
      * @var string|null
      */
-    private $version;
+    private static $version;
 
     /**
      * @param  null|string $version
@@ -20,12 +20,22 @@ class MockMyParcelNL extends MyParcelNL
      */
     public function __construct(?string $version = null)
     {
-        $this->version = $version;
+        self::$version = $version;
         parent::__construct();
     }
 
-    protected function getVersionFromComposer(): string
+    /**
+     * @param  null|string $version
+     *
+     * @return void
+     */
+    public static function setVersion(?string $version): void
     {
-        return $this->version ?? parent::getVersionFromComposer();
+        self::$version = $version;
+    }
+
+    protected static function getVersionFromComposer(): string
+    {
+        return self::$version ?? parent::getVersionFromComposer();
     }
 }
