@@ -53,7 +53,7 @@ class MyParcelNL extends CarrierModule
         error_reporting(error_reporting() & ~E_DEPRECATED);
 
         $this->name                   = 'myparcelnl';
-        $this->version                = $this->getVersionFromComposer();
+        $this->version                = self::getVersionFromComposer();
         $this->author                 = 'MyParcel';
         $this->author_uri             = 'https://myparcel.nl';
         $this->need_instance          = 1;
@@ -77,6 +77,67 @@ class MyParcelNL extends CarrierModule
                     $this->disable();
                 }
             }
+        );
+    }
+
+    /**
+     * @return string
+     * @throws \JsonException
+     */
+    protected static function getVersionFromComposer(): string
+    {
+        $filename     = __DIR__ . '/composer.json';
+        $composerData = json_decode(file_get_contents($filename), true, 512, JSON_THROW_ON_ERROR);
+
+        return $composerData['version'];
+    }
+
+    /**
+     * @param  string $moduleName
+     * @param  string $moduleVersion
+     * @param  string $registeredVersion
+     *
+     * @return bool
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     * @noinspection PhpParameterNameChangedDuringInheritanceInspection
+     */
+    protected static function loadUpgradeVersionList($moduleName, $moduleVersion, $registeredVersion)
+    {
+        try {
+            self::writeUpgradeFile();
+        } catch (Throwable $e) {
+            return false;
+        }
+
+        return parent::loadUpgradeVersionList($moduleName, $moduleVersion, $registeredVersion);
+    }
+
+    /**
+     * When the module is upgraded, PrestaShop checks to see if upgrade files exist. We need every update ever to
+     * trigger MyParcelModule::install(). So, whenever PrestaShop checks our module for upgrade files, write a new
+     * upgrade file for the current version to trigger the install method.
+     *
+     * @note We can't use pdk stuff here because the module is not instantiated yet.
+     * @return void
+     * @throws \JsonException
+     * @throws \Exception
+     */
+    private static function writeUpgradeFile(): void
+    {
+        $version    = static::getVersionFromComposer();
+        $content    = '<?php function upgrade_module___VERSION__($module): bool { return \\MyParcelNL\\PrestaShop\\Facade\\MyParcelModule::install($module); }';
+        $upgradeDir = sprintf('%s/upgrade', __DIR__);
+
+        if (! is_dir($upgradeDir) && ! mkdir($upgradeDir, 0755, true) && ! is_dir($upgradeDir)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $upgradeDir));
+        }
+
+        file_put_contents(
+            sprintf('%s/upgrade-%s.php', $upgradeDir, $version),
+            strtr($content, [
+                '__VERSION__' => str_replace(['.', '-'], '_', $version),
+            ])
         );
     }
 
@@ -137,17 +198,6 @@ class MyParcelNL extends CarrierModule
                 Installer::uninstall($this);
             })
             && parent::uninstall();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getVersionFromComposer(): string
-    {
-        $filename     = __DIR__ . '/composer.json';
-        $composerData = json_decode(file_get_contents($filename), true);
-
-        return $composerData['version'];
     }
 
     /**

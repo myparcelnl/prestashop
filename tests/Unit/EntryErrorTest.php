@@ -10,7 +10,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
 use RuntimeException;
 use Throwable;
 
-class MockMyParcelNL extends MyParcelNL
+final class MockErrorMyParcelNL extends MyParcelNL
 {
     public function getLocalPath(): string
     {
@@ -20,7 +20,7 @@ class MockMyParcelNL extends MyParcelNL
 
 function createModule(): MyParcelNL
 {
-    $module = new MockMyParcelNL();
+    $module = new MockErrorMyParcelNL();
 
     MockPsModule::setInstance($module->name, $module);
 
