@@ -5,9 +5,13 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop;
 
+use DI\Definition\Helper\FactoryDefinitionHelper;
 use MyParcelNL\Pdk\Base\Pdk;
+use MyParcelNL\Pdk\Facade\Pdk as PdkFacade;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
+use MyParcelNL\Sdk\src\Support\Arr;
+use function DI\factory;
 
 if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {
     /**
@@ -38,4 +42,34 @@ if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {
 
         MockPsPdkBootstrapper::boot(...func_get_args());
     }
+}
+
+/**
+ * @template-covariant T
+ * @param  array{version: string, operator: string, class: class-string<T>}[] $entries
+ *
+ * @return \DI\Definition\Helper\FactoryDefinitionHelper
+ */
+function psVersionFactory(array $entries): FactoryDefinitionHelper
+{
+    return factory(function () use ($entries) {
+        $psVersion = PdkFacade::get('ps.version');
+        $fallback  = Arr::first($entries, static function ($entry) {
+            return ! isset($entry['version']);
+        });
+
+        foreach ($entries as $item) {
+            if (! isset($item['version'])) {
+                continue;
+            }
+
+            $operator = $item['operator'] ?? '>=';
+
+            if (version_compare($psVersion, (string) $item['version'], $operator)) {
+                return PdkFacade::get($item['class']);
+            }
+        }
+
+        return PdkFacade::get($fallback['class']);
+    });
 }

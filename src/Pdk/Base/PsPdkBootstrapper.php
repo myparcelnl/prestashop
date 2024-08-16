@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Base;
 
-use Context;
 use DI\Definition\Helper\FactoryDefinitionHelper;
 use FileLogger;
 use Module;
@@ -19,9 +18,6 @@ use PrestaShopBundle\Exception\InvalidModuleException;
 use Psr\Log\LogLevel;
 use ReflectionClass;
 use ReflectionMethod;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\Router;
 use function DI\factory;
 use function DI\value;
 
@@ -173,14 +169,18 @@ class PsPdkBootstrapper extends PdkBootstrapper
     private function resolvePrestaShopServices(): array
     {
         return [
+            'ps.version'   => value(_PS_VERSION_),
+            'ps.container' => factory(function () {
+                return Pdk::get('moduleInstance')
+                    ->getContainer();
+            }),
+
             'getPsService' => factory(function () {
                 return static function (string $serviceName) {
-                    /** @var MyParcelNL $module */
-                    $module = Pdk::get('moduleInstance');
+                    /** @var \Psr\Container\ContainerInterface $container */
+                    $container = Pdk::get('ps.container');
 
-                    return $module
-                        ->getContainer()
-                        ->get($serviceName);
+                    return $container->get($serviceName);
                 };
             }),
 
@@ -194,28 +194,6 @@ class PsPdkBootstrapper extends PdkBootstrapper
 
             'ps.tabRepository' => factory(function () {
                 return Pdk::get('getPsService')('prestashop.core.admin.tab.repository');
-            }),
-
-            'ps.router' => factory(function () {
-                /** @var MyParcelNL $module */
-                $module    = Pdk::get('moduleInstance');
-                $container = $module->getContainer();
-
-                if (_PS_VERSION_ <= 8) {
-                    return $container->get('router');
-                }
-
-                $controller = Context::getContext()->controller;
-
-                if ('order' === $controller->php_self) {
-                    $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
-                    $locator         = new FileLocator([$routesDirectory]);
-                    $loader          = new YamlFileLoader($locator);
-
-                    return new Router($loader, 'routes.yml');
-                }
-
-                return $container->get('prestashop.router');
             }),
 
             'ps.twig' => factory(function () {
