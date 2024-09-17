@@ -10,6 +10,7 @@ use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use Tools;
 
 trait HasPsShippingCostHooks
@@ -99,6 +100,15 @@ trait HasPsShippingCostHooks
 
         if ($deliveryOptions) {
             return new DeliveryOptions(json_decode($deliveryOptions, true));
+        }
+
+        //Delivery options are not in hidden input, fetch them from the database.
+        /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
+        $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
+        $deliveryOptions = $cartDeliveryOptionsRepository->findOneBy(['cartId' => $this->context->cart->id]);
+
+        if ($deliveryOptions && property_exists($deliveryOptions, 'data')) {
+            return new DeliveryOptions($deliveryOptions->getData());
         }
 
         return new DeliveryOptions(['carrier' => $carrier]);
