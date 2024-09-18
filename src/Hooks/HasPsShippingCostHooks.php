@@ -88,7 +88,8 @@ trait HasPsShippingCostHooks
     }
 
     /**
-     * Get the actual delivery options from the checkout hidden input, or get the default delivery options for the current carrier, without any options.
+     * Get the actual delivery options from the checkout hidden input, or from the database using the cart id,
+     * or get the default delivery options for the current carrier, without any options.
      *
      * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $carrier
      *
@@ -107,7 +108,11 @@ trait HasPsShippingCostHooks
         $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
         $deliveryOptions = $cartDeliveryOptionsRepository->findOneBy(['cartId' => $this->context->cart->id]);
 
-        if ($deliveryOptions && property_exists($deliveryOptions, 'data')) {
+        $useDbDeliveryOptions = $deliveryOptions && property_exists($deliveryOptions, 'data');
+        $useDbDeliveryOptions = $useDbDeliveryOptions && $deliveryOptions->getData()['carrier']['externalIdentifier'] === $carrier->externalIdentifier;
+
+        if ($useDbDeliveryOptions) {
+            //todo coverage verhogen
             return new DeliveryOptions($deliveryOptions->getData());
         }
 
