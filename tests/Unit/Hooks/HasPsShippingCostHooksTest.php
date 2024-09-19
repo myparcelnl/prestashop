@@ -142,33 +142,35 @@ it('returns input shipping cost if pdk is not set up', function () {
     expect($result)->toBe(123.45);
 });
 
+it(
+    'calculates shipping costs using database',
+    function (CartFactory $cartFactory, array $deliveryOptions = [], float $addedCost = 0) {
+        $cart = $cartFactory->make();
 
-it('calculates shipping costs using database', function (CartFactory $cartFactory, array $deliveryOptions = [], float $addedCost = 0) {
-    $cart = $cartFactory->make();
+        /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
+        $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
 
-    /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
-    $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
+        $deliveryOptions = new DeliveryOptions($deliveryOptions);
 
-    $deliveryOptions = new DeliveryOptions($deliveryOptions);
+        $cartDeliveryOptionsRepository->updateOrCreate(
+            [
+                'cartId' => $cart->id,
+            ],
+            [
+                'data' => json_encode($deliveryOptions->toStorableArray()),
+            ]
+        );
 
-    $cartDeliveryOptionsRepository->updateOrCreate(
-        [
-            'cartId' => $cart->id,
-        ],
-        [
-            'data' => json_encode($deliveryOptions->toStorableArray()),
-        ]
-    );
+        $instance = new ClassWithTrait();
+        $instance->setIdCarrier(93);
+        $instance->setCart($cart);
 
-    $instance = new ClassWithTrait();
-    $instance->setIdCarrier(93);
-    $instance->setCart($cart);
+        $baseCost = 10;
+        $cost     = $instance->getOrderShippingCost($cart, $baseCost);
 
-    $baseCost = 10;
-    $cost     = $instance->getOrderShippingCost($cart, $baseCost);
-
-    expect(number_format($cost, 2))->toEqual(number_format($baseCost + $addedCost, 2));
-})->with([
+        expect(number_format($cost, 2))->toEqual(number_format($baseCost + $addedCost, 2));
+    }
+)->with([
     'standard delivery with delivery options in values' => [
         function () {
             $psCarrier = psFactory(PsCarrier::class)->withId(93);
@@ -186,10 +188,10 @@ it('calculates shipping costs using database', function (CartFactory $cartFactor
             return psFactory(Cart::class)->withCarrier($psCarrier);
         },
         'values' => [
-            DeliveryOptions::CARRIER          => Carrier::CARRIER_POSTNL_NAME,
-            DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::CARRIER       => Carrier::CARRIER_POSTNL_NAME,
+            DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
         ],
-        'cost' => 2.95,
+        'cost'   => 2.95,
     ],
 
     'carrier with linked myparcel carrier and delivery options in values' => [

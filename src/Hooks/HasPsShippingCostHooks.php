@@ -103,16 +103,17 @@ trait HasPsShippingCostHooks
             return new DeliveryOptions(json_decode($deliveryOptions, true));
         }
 
-        //Delivery options are not in hidden input, fetch them from the database.
-        /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
+        /** @var \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
         $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
-        $deliveryOptions = $cartDeliveryOptionsRepository->findOneBy(['cartId' => $this->context->cart->id]);
+        $dbDeliveryOptions             = $cartDeliveryOptionsRepository->findOneBy(
+            ['cartId' => $this->context->cart->id]
+        );
 
-        $useDbDeliveryOptions = $deliveryOptions && property_exists($deliveryOptions, 'data');
-        $useDbDeliveryOptions = $useDbDeliveryOptions && $deliveryOptions->getData()['carrier']['externalIdentifier'] === $carrier->externalIdentifier;
-
-        if ($useDbDeliveryOptions) {
-            return new DeliveryOptions($deliveryOptions->getData());
+        if (
+            $dbDeliveryOptions
+            && $dbDeliveryOptions->getData()['carrier']['externalIdentifier'] === $carrier->externalIdentifier
+        ) {
+            return new DeliveryOptions($dbDeliveryOptions->getData());
         }
 
         return new DeliveryOptions(['carrier' => $carrier]);
