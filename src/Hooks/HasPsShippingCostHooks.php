@@ -112,7 +112,6 @@ trait HasPsShippingCostHooks
         $useDbDeliveryOptions = $useDbDeliveryOptions && $deliveryOptions->getData()['carrier']['externalIdentifier'] === $carrier->externalIdentifier;
 
         if ($useDbDeliveryOptions) {
-            //todo coverage verhogen
             return new DeliveryOptions($deliveryOptions->getData());
         }
 
