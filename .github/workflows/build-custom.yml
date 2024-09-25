@@ -22,11 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 'Build frontend'
-        uses: myparcelnl/actions/nx-run-many@v4
-        with:
-          target: 'build'
-
       - uses: myparcelnl/actions/pdk-custom-build@v4
         with:
           js-pdk-ref: ${{ inputs.js-pdk-ref }}
