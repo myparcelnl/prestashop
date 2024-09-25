@@ -22,8 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: myparcelnl/actions/pdk-custom-build-prepare@v4
-        id: prepare
+      - name: 'Build frontend'
+        uses: myparcelnl/actions/nx-run-many@v4
+        with:
+          target: 'build'
+
+      - uses: myparcelnl/actions/pdk-custom-build@v4
         with:
           js-pdk-ref: ${{ inputs.js-pdk-ref }}
           php-pdk-ref: ${{ inputs.php-pdk-ref }}
@@ -34,14 +38,3 @@ jobs:
             upgrade/**/*
             myparcelnl.php
             scoper.inc.php
-
-      - name: 'Build frontend'
-        uses: myparcelnl/actions/nx-run-many@v4
-        with:
-          target: 'build'
-
-      - uses: myparcelnl/actions/pdk-custom-build@v4
-        with:
-          image: ${{ steps.prepare.outputs.image }}
-          js-pdk-ref: ${{ inputs.js-pdk-ref }}
-          php-pdk-ref: ${{ inputs.php-pdk-ref }}
