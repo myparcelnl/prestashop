@@ -5,13 +5,12 @@ declare(strict_types=1);
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
- * @see \CountryCore
- * @method $this withIsoCode(string $isoCode)
+ * @see \EmployeeCore
  */
-final class CountryFactory extends AbstractPsObjectModelFactory
+final class EmployeeFactory extends AbstractPsObjectModelFactory
 {
     protected function getObjectModelClass(): string
     {
-        return Country::class;
+        return Employee::class;
     }
 }

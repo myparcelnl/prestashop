@@ -8,6 +8,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsCarrier;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsContext;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsController;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsCountry;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCustomerMessage;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDbQuery;
@@ -124,7 +125,7 @@ final class Address extends AddressCore { }
 /** @see \CarrierCore */
 abstract class CarrierCore extends MockPsCarrier
 {
-    protected $hasCustomIdKey = true;
+    protected bool $hasCustomIdKey = true;
 }
 
 final class Carrier extends CarrierCore { }
@@ -134,8 +135,13 @@ abstract class CartCore extends ObjectModel { }
 
 final class Cart extends CartCore { }
 
+/** @see \CookieCore */
+abstract class CookieCore extends ObjectModel { }
+
+final class Cookie extends CookieCore { }
+
 /** @see \CountryCore */
-abstract class CountryCore extends ObjectModel { }
+abstract class CountryCore extends MockPsCountry { }
 
 final class Country extends CountryCore { }
 
@@ -187,7 +193,7 @@ final class Order extends OrderCore { }
 /** @see \OrderStateCore */
 abstract class OrderStateCore extends ObjectModel
 {
-    protected $hasCustomIdKey = true;
+    protected bool $hasCustomIdKey = true;
 }
 
 final class OrderState extends OrderStateCore { }
@@ -195,7 +201,7 @@ final class OrderState extends OrderStateCore { }
 /** @see \ProductCore */
 abstract class ProductCore extends ObjectModel
 {
-    protected $hasCustomIdKey = true;
+    protected bool $hasCustomIdKey = true;
 }
 
 final class Product extends ProductCore { }
@@ -248,7 +254,7 @@ final class Warehouse extends WarehouseCore { }
 /** @see \ZoneCore */
 abstract class ZoneCore extends ObjectModel
 {
-    protected $hasCustomIdKey = true;
+    protected bool $hasCustomIdKey = true;
 }
 
 /** @see \Zone */
