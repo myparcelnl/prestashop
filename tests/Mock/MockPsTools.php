@@ -30,6 +30,11 @@ abstract class MockPsTools extends BaseMock
         return self::$values[$key] ?? null;
     }
 
+    public static function reset(): void
+    {
+        self::$values = [];
+    }
+
     /**
      * @param  array $values
      *

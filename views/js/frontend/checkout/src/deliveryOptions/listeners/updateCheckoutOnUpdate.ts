@@ -1,13 +1,13 @@
-import {debounce, type DeliveryOptionsStoreState, type StoreCallbackUpdate} from '@myparcel-pdk/checkout';
+import {
+  debounce,
+  useDeliveryOptionsStore,
+  type DeliveryOptionsStoreState,
+  type StoreCallbackUpdate,
+} from '@myparcel-pdk/checkout';
 import {objectIsEqual} from '@myparcel/ts-utils';
 import {getCurrentShippingMethod} from '../../utils';
 
 const CHECKOUT_UPDATE_DELAY = 200;
-
-/**
- * Only do this once to avoid excessive animations.
- */
-let done = false;
 
 export const onDeliveryOptionsOutputChange: StoreCallbackUpdate<DeliveryOptionsStoreState> = debounce(
   (newState, oldState) => {
@@ -21,13 +21,12 @@ export const onDeliveryOptionsOutputChange: StoreCallbackUpdate<DeliveryOptionsS
       return;
     }
 
-    if (done) {
-      return;
-    }
+    const deliveryOptions = useDeliveryOptionsStore();
 
-    // Trigger a change event on the shipping method input to let PrestaShop fetch the new price.
-    currentShippingMethod.input.trigger('change');
-    done = true;
+    // Update the hidden input.
+    if (deliveryOptions.state.hiddenInput) {
+      $(deliveryOptions.state.hiddenInput).trigger('change');
+    }
   },
   CHECKOUT_UPDATE_DELAY,
 );

@@ -10,6 +10,7 @@ use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
+use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use Tools;
 
 trait HasPsShippingCostHooks
@@ -87,7 +88,8 @@ trait HasPsShippingCostHooks
     }
 
     /**
-     * Get the actual delivery options from the checkout hidden input, or get the default delivery options for the current carrier, without any options.
+     * Get the actual delivery options from the checkout hidden input, or from the database using the cart id,
+     * or get the default delivery options for the current carrier, without any options.
      *
      * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $carrier
      *
@@ -99,6 +101,19 @@ trait HasPsShippingCostHooks
 
         if ($deliveryOptions) {
             return new DeliveryOptions(json_decode($deliveryOptions, true));
+        }
+
+        /** @var \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
+        $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
+        $dbDeliveryOptions             = $cartDeliveryOptionsRepository->findOneBy(
+            ['cartId' => $this->context->cart->id]
+        );
+
+        if (
+            $dbDeliveryOptions
+            && $dbDeliveryOptions->getData()['carrier']['externalIdentifier'] === $carrier->externalIdentifier
+        ) {
+            return new DeliveryOptions($dbDeliveryOptions->getData());
         }
 
         return new DeliveryOptions(['carrier' => $carrier]);
