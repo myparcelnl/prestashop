@@ -6,11 +6,14 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use Exception;
 use MyParcelNL\Pdk\Base\Contract\Arrayable;
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Sdk\src\Support\Str;
+use ObjectModel;
 use PrestaShop\PrestaShop\Core\Foundation\Database\EntityInterface;
 
 /**
+ * @template T of ObjectModel
  * @property bool $deleted
  */
 abstract class MockPsObjectModel extends BaseMock implements EntityInterface
@@ -42,6 +45,52 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
 
             $this->hydrate($existing->toArray(Arrayable::SKIP_NULL));
         }
+    }
+
+    /**
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     */
+    public static function all(): Collection
+    {
+        return MockPsObjectModels::getByClass(static::class);
+    }
+
+    /**
+     * @param  array $wheres
+     *
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     */
+    public static function findBy(array $wheres): Collection
+    {
+        $all = MockPsObjectModels::getByClass(static::class);
+
+        foreach ($wheres as $key => $value) {
+            $all = $all->filter(function (ObjectModel $model) use ($value, $key) {
+                return $model->getAttribute($key) === $value;
+            });
+        }
+
+        return $all;
+    }
+
+    /**
+     * @return null|T
+     */
+    public static function first(): ?ObjectModel
+    {
+        return MockPsObjectModels::getByClass(static::class)
+            ->first();
+    }
+
+    /**
+     * @param  array $wheres
+     *
+     * @return T|null
+     */
+    public static function firstWhere(array $wheres): ?ObjectModel
+    {
+        return self::findBy($wheres)
+            ->first();
     }
 
     /**
@@ -94,10 +143,7 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
         return MockPsObjectModels::add($this);
     }
 
-    /**
-     * @return bool
-     */
-    public function delete()
+    public function delete(): int
     {
         $where = $this->hasCustomIdKey
             ? [$this->getAdditionalIdKey() => $this->getId()]
@@ -107,13 +153,13 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
             MockPsDb::deleteRows(static::getTable(), $where);
             MockPsObjectModels::delete($this->getId());
         } catch (Exception $e) {
-            return false;
+            return 0;
         }
 
         $this->setId(null);
         $this->deleted = true;
 
-        return true;
+        return 1;
     }
 
     /**
@@ -136,17 +182,12 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
         $this->updateId();
     }
 
-    public function save(): void
+    public function save(): int
     {
-        $this->update();
+        return (int) $this->update();
     }
 
-    /**
-     * @return bool
-     * @noinspection PhpMissingReturnTypeInspection
-     * @noinspection ReturnTypeCanBeDeclaredInspection
-     */
-    public function softDelete()
+    public function softDelete(): int
     {
         $this->setId(null);
         $this->deleted = true;
@@ -158,13 +199,13 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      * @return void
      * @see \ObjectModel::update()
      */
-    public function update($null_values = false): bool
+    public function update($null_values = false): int
     {
         MockPsDb::updateRow(static::getTable(), $this->getStorable());
 
         MockPsObjectModels::update($this);
 
-        return true;
+        return 1;
     }
 
     /**

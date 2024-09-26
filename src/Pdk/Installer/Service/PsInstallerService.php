@@ -119,7 +119,7 @@ final class PsInstallerService extends InstallerService
         $accountRepository = Pdk::get(PdkSettingsRepositoryInterface::class);
         $accountRepository->storeSettings(new AccountSettings());
 
-        Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
+        Actions::execute(PdkBackendActions::UPDATE_ACCOUNT, ['mode' => Pdk::get('updateAccountModeUninstall')]);
     }
 
     /**

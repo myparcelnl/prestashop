@@ -15,13 +15,16 @@ use Lang;
 use Manufacturer;
 use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
+use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Facade\Config;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\Pdk\Tests\Factory\SharedFactoryState;
 use MyParcelNL\Pdk\Tests\Uses\UsesEachMockPdkInstance;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsCountries;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
+use MyParcelNL\Sdk\src\Support\Str;
 use OrderState;
 use OrderStateFactory;
 use Risk;
@@ -35,20 +38,6 @@ use function MyParcelNL\PrestaShop\psFactory;
 
 class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
 {
-    /**
-     * @return void
-     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
-     */
-    public function createZones(): void
-    {
-        (new FactoryCollection([
-            psFactory(Zone::class)
-                ->withName('Europe'),
-            psFactory(Zone::class)
-                ->withName('North America'),
-        ]))->store();
-    }
-
     /**
      * @return void
      * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
@@ -75,7 +64,7 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
             psFactory(Warehouse::class),
         ]))->store();
 
-        $this->createZones();
+        $this->createZonesAndCountries();
         $this->createOrderStates();
 
         /** @var FileSystemInterface $fileSystem */
@@ -179,5 +168,39 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
                 return $factory->withUnremovable(1);
             })
             ->store();
+    }
+
+    /**
+     * @return void
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
+     */
+    private function createZonesAndCountries(): void
+    {
+        $euZone = psFactory(Zone::class)
+            ->withName('Europe')
+            ->store();
+        $naZone = psFactory(Zone::class)
+            ->withName('North America')
+            ->store();
+
+        // Array keys are set for easier debugging.
+        $euCountryIds = [];
+        $naCountryIds = [];
+
+        foreach (CountryCodes::ALL as $countryIso) {
+            $psCountry = psFactory(Country::class)
+                ->withIsoCode(Str::upper($countryIso))
+                ->store();
+
+            // Simulate some countries in the EU and NA zones in prestashop by default.
+            if (in_array($countryIso, [CountryCodes::CC_US, CountryCodes::CC_CA], true)) {
+                $naCountryIds[$countryIso] = $psCountry->id;
+            } elseif (in_array($countryIso, CountryCodes::EU_COUNTRIES, true)) {
+                $euCountryIds[$countryIso] = $psCountry->id;
+            }
+        }
+
+        MockPsCountries::setZoneCountries($euZone->id, $euCountryIds);
+        MockPsCountries::setZoneCountries($naZone->id, $naCountryIds);
     }
 }

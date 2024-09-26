@@ -19,9 +19,9 @@ use function MyParcelNL\PrestaShop\psFactory;
 
 usesShared(new UsesMockPsPdkInstance());
 
-class WithHasPsCarrierHooks
+class WithHasPsCarrierUpdateHooks
 {
-    use HasPsCarrierHooks;
+    use HasPsCarrierUpdateHooks;
 }
 
 it('re-synchronises carrier id and logo when it is updated', function () {
@@ -43,7 +43,7 @@ it('re-synchronises carrier id and logo when it is updated', function () {
         $fileSystem->put(_PS_SHIP_IMG_DIR_ . '14' . $fileExtension, '[IMAGE]');
     }
 
-    $class = new WithHasPsCarrierHooks();
+    $class = new WithHasPsCarrierUpdateHooks();
 
     $class->hookActionCarrierUpdate([
         'id_carrier' => 14,

@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
+use MyParcelNL\Sdk\src\Support\Str;
 
 abstract class MockItems implements StaticMockInterface
 {
@@ -21,8 +22,7 @@ abstract class MockItems implements StaticMockInterface
      */
     public static function add(object $object): bool
     {
-        $class   = get_class($object);
-        $byClass = self::getByClass($class);
+        $byClass = self::getByClass(get_class($object));
 
         if ($byClass->has($object->id)) {
             return false;
@@ -90,7 +90,7 @@ abstract class MockItems implements StaticMockInterface
     public static function getByClass(string $class): Collection
     {
         return static::all()
-            ->get($class, new Collection());
+            ->get(Str::lower($class), new Collection());
     }
 
     public static function reset(): void
@@ -105,7 +105,7 @@ abstract class MockItems implements StaticMockInterface
      */
     public static function update(object $entity): bool
     {
-        $class = get_class($entity);
+        $class = Str::lower(get_class($entity));
         $all   = static::all();
 
         if (! $all->has($class)) {
