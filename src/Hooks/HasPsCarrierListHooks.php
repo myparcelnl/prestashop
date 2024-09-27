@@ -89,7 +89,7 @@ trait HasPsCarrierListHooks
     ): ?MyparcelnlCarrierMapping {
         $carrierArray = Arr::first($carrierList);
 
-        /** @var \Carrier $instance */
+        /** @var \Carrier $psCarrier */
         $psCarrier = $carrierArray['instance'] ?? null;
 
         return $mappings
