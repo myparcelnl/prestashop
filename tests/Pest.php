@@ -30,17 +30,7 @@ const _PS_MODE_DEV_      = false;
 const _PS_VERSION_       = '8.0.0';
 const _PS_USE_SQL_SLAVE_ = false;
 
-uses(TestCase::class)
-    ->afterEach(function () {
-        $resetInterfaces = [
-            MockPsTools::class,
-        ];
-
-        foreach ($resetInterfaces as $resetInterface) {
-            $resetInterface::reset();
-        }
-    })
-    ->in(__DIR__);
+uses(TestCase::class)->in(__DIR__);
 
 uses()
     ->group('migrations')
