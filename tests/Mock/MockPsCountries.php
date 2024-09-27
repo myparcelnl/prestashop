@@ -7,7 +7,6 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 
 final class MockPsCountries extends BaseMock implements StaticMockInterface
-
 {
     /**
      * @var array<int, int[]>
