@@ -23,7 +23,13 @@ abstract class MockPsCountry extends ObjectModel
      */
     public static function getByIso(string $isoCode, bool $active = false)
     {
-        $found = self::firstWhere(['iso_code' => $isoCode]);
+        $wheres = ['iso_code' => $isoCode];
+
+        if ($active) {
+            $wheres[] = ['active' => true];
+        }
+
+        $found = self::firstWhere($wheres);
 
         if (! $found) {
             return false;
@@ -33,17 +39,16 @@ abstract class MockPsCountry extends ObjectModel
     }
 
     /**
-     * @param  int $id_zone
-     * @param  int $id_lang
+     * @param  int $zoneId
+     * @param  int $langId
      *
      * @return array[]
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      * @see \CountryCore::getCountriesByZoneId()
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public static function getCountriesByZoneId(int $id_zone, int $id_lang): array
+    public static function getCountriesByZoneId(int $zoneId, int $langId): array
     {
-        $ids = MockPsCountries::getCountriesByZoneId($id_zone);
+        $ids = MockPsCountries::getCountriesByZoneId($zoneId);
 
         return array_map(static function (int $id) {
             return (new static($id))->toArray();
