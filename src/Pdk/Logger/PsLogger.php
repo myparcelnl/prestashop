@@ -29,14 +29,14 @@ final class PsLogger extends AbstractLogger
     ];
 
     /**
-     * @var \FileLogger
+     * @var \FileLogger[]
      */
-    private static $loggers = [];
+    private static array $loggers = [];
 
     /**
      * @var \MyParcelNL\Pdk\Base\FileSystemInterface
      */
-    private $fileSystem;
+    private FileSystemInterface $fileSystem;
 
     /**
      * @param  \MyParcelNL\Pdk\Base\FileSystemInterface $fileSystem
@@ -60,7 +60,7 @@ final class PsLogger extends AbstractLogger
         $logger      = $this->getLogger($level);
         $fullMessage = empty($context)
             ? $message
-            : $message . "\n" . json_encode(Utils::filterNull($context), JSON_PRETTY_PRINT);
+            : sprintf("%s\n%s", $message, json_encode(Utils::filterNull($context), JSON_PRETTY_PRINT));
 
         $logger->log($fullMessage, $this->mapLevel($level));
     }
