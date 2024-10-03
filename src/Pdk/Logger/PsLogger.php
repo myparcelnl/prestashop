@@ -49,6 +49,16 @@ final class PsLogger extends AbstractLogger
     }
 
     /**
+     * @return string[]
+     */
+    public function getLogFiles(): array
+    {
+        return array_map(function (string $level): string {
+            return $this->getLogFilename($level);
+        }, self::LOG_LEVELS);
+    }
+
+    /**
      * @param  string                  $level
      * @param  \Throwable|array|string $message
      * @param  array                   $context
