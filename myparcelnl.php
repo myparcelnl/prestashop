@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
@@ -44,7 +45,7 @@ class MyParcelNL extends CarrierModule
     private $hasPdk;
 
     /**
-     * @throws \Throwable
+     * @throws \JsonException
      */
     public function __construct()
     {
@@ -105,8 +106,17 @@ class MyParcelNL extends CarrierModule
     protected static function loadUpgradeVersionList($moduleName, $moduleVersion, $registeredVersion)
     {
         try {
+            // Trigger pdk setup to use facades
+            new MyParcelNL();
+
             self::writeUpgradeFile();
         } catch (Throwable $e) {
+            Logger::error("Failed to write upgrade file: {$e->getMessage()}", [
+                'file'  => $e->getFile(),
+                'line'  => $e->getLine(),
+                'trace' => $e->getTrace(),
+            ]);
+
             return false;
         }
 
@@ -118,22 +128,22 @@ class MyParcelNL extends CarrierModule
      * trigger MyParcelModule::install(). So, whenever PrestaShop checks our module for upgrade files, write a new
      * upgrade file for the current version to trigger the install method.
      *
-     * @note We can't use pdk stuff here because the module is not instantiated yet.
      * @return void
      * @throws \JsonException
-     * @throws \Exception
      */
     private static function writeUpgradeFile(): void
     {
-        $version    = static::getVersionFromComposer();
-        $content    = '<?php function upgrade_module___VERSION__($module): bool { return \\MyParcelNL\\PrestaShop\\Facade\\MyParcelModule::install($module); }';
+        /** @var \MyParcelNL\Pdk\Base\FileSystemInterface $fileSystem */
+        $fileSystem = Pdk::get(FileSystemInterface::class);
+
+        $version = str_replace('-', '_', static::getVersionFromComposer());
+        $content = '<?php function upgrade_module___VERSION__($module): bool { return \\MyParcelNL\\PrestaShop\\Facade\\MyParcelModule::install($module); }';
+
         $upgradeDir = sprintf('%s/upgrade', __DIR__);
 
-        if (! is_dir($upgradeDir) && ! mkdir($upgradeDir, 0755, true) && ! is_dir($upgradeDir)) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $upgradeDir));
-        }
+        $fileSystem->mkdir($upgradeDir, true);
 
-        file_put_contents(
+        $fileSystem->put(
             sprintf('%s/upgrade-%s.php', $upgradeDir, $version),
             strtr($content, [
                 '__VERSION__' => str_replace(['.', '-'], '_', $version),
@@ -183,6 +193,28 @@ class MyParcelNL extends CarrierModule
             && $this->withErrorHandling(function () {
                 Installer::install($this);
             });
+    }
+
+    /**
+     * For some reason the cache is cleared halfway throughout the upgrade process when running it via the CLI.
+     * PrestaShop then proceeds to throw errors because these properties are not set.
+     *
+     * @return array
+     */
+    public function runUpgradeModule(): array
+    {
+        $upgrade = &static::$modules_cache[$this->name]['upgrade'];
+
+        $upgrade['success']             ??= false;
+        $upgrade['available_upgrade']   ??= 0;
+        $upgrade['number_upgraded']     ??= 0;
+        $upgrade['number_upgrade_left'] ??= 0;
+        $upgrade['upgrade_file_left']   ??= [];
+        $upgrade['version_fail']        ??= 0;
+        $upgrade['upgraded_from']       ??= 0;
+        $upgrade['upgraded_to']         ??= 0;
+
+        return parent::runUpgradeModule();
     }
 
     /**
