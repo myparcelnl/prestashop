@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Database;
 
 use MyParcelNL\PrestaShop\Database\Sql\CreateTableSqlBuilder;
-use MyParcelNL\PrestaShop\Database\Sql\DropTableSqlBuilder;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 
 /**
@@ -15,19 +14,18 @@ final class CreateCarrierMappingTableDatabaseMigration extends AbstractDatabaseM
 {
     public function down(): void
     {
-        $this->execute(new DropTableSqlBuilder($this->getTable()));
+        $this->dropTable($this->getTable());
     }
 
     public function up(): void
     {
-        $sql = (new CreateTableSqlBuilder($this->getTable()))
-            ->id('carrier_id')
-            ->column('myparcel_carrier', 'VARCHAR(32)')
-            ->timestamps()
-            ->primary(['carrier_id'])
-            ->unique(['myparcel_carrier']);
-
-        $this->execute($sql);
+        $this->createTable($this->getTable(), function (CreateTableSqlBuilder $builder) {
+            $builder->id('carrier_id');
+            $builder->column('myparcel_carrier', 'VARCHAR(32)');
+            $builder->timestamps();
+            $builder->primary(['carrier_id']);
+            $builder->unique(['myparcel_carrier']);
+        });
     }
 
     /**
