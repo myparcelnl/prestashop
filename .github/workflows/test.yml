@@ -59,7 +59,12 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unit,frontend,checkout
-          files: coverage/views/frontend/*.xml
+          files: coverage/views/js/frontend/*.xml
+
+      - uses: lhotari/action-upterm@v1
+        if: failure()
+        with:
+          limit-access-to-actor: true
 
   test-backend:
     runs-on: ubuntu-22.04
@@ -104,3 +109,8 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unit,backend
           files: clover.xml
+
+      - uses: lhotari/action-upterm@v1
+        if: failure()
+        with:
+          limit-access-to-actor: true
