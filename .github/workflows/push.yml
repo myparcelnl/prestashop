@@ -36,6 +36,9 @@ jobs:
 
   rebase-prs:
     uses: ./.github/workflows/rebase-prs.yml
+    needs:
+      - test
+      - build
     secrets: inherit
 
   notify-on-failure:
