@@ -67,8 +67,7 @@ final class PsAddressAdapter
     {
         $country = new Country($address->id_country);
         $state   = $country->iso_code === Platform::get('localCountry')
-            ? null
-            : new State($address->id_state);
+            ? null : new State($address->id_state);
 
         return array_merge([
             'cc'         => $country->iso_code,
