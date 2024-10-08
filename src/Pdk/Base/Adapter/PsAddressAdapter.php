@@ -66,8 +66,11 @@ final class PsAddressAdapter
     private function createFromAddress(Address $address): array
     {
         $country = new Country($address->id_country);
+        $state   = $country->iso_code === Platform::get('localCountry')
+            ? null
+            : new State($address->id_state);
 
-        return [
+        return array_merge([
             'cc'         => $country->iso_code,
             'city'       => $address->city,
             'address1'   => $address->address1,
@@ -75,10 +78,11 @@ final class PsAddressAdapter
             'postalCode' => $address->postcode,
             'person'     => trim(sprintf('%s %s', $address->firstname, $address->lastname)),
             'phone'      => $address->phone,
-            'region'     => $country->iso_code === Platform::get('localCountry')
-                ? null
-                : (new State($address->id_state))->name,
-        ];
+        ],
+            $state ? [
+                'region' => $state->name,
+                'state'  => $state->iso_code,
+            ] : []);
     }
 
     /**
