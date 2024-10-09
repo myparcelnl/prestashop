@@ -6,6 +6,8 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
  * @see \GenderCore
+ * @extends AbstractPsObjectModelFactory<Gender>
+ * @see \GenderCore
  */
 final class GenderFactory extends AbstractPsObjectModelFactory
 {

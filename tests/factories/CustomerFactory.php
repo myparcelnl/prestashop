@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithGender;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithLang;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithRisk;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShop;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShopGroup;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
-use function MyParcelNL\PrestaShop\psFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithActive;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithGender;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithLang;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithRisk;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithShop;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithShopGroup;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithSoftDeletes;
 
 /**
  * @see \CustomerCore
- * @method $this withActive(bool $active)
  * @method $this withApe(string $ape)
  * @method $this withBirthday(string $birthday)
  * @method $this withCompany(string $company)
- * @method $this withDefaultGroup(int|Group|GroupFactory $defaultGroup)
  * @method $this withEmail(string $email)
  * @method $this withFirstname(string $firstname)
  * @method $this withIdDefaultGroup(int $idDefaultGroup)
@@ -37,10 +35,24 @@ use function MyParcelNL\PrestaShop\psFactory;
  * @method $this withShowPublicPrices(int $showPublicPrices)
  * @method $this withSiret(string $siret)
  * @method $this withWebsite(string $website)
+ * @extends AbstractPsObjectModelFactory<Customer>
+ * @see \CustomerCore
  */
 final class CustomerFactory extends AbstractPsObjectModelFactory implements WithShop, WithShopGroup, WithLang, WithRisk,
-                                                                            WithGender, WithSoftDeletes
+                                                                            WithGender, WithSoftDeletes, WithActive
 {
+    /**
+     * @param  int|Group|\GroupFactory $input
+     * @param  array                   $attributes
+     *
+     * @return $this
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
+     */
+    public function withDefaultGroup($input, array $attributes = []): self
+    {
+        return $this->withRelation(Group::class, 'default_group', $input, $attributes);
+    }
+
     /**
      * @return \MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface
      * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
@@ -50,7 +62,7 @@ final class CustomerFactory extends AbstractPsObjectModelFactory implements With
         return parent::createDefault()
             ->withFirstname('Felicia')
             ->withLastname('Parcel')
-            ->withDefaultGroup(psFactory(Group::class, 1))
+            ->withDefaultGroup(1)
             ->withIdGender(1)
             ->withIdLang(1)
             ->withIdRisk(1)
