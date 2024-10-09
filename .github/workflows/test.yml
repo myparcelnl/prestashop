@@ -20,46 +20,45 @@ jobs:
 
       - name: 'Cache coverage'
         uses: actions/cache@v4
-        id: coverage-cache
+        id: cache
         with:
-          path: coverage/views
-          key: coverage-${{ hashFiles('**/package.json', '**/yarn.lock', 'views/**/*') }}
+          path: coverage
+          key: coverage-frontend-${{ hashFiles('**/package.json', '**/yarn.lock', 'views/**/*') }}
 
       - uses: myparcelnl/actions/pdk-setup-upgrade@v4
-        if: steps.coverage-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         with:
           app-id: ${{ secrets.MYPARCEL_APP_ID }}
           private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
           mode: 'frontend'
 
       - name: 'Run frontend tests'
-        if: steps.coverage-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: myparcelnl/actions/nx-run-many@v4
         with:
           target: 'test:coverage'
           args: '--parallel=1'
 
       - name: 'Move coverage files'
-        if: steps.coverage-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         shell: bash
         #language=bash
         run: |
+          # Create the coverage directory in case it doesn't exist
+          mkdir -p coverage
+
+          # Copy the coverage files to the coverage folder, named after the project.
           yarn workspaces foreach -Apv --exclude . exec \
-            bash -c 'if [ -f coverage/clover.xml ]; then mv coverage/clover.xml coverage/$(basename $(pwd)).xml; fi'
+            bash -c 'if [ -f coverage/clover.xml ]; then cp -f coverage/clover.xml ../../../../coverage/$(basename $PWD).xml; fi'
 
-          find views -type f -name '*.xml' -exec bash -c 'mkdir -p coverage/$(dirname {}); cp {} coverage/{}' \;
-
-      - uses: myparcelnl/actions/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: unit,frontend,admin
-          files: coverage/views/js/backend/**/*.xml
+          # Strip the /app/ prefix from the coverage paths before uploading.
+          find coverage -type f -name '*.xml' -exec sed -i 's/\/app\///g' {} \;
 
       - uses: myparcelnl/actions/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: unit,frontend,checkout
-          files: coverage/views/js/frontend/**/*.xml
+          flags: unit,frontend
+          files: coverage/**/*.xml
 
   test-backend:
     runs-on: ubuntu-22.04
@@ -72,13 +71,13 @@ jobs:
 
       - name: 'Cache coverage'
         uses: actions/cache@v4
-        id: coverage-cache
+        id: cache
         with:
-          path: coverage
-          key: coverage-${{ hashFiles('**/composer.json', '**/composer.lock', 'src/**/*', 'tests/**/*') }}
+          path: clover.xml
+          key: coverage-backend-${{ hashFiles('**/composer.json', '**/composer.lock', 'src/**/*', 'tests/**/*') }}
 
       - uses: myparcelnl/actions/pdk-setup-upgrade@v4
-        if: steps.coverage-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         id: setup
         with:
           app-id: ${{ secrets.MYPARCEL_APP_ID }}
@@ -87,12 +86,12 @@ jobs:
           mode: 'backend'
 
       - uses: myparcelnl/actions/composer-pest@v4
-        if: steps.coverage-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         with:
           image: ${{ steps.setup.outputs.image }}
 
       - name: 'Move coverage file'
-        if: steps.coverage-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         shell: bash
         #language=bash
         run: |
