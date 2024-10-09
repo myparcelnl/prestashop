@@ -25,7 +25,7 @@ jobs:
           path: |
             .tmp/coverage
             .tmp/junit
-          key: test-frontend-${{ hashFiles('**/package.json', '**/yarn.lock', 'views/**/*') }}
+          key: test-frontend-${{ hashFiles('**/package.json', '**/yarn.lock', 'views/js/**/*') }}
 
       - uses: myparcelnl/actions/pdk-setup-upgrade@v4
         if: steps.cache.outputs.cache-hit != 'true'
