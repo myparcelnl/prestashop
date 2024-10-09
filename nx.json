@@ -41,7 +41,7 @@
     },
     "test:coverage": {
       "inputs": ["test"],
-      "outputs": ["{projectRoot}/coverage"]
+      "outputs": ["{projectRoot}/coverage", "{projectRoot}/junit.xml"]
     }
   },
   "tasksRunnerOptions": {

@@ -11,6 +11,7 @@ docker-compose.override.yml
 *.tgz
 *.zip
 clover.xml
+junit.xml
 
 coverage/
 dist/

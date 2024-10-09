@@ -19,6 +19,7 @@ const createDefaultConfig = (env) => {
     },
     plugins: [customTsConfig()],
     test: {
+      reporters: ['default', ['junit', {outputFile: './junit.xml'}]],
       passWithNoTests: true,
       coverage: {
         all: true,
