@@ -5,13 +5,13 @@ declare(strict_types=1);
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
- * @extends AbstractPsObjectModelFactory<Lang>
- * @see \LangCore
+ * @extends AbstractPsObjectModelFactory<\Guest>
+ * @see \GuestCore
  */
-final class LangFactory extends AbstractPsObjectModelFactory
+final class GuestFactory extends AbstractPsObjectModelFactory
 {
     protected function getObjectModelClass(): string
     {
-        return Lang::class;
+        return Guest::class;
     }
 }

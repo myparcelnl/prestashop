@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCarrier;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithActive;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCarrier;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithSoftDeletes;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithTimestamps;
 
 /**
  * @see \CarrierCore
  * @method $this withName(string $name)
  * @method $this withUrl(string $url)
- * @method $this withActive(int $active)
  * @method $this withShippingHandling(int $shippingHandling)
  * @method $this withRangeBehavior(int $rangeBehavior)
  * @method $this withIsModule(int $isModule)
@@ -27,8 +27,11 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
  * @method $this withMaxDepth(int $maxDepth)
  * @method $this withMaxWeight(int $maxWeight)
  * @method $this withGrade(int $grade)
+ * @extends AbstractPsObjectModelFactory<Carrier>
+ * @see \CarrierCore
  */
-final class CarrierFactory extends AbstractPsObjectModelFactory implements WithTimestamps, WithSoftDeletes, WithCarrier
+final class CarrierFactory extends AbstractPsObjectModelFactory implements WithTimestamps, WithSoftDeletes, WithCarrier,
+                                                                           WithActive
 {
     /**
      * Defined manually to avoid this being treated as the id of a class.
