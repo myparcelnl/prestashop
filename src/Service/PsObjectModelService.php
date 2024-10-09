@@ -41,8 +41,8 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
     }
 
     /**
-     * @throws \PrestaShopException
      * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function delete(string $class, $input, bool $soft = false): bool
     {
@@ -120,6 +120,11 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
         }
 
         return $input ? (int) $input : null;
+    }
+
+    public function getWithFallback(string $class, $input): ObjectModel
+    {
+        return $this->get($class, $input) ?? $this->create($class);
     }
 
     /**

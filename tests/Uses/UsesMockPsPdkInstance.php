@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Uses;
 
+use Address;
 use CarrierModule;
 use Configuration;
+use Country;
+use Customer;
+use Gender;
+use Group;
+use Lang;
+use Manufacturer;
 use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Facade\Config;
@@ -17,6 +24,12 @@ use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
 use OrderState;
 use OrderStateFactory;
+use Risk;
+use Shop;
+use ShopGroup;
+use State;
+use Supplier;
+use Warehouse;
 use Zone;
 use function MyParcelNL\PrestaShop\psFactory;
 
@@ -43,6 +56,24 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
     protected function addDefaultData(): void
     {
         psFactory(Configuration::class)->make();
+
+        (new FactoryCollection([
+            psFactory(Country::class)
+                ->withIsoCode('NL'),
+            psFactory(Address::class),
+            psFactory(Address::class)->withAddress2('(Billing)'),
+            psFactory(Customer::class),
+            psFactory(Gender::class),
+            psFactory(Group::class),
+            psFactory(Lang::class),
+            psFactory(Manufacturer::class),
+            psFactory(Risk::class),
+            psFactory(Shop::class),
+            psFactory(ShopGroup::class),
+            psFactory(State::class),
+            psFactory(Supplier::class),
+            psFactory(Warehouse::class),
+        ]))->store();
 
         $this->createZones();
         $this->createOrderStates();

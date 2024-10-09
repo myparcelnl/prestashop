@@ -13,6 +13,8 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
  * @method $this withName(array $names)
  * @method $this withPrice(int $price)
  * @method $this withWeight(float|string $weight)
+ * @extends AbstractPsObjectModelFactory<Product>
+ * @see \ProductCore
  */
 final class ProductFactory extends AbstractPsObjectModelFactory
 {

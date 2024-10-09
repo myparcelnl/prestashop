@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCarrier;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCart;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCurrency;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCustomer;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithLang;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShop;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShopGroup;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
-use function MyParcelNL\PrestaShop\psFactory;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCarrier;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCart;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCurrency;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCustomer;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithLang;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithShop;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithShopGroup;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithTimestamps;
 
 /**
  * @see \OrderCore
  * @method $this add()
  * @method $this withConversionRate(float $conversionRate)
- * @method $this withCurrentState(int $currentState)
  * @method $this withDeliveryDate(string $deliveryDate)
  * @method $this withDeliveryNumber(int $deliveryNumber)
  * @method $this withGift(bool $gift)
@@ -52,6 +50,8 @@ use function MyParcelNL\PrestaShop\psFactory;
  * @method $this withTotalWrappingTaxExcl(float $totalWrappingTaxExcl)
  * @method $this withTotalWrappingTaxIncl(float $totalWrappingTaxIncl)
  * @method $this withValid(bool $valid)
+ * @extends AbstractPsObjectModelFactory<Order>
+ * @see \OrderCore
  */
 final class OrderFactory extends AbstractPsObjectModelFactory implements WithShop, WithShopGroup, WithLang,
                                                                          WithCustomer, WithCurrency, WithCart,
@@ -66,7 +66,7 @@ final class OrderFactory extends AbstractPsObjectModelFactory implements WithSho
      */
     public function withAddressDelivery($input, array $attributes = []): self
     {
-        return $this->withRelation('address_delivery', $input, $attributes, 'id_customer');
+        return $this->withRelation(Address::class, 'address_delivery', $input, $attributes);
     }
 
     /**
@@ -78,7 +78,19 @@ final class OrderFactory extends AbstractPsObjectModelFactory implements WithSho
      */
     public function withAddressInvoice($input, array $attributes = []): self
     {
-        return $this->withRelation('address_invoice', $input, $attributes, 'id_customer');
+        return $this->withRelation(Address::class, 'address_invoice', $input, $attributes);
+    }
+
+    /**
+     * @param  int|\OrderState|\OrderStateFactory $input
+     * @param  array                              $attributes
+     *
+     * @return $this
+     * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
+     */
+    public function withCurrentState($input, array $attributes = []): self
+    {
+        return $this->withRelation(OrderState::class, 'current_state', $input, $attributes);
     }
 
     /**
@@ -88,8 +100,9 @@ final class OrderFactory extends AbstractPsObjectModelFactory implements WithSho
     protected function createDefault(): FactoryInterface
     {
         return parent::createDefault()
-            ->withAddressDelivery(psFactory(Address::class, 1))
-            ->withAddressInvoice(psFactory(Address::class, 2))
+            ->withAddressDelivery(1)
+            ->withAddressInvoice(2)
+            ->withCurrentState(1)
             ->withIdCarrier(1)
             ->withIdCart(1)
             ->withIdCurrency(1)
