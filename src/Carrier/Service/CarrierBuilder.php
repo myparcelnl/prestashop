@@ -24,32 +24,20 @@ use Zone;
 
 final class CarrierBuilder
 {
+    /**
+     * @var array<class-string<\ObjectModel>>
+     */
     private const RANGE_CLASSES = [RangePrice::class, RangeWeight::class];
 
-    /**
-     * @var \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository
-     */
-    private $carrierMappingRepository;
+    private PsCarrierMappingRepository    $carrierMappingRepository;
 
-    /**
-     * @var \MyParcelNL\Pdk\Carrier\Model\Carrier
-     */
-    private $myParcelCarrier;
+    private Carrier                       $myParcelCarrier;
 
-    /**
-     * @var \Carrier
-     */
-    private $psCarrier;
+    private PsCarrier                     $psCarrier;
 
-    /**
-     * @var \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface
-     */
-    private $psCarrierService;
+    private PsCarrierServiceInterface     $psCarrierService;
 
-    /**
-     * @var \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface
-     */
-    private $psObjectModelService;
+    private PsObjectModelServiceInterface $psObjectModelService;
 
     /**
      * @param  \MyParcelNL\Pdk\Carrier\Model\Carrier $myParcelCarrier
@@ -129,7 +117,6 @@ final class CarrierBuilder
      */
     private function addRanges(): void
     {
-        /** @var RangeWeight|RangePrice $objectClass */
         foreach (self::RANGE_CLASSES as $objectClass) {
             $hasExistingRanges = $objectClass::getRanges($this->psCarrier->id);
 
@@ -137,6 +124,7 @@ final class CarrierBuilder
                 continue;
             }
 
+            /** @var RangeWeight|RangePrice $instance */
             $instance = $this->psObjectModelService->create($objectClass);
 
             $instance->id_carrier = $this->psCarrier->id;
