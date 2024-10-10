@@ -15,6 +15,7 @@ junit.xml
 
 coverage/
 dist/
+junit/
 lib/
 node_modules/
 vendor/
