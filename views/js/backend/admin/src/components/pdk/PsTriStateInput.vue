@@ -4,6 +4,7 @@
     class="row">
     <div class="col-4">
       <input
+        :id="id"
         v-model="model"
         :name="id"
         type="hidden" />
