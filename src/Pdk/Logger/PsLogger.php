@@ -54,13 +54,14 @@ final class PsLogger extends AbstractLogger
      * @param  array                   $context
      *
      * @return void
+     * @noinspection JsonEncodingApiUsageInspection
      */
     public function log($level, $message, array $context = []): void
     {
         $logger      = $this->getLogger($level);
         $fullMessage = empty($context)
             ? $message
-            : sprintf("%s\n%s", $message, json_encode(Utils::filterNull($context), JSON_PRETTY_PRINT));
+            : sprintf('%s %s', $message, json_encode(Utils::filterNull($context)));
 
         $logger->log($fullMessage, $this->mapLevel($level));
     }
