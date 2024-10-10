@@ -3,6 +3,7 @@
   "referenceIdentifier": "PrestaShop: 1",
   "deliveryOptions": {
     "carrier": {
+      "externalIdentifier": "postnl",
       "id": 1,
       "name": "postnl",
       "human": "PostNL",
@@ -46,6 +47,7 @@
     "totalWeight": 0
   },
   "lines": [],
+  "notes": [],
   "exported": false,
   "shipmentPrice": 0,
   "shipmentPriceAfterVat": 0,
@@ -55,5 +57,6 @@
   "orderVat": 0,
   "totalPrice": 0,
   "totalVat": 0,
-  "totalPriceAfterVat": 0
+  "totalPriceAfterVat": 0,
+  "audits": []
 }

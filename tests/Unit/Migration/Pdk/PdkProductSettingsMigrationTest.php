@@ -53,6 +53,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             ProductSettings::EXPORT_ONLY_RECIPIENT    => TriStateService::INHERIT,
             ProductSettings::EXPORT_RETURN            => TriStateService::INHERIT,
             ProductSettings::EXPORT_SIGNATURE         => TriStateService::INHERIT,
+            ProductSettings::EXPORT_TRACKED           => TriStateService::INHERIT,
             ProductSettings::FIT_IN_DIGITAL_STAMP     => TriStateService::INHERIT,
             ProductSettings::FIT_IN_MAILBOX           => TriStateService::INHERIT,
             ProductSettings::PACKAGE_TYPE             => TriStateService::INHERIT,

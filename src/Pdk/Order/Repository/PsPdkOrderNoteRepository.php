@@ -76,11 +76,11 @@ final class PsPdkOrderNoteRepository extends AbstractPdkOrderNoteRepository
 
         return $this->retrieve($order->externalIdentifier, function () use ($notes, $order) {
             $collection = new PdkOrderNoteCollection($notes ?? []);
-            $messages   = CustomerMessage::getMessagesByOrderId($order->externalIdentifier);
+            $messages   = CustomerMessage::getMessagesByOrderId((int) $order->externalIdentifier);
 
             $customerNotes = (new Collection($messages))
                 ->map(function (array $customerNote) use ($order) {
-                    $author = ($customerNote['id_employee'] ?? '0') === '0'
+                    $author = '0' === ($customerNote['id_employee'] ?? '0')
                         ? OrderNote::AUTHOR_CUSTOMER
                         : OrderNote::AUTHOR_WEBSHOP;
 
