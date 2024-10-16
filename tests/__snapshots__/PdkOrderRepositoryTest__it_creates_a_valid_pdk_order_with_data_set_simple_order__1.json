@@ -30,12 +30,14 @@
   },
   "billingAddress": {
     "address1": "Antareslaan 31",
+    "cc": "NL",
     "city": "Hoofddorp",
     "postalCode": "2132JE",
     "person": "Felicia Parcel"
   },
   "shippingAddress": {
     "address1": "Antareslaan 31",
+    "cc": "NL",
     "city": "Hoofddorp",
     "postalCode": "2132JE",
     "person": "Felicia Parcel"

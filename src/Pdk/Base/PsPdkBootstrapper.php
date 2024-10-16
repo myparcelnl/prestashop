@@ -9,6 +9,7 @@ use FileLogger;
 use Module;
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
+use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
@@ -115,6 +116,17 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'routeNameWebhook'  => value('myparcelnl_webhook'),
 
             'legacyControllerSettings' => value('MyParcelNLAdminSettings'),
+
+            'updateAccountModeUninstall' => value('uninstall'),
+
+            /**
+             * @TODO: Move to pdk
+             */
+            'countryCodesZoneRow'        => factory(function () {
+                $nonRowCountries = array_merge(CountryCodes::EU_COUNTRIES, CountryCodes::UNIQUE_COUNTRIES);
+
+                return array_diff(CountryCodes::ALL, $nonRowCountries);
+            }),
 
             /**
              * Settings that are not available in the module.
