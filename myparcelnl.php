@@ -8,6 +8,7 @@ use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
+use MyParcelNL\PrestaShop\Hooks\HasModuleUpgradeOverrides;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutDeliveryOptionsHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkOrderGridHooks;
@@ -28,6 +29,11 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 class MyParcelNL extends CarrierModule
 {
+    use HasModuleUpgradeOverrides;
+
+    /**
+     * Module hooks
+     */
     use HasPdkCheckoutDeliveryOptionsHooks;
     use HasPdkCheckoutHooks;
     use HasPdkOrderGridHooks;
@@ -38,14 +44,10 @@ class MyParcelNL extends CarrierModule
     use HasPsCarrierHooks;
     use HasPsShippingCostHooks;
 
-    /**
-     * @var bool
-     */
-    private $hasPdk;
+    private static ?string $versionFromComposer = null;
 
-    /**
-     * @throws \Throwable
-     */
+    private bool           $hasPdk              = false;
+
     public function __construct()
     {
         // Suppress deprecation warning from Pdk HasAttributes
@@ -53,7 +55,7 @@ class MyParcelNL extends CarrierModule
         error_reporting(error_reporting() & ~E_DEPRECATED);
 
         $this->name                   = 'myparcelnl';
-        $this->version                = $this->getVersionFromComposer();
+        $this->version                = self::getVersionFromComposer();
         $this->author                 = 'MyParcel';
         $this->author_uri             = 'https://myparcel.nl';
         $this->need_instance          = 1;
@@ -78,6 +80,22 @@ class MyParcelNL extends CarrierModule
                 }
             }
         );
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getVersionFromComposer(): string
+    {
+        if (! self::$versionFromComposer) {
+            $filename = __DIR__ . '/composer.json';
+            /** @noinspection JsonEncodingApiUsageInspection */
+            $composerData = json_decode(file_get_contents($filename), true);
+
+            self::$versionFromComposer = $composerData['version'];
+        }
+
+        return self::$versionFromComposer;
     }
 
     /**
@@ -137,17 +155,6 @@ class MyParcelNL extends CarrierModule
                 Installer::uninstall($this);
             })
             && parent::uninstall();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getVersionFromComposer(): string
-    {
-        $filename     = __DIR__ . '/composer.json';
-        $composerData = json_decode(file_get_contents($filename), true);
-
-        return $composerData['version'];
     }
 
     /**

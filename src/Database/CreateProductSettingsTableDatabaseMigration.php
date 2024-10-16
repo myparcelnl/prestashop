@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Database;
 
 use MyParcelNL\PrestaShop\Database\Sql\CreateTableSqlBuilder;
-use MyParcelNL\PrestaShop\Database\Sql\DropTableSqlBuilder;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlProductSettings;
 
 /**
@@ -15,18 +14,17 @@ final class CreateProductSettingsTableDatabaseMigration extends AbstractDatabase
 {
     public function down(): void
     {
-        $this->execute(new DropTableSqlBuilder($this->getTable()));
+        $this->dropTable($this->getTable());
     }
 
     public function up(): void
     {
-        $sql = (new CreateTableSqlBuilder($this->getTable()))
-            ->id('product_id')
-            ->column('data')
-            ->primary(['product_id'])
-            ->timestamps();
-
-        $this->execute($sql);
+        $this->createTable($this->getTable(), function (CreateTableSqlBuilder $builder) {
+            $builder->id('product_id');
+            $builder->column('data');
+            $builder->primary(['product_id']);
+            $builder->timestamps();
+        });
     }
 
     /**
