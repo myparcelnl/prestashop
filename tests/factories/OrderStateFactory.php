@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithLang;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithOrderState;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithLang;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithOrderState;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithSoftDeletes;
 
 /**
  * @method $this withColor(string $color)
@@ -23,6 +23,8 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
  * @method $this withShipped(int $shipped)
  * @method $this withTemplate(string $template)
  * @method $this withUnremovable(int $unremovable)
+ * @extends AbstractPsObjectModelFactory<OrderState>
+ * @see \OrderStateCore
  */
 final class OrderStateFactory extends AbstractPsObjectModelFactory implements WithSoftDeletes, WithLang, WithOrderState
 {
