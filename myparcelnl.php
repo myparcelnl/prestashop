@@ -3,12 +3,12 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
+use MyParcelNL\PrestaShop\Hooks\HasModuleUpgradeOverrides;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutDeliveryOptionsHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkCheckoutHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkOrderGridHooks;
@@ -29,6 +29,11 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 class MyParcelNL extends CarrierModule
 {
+    use HasModuleUpgradeOverrides;
+
+    /**
+     * Module hooks
+     */
     use HasPdkCheckoutDeliveryOptionsHooks;
     use HasPdkCheckoutHooks;
     use HasPdkOrderGridHooks;
@@ -39,14 +44,10 @@ class MyParcelNL extends CarrierModule
     use HasPsCarrierHooks;
     use HasPsShippingCostHooks;
 
-    /**
-     * @var bool
-     */
-    private $hasPdk;
+    private static ?string $versionFromComposer = null;
 
-    /**
-     * @throws \JsonException
-     */
+    private bool           $hasPdk              = false;
+
     public function __construct()
     {
         // Suppress deprecation warning from Pdk HasAttributes
@@ -83,72 +84,18 @@ class MyParcelNL extends CarrierModule
 
     /**
      * @return string
-     * @throws \JsonException
      */
     protected static function getVersionFromComposer(): string
     {
-        $filename     = __DIR__ . '/composer.json';
-        $composerData = json_decode(file_get_contents($filename), true, 512, JSON_THROW_ON_ERROR);
+        if (! self::$versionFromComposer) {
+            $filename = __DIR__ . '/composer.json';
+            /** @noinspection JsonEncodingApiUsageInspection */
+            $composerData = json_decode(file_get_contents($filename), true);
 
-        return $composerData['version'];
-    }
-
-    /**
-     * @param  string $moduleName
-     * @param  string $moduleVersion
-     * @param  string $registeredVersion
-     *
-     * @return bool
-     * @noinspection PhpMissingReturnTypeInspection
-     * @noinspection ReturnTypeCanBeDeclaredInspection
-     * @noinspection PhpParameterNameChangedDuringInheritanceInspection
-     */
-    protected static function loadUpgradeVersionList($moduleName, $moduleVersion, $registeredVersion)
-    {
-        try {
-            // Trigger pdk setup to use facades
-            new MyParcelNL();
-
-            self::writeUpgradeFile();
-        } catch (Throwable $e) {
-            Logger::error("Failed to write upgrade file: {$e->getMessage()}", [
-                'file'  => $e->getFile(),
-                'line'  => $e->getLine(),
-                'trace' => $e->getTrace(),
-            ]);
-
-            return false;
+            self::$versionFromComposer = $composerData['version'];
         }
 
-        return parent::loadUpgradeVersionList($moduleName, $moduleVersion, $registeredVersion);
-    }
-
-    /**
-     * When the module is upgraded, PrestaShop checks to see if upgrade files exist. We need every update ever to
-     * trigger MyParcelModule::install(). So, whenever PrestaShop checks our module for upgrade files, write a new
-     * upgrade file for the current version to trigger the install method.
-     *
-     * @return void
-     * @throws \JsonException
-     */
-    private static function writeUpgradeFile(): void
-    {
-        /** @var \MyParcelNL\Pdk\Base\FileSystemInterface $fileSystem */
-        $fileSystem = Pdk::get(FileSystemInterface::class);
-
-        $version = str_replace('-', '_', static::getVersionFromComposer());
-        $content = '<?php function upgrade_module___VERSION__($module): bool { return \\MyParcelNL\\PrestaShop\\Facade\\MyParcelModule::install($module); }';
-
-        $upgradeDir = sprintf('%s/upgrade', __DIR__);
-
-        $fileSystem->mkdir($upgradeDir, true);
-
-        $fileSystem->put(
-            sprintf('%s/upgrade-%s.php', $upgradeDir, $version),
-            strtr($content, [
-                '__VERSION__' => str_replace(['.', '-'], '_', $version),
-            ])
-        );
+        return self::$versionFromComposer;
     }
 
     /**
@@ -193,28 +140,6 @@ class MyParcelNL extends CarrierModule
             && $this->withErrorHandling(function () {
                 Installer::install($this);
             });
-    }
-
-    /**
-     * For some reason the cache is cleared halfway throughout the upgrade process when running it via the CLI.
-     * PrestaShop then proceeds to throw errors because these properties are not set.
-     *
-     * @return array
-     */
-    public function runUpgradeModule(): array
-    {
-        $upgrade = &static::$modules_cache[$this->name]['upgrade'];
-
-        $upgrade['success']             ??= false;
-        $upgrade['available_upgrade']   ??= 0;
-        $upgrade['number_upgraded']     ??= 0;
-        $upgrade['number_upgrade_left'] ??= 0;
-        $upgrade['upgrade_file_left']   ??= [];
-        $upgrade['version_fail']        ??= 0;
-        $upgrade['upgraded_from']       ??= 0;
-        $upgrade['upgraded_to']         ??= 0;
-
-        return parent::runUpgradeModule();
     }
 
     /**
