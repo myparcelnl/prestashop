@@ -1,20 +1,20 @@
 name: 'Bug report'
-description: 'Report a bug to help us fix it.'
-labels: [ 'bug' ]
+description: 'This form is for reporting bugs in the module. If you have a feature request, please use the feature request form.'
+labels: ['bug', 'pdk']
 
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this form! We will respond as fast as we can. Don't forget to check
-        whether your issue might be a duplicate of an existing one before submitting.
+        whether your issue might be a [duplicate of an existing one](https://github.com/myparcelnl/prestashop/issues) before submitting.
 
   - type: input
-    id: version
+    id: myparcel-version
     attributes:
-      label: 'Module version'
-      description: 'Which version of our software are you using?'
-      placeholder: 'x.x.x'
+      label: 'MyParcelNL version'
+      description: 'Which version of the MyParcelNL module are you using?'
+      placeholder: 'v4.0.0'
     validations:
       required: true
   - type: input
@@ -22,7 +22,7 @@ body:
     attributes:
       label: 'PrestaShop version'
       description: 'Which PrestaShop version are you using?'
-      placeholder: '1.7.x.x'
+      placeholder: '8.0.0'
     validations:
       required: true
   - type: input

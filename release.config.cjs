@@ -1,7 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 const mainConfig = require('@myparcel/semantic-release-config');
 const {addExecPlugin, addGitHubPlugin, addGitPlugin} = require('@myparcel/semantic-release-config/src/plugins');
-const {gitPluginDefaults} = require('@myparcel/semantic-release-config/src/plugins/addGitPlugin');
 const {
   addCommitAnalyzerPlugin,
   addGitHubActionsOutputPlugin,

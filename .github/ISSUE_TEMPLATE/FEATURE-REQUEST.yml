@@ -1,6 +1,6 @@
 name: 'Feature request'
 description: 'Suggest an idea to improve the module.'
-labels: [ 'feature' ]
+labels: ['feature']
 
 body:
   - type: markdown
