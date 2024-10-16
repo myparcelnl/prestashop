@@ -96,7 +96,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           image: ${{ steps.setup.outputs.image }}
-          args: '--log-junit=junit.xml'
+          pest-args: |
+            --log-junit=junit.xml
 
       - name: 'Fix coverage file'
         if: always() && steps.cache.outputs.cache-hit != 'true'
