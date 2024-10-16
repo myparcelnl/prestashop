@@ -3,15 +3,15 @@
     {
       "zones": [
         {
-          "active": 1,
-          "name": "Europe",
           "id": 1,
+          "active": true,
+          "name": "Europe",
           "id_zone": 1
         },
         {
-          "active": 1,
-          "name": "North America",
           "id": 2,
+          "active": true,
+          "name": "North America",
           "id_zone": 2
         }
       ],
@@ -44,15 +44,15 @@
     {
       "zones": [
         {
-          "active": 1,
-          "name": "Europe",
           "id": 1,
+          "active": true,
+          "name": "Europe",
           "id_zone": 1
         },
         {
-          "active": 1,
-          "name": "North America",
           "id": 2,
+          "active": true,
+          "name": "North America",
           "id_zone": 2
         }
       ],
@@ -85,15 +85,15 @@
     {
       "zones": [
         {
-          "active": 1,
-          "name": "Europe",
           "id": 1,
+          "active": true,
+          "name": "Europe",
           "id_zone": 1
         },
         {
-          "active": 1,
-          "name": "North America",
           "id": 2,
+          "active": true,
+          "name": "North America",
           "id_zone": 2
         }
       ],
