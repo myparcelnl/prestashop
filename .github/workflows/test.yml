@@ -42,9 +42,10 @@ jobs:
           parallel: 1
 
       - uses: myparcelnl/actions/collect-test-results@v4
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: always() && steps.cache.outputs.cache-hit != 'true'
 
       - uses: myparcelnl/actions/codecov-coverage@v4
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: frontend
@@ -52,6 +53,7 @@ jobs:
           files: coverage/*.xml
 
       - uses: myparcelnl/actions/codecov-test-results@v4
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: frontend
@@ -97,7 +99,7 @@ jobs:
           args: '--log-junit=junit.xml'
 
       - name: 'Fix coverage file'
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: always() && steps.cache.outputs.cache-hit != 'true'
         shell: bash
         #language=bash
         run: |
@@ -105,6 +107,7 @@ jobs:
           sed -i 's/\/app\///g' clover.xml
 
       - uses: myparcelnl/actions/codecov-coverage@v4
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: backend
@@ -112,6 +115,7 @@ jobs:
           files: clover.xml
 
       - uses: myparcelnl/actions/codecov-test-results@v4
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: backend
