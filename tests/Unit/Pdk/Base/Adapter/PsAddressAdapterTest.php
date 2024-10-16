@@ -66,4 +66,3 @@ it('creates address from ps address and ps order', function (AddressFactory $add
     ],
 
 ]);
-
