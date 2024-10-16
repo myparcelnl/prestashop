@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop;
 
+use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Tests\Mock\MockMyParcelNL;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPlugin;
@@ -58,6 +59,9 @@ it('writes upgrade file when prestashop checks if upgrade is needed', function (
 ) {
     MockMyParcelNL::setVersion($version);
 
+    /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockFileSystem $mockFileSystem */
+    $mockFileSystem = Pdk::get(FileSystemInterface::class);
+
     /** @var \MyParcelNL\PrestaShop\Tests\Mock\MockMyParcelNL $module */
     $module  = Pdk::get('moduleInstance');
     $appInfo = Pdk::getAppInfo();
@@ -68,14 +72,14 @@ it('writes upgrade file when prestashop checks if upgrade is needed', function (
 
     expect($result)
         ->toBeTrue()
-        ->and(file_exists($filename))
+        ->and($mockFileSystem->fileExists($filename))
         ->toBeTrue()
-        ->and(file_get_contents($filename))
+        ->and($mockFileSystem->get($filename))
         ->toContain("upgrade_module_$expectedVersion");
 
-    unlink($filename);
+    $mockFileSystem->unlink($filename);
 })->with([
     ['1.0.0', 'upgrade-1.0.0.php', '1_0_0'],
     ['2.5.6', 'upgrade-2.5.6.php', '2_5_6'],
-    ['4.0.0-beta.4', 'upgrade-4.0.0-beta.4.php', '4_0_0_beta_4'],
+    ['4.0.0-beta.4', 'upgrade-4.0.0_beta.4.php', '4_0_0_beta_4'],
 ]);
