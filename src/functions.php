@@ -52,7 +52,7 @@ if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {
  */
 function psVersionFactory(array $entries): FactoryDefinitionHelper
 {
-    return factory(function () use ($entries) {
+    return factory(function (array $entries) {
         $psVersion = PdkFacade::get('ps.version');
         $fallback  = Arr::first($entries, static function ($entry) {
             return ! isset($entry['version']);
@@ -71,5 +71,5 @@ function psVersionFactory(array $entries): FactoryDefinitionHelper
         }
 
         return PdkFacade::get($fallback['class']);
-    });
+    })->parameter('entries', $entries);
 }
