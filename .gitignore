@@ -19,6 +19,8 @@ junit/
 lib/
 node_modules/
 vendor/
+# Upgrade files are written dynamically. See MyParcelNL::loadUpgradeVersionList()
+upgrade/
 
 views/**/tsconfig.json
 
