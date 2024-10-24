@@ -41,7 +41,7 @@ final class AddressFactory extends AbstractPsObjectModelFactory implements WithC
             ->withAddress1('Antareslaan 31')
             ->withFirstname('Meredith')
             ->withLastname('Mailbox')
-            ->withIdCountry(1)
+            ->withIdCountry(Country::getByIso('NL'))
             ->withIdCustomer(1)
             ->withIdManufacturer(1)
             ->withIdState(1)

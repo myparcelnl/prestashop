@@ -11,8 +11,6 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithShopGroup;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
 
 /**
- * @method $this withIdAddressDelivery(int $idAddressDelivery)
- * @method $this withIdAddressInvoice(int $idAddressInvoice)
  * @method $this withIdGuest(int $idGuest)
  * @method $this withRecyclable(bool $recyclable)
  * @method $this withGift(bool $gift)
@@ -29,6 +27,26 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
 final class CartFactory extends AbstractPsObjectModelFactory implements WithShopGroup, WithLang, WithCurrency,
                                                                         WithCustomer, WithCarrier, WithTimestamps
 {
+    /**
+     * @param  int $idAddressDelivery
+     *
+     * @return $this
+     */
+    public function withIdAddressDelivery(int $idAddressDelivery): self
+    {
+        return $this->with(['id_address_delivery' => $idAddressDelivery]);
+    }
+
+    /**
+     * @param  int $idAddressInvoice
+     *
+     * @return $this
+     */
+    public function withIdAddressInvoice(int $idAddressInvoice): self
+    {
+        return $this->with(['id_address_invoice' => $idAddressInvoice]);
+    }
+
     protected function getObjectModelClass(): string
     {
         return Cart::class;

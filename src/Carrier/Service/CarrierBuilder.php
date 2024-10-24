@@ -10,17 +10,18 @@ use Group;
 use Language as PsLanguage;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\Support\Arr;
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Language;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
+use MyParcelNL\PrestaShop\Exception\CreateCarrierException;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use RangePrice;
 use RangeWeight;
-use RuntimeException;
-use Zone;
+use Zone as PsZone;
 
 final class CarrierBuilder
 {
@@ -53,6 +54,7 @@ final class CarrierBuilder
     /**
      * @return \Carrier
      * @throws \Doctrine\ORM\ORMException
+     * @throws \MyParcelNL\PrestaShop\Exception\CreateCarrierException
      */
     public function create(): PsCarrier
     {
@@ -102,13 +104,14 @@ final class CarrierBuilder
 
     /**
      * @return void
+     * @throws \MyParcelNL\PrestaShop\Exception\CreateCarrierException
      */
     private function addGroups(): void
     {
         $groups = Group::getGroups(Context::getContext()->language->id);
 
         if (! $this->psCarrier->setGroups(Arr::pluck($groups, 'id_group'))) {
-            throw new RuntimeException("Failed to add groups to carrier $this->psCarrier->id");
+            throw new CreateCarrierException("Failed to add groups to carrier $this->psCarrier->id");
         }
     }
 
@@ -137,21 +140,22 @@ final class CarrierBuilder
 
     /**
      * @return void
+     * @throws \MyParcelNL\PrestaShop\Exception\CreateCarrierException
      */
     private function addZones(): void
     {
-        $existingZones = $this->psCarrier->getZones();
+        $existingZones = new Collection($this->psCarrier->getZones());
 
-        if ($existingZones) {
-            return;
-        }
+        foreach (PsZone::getZones() as $zone) {
+            $alreadyHasZone = $existingZones->contains(function (array $existingZone) use ($zone) {
+                return $existingZone['id_zone'] === $zone['id_zone'];
+            });
 
-        foreach (Zone::getZones() as $zone) {
-            if ($this->psCarrier->addZone($zone['id_zone'])) {
+            if ($alreadyHasZone || $this->psCarrier->addZone($zone['id_zone'])) {
                 continue;
             }
 
-            throw new RuntimeException("Failed to add zone {$zone['id_zone']} to carrier {$this->psCarrier->id}");
+            throw new CreateCarrierException("Failed to add zone {$zone['id_zone']} to carrier {$this->psCarrier->id}");
         }
     }
 

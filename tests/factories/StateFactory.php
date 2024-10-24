@@ -22,8 +22,8 @@ final class StateFactory extends AbstractPsObjectModelFactory implements WithCou
     {
         return parent::createDefault()
             ->withActive(true)
-            ->withIdCountry(1)
-            ->withIdZone(1);
+            ->withIdCountry(Country::getByIso('NL'))
+            ->withIdZone(Zone::first()->id);
     }
 
     protected function getObjectModelClass(): string
