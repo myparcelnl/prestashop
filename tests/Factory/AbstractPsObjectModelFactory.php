@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Tests\Factory;
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithActive;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithSoftDeletes;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithTimestamps;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSoftDeletes;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithTimestamps;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -26,12 +27,12 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     /**
      * @var PsObjectModelFactoryInterface[]
      */
-    private $additionalModelsToStore = [];
+    private array $additionalModelsToStore = [];
 
     /**
      * @var null|int
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @param  null|int $id
@@ -73,7 +74,7 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
     protected function addAttribute(string $attribute, $value, array $attributes = []): AbstractPsFactory
     {
         if (Str::startsWith($attribute, 'id_')) {
-            return $this->withModel(Str::after($attribute, 'id_'), $value, $attributes);
+            return $this->withModel($attribute, $value, $attributes);
         }
 
         if ($value instanceof PsObjectModelFactoryInterface || $value instanceof MockPsObjectModel) {
@@ -101,7 +102,21 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
             $factory->withDeleted(false);
         }
 
+        if ($factory instanceof WithActive) {
+            $factory->withActive(true);
+        }
+
         return $factory;
+    }
+
+    /**
+     * @param  string $key
+     *
+     * @return string
+     */
+    protected function createIdKey(string $key): string
+    {
+        return sprintf('id_%s', Str::snake($key));
     }
 
     /**
@@ -155,24 +170,25 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
      * @param  string                                        $key
      * @param  int|ObjectModel|PsObjectModelFactoryInterface $input
      * @param  array                                         $attributes
+     * @param  null|string                                   $keyOverride
      *
      * @return $this
      * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
-    protected function withModel(string $key, $input, array $attributes = []): self
+    protected function withModel(string $key, $input, array $attributes = [], ?string $keyOverride = null): self
     {
         if (is_int($input)) {
             $class         = Str::after($key, 'id_');
             $existingModel = MockPsObjectModels::get($class, $input);
 
             if ($existingModel) {
-                return $this->withModel($class, $existingModel, $attributes);
+                return $this->withModel($class, $existingModel, $attributes, $keyOverride);
             }
 
             /** @var PsObjectModelFactoryInterface $factory */
             $factory = psFactory(Str::studly($class), $input);
 
-            return $this->withModel($class, $factory, $attributes);
+            return $this->withModel($class, $factory, $attributes, $keyOverride);
         }
 
         if ($input instanceof PsFactoryInterface) {
@@ -182,25 +198,31 @@ abstract class AbstractPsObjectModelFactory extends AbstractPsModelFactory imple
                 ->with($attributes)
                 ->make();
 
-            return $this->withModel($key, $model);
+            return $this->withModel($key, $model, [], $keyOverride);
         }
 
-        $idKey = sprintf('id_%s', Str::snake($key));
+        $idKey = $this->createIdKey($keyOverride ?? $key);
 
         return $this->with([$idKey => $input->id]);
     }
 
     /**
-     * @param  string                                        $key
-     * @param  int|ObjectModel|PsObjectModelFactoryInterface $input
-     * @param  array                                         $attributes
-     * @param  string                                        $foreignKey
+     * @template Model of ObjectModel
+     * @template Instance of Model
+     * @param  class-string<Model>                                  $class
+     * @param  string                                               $key
+     * @param  int|Instance|PsObjectModelFactoryInterface<Instance> $input
+     * @param  array                                                $attributes
      *
      * @return $this
      * @throws \MyParcelNL\Pdk\Tests\Factory\Exception\InvalidFactoryException
      */
-    protected function withRelation(string $key, $input, array $attributes, string $foreignKey): self
-    {
-        return $this->withModel($key, $input, array_replace($attributes, [$foreignKey => $this->getId()]));
+    protected function withRelation(
+        string $class,
+        string $key,
+               $input,
+        array  $attributes
+    ): self {
+        return $this->withModel($class, $input, $attributes, $key);
     }
 }

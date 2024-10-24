@@ -14,7 +14,20 @@ abstract class AbstractPsModelFactory extends AbstractPsFactory
     /**
      * @var array<string, T>
      */
-    private $cache = [];
+    private array $cache = [];
+
+    /**
+     * @param  string $class
+     * @param  array  $attributes
+     *
+     * @return T
+     */
+    abstract protected function createObject(string $class, array $attributes);
+
+    /**
+     * @return class-string<T>
+     */
+    abstract protected function getClass(): string;
 
     /**
      * @return T
@@ -46,19 +59,6 @@ abstract class AbstractPsModelFactory extends AbstractPsFactory
 
         return $model;
     }
-
-    /**
-     * @param  string $class
-     * @param  array  $attributes
-     *
-     * @return T
-     */
-    abstract protected function createObject(string $class, array $attributes);
-
-    /**
-     * @return class-string<T>
-     */
-    abstract protected function getClass(): string;
 
     /**
      * @return int
