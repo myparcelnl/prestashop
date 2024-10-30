@@ -20,6 +20,10 @@ This module allows you to seamlessly integrate [the MyParcel services] into your
 
 For the manual and more information, check out our [PrestaShop module guide] on the [MyParcel Developer Portal].
 
+### Upgrading to v4.x
+
+When upgrading to v4.x it is necessary to clear the cache of Prestashop. To do so, go to `Advanced Parameters` -> `Performance` and click on `Clear cache`.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
