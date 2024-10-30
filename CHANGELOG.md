@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.0](https://github.com/myparcelnl/prestashop/compare/v4.0.0...v4.1.0) (2024-10-30)
+
+
+### :bug: Bug Fixes
+
+* fix error on install due to usage of `use` in factory closure ([#283](https://github.com/myparcelnl/prestashop/issues/283)) ([1b4fdca](https://github.com/myparcelnl/prestashop/commit/1b4fdca106729eaee82d18c44a1f4a2b69e18aa8)), closes [#281](https://github.com/myparcelnl/prestashop/issues/281)
+
+
+### :zap: Performance Improvements
+
+* **admin:** only save product settings once per request ([#279](https://github.com/myparcelnl/prestashop/issues/279)) ([e60bce1](https://github.com/myparcelnl/prestashop/commit/e60bce1b4c18fd9c7c853389fc5712fc6b53adcc))
+
+
+### :sparkles: New Features
+
+* **deps:** upgrade @myparcel-pdk/* ([0cd4941](https://github.com/myparcelnl/prestashop/commit/0cd4941c934af371b5580778fc138ca1a292202c))
+* **deps:** upgrade myparcelnl/pdk to v2.45.0 ([6ff668d](https://github.com/myparcelnl/prestashop/commit/6ff668d1ad76221c4164e66b6e8e05ff8b72fc2c))
+
 ## [4.0.0](https://github.com/myparcelnl/prestashop/compare/v3.10.0...v4.0.0) (2024-10-16)
 
 
