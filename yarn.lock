@@ -866,8 +866,8 @@ __metadata:
   linkType: hard
 
 "@myparcel-pdk/app-builder@npm:^1.0.0":
-  version: 1.4.6
-  resolution: "@myparcel-pdk/app-builder@npm:1.4.6"
+  version: 1.4.7
+  resolution: "@myparcel-pdk/app-builder@npm:1.4.7"
   dependencies:
     "@edielemoine/google-docs-importer": "npm:^2.2.0"
     "@myparcel/ts-utils": "npm:^1.9.0"
@@ -883,7 +883,7 @@ __metadata:
     supports-color: "npm:^9.3.1"
   bin:
     pdk-builder: ./bin/index.js
-  checksum: 10c0/5a8b7d6a173cbcafcec25dc427cd8b088826f192333dfed01ffee50cdf55fb7875907a9f61c84dd4329d0160632d05e2bc6dbb809bcaac202556da90371951ac
+  checksum: 10c0/6e8a47053b80e53c90ad72b8158f781d79f6202cb63d7c6a2960d45cf0c024bf24bfe3201d8a5e753bf0a81e26d11f005aed2873c47598d72dceb788d3f16df5
   languageName: node
   linkType: hard
 
