@@ -22,7 +22,7 @@ For the manual and more information, check out our [PrestaShop module guide] on 
 
 ### Upgrading to v4.x
 
-When upgrading to v4.x it is necessary to clear the cache of Prestashop. To do so, go to `Advanced Parameters` -> `Performance` and click on `Clear cache`.
+When upgrading to v4.x it may be necessary to first clear the cache of Prestashop. To do so, go to `Advanced Parameters` -> `Performance` and click on `Clear cache`, then upload the plugin as normal.
 
 ## Contributing
 
