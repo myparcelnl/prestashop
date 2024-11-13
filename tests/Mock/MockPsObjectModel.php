@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
+use Exception;
 use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Foundation\Database\EntityInterface;
 
+/**
+ * @property bool $deleted
+ */
 abstract class MockPsObjectModel extends BaseMock implements EntityInterface
 {
-    protected $hasCustomIdKey = false;
+    protected bool $hasCustomIdKey = false;
 
     /**
      * @param  null|int $id
@@ -91,13 +95,25 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
-     * @return void
+     * @return bool
      */
-    public function delete(): void
+    public function delete()
     {
-        MockPsDb::deleteRows(static::getTable(), $this->getStorable());
+        $where = $this->hasCustomIdKey
+            ? [$this->getAdditionalIdKey() => $this->getId()]
+            : ['id' => $this->getId()];
 
-        MockPsObjectModels::delete($this->getId());
+        try {
+            MockPsDb::deleteRows(static::getTable(), $where);
+            MockPsObjectModels::delete($this->getId());
+        } catch (Exception $e) {
+            return false;
+        }
+
+        $this->setId(null);
+        $this->deleted = true;
+
+        return true;
     }
 
     /**
@@ -123,6 +139,19 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     public function save(): void
     {
         $this->update();
+    }
+
+    /**
+     * @return bool
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     */
+    public function softDelete()
+    {
+        $this->setId(null);
+        $this->deleted = true;
+
+        return $this->update();
     }
 
     /**

@@ -12,7 +12,7 @@ use OrderState;
  */
 abstract class MockPsOrder extends ObjectModel
 {
-    protected $hasCustomIdKey = true;
+    protected bool $hasCustomIdKey = true;
 
     protected static function getTable(): string
     {
