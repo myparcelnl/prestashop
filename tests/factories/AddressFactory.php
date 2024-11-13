@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\Tests\Factory\Contract\FactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCountry;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCustomer;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithManufacturer;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithState;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithSupplier;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithWarehouse;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCountry;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCustomer;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithManufacturer;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithState;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithSupplier;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithWarehouse;
 
 /**
  * @see \AddressCore
@@ -26,6 +26,8 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithWarehouse;
  * @method $this withPhoneMobile(string $phoneMobile)
  * @method $this withPostcode(string $postcode)
  * @method $this withVatNumber(string $vatNumber)
+ * @extends AbstractPsObjectModelFactory<Address>
+ * @see \AddressCore
  */
 final class AddressFactory extends AbstractPsObjectModelFactory implements WithCountry, WithCustomer, WithManufacturer,
                                                                            WithState, WithSupplier, WithWarehouse
@@ -41,7 +43,7 @@ final class AddressFactory extends AbstractPsObjectModelFactory implements WithC
             ->withAddress1('Antareslaan 31')
             ->withFirstname('Meredith')
             ->withLastname('Mailbox')
-            ->withIdCountry(1)
+            ->withCountry(Country::getByIso('NL'))
             ->withIdCustomer(1)
             ->withIdManufacturer(1)
             ->withIdState(1)

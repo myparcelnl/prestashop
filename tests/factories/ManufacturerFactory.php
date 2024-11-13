@@ -6,6 +6,8 @@ use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
 
 /**
  * @see \ManufacturerCore
+ * @extends AbstractPsObjectModelFactory<Manufacturer>
+ * @see \ManufacturerCore
  */
 final class ManufacturerFactory extends AbstractPsObjectModelFactory
 {

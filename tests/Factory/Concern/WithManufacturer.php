@@ -1,6 +1,8 @@
 <?php
 
-namespace MyParcelNL\PrestaShop\Tests\Factory\Contract;
+declare(strict_types=1);
+
+namespace MyParcelNL\PrestaShop\Tests\Factory\Concern;
 
 use Manufacturer;
 use ManufacturerFactory;

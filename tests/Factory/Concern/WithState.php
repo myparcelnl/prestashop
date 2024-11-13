@@ -1,6 +1,6 @@
 <?php
 
-namespace MyParcelNL\PrestaShop\Tests\Factory\Contract;
+namespace MyParcelNL\PrestaShop\Tests\Factory\Concern;
 
 use State;
 use StateFactory;
