@@ -10,11 +10,9 @@ interface EntityInterface
 {
     public static function getRepositoryClassName(): string;
 
-    public function delete(): int;
+    public function delete();
 
-    public function hydrate(array $keyValueData): void;
+    public function hydrate(array $keyValueData);
 
-    public function save(): int;
-
-    public function softDelete(): int;
+    public function save();
 }

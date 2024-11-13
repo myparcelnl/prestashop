@@ -135,15 +135,24 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      * @param  bool $null_values
      *
      * @return bool
+     * @see          \ObjectModel::add()
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
-    public function add(bool $auto_date = true, bool $null_values = false): bool
+    public function add(bool $auto_date = true, bool $null_values = false)
     {
         MockPsDb::insertRow(static::getTable(), $this->getStorable());
 
         return MockPsObjectModels::add($this);
     }
 
-    public function delete(): int
+    /**
+     * @return bool
+     * @see          \ObjectModel::delete()
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     */
+    public function delete()
     {
         $where = $this->hasCustomIdKey
             ? [$this->getAdditionalIdKey() => $this->getId()]
@@ -153,13 +162,13 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
             MockPsDb::deleteRows(static::getTable(), $where);
             MockPsObjectModels::delete($this->getId());
         } catch (Exception $e) {
-            return 0;
+            return false;
         }
 
         $this->setId(null);
         $this->deleted = true;
 
-        return 1;
+        return true;
     }
 
     /**
@@ -174,20 +183,33 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      * @param  array $keyValueData
      *
      * @return void
+     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
-    public function hydrate(array $keyValueData): void
+    public function hydrate(array $keyValueData)
     {
         $this->fill($keyValueData);
 
         $this->updateId();
     }
 
-    public function save(): int
+    /**
+     * @return int
+     * @see          \ObjectModel::save()
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     */
+    public function save()
     {
         return (int) $this->update();
     }
 
-    public function softDelete(): int
+    /**
+     * @return bool
+     * @see          \ObjectModel::softDelete()
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     */
+    public function softDelete()
     {
         $this->setId(null);
         $this->deleted = true;
@@ -196,16 +218,19 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
-     * @return void
-     * @see \ObjectModel::update()
+     * @param  bool $null_values
+     *
+     * @return bool
+     * @see          \ObjectModel::update()
+     * @noinspection PhpMissingParamTypeInspection
      */
-    public function update($null_values = false): int
+    public function update($null_values = false): bool
     {
         MockPsDb::updateRow(static::getTable(), $this->getStorable());
 
         MockPsObjectModels::update($this);
 
-        return 1;
+        return true;
     }
 
     /**
