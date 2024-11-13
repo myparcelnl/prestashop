@@ -88,7 +88,7 @@ it('filters carriers from delivery options list', function (
         'altern'               => 1,
         'cookie'               => psFactory(Cookie::class)->make(),
         'cart'                 => psFactory(Cart::class)
-            ->withIdAddressDelivery($deliveryAddress->id)
+            ->withAddressDelivery($deliveryAddress->id)
             ->make(),
         'delivery_option_list' => [
             2 => $deliveryOptionCarrierList,

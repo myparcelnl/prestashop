@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsObjectModelFactory;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithCustomer;
-use MyParcelNL\PrestaShop\Tests\Factory\Contract\WithLang;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithCustomer;
+use MyParcelNL\PrestaShop\Tests\Factory\Concern\WithLang;
 
 /**
  * @method withDetectLanguage(bool $detectLanguage)
