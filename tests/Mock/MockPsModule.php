@@ -51,6 +51,20 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
         return static::$instances[$name] ?? false;
     }
 
+    /**
+     * @param  \Module $module
+     *
+     * @return bool|null
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection PhpMissingParamTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     * @see          \ModuleCore::needUpgrade()
+     */
+    public static function needUpgrade($module)
+    {
+        return static::loadUpgradeVersionList($module->name, $module->version, $module->version);
+    }
+
     public static function reset(): void
     {
         static::$instances = [];
@@ -65,6 +79,22 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
     public static function setInstance(string $name, MockPsModule $instance): void
     {
         static::$instances[$name] = $instance;
+    }
+
+    /**
+     * @param  string $module_name
+     * @param  string $module_version
+     * @param  string $registered_version
+     *
+     * @return bool
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     * @noinspection PhpMissingParamTypeInspection
+     * @see          \ModuleCore::loadUpgradeVersionList()
+     */
+    protected static function loadUpgradeVersionList($module_name, $module_version, $registered_version)
+    {
+        return true;
     }
 
     public function disable(): bool

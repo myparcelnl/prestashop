@@ -30,6 +30,5 @@ jobs:
             src/**/*
             config/**/*
             controllers/**/*
-            upgrade/**/*
             myparcelnl.php
             scoper.inc.php

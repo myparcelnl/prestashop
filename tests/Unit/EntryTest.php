@@ -5,7 +5,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop;
 
+use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Tests\Mock\MockMyParcelNL;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPlugin;
 use Throwable;
 use function expect;
@@ -49,3 +51,35 @@ it('calls getContent method', function () {
 
     expect($module->getContent())->toEqual('');
 });
+
+it('writes upgrade file when prestashop checks if upgrade is needed', function (
+    string $version,
+    string $expectedFilename,
+    string $expectedVersion
+) {
+    MockMyParcelNL::setVersion($version);
+
+    /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockFileSystem $mockFileSystem */
+    $mockFileSystem = Pdk::get(FileSystemInterface::class);
+
+    /** @var \MyParcelNL\PrestaShop\Tests\Mock\MockMyParcelNL $module */
+    $module  = Pdk::get('moduleInstance');
+    $appInfo = Pdk::getAppInfo();
+
+    $result = $module::needUpgrade($module);
+
+    $filename = sprintf('%s/upgrade/%s', $appInfo->path, $expectedFilename);
+
+    expect($result)
+        ->toBeTrue()
+        ->and($mockFileSystem->fileExists($filename))
+        ->toBeTrue()
+        ->and($mockFileSystem->get($filename))
+        ->toContain("upgrade_module_$expectedVersion");
+
+    $mockFileSystem->unlink($filename);
+})->with([
+    ['1.0.0', 'upgrade-1.0.0.php', '1_0_0'],
+    ['2.5.6', 'upgrade-2.5.6.php', '2_5_6'],
+    ['4.0.0-beta.4', 'upgrade-4.0.0_beta.4.php', '4_0_0_beta_4'],
+]);

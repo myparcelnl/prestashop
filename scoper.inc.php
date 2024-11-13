@@ -21,7 +21,7 @@ return [
             ]),
         Finder::create()
             ->files()
-            ->in(['src', 'config', 'controllers', 'upgrade']),
+            ->in(['src', 'config', 'controllers']),
     ],
 
     'exclude-namespaces' => [
