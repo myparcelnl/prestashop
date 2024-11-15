@@ -8,6 +8,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsCarrier;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsContext;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsController;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsCountry;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCustomerMessage;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDbQuery;
@@ -134,8 +135,13 @@ abstract class CartCore extends ObjectModel { }
 
 final class Cart extends CartCore { }
 
+/** @see \CookieCore */
+abstract class CookieCore extends ObjectModel { }
+
+final class Cookie extends CookieCore { }
+
 /** @see \CountryCore */
-abstract class CountryCore extends ObjectModel { }
+abstract class CountryCore extends MockPsCountry { }
 
 final class Country extends CountryCore { }
 

@@ -16,7 +16,8 @@ use MyParcelNL\PrestaShop\Hooks\HasPdkOrderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkProductHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkRenderHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPdkScriptHooks;
-use MyParcelNL\PrestaShop\Hooks\HasPsCarrierHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPsCarrierListHooks;
+use MyParcelNL\PrestaShop\Hooks\HasPsCarrierUpdateHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsShippingCostHooks;
 use function MyParcelNL\PrestaShop\bootPdk;
 
@@ -41,7 +42,8 @@ class MyParcelNL extends CarrierModule
     use HasPdkProductHooks;
     use HasPdkRenderHooks;
     use HasPdkScriptHooks;
-    use HasPsCarrierHooks;
+    use HasPsCarrierListHooks;
+    use HasPsCarrierUpdateHooks;
     use HasPsShippingCostHooks;
 
     private static ?string $versionFromComposer = null;

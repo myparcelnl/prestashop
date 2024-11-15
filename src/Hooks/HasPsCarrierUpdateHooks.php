@@ -15,7 +15,7 @@ use Throwable;
 /**
  * @property \Context $context
  */
-trait HasPsCarrierHooks
+trait HasPsCarrierUpdateHooks
 {
     /**
      * Prevents carrier id from de-synchronising with our mappings when user modifies it.

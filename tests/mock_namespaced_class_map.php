@@ -12,9 +12,7 @@ interface EntityInterface
 
     public function delete();
 
-    public function hydrate(array $keyValueData): void;
+    public function hydrate(array $keyValueData);
 
-    public function save(): void;
-
-    public function softDelete();
+    public function save();
 }

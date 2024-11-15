@@ -6,11 +6,14 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use Exception;
 use MyParcelNL\Pdk\Base\Contract\Arrayable;
+use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Sdk\src\Support\Str;
+use ObjectModel;
 use PrestaShop\PrestaShop\Core\Foundation\Database\EntityInterface;
 
 /**
+ * @template T of ObjectModel
  * @property bool $deleted
  */
 abstract class MockPsObjectModel extends BaseMock implements EntityInterface
@@ -42,6 +45,52 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
 
             $this->hydrate($existing->toArray(Arrayable::SKIP_NULL));
         }
+    }
+
+    /**
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     */
+    public static function all(): Collection
+    {
+        return MockPsObjectModels::getByClass(static::class);
+    }
+
+    /**
+     * @param  array $wheres
+     *
+     * @return \MyParcelNL\Pdk\Base\Support\Collection
+     */
+    public static function findBy(array $wheres): Collection
+    {
+        $all = MockPsObjectModels::getByClass(static::class);
+
+        foreach ($wheres as $key => $value) {
+            $all = $all->filter(function (ObjectModel $model) use ($value, $key) {
+                return $model->getAttribute($key) === $value;
+            });
+        }
+
+        return $all;
+    }
+
+    /**
+     * @return null|T
+     */
+    public static function first(): ?ObjectModel
+    {
+        return MockPsObjectModels::getByClass(static::class)
+            ->first();
+    }
+
+    /**
+     * @param  array $wheres
+     *
+     * @return T|null
+     */
+    public static function firstWhere(array $wheres): ?ObjectModel
+    {
+        return self::findBy($wheres)
+            ->first();
     }
 
     /**
@@ -86,8 +135,11 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      * @param  bool $null_values
      *
      * @return bool
+     * @see          \ObjectModel::add()
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
-    public function add(bool $auto_date = true, bool $null_values = false): bool
+    public function add(bool $auto_date = true, bool $null_values = false)
     {
         MockPsDb::insertRow(static::getTable(), $this->getStorable());
 
@@ -96,6 +148,9 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
 
     /**
      * @return bool
+     * @see          \ObjectModel::delete()
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
     public function delete()
     {
@@ -128,21 +183,29 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
      * @param  array $keyValueData
      *
      * @return void
+     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
-    public function hydrate(array $keyValueData): void
+    public function hydrate(array $keyValueData)
     {
         $this->fill($keyValueData);
 
         $this->updateId();
     }
 
-    public function save(): void
+    /**
+     * @return int
+     * @see          \ObjectModel::save()
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     */
+    public function save()
     {
-        $this->update();
+        return (int) $this->update();
     }
 
     /**
      * @return bool
+     * @see          \ObjectModel::softDelete()
      * @noinspection PhpMissingReturnTypeInspection
      * @noinspection ReturnTypeCanBeDeclaredInspection
      */
@@ -155,8 +218,11 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     }
 
     /**
-     * @return void
-     * @see \ObjectModel::update()
+     * @param  bool $null_values
+     *
+     * @return bool
+     * @see          \ObjectModel::update()
+     * @noinspection PhpMissingParamTypeInspection
      */
     public function update($null_values = false): bool
     {

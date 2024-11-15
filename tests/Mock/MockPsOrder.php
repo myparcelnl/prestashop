@@ -35,8 +35,7 @@ abstract class MockPsOrder extends ObjectModel
      * @param  int|null $idEmployee
      *
      * @return bool
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function setCurrentState(int $state, int $idEmployee = null): bool
     {

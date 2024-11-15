@@ -23,6 +23,7 @@ final class StateFactory extends AbstractPsObjectModelFactory implements WithCou
     protected function createDefault(): FactoryInterface
     {
         return parent::createDefault()
+            ->withActive(true)
             ->withIdCountry(1)
             ->withIdZone(1);
     }

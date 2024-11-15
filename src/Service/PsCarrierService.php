@@ -20,8 +20,6 @@ use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
-use MyParcelNL\PrestaShop\Facade\EntityManager;
-use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 
 /**
@@ -83,10 +81,11 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
         return (new Collection($carriers))->map(
             static function (Carrier $carrier): PsCarrier {
                 $builder = new CarrierBuilder($carrier);
+                $created = $builder->create();
 
-                Logger::debug('Created carrier ' . $carrier->externalIdentifier);
+                Logger::debug(sprintf('Created carrier %s', $carrier->externalIdentifier));
 
-                return $builder->create();
+                return $created;
             }
         );
     }
@@ -179,10 +178,6 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
 
         $createdCarriers = $this->createOrUpdateCarriers($carriers);
         $this->deleteUnusedCarriers($createdCarriers);
-
-        // Refresh the hooks
-        MyParcelModule::registerHooks();
-        EntityManager::flush();
     }
 
     /**

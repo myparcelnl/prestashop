@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
+use Country as T;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsSpecificObjectModelServiceInterface;
 use ObjectModel;
 
 /**
- * @template T of \ObjectModel
+ * @template T of ObjectModel
+ * @extends \MyParcelNL\PrestaShop\Contract\PsSpecificObjectModelServiceInterface<T>
  */
 abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServiceInterface
 {
-    /**
-     * @var \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface
-     */
-    private $psObjectModelService;
+    private PsObjectModelServiceInterface $psObjectModelService;
 
     /**
      * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface $psObjectModelService
@@ -32,9 +32,9 @@ abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServ
     abstract protected function getClass(): string;
 
     /**
-     * @param  \T $model
+     * @param  T $model
      *
-     * @return \T
+     * @return T
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -100,9 +100,24 @@ abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServ
     }
 
     /**
-     * @param  \T $model
+     * @param  T $model
      *
-     * @return \T
+     * @return void
+     * @throws \PrestaShopException
+     */
+    public function save(ObjectModel $model): void
+    {
+        $action = $model->id ? 'Saved' : 'Updated';
+
+        $model->save();
+
+        Logger::debug(sprintf('%s %s with id %s', $action, $this->getClass(), $model->id));
+    }
+
+    /**
+     * @param  T $model
+     *
+     * @return T
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -112,10 +127,10 @@ abstract class PsSpecificObjectModelService implements PsSpecificObjectModelServ
     }
 
     /**
-     * @param  \T        $model
+     * @param  T         $model
      * @param  null|bool $existing
      *
-     * @return \T
+     * @return T
      */
     public function updateOrAdd(ObjectModel $model, ?bool $existing = null): ObjectModel
     {
