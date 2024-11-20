@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a8368a6990043f7275104fa7d0523994",
+    "content-hash": "b926efc276e0f8c625cae238b5fd6561",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -134,16 +134,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "2.45.0",
+            "version": "2.47.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "80ff885c54f02a09cdccfffa282e7581247be1ce"
+                "reference": "78bdece30988900cf1b1af0e5cf9eb5f06eaba8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/80ff885c54f02a09cdccfffa282e7581247be1ce",
-                "reference": "80ff885c54f02a09cdccfffa282e7581247be1ce",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/78bdece30988900cf1b1af0e5cf9eb5f06eaba8f",
+                "reference": "78bdece30988900cf1b1af0e5cf9eb5f06eaba8f",
                 "shasum": ""
             },
             "require": {
@@ -188,9 +188,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v2.45.0"
+                "source": "https://github.com/myparcelnl/pdk/tree/v2.47.1"
             },
-            "time": "2024-10-24T16:06:48+00:00"
+            "time": "2024-11-14T16:06:45+00:00"
         },
         {
             "name": "myparcelnl/sdk",
