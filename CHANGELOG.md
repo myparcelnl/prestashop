@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.0](https://github.com/myparcelnl/prestashop/compare/v4.1.0...v4.2.0) (2024-11-20)
+
+
+### :bug: Bug Fixes
+
+* **admin:** fix toggle and tristate input elements not working correctly ([#278](https://github.com/myparcelnl/prestashop/issues/278)) ([c8832fd](https://github.com/myparcelnl/prestashop/commit/c8832fdf8c370c0cf5dc3902975fb6659562d43e)), closes [myparcelnl/js-pdk#223](https://github.com/myparcelnl/js-pdk/issues/223)
+* **orders:** export correct recipient name ([#277](https://github.com/myparcelnl/prestashop/issues/277)) ([883dcf4](https://github.com/myparcelnl/prestashop/commit/883dcf4b2d94389a6663074b5ad4f31431000c0d)), closes [#276](https://github.com/myparcelnl/prestashop/issues/276)
+* **upgrade:** always execute module installation on upgrade ([#271](https://github.com/myparcelnl/prestashop/issues/271)) ([78b3657](https://github.com/myparcelnl/prestashop/commit/78b3657ac714b9ccdc732421564c335cc4ccbe50))
+
+
+### :sparkles: New Features
+
+* **backend:** add download logs action ([#275](https://github.com/myparcelnl/prestashop/issues/275)) ([7bb1349](https://github.com/myparcelnl/prestashop/commit/7bb134965bc46ebc579d5d70208827c4bca9d7db)), closes [myparcelnl/pdk#288](https://github.com/myparcelnl/pdk/issues/288) [myparcelnl/js-pdk#221](https://github.com/myparcelnl/js-pdk/issues/221)
+* **checkout:** show carriers only for countries they ship to ([#273](https://github.com/myparcelnl/prestashop/issues/273)) ([e13b6a2](https://github.com/myparcelnl/prestashop/commit/e13b6a2d6d7de353ef851e82b82418779cd5eae2))
+* **deps:** upgrade @myparcel-pdk/checkout to v1.2.0 ([0b314e9](https://github.com/myparcelnl/prestashop/commit/0b314e90c9a126055a6ed47876cbc2e3627be98a))
+* **deps:** upgrade myparcelnl/pdk to v2.47.1 ([ffe8ce4](https://github.com/myparcelnl/prestashop/commit/ffe8ce47547b413a50998059f3e24e4ae08fba76))
+
 ## [4.1.0](https://github.com/myparcelnl/prestashop/compare/v4.0.0...v4.1.0) (2024-10-30)
 
 
