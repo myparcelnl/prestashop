@@ -172,7 +172,7 @@ it('migrates settings to pdk', function () {
             ['name' => 'MYPARCELNL_SHARE_CUSTOMER_PHONE', 'value' => '1'],
             ['name' => 'MYPARCELNL_LABEL_OPEN_DOWNLOAD', 'value' => 'false'],
             ['name' => 'MYPARCELNL_LABEL_CREATED_ORDER_STATUS', 'value' => '3'],
-            ['name' => 'MYPARCELNL_LABEL_SCANNED_ORDER_STATUS', 'value' => '4'],
+            ['name' => 'MYPARCELNL_LABEL_SCANNED_ORDER_STATUS', 'value' => null],
             ['name' => 'MYPARCELNL_DELIVERED_ORDER_STATUS', 'value' => '5'],
             ['name' => 'MYPARCELNL_IGNORE_ORDER_STATUS', 'value' => '8,6'],
             ['name' => 'MYPARCELNL_STATUS_CHANGE_MAIL', 'value' => '1'],
