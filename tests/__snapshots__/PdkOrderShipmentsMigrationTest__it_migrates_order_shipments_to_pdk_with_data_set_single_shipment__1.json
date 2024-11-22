@@ -22,6 +22,7 @@
         "hideSender": -1,
         "largeFormat": -1,
         "onlyRecipient": -1,
+        "receiptCode": -1,
         "return": -1,
         "sameDayDelivery": -1,
         "signature": -1,
