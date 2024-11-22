@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Service;
 
 use Context;
 use MyParcelNL\Pdk\App\Order\Contract\OrderStatusServiceInterface;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use OrderState;
 
@@ -31,13 +32,12 @@ final class PsOrderStatusService implements OrderStatusServiceInterface
     {
         $orderStates = OrderState::getOrderStates(Context::getContext()->language->id);
 
-        $array = [];
+        return array_reduce($orderStates, static function ($carry, $orderState) {
+            $key         = sprintf('status_%s', $orderState['id_order_state']);
+            $carry[$key] = $orderState['name'];
 
-        foreach ($orderStates as $orderState) {
-            $array[$orderState['id_order_state']] = $orderState['name'];
-        }
-
-        return $array;
+            return $carry;
+        }, []);
     }
 
     /**
@@ -49,9 +49,15 @@ final class PsOrderStatusService implements OrderStatusServiceInterface
     public function updateStatus(array $orderIds, string $status): void
     {
         foreach ($orderIds as $orderId) {
+            /** @var \Order|null $psOrder */
             $psOrder = $this->psOrderService->get($orderId);
 
-            $psOrder->setCurrentState((int) $status);
+            if (! $psOrder) {
+                Logger::error(sprintf('Order with id %s not found', $orderId));
+                continue;
+            }
+
+            $psOrder->setCurrentState((int) str_replace('status_', '', $status));
         }
     }
 }
