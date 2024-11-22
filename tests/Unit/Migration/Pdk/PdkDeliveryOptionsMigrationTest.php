@@ -92,6 +92,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         ShipmentOptions::LABEL_DESCRIPTION => TriStateService::INHERIT,
         ShipmentOptions::LARGE_FORMAT      => TriStateService::INHERIT,
         ShipmentOptions::ONLY_RECIPIENT    => TriStateService::INHERIT,
+        ShipmentOptions::RECEIPT_CODE      => TriStateService::INHERIT,
         ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::INHERIT,
         ShipmentOptions::SIGNATURE         => TriStateService::INHERIT,
         ShipmentOptions::TRACKED           => TriStateService::INHERIT,
