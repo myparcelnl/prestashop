@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1](https://github.com/myparcelnl/prestashop/compare/v4.2.0...v4.2.1) (2024-11-27)
+
+
+### :bug: Bug Fixes
+
+* **deps:** upgrade @myparcel-pdk/* ([c0b3138](https://github.com/myparcelnl/prestashop/commit/c0b3138d18c03ad6130b1864f06244606933af94))
+* **deps:** upgrade myparcelnl/pdk to v2.47.2 ([bb765ba](https://github.com/myparcelnl/prestashop/commit/bb765ba9438dd195ec4bf42888d1a40e0d73f6ee))
+* **install:** fix error when creating audit table ([#288](https://github.com/myparcelnl/prestashop/issues/288)) ([d519ed2](https://github.com/myparcelnl/prestashop/commit/d519ed2bc3d6976347e416c909ce6fd03895279a))
+
 ## [4.2.0](https://github.com/myparcelnl/prestashop/compare/v4.1.0...v4.2.0) (2024-11-20)
 
 
