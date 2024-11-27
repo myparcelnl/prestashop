@@ -28,7 +28,6 @@ final class CreateAuditTableDatabaseMigration extends AbstractDatabaseMigration
             $builder->column('model_identifier', 'VARCHAR(255) NOT NULL');
             $builder->timestamps();
             $builder->primary(['id']);
-            $builder->createdTimestamps();
         });
 
         $this->createIndex($this->getTable(), function (CreateIndexSqlBuilder $builder) {
