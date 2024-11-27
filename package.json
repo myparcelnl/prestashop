@@ -40,15 +40,18 @@
     "ws:test:coverage": "cd $0 && vitest run --coverage",
     "ws:test:run": "cd $0 && vitest run"
   },
-  "resolutions": {
-    "eslint-plugin-prettier": "^4.2.1"
-  },
   "lint-staged": {
     "*.{ts,vue,js,cjs,mjs}": "eslint --fix",
     "*.{md,json,yml,css,scss}": "prettier --write",
     "package.json": "npx sort-package-json"
   },
   "prettier": "@myparcel/prettier-config",
+  "resolutions": {
+    "eslint-plugin-prettier": "^4.2.1"
+  },
+  "dependencies": {
+    "@myparcel/vue-form-builder": "1.0.0-beta.9"
+  },
   "devDependencies": {
     "@myparcel-eslint/eslint-config-esnext": "^1.2.0",
     "@myparcel-eslint/eslint-config-import": "^1.0.0",
