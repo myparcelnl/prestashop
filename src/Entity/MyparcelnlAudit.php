@@ -25,9 +25,9 @@ class MyparcelnlAudit extends AbstractEntity implements EntityWithCreatedTimesta
     private $action;
 
     /**
-     * @var string
+     * @var int
      * @ORM\Id
-     * @ORM\Column(name="id", type="string")
+     * @ORM\Column(name="id", type="integer")
      */
     private $id;
 
@@ -53,7 +53,7 @@ class MyparcelnlAudit extends AbstractEntity implements EntityWithCreatedTimesta
         return $this->action;
     }
 
-    public function getId(): string
+    public function getId(): int
     {
         return $this->id;
     }
@@ -73,9 +73,9 @@ class MyparcelnlAudit extends AbstractEntity implements EntityWithCreatedTimesta
         $this->action = $action;
     }
 
-    public function setId(string $id): void
+    public function setId($id): void
     {
-        $this->id = $id;
+        $this->id = (int) $id;
     }
 
     public function setModel(string $model): void
