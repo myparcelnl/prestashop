@@ -18,9 +18,9 @@
     "sendNotificationAfter": -1,
     "sendReturnEmail": false,
     "shareCustomerInformation": true,
-    "statusOnLabelCreate": "3",
-    "statusWhenDelivered": "5",
-    "statusWhenLabelScanned": "4",
+    "statusOnLabelCreate": "status_3",
+    "statusWhenDelivered": "status_5",
+    "statusWhenLabelScanned": -1,
     "trackTraceInAccount": false,
     "trackTraceInEmail": false
   },
