@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.2](https://github.com/myparcelnl/prestashop/compare/v4.2.1...v4.2.2) (2024-12-19)
+
+
+### :bug: Bug Fixes
+
+* **audits:** prevent type error for id in model ([#291](https://github.com/myparcelnl/prestashop/issues/291)) ([24c1072](https://github.com/myparcelnl/prestashop/commit/24c1072b2cda43a27b4bad999f09133e2e499cd9))
+
 ## [4.2.1](https://github.com/myparcelnl/prestashop/compare/v4.2.0...v4.2.1) (2024-11-27)
 
 
