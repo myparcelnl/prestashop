@@ -16,6 +16,14 @@ This module allows you to seamlessly integrate [the MyParcel services] into your
 
 > :warning: Older 1.7.x versions may work, but are not officially tested or supported.
 
+## Important notice about third-party checkouts
+
+> :warning: Third-Party Checkouts Compatibility.
+
+Our plugin may not be fully compatible with “third-party” checkout solutions provided by plugins, other than those native to PrestaShop itself. Features such as Delivery Options or other functionalities might not work as expected.
+
+We recommend testing the plugin’s functionality in your specific setup before fully implementing it.
+
 ## Manual
 
 For the manual and more information, check out our [PrestaShop module guide] on the [MyParcel Developer Portal].
