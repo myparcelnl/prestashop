@@ -337,22 +337,30 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
             new CastValue(CastValue::CAST_BOOL)
         );
 
+        $transformStatus = new TransformValue(function ($value) {
+            if ($value) {
+                return "status_$value";
+            }
+
+            return (new CastValue(CastValue::CAST_TRI_STATE))->modify($value);
+        });
+
         yield new MigratableValue(
             'MYPARCELNL_LABEL_CREATED_ORDER_STATUS',
             implode('.', [OrderSettings::ID, OrderSettings::STATUS_ON_LABEL_CREATE]),
-            new CastValue(CastValue::CAST_TRI_STATE)
+            $transformStatus
         );
 
         yield new MigratableValue(
             'MYPARCELNL_LABEL_SCANNED_ORDER_STATUS',
             implode('.', [OrderSettings::ID, OrderSettings::STATUS_WHEN_LABEL_SCANNED]),
-            new CastValue(CastValue::CAST_TRI_STATE)
+            $transformStatus
         );
 
         yield new MigratableValue(
             'MYPARCELNL_DELIVERED_ORDER_STATUS',
             implode('.', [OrderSettings::ID, OrderSettings::STATUS_WHEN_DELIVERED]),
-            new CastValue(CastValue::CAST_TRI_STATE)
+            $transformStatus
         );
 
         /*
