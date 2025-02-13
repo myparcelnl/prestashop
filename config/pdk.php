@@ -38,7 +38,6 @@ use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsCountryServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
-use MyParcelNL\PrestaShop\Database\CreateAuditTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateCarrierMappingTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateCartDeliveryOptionsTableDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\CreateOrderDataTableDatabaseMigration;
@@ -88,6 +87,7 @@ use function DI\factory;
 use function DI\get;
 use function DI\value;
 use function MyParcelNL\PrestaShop\psVersionFactory;
+use MyParcelNL\PrestaShop\Migration\Pdk\RemoveAuditTableMigration;
 
 return [
     'defaultCutoffTime'        => value('17:00'),
@@ -100,12 +100,12 @@ return [
     'pdkMigrationVersion' => value('4.0.0-alpha.0'),
 
     'databaseMigrationClasses' => value([
-        CreateAuditTableDatabaseMigration::class,
         CreateCarrierMappingTableDatabaseMigration::class,
         CreateCartDeliveryOptionsTableDatabaseMigration::class,
         CreateOrderDataTableDatabaseMigration::class,
         CreateOrderShipmentTableDatabaseMigration::class,
         CreateProductSettingsTableDatabaseMigration::class,
+        RemoveAuditTableMigration::class,
     ]),
 
     'pdkMigrationClasses'                       => value([
