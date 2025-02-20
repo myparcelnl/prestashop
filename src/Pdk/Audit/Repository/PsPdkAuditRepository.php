@@ -12,55 +12,26 @@ use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlAudit;
 use MyParcelNL\PrestaShop\Repository\PsAuditRepository;
 
+/**
+ * @deprecated This class is deprecated and will be removed in the next major release.
+ */
 final class PsPdkAuditRepository extends Repository implements PdkAuditRepositoryInterface
 {
     /**
-     * @var \MyParcelNL\PrestaShop\Repository\PsAuditRepository
+     * @deprecated This method is a no-op, retained for compatibility only.
      */
-    private $psAuditRepository;
-
-    /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface   $storage
-     * @param  \MyParcelNL\PrestaShop\Repository\PsAuditRepository $psAuditRepository
-     */
-    public function __construct(StorageInterface $storage, PsAuditRepository $psAuditRepository)
-    {
-        parent::__construct($storage);
-        $this->psAuditRepository = $psAuditRepository;
-    }
-
     public function all(): AuditCollection
     {
-        return new AuditCollection(
-            $this->psAuditRepository->all()
-                ->map(function (MyparcelnlAudit $audit) {
-                    return [
-                        'id'              => $audit->getId(),
-                        'action'          => $audit->getAction(),
-                        'model'           => $audit->getModel(),
-                        'modelIdentifier' => $audit->getModelIdentifier(),
-                        'arguments'       => $audit->getData(),
-                        'created'         => $audit->getDateAdd(),
-                    ];
-                })
-        );
+        return new AuditCollection([]);
     }
 
     /**
+     * @deprecated This method is a no-op, retained for compatibility only.
      * @throws \Doctrine\ORM\ORMException
      */
     public function store(Audit $audit): void
     {
-        $this->psAuditRepository->create([
-            'id'              => $audit->id,
-            'action'          => $audit->action,
-            'model'           => $audit->model,
-            'modelIdentifier' => $audit->modelIdentifier,
-            'data'            => json_encode($audit->arguments),
-            'dateAdd'         => $audit->created,
-        ]);
-
-        $this->save($audit->id ?? '', $audit);
+        // no-op
     }
 
     protected function getKeyPrefix(): string
