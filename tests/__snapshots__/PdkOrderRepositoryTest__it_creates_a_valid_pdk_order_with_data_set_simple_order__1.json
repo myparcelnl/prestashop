@@ -59,6 +59,5 @@
   "orderVat": 0,
   "totalPrice": 0,
   "totalVat": 0,
-  "totalPriceAfterVat": 0,
-  "audits": []
+  "totalPriceAfterVat": 0
 }
