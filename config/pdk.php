@@ -105,7 +105,6 @@ return [
         CreateOrderDataTableDatabaseMigration::class,
         CreateOrderShipmentTableDatabaseMigration::class,
         CreateProductSettingsTableDatabaseMigration::class,
-        RemoveAuditTableMigration::class,
     ]),
 
     'pdkMigrationClasses'                       => value([
