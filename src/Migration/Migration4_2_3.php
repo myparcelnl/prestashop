@@ -24,12 +24,6 @@ final class Migration4_2_3 extends AbstractDatabaseMigration
 
     public function up(): void
     {
-        $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
-        $auditService = Pdk::get(AuditService::class);
-
-        // move auto exported flag from audits table to pdk order
-        $auditService->migrateExportedPropertyToOrders($orderRepository);
-
         // get rid of the audits table
         $this->dropTable(Table::TABLE_AUDITS);
     }
