@@ -87,7 +87,6 @@ use function DI\factory;
 use function DI\get;
 use function DI\value;
 use function MyParcelNL\PrestaShop\psVersionFactory;
-use MyParcelNL\PrestaShop\Migration\Pdk\RemoveAuditTableMigration;
 
 return [
     'defaultCutoffTime'        => value('17:00'),
