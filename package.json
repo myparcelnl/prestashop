@@ -5,6 +5,14 @@
   "repository": "github:myparcelnl/prestashop",
   "license": "MIT",
   "type": "module",
+  "packageManager": "yarn@4.3.1",
+  "engines": {
+    "node": "20.10.0"
+  },
+  "volta": {
+    "node": "20.10.0",
+    "yarn": "4.3.1"
+  },
   "workspaces": [
     "views/js/**/*"
   ],
@@ -73,9 +81,5 @@
     "nx": "^18.0.0",
     "prettier": "^2.8.8",
     "sharp": "^0.33.0"
-  },
-  "volta": {
-    "node": "20.10.0",
-    "yarn": "4.3.1"
   }
 }
