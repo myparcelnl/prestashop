@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration;
 
-use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
-use MyParcelNL\Pdk\Audit\Service\AuditService;
-use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Database\AbstractDatabaseMigration;
 use MyParcelNL\PrestaShop\Database\Table;
 
