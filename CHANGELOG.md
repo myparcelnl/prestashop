@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.3](https://github.com/myparcelnl/prestashop/compare/v4.2.2...v4.2.3) (2025-03-07)
+
+
+### :bug: Bug Fixes
+
+* **orders:** fix automated order status settings not saving ([#290](https://github.com/myparcelnl/prestashop/issues/290)) ([3aa2e7d](https://github.com/myparcelnl/prestashop/commit/3aa2e7d859fe670c9d525f11075f83bc47ecb8ca)), closes [#237](https://github.com/myparcelnl/prestashop/issues/237)
+
 ## [4.2.2](https://github.com/myparcelnl/prestashop/compare/v4.2.1...v4.2.2) (2024-12-19)
 
 
