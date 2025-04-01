@@ -16,7 +16,6 @@ use MyParcelNL\Pdk\Tests\Api\Response\ExampleAclResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetAccountsResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierConfigurationResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierOptionsResponse;
-use MyParcelNL\Pdk\Tests\Api\Response\ExampleJsonResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExamplePrinterGroupIdResponse;
 use MyParcelNL\Pdk\Tests\Bootstrap\MockApi;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
