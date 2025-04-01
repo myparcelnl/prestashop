@@ -16,6 +16,7 @@ use MyParcelNL\Pdk\Tests\Api\Response\ExampleAclResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetAccountsResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierConfigurationResponse;
 use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierOptionsResponse;
+use MyParcelNL\Pdk\Tests\Api\Response\ExamplePrinterGroupIdResponse;
 use MyParcelNL\Pdk\Tests\Bootstrap\MockApi;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
@@ -95,7 +96,8 @@ it('creates carriers on account update', function () {
         new ExampleGetAccountsResponse(),
         new ExampleGetCarrierConfigurationResponse(),
         new ExampleGetCarrierOptionsResponse($carrierOptions->toArrayWithoutNull()),
-        new ExampleAclResponse()
+        new ExampleAclResponse(),
+        new ExamplePrinterGroupIdResponse([])
     );
 
     Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
