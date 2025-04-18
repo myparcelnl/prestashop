@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.0](https://github.com/myparcelnl/prestashop/compare/v4.2.4...v4.3.0) (2025-04-18)
+
+
+### :bug: Bug Fixes
+
+* update order status on webhook ([#314](https://github.com/myparcelnl/prestashop/issues/314)) ([cb2c3fb](https://github.com/myparcelnl/prestashop/commit/cb2c3fb30ad7ca4645ff567c06f62af01dda43ac))
+
+
+### :sparkles: New Features
+
+* allow receipt code BE ([#316](https://github.com/myparcelnl/prestashop/issues/316)) ([588ba33](https://github.com/myparcelnl/prestashop/commit/588ba33bb20ca7e46e9d4b7d993a96ff3ed0012f))
+
 ## [4.2.4](https://github.com/myparcelnl/prestashop/compare/v4.2.3...v4.2.4) (2025-03-07)
 
 
