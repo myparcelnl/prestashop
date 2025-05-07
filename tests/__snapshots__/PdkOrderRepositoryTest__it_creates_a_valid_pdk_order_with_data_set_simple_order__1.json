@@ -1,64 +1,64 @@
 {
-    "externalIdentifier": "1",
-    "referenceIdentifier": "PrestaShop: 1",
-    "deliveryOptions": {
-        "carrier": {
-            "externalIdentifier": "postnl",
-            "id": 1,
-            "name": "postnl",
-            "human": "PostNL",
-            "enabled": true,
-            "isDefault": true,
-            "optional": false,
-            "primary": false,
-            "type": "main"
-        },
-        "labelAmount": 1,
-        "shipmentOptions": {
-            "insurance": -1,
-            "ageCheck": -1,
-            "return": -1,
-            "hideSender": -1,
-            "largeFormat": -1,
-            "onlyRecipient": -1,
-            "receiptCode": -1,
-            "sameDayDelivery": -1,
-            "signature": -1,
-            "tracked": -1,
-            "collect": -1
-        },
-        "deliveryType": "standard",
-        "packageType": "package"
+  "billingAddress": {
+    "city": "Hoofddorp",
+    "person": "Meredith Mailbox",
+    "postalCode": "2132JE",
+    "street": "Antareslaan 31 (Billing)",
+    "streetAdditionalInfo": "(Billing)"
+  },
+  "deliveryOptions": {
+    "carrier": {
+      "enabled": true,
+      "externalIdentifier": "postnl",
+      "human": "PostNL",
+      "id": 1,
+      "isDefault": true,
+      "name": "postnl",
+      "optional": false,
+      "primary": false,
+      "type": "main"
     },
-    "billingAddress": {
-        "address1": "Antareslaan 31",
-        "address2": "(Billing)",
-        "city": "Hoofddorp",
-        "postalCode": "2132JE",
-        "person": "Meredith Mailbox"
-    },
-    "shippingAddress": {
-        "address1": "Antareslaan 31",
-        "city": "Hoofddorp",
-        "postalCode": "2132JE",
-        "person": "Meredith Mailbox"
-    },
-    "shipments": [],
-    "physicalProperties": {
-        "initialWeight": 0,
-        "manualWeight": -1,
-        "totalWeight": 0
-    },
-    "lines": [],
-    "notes": [],
-    "exported": false,
-    "shipmentPrice": 0,
-    "shipmentPriceAfterVat": 0,
-    "shipmentVat": 0,
-    "orderPrice": 0,
-    "orderPriceAfterVat": 0,
-    "orderVat": 0,
-    "totalPrice": 0,
-    "totalVat": 0,
-    "totalPriceAfterVat": 0
+    "deliveryType": "standard",
+    "labelAmount": 1,
+    "packageType": "package",
+    "shipmentOptions": {
+      "ageCheck": -1,
+      "collect": -1,
+      "hideSender": -1,
+      "insurance": -1,
+      "largeFormat": -1,
+      "onlyRecipient": -1,
+      "receiptCode": -1,
+      "return": -1,
+      "sameDayDelivery": -1,
+      "signature": -1,
+      "tracked": -1
+    }
+  },
+  "exported": false,
+  "externalIdentifier": "1",
+  "lines": [],
+  "notes": [],
+  "orderPrice": 0,
+  "orderPriceAfterVat": 0,
+  "orderVat": 0,
+  "physicalProperties": {
+    "initialWeight": 0,
+    "manualWeight": -1,
+    "totalWeight": 0
+  },
+  "referenceIdentifier": "PrestaShop: 1",
+  "shipmentPrice": 0,
+  "shipmentPriceAfterVat": 0,
+  "shipmentVat": 0,
+  "shipments": [],
+  "shippingAddress": {
+    "city": "Hoofddorp",
+    "person": "Meredith Mailbox",
+    "postalCode": "2132JE",
+    "street": "Antareslaan 31"
+  },
+  "totalPrice": 0,
+  "totalPriceAfterVat": 0,
+  "totalVat": 0
 }
