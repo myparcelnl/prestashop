@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/myparcelnl/prestashop/compare/v4.3.0...v4.3.1) (2025-05-07)
+
+
+### :bug: Bug Fixes
+
+* disable delivery date selection for Bpost carrier ([#317](https://github.com/myparcelnl/prestashop/issues/317)) ([e1fe9bf](https://github.com/myparcelnl/prestashop/commit/e1fe9bffa26a6c04357a191af2bafd696ec38358))
+
 ## [4.3.0](https://github.com/myparcelnl/prestashop/compare/v4.2.4...v4.3.0) (2025-04-18)
 
 
