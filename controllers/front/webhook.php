@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 use MyParcelNL\Pdk\App\Webhook\PdkWebhookManager;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
-use MyParcelNL\Pdk\App\Api\PdkEndpoint;
 use MyParcelNL\Pdk\Facade\Pdk;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
