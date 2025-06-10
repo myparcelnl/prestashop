@@ -24,8 +24,8 @@ class MyParcelNLWebhookModuleFrontController extends FrontController
         /** @var \MyParcelNL\Pdk\App\Webhook\PdkWebhookManager $webhooks */
         $webhooks = Pdk::get(PdkWebhookManager::class);
         $webhooks->call(Request::createFromGlobals());
-
-        exit;// bugfix for smarty missing $template variable if execution is not stopped in front controller
+        // bugfix for smarty missing $template variable if execution is not stopped in front controller
+        $this->sendResponse(200, 'OK');
     }
 
     /**
