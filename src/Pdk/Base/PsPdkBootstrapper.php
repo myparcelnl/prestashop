@@ -19,6 +19,7 @@ use PrestaShopBundle\Exception\InvalidModuleException;
 use Psr\Log\LogLevel;
 use ReflectionClass;
 use ReflectionMethod;
+
 use function DI\factory;
 use function DI\value;
 
@@ -138,6 +139,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
                     CheckoutSettings::DELIVERY_OPTIONS_CUSTOM_CSS,
                     CheckoutSettings::DELIVERY_OPTIONS_POSITION,
                     CheckoutSettings::USE_SEPARATE_ADDRESS_FIELDS,
+                    CheckoutSettings::ENABLE_ADDRESS_WIDGET
                 ],
             ]),
 
