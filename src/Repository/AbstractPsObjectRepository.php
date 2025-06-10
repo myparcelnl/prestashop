@@ -157,6 +157,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
         }
 
         $this->entityManager->persist($entity);
+        $this->entityManager->flush($entity);
 
         return $entity;
     }
