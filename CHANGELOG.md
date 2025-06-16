@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.0](https://github.com/myparcelnl/prestashop/compare/v4.3.1...v4.4.0) (2025-06-16)
+
+
+### :bug: Bug Fixes
+
+* **admin:** remove address widget toggle, feature not yet available ([83f4c18](https://github.com/myparcelnl/prestashop/commit/83f4c18ce31b9bfefb3075a120b88b52f8176f40))
+* **deps:** bump myparcelnl/pdk to 2.58.5 ([#329](https://github.com/myparcelnl/prestashop/issues/329)) ([e58b415](https://github.com/myparcelnl/prestashop/commit/e58b41506a790fe8f53a512db1829b2a53257fbe))
+* have webhooks work ([#321](https://github.com/myparcelnl/prestashop/issues/321)) ([6ce7361](https://github.com/myparcelnl/prestashop/commit/6ce73619a3d0d831054a1143a540ae1204742256))
+
+
+### :sparkles: New Features
+
+* bump the js-pdk group with 5 updates ([#302](https://github.com/myparcelnl/prestashop/issues/302)) ([7e6aaec](https://github.com/myparcelnl/prestashop/commit/7e6aaecc9cd3a3c5d3ce7feecc6ef216d159e5b4))
+
 ## [4.3.1](https://github.com/myparcelnl/prestashop/compare/v4.3.0...v4.3.1) (2025-05-07)
 
 
