@@ -1301,7 +1301,7 @@ __metadata:
     eslint-plugin-sort-exports: "npm:^0.9.0"
     fast-glob: "npm:^3.3.1"
     husky: "npm:^9.0.0"
-    is-ci: "npm:^3.0.1"
+    is-ci: "npm:^4.1.0"
     lint-staged: "npm:^15.0.0"
     node-fetch: "npm:^3.3.2"
     nx: "npm:^18.0.0"
@@ -4506,10 +4506,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ci-info@npm:^3.2.0, ci-info@npm:^3.6.1, ci-info@npm:^3.7.1, ci-info@npm:^3.8.0":
+"ci-info@npm:^3.6.1, ci-info@npm:^3.7.1, ci-info@npm:^3.8.0":
   version: 3.8.0
   resolution: "ci-info@npm:3.8.0"
   checksum: 10c0/0d3052193b58356372b34ab40d2668c3e62f1006d5ca33726d1d3c423853b19a85508eadde7f5908496fb41448f465263bf61c1ee58b7832cb6a924537e3863a
+  languageName: node
+  linkType: hard
+
+"ci-info@npm:^4.1.0":
+  version: 4.2.0
+  resolution: "ci-info@npm:4.2.0"
+  checksum: 10c0/37a2f4b6a213a5cf835890eb0241f0d5b022f6cfefde58a69e9af8e3a0e71e06d6ad7754b0d4efb9cd2613e58a7a33996d71b56b0d04242722e86666f3f3d058
   languageName: node
   linkType: hard
 
@@ -7653,14 +7660,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-ci@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "is-ci@npm:3.0.1"
+"is-ci@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "is-ci@npm:4.1.0"
   dependencies:
-    ci-info: "npm:^3.2.0"
+    ci-info: "npm:^4.1.0"
   bin:
     is-ci: bin.js
-  checksum: 10c0/0e81caa62f4520d4088a5bef6d6337d773828a88610346c4b1119fb50c842587ed8bef1e5d9a656835a599e7209405b5761ddf2339668f2d0f4e889a92fe6051
+  checksum: 10c0/c58e733d21f8d7e6ba3d70686124004576b369b4a02a37c4783159ed5a668b3a9e4b359efa955e4a675bd021eca7305010c45a1e646bf77cce14b08808eda88d
   languageName: node
   linkType: hard
 
