@@ -15,7 +15,7 @@
     "@myparcel-pdk/admin-preset-bootstrap4": "^1.0.0",
     "@myparcel-pdk/admin-preset-default": "^1.0.0",
     "@myparcel/ts-utils": "^1.7.0",
-    "@vueuse/core": "^10.1.2"
+    "@vueuse/core": "^13.5.0"
   },
   "devDependencies": {
     "@myparcel-pdk/admin-component-tests": "^1.0.0",
