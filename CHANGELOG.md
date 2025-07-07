@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.1](https://github.com/myparcelnl/prestashop/compare/v4.4.0...v4.4.1) (2025-07-07)
+
+
+### :bug: Bug Fixes
+
+* fix conflicting class names in autoload ([#343](https://github.com/myparcelnl/prestashop/issues/343)) ([ccffa40](https://github.com/myparcelnl/prestashop/commit/ccffa400d1a04bc647145742429ccf3af087824c))
+
 ## [4.4.0](https://github.com/myparcelnl/prestashop/compare/v4.3.1...v4.4.0) (2025-06-16)
 
 
