@@ -1262,7 +1262,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^1.0.0"
     "@vueuse/core": "npm:^10.1.2"
     autoprefixer: "npm:^10.4.14"
-    happy-dom: "npm:^14.0.0"
+    happy-dom: "npm:^15.10.2"
     postcss: "npm:^8.4.21"
     rollup-plugin-analyzer: "npm:^4.0.0"
     sass: "npm:^1.58.2"
@@ -7071,6 +7071,17 @@ __metadata:
     webidl-conversions: "npm:^7.0.0"
     whatwg-mimetype: "npm:^3.0.0"
   checksum: 10c0/546a16921cde2cad91a35eefc936eb26df444d95e976e01276052e5fd2db3a8dd5864182475ebbfc8443689ce306246d8e6dfec40bab5fb8bc99e2a448b795e9
+  languageName: node
+  linkType: hard
+
+"happy-dom@npm:^15.10.2":
+  version: 15.11.7
+  resolution: "happy-dom@npm:15.11.7"
+  dependencies:
+    entities: "npm:^4.5.0"
+    webidl-conversions: "npm:^7.0.0"
+    whatwg-mimetype: "npm:^3.0.0"
+  checksum: 10c0/22b08cac20192b08edf2e9c857ceeda8333a3301c4b5965a9550787b00db60d6d107c726390bd45a35305cd12ab086abd656bf957a408be0fcdc9fcd389f1973
   languageName: node
   linkType: hard
 
