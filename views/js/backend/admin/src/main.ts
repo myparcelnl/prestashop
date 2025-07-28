@@ -47,7 +47,7 @@ import {
 } from './components';
 
 // eslint-disable-next-line max-lines-per-function
-window.onload = () => {
+window.addEventListener('load', () => {
   createPdkAdmin({
     ...bootstrap4Config,
 
@@ -142,4 +142,4 @@ window.onload = () => {
       listenForBulkActions();
     },
   });
-};
+});
