@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.0](https://github.com/myparcelnl/prestashop/compare/v4.4.1...v4.5.0) (2025-07-31)
+
+
+### :bug: Bug Fixes
+
+* fix unreachable settings page when order status is NULL ([#367](https://github.com/myparcelnl/prestashop/issues/367)) ([daab555](https://github.com/myparcelnl/prestashop/commit/daab5556956fa5fa2818a63435863aa775ba91e2))
+
+
+### :sparkles: New Features
+
+* **admin:** show delivery type and display errors when exporting shipments ([fd1d63f](https://github.com/myparcelnl/prestashop/commit/fd1d63f7d980825b96ce06104bd7cbfd308f5810))
+* **export:** display api errors on screen when exporting ([12f81b5](https://github.com/myparcelnl/prestashop/commit/12f81b53dce14d8af0544807b339d686cfbcda4d))
+* improve javascript compatibility with other plugins ([#371](https://github.com/myparcelnl/prestashop/issues/371)) ([14d94ed](https://github.com/myparcelnl/prestashop/commit/14d94ed81771dc3276cb0d617f2d8fa7062ce519))
+* **pdk:** update myparcelnl/pdk from 2.59.1 to 2.61.0 ([#363](https://github.com/myparcelnl/prestashop/issues/363)) ([5226a67](https://github.com/myparcelnl/prestashop/commit/5226a6729eba36d6c5527534defe8e95c4ca9de1))
+
 ## [4.4.1](https://github.com/myparcelnl/prestashop/compare/v4.4.0...v4.4.1) (2025-07-07)
 
 
