@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.0](https://github.com/myparcelnl/prestashop/compare/v4.5.0...v4.6.0) (2025-08-07)
+
+
+### :sparkles: New Features
+
+* add carrier GLS ([#382](https://github.com/myparcelnl/prestashop/issues/382)) ([54c7150](https://github.com/myparcelnl/prestashop/commit/54c7150430b4c5f2301b4f628d867bb6c4ccee3d))
+
 ## [4.5.0](https://github.com/myparcelnl/prestashop/compare/v4.4.1...v4.5.0) (2025-07-31)
 
 
