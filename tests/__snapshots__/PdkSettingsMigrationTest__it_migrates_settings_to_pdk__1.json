@@ -1,889 +1,991 @@
 {
-    "account": {
-        "id": "account",
-        "apiKey": "api_key",
-        "apiKeyValid": true
+  "account": {
+    "id": "account",
+    "apiKey": "api_key",
+    "apiKeyValid": true
+  },
+  "order": {
+    "id": "order",
+    "barcodeInNote": false,
+    "conceptShipments": true,
+    "emptyDigitalStampWeight": 0,
+    "emptyMailboxWeight": 0,
+    "emptyParcelWeight": 0,
+    "emptyPackageSmallWeight": 0,
+    "orderMode": false,
+    "processDirectly": "1",
+    "saveCustomerAddress": false,
+    "sendNotificationAfter": -1,
+    "sendReturnEmail": false,
+    "shareCustomerInformation": true,
+    "statusOnLabelCreate": "status_3",
+    "statusWhenDelivered": "status_5",
+    "statusWhenLabelScanned": -1,
+    "trackTraceInAccount": false,
+    "trackTraceInEmail": false
+  },
+  "label": {
+    "id": "label",
+    "description": "[ORDER_ID] [ORDER_ID]",
+    "format": "a6",
+    "output": "open",
+    "position": 3,
+    "directPrint": false,
+    "printerGroupId": "",
+    "prompt": true
+  },
+  "customs": {
+    "id": "customs",
+    "countryOfOrigin": "DE",
+    "customsCode": "1234",
+    "packageContents": "1"
+  },
+  "checkout": {
+    "id": "checkout",
+    "allowedShippingMethods": [],
+    "deliveryOptionsHeader": "delivery options here",
+    "priceType": "surcharge",
+    "enableDeliveryOptions": true,
+    "enableDeliveryOptionsWhenNotInStock": true,
+    "useSeparateAddressFields": true,
+    "showTaxFields": true,
+    "enableAddressWidget": false
+  },
+  "carrier": {
+    "*": {
+      "id": "*",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": true,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "17:00",
+      "cutoffTimeSameDay": "09:00",
+      "defaultPackageType": "package",
+      "deliveryDaysWindow": 7,
+      "deliveryOptionsEnabled": true,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 6
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 0
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": false,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 0,
+      "priceDeliveryTypeMonday": 0,
+      "priceDeliveryTypeMorning": 0,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 0,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 0,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
     },
-    "order": {
-        "id": "order",
-        "barcodeInNote": false,
-        "conceptShipments": true,
-        "emptyDigitalStampWeight": 0,
-        "emptyMailboxWeight": 0,
-        "emptyParcelWeight": 0,
-        "emptyPackageSmallWeight": 0,
-        "orderMode": false,
-        "processDirectly": "1",
-        "saveCustomerAddress": false,
-        "sendNotificationAfter": -1,
-        "sendReturnEmail": false,
-        "shareCustomerInformation": true,
-        "statusOnLabelCreate": "status_3",
-        "statusWhenDelivered": "status_5",
-        "statusWhenLabelScanned": -1,
-        "trackTraceInAccount": false,
-        "trackTraceInEmail": false
+    "postnl": {
+      "id": "postnl",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": false,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "16:00",
+      "cutoffTimeSameDay": "10:00",
+      "defaultPackageType": "letter",
+      "deliveryDaysWindow": 3,
+      "deliveryOptionsEnabled": false,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 2,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "16:07:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 0
+          },
+          {
+            "cutoffTime": "16:01:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "16:02:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "16:03:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "16:04:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "16:05:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "16:06:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 6
+          }
+        ],
+        "dropOffDaysDeviations": [
+          {
+            "cutoffTime": "10:00",
+            "date": "2023-10-27 00:00:00",
+            "dispatch": false,
+            "weekday": 5
+          },
+          {
+            "date": "2023-10-29 00:00:00",
+            "dispatch": false,
+            "weekday": 0
+          },
+          {
+            "date": "2023-10-30 00:00:00",
+            "dispatch": false,
+            "weekday": 1
+          }
+        ]
+      },
+      "exportAgeCheck": true,
+      "exportHideSender": false,
+      "exportInsurance": true,
+      "exportInsuranceFromAmount": 100,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 5000000,
+      "exportInsuranceUpToEu": 1000000,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 2000000,
+      "exportLargeFormat": true,
+      "exportOnlyRecipient": true,
+      "exportReceiptCode": false,
+      "exportReturn": true,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": true,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 249,
+      "priceDeliveryTypeMonday": 229,
+      "priceDeliveryTypeMorning": 219,
+      "priceDeliveryTypePickup": -100,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 299,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 99,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 59,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
     },
-    "label": {
-        "id": "label",
-        "description": "[ORDER_ID] [ORDER_ID]",
-        "format": "a6",
-        "output": "open",
-        "position": 3,
-        "directPrint": false,
-        "printerGroupId": "",
-        "prompt": true
+    "dpd": {
+      "id": "dpd",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": true,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "17:00",
+      "cutoffTimeSameDay": "09:00",
+      "defaultPackageType": "package",
+      "deliveryDaysWindow": 7,
+      "deliveryOptionsEnabled": true,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 6
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 0
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": false,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 0,
+      "priceDeliveryTypeMonday": 0,
+      "priceDeliveryTypeMorning": 0,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 0,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 0,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
     },
-    "customs": {
-        "id": "customs",
-        "countryOfOrigin": "DE",
-        "customsCode": "1234",
-        "packageContents": "1"
+    "dhlforyou": {
+      "id": "dhlforyou",
+      "allowDeliveryOptions": false,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": false,
+      "allowMondayDelivery": false,
+      "allowMorningDelivery": false,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": false,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "16:00",
+      "cutoffTimeSameDay": "10:00",
+      "defaultPackageType": "mailbox",
+      "deliveryDaysWindow": -1,
+      "deliveryOptionsEnabled": false,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 0
+          },
+          {
+            "cutoffTime": "17:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "14:00:00",
+            "dispatch": false,
+            "sameDayCutoffTime": "10:00",
+            "weekday": 6
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": true,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": true,
+      "exportReturnPackageType": "mailbox",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 200,
+      "priceDeliveryTypeMonday": 180,
+      "priceDeliveryTypeMorning": 230,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 300,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 90,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 40,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
     },
-    "checkout": {
-        "id": "checkout",
-        "allowedShippingMethods": [],
-        "deliveryOptionsHeader": "delivery options here",
-        "priceType": "surcharge",
-        "enableDeliveryOptions": true,
-        "enableDeliveryOptionsWhenNotInStock": true,
-        "useSeparateAddressFields": true,
-        "showTaxFields": true,
-        "enableAddressWidget": false
+    "dhlparcelconnect": {
+      "id": "dhlparcelconnect",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": true,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "17:00",
+      "cutoffTimeSameDay": "09:00",
+      "defaultPackageType": "package",
+      "deliveryDaysWindow": 7,
+      "deliveryOptionsEnabled": true,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 6
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 0
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": false,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 0,
+      "priceDeliveryTypeMonday": 0,
+      "priceDeliveryTypeMorning": 0,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 0,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 0,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
     },
-    "carrier": {
-        "*": {
-            "id": "*",
-            "allowDeliveryOptions": true,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": true,
-            "allowMondayDelivery": true,
-            "allowMorningDelivery": true,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": true,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "17:00",
-            "cutoffTimeSameDay": "09:00",
-            "defaultPackageType": "package",
-            "deliveryDaysWindow": 7,
-            "deliveryOptionsEnabled": true,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 0,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 6
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 0
-                    }
-                ],
-                "dropOffDaysDeviations": []
-            },
-            "exportAgeCheck": false,
-            "exportHideSender": false,
-            "exportInsurance": false,
-            "exportInsuranceFromAmount": 0,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 0,
-            "exportInsuranceUpToEu": 0,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 0,
-            "exportLargeFormat": false,
-            "exportOnlyRecipient": false,
-            "exportReceiptCode": false,
-            "exportReturn": false,
-            "exportReturnLargeFormat": false,
-            "exportReturnPackageType": "package",
-            "exportSignature": false,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 0,
-            "priceDeliveryTypeMonday": 0,
-            "priceDeliveryTypeMorning": 0,
-            "priceDeliveryTypePickup": 0,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 0,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 0,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 0,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        },
-        "postnl": {
-            "id": "postnl",
-            "allowDeliveryOptions": true,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": true,
-            "allowMondayDelivery": true,
-            "allowMorningDelivery": true,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": false,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "16:00",
-            "cutoffTimeSameDay": "10:00",
-            "defaultPackageType": "letter",
-            "deliveryDaysWindow": 3,
-            "deliveryOptionsEnabled": false,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 2,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "16:07:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 0
-                    },
-                    {
-                        "cutoffTime": "16:01:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "16:02:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "16:03:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "16:04:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "16:05:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "16:06:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 6
-                    }
-                ],
-                "dropOffDaysDeviations": [
-                    {
-                        "cutoffTime": "10:00",
-                        "date": "2023-10-27 00:00:00",
-                        "dispatch": false,
-                        "weekday": 5
-                    },
-                    {
-                        "date": "2023-10-29 00:00:00",
-                        "dispatch": false,
-                        "weekday": 0
-                    },
-                    {
-                        "date": "2023-10-30 00:00:00",
-                        "dispatch": false,
-                        "weekday": 1
-                    }
-                ]
-            },
-            "exportAgeCheck": true,
-            "exportHideSender": false,
-            "exportInsurance": true,
-            "exportInsuranceFromAmount": 100,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 5000000,
-            "exportInsuranceUpToEu": 1000000,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 2000000,
-            "exportLargeFormat": true,
-            "exportOnlyRecipient": true,
-            "exportReceiptCode": false,
-            "exportReturn": true,
-            "exportReturnLargeFormat": false,
-            "exportReturnPackageType": "package",
-            "exportSignature": true,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 249,
-            "priceDeliveryTypeMonday": 229,
-            "priceDeliveryTypeMorning": 219,
-            "priceDeliveryTypePickup": -100,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 299,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 99,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 59,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        },
-        "dpd": {
-            "id": "dpd",
-            "allowDeliveryOptions": true,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": true,
-            "allowMondayDelivery": true,
-            "allowMorningDelivery": true,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": true,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "17:00",
-            "cutoffTimeSameDay": "09:00",
-            "defaultPackageType": "package",
-            "deliveryDaysWindow": 7,
-            "deliveryOptionsEnabled": true,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 0,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 6
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 0
-                    }
-                ],
-                "dropOffDaysDeviations": []
-            },
-            "exportAgeCheck": false,
-            "exportHideSender": false,
-            "exportInsurance": false,
-            "exportInsuranceFromAmount": 0,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 0,
-            "exportInsuranceUpToEu": 0,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 0,
-            "exportLargeFormat": false,
-            "exportOnlyRecipient": false,
-            "exportReceiptCode": false,
-            "exportReturn": false,
-            "exportReturnLargeFormat": false,
-            "exportReturnPackageType": "package",
-            "exportSignature": false,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 0,
-            "priceDeliveryTypeMonday": 0,
-            "priceDeliveryTypeMorning": 0,
-            "priceDeliveryTypePickup": 0,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 0,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 0,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 0,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        },
-        "dhlforyou": {
-            "id": "dhlforyou",
-            "allowDeliveryOptions": false,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": false,
-            "allowMondayDelivery": false,
-            "allowMorningDelivery": false,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": false,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "16:00",
-            "cutoffTimeSameDay": "10:00",
-            "defaultPackageType": "mailbox",
-            "deliveryDaysWindow": -1,
-            "deliveryOptionsEnabled": false,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 0,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "17:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 0
-                    },
-                    {
-                        "cutoffTime": "17:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "17:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "17:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "17:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "17:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "14:00:00",
-                        "dispatch": false,
-                        "sameDayCutoffTime": "10:00",
-                        "weekday": 6
-                    }
-                ],
-                "dropOffDaysDeviations": []
-            },
-            "exportAgeCheck": false,
-            "exportHideSender": false,
-            "exportInsurance": false,
-            "exportInsuranceFromAmount": 0,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 0,
-            "exportInsuranceUpToEu": 0,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 0,
-            "exportLargeFormat": true,
-            "exportOnlyRecipient": false,
-            "exportReceiptCode": false,
-            "exportReturn": false,
-            "exportReturnLargeFormat": true,
-            "exportReturnPackageType": "mailbox",
-            "exportSignature": false,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 200,
-            "priceDeliveryTypeMonday": 180,
-            "priceDeliveryTypeMorning": 230,
-            "priceDeliveryTypePickup": 0,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 300,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 90,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 40,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        },
-        "dhlparcelconnect": {
-            "id": "dhlparcelconnect",
-            "allowDeliveryOptions": true,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": true,
-            "allowMondayDelivery": true,
-            "allowMorningDelivery": true,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": true,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "17:00",
-            "cutoffTimeSameDay": "09:00",
-            "defaultPackageType": "package",
-            "deliveryDaysWindow": 7,
-            "deliveryOptionsEnabled": true,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 0,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 6
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 0
-                    }
-                ],
-                "dropOffDaysDeviations": []
-            },
-            "exportAgeCheck": false,
-            "exportHideSender": false,
-            "exportInsurance": false,
-            "exportInsuranceFromAmount": 0,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 0,
-            "exportInsuranceUpToEu": 0,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 0,
-            "exportLargeFormat": false,
-            "exportOnlyRecipient": false,
-            "exportReceiptCode": false,
-            "exportReturn": false,
-            "exportReturnLargeFormat": false,
-            "exportReturnPackageType": "package",
-            "exportSignature": false,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 0,
-            "priceDeliveryTypeMonday": 0,
-            "priceDeliveryTypeMorning": 0,
-            "priceDeliveryTypePickup": 0,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 0,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 0,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 0,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        },
-        "dhleuroplus": {
-            "id": "dhleuroplus",
-            "allowDeliveryOptions": true,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": true,
-            "allowMondayDelivery": true,
-            "allowMorningDelivery": true,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": true,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "17:00",
-            "cutoffTimeSameDay": "09:00",
-            "defaultPackageType": "package",
-            "deliveryDaysWindow": 7,
-            "deliveryOptionsEnabled": true,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 0,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 6
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 0
-                    }
-                ],
-                "dropOffDaysDeviations": []
-            },
-            "exportAgeCheck": false,
-            "exportHideSender": false,
-            "exportInsurance": false,
-            "exportInsuranceFromAmount": 0,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 0,
-            "exportInsuranceUpToEu": 0,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 0,
-            "exportLargeFormat": false,
-            "exportOnlyRecipient": false,
-            "exportReceiptCode": false,
-            "exportReturn": false,
-            "exportReturnLargeFormat": false,
-            "exportReturnPackageType": "package",
-            "exportSignature": false,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 0,
-            "priceDeliveryTypeMonday": 0,
-            "priceDeliveryTypeMorning": 0,
-            "priceDeliveryTypePickup": 0,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 0,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 0,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 0,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        },
-        "upsstandard": {
-            "id": "upsstandard",
-            "allowDeliveryOptions": true,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": true,
-            "allowMondayDelivery": true,
-            "allowMorningDelivery": true,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": true,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "17:00",
-            "cutoffTimeSameDay": "09:00",
-            "defaultPackageType": "package",
-            "deliveryDaysWindow": 7,
-            "deliveryOptionsEnabled": true,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 0,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 6
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 0
-                    }
-                ],
-                "dropOffDaysDeviations": []
-            },
-            "exportAgeCheck": false,
-            "exportHideSender": false,
-            "exportInsurance": false,
-            "exportInsuranceFromAmount": 0,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 0,
-            "exportInsuranceUpToEu": 0,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 0,
-            "exportLargeFormat": false,
-            "exportOnlyRecipient": false,
-            "exportReceiptCode": false,
-            "exportReturn": false,
-            "exportReturnLargeFormat": false,
-            "exportReturnPackageType": "package",
-            "exportSignature": false,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 0,
-            "priceDeliveryTypeMonday": 0,
-            "priceDeliveryTypeMorning": 0,
-            "priceDeliveryTypePickup": 0,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 0,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 0,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 0,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        },
-        "upsexpresssaver": {
-            "id": "upsexpresssaver",
-            "allowDeliveryOptions": true,
-            "allowStandardDelivery": false,
-            "allowEveningDelivery": true,
-            "allowMondayDelivery": true,
-            "allowMorningDelivery": true,
-            "allowOnlyRecipient": true,
-            "allowPickupLocations": true,
-            "allowSameDayDelivery": true,
-            "allowSaturdayDelivery": true,
-            "allowSignature": true,
-            "allowDeliveryTypeExpress": false,
-            "cutoffTime": "17:00",
-            "cutoffTimeSameDay": "09:00",
-            "defaultPackageType": "package",
-            "deliveryDaysWindow": 7,
-            "deliveryOptionsEnabled": true,
-            "deliveryOptionsEnabledForBackorders": false,
-            "digitalStampDefaultWeight": 0,
-            "dropOffDelay": 0,
-            "dropOffPossibilities": {
-                "dropOffDays": [
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 1
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 2
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 3
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 4
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 5
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 6
-                    },
-                    {
-                        "cutoffTime": "17:00:00",
-                        "dispatch": true,
-                        "sameDayCutoffTime": "09:00:00",
-                        "weekday": 0
-                    }
-                ],
-                "dropOffDaysDeviations": []
-            },
-            "exportAgeCheck": false,
-            "exportHideSender": false,
-            "exportInsurance": false,
-            "exportInsuranceFromAmount": 0,
-            "exportInsurancePricePercentage": 100,
-            "exportInsuranceUpTo": 0,
-            "exportInsuranceUpToEu": 0,
-            "exportInsuranceUpToRow": 0,
-            "exportInsuranceUpToUnique": 0,
-            "exportLargeFormat": false,
-            "exportOnlyRecipient": false,
-            "exportReceiptCode": false,
-            "exportReturn": false,
-            "exportReturnLargeFormat": false,
-            "exportReturnPackageType": "package",
-            "exportSignature": false,
-            "exportCollect": false,
-            "priceDeliveryTypeEvening": 0,
-            "priceDeliveryTypeMonday": 0,
-            "priceDeliveryTypeMorning": 0,
-            "priceDeliveryTypePickup": 0,
-            "priceDeliveryTypeSameDay": 0,
-            "priceDeliveryTypeSaturday": 0,
-            "priceDeliveryTypeStandard": 0,
-            "priceOnlyRecipient": 0,
-            "pricePackageTypeDigitalStamp": 0,
-            "pricePackageTypeMailbox": 0,
-            "pricePackageTypePackageSmall": 0,
-            "priceSignature": 0,
-            "allowInternationalMailbox": false,
-            "priceInternationalMailbox": 0,
-            "priceCollect": 0,
-            "priceDeliveryTypeExpress": 0
-        }
+    "dhleuroplus": {
+      "id": "dhleuroplus",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": true,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "17:00",
+      "cutoffTimeSameDay": "09:00",
+      "defaultPackageType": "package",
+      "deliveryDaysWindow": 7,
+      "deliveryOptionsEnabled": true,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 6
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 0
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": false,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 0,
+      "priceDeliveryTypeMonday": 0,
+      "priceDeliveryTypeMorning": 0,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 0,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 0,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
+    },
+    "upsstandard": {
+      "id": "upsstandard",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": true,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "17:00",
+      "cutoffTimeSameDay": "09:00",
+      "defaultPackageType": "package",
+      "deliveryDaysWindow": 7,
+      "deliveryOptionsEnabled": true,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 6
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 0
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": false,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 0,
+      "priceDeliveryTypeMonday": 0,
+      "priceDeliveryTypeMorning": 0,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 0,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 0,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
+    },
+    "upsexpresssaver": {
+      "id": "upsexpresssaver",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": true,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "17:00",
+      "cutoffTimeSameDay": "09:00",
+      "defaultPackageType": "package",
+      "deliveryDaysWindow": 7,
+      "deliveryOptionsEnabled": true,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 6
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 0
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": false,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 0,
+      "priceDeliveryTypeMonday": 0,
+      "priceDeliveryTypeMorning": 0,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 0,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 0,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
+    },
+    "gls": {
+      "id": "gls",
+      "allowDeliveryOptions": true,
+      "allowStandardDelivery": false,
+      "allowEveningDelivery": true,
+      "allowMondayDelivery": true,
+      "allowMorningDelivery": true,
+      "allowOnlyRecipient": true,
+      "allowPickupLocations": true,
+      "allowSameDayDelivery": true,
+      "allowSaturdayDelivery": true,
+      "allowSignature": true,
+      "allowDeliveryTypeExpress": false,
+      "cutoffTime": "17:00",
+      "cutoffTimeSameDay": "09:00",
+      "defaultPackageType": "package",
+      "deliveryDaysWindow": 7,
+      "deliveryOptionsEnabled": true,
+      "deliveryOptionsEnabledForBackorders": false,
+      "digitalStampDefaultWeight": 0,
+      "dropOffDelay": 0,
+      "dropOffPossibilities": {
+        "dropOffDays": [
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 1
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 2
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 3
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 4
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 5
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 6
+          },
+          {
+            "cutoffTime": "17:00:00",
+            "dispatch": true,
+            "sameDayCutoffTime": "09:00:00",
+            "weekday": 0
+          }
+        ],
+        "dropOffDaysDeviations": []
+      },
+      "exportAgeCheck": false,
+      "exportHideSender": false,
+      "exportInsurance": false,
+      "exportInsuranceFromAmount": 0,
+      "exportInsurancePricePercentage": 100,
+      "exportInsuranceUpTo": 0,
+      "exportInsuranceUpToEu": 0,
+      "exportInsuranceUpToRow": 0,
+      "exportInsuranceUpToUnique": 0,
+      "exportLargeFormat": false,
+      "exportOnlyRecipient": false,
+      "exportReceiptCode": false,
+      "exportReturn": false,
+      "exportReturnLargeFormat": false,
+      "exportReturnPackageType": "package",
+      "exportSignature": false,
+      "exportCollect": false,
+      "priceDeliveryTypeEvening": 0,
+      "priceDeliveryTypeMonday": 0,
+      "priceDeliveryTypeMorning": 0,
+      "priceDeliveryTypePickup": 0,
+      "priceDeliveryTypeSameDay": 0,
+      "priceDeliveryTypeSaturday": 0,
+      "priceDeliveryTypeStandard": 0,
+      "priceOnlyRecipient": 0,
+      "pricePackageTypeDigitalStamp": 0,
+      "pricePackageTypeMailbox": 0,
+      "pricePackageTypePackageSmall": 0,
+      "priceSignature": 0,
+      "allowInternationalMailbox": false,
+      "priceInternationalMailbox": 0,
+      "priceCollect": 0,
+      "priceDeliveryTypeExpress": 0
     }
+  }
 }
