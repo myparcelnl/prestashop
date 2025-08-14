@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.1](https://github.com/myparcelnl/prestashop/compare/v4.6.0...v4.6.1) (2025-08-14)
+
 ## [4.6.0](https://github.com/myparcelnl/prestashop/compare/v4.5.0...v4.6.0) (2025-08-07)
 
 
