@@ -455,4 +455,46 @@ return [
             ],
         ],
     ]),
+
+    /**
+     * Runtime configuration for dynamic behavior based on API key
+     */
+    'userAgent' => factory(function (): array {
+        try {
+            $baseUserAgent = [
+                'PrestaShop'          => defined('_PS_VERSION_') ? _PS_VERSION_ : '8.1.6',
+                'MyParcel-PrestaShop' => Pdk::getAppInfo()->version ?? 'unknown',
+            ];
+        } catch (\Throwable $e) {
+            // Fallback for very early initialization
+            $baseUserAgent = [
+                'PrestaShop'          => defined('_PS_VERSION_') ? _PS_VERSION_ : '8.1.6',
+                'MyParcel-PrestaShop' => 'unknown',
+            ];
+        }
+        
+        try {
+            // Try to get proposition dynamically at runtime
+            if (class_exists('\MyParcelNL\Pdk\Facade\Platform')) {
+                $baseUserAgent['MyParcel-Proposition'] = \MyParcelNL\Pdk\Facade\Platform::getPropositionName();
+            } else {
+                $baseUserAgent['MyParcel-Proposition'] = 'myparcel';
+            }
+        } catch (\Throwable $e) {
+            // Fallback during early initialization when API key might not be available
+            $baseUserAgent['MyParcel-Proposition'] = 'myparcel';
+        }
+        
+        return $baseUserAgent;
+    }),
+
+    'settingKeyPrefix' => factory(function (): string {
+        try {
+            // Use dynamic namespace instead of hardcoded prefix
+            return \MyParcelNL\Pdk\Base\PdkBootstrapper::PLUGIN_NAMESPACE . '_';
+        } catch (\Throwable $e) {
+            // Fallback to legacy prefix during early initialization
+            return 'myparcelnl_';
+        }
+    }),
 ];

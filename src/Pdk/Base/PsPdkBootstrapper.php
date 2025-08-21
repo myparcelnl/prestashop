@@ -15,6 +15,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
+use Configuration;
 use PrestaShopBundle\Exception\InvalidModuleException;
 use Psr\Log\LogLevel;
 use ReflectionClass;
@@ -157,9 +158,18 @@ class PsPdkBootstrapper extends PdkBootstrapper
             }),
 
             /**
-             * Get all hooks from the MyParcelNL class dynamically.
+             * Get hooks based on API key availability - conditional loading
              */
             'moduleHooks'    => factory(function () {
+                // Check if we have an API key
+                $apiKey = $this->getApiKey();
+                
+                if (!$apiKey) {
+                    // Early initialization - only essential admin hooks for settings interface
+                    return $this->getPluginInitHooks();
+                }
+                
+                // Full initialization - all hooks via reflection (existing logic)
                 $reflectionClass = new ReflectionClass(MyParcelNL::class);
 
                 $hooks = (new Collection($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC)))
@@ -214,6 +224,78 @@ class PsPdkBootstrapper extends PdkBootstrapper
                 return Pdk::get('getPsService')('twig');
             }),
 
+        ];
+    }
+
+    /**
+     * Get API key for early initialization check
+     */
+    private function getApiKey(): ?string
+    {
+        try {
+            // First try current configuration keys that are likely to exist
+            $candidates = [
+                'myparcelnl_account',            // Current primary key
+                'myparcelnl_data_account',       // Current data key
+                "_myparcelnl_account",          // Legacy with underscore
+            ];
+            
+            // Try the PDK namespace keys too (for future compatibility)
+            try {
+                $namespace = PdkBootstrapper::PLUGIN_NAMESPACE;
+                $candidates = array_merge([
+                    "_{$namespace}_account",        // New format with underscore
+                    "{$namespace}_account",         // New format
+                    "{$namespace}_data_account",    // New format data
+                ], $candidates);
+            } catch (\Throwable $e) {
+                // If PLUGIN_NAMESPACE is not available yet, continue with legacy keys
+            }
+            
+            foreach ($candidates as $key) {
+                $value = Configuration::get($key);
+                if (!$value) {
+                    continue;
+                }
+                
+                // Handle both JSON string and array formats
+                if (is_string($value)) {
+                    $data = json_decode($value, true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        continue; // Skip invalid JSON
+                    }
+                } else {
+                    $data = (array) $value;
+                }
+                
+                if (isset($data['apiKey']) && !empty($data['apiKey']) && is_string($data['apiKey'])) {
+                    return trim($data['apiKey']);
+                }
+            }
+            
+            return null;
+        } catch (\Throwable $e) {
+            // Log the error but don't break the initialization
+            if (class_exists('PrestaShopLogger')) {
+                \PrestaShopLogger::addLog(
+                    'MyParcel PDK: Error checking API key during bootstrap: ' . $e->getMessage(),
+                    \PrestaShopLogger::LOG_SEVERITY_LEVEL_WARNING
+                );
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Get minimal hooks for plugin initialization (settings interface only)
+     */
+    private function getPluginInitHooks(): array
+    {
+        return [
+            'displayBackOfficeHeader',    // For admin CSS/JS
+            'displayAdminAfterHeader',    // For admin container
+            'displayAdminEndContent',     // For admin footer scripts
+            'actionAdminControllerSetMedia', // For settings page assets
         ];
     }
 }
