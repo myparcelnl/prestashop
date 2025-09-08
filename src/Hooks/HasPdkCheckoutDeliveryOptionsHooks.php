@@ -73,6 +73,18 @@ trait HasPdkCheckoutDeliveryOptionsHooks
     }
 
     /**
+     * @param  array $params
+     *
+     * @return false|string
+     */
+    public function hookDisplayOrderConfirmation(array $params)
+    {
+        // This hook can be used for order confirmation functionality
+        // For now, return false to avoid breaking the installation
+        return false;
+    }
+
+    /**
      * @return bool
      */
     private function deliveryOptionsDisabled(): bool
