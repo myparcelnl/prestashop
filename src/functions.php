@@ -15,8 +15,6 @@ use function DI\factory;
 
 if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {
     /**
-     * @param  string $name
-     * @param  string $title
      * @param  string $version
      * @param  string $path
      * @param  string $url
@@ -26,8 +24,6 @@ if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {
      * @throws \Exception
      */
     function bootPdk(
-        string $name,
-        string $title,
         string $version,
         string $path,
         string $url,
