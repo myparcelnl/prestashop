@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPlugin;
@@ -44,13 +45,40 @@ it('installs: registers hooks', function () {
     /** @var \MyParcelNL $module */
     $module = Pdk::get('moduleInstance');
 
+    MyParcelModule::resetRegisteringHooks();
+
     expect(MockPsObjectModels::getByClass(Hook::class))->toBeEmpty();
+
     Installer::install($module);
 
     $createdHooks = MockPsObjectModels::getByClass(Hook::class);
 
     expect($createdHooks)->not->toBeEmpty();
-    $this->assertMatchesJsonSnapshot(json_encode($createdHooks->toArray(Arrayable::SKIP_NULL)));
+
+    $hooks = array_reduce($createdHooks->toArray(), function ($carry, $item) {
+        if (isset($item['name'])) {
+            $carry[] = $item['name'];
+        }
+
+        return $carry;
+    }, []);
+
+    expect($hooks)->toMatchArray([
+        'displayBackOfficeHeader',
+        'displayBackOfficeFooter',
+        'displayAdminAfterHeader',
+        'displayAdminEndContent',
+        'displayHeader',
+        'displayOrderConfirmation',
+        'displayAdminOrderLeft',
+        'displayAdminOrderMainBottom',
+        'displayAdminProductsExtra',
+        'displayCarrierList',
+        'actionOrderGridDefinitionModifier',
+        'actionOrderGridPresenterModifier',
+        'actionProductUpdate',
+        'actionCarrierUpdate',
+    ]);
 });
 
 it('installs: installs tabs', function () {

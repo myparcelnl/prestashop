@@ -1,17 +1,22 @@
 [
   "displayBeforeCarrier",
   "displayCarrierExtraContent",
+  "displayOrderConfirmation",
   "actionCarrierProcess",
   "actionOrderGridDefinitionModifier",
   "actionOrderGridPresenterModifier",
   "actionObjectCustomerMessageAddAfter",
   "displayAdminOrderMain",
+  "displayAdminOrderLeft",
+  "displayAdminOrderMainBottom",
   "actionProductUpdate",
   "displayAdminProductsExtra",
   "displayAdminAfterHeader",
+  "displayBackOfficeFooter",
   "displayAdminEndContent",
   "displayBackOfficeHeader",
   "displayHeader",
   "actionFilterDeliveryOptionList",
+  "displayCarrierList",
   "actionCarrierUpdate"
 ]

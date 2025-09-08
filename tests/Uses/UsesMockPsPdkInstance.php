@@ -15,6 +15,7 @@ use Lang;
 use Manufacturer;
 use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
+use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Facade\Config;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -98,8 +99,8 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
     protected function setup(): void
     {
         MockPsPdkBootstrapper::setConfig($this->config);
-        MockPsPdkBootstrapper::boot('pest', 'Pest', '1.0.0', __DIR__ . '/../../', 'APP_URL');
-        MockPsModule::setInstance('pest', new CarrierModule());
+        MockPsPdkBootstrapper::boot('1.0.0', __DIR__ . '/../../', 'APP_URL');
+        MockPsModule::setInstance(PdkBootstrapper::PLUGIN_NAMESPACE, new CarrierModule());
 
         $this->addDefaultData();
     }

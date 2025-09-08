@@ -63,6 +63,20 @@ trait HasPsCarrierListHooks
     }
 
     /**
+     * Hook for displaying content in the carrier list.
+     * This hook is registered but the functionality is handled by actionFilterDeliveryOptionList.
+     *
+     * @param array $params
+     * @return string
+     */
+    public function hookDisplayCarrierList(array $params): string
+    {
+        // The actual carrier filtering logic is handled by hookActionFilterDeliveryOptionList
+        // This hook is here for compatibility but doesn't need to output anything
+        return '';
+    }
+
+    /**
      * @param  string $carrierName
      *
      * @return int[]

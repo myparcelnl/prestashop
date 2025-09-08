@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
@@ -43,25 +44,27 @@ class PsPdkBootstrapper extends PdkBootstrapper
         string $url
     ): array {
         return array_replace(
-            $this->getConfig($version, $name, $path),
+            $this->getConfig($version, $path),
             $this->resolvePrestaShopServices()
         );
     }
 
     /**
      * @param  string $version
-     * @param  string $name
      * @param  string $path
      *
      * @return array
      */
-    protected function getConfig(string $version, string $name, string $path): array
+    protected function getConfig(string $version, string $path): array
     {
         return [
-            'userAgent' => value([
-                'PrestaShop'          => _PS_VERSION_,
-                'MyParcel-PrestaShop' => $version,
-            ]),
+            'userAgent' => factory(function () use ($version): array {
+                return [
+                    'MyParcel-PrestaShop' => $version,
+                    'MyParcel-Proposition' => Platform::getPropositionName(),
+                    'PrestaShop'          => _PS_VERSION_,
+                ];
+            }),
 
             /**
              * The name of the tab we want to show the settings page under.
@@ -84,7 +87,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * Logging
              */
 
-            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, self::PLUGIN_NAMESPACE)),
 
             'logLevelFilenameMap' => value([
                 LogLevel::DEBUG     => FileLogger::DEBUG,
@@ -111,10 +114,10 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * @see config/routes.yml
              */
 
-            'routeNameFrontend' => value('myparcelnl_frontend'),
-            'routeNamePdk'      => value('myparcelnl_pdk'),
-            'routeNameSettings' => value('myparcelnl_settings'),
-            'routeNameWebhook'  => value('myparcelnl_webhook'),
+            'routeNameFrontend' => value(self::PLUGIN_NAMESPACE . '_frontend'),
+            'routeNamePdk'      => value(self::PLUGIN_NAMESPACE . '_pdk'),
+            'routeNameSettings' => value(self::PLUGIN_NAMESPACE . '_settings'),
+            'routeNameWebhook'  => value(self::PLUGIN_NAMESPACE . '_webhook'),
 
             'legacyControllerSettings' => value('MyParcelNLAdminSettings'),
 
@@ -144,7 +147,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             ]),
 
             'moduleInstance' => factory(static function (): Module {
-                $name = Pdk::getAppInfo()->name;
+                $name = PdkBootstrapper::PLUGIN_NAMESPACE;
 
                 /** @var MyParcelNL|false $module */
                 $module = Module::getInstanceByName($name);

@@ -11,12 +11,14 @@ use Carrier as PsCarrier;
 use Cart;
 use Cookie;
 use Country;
+use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Platform;
+use MyParcelNL\Pdk\Facade\Platform as PlatformFacade;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use MyParcelNL\Sdk\src\Support\Arr;
-use function MyParcelNL\Pdk\Tests\mockPlatform;
+use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
 
@@ -32,7 +34,14 @@ it('filters carriers from delivery options list', function (
     array  $filteredCarriers,
     string $platform = Platform::MYPARCEL_NAME
 ) {
-    $reset = mockPlatform($platform);
+    $platformId = Platform::MYPARCEL_ID;
+    if (Platform::SENDMYPARCEL_NAME === $platform) {
+        $platformId = Platform::SENDMYPARCEL_ID;
+    }
+    factory(Account::class, $platformId)
+        ->withShops()
+        ->store();
+
 
     $allCarriers = [
         Carrier::CARRIER_BPOST_NAME,
@@ -107,15 +116,13 @@ it('filters carriers from delivery options list', function (
         $carrierList  = $carrier['carrier_list'];
         $firstCarrier = Arr::first($carrierList);
 
-        return $flippedMap[$firstCarrier['instance']->id];
+        return $flippedMap[$firstCarrier['instance']->id] ?? null;
     }, $carriers)));
 
     expect($filteredCarrierNames)
         ->toEqual($filteredCarriers)
         ->and($carriers)
         ->toHaveLength(count($filteredCarriers) + 1);
-
-    $reset();
 })->with([
     'NL' => [
         'country'          => 'NL',
