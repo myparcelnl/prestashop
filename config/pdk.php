@@ -24,6 +24,7 @@ use MyParcelNL\Pdk\Audit\Contract\PdkAuditRepositoryInterface;
 use MyParcelNL\Pdk\Audit\Service\AuditService;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
+use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Context\Contract\ContextServiceInterface;
@@ -183,6 +184,7 @@ return [
     /**
      * Custom services
      */
+    NamespaceMigrationService::class       => get(NamespaceMigrationService::class),
     PsConfigurationServiceInterface::class => get(Ps17PsConfigurationService::class),
     PsRouterServiceInterface::class        => psVersionFactory([
         ['class' => Ps8RouterService::class, 'version' => 8],

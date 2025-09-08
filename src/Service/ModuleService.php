@@ -9,6 +9,7 @@ use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
+use MyParcelNL\PrestaShop\Service\ModuleHookService;
 use Throwable;
 
 final class ModuleService
