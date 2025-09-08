@@ -47,4 +47,28 @@ trait HasPdkOrderHooks
 
         return Frontend::renderOrderBox($order);
     }
+
+    /**
+     * @param  array $params
+     *
+     * @return string
+     */
+    public function hookDisplayAdminOrderLeft(array $params): string
+    {
+        // This hook can be used for order left sidebar functionality
+        // For now, return empty string to avoid breaking the installation
+        return '';
+    }
+
+    /**
+     * @param  array $params
+     *
+     * @return string
+     */
+    public function hookDisplayAdminOrderMainBottom(array $params): string
+    {
+        // This hook can be used for order main bottom functionality
+        // For now, return empty string to avoid breaking the installation
+        return '';
+    }
 }

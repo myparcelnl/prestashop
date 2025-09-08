@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
+use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -19,6 +20,7 @@ use MyParcelNL\PrestaShop\Hooks\HasPdkScriptHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsCarrierListHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsCarrierUpdateHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsShippingCostHooks;
+use MyParcelNL\PrestaShop\Service\NamespaceMigrationService;
 use function MyParcelNL\PrestaShop\bootPdk;
 
 defined('_PS_VERSION_') or exit();
@@ -56,7 +58,7 @@ class MyParcelNL extends CarrierModule
         // todo: find a better solution
         error_reporting(error_reporting() & ~E_DEPRECATED);
 
-        $this->name                   = 'myparcelnl';
+        $this->name                   = PdkBootstrapper::PLUGIN_NAMESPACE;
         $this->version                = self::getVersionFromComposer();
         $this->author                 = 'MyParcel';
         $this->author_uri             = 'https://myparcel.nl';
@@ -181,12 +183,31 @@ class MyParcelNL extends CarrierModule
         $this->tabs = [
             [
                 'name'              => $translatedName,
-                'route_name'        => "{$this->name}_settings",
+                'route_name'        => PdkBootstrapper::PLUGIN_NAMESPACE . '_settings',
                 'class_name'        => MyParcelNLAdminSettingsController::class,
                 'visible'           => true,
                 'parent_class_name' => $this->tab,
             ],
         ];
+    }
+
+    /**
+     * Get API key from PrestaShop configuration without PDK calls to prevent endless loops
+     * 
+     * @return string|null
+     */
+    private function getApiKey(): ?string
+    {
+        $optionKey = sprintf('_%s_account', PdkBootstrapper::PLUGIN_NAMESPACE);
+        $accountData = Configuration::get($optionKey);
+        
+        if (!$accountData) {
+            return null;
+        }
+        
+        $decodedData = json_decode($accountData, true);
+        
+        return $decodedData['apiKey'] ?? null;
     }
 
     /**
@@ -196,8 +217,6 @@ class MyParcelNL extends CarrierModule
     private function setup(): void
     {
         bootPdk(
-            $this->name,
-            $this->displayName,
             $this->version,
             $this->getLocalPath(),
             $this->getBaseUrl(),
@@ -205,6 +224,24 @@ class MyParcelNL extends CarrierModule
         );
 
         $this->hasPdk = true;
+        
+        // Run namespace migration after PDK is available
+        $this->runNamespaceMigration();
+    }
+    
+    /**
+     * Run namespace migration from old myparcelnl to new myparcelcom namespace
+     * This ensures backwards compatibility with existing installations
+     */
+    private function runNamespaceMigration(): void
+    {
+        try {
+            // Create service directly to avoid circular dependency
+            $migrationService = new NamespaceMigrationService();
+            $migrationService->migrate();
+        } catch (Throwable $e) {
+            Logger::warning('Failed to run namespace migration', ['exception' => $e]);
+        }
     }
 
     /**
@@ -253,8 +290,6 @@ class MyParcelNL extends CarrierModule
             );
 
             PrestaShopLogger::addLog($formattedMessage, PrestaShopLogger::LOG_SEVERITY_LEVEL_ERROR);
-
-            $this->_errors[] = str_replace("\n", '<br>', $formattedMessage);
 
             if ($failureCallback) {
                 $failureCallback($e);

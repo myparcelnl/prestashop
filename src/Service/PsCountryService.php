@@ -35,7 +35,7 @@ final class PsCountryService extends PsSpecificObjectModelService implements PsC
         // Resolve carrier identifier
         [$resolvedCarrierName] = explode(':', $carrierName);
 
-        $platform            = Platform::getPlatform();
+        $platform            = Platform::getPropositionName();
         $allCarrierCountries = Pdk::get('countriesPerPlatformAndCarrier')[$platform] ?? [];
         $countriesForCarrier = $allCarrierCountries[$resolvedCarrierName] ?? [];
 
