@@ -160,7 +160,7 @@ it('migrates settings to pdk', function () {
             ['name' => 'MYPARCELNL_FROM_TITLE', 'value' => 'from'],
             ['name' => 'MYPARCELNL_DISCOUNT_TITLE', 'value' => 'discount'],
             ['name' => 'MYPARCELNL_CONCEPT_FIRST', 'value' => '1'],
-            ['name' => 'MYPARCELNL_LABEL_DESCRIPTION', 'value' => '{order.id} {order.reference}'],
+            ['name' => 'MYPARCELNL_LABEL_DESCRIPTION', 'value' => '{order.id} {order.reference} [ORDER_NR]'],
             ['name' => 'MYPARCELNL_LABEL_SIZE', 'value' => 'a6'],
             ['name' => 'MYPARCELNL_LABEL_POSITION', 'value' => '3'],
             ['name' => 'MYPARCELNL_LABEL_PROMPT_POSITION', 'value' => '1'],

@@ -374,6 +374,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
                 return strtr((string) $value, [
                     '{order.id}'        => '[ORDER_ID]',
                     '{order.reference}' => '[ORDER_ID]',
+                    '[ORDER_NR]'        => '[ORDER_ID]',
                 ]);
             })
         );
