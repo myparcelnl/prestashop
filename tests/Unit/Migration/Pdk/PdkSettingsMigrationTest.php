@@ -198,3 +198,25 @@ it('migrates settings to pdk', function () {
 
     assertMatchesJsonSnapshot(json_encode($settings));
 });
+
+it('replaces [ORDER_NR] placeholder with [ORDER_ID] in label description', function () {
+    MockPsDb::insertRows(
+        'configuration',
+        [
+            ['name' => 'MYPARCELNL_API_KEY', 'value' => 'test_api_key'],
+            ['name' => 'MYPARCELNL_LABEL_DESCRIPTION', 'value' => 'Order [ORDER_NR] from shop'],
+        ],
+        'id_configuration'
+    );
+
+    /** @var \MyParcelNL\PrestaShop\Migration\Pdk\PdkSettingsMigration $migration */
+    $migration = Pdk::get(PdkSettingsMigration::class);
+    $migration->up();
+
+    /** @var PdkSettingsRepositoryInterface $settingsRepository */
+    $settingsRepository = Pdk::get(PdkSettingsRepositoryInterface::class);
+
+    $settings = $settingsRepository->all()->toArrayWithoutNull();
+    $description = $settings['label']['description'] ?? null;
+    expect($description)->toBe('Order [ORDER_ID] from shop');
+});
