@@ -10,6 +10,7 @@ use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\Pdk\App\Installer\Service\InstallerService;
 use MyParcelNL\Pdk\Facade\Actions;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\Pdk\Settings\Model\AccountSettings;
@@ -183,7 +184,6 @@ final class PsInstallerService extends InstallerService
 
     /**
      * @return void
-     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
      */
     private function uninstallHooks(): void
     {
@@ -192,7 +192,7 @@ final class PsInstallerService extends InstallerService
                 continue;
             }
 
-            //throw new InstallationException(sprintf('Hook %s could not be unregistered.', $hook)); // JOERI!
+            Logger::error(sprintf('Hook %s could not be unregistered.', $hook));
         }
     }
 }
