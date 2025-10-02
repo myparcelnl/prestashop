@@ -9,7 +9,8 @@ import {
   DefaultTableCol,
   DefaultTableRow,
   DefaultTimeInput,
-  DefaultRadioGroup, DefaultMultiDateInput,
+  DefaultRadioGroup,
+  DefaultMultiDateInput,
 } from '@myparcel-pdk/admin-preset-default';
 import {
   Bootstrap4Box,
