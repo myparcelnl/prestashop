@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Grid\Column;
 
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\Pdk;
 use PrestaShop\PrestaShop\Core\Grid\Column\AbstractColumn;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -12,11 +13,9 @@ final class MyParcelOrderColumn extends AbstractColumn
 {
     public function __construct()
     {
-        $appInfo = Pdk::getAppInfo();
+        parent::__construct(MyParcelNL::MODULE_NAME);
 
-        parent::__construct($appInfo->name);
-
-        $this->setName($appInfo->title);
+        $this->setName('MyParcel');
     }
 
     /**

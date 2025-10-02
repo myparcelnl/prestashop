@@ -44,25 +44,25 @@ class PsPdkBootstrapper extends PdkBootstrapper
         string $url
     ): array {
         return array_replace(
-            $this->getConfig($version, $path),
+            $this->getConfig($path),
             $this->resolvePrestaShopServices()
         );
     }
 
     /**
-     * @param  string $version
      * @param  string $path
      *
      * @return array
      */
-    protected function getConfig(string $version, string $path): array
+    protected function getConfig(string $path): array
     {
         return [
-            'userAgent' => factory(function () use ($version): array {
+            // you cannot use ‘use’ statements as php-di will not compile closures with them
+            'userAgent' => factory(function (): array {
                 return [
-                    'MyParcel-PrestaShop' => $version,
+                    'MyParcel-PrestaShop'  => Pdk::getAppInfo()->version,
                     'MyParcel-Proposition' => Platform::getPropositionName(),
-                    'PrestaShop'          => _PS_VERSION_,
+                    'PrestaShop'           => _PS_VERSION_,
                 ];
             }),
 
@@ -87,7 +87,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * Logging
              */
 
-            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, self::PLUGIN_NAMESPACE)),
+            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, MyParcelNL::MODULE_NAME)),
 
             'logLevelFilenameMap' => value([
                 LogLevel::DEBUG     => FileLogger::DEBUG,
@@ -114,10 +114,10 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * @see config/routes.yml
              */
 
-            'routeNameFrontend' => value(self::PLUGIN_NAMESPACE . '_frontend'),
-            'routeNamePdk'      => value(self::PLUGIN_NAMESPACE . '_pdk'),
-            'routeNameSettings' => value(self::PLUGIN_NAMESPACE . '_settings'),
-            'routeNameWebhook'  => value(self::PLUGIN_NAMESPACE . '_webhook'),
+            'routeNameFrontend' => value(MyParcelNL::MODULE_NAME . '_frontend'),
+            'routeNamePdk'      => value(MyParcelNL::MODULE_NAME . '_pdk'),
+            'routeNameSettings' => value(MyParcelNL::MODULE_NAME . '_settings'),
+            'routeNameWebhook'  => value(MyParcelNL::MODULE_NAME . '_webhook'),
 
             'legacyControllerSettings' => value('MyParcelNLAdminSettings'),
 
@@ -147,7 +147,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             ]),
 
             'moduleInstance' => factory(static function (): Module {
-                $name = PdkBootstrapper::PLUGIN_NAMESPACE;
+                $name = MyParcelNL::MODULE_NAME;
 
                 /** @var MyParcelNL|false $module */
                 $module = Module::getInstanceByName($name);

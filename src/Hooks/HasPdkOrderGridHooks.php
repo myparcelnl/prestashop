@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Hooks;
 
+use MyParcelNL;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Language;
@@ -66,14 +67,13 @@ trait HasPdkOrderGridHooks
      */
     private function addBulkActions(GridDefinitionInterface $definition): void
     {
-        $appInfo     = Pdk::getAppInfo();
         $bulkActions = $definition->getBulkActions();
 
         foreach (Pdk::get('bulkActions') as $bulkAction) {
-            $id     = "$appInfo->name-$bulkAction";
+            $id     = MyParcelNL::MODULE_NAME . "-$bulkAction";
             $action = new ButtonBulkAction($id);
 
-            $translation = sprintf('%s: %s', $appInfo->title, Language::translate($bulkAction));
+            $translation = sprintf('MyParcel: %s', Language::translate($bulkAction));
 
             $action
                 ->setName($translation)
