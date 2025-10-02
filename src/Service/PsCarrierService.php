@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier as PsCarrier;
 use Context;
+use MyParcelNL;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
@@ -188,7 +189,7 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     protected function deleteUnusedCarriers(Collection $createdCarriers): void
     {
         $psCarriers = $this->getPsCarriers();
-        $moduleName = Pdk::getAppInfo()->name;
+        $moduleName = MyParcelNL::MODULE_NAME;
 
         $psCarriers
             ->filter(function (PsCarrier $psCarrier) use ($moduleName, $createdCarriers): bool {

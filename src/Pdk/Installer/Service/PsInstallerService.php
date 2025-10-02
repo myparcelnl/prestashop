@@ -192,7 +192,7 @@ final class PsInstallerService extends InstallerService
                 continue;
             }
 
-            throw new InstallationException(sprintf('Hook %s could not be unregistered.', $hook));
+            //throw new InstallationException(sprintf('Hook %s could not be unregistered.', $hook)); // JOERI!
         }
     }
 }
