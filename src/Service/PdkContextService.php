@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
+use Module;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Context\Service\ContextService;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use Context;
 
@@ -17,111 +19,23 @@ final class PdkContextService extends ContextService
      */
     public function shouldRenderPdkComponents(): bool
     {
+        return Module::getInstanceByName('myparcelnl') instanceof \MyParcelNL;
+        // TODO JOERI: below logic seems to be very unstable, but above logic is not really battle-tested
         $context = Context::getContext();
-        
+
         if (!isset($context->controller)) {
             return false;
         }
 
-        $controller = $context->controller;
-        $controllerName = get_class($controller);
+        $controllerName = get_class($context->controller);
+        Logger::debug('GFJWREWIFJWEILKR: ' . $controllerName);
+        $controller = filter_input(INPUT_GET, 'controller', FILTER_SANITIZE_STRING);
+        $configure = filter_input(INPUT_GET, 'configure', FILTER_SANITIZE_STRING);
 
         // Check if we're on our settings controller or configure page
-        return strpos($controllerName, 'MyParcelNL') !== false
-            || (isset($_GET['configure']) && $_GET['configure'] === 'myparcelnl')
-            || (isset($_GET['controller']) && strpos($_GET['controller'], 'MyParcelNL') !== false);
-    }
-    
-    /**
-     * Check if we have an API key configured
-     * Uses the same configuration key as the account repository
-     */
-    public function hasApiKey(): bool
-    {
-        // Use the same key pattern as PsPdkAccountRepository
-        $configKey = Pdk::get('createSettingsKey')('data_account');
-        $accountData = \Configuration::get($configKey);
-        
-        if (!$accountData) {
-            return false;
-        }
-        
-        // Account data is stored as JSON
-        if (is_string($accountData)) {
-            $decodedData = json_decode($accountData, true);
-            return !empty($decodedData['apiKey'] ?? null);
-        }
-        
-        // Or as array directly
-        if (is_array($accountData)) {
-            return !empty($accountData['apiKey'] ?? null);
-        }
-        
-        return false;
-    }
-    
-    /**
-     * Render minimal boot context for API key entry
-     * This allows the settings page to render even without an API key
-     */
-    public function renderMinimalBootContainer(): string
-    {
-        // Only render on our settings pages
-        if (!$this->shouldRenderPdkComponents()) {
-            return '';
-        }
-
-        $appInfo = Pdk::getAppInfo();
-        
-        // Create minimal context data that allows API key entry
-        $minimalContext = [
-            'global' => [
-                'appInfo' => [
-                    'name' => $appInfo->name,
-                    'title' => $appInfo->title,
-                    'version' => $appInfo->version,
-                    'path' => $appInfo->path,
-                    'url' => $this->getCurrentAdminUrl(),
-                ],
-                'baseUrl' => $this->getBackendBaseUrl(),
-                'bootstrapId' => 'myparcel-pdk-boot',
-                'endpoints' => [
-                    'base' => Pdk::get('routeBackend'),
-                    'routes' => [
-                        'backend' => Pdk::get('routeBackend'),
-                        'backendPdk' => 'pdk',
-                        'frontend' => Pdk::get('routeFrontend'),
-                    ],
-                ],
-                'eventPing' => 'myparcel_pdk_ping',
-                'eventPong' => 'myparcel_pdk_pong',
-                'language' => $this->getCurrentLocale(),
-                'mode' => Pdk::getMode(),
-                'platform' => [
-                    'name' => 'prestashop',
-                    'human' => 'PrestaShop',
-                    'backofficeUrl' => $this->getCurrentAdminUrl(),
-                    'supportUrl' => 'https://github.com/myparcelnl/prestashop',
-                    'localCountry' => 'NL',
-                    'defaultCarrier' => 'postnl',
-                    'defaultCarrierId' => 1,
-                ],
-                'translations' => [],
-            ],
-            'dynamic' => [],
-            'checkout' => null,
-            'orderData' => null,
-            'pluginSettingsView' => null,
-            'productData' => null,
-            'productSettingsView' => null,
-        ];
-        
-        $contextJson = json_encode($minimalContext, JSON_UNESCAPED_SLASHES);
-
-        return sprintf(
-            '<span id="myparcel-pdk-boot" data-pdk-context="%s"></span>',
-            htmlspecialchars($contextJson, ENT_QUOTES, 'UTF-8')
-        );
+        return false !== strpos($controllerName, 'MyParcelNL')
+            || ($configure && 'myparcelnl' === $configure)
+            || ($controller && false !== strpos($controller, 'MyParcelNL'));
     }
     
     /**

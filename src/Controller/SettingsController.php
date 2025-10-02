@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Controller;
 
-use MyParcelNL\Pdk\Facade\Frontend;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
