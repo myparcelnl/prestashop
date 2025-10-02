@@ -9,7 +9,7 @@ import {
   DefaultTableCol,
   DefaultTableRow,
   DefaultTimeInput,
-  DefaultRadioGroup,
+  DefaultRadioGroup, DefaultMultiDateInput,
 } from '@myparcel-pdk/admin-preset-default';
 import {
   Bootstrap4Box,
@@ -89,6 +89,7 @@ window.addEventListener('load', () => {
       [AdminComponent.TimeInput]: DefaultTimeInput,
       [AdminComponent.ToggleInput]: PsToggleInput,
       [AdminComponent.TriStateInput]: PsTriStateInput,
+      [AdminComponent.MultiDateInput]: DefaultMultiDateInput
     },
 
     formConfig: {
