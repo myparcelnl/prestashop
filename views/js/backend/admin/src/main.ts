@@ -90,7 +90,7 @@ window.addEventListener('load', () => {
       [AdminComponent.TimeInput]: DefaultTimeInput,
       [AdminComponent.ToggleInput]: PsToggleInput,
       [AdminComponent.TriStateInput]: PsTriStateInput,
-      [AdminComponent.MultiDateInput]: DefaultMultiDateInput
+      [AdminComponent.MultiDateInput]: DefaultMultiDateInput,
     },
 
     formConfig: {
