@@ -20,22 +20,6 @@ final class PdkContextService extends ContextService
     public function shouldRenderPdkComponents(): bool
     {
         return Module::getInstanceByName('myparcelnl') instanceof \MyParcelNL;
-        // TODO JOERI: below logic seems to be very unstable, but above logic is not really battle-tested
-        $context = Context::getContext();
-
-        if (!isset($context->controller)) {
-            return false;
-        }
-
-        $controllerName = get_class($context->controller);
-        Logger::debug('GFJWREWIFJWEILKR: ' . $controllerName);
-        $controller = filter_input(INPUT_GET, 'controller', FILTER_SANITIZE_STRING);
-        $configure = filter_input(INPUT_GET, 'configure', FILTER_SANITIZE_STRING);
-
-        // Check if we're on our settings controller or configure page
-        return false !== strpos($controllerName, 'MyParcelNL')
-            || ($configure && 'myparcelnl' === $configure)
-            || ($controller && false !== strpos($controller, 'MyParcelNL'));
     }
     
     /**
