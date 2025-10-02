@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
-use MyParcelNL\Pdk\Base\PdkBootstrapper;
+use MyParcelNL;
 use MyParcelNL\Pdk\Facade\Logger;
 use Configuration;
 
 final class NamespaceMigrationService
 {
     private const OLD_NAMESPACE = 'myparcelnl';
-    private const NEW_NAMESPACE = PdkBootstrapper::PLUGIN_NAMESPACE;
+    private const NEW_NAMESPACE = MyParcelNL::MODULE_NAME;
     private const MIGRATION_COMPLETED_KEY = '_namespace_migration_completed';
 
     /**
@@ -87,7 +87,7 @@ final class NamespaceMigrationService
     /**
      * Migrate any embedded namespaces within JSON values
      */
-    private function migrateJsonNamespaces($value): string
+    private function migrateJsonNamespaces($value)
     {
         if (! is_string($value)) {
             return $value;

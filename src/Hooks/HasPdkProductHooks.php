@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Hooks;
 
+use MyParcelNL;
 use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Arr;
@@ -90,8 +91,8 @@ trait HasPdkProductHooks
      */
     private function isAlreadySaved(int $idProduct, array $productSettings): bool
     {
-        $appInfo          = Pdk::getAppInfo();
-        $checksumKey      = "_$appInfo->name-product-save-checksum-$idProduct";
+        $appName          = MyParcelNL::MODULE_NAME;
+        $checksumKey      = "_$appName-product-save-checksum-$idProduct";
         $existingChecksum = $_POST[$checksumKey] ?? null;
         $checksum         = md5(json_encode($productSettings, JSON_THROW_ON_ERROR));
 
@@ -126,7 +127,7 @@ trait HasPdkProductHooks
      */
     private function saveProductSettings(int $productId): void
     {
-        $name            = Pdk::getAppInfo()->name;
+        $name            = MyParcelNL::MODULE_NAME;
         $productSettings = array_filter(Tools::getAllValues(), static function ($key) use ($name) {
             return Str::startsWith((string) $key, $name);
         }, ARRAY_FILTER_USE_KEY);
