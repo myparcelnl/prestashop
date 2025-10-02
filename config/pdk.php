@@ -24,11 +24,9 @@ use MyParcelNL\Pdk\Audit\Contract\PdkAuditRepositoryInterface;
 use MyParcelNL\Pdk\Audit\Service\AuditService;
 use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
-use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Context\Contract\ContextServiceInterface;
-use MyParcelNL\Pdk\Context\Service\ContextService;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
@@ -81,7 +79,6 @@ use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\Ps17RouterService;
 use MyParcelNL\PrestaShop\Router\Service\Ps8RouterService;
 use MyParcelNL\PrestaShop\Script\Service\PsScriptService;
-use MyParcelNL\PrestaShop\Service\ModuleHookService;
 use MyParcelNL\PrestaShop\Service\NamespaceMigrationService;
 use MyParcelNL\PrestaShop\Service\PdkContextService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
@@ -532,14 +529,14 @@ return [
     # Routes - CRITICAL for PDK frontend to work!
     ###
 
-    'routeBackend'                   => value(PdkBootstrapper::PLUGIN_NAMESPACE . '/backend/v1'),
+    'routeBackend'                   => value(MyParcelNL::MODULE_NAME . '/backend/v1'),
     'routeBackendPdk'                => value('pdk'),
     'routeBackendWebhookBase'        => value('webhook'),
     'routeBackendWebhook'            => factory(function (): string {
         return sprintf('%s/(?P<hash>.+)', Pdk::get('routeBackendWebhookBase'));
     }),
-    'routeFrontend'                  => value(PdkBootstrapper::PLUGIN_NAMESPACE . '/frontend/v1'),
-    'routeFrontendMyParcel'          => value(PdkBootstrapper::PLUGIN_NAMESPACE),
+    'routeFrontend'                  => value(MyParcelNL::MODULE_NAME . '/frontend/v1'),
+    'routeFrontendMyParcel'          => value(MyParcelNL::MODULE_NAME),
 
     ###
     # Settings
@@ -549,13 +546,13 @@ return [
     'settingsMenuSlugShort' => value('myparcel-settings'),
     'settingsMenuTitle'     => value('MyParcel'),
     'settingsPageTitle'     => value('MyParcel PrestaShop'),
-    
+
     /**
      * Function to create settings keys with the plugin namespace prefix
      */
     'createSettingsKey' => factory(function (): callable {
         return static function (string $key): string {
-            return sprintf('_%s_%s', PdkBootstrapper::PLUGIN_NAMESPACE, $key);
+            return sprintf('_%s_%s', MyParcelNL::MODULE_NAME, $key);
         };
     }),
 ];

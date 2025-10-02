@@ -63,13 +63,15 @@ it('installs: registers hooks', function () {
         return $carry;
     }, []);
 
-    expect($hooks)->toMatchArray([
+    expect(array_flip($hooks))->toHaveKeys([
+        'displayBeforeCarrier',
+        'displayCarrierExtraContent',
+        'displayOrderConfirmation',
         'displayBackOfficeHeader',
         'displayBackOfficeFooter',
         'displayAdminAfterHeader',
         'displayAdminEndContent',
         'displayHeader',
-        'displayOrderConfirmation',
         'displayAdminOrderLeft',
         'displayAdminOrderMainBottom',
         'displayAdminProductsExtra',
@@ -78,6 +80,7 @@ it('installs: registers hooks', function () {
         'actionOrderGridPresenterModifier',
         'actionProductUpdate',
         'actionCarrierUpdate',
+        'actionCarrierProcess',
     ]);
 });
 

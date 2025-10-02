@@ -13,6 +13,7 @@ use Gender;
 use Group;
 use Lang;
 use Manufacturer;
+use MyParcelNL;
 use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
@@ -100,7 +101,7 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
     {
         MockPsPdkBootstrapper::setConfig($this->config);
         MockPsPdkBootstrapper::boot('1.0.0', __DIR__ . '/../../', 'APP_URL');
-        MockPsModule::setInstance(PdkBootstrapper::PLUGIN_NAMESPACE, new CarrierModule());
+        MockPsModule::setInstance(MyParcelNL::MODULE_NAME, new CarrierModule());
 
         $this->addDefaultData();
     }
