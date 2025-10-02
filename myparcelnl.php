@@ -20,7 +20,6 @@ use MyParcelNL\PrestaShop\Hooks\HasPdkScriptHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsCarrierListHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsCarrierUpdateHooks;
 use MyParcelNL\PrestaShop\Hooks\HasPsShippingCostHooks;
-use MyParcelNL\PrestaShop\Service\NamespaceMigrationService;
 use function MyParcelNL\PrestaShop\bootPdk;
 
 defined('_PS_VERSION_') or exit();
@@ -207,24 +206,6 @@ class MyParcelNL extends CarrierModule
         );
 
         $this->hasPdk = true;
-        
-        // Run namespace migration after PDK is available
-        $this->runNamespaceMigration();
-    }
-    
-    /**
-     * Run namespace migration from old myparcelnl to new myparcelcom namespace
-     * This ensures backwards compatibility with existing installations
-     */
-    private function runNamespaceMigration(): void
-    {
-        try {
-            // Create service directly to avoid circular dependency
-            $migrationService = new NamespaceMigrationService();
-            $migrationService->migrate();
-        } catch (Throwable $e) {
-            Logger::warning('Failed to run namespace migration', ['exception' => $e]);
-        }
     }
 
     /**
