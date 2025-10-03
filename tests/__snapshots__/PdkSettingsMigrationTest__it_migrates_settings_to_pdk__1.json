@@ -50,7 +50,8 @@
         "enableDeliveryOptionsWhenNotInStock": true,
         "useSeparateAddressFields": true,
         "showTaxFields": true,
-        "enableAddressWidget": false
+        "enableAddressWidget": false,
+        "closedDays": []
     },
     "carrier": {
         "*": {
