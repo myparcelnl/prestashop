@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.0](https://github.com/myparcelnl/prestashop/compare/v4.6.1...v4.7.0) (2025-10-02)
+
+
+### :bug: Bug Fixes
+
+* migrate ORDER_NR placeholder to ORDER_ID in label descriptions ([#395](https://github.com/myparcelnl/prestashop/issues/395)) ([a20f87d](https://github.com/myparcelnl/prestashop/commit/a20f87d489b8860e1ab1650eb3c7cb807aaee292))
+
+
+### :sparkles: New Features
+
+* allow the use of delivery_date in label description ([#392](https://github.com/myparcelnl/prestashop/issues/392)) ([721d1bb](https://github.com/myparcelnl/prestashop/commit/721d1bbcd9d6f6eaba0687d6443809394d0f2bcb))
+
 ## [4.6.1](https://github.com/myparcelnl/prestashop/compare/v4.6.0...v4.6.1) (2025-08-14)
 
 ## [4.6.0](https://github.com/myparcelnl/prestashop/compare/v4.5.0...v4.6.0) (2025-08-07)
