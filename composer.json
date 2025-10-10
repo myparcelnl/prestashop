@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "prestashop-module",
   "require": {
-    "myparcelnl/pdk": "^2.53.1",
+    "myparcelnl/pdk": "^2.64.0",
     "php": ">=7.4.0"
   },
   "platform": {
