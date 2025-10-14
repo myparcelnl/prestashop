@@ -13,6 +13,7 @@ use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Platform;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Sdk\src\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
@@ -61,7 +62,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'userAgent' => factory(function (): array {
                 return [
                     'MyParcel-PrestaShop'  => Pdk::getAppInfo()->version,
-                    'MyParcel-Proposition' => Platform::getPropositionName(),
+                    'MyParcel-Proposition' => Pdk::get(PropositionService::class)->getPropositionConfig()->name,
                     'PrestaShop'           => _PS_VERSION_,
                 ];
             }),
