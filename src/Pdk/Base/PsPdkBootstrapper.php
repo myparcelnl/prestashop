@@ -12,7 +12,6 @@ use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -60,9 +59,10 @@ class PsPdkBootstrapper extends PdkBootstrapper
         return [
             // you cannot use ‘use’ statements as php-di will not compile closures with them
             'userAgent' => factory(function (): array {
+                $propositionService = Pdk::get(PropositionService::class);
                 return [
                     'MyParcel-PrestaShop'  => Pdk::getAppInfo()->version,
-                    'MyParcel-Proposition' => Pdk::get(PropositionService::class)->getPropositionConfig()->name,
+                    'MyParcel-Proposition' => $propositionService->hasActivePropositionId() ? $propositionService->getPropositionConfig()->proposition->key : 'unknown',
                     'PrestaShop'           => _PS_VERSION_,
                 ];
             }),

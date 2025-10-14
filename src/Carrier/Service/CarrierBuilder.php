@@ -169,7 +169,7 @@ final class CarrierBuilder
 
         $psCarrier = $this->getExistingPsCarrier() ?? $this->psCarrierService->create();
 
-        $psCarrier->name                 = $psCarrier->name ?? $this->myParcelCarrier->human;
+        $psCarrier->name                 = $psCarrier->name ?? $this->myParcelCarrier->name;
         $psCarrier->active               = $this->psCarrierService->carrierIsActive($this->myParcelCarrier);
         $psCarrier->deleted              = false;
         $psCarrier->external_module_name = $module->name;
