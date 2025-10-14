@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12d64fc27a6fc3b23273bdb52fad0814",
+    "content-hash": "4e97fe2a64ece831b6a572209e8a8f4b",
     "packages": [
         {
             "name": "fruitcake/php-cors",
@@ -205,16 +205,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "2.64.0",
+            "version": "2.65.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "1f9925673889ce98513061900e9dd8329d07a138"
+                "reference": "77cf9417b1bce92fd8b49ca7f5708128f38d0d38"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/1f9925673889ce98513061900e9dd8329d07a138",
-                "reference": "1f9925673889ce98513061900e9dd8329d07a138",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/77cf9417b1bce92fd8b49ca7f5708128f38d0d38",
+                "reference": "77cf9417b1bce92fd8b49ca7f5708128f38d0d38",
                 "shasum": ""
             },
             "require": {
@@ -261,9 +261,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v2.64.0"
+                "source": "https://github.com/myparcelnl/pdk/tree/v2.65.0"
             },
-            "time": "2025-10-10T07:49:39+00:00"
+            "time": "2025-10-14T12:39:39+00:00"
         },
         {
             "name": "myparcelnl/sdk",
@@ -4705,12 +4705,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
