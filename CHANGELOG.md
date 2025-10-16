@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.8.0](https://github.com/myparcelnl/prestashop/compare/v4.7.0...v4.8.0) (2025-10-16)
+
+
+### :sparkles: New Features
+
+* **prestashop:** add option to list closed days for shop ([#397](https://github.com/myparcelnl/prestashop/issues/397)) ([31cbfb7](https://github.com/myparcelnl/prestashop/commit/31cbfb710224dc3f0f9ad1fba3f218b2626dde74))
+
 ## [4.7.0](https://github.com/myparcelnl/prestashop/compare/v4.6.1...v4.7.0) (2025-10-02)
 
 
