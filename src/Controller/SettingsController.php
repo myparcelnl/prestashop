@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Controller;
 
-use MyParcelNL\Pdk\Facade\Frontend;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -17,8 +16,9 @@ class SettingsController extends AbstractAdminController
      */
     public function index(): Response
     {
+        // The hooks handle renderPluginSettings() - this controller just provides the page structure
         return $this->render('@Modules/myparcelnl/views/templates/admin/page.twig', [
-            'content' => Frontend::renderPluginSettings(),
+            'content' => '', // Empty content - hooks will render the PDK components
         ]);
     }
 }

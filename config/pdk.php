@@ -26,6 +26,7 @@ use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Context\Contract\ContextServiceInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface;
 use MyParcelNL\Pdk\Frontend\Contract\ScriptServiceInterface;
@@ -78,11 +79,13 @@ use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\Ps17RouterService;
 use MyParcelNL\PrestaShop\Router\Service\Ps8RouterService;
 use MyParcelNL\PrestaShop\Script\Service\PsScriptService;
+use MyParcelNL\PrestaShop\Service\PdkContextService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsCountryService;
 use MyParcelNL\PrestaShop\Service\PsObjectModelService;
 use MyParcelNL\PrestaShop\Service\PsOrderService;
 use Psr\Log\LoggerInterface;
+
 use function DI\factory;
 use function DI\get;
 use function DI\value;
@@ -130,6 +133,7 @@ return [
      * Services
      */
     AuditServiceInterface::class                => get(AuditService::class),
+    ContextServiceInterface::class              => get(PdkContextService::class),
     CronServiceInterface::class                 => get(PsCronService::class),
     FrontendRenderServiceInterface::class       => get(PsFrontendRenderService::class),
     LanguageServiceInterface::class             => get(PsLanguageService::class),
@@ -202,7 +206,7 @@ return [
      */
     'countriesPerPlatformAndCarrier' => value([
         Platform::MYPARCEL_NAME => [
-            Carrier::CARRIER_POSTNL_NAME             => [
+            Carrier::CARRIER_POSTNL_LEGACY_NAME             => [
                 'deliveryCountries' => [
                     CountryCodes::CC_NL, // Netherlands
                     CountryCodes::CC_BE, // Belgium
@@ -216,7 +220,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_DHL_FOR_YOU_NAME        => [
+            Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME        => [
                 'deliveryCountries' => [
                     CountryCodes::CC_NL, // Netherlands
                     CountryCodes::CC_BE, // Belgium
@@ -225,7 +229,7 @@ return [
                     CountryCodes::CC_NL, // Netherlands
                 ],
             ],
-            Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME => [
+            Carrier::CARRIER_DHL_PARCEL_CONNECT_LEGACY_NAME => [
                 'deliveryCountries' => [
                     CountryCodes::CC_AT, // Austria
                     CountryCodes::CC_BG, // Bulgaria
@@ -269,7 +273,7 @@ return [
                     CountryCodes::CC_SE, // Sweden
                 ],
             ],
-            Carrier::CARRIER_DHL_EUROPLUS_NAME       => [
+            Carrier::CARRIER_DHL_EUROPLUS_LEGACY_NAME => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BE, // Belgium
                     CountryCodes::CC_BG, // Bulgaria
@@ -300,7 +304,7 @@ return [
                 ],
                 'pickupCountries'   => [],
             ],
-            Carrier::CARRIER_UPS_NAME                => [
+            Carrier::CARRIER_UPS_EXPRESS_SAVER_LEGACY_NAME => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BG, // Bulgaria
                     CountryCodes::CC_DE, // Germany
@@ -328,7 +332,35 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_DPD_NAME                => [
+            Carrier::CARRIER_UPS_STANDARD_LEGACY_NAME => [
+                'deliveryCountries' => [
+                    CountryCodes::CC_BG, // Bulgaria
+                    CountryCodes::CC_DE, // Germany
+                    CountryCodes::CC_EE, // Estonia
+                    CountryCodes::CC_FI, // Finland
+                    CountryCodes::CC_GR, // Greece
+                    CountryCodes::CC_HU, // Hungary
+                    CountryCodes::CC_IE, // Ireland
+                    CountryCodes::CC_IT, // Italy
+                    CountryCodes::CC_HR, // Croatia
+                    CountryCodes::CC_LV, // Latvia
+                    CountryCodes::CC_LT, // Lithuania
+                    CountryCodes::CC_LU, // Luxembourg
+                    CountryCodes::CC_AT, // Austria
+                    CountryCodes::CC_PL, // Poland
+                    CountryCodes::CC_PT, // Portugal
+                    CountryCodes::CC_RO, // Romania
+                    CountryCodes::CC_SI, // Slovenia
+                    CountryCodes::CC_SK, // Slovakia
+                    CountryCodes::CC_ES, // Spain
+                    CountryCodes::CC_CZ, // Czech Republic
+                ],
+                'pickupCountries'   => [
+                    CountryCodes::CC_DE, // Germany
+                ],
+                'fakeDelivery'      => true,
+            ],
+            Carrier::CARRIER_DPD_LEGACY_NAME => [
                 'deliveryCountries' => [
                     CountryCodes::CC_AT, // Austria
                     CountryCodes::CC_BE, // Belgium
@@ -381,7 +413,7 @@ return [
         ],
 
         Platform::SENDMYPARCEL_NAME => [
-            Carrier::CARRIER_BPOST_NAME  => [
+            Carrier::CARRIER_BPOST_LEGACY_NAME  => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BE, // Belgium
                     CountryCodes::CC_NL, // Netherlands
@@ -392,7 +424,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_POSTNL_NAME => [
+            Carrier::CARRIER_POSTNL_LEGACY_NAME => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BE, // Belgium
                     CountryCodes::CC_NL, // Netherlands
@@ -403,7 +435,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_DPD_NAME    => [
+            Carrier::CARRIER_DPD_LEGACY_NAME    => [
                 'deliveryCountries' => [
                     CountryCodes::CC_AT, // Austria
                     CountryCodes::CC_BE, // Belgium
@@ -455,4 +487,35 @@ return [
             ],
         ],
     ]),
+
+    ###
+    # Routes - CRITICAL for PDK frontend to work!
+    ###
+
+    'routeBackend'                   => value(MyParcelNL::MODULE_NAME . '/backend/v1'),
+    'routeBackendPdk'                => value('pdk'),
+    'routeBackendWebhookBase'        => value('webhook'),
+    'routeBackendWebhook'            => factory(function (): string {
+        return sprintf('%s/(?P<hash>.+)', Pdk::get('routeBackendWebhookBase'));
+    }),
+    'routeFrontend'                  => value(MyParcelNL::MODULE_NAME . '/frontend/v1'),
+    'routeFrontendMyParcel'          => value(MyParcelNL::MODULE_NAME),
+
+    ###
+    # Settings
+    ###
+
+    'settingsMenuSlug'      => value('prestashop_page_myparcel-settings'),
+    'settingsMenuSlugShort' => value('myparcel-settings'),
+    'settingsMenuTitle'     => value('MyParcel'),
+    'settingsPageTitle'     => value('MyParcel PrestaShop'),
+
+    /**
+     * Function to create settings keys with the plugin namespace prefix
+     */
+    'createSettingsKey' => factory(function (): callable {
+        return static function (string $key): string {
+            return sprintf('_%s_%s', MyParcelNL::MODULE_NAME, $key);
+        };
+    }),
 ];
