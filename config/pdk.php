@@ -400,6 +400,7 @@ return [
                     CountryCodes::CC_PL, // Poland
                     CountryCodes::CC_PT, // Portugal
                     CountryCodes::CC_RO, // Romania
+                    CountryCodes::CC_HR, // Croatia
                     CountryCodes::CC_SK, // Slovakia
                     CountryCodes::CC_SI, // Slovenia
                     CountryCodes::CC_ES, // Spain
