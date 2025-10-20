@@ -378,6 +378,60 @@ return [
                     CountryCodes::CC_GB, // United Kingdom
                 ],
             ],
+            Carrier::CARRIER_GLS_NAME => [
+                'deliveryCountries' => [
+                    CountryCodes::CC_AT, // Austria
+                    CountryCodes::CC_BE, // Belgium
+                    CountryCodes::CC_BG, // Bulgaria
+                    CountryCodes::CC_CZ, // Czech Republic
+                    CountryCodes::CC_DK, // Denmark
+                    CountryCodes::CC_EE, // Estonia
+                    CountryCodes::CC_FI, // Finland
+                    CountryCodes::CC_FR, // France
+                    CountryCodes::CC_DE, // Germany
+                    CountryCodes::CC_GR, // Greece
+                    CountryCodes::CC_HU, // Hungary
+                    CountryCodes::CC_IE, // Ireland
+                    CountryCodes::CC_IT, // Italy
+                    CountryCodes::CC_LV, // Latvia
+                    CountryCodes::CC_LT, // Lithuania
+                    CountryCodes::CC_LU, // Luxembourg
+                    CountryCodes::CC_NL, // Netherlands
+                    CountryCodes::CC_PL, // Poland
+                    CountryCodes::CC_PT, // Portugal
+                    CountryCodes::CC_RO, // Romania
+                    CountryCodes::CC_HR, // Croatia
+                    CountryCodes::CC_SK, // Slovakia
+                    CountryCodes::CC_SI, // Slovenia
+                    CountryCodes::CC_ES, // Spain
+                    CountryCodes::CC_SE, // Sweden
+                ],
+                'pickupCountries' => [
+                    CountryCodes::CC_AT, // Austria
+                    CountryCodes::CC_BE, // Belgium
+                    CountryCodes::CC_HR, // Croatia
+                    CountryCodes::CC_CZ, // Czech Republic
+                    CountryCodes::CC_DE, // Germany
+                    CountryCodes::CC_DK, // Denmark
+                    CountryCodes::CC_EE, // Estonia
+                    CountryCodes::CC_ES, // Spain
+                    CountryCodes::CC_FI, // Finland
+                    CountryCodes::CC_FR, // France
+                    CountryCodes::CC_HU, // Hungary
+                    CountryCodes::CC_IE, // Ireland
+                    CountryCodes::CC_IT, // Italy
+                    CountryCodes::CC_LT, // Lithuania
+                    CountryCodes::CC_LU, // Luxembourg
+                    CountryCodes::CC_LV, // Latvia
+                    CountryCodes::CC_NL, // Netherlands
+                    CountryCodes::CC_PL, // Poland
+                    CountryCodes::CC_PT, // Portugal
+                    CountryCodes::CC_RO, // Romania
+                    CountryCodes::CC_SE, // Sweden
+                    CountryCodes::CC_SI, // Slovenia
+                    CountryCodes::CC_SK, // Slovakia
+                ],
+            ],
         ],
 
         Platform::SENDMYPARCEL_NAME => [
