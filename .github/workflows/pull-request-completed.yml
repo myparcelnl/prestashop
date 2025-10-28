@@ -12,7 +12,7 @@ jobs:
   post-pr-artifacts:
     runs-on: ubuntu-22.04
     steps:
-      - uses: myparcelnl/actions/pr-post-artifacts@v4
+      - uses: myparcelnl/actions/pr-post-artifacts@v5
         with:
           app-id: ${{ secrets.MYPARCEL_APP_ID }}
           private-key: ${{ secrets.MYPARCEL_APP_PRIVATE_KEY }}
