@@ -550,6 +550,18 @@ return [
                 ],
             ],
         ],
+
+        'myparcel-italie' => [
+            Carrier::CARRIER_BRT_LEGACY_NAME => [
+                'deliveryCountries' => [
+                    CountryCodes::CC_IT, // Italy
+                ],
+                'pickupCountries'   => [
+                    CountryCodes::CC_IT, // Italy
+                ],
+                'fakeDelivery'      => true,
+            ]
+        ]
     ]),
 
     ###
