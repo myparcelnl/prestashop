@@ -66,9 +66,7 @@ final class PsAddressAdapter
     private function createFromAddress(Address $address): array
     {
         $country = $this->psObjectModelService->getWithFallback(Country::class, $address->id_country);
-        $state   = $country->iso_code === Platform::get('localCountry')
-            ? null
-            : $this->psObjectModelService->getWithFallback(State::class, $address->id_state);
+        $state   = $this->psObjectModelService->getWithFallback(State::class, $address->id_state);
 
         return array_merge(
             [
