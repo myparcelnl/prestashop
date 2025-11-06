@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.0](https://github.com/myparcelnl/prestashop/compare/v4.8.0...v4.9.0) (2025-11-06)
+
+
+### :bug: Bug Fixes
+
+* add GLS to PDK config ([#402](https://github.com/myparcelnl/prestashop/issues/402)) ([b4042aa](https://github.com/myparcelnl/prestashop/commit/b4042aa6b2797814ee04eb0c35e0a83c109c5417))
+
+
+### :sparkles: New Features
+
+* **pdk:** add feature exclude parcel lockers ([#404](https://github.com/myparcelnl/prestashop/issues/404)) ([c46731c](https://github.com/myparcelnl/prestashop/commit/c46731cbe00630491855c7c41700b4db7575a930))
+
 ## [4.8.0](https://github.com/myparcelnl/prestashop/compare/v4.7.0...v4.8.0) (2025-10-16)
 
 
