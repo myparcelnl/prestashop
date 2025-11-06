@@ -51,7 +51,8 @@
         "useSeparateAddressFields": true,
         "showTaxFields": true,
         "enableAddressWidget": false,
-        "closedDays": []
+        "closedDays": [],
+        "excludeParcelLockers": false
     },
     "carrier": {
         "*": {
