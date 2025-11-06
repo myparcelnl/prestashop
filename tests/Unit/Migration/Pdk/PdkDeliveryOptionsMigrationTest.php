@@ -97,6 +97,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         ShipmentOptions::SIGNATURE         => TriStateService::INHERIT,
         ShipmentOptions::TRACKED           => TriStateService::INHERIT,
         ShipmentOptions::COLLECT           => TriStateService::INHERIT,
+        ShipmentOptions::EXCLUDE_PARCEL_LOCKERS => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
 
     $fullResult = array_replace(

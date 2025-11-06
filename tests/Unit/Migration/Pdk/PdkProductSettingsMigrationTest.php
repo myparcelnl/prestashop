@@ -57,6 +57,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             ProductSettings::FIT_IN_DIGITAL_STAMP     => TriStateService::INHERIT,
             ProductSettings::FIT_IN_MAILBOX           => TriStateService::INHERIT,
             ProductSettings::PACKAGE_TYPE             => TriStateService::INHERIT,
+            ProductSettings::EXCLUDE_PARCEL_LOCKERS   => TriStateService::INHERIT,
         ], $result)
     );
 })->with([
