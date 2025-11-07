@@ -11,6 +11,7 @@ use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
+use MyParcelNL\Pdk\Types\Service\TriStateService;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use Throwable;
@@ -73,11 +74,48 @@ trait HasPdkCheckoutDeliveryOptionsHooks
     }
 
     /**
+     * Check if delivery options should be disabled for the current cart.
+     *
+     * Delivery options are disabled when:
+     * - Global checkout setting disables them, OR
+     * - Any product in the cart has disableDeliveryOptions enabled, OR
+     * - No items in the cart are deliverable
+     *
      * @return bool
      */
     private function deliveryOptionsDisabled(): bool
     {
-        return ! Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
+        // First check global checkout setting.
+        if (! Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID)) {
+            return true;
+        }
+
+        // Check cart-level conditions (product settings and deliverability).
+        try {
+            /** @var PdkCartRepositoryInterface $cartRepository */
+            $cartRepository = Pdk::get(PdkCartRepositoryInterface::class);
+
+            $pdkCart = $cartRepository->get($this->context->cart);
+
+            // Check if any product explicitly disables delivery options.
+            $hasProductDisablingDeliveryOptions = $pdkCart->lines->containsStrict(
+                'product.mergedSettings.disableDeliveryOptions',
+                TriStateService::ENABLED
+            );
+
+            // Check if any items are deliverable.
+            $hasDeliverableItems = $pdkCart->lines->isDeliverable();
+
+            // Disable if: no deliverable items OR a product disables delivery options.
+            return ! $hasDeliverableItems || $hasProductDisablingDeliveryOptions;
+        } catch (Throwable $e) {
+            Logger::error('Failed to determine delivery options availability', [
+                'exception' => $e->getMessage(),
+            ]);
+
+            // If anything goes wrong, do not block delivery options (fail open).
+            return false;
+        }
     }
 
     /**
