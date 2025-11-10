@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 
 export default defineConfig({
   name: 'myparcel-prestashop',
+  buildFolderName: 'myparcelnl', // for backwards compatibility
   source: [
     '!**/node_modules/**',
     // Php files will be copied after scoping
