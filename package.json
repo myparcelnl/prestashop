@@ -64,7 +64,7 @@
     "@myparcel-eslint/eslint-config-prettier": "^1.2.0",
     "@myparcel-eslint/eslint-config-prettier-typescript": "^1.2.0",
     "@myparcel-eslint/eslint-config-prettier-typescript-vue": "^1.2.0",
-    "@myparcel-pdk/app-builder": "^1.6.2",
+    "@myparcel-pdk/app-builder": "^1.7.0",
     "@myparcel/sdk": "^4.4.1",
     "@myparcel/semantic-release-config": "^5.0.0",
     "@types/node": "^20.0.0",
