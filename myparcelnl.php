@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 use MyParcelNL\Pdk\Base\Pdk as PdkInstance;
+use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -30,6 +31,8 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 class MyParcelNL extends CarrierModule
 {
+    public const MODULE_NAME = 'myparcelnl'; // name MUST MATCH folder and file name
+
     use HasModuleUpgradeOverrides;
 
     /**
@@ -56,13 +59,13 @@ class MyParcelNL extends CarrierModule
         // todo: find a better solution
         error_reporting(error_reporting() & ~E_DEPRECATED);
 
-        $this->name                   = 'myparcelnl';
+        $this->name                   = self::MODULE_NAME;
         $this->version                = self::getVersionFromComposer();
         $this->author                 = 'MyParcel';
         $this->author_uri             = 'https://myparcel.nl';
         $this->need_instance          = 1;
         $this->bootstrap              = true;
-        $this->displayName            = 'MyParcelNL';
+        $this->displayName            = 'MyParcel';
         $this->description            = 'MyParcel';
         $this->tab                    = 'shipping_logistics';
         $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => '8.99.99'];
@@ -181,7 +184,7 @@ class MyParcelNL extends CarrierModule
         $this->tabs = [
             [
                 'name'              => $translatedName,
-                'route_name'        => "{$this->name}_settings",
+                'route_name'        => self::MODULE_NAME . '_settings',
                 'class_name'        => MyParcelNLAdminSettingsController::class,
                 'visible'           => true,
                 'parent_class_name' => $this->tab,
@@ -196,12 +199,10 @@ class MyParcelNL extends CarrierModule
     private function setup(): void
     {
         bootPdk(
-            $this->name,
-            $this->displayName,
             $this->version,
             $this->getLocalPath(),
             $this->getBaseUrl(),
-            _PS_MODE_DEV_ ? PdkInstance::MODE_DEVELOPMENT : PdkInstance::MODE_PRODUCTION
+            defined('_PS_MODE_DEV_') && _PS_MODE_DEV_ ? PdkInstance::MODE_DEVELOPMENT : PdkInstance::MODE_PRODUCTION
         );
 
         $this->hasPdk = true;
@@ -253,8 +254,6 @@ class MyParcelNL extends CarrierModule
             );
 
             PrestaShopLogger::addLog($formattedMessage, PrestaShopLogger::LOG_SEVERITY_LEVEL_ERROR);
-
-            $this->_errors[] = str_replace("\n", '<br>', $formattedMessage);
 
             if ($failureCallback) {
                 $failureCallback($e);
