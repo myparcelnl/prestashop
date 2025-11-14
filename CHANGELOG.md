@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.10.0](https://github.com/myparcelnl/prestashop/compare/v4.9.0...v4.10.0) (2025-11-14)
+
+
+### :sparkles: New Features
+
+* import newest functionality from pdk ([#419](https://github.com/myparcelnl/prestashop/issues/419)) ([aab2f4b](https://github.com/myparcelnl/prestashop/commit/aab2f4bc254013ee37d4b8f26218a0670eb4fbfa))
+
 ## [4.9.0](https://github.com/myparcelnl/prestashop/compare/v4.8.0...v4.9.0) (2025-11-06)
 
 
