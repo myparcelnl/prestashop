@@ -441,7 +441,7 @@ return [
                     CountryCodes::CC_NL,
                     CountryCodes::CC_BE
                 ]
-            ]
+            ],
         ],
 
         Platform::SENDMYPARCEL_NAME => [
