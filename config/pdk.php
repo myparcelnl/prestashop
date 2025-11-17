@@ -431,16 +431,17 @@ return [
                     CountryCodes::CC_SI, // Slovenia
                     CountryCodes::CC_SK, // Slovakia
                 ],
-                Carrier::CARRIER_TRUNKRS_NAME => [
-                    'deliveryCountries' => [
-                        CountryCodes::CC_NL,
-                        CountryCodes::CC_BE
-                    ],
-                    'pickupCountries' => [
-                        CountryCodes::CC_NL,
-                        CountryCodes::CC_BE
-                ]
             ],
+            Carrier::CARRIER_TRUNKRS_NAME => [
+                'deliveryCountries' => [
+                    CountryCodes::CC_NL,
+                    CountryCodes::CC_BE
+                ],
+                'pickupCountries' => [
+                    CountryCodes::CC_NL,
+                    CountryCodes::CC_BE
+                ]
+            ]
         ],
 
         Platform::SENDMYPARCEL_NAME => [
