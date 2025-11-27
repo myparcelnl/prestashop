@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpUnhandledExceptionInspection,StaticClosureCanBeUsedInspection */
 
 declare(strict_types=1);
@@ -98,6 +99,8 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         ShipmentOptions::TRACKED           => TriStateService::INHERIT,
         ShipmentOptions::COLLECT           => TriStateService::INHERIT,
         ShipmentOptions::EXCLUDE_PARCEL_LOCKERS => TriStateService::INHERIT,
+        ShipmentOptions::FRESH_FOOD        => TriStateService::INHERIT,
+        ShipmentOptions::FROZEN            => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
 
     $fullResult = array_replace(

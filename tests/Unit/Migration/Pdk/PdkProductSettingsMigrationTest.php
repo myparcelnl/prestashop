@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpUnhandledExceptionInspection,StaticClosureCanBeUsedInspection */
 
 declare(strict_types=1);
@@ -58,6 +59,8 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             ProductSettings::FIT_IN_MAILBOX           => TriStateService::INHERIT,
             ProductSettings::PACKAGE_TYPE             => TriStateService::INHERIT,
             ProductSettings::EXCLUDE_PARCEL_LOCKERS   => TriStateService::INHERIT,
+            ProductSettings::EXPORT_FRESH_FOOD        => TriStateService::INHERIT,
+            ProductSettings::EXPORT_FROZEN            => TriStateService::INHERIT,
         ], $result)
     );
 })->with([
