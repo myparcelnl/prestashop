@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.0](https://github.com/myparcelnl/prestashop/compare/v4.10.0...v4.11.0) (2025-11-27)
+
+
+### :sparkles: New Features
+
+* add carrier trunkrs ([#426](https://github.com/myparcelnl/prestashop/issues/426)) ([94ff1e3](https://github.com/myparcelnl/prestashop/commit/94ff1e36aa39d0083a68660c6b81ab7036851252))
+* disable do with product setting ([#414](https://github.com/myparcelnl/prestashop/issues/414)) ([e9c05d5](https://github.com/myparcelnl/prestashop/commit/e9c05d5e9edb9b03e6ba5f6f2072fb3917807c6d))
+
 ## [4.10.0](https://github.com/myparcelnl/prestashop/compare/v4.9.0...v4.10.0) (2025-11-14)
 
 
