@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2aed5d5f5f6129a578cf601e08c5c269",
+    "content-hash": "caa4c57358fc2c355bc6f8f2cdceb265",
     "packages": [
         {
             "name": "fruitcake/php-cors",
@@ -205,16 +205,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "2.67.1",
+            "version": "2.68.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "19ba38d5b317cdffa7d16acb31075517fbbf4f70"
+                "reference": "6eaaa3e331f0b625cc63758d5f74edc919cbdaa8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/19ba38d5b317cdffa7d16acb31075517fbbf4f70",
-                "reference": "19ba38d5b317cdffa7d16acb31075517fbbf4f70",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/6eaaa3e331f0b625cc63758d5f74edc919cbdaa8",
+                "reference": "6eaaa3e331f0b625cc63758d5f74edc919cbdaa8",
                 "shasum": ""
             },
             "require": {
@@ -261,9 +261,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v2.67.1"
+                "source": "https://github.com/myparcelnl/pdk/tree/v2.68.0"
             },
-            "time": "2025-11-20T16:10:32+00:00"
+            "time": "2025-12-09T09:31:43+00:00"
         },
         {
             "name": "myparcelnl/sdk",
@@ -1499,16 +1499,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.6.2",
+            "version": "v5.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "3a454ca033b9e06b63282ce19562e892747449bb"
+                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/3a454ca033b9e06b63282ce19562e892747449bb",
-                "reference": "3a454ca033b9e06b63282ce19562e892747449bb",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/dca41cd15c2ac9d055ad70dbfd011130757d1f82",
+                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82",
                 "shasum": ""
             },
             "require": {
@@ -1551,9 +1551,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.6.2"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
             },
-            "time": "2025-10-21T19:32:17+00:00"
+            "time": "2025-12-06T11:56:16+00:00"
         },
         {
             "name": "nunomaduro/collision",
