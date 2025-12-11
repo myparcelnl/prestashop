@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.1](https://github.com/myparcelnl/prestashop/compare/v4.11.0...v4.11.1) (2025-12-11)
+
+
+### :bug: Bug Fixes
+
+* add trunks to pdk config ([#422](https://github.com/myparcelnl/prestashop/issues/422)) ([3c4fbe5](https://github.com/myparcelnl/prestashop/commit/3c4fbe5aeb3ce2401bc3390032236136db2205dc))
+
 ## [4.11.0](https://github.com/myparcelnl/prestashop/compare/v4.10.0...v4.11.0) (2025-11-27)
 
 
