@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.2](https://github.com/myparcelnl/prestashop/compare/v4.11.1...v4.11.2) (2026-01-08)
+
+
+### :bug: Bug Fixes
+
+* update js-pdk for small package insurance fix ([#433](https://github.com/myparcelnl/prestashop/issues/433)) ([8742012](https://github.com/myparcelnl/prestashop/commit/8742012c2327b59f779253ad956c4639c7cac451))
+
 ## [4.11.1](https://github.com/myparcelnl/prestashop/compare/v4.11.0...v4.11.1) (2025-12-11)
 
 
