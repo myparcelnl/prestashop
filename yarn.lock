@@ -961,11 +961,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/admin-component-tests@npm:^1.11.5":
-  version: 1.11.5
-  resolution: "@myparcel-pdk/admin-component-tests@npm:1.11.5"
+"@myparcel-pdk/admin-component-tests@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@myparcel-pdk/admin-component-tests@npm:1.12.0"
   dependencies:
-    "@myparcel-pdk/admin": "npm:^1.11.5"
+    "@myparcel-pdk/admin": "npm:^1.12.0"
     "@myparcel/vue-form-builder": "npm:^1.0.0-alpha.1"
     "@pinia/testing": "npm:>= 0.1.0 < 1"
     "@vitest/coverage-v8": "npm:^2.1.3"
@@ -975,37 +975,37 @@ __metadata:
     vitest: "npm:^2.1.3"
   peerDependencies:
     vue: ^3
-  checksum: 10c0/91f0350736e4463af8ce70435d7e25f797e270feff1b0c8bcb419e770c777be92c048e21c4903ce4cbaa395d5b83e68918f205484ee8b27dc0033adac2daf385
+  checksum: 10c0/bc2165540f840d261a06685d5ec7b93d07ad374315eef213d1a2aaa2c746d5296d2dda81c8c13a473b94500c4b530b1182d1d3e0b95c569c867c64f6d376f5d3
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/admin-preset-bootstrap4@npm:^1.11.5":
-  version: 1.11.5
-  resolution: "@myparcel-pdk/admin-preset-bootstrap4@npm:1.11.5"
+"@myparcel-pdk/admin-preset-bootstrap4@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@myparcel-pdk/admin-preset-bootstrap4@npm:1.12.0"
   dependencies:
-    "@myparcel-pdk/admin": "npm:^1.11.5"
+    "@myparcel-pdk/admin": "npm:^1.12.0"
     "@myparcel/ts-utils": "npm:^1.9.0"
     vue: "npm:^3.3.0"
-  checksum: 10c0/269db4cdfeea4a93f1488a3a5661a62e15f63498c8dcdb0298e441bb0f394d756c89713bfef6d9d2ae02bb2bab8be6236622fb05c6c9aa37a4dd0d30f79c2dec
+  checksum: 10c0/28862f52caa2dbd11523738604f108f3836bc266bd5c3bae75b25c0251e6ca3b59507437671abaff0d168135f1b190ed162279beb0b390024518ffbb0b4dadb2
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/admin-preset-default@npm:^1.11.5":
-  version: 1.11.5
-  resolution: "@myparcel-pdk/admin-preset-default@npm:1.11.5"
+"@myparcel-pdk/admin-preset-default@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@myparcel-pdk/admin-preset-default@npm:1.12.0"
   dependencies:
-    "@myparcel-pdk/admin": "npm:^1.11.5"
+    "@myparcel-pdk/admin": "npm:^1.12.0"
     "@myparcel/ts-utils": "npm:^1.9.0"
     "@vuepic/vue-datepicker": "npm:^11.0.2"
     "@vueuse/core": "npm:^10.0.0"
     vue: "npm:^3.3.0"
-  checksum: 10c0/b6965f0412dd68b5c9ab9b1dda521a9670beb3e716014663f9456ae8bf8b379306147d30b19d17df9313cfdef351b93201e5b73df94394628ba812502a013002
+  checksum: 10c0/b88b954321c585141b994dcc0995fb420db44a6b37ddb4441a6b78dc4ce4fcca25d822dec94bebfd6a3e239432179ff4470da5a7c5de681eb9ebc54062714aff
   languageName: node
   linkType: hard
 
-"@myparcel-pdk/admin@npm:^1.11.5":
-  version: 1.11.5
-  resolution: "@myparcel-pdk/admin@npm:1.11.5"
+"@myparcel-pdk/admin@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@myparcel-pdk/admin@npm:1.12.0"
   dependencies:
     "@myparcel-pdk/common": "npm:^1.10.0"
     "@myparcel/constants": "npm:^2.0.0"
@@ -1019,7 +1019,7 @@ __metadata:
     vite: "npm:^5.4.10"
     vue: "npm:^3.3.0"
     vue-tsc: "npm:^2.0.0"
-  checksum: 10c0/18b104e7b3e22ffcccd1a4ee47beb9a93c07cec36578d2bf6a2c88b072b1b81f71f96ab533d9b913b62d8b21feec5d4fe9821de951fbd4ebff501684e2bfb356
+  checksum: 10c0/c129b98f0b821af439c5b37540dd74d015f614ae7ddb324ddcd06b7c94f8a69dcb1313b40e6efea2c85d86e879f41f0b400828dacbce7cf06a47790e8d4f7d4d
   languageName: node
   linkType: hard
 
@@ -1115,10 +1115,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@myparcel-prestashop/backend-admin@workspace:views/js/backend/admin"
   dependencies:
-    "@myparcel-pdk/admin": "npm:^1.11.5"
-    "@myparcel-pdk/admin-component-tests": "npm:^1.11.5"
-    "@myparcel-pdk/admin-preset-bootstrap4": "npm:^1.11.5"
-    "@myparcel-pdk/admin-preset-default": "npm:^1.11.5"
+    "@myparcel-pdk/admin": "npm:^1.12.0"
+    "@myparcel-pdk/admin-component-tests": "npm:^1.12.0"
+    "@myparcel-pdk/admin-preset-bootstrap4": "npm:^1.12.0"
+    "@myparcel-pdk/admin-preset-default": "npm:^1.12.0"
     "@myparcel/ts-utils": "npm:^1.7.0"
     "@vitejs/plugin-vue": "npm:^5.0.0"
     "@vitest/coverage-v8": "npm:^1.0.0"
