@@ -20,7 +20,7 @@ jobs:
       released: ${{ steps.release.outputs.released }}
       version: ${{ steps.release.outputs.version }}
     steps:
-      - uses: myparcelnl/actions/pdk-semantic-release@v4
+      - uses: myparcelnl/actions/pdk-semantic-release@v5
         id: release
         with:
           app-id: ${{ secrets.MYPARCEL_APP_ID }}

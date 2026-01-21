@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: myparcelnl/actions/pdk-custom-build@v4
+      - uses: myparcelnl/actions/pdk-custom-build@v5
         with:
           js-pdk-ref: ${{ inputs.js-pdk-ref }}
           php-pdk-ref: ${{ inputs.php-pdk-ref }}
