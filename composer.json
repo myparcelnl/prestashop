@@ -5,6 +5,7 @@
   "type": "prestashop-module",
   "require": {
     "myparcelnl/pdk": "^3.0.0",
+    "myparcelnl/sdk": "^10.0.0",
     "php": ">=7.4.0"
   },
   "platform": {

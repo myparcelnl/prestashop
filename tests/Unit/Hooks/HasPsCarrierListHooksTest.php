@@ -17,7 +17,7 @@ use MyParcelNL\Pdk\Facade\Platform as PlatformFacade;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
-use MyParcelNL\Sdk\src\Support\Arr;
+use MyParcelNL\Sdk\Support\Arr;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;

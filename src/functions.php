@@ -10,7 +10,7 @@ use MyParcelNL\Pdk\Base\Pdk;
 use MyParcelNL\Pdk\Facade\Pdk as PdkFacade;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
-use MyParcelNL\Sdk\src\Support\Arr;
+use MyParcelNL\Sdk\Support\Arr;
 use function DI\factory;
 
 if (! function_exists('\MyParcelNL\PrestaShop\bootPdk')) {

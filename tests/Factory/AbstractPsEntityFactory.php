@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Tests\Factory;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsEntityFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntities;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 /**
  * @template T of \MyParcelNL\PrestaShop\Entity\EntityInterface

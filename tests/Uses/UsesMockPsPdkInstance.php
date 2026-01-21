@@ -26,7 +26,7 @@ use MyParcelNL\Pdk\Tests\Uses\UsesEachMockPdkInstance;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCountries;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use OrderState;
 use OrderStateFactory;
 use Risk;

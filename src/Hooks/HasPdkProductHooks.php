@@ -13,7 +13,7 @@ use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 use Tools;

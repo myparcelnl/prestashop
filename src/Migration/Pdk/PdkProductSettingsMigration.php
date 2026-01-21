@@ -17,7 +17,7 @@ use MyParcelNL\PrestaShop\Migration\Util\ToPackageTypeName;
 use MyParcelNL\PrestaShop\Migration\Util\ToTriStateValue;
 use MyParcelNL\PrestaShop\Migration\Util\TransformValue;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
-use MyParcelNL\Sdk\src\Support\Collection;
+use MyParcelNL\Sdk\Support\Collection;
 
 final class PdkProductSettingsMigration extends AbstractPsPdkMigration
 {

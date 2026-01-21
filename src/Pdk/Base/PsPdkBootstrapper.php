@@ -14,7 +14,7 @@ use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShopBundle\Exception\InvalidModuleException;
 use Psr\Log\LogLevel;

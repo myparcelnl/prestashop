@@ -12,7 +12,7 @@ use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsObjectModelFactoryInterface;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use ObjectModel;
 use function MyParcelNL\PrestaShop\psFactory;
 

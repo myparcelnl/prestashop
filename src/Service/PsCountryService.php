@@ -11,7 +11,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\PrestaShop\Contract\PsCountryServiceInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 /**
  * @template T of PsCountry

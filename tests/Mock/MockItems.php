@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 abstract class MockItems implements StaticMockInterface
 {
