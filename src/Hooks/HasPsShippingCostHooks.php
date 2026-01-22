@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Hooks;
 use MyParcelNL\Pdk\App\Cart\Model\PdkCartFee;
 use MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsFeesServiceInterface;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Facade\FrontendData;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
@@ -48,7 +49,7 @@ trait HasPsShippingCostHooks
         if (! $carrier) {
             return $shippingCost;
         }
-
+        $carrier         = FrontendData::convertCarrierToLegacyFormat($carrier);
         $deliveryOptions = $this->getDeliveryOptions($carrier);
         $cacheKey        = md5(json_encode($deliveryOptions->toArrayWithoutNull()));
 

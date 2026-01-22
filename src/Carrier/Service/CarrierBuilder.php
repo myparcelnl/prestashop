@@ -8,6 +8,7 @@ use Carrier as PsCarrier;
 use Context;
 use Group;
 use Language as PsLanguage;
+use MyParcelNL;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
@@ -164,15 +165,16 @@ final class CarrierBuilder
      */
     private function createCarrier(): void
     {
-        /** @var \MyParcelNL $module */
-        $module = Pdk::get('moduleInstance');
-
         $psCarrier = $this->getExistingPsCarrier() ?? $this->psCarrierService->create();
 
-        $psCarrier->name                 = $psCarrier->name ?? $this->myParcelCarrier->name;
+        // Naming schema: Use existing $psCarrier name, or use the human name is provided, finally use the MyParcel carrier name as a fallback.
+        $psCarrier->name                 = $psCarrier->name
+            ?? $this->myParcelCarrier->human
+            ?? $this->myParcelCarrier->name;
+
         $psCarrier->active               = $this->psCarrierService->carrierIsActive($this->myParcelCarrier);
         $psCarrier->deleted              = false;
-        $psCarrier->external_module_name = $module->name;
+        $psCarrier->external_module_name = MyParcelNL::MODULE_NAME;
         $psCarrier->is_module            = true;
         $psCarrier->need_range           = true;
         $psCarrier->range_behavior       = true;

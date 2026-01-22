@@ -33,10 +33,15 @@ final class PsCountryService extends PsSpecificObjectModelService implements PsC
      */
     public function getCountriesForCarrier(string $carrierName): array
     {
+        $propositionService = Pdk::get(PropositionService::class);
+
         // Resolve carrier identifier
         [$resolvedCarrierName] = explode(':', $carrierName);
 
-        $propositionName     = Pdk::get(PropositionService::class)->getPropositionConfig()->proposition->key;
+        // Use legacy carrier name for backwards compatibility
+        $resolvedCarrierName = $propositionService->mapNewToLegacyCarrierName($resolvedCarrierName);
+
+        $propositionName     = $propositionService->getPropositionConfig()->proposition->key;
         $allCarrierCountries = Pdk::get('countriesPerPlatformAndCarrier')[$propositionName] ?? [];
         $countriesForCarrier = $allCarrierCountries[$resolvedCarrierName] ?? [];
 
