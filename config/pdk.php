@@ -56,7 +56,6 @@ use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle5ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
-use MyParcelNL\PrestaShop\Pdk\Audit\Repository\PsPdkAuditRepository;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsCronService;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Pdk\Cart\Repository\PsPdkCartRepository;
@@ -80,6 +79,7 @@ use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\Ps17RouterService;
 use MyParcelNL\PrestaShop\Router\Service\Ps8RouterService;
 use MyParcelNL\PrestaShop\Script\Service\PsScriptService;
+use MyParcelNL\PrestaShop\Service\NamespaceMigrationService;
 use MyParcelNL\PrestaShop\Service\PdkContextService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsCountryService;
@@ -122,7 +122,6 @@ return [
      * Repositories
      */
     PdkAccountRepositoryInterface::class        => get(PsPdkAccountRepository::class),
-    PdkAuditRepositoryInterface::class          => get(PsPdkAuditRepository::class),
     PdkCartRepositoryInterface::class           => get(PsPdkCartRepository::class),
     PdkOrderNoteRepositoryInterface::class      => get(PsPdkOrderNoteRepository::class),
     PdkOrderRepositoryInterface::class          => get(PsPdkOrderRepository::class),
