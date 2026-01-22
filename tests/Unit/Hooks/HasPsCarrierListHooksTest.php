@@ -13,8 +13,9 @@ use Cookie;
 use Country;
 use MyParcelNL\Pdk\Account\Model\Account;
 use MyParcelNL\Pdk\Account\Platform;
-use MyParcelNL\Pdk\Facade\Platform as PlatformFacade;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use MyParcelNL\Sdk\Support\Arr;
@@ -38,10 +39,11 @@ it('filters carriers from delivery options list', function (
     if (Platform::SENDMYPARCEL_NAME === $platform) {
         $platformId = Platform::SENDMYPARCEL_ID;
     }
+    Pdk::get(PropositionService::class)->setActivePropositionId($platformId);
+
     factory(Account::class, $platformId)
         ->withShops()
         ->store();
-
 
     $allCarriers = [
         Carrier::CARRIER_BPOST_NAME,
@@ -50,7 +52,7 @@ it('filters carriers from delivery options list', function (
         Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME,
         Carrier::CARRIER_DPD_NAME,
         Carrier::CARRIER_POSTNL_NAME,
-        Carrier::CARRIER_UPS_NAME,
+        Carrier::CARRIER_UPS_STANDARD_NAME,
     ];
 
     $deliveryOptionCarrierList = [
@@ -131,7 +133,7 @@ it('filters carriers from delivery options list', function (
             Carrier::CARRIER_DHL_FOR_YOU_NAME . ':1234',
             Carrier::CARRIER_DPD_NAME,
             Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_NAME,
+            Carrier::CARRIER_UPS_STANDARD_NAME,
         ],
     ],
 
@@ -142,7 +144,7 @@ it('filters carriers from delivery options list', function (
             Carrier::CARRIER_DHL_FOR_YOU_NAME . ':1234',
             Carrier::CARRIER_DPD_NAME,
             Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_NAME,
+            Carrier::CARRIER_UPS_STANDARD_NAME,
         ],
     ],
 
@@ -162,7 +164,7 @@ it('filters carriers from delivery options list', function (
             Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME,
             Carrier::CARRIER_DPD_NAME,
             Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_NAME,
+            Carrier::CARRIER_UPS_STANDARD_NAME,
         ],
     ],
 
@@ -170,7 +172,7 @@ it('filters carriers from delivery options list', function (
         'country'          => 'US',
         'filteredCarriers' => [
             Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_NAME,
+            Carrier::CARRIER_UPS_STANDARD_NAME,
         ],
     ],
 
@@ -178,7 +180,7 @@ it('filters carriers from delivery options list', function (
         'country'          => 'AX',
         'filteredCarriers' => [
             Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_NAME,
+            Carrier::CARRIER_UPS_STANDARD_NAME,
         ],
     ],
 ]);

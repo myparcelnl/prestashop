@@ -66,7 +66,6 @@ it('installs: registers hooks', function () {
     expect(array_flip($hooks))->toHaveKeys([
         'displayBeforeCarrier',
         'displayCarrierExtraContent',
-        'displayOrderConfirmation',
         'displayBackOfficeHeader',
         'displayBackOfficeFooter',
         'displayAdminAfterHeader',
@@ -103,11 +102,11 @@ it('installs: doesn\'t add same tab twice', function () {
     $tabRepository = Pdk::get('ps.tabRepository');
 
     psFactory(Tab::class)
-        ->withModule($module->name)
+        ->withModule(\MyParcelNL::MODULE_NAME)
         ->withClassName(Pdk::get('legacyControllerSettings'))
         ->store();
 
-    expect($tabRepository->findByModule($module->name))->toHaveCount(1);
+    expect($tabRepository->findByModule(\MyParcelNL::MODULE_NAME))->toHaveCount(1);
     Installer::install($module);
-    expect($tabRepository->findByModule($module->name))->toHaveCount(1);
+    expect($tabRepository->findByModule(\MyParcelNL::MODULE_NAME))->toHaveCount(1);
 });

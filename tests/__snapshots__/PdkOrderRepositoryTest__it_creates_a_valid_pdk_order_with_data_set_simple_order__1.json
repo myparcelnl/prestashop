@@ -3,15 +3,43 @@
     "referenceIdentifier": "PrestaShop: 1",
     "deliveryOptions": {
         "carrier": {
-            "externalIdentifier": "postnl",
+            "externalIdentifier": "POSTNL",
             "id": 1,
-            "name": "postnl",
-            "human": "PostNL",
+            "name": "POSTNL",
             "enabled": true,
             "isDefault": true,
             "optional": false,
             "primary": false,
-            "type": "main"
+            "type": "main",
+            "deliveryOptions": {
+                "addressFields": [
+                    "postalCode",
+                    "street",
+                    "city"
+                ],
+                "availableFeatures": [
+                    "deliveryDaysWindow",
+                    "dropOffDays",
+                    "dropOffDelay",
+                    "pickupMapAllowLoadMore"
+                ],
+                "shipmentOptionsPerPackageType": {
+                    "package": [
+                        "only_recipient",
+                        "signature"
+                    ],
+                    "mailbox": [
+                        "priority_delivery"
+                    ],
+                    "letter": [],
+                    "digital_stamp": [],
+                    "package_small": [
+                        "only_recipient",
+                        "signature"
+                    ]
+                },
+                "allowFakeDelivery": true
+            }
         },
         "labelAmount": 1,
         "shipmentOptions": {

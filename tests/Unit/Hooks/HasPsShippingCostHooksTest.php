@@ -113,7 +113,7 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
                 $psCarrier,
                 psFactory(MyparcelnlCarrierMapping::class)
                     ->withCarrierId(93)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_NAME),
+                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME),
                 factory(Settings::class)
                     ->withCarrierPostNl([
                         CarrierSettings::PRICE_SIGNATURE              => 0.45,
@@ -124,7 +124,7 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
             return psFactory(Cart::class)->withCarrier($psCarrier);
         },
         'values' => [
-            DeliveryOptions::CARRIER          => Carrier::CARRIER_POSTNL_NAME,
+            DeliveryOptions::CARRIER          => Carrier::CARRIER_POSTNL_LEGACY_NAME,
             DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::SHIPMENT_OPTIONS => [
                 ShipmentOptions::SIGNATURE => true,
@@ -188,7 +188,7 @@ it(
             return psFactory(Cart::class)->withCarrier($psCarrier);
         },
         'values' => [
-            DeliveryOptions::CARRIER       => Carrier::CARRIER_POSTNL_NAME,
+            DeliveryOptions::CARRIER       => Carrier::CARRIER_POSTNL_LEGACY_NAME,
             DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
         ],
         'cost'   => 2.95,
@@ -202,7 +202,7 @@ it(
                 $psCarrier,
                 psFactory(MyparcelnlCarrierMapping::class)
                     ->withCarrierId(93)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_NAME),
+                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME),
                 factory(Settings::class)
                     ->withCarrierPostNl([
                         CarrierSettings::PRICE_SIGNATURE              => 0.45,
@@ -213,7 +213,7 @@ it(
             return psFactory(Cart::class)->withCarrier($psCarrier);
         },
         'values' => [
-            DeliveryOptions::CARRIER          => Carrier::CARRIER_POSTNL_NAME,
+            DeliveryOptions::CARRIER          => Carrier::CARRIER_POSTNL_LEGACY_NAME,
             DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::SHIPMENT_OPTIONS => [
                 ShipmentOptions::SIGNATURE => true,
