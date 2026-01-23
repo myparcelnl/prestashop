@@ -80,6 +80,8 @@ it('installs: registers hooks', function () {
         'actionProductUpdate',
         'actionCarrierUpdate',
         'actionCarrierProcess',
+        'actionObjectCustomerMessageAddAfter',
+        'displayAdminOrderMain'
     ]);
 });
 
