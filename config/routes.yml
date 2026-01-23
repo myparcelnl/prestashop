@@ -5,8 +5,8 @@
 ##
 # Route for the admin settings page
 ##
-myparcelcom_settings:
-  path: myparcelcom/settings
+myparcelnl_settings:
+  path: myparcelnl/settings
   methods: [GET]
   defaults:
     _controller: 'MyParcelNL\PrestaShop\Controller\SettingsController::index'
@@ -16,8 +16,8 @@ myparcelcom_settings:
 ##
 # Route for the front-end page, used to render delivery options on checkout
 ##
-myparcelcom_frontend:
-  path: myparcelcom/views
+myparcelnl_frontend:
+  path: myparcelnl/views
   methods: [GET]
   defaults:
     _controller: 'MyParcelNL\PrestaShop\Controller\AdminMyParcelFrontController::index'
@@ -25,8 +25,8 @@ myparcelcom_frontend:
 ##
 # The controller that executes all PDK actions
 ##
-myparcelcom_pdk:
-  path: myparcelcom/pdk
+myparcelnl_pdk:
+  path: myparcelnl/pdk
   methods: [GET, POST, PUT, DELETE]
   defaults:
     _controller: 'MyParcelNL\PrestaShop\Controller\PdkController::index'
@@ -34,8 +34,8 @@ myparcelcom_pdk:
 ##
 # The controller that executes webhook actions
 ##
-myparcelcom_webhook:
-  path: myparcelcom/webhook
+myparcelnl_webhook:
+  path: myparcelnl/webhook
   methods: [POST]
   defaults:
     _controller: 'MyParcelNL\PrestaShop\Controller\WebhookController::index'
