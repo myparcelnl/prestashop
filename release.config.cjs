@@ -27,7 +27,7 @@ module.exports = {
     addReleaseNotesGeneratorPlugin({header: path.resolve(__dirname, `private/semantic-release/header-${branch}.md`)}),
     addChangelogPlugin(),
     addExecPlugin({
-      prepareCmd: `yarn pdk-builder release --root-command "${process.env.PDK_ROOT_COMMAND}" --version $\{nextRelease.version} -vvv && zip -r ./dist/myparcel-woocommerce-$\{nextRelease.version}.zip -C dist .`,
+      prepareCmd: `yarn pdk-builder release --root-command "${process.env.PDK_ROOT_COMMAND}" --version $\{nextRelease.version} -vvv && zip -r ./dist/myparcel-prestashop-$\{nextRelease.version}.zip -C dist .`,
     }),
     addGitHubPlugin({
       assets: [
