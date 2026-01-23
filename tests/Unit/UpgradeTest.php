@@ -30,10 +30,10 @@ function runUpgradeSuccessfully(string $newVersion): void
 
     $result = runUpgrade($newVersion);
 
-    expect($settingsRepository->get(Pdk::get('settingKeyInstalledVersion')))
-        ->toBe($newVersion)
-        ->and($result)
-        ->toBeTrue();
+    expect($result)
+        ->toBeTrue()
+        ->and($settingsRepository->get(Pdk::get('settingKeyInstalledVersion')))
+        ->toBe($newVersion);
 }
 
 function runUpgrade(string $newVersion): bool
@@ -72,11 +72,13 @@ it('runs upgrade with (invalid) old api key saved', function () {
 
     runUpgradeSuccessfully('4.0.0');
 
-    $firstWarningLog = Arr::first($logger->getLogs(), function (array $log) {
+    $warningLogs = \array_filter($logger->getLogs(), function (array $log) {
         return $log['level'] === LogLevel::WARNING;
     });
 
-    expect($firstWarningLog)->toHaveKeysAndValues([
-        'message' => '[PDK]: Existing API key is invalid',
-    ]);
+    $hasExpectedLog = \array_filter($warningLogs, function (array $log) {
+        return $log['message'] === '[PDK]: Existing API key is invalid';
+    });
+
+    expect($hasExpectedLog)->toHaveCount(1);
 });

@@ -119,7 +119,7 @@ it('does not create duplicate carriers', function () {
     setupAccountAndCarriers(
         factory(CarrierCollection::class)->push(
             factory(Carrier::class)
-                ->withName('postnl')
+                ->withName(Carrier::CARRIER_POSTNL_NAME)
                 ->withId(12)
                 ->withContractId(23)
         )

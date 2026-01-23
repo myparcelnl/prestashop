@@ -7,7 +7,7 @@ namespace MyParcelNL\PrestaShop\Tests\Factory;
 use BadMethodCallException;
 use MyParcelNL\Pdk\Tests\Factory\AbstractFactory;
 use MyParcelNL\PrestaShop\Tests\Factory\Contract\PsFactoryInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 abstract class AbstractPsFactory extends AbstractFactory implements PsFactoryInterface
 {

@@ -8,6 +8,8 @@ use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsEntityFactory;
 
 /**
+ * Note: legacy names are currently used for storage but should be replaced with CONSTANT_CASE and migration in the future.
+ *
  * @method $this withCarrierId(int $carrierId)
  * @method $this withMyparcelCarrier(string $myparcelCarrier)
  */
@@ -15,37 +17,37 @@ final class MyparcelnlCarrierMappingFactory extends AbstractPsEntityFactory
 {
     public function fromBpost(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_BPOST_NAME, $contractId);
+        return $this->fromCarrier(Carrier::CARRIER_BPOST_LEGACY_NAME, $contractId);
     }
 
     public function fromDhlEuroplus(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_EUROPLUS_NAME, $contractId);
+        return $this->fromCarrier(Carrier::CARRIER_DHL_EUROPLUS_LEGACY_NAME, $contractId);
     }
 
     public function fromDhlForYou(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_FOR_YOU_NAME, $contractId);
+        return $this->fromCarrier(Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME, $contractId);
     }
 
     public function fromDhlParcelConnect(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME, $contractId);
+        return $this->fromCarrier(Carrier::CARRIER_DHL_PARCEL_CONNECT_LEGACY_NAME, $contractId);
     }
 
     public function fromDpd(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DPD_NAME, $contractId);
+        return $this->fromCarrier(Carrier::CARRIER_DPD_LEGACY_NAME, $contractId);
     }
 
     public function fromPostNL(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_POSTNL_NAME, $contractId);
+        return $this->fromCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME, $contractId);
     }
 
     public function fromUps(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_UPS_NAME, $contractId);
+        return $this->fromCarrier(Carrier::CARRIER_UPS_STANDARD_LEGACY_NAME, $contractId);
     }
 
     protected function getEntityClass(): string

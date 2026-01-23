@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use DbQuery;
+use MyParcelNL\Pdk\Account\Platform as AccountPlatform;
+use MyParcelNL\Pdk\Base\Pdk;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Config;
 use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\Facade\Pdk as FacadePdk;
 use MyParcelNL\Pdk\Facade\Platform;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 final class PdkCarrierMigration extends AbstractPsPdkMigration
 {
@@ -88,9 +92,15 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
     private function getCarriersToMigrate(Collection $carrierRows): Collection
     {
         $mappings = $this->psCarrierMappingRepository->all();
-        $carriers = new Collection(Config::get('carriers'));
+        $propositionService = FacadePdk::get(PropositionService::class);
+        $carriers = $propositionService->getCarriers();
+        // Set BE as active proposition to merge in its carriers as the migration could be for any platform and we do not know in advance.
+        $propositionService->setActivePropositionId(AccountPlatform::SENDMYPARCEL_ID);
+        $carriers = $carriers->merge($propositionService->getCarriers());
+        // Reset
+        $propositionService->clearActivePropositionId();
 
-        return $carrierRows->reduce(function (Collection $carry, array $item) use ($carriers, $mappings) {
+        return $carrierRows->reduce(function (Collection $carry, array $item) use ($carriers, $mappings, $propositionService) {
             $oldCarrier = Str::after($item['name'], self::SETTING_PREFIX);
 
             $name = strtolower($oldCarrier);
@@ -102,7 +112,10 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
                 return $carry;
             }
 
-            if (! $carriers->containsStrict('name', $name)) {
+            $legacyNames = $carriers->map(function ($carrier) use ($propositionService) {
+                return $propositionService->mapNewToLegacyCarrierName($carrier->name);
+            });
+            if (!in_array($name, $legacyNames->toArray(), true)) {
                 Logger::debug("Carrier \"$oldCarrier\" not found in carriers.");
 
                 return $carry;

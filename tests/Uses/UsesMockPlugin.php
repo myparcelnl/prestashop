@@ -22,7 +22,7 @@ final class UsesMockPlugin extends UsesMockPsPdkInstance
 
         $module = new MockMyParcelNL();
 
-        MockPsModule::setInstance($module->name, $module);
+        MockPsModule::setInstance(\MyParcelNL::MODULE_NAME, $module);
 
         $this->addDefaultData();
     }
