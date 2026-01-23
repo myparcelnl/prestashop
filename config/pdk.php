@@ -78,6 +78,8 @@ use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
 use MyParcelNL\PrestaShop\Router\Service\Ps17RouterService;
 use MyParcelNL\PrestaShop\Router\Service\Ps8RouterService;
 use MyParcelNL\PrestaShop\Script\Service\PsScriptService;
+use MyParcelNL\PrestaShop\Service\NamespaceMigrationService;
+use MyParcelNL\PrestaShop\Service\PdkContextService;
 use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsCountryService;
 use MyParcelNL\PrestaShop\Service\PsObjectModelService;
@@ -179,6 +181,7 @@ return [
     /**
      * Custom services
      */
+    NamespaceMigrationService::class       => get(NamespaceMigrationService::class),
     PsConfigurationServiceInterface::class => get(Ps17PsConfigurationService::class),
     PsRouterServiceInterface::class        => psVersionFactory([
         ['class' => Ps8RouterService::class, 'version' => 8],
