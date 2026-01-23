@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Hooks;
 
+use MyParcelNL\Pdk\Context\Contract\ContextServiceInterface;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\PrestaShop\Service\PdkContextService;
 
 trait HasPdkRenderHooks
 {
@@ -18,14 +18,14 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayAdminAfterHeader(): string
     {
-        /** @var PdkContextService $contextService */
-        $contextService = Pdk::get(PdkContextService::class);
-        
+        /** @var PsPdkContextService $contextService */
+        $contextService = Pdk::get(ContextServiceInterface::class);
+
         // Only render on MyParcel pages
         if (!$contextService->shouldRenderPdkComponents()) {
             return '';
         }
-        
+
         // Always render all PDK components - mirroring WooCommerce PdkPluginSettingsHooks pattern
         $html = Frontend::renderNotifications();
         $html .= Frontend::renderModals();
@@ -43,14 +43,14 @@ trait HasPdkRenderHooks
      */
     public function hookDisplayBackOfficeFooter(): string
     {
-        /** @var PdkContextService $contextService */
-        $contextService = Pdk::get(PdkContextService::class);
-        
+        /** @var PsPdkContextService $contextService */
+        $contextService = Pdk::get(ContextServiceInterface::class);
+
         // Only render on MyParcel pages
         if (!$contextService->shouldRenderPdkComponents()) {
             return '';
         }
-        
+
         // Always use PDK's standard rendering system - it handles minimal vs full boot internally
         return Frontend::renderInitScript();
     }

@@ -85,6 +85,7 @@ use MyParcelNL\PrestaShop\Service\PsCarrierService;
 use MyParcelNL\PrestaShop\Service\PsCountryService;
 use MyParcelNL\PrestaShop\Service\PsObjectModelService;
 use MyParcelNL\PrestaShop\Service\PsOrderService;
+use MyParcelNL\PrestaShop\Service\PsPdkContextService;
 use Psr\Log\LoggerInterface;
 
 use function DI\factory;
@@ -133,7 +134,7 @@ return [
      * Services
      */
     AuditServiceInterface::class                => get(AuditService::class),
-    ContextServiceInterface::class              => get(PdkContextService::class),
+    ContextServiceInterface::class              => get(PsPdkContextService::class),
     CronServiceInterface::class                 => get(PsCronService::class),
     FrontendRenderServiceInterface::class       => get(PsFrontendRenderService::class),
     LanguageServiceInterface::class             => get(PsLanguageService::class),
