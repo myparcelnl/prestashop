@@ -16,7 +16,7 @@ use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 use MyParcelNL\PrestaShop\Service\PsProductService;
-use MyParcelNL\Sdk\src\Support\Arr;
+use MyParcelNL\Sdk\Support\Arr;
 use Product as PsProduct;
 
 class PsPdkProductRepository extends AbstractPdkPdkProductRepository

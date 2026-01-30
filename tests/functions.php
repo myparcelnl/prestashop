@@ -60,7 +60,7 @@ function setupCarrierActiveSettings(array $settings): SettingsFactory
             ->withId(12),
 
         psFactory(MyparcelnlCarrierMapping::class)
-            ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_NAME)
+            ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME)
             ->withCarrierId(12),
     ]))->store();
 

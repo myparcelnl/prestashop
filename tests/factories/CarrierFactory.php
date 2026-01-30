@@ -47,7 +47,7 @@ final class CarrierFactory extends AbstractPsObjectModelFactory implements WithT
 
     protected function createDefault(): FactoryInterface
     {
-        return $this->withActive(1);
+        return $this->withActive(true);
     }
 
     protected function getObjectModelClass(): string

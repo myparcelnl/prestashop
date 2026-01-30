@@ -9,10 +9,13 @@ use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException;
+use MyParcelNL\PrestaShop\Service\ModuleHookService;
 use Throwable;
 
 final class ModuleService
 {
+    private static bool $isRegisteringHooks = false;
+
     /**
      * @return \MyParcelNL
      */
@@ -48,12 +51,22 @@ final class ModuleService
     }
 
     /**
+     * Register all hooks at install time
      * @return void
      * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
-     * @noinspection PhpUnused
      */
     public function registerHooks(): void
     {
+        /**
+         * registerHooks can be called multiple times during one request / install.
+         * However: this throws a ‘key already exists’ / ‘duplicate key’ exception from the database.
+         * Ensure we run this only once per request.
+         */
+        if (self::$isRegisteringHooks) {
+            return;
+        }
+        self::$isRegisteringHooks = true;
+
         $instance = $this->getInstance();
 
         foreach (Pdk::get('moduleHooks') as $hook) {
@@ -64,5 +77,14 @@ final class ModuleService
 
             throw new InstallationException(sprintf('Hook %s could not be registered', $hook));
         }
+    }
+
+    /**
+     * Provide a method to reset the registering hooks flag for testing purposes.
+     * @return void
+     */
+    public static function resetRegisteringHooks(): void
+    {
+        self::$isRegisteringHooks = false;
     }
 }

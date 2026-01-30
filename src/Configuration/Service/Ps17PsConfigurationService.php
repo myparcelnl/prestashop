@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Configuration\Service;
 
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint;
 
 /**

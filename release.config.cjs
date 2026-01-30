@@ -27,18 +27,14 @@ module.exports = {
     addReleaseNotesGeneratorPlugin({header: path.resolve(__dirname, `private/semantic-release/header-${branch}.md`)}),
     addChangelogPlugin(),
     addExecPlugin({
-      prepareCmd: `yarn pdk-builder release --root-command "${process.env.PDK_ROOT_COMMAND}" --version $\{nextRelease.version} -vvv`,
+      prepareCmd: `yarn pdk-builder release --root-command "${process.env.PDK_ROOT_COMMAND}" --version $\{nextRelease.version} -vvv && zip -r ./dist/myparcel-prestashop-$\{nextRelease.version}.zip -C dist .`,
     }),
     addGitHubPlugin({
       assets: [
         {
-          path: './dist/myparcelnl-*.zip',
-          label: 'Download MyParcelNL PrestaShop v${nextRelease.version} (for myparcel.nl customers)',
-        },
-        {
-          path: './dist/myparcelbe-*.zip',
-          label: 'Download MyParcelBE PrestaShop v${nextRelease.version} (for sendmyparcel.be customers)',
-        },
+          path: './dist/myparcel-*.zip',
+          label: 'Download MyParcel PrestaShop v${nextRelease.version}',
+        }
       ],
     }),
     addGitPlugin(),

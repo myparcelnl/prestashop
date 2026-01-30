@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Router\Service;
 
 use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\PrestaShop\Router\Contract\PsRouterServiceInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 abstract class PsRouterService extends Repository implements PsRouterServiceInterface
 {
