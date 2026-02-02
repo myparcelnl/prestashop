@@ -1,4 +1,8 @@
 ##
+# WARNING the prefix of the routes MUST MATCH the plugin name as currently defined in myparcelnl.php
+##
+
+##
 # Route for the admin settings page
 ##
 myparcelnl_settings:
@@ -10,7 +14,7 @@ myparcelnl_settings:
     _legacy_link: 'MyParcelNLAdminSettings'
 
 ##
-# Route for the front-end page
+# Route for the front-end page, used to render delivery options on checkout
 ##
 myparcelnl_frontend:
   path: myparcelnl/views

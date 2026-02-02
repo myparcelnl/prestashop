@@ -90,7 +90,7 @@ trait HasModuleUpgradeOverrides
         $content = '<?php function upgrade_module___VERSION__($module): bool { return \\MyParcelNL\\PrestaShop\\Facade\\MyParcelModule::install($module); }';
 
         $fileSystem->put(static::getUpgradeFileName(), strtr($content, [
-            '__VERSION__' => str_replace(['.', '-'], '_', static::getVersionFromComposer()),
+            '__VERSION__' => str_replace(['.', '-', '+'], '_', static::getVersionFromComposer()),
         ]));
     }
 
@@ -108,7 +108,7 @@ trait HasModuleUpgradeOverrides
     private static function getUpgradeFileName(): string
     {
         $upgradeDir = static::getUpgradeDir();
-        $version    = str_replace('-', '_', static::getVersionFromComposer());
+        $version    = str_replace(['-', '+'], '_', static::getVersionFromComposer());
 
         return sprintf('%s/upgrade-%s.php', $upgradeDir, $version);
     }

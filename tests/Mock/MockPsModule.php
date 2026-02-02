@@ -62,7 +62,7 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
      */
     public static function needUpgrade($module)
     {
-        return static::loadUpgradeVersionList($module->name, $module->version, $module->version);
+        return static::loadUpgradeVersionList(\MyParcelNL::MODULE_NAME, $module->version, $module->version);
     }
 
     public static function reset(): void

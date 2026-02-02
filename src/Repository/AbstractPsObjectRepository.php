@@ -11,7 +11,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Contract\PsObjectRepositoryInterface;
 use MyParcelNL\PrestaShop\Entity\EntityInterface;
 use MyParcelNL\PrestaShop\Entity\EntityWithTimestampsInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use Throwable;
 
 /**

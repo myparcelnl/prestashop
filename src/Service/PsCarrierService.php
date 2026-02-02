@@ -6,14 +6,17 @@ namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier as PsCarrier;
 use Context;
+use MyParcelNL;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\AccountSettings;
+use MyParcelNL\Pdk\Facade\FrontendData;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
@@ -176,6 +179,9 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     {
         $carriers = AccountSettings::getCarriers();
 
+        // Map to legacy carrier for BC compatibility
+        $carriers = FrontendData::carrierCollectionToLegacyFormat($carriers);
+
         $createdCarriers = $this->createOrUpdateCarriers($carriers);
         $this->deleteUnusedCarriers($createdCarriers);
     }
@@ -188,7 +194,7 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     protected function deleteUnusedCarriers(Collection $createdCarriers): void
     {
         $psCarriers = $this->getPsCarriers();
-        $moduleName = Pdk::getAppInfo()->name;
+        $moduleName = MyParcelNL::MODULE_NAME;
 
         $psCarriers
             ->filter(function (PsCarrier $psCarrier) use ($moduleName, $createdCarriers): bool {

@@ -11,6 +11,7 @@ use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Platform;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Shipment\Model\ShipmentOptions;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
@@ -103,10 +104,14 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         ShipmentOptions::FROZEN            => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
 
+    $propositionService = Pdk::get(PropositionService::class);
+
     $fullResult = array_replace(
         array_replace([
             DeliveryOptions::CARRIER       => [
-                'externalIdentifier' => Platform::get('defaultCarrier'),
+                'externalIdentifier' => $propositionService->mapNewToLegacyCarrierName(
+                    $propositionService->getDefaultCarrier()->name
+                ),
             ],
             DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::LABEL_AMOUNT  => 1,
@@ -120,12 +125,12 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
     ->with([
         'defaults' => [
             'delivery_settings' => [
-                'carrier' => Carrier::CARRIER_POSTNL_NAME,
+                'carrier' => Carrier::CARRIER_POSTNL_LEGACY_NAME,
             ],
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER => ['externalIdentifier' => Carrier::CARRIER_POSTNL_NAME],
+                DeliveryOptions::CARRIER => ['externalIdentifier' => Carrier::CARRIER_POSTNL_LEGACY_NAME],
             ],
         ],
 
@@ -138,7 +143,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER       => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
+                DeliveryOptions::CARRIER       => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
                 DeliveryOptions::DATE          => '2077-04-07 00:00:00',
                 DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_MORNING_NAME,
             ],
@@ -146,21 +151,21 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'different label amount' => [
             'delivery_settings' => [
-                'carrier' => Carrier::CARRIER_POSTNL_NAME,
+                'carrier' => Carrier::CARRIER_POSTNL_LEGACY_NAME,
             ],
             'extra_options'     => [
                 'labelAmount' => 5,
             ],
 
             'result' => [
-                DeliveryOptions::CARRIER      => ['externalIdentifier' => Carrier::CARRIER_POSTNL_NAME],
+                DeliveryOptions::CARRIER      => ['externalIdentifier' => Carrier::CARRIER_POSTNL_LEGACY_NAME],
                 DeliveryOptions::LABEL_AMOUNT => 5,
             ],
         ],
 
         'all shipment options enabled' => [
             'delivery_settings' => [
-                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
                 'shipmentOptions' => [
                     'signature'         => true,
                     'insurance'         => 2000,
@@ -177,7 +182,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
+                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
                 DeliveryOptions::SHIPMENT_OPTIONS => [
                     ShipmentOptions::INSURANCE         => 2000,
                     ShipmentOptions::AGE_CHECK         => TriStateService::ENABLED,
@@ -194,7 +199,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'all shipment options disabled' => [
             'delivery_settings' => [
-                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
                 'shipmentOptions' => [
                     'signature'         => false,
                     'insurance'         => 0,
@@ -211,7 +216,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
+                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
                 DeliveryOptions::SHIPMENT_OPTIONS => [
                     ShipmentOptions::INSURANCE         => 0,
                     ShipmentOptions::AGE_CHECK         => TriStateService::DISABLED,
@@ -228,7 +233,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'pickup location' => [
             'delivery_settings' => [
-                'carrier'        => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                'carrier'        => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
                 'pickupLocation' => [
                     'box_number'        => 'box_number',
                     'cc'                => 'cc',
@@ -247,7 +252,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER         => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_NAME],
+                DeliveryOptions::CARRIER         => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
                 DeliveryOptions::PICKUP_LOCATION => [
                     'boxNumber'       => 'box_number',
                     'cc'              => 'cc',

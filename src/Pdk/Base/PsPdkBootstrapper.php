@@ -12,8 +12,9 @@ use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShopBundle\Exception\InvalidModuleException;
 use Psr\Log\LogLevel;
@@ -43,25 +44,28 @@ class PsPdkBootstrapper extends PdkBootstrapper
         string $url
     ): array {
         return array_replace(
-            $this->getConfig($version, $name, $path),
+            $this->getConfig($path),
             $this->resolvePrestaShopServices()
         );
     }
 
     /**
-     * @param  string $version
-     * @param  string $name
      * @param  string $path
      *
      * @return array
      */
-    protected function getConfig(string $version, string $name, string $path): array
+    protected function getConfig(string $path): array
     {
         return [
-            'userAgent' => value([
-                'PrestaShop'          => _PS_VERSION_,
-                'MyParcel-PrestaShop' => $version,
-            ]),
+            // you cannot use ‘use’ statements as php-di will not compile closures with them
+            'userAgent' => factory(function (): array {
+                $propositionService = Pdk::get(PropositionService::class);
+                return [
+                    'MyParcel-PrestaShop'  => Pdk::getAppInfo()->version,
+                    'MyParcel-Proposition' => $propositionService->hasActivePropositionId() ? $propositionService->getPropositionConfig()->proposition->key : 'unknown',
+                    'PrestaShop'           => _PS_VERSION_,
+                ];
+            }),
 
             /**
              * The name of the tab we want to show the settings page under.
@@ -84,7 +88,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * Logging
              */
 
-            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, $name)),
+            'logDirectory' => value(sprintf('%s/var/logs/%s', _PS_ROOT_DIR_, MyParcelNL::MODULE_NAME)),
 
             'logLevelFilenameMap' => value([
                 LogLevel::DEBUG     => FileLogger::DEBUG,
@@ -111,10 +115,10 @@ class PsPdkBootstrapper extends PdkBootstrapper
              * @see config/routes.yml
              */
 
-            'routeNameFrontend' => value('myparcelnl_frontend'),
-            'routeNamePdk'      => value('myparcelnl_pdk'),
-            'routeNameSettings' => value('myparcelnl_settings'),
-            'routeNameWebhook'  => value('myparcelnl_webhook'),
+            'routeNameFrontend' => value(MyParcelNL::MODULE_NAME . '_frontend'),
+            'routeNamePdk'      => value(MyParcelNL::MODULE_NAME . '_pdk'),
+            'routeNameSettings' => value(MyParcelNL::MODULE_NAME . '_settings'),
+            'routeNameWebhook'  => value(MyParcelNL::MODULE_NAME . '_webhook'),
 
             'legacyControllerSettings' => value('MyParcelNLAdminSettings'),
 
@@ -144,7 +148,7 @@ class PsPdkBootstrapper extends PdkBootstrapper
             ]),
 
             'moduleInstance' => factory(static function (): Module {
-                $name = Pdk::getAppInfo()->name;
+                $name = MyParcelNL::MODULE_NAME;
 
                 /** @var MyParcelNL|false $module */
                 $module = Module::getInstanceByName($name);

@@ -6,7 +6,7 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\PrestaShop\Entity\EntityInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 /**
  * @template T of EntityInterface

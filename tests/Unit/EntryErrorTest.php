@@ -22,7 +22,7 @@ function createModule(): MyParcelNL
 {
     $module = new MockErrorMyParcelNL();
 
-    MockPsModule::setInstance($module->name, $module);
+    MockPsModule::setInstance(\MyParcelNL::MODULE_NAME, $module);
 
     return $module;
 }

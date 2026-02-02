@@ -8,7 +8,7 @@ use Exception;
 use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Base\Support\Utils;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use ObjectModel;
 use PrestaShop\PrestaShop\Core\Foundation\Database\EntityInterface;
 

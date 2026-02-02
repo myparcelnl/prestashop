@@ -9,8 +9,9 @@ use Country as PsCountry;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Platform;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\PrestaShop\Contract\PsCountryServiceInterface;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 
 /**
  * @template T of PsCountry
@@ -32,11 +33,16 @@ final class PsCountryService extends PsSpecificObjectModelService implements PsC
      */
     public function getCountriesForCarrier(string $carrierName): array
     {
+        $propositionService = Pdk::get(PropositionService::class);
+
         // Resolve carrier identifier
         [$resolvedCarrierName] = explode(':', $carrierName);
 
-        $platform            = Platform::getPlatform();
-        $allCarrierCountries = Pdk::get('countriesPerPlatformAndCarrier')[$platform] ?? [];
+        // Use legacy carrier name for backwards compatibility
+        $resolvedCarrierName = $propositionService->mapNewToLegacyCarrierName($resolvedCarrierName);
+
+        $propositionName     = $propositionService->getPropositionConfig()->proposition->key;
+        $allCarrierCountries = Pdk::get('countriesPerPlatformAndCarrier')[$propositionName] ?? [];
         $countriesForCarrier = $allCarrierCountries[$resolvedCarrierName] ?? [];
 
         if (true === ($countriesForCarrier['fakeDelivery'] ?? null)) {

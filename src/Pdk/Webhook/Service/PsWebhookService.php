@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Webhook\Service;
 
 use Context;
+use MyParcelNL;
 use MyParcelNL\Pdk\App\Webhook\Service\AbstractPdkWebhookService;
+use MyParcelNL\Pdk\Base\PdkBootstrapper;
 
 class PsWebhookService extends AbstractPdkWebhookService
 {
@@ -19,6 +21,6 @@ class PsWebhookService extends AbstractPdkWebhookService
 
     public function getBaseUrl(): string
     {
-        return Context::getContext()->link->getModuleLink('myparcelnl', 'webhook');
+        return Context::getContext()->link->getModuleLink(MyParcelNL::MODULE_NAME, 'webhook');
     }
 }

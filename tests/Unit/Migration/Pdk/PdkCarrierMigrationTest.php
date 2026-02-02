@@ -64,15 +64,15 @@ it('migrates carriers to pdk', function (
         'expected'      => [
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 21,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_LEGACY_NAME,
             ],
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 22,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_DHL_FOR_YOU_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
             ],
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 24,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_BPOST_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_BPOST_LEGACY_NAME,
             ],
         ],
     ],
@@ -94,7 +94,7 @@ it('migrates carriers to pdk', function (
             return [
                 factory(PsCarrier::class)->withId(21),
                 factory(MyparcelnlCarrierMapping::class)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_NAME)
+                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME)
                     ->withCarrierId(40),
             ];
         },
@@ -104,7 +104,7 @@ it('migrates carriers to pdk', function (
         'expected'      => [
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 40,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_LEGACY_NAME,
             ],
         ],
     ],

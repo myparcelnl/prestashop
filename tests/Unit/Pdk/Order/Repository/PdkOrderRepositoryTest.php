@@ -31,7 +31,12 @@ it('creates a valid pdk order', function (OrderFactory $orderFactory) {
         json_encode(
             Arr::except(
                 $pdkOrder->toArrayWithoutNull(),
-                ['deliveryOptions.carrier.capabilities', 'deliveryOptions.carrier.returnCapabilities']
+                [
+                    'deliveryOptions.carrier.capabilities',
+                    'deliveryOptions.carrier.returnCapabilities',
+                    'deliveryOptions.carrier.inboundFeatures',
+                    'deliveryOptions.carrier.outboundFeatures',
+                ]
             )
         )
     );

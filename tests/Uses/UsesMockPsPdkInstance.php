@@ -13,18 +13,23 @@ use Gender;
 use Group;
 use Lang;
 use Manufacturer;
+use MyParcelNL;
+use MyParcelNL\Pdk\Account\Platform;
 use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
+use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Facade\Config;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Proposition\Model\PropositionConfig;
+use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\Pdk\Tests\Factory\SharedFactoryState;
 use MyParcelNL\Pdk\Tests\Uses\UsesEachMockPdkInstance;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCountries;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
-use MyParcelNL\Sdk\src\Support\Str;
+use MyParcelNL\Sdk\Support\Str;
 use OrderState;
 use OrderStateFactory;
 use Risk;
@@ -76,9 +81,13 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
         /** @var FileSystemInterface $fileSystem */
         $fileSystem = Pdk::get(FileSystemInterface::class);
 
-        foreach (Config::get('carriers') as $carrier) {
+        $propositionService = Pdk::get(PropositionService::class);
+        $propositionService->setActivePropositionId(Platform::MYPARCEL_ID);
+        $propositionCarriers  = $propositionService->getCarriers(true);
+
+        foreach ($propositionCarriers as $carrier) {
             foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
-                $filename = Pdk::get('carrierLogosDirectory') . $carrier['name'] . $fileExtension;
+                $filename = Pdk::get('carrierLogosDirectory') . $propositionService->mapNewToLegacyCarrierName($carrier->name) . $fileExtension;
 
                 $fileSystem->put($filename, '[IMAGE]');
             }
@@ -98,8 +107,8 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
     protected function setup(): void
     {
         MockPsPdkBootstrapper::setConfig($this->config);
-        MockPsPdkBootstrapper::boot('pest', 'Pest', '1.0.0', __DIR__ . '/../../', 'APP_URL');
-        MockPsModule::setInstance('pest', new CarrierModule());
+        MockPsPdkBootstrapper::boot('1.0.0', __DIR__ . '/../../', 'APP_URL');
+        MockPsModule::setInstance(MyParcelNL::MODULE_NAME, new CarrierModule());
 
         $this->addDefaultData();
     }

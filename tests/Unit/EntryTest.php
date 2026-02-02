@@ -82,4 +82,6 @@ it('writes upgrade file when prestashop checks if upgrade is needed', function (
     ['1.0.0', 'upgrade-1.0.0.php', '1_0_0'],
     ['2.5.6', 'upgrade-2.5.6.php', '2_5_6'],
     ['4.0.0-beta.4', 'upgrade-4.0.0_beta.4.php', '4_0_0_beta_4'],
+    ['4.0.0-beta.4', 'upgrade-4.0.0_beta.4.php', '4_0_0_beta_4'],
+    ['4.11.2.39-dev+391-feat-proposition-apikey', 'upgrade-4.11.2.39_dev_391_feat_proposition_apikey.php', '4_11_2_39_dev_391_feat_proposition_apikey']
 ]);

@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPlugin;
@@ -44,13 +45,44 @@ it('installs: registers hooks', function () {
     /** @var \MyParcelNL $module */
     $module = Pdk::get('moduleInstance');
 
+    MyParcelModule::resetRegisteringHooks();
+
     expect(MockPsObjectModels::getByClass(Hook::class))->toBeEmpty();
+
     Installer::install($module);
 
     $createdHooks = MockPsObjectModels::getByClass(Hook::class);
 
     expect($createdHooks)->not->toBeEmpty();
-    $this->assertMatchesJsonSnapshot(json_encode($createdHooks->toArray(Arrayable::SKIP_NULL)));
+
+    $hooks = array_reduce($createdHooks->toArray(), function ($carry, $item) {
+        if (isset($item['name'])) {
+            $carry[] = $item['name'];
+        }
+
+        return $carry;
+    }, []);
+
+    expect(array_flip($hooks))->toHaveKeys([
+        'displayBeforeCarrier',
+        'displayCarrierExtraContent',
+        'displayBackOfficeHeader',
+        'displayBackOfficeFooter',
+        'displayAdminAfterHeader',
+        'displayAdminEndContent',
+        'displayHeader',
+        'displayAdminOrderLeft',
+        'displayAdminOrderMainBottom',
+        'displayAdminProductsExtra',
+        'displayCarrierList',
+        'actionOrderGridDefinitionModifier',
+        'actionOrderGridPresenterModifier',
+        'actionProductUpdate',
+        'actionCarrierUpdate',
+        'actionCarrierProcess',
+        'actionObjectCustomerMessageAddAfter',
+        'displayAdminOrderMain'
+    ]);
 });
 
 it('installs: installs tabs', function () {
@@ -72,11 +104,11 @@ it('installs: doesn\'t add same tab twice', function () {
     $tabRepository = Pdk::get('ps.tabRepository');
 
     psFactory(Tab::class)
-        ->withModule($module->name)
+        ->withModule(\MyParcelNL::MODULE_NAME)
         ->withClassName(Pdk::get('legacyControllerSettings'))
         ->store();
 
-    expect($tabRepository->findByModule($module->name))->toHaveCount(1);
+    expect($tabRepository->findByModule(\MyParcelNL::MODULE_NAME))->toHaveCount(1);
     Installer::install($module);
-    expect($tabRepository->findByModule($module->name))->toHaveCount(1);
+    expect($tabRepository->findByModule(\MyParcelNL::MODULE_NAME))->toHaveCount(1);
 });
