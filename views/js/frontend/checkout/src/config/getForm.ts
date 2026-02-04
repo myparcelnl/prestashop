@@ -1,4 +1,4 @@
-import {type PdkCheckoutConfigInput, useUtil, Util} from '@myparcel-pdk/checkout';
+import {type PdkCheckoutConfigInput, useUtil, Util} from '@myparcel-dev/pdk-checkout';
 
 export const getForm: PdkCheckoutConfigInput['getForm'] = () => {
   const getElement = useUtil(Util.GetElement);

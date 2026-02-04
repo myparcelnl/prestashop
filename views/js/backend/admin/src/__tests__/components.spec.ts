@@ -1,4 +1,4 @@
-// import {executePdkComponentTests} from '@myparcel-pdk/admin-component-tests';
+// import {executePdkComponentTests} from '@myparcel-dev/pdk-admin-component-tests';
 // import {
 //   PsFormGroup,
 //   PsIcon,

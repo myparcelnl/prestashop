@@ -1,5 +1,5 @@
-import {useDeliveryOptionsStore} from '@myparcel-pdk/checkout';
-import {type InputDeliveryOptionsConfiguration} from '@myparcel/delivery-options';
+import {useDeliveryOptionsStore} from '@myparcel-dev/pdk-checkout';
+import {type InputDeliveryOptionsConfiguration} from '@myparcel-dev/delivery-options';
 
 let configuration: InputDeliveryOptionsConfiguration | undefined;
 

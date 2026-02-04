@@ -1,4 +1,4 @@
-import {useUtil, Util} from '@myparcel-pdk/checkout';
+import {useUtil, Util} from '@myparcel-dev/pdk-checkout';
 
 interface Address {
   address1: string;

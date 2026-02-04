@@ -1,5 +1,5 @@
 /* eslint-disable no-magic-numbers,id-length */
-import {FetchClient, GetCarriers, createPublicSdk} from '@myparcel/sdk';
+import {FetchClient, GetCarriers, createPublicSdk} from '@myparcel-dev/sdk';
 import chalk from 'chalk';
 import fetch from 'node-fetch';
 import fs from 'fs';
@@ -10,7 +10,7 @@ import sharp from 'sharp';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 /**
- * @type {import('@myparcel-pdk/app-builder').PdkBuilderCommand} downloadCarrierLogos
+ * @type {import('@myparcel-dev/pdk-app-builder').PdkBuilderCommand} downloadCarrierLogos
  */
 
 export const downloadCarrierLogos = async ({debug}) => {

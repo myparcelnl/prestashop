@@ -7,7 +7,7 @@
 
 <script lang="ts" setup>
 import {computed} from 'vue';
-import {AdminIcon, AdminComponent} from '@myparcel-pdk/admin';
+import {AdminIcon, AdminComponent} from '@myparcel-dev/pdk-admin';
 
 const props = defineProps<{icon: AdminIcon}>();
 

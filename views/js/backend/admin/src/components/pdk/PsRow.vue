@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import {computed} from 'vue';
-import {AdminComponent} from '@myparcel-pdk/admin';
+import {AdminComponent} from '@myparcel-dev/pdk-admin';
 
 const props = defineProps<{
   collapseGutters: boolean;

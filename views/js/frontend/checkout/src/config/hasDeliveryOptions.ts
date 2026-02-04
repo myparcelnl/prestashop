@@ -1,4 +1,4 @@
-import {type PdkCheckoutConfigInput, useSettings} from '@myparcel-pdk/checkout';
+import {type PdkCheckoutConfigInput, useSettings} from '@myparcel-dev/pdk-checkout';
 import {useShippingMethodData} from '../utils';
 
 /**

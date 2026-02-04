@@ -1,4 +1,4 @@
-import { defineConfig } from '@myparcel-pdk/app-builder';
+import { defineConfig } from '@myparcel-dev/pdk-app-builder';
 import { downloadCarrierLogos } from './private/downloadCarrierLogos.js';
 import { spawnSync } from 'node:child_process';
 
