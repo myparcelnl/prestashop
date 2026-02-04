@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import {AdminComponent, useLanguage, type SettingsDividerProps} from '@myparcel-pdk/admin';
+import {AdminComponent, useLanguage, type SettingsDividerProps} from '@myparcel-dev/pdk-admin';
 
 // eslint-disable-next-line vue/no-unused-properties
 defineProps<SettingsDividerProps>();

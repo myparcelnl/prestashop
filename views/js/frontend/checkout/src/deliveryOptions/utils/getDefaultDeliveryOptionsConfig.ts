@@ -1,4 +1,4 @@
-import {useDeliveryOptionsStore} from '@myparcel-pdk/checkout';
+import {useDeliveryOptionsStore} from '@myparcel-dev/pdk-checkout';
 import {type InputDeliveryOptionsConfiguration} from '@myparcel/delivery-options';
 
 let configuration: InputDeliveryOptionsConfiguration | undefined;

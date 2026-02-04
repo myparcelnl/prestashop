@@ -1,4 +1,4 @@
-import {AddressField, type AddressFields} from '@myparcel-pdk/checkout';
+import {AddressField, type AddressFields} from '@myparcel-dev/pdk-checkout';
 
 export const createFields = (
   prefix: string,

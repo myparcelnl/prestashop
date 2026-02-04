@@ -49,7 +49,7 @@
 
 <script lang="ts" setup>
 import {toRefs, computed} from 'vue';
-import {generateFieldId, useLanguage, type FormGroupProps, AdminComponent} from '@myparcel-pdk/admin';
+import {generateFieldId, useLanguage, type FormGroupProps, AdminComponent} from '@myparcel-dev/pdk-admin';
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<FormGroupProps>();

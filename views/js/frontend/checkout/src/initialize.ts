@@ -1,4 +1,4 @@
-import {createPdkCheckout, PdkField, AddressType, usePdkCheckout} from '@myparcel-pdk/checkout';
+import {createPdkCheckout, PdkField, AddressType, usePdkCheckout} from '@myparcel-dev/pdk-checkout';
 import {createFields} from './utils';
 import {initializeDeliveryOptions} from './initializeDeliveryOptions';
 import {

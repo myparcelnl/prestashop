@@ -1,4 +1,4 @@
-import {type PdkCheckoutConfigInput} from '@myparcel-pdk/checkout';
+import {type PdkCheckoutConfigInput} from '@myparcel-dev/pdk-checkout';
 
 export const toggleField: PdkCheckoutConfigInput['toggleField'] = (field: HTMLInputElement, show: boolean): void => {
   const $field = jQuery(field);

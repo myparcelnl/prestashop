@@ -1,4 +1,4 @@
-import {PdkField, useCheckoutStore} from '@myparcel-pdk/checkout';
+import {PdkField, useCheckoutStore} from '@myparcel-dev/pdk-checkout';
 import {type ShippingMethod} from '../types';
 import {useShippingMethodData} from './useShippingMethodData';
 

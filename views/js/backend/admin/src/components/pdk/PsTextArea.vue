@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import {AdminComponent, type TextAreaProps, type TextAreaEmits, useElementContext} from '@myparcel-pdk/admin';
+import {AdminComponent, type TextAreaProps, type TextAreaEmits, useElementContext} from '@myparcel-dev/pdk-admin';
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<TextAreaProps>();

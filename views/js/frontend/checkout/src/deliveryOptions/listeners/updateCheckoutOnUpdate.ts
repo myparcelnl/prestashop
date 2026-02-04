@@ -3,8 +3,8 @@ import {
   useDeliveryOptionsStore,
   type DeliveryOptionsStoreState,
   type StoreCallbackUpdate,
-} from '@myparcel-pdk/checkout';
-import {objectIsEqual} from '@myparcel/ts-utils';
+} from '@myparcel-dev/pdk-checkout';
+import {objectIsEqual} from '@myparcel-dev/ts-utils';
 import {getCurrentShippingMethod} from '../../utils';
 
 const CHECKOUT_UPDATE_DELAY = 200;
