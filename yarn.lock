@@ -1135,6 +1135,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@myparcel-dev/semantic-release-config@npm:^6.0.0":
+  version: 6.0.10
+  resolution: "@myparcel-dev/semantic-release-config@npm:6.0.10"
+  dependencies:
+    "@iwavesmedia/semantic-release-composer": "npm:^1.0.0"
+    "@semantic-release/changelog": "npm:^6.0.1"
+    "@semantic-release/commit-analyzer": "npm:^9.0.2"
+    "@semantic-release/exec": "npm:^6.0.3"
+    "@semantic-release/git": "npm:^10.0.1"
+    "@semantic-release/github": "npm:^8.0.4"
+    "@semantic-release/npm": "npm:^10.0.0"
+    "@semantic-release/release-notes-generator": "npm:^10.0.0"
+    conventional-changelog-conventionalcommits: "npm:^4.0.0 || ^5.0.0"
+    semantic-release: "npm:^21.0.0"
+  checksum: 10c0/6229ebd6073cce372630ea3ecd4e23f143f1d19fcb2ec1c0e0fd6bf8ce48aed05dde72124dd18aa8981fa9f0cbbe3486bc0683b15a69e413b9fe9c629062d485
+  languageName: node
+  linkType: hard
+
 "@myparcel-dev/ts-utils@npm:>= 1.6.0, @myparcel-dev/ts-utils@npm:^1.15.0, @myparcel-dev/ts-utils@npm:^1.7.0":
   version: 1.15.0
   resolution: "@myparcel-dev/ts-utils@npm:1.15.0"
@@ -1215,8 +1233,8 @@ __metadata:
     "@myparcel-dev/eslint-config-prettier-typescript": "npm:^1.2.0"
     "@myparcel-dev/eslint-config-prettier-typescript-vue": "npm:^1.2.0"
     "@myparcel-dev/pdk-app-builder": "npm:^4.0.0"
-    "@myparcel/sdk": "npm:^4.4.1"
-    "@myparcel/semantic-release-config": "npm:^5.0.0"
+    "@myparcel-dev/sdk": "npm:^5.0.0"
+    "@myparcel-dev/semantic-release-config": "npm:^6.0.0"
     "@types/node": "npm:^20.0.0"
     "@vue/tsconfig": "npm:^0.8.1"
     array.prototype.flatmap: "npm:^1.3.1"
@@ -1283,15 +1301,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myparcel/constants@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@myparcel/constants@npm:2.0.0"
-  dependencies:
-    "@myparcel/ts-utils": "npm:^1.7.0"
-  checksum: 10c0/77e190badd762e0d862afe09bf351ca3d7a57b2f9c98c835e94f26ff71d551cba6748bd6c9e40b2ccc44cf05982798527982448a56b67e0756daa16c746a72f0
-  languageName: node
-  linkType: hard
-
 "@myparcel/prettier-config@npm:>= 1":
   version: 1.1.0
   resolution: "@myparcel/prettier-config@npm:1.1.0"
@@ -1299,35 +1308,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myparcel/sdk@npm:^4.4.1":
-  version: 4.4.2
-  resolution: "@myparcel/sdk@npm:4.4.2"
-  dependencies:
-    "@myparcel/constants": "npm:^2.0.0"
-    "@myparcel/ts-utils": "npm:^1.6.0"
-  checksum: 10c0/a86aa8c041dcb1f25d2d89ac9f2bc0c9af0922957c8014f4bb73ec00db127d7113b6d5d3efebb0aed93e9ad2bb474e128893b128d904604d080bc076a7f056fc
-  languageName: node
-  linkType: hard
-
-"@myparcel/semantic-release-config@npm:^5.0.0":
-  version: 5.1.0
-  resolution: "@myparcel/semantic-release-config@npm:5.1.0"
-  dependencies:
-    "@iwavesmedia/semantic-release-composer": "npm:^1.0.0"
-    "@semantic-release/changelog": "npm:^6.0.1"
-    "@semantic-release/commit-analyzer": "npm:^9.0.2"
-    "@semantic-release/exec": "npm:^6.0.3"
-    "@semantic-release/git": "npm:^10.0.1"
-    "@semantic-release/github": "npm:^8.0.4"
-    "@semantic-release/npm": "npm:^10.0.0"
-    "@semantic-release/release-notes-generator": "npm:^10.0.0"
-    conventional-changelog-conventionalcommits: "npm:^4.0.0 || ^5.0.0"
-    semantic-release: "npm:^21.0.0"
-  checksum: 10c0/e43369a6cd7b65ba1adf8470edf36f98a1f46cadf83304ff92f7eed3105af3b59a4e0edf96046bd8700ebf192ac7938683ec3defe77798e3a03770df3d6c2d6a
-  languageName: node
-  linkType: hard
-
-"@myparcel/ts-utils@npm:^1.6.0, @myparcel/ts-utils@npm:^1.7.0":
+"@myparcel/ts-utils@npm:^1.6.0":
   version: 1.14.0
   resolution: "@myparcel/ts-utils@npm:1.14.0"
   checksum: 10c0/13bf9521403e9761303cde9916932e12bdd50096a678de19282899809430086071e071851f49ce58fe3a9afb0b78fd807a5e0b7aa88344c30dfdae010b061866
