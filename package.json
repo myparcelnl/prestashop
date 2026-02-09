@@ -46,8 +46,7 @@
     "ws:test:run": "cd $0 && vitest run"
   },
   "resolutions": {
-    "eslint-plugin-prettier": "^4.2.1",
-    "@myparcel-dev/vue-form-builder": "1.0.0-beta.44-pdk-compatible.1"
+    "eslint-plugin-prettier": "^4.2.1"
   },
   "lint-staged": {
     "*.{ts,vue,js,cjs,mjs}": "eslint --fix",
@@ -62,7 +61,7 @@
     "@myparcel-dev/eslint-config-prettier": "^1.2.0",
     "@myparcel-dev/eslint-config-prettier-typescript": "^1.2.0",
     "@myparcel-dev/eslint-config-prettier-typescript-vue": "^1.2.0",
-    "@myparcel-dev/pdk-app-builder": "^4.0.0",
+    "@myparcel-dev/pdk-app-builder": "^4.1.0",
     "@myparcel-dev/sdk": "^5.0.0",
     "@myparcel-dev/semantic-release-config": "^6.0.0",
     "@types/node": "^20.0.0",
