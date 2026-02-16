@@ -26,7 +26,7 @@ import {
   type CheckboxInputProps,
   type CheckboxInputEmits,
   type CheckboxInputModelValue,
-} from '@myparcel-pdk/admin';
+} from '@myparcel-dev/pdk-admin';
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<CheckboxInputProps<T>>();

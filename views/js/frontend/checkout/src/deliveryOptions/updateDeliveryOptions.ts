@@ -1,4 +1,4 @@
-import {type DeliveryOptionsStoreState} from '@myparcel-pdk/checkout';
+import {type DeliveryOptionsStoreState} from '@myparcel-dev/pdk-checkout';
 import {getCurrentShippingMethod} from '../utils';
 import {getDefaultDeliveryOptionsConfig} from './utils';
 

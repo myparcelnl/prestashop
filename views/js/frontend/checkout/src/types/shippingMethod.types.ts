@@ -1,4 +1,4 @@
-import {type MyParcel} from '@myparcel/delivery-options';
+import {type MyParcel} from '@myparcel-dev/delivery-options';
 
 export interface ShippingMethod {
   carrier: MyParcel.CarrierIdentifier;

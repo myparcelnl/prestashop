@@ -1,12 +1,12 @@
 /* eslint-disable no-template-curly-in-string */
-const mainConfig = require('@myparcel/semantic-release-config');
-const {addExecPlugin, addGitHubPlugin, addGitPlugin} = require('@myparcel/semantic-release-config/src/plugins');
+const mainConfig = require('@myparcel-dev/semantic-release-config');
+const {addExecPlugin, addGitHubPlugin, addGitPlugin} = require('@myparcel-dev/semantic-release-config/src/plugins');
 const {
   addCommitAnalyzerPlugin,
   addGitHubActionsOutputPlugin,
   addReleaseNotesGeneratorPlugin,
   addChangelogPlugin,
-} = require('@myparcel/semantic-release-config/src/plugins/index.js');
+} = require('@myparcel-dev/semantic-release-config/src/plugins/index.js');
 const {spawnSync} = require('child_process');
 const path = require('path');
 
@@ -14,7 +14,7 @@ const branch = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).stdout.to
 
 module.exports = {
   ...mainConfig,
-  extends: '@myparcel/semantic-release-config',
+  extends: '@myparcel-dev/semantic-release-config',
   branches: [
     {name: 'main'},
     {name: 'develop', prerelease: 'rc', channel: 'rc'},

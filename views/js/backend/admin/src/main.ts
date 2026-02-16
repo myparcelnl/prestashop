@@ -11,7 +11,7 @@ import {
   DefaultTimeInput,
   DefaultRadioGroup,
   DefaultMultiDateInput,
-} from '@myparcel-pdk/admin-preset-default';
+} from '@myparcel-dev/pdk-admin-preset-default';
 import {
   Bootstrap4Box,
   Bootstrap4Button,
@@ -25,8 +25,8 @@ import {
   Bootstrap4Loader,
   Bootstrap4ShipmentLabelWrapper,
   Bootstrap4DropdownButton,
-} from '@myparcel-pdk/admin-preset-bootstrap4';
-import {AdminComponent, LogLevel, createPdkAdmin, type ElementInstance} from '@myparcel-pdk/admin';
+} from '@myparcel-dev/pdk-admin-preset-bootstrap4';
+import {AdminComponent, LogLevel, createPdkAdmin, type ElementInstance} from '@myparcel-dev/pdk-admin';
 import {listenForBulkActions} from './functions/listenForBulkActions';
 import {
   PsFormGroup,

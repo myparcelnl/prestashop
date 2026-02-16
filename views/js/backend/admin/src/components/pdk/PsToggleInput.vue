@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useLanguage, type ToggleInputProps, type ToggleInputEmits, useToggleInputContext} from '@myparcel-pdk/admin';
+import {useLanguage, type ToggleInputProps, type ToggleInputEmits, useToggleInputContext} from '@myparcel-dev/pdk-admin';
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<ToggleInputProps>();

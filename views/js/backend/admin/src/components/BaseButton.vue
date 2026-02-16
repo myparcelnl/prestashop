@@ -15,7 +15,7 @@
 
 <script lang="ts" setup>
 import {type PropType} from 'vue';
-import {type Size, type AdminIcon, useLanguage} from '@myparcel-pdk/admin';
+import {type Size, type AdminIcon, useLanguage} from '@myparcel-dev/pdk-admin';
 
 defineProps({
   disabled: {

@@ -4,7 +4,7 @@ import {
   StoreListener,
   useDeliveryOptionsStore,
   debounce,
-} from '@myparcel-pdk/checkout';
+} from '@myparcel-dev/pdk-checkout';
 import {
   updateDeliveryOptions,
   getDefaultDeliveryOptionsConfig,

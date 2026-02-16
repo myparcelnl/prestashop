@@ -40,7 +40,7 @@ import {
   useLanguage,
   type DropOffInputProps,
   type DropOffInputEmits,
-} from '@myparcel-pdk/admin';
+} from '@myparcel-dev/pdk-admin';
 
 // eslint-disable-next-line vue/no-unused-properties
 const props = defineProps<DropOffInputProps>();
