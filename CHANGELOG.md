@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.0](https://github.com/myparcelnl/prestashop/compare/v4.11.2...v5.0.0) (2026-02-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **config:** determine active platform via API and make plugin generic for all platforms / propositions (#391)
+
+### :bug: Bug Fixes
+
+* **delivery-options:** update CDN url to allow for future updates ([#447](https://github.com/myparcelnl/prestashop/issues/447)) ([36ab2ed](https://github.com/myparcelnl/prestashop/commit/36ab2ed582b2260498d410f7415151df7e48ac0f))
+
+
+### :sparkles: New Features
+
+* **config:** determine active platform via API and make plugin generic for all platforms / propositions ([#391](https://github.com/myparcelnl/prestashop/issues/391)) ([ae40b06](https://github.com/myparcelnl/prestashop/commit/ae40b065c3c3c7692e98b3e82d6f33ad5ab754ae))
+* move to myparcel-dev scope ([#448](https://github.com/myparcelnl/prestashop/issues/448)) ([8c93b63](https://github.com/myparcelnl/prestashop/commit/8c93b635094a9bc253ff95b9dd650643d6f85816))
+* **pdk:** bump js-pdk to  1.14.1 ([15ecbef](https://github.com/myparcelnl/prestashop/commit/15ecbefd0e735bdf2b66b284fe7dfe0bc756e1da))
+* **pdk:** bump myparcelnl/pdk from 3.1.2 to 3.2.0 in the php-pdk group ([#449](https://github.com/myparcelnl/prestashop/issues/449)) ([001ffd3](https://github.com/myparcelnl/prestashop/commit/001ffd3112b01d9de0f9912884b87747f70fb76f)), closes [#413](https://github.com/myparcelnl/prestashop/issues/413) [#419](https://github.com/myparcelnl/prestashop/issues/419)
+
 ## [4.11.2](https://github.com/myparcelnl/prestashop/compare/v4.11.1...v4.11.2) (2026-01-08)
 
 
