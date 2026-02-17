@@ -18,6 +18,7 @@
   },
   "scripts": {
     "test": "vendor/bin/pest",
+    "test:snapshots": "vendor/bin/pest -d --update-snapshots",
     "test:coverage": "php -dpcov.enabled=1 vendor/bin/pest --coverage-clover=clover.xml --coverage-html=coverage"
   },
   "source": {
