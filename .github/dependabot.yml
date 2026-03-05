@@ -35,6 +35,7 @@ updates:
         exclude-patterns:
           - "@myparcel-pdk/*"
           - "@myparcel-dev/pdk-*"
+        group-by: dependency-name
         update-types:
           - "minor"
           - "patch"
