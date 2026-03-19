@@ -103,6 +103,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         ShipmentOptions::FRESH_FOOD        => TriStateService::INHERIT,
         ShipmentOptions::FROZEN            => TriStateService::INHERIT,
         ShipmentOptions::PRIORITY_DELIVERY => TriStateService::INHERIT,
+        ShipmentOptions::SATURDAY_DELIVERY => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
 
     $propositionService = Pdk::get(PropositionService::class);
