@@ -8,9 +8,6 @@
     "myparcelnl/sdk": "^11.0.0-beta.1",
     "php": ">=7.4.0"
   },
-  "platform": {
-    "php": "7.4"
-  },
   "require-dev": {
     "guzzlehttp/guzzle": "^7.4",
     "pestphp/pest": "^1.22",
@@ -28,6 +25,9 @@
   },
   "config": {
     "prepend-autoloader": false,
+    "platform": {
+      "php": "7.4"
+    },
     "allow-plugins": {
       "pestphp/pest-plugin": true
     }
