@@ -1,5 +1,15 @@
 # PrestaShop Module (myparcelnl)
 
+## Running Tests
+
+Tests run inside Docker using the `test` service defined in `docker-compose.yml`:
+
+```sh
+docker compose run --rm test
+```
+
+Do not run `composer test` or `vendor/bin/pest` directly on the host — the container provides the correct PHP version and environment.
+
 ## Building Frontend Assets
 
 The admin and checkout UIs are built with Vite/Vue via the js-pdk. If the admin page renders but shows empty content (empty `data-pdk-context`, no Vue components), the JS assets need to be (re)built:
