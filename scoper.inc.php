@@ -38,7 +38,6 @@ return [
         'Symfony\\Bundle',
         'Symfony\\Component',
         'Symfony\\Contracts',
-        'Symfony\\Polyfill',
-        'GuzzleHttp',
+        'Symfony\\Polyfill'
     ],
 ];
