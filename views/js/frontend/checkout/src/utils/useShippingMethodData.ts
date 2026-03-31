@@ -14,7 +14,12 @@ export const useShippingMethodData = (): StoredShippingMethodData => {
   const carrierData = useCarrierData();
 
   carrierData.forEach((carrier) => {
-    const $checkbox = carrier.row.parent().prev().find('input');
+    // PS 9 (Hummingbird): radio input is inside .delivery-option__item ancestor
+    // PS 1.7/8 (Classic): radio input is a sibling of the extra content container
+    const $item = carrier.row.closest('.delivery-option__item, .delivery-option');
+    const $checkbox = $item.length
+      ? $item.find('input[type="radio"][name^="delivery_option"]')
+      : carrier.row.parent().prev().find('input');
 
     data.shippingMethodName = $checkbox.attr('name') ?? '';
 
