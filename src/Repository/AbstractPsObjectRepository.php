@@ -34,10 +34,27 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     protected $entityRepository;
 
-    public function __construct()
+    /**
+     * Lazy-loads the entity manager. PrestaShop 9 registers module Doctrine entities at Symfony container compilation
+     * time via ModulesDoctrineCompilerPass. During first install the module is not yet registered, so eagerly resolving
+     * the entity manager in the constructor would fail with a missing namespace error.
+     */
+    protected function getEntityManager(): \Doctrine\ORM\EntityManager
     {
-        $this->entityManager    = Pdk::get('ps.entityManager');
-        $this->entityRepository = $this->entityManager->getRepository($this->entity);
+        if (! $this->entityManager) {
+            $this->entityManager = Pdk::get('ps.entityManager');
+        }
+
+        return $this->entityManager;
+    }
+
+    protected function getEntityRepository(): \Doctrine\ORM\EntityRepository
+    {
+        if (! $this->entityRepository) {
+            $this->entityRepository = $this->getEntityManager()->getRepository($this->entity);
+        }
+
+        return $this->entityRepository;
     }
 
     /**
@@ -45,7 +62,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     public function all(): Collection
     {
-        return new Collection(array_values($this->entityRepository->findAll()));
+        return new Collection(array_values($this->getEntityRepository()->findAll()));
     }
 
     /**
@@ -75,7 +92,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     public function delete(EntityInterface $entity): void
     {
-        $this->entityManager->remove($entity);
+        $this->getEntityManager()->remove($entity);
     }
 
     /**
@@ -85,7 +102,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     public function find(int $id): EntityInterface
     {
-        return $this->entityRepository->find($id);
+        return $this->getEntityRepository()->find($id);
     }
 
     /**
@@ -95,7 +112,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     public function findOneBy(array $criteria)
     {
-        return $this->entityRepository->findOneBy($criteria);
+        return $this->getEntityRepository()->findOneBy($criteria);
     }
 
     /**
@@ -106,7 +123,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     public function firstWhere(string $key, $value)
     {
-        return $this->entityRepository->findOneBy([$key => $value]);
+        return $this->getEntityRepository()->findOneBy([$key => $value]);
     }
 
     /**
@@ -119,7 +136,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     public function update(array $values, array $where): ?EntityInterface
     {
-        $entity = $this->entityRepository->findOneBy($where);
+        $entity = $this->getEntityRepository()->findOneBy($where);
 
         if (! $entity) {
             throw new EntityNotFoundException('Entity not found');
@@ -138,7 +155,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
     public function updateOrCreate(array $where, array $values)
     {
         try {
-            $entity = empty($where) ? null : $this->entityRepository->findOneBy($where);
+            $entity = empty($where) ? null : $this->getEntityRepository()->findOneBy($where);
         } catch (Throwable $e) {
             $entity = null;
         }
@@ -156,8 +173,8 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
             $entity->updateTimestamps();
         }
 
-        $this->entityManager->persist($entity);
-        $this->entityManager->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
         return $entity;
     }
@@ -170,7 +187,7 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
      */
     public function where(string $key, $value): Collection
     {
-        return new Collection($this->entityRepository->findBy([$key => $value]));
+        return new Collection($this->getEntityRepository()->findBy([$key => $value]));
     }
 
     /**
