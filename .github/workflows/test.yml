@@ -58,6 +58,10 @@ jobs:
 
   test-backend:
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
     env:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
@@ -72,13 +76,13 @@ jobs:
           path: |
             clover.xml
             junit.xml
-          key: test-backend-${{ hashFiles('**/composer.json', '**/composer.lock', 'src/**/*', 'tests/**/*') }}
+          key: test-backend-php${{ matrix.php-version }}-${{ hashFiles('**/composer.json', '**/composer.lock', 'src/**/*', 'tests/**/*') }}
 
       - uses: myparcelnl/actions/pdk-setup@v5
         if: steps.cache.outputs.cache-hit != 'true'
         id: setup
         with:
-          php-version: ${{ vars.PHP_VERSION }}
+          php-version: ${{ matrix.php-version }}
 
       - uses: myparcelnl/actions/pdk-builder@v5
         if: steps.cache.outputs.cache-hit != 'true'
@@ -104,14 +108,14 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          name: backend
-          flags: backend
+          name: backend-php${{ matrix.php-version }}
+          flags: backend,php${{ matrix.php-version }}
           files: clover.xml
 
       - uses: myparcelnl/actions/codecov-test-results@v5
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          name: backend
-          flags: backend
+          name: backend-php${{ matrix.php-version }}
+          flags: backend,php${{ matrix.php-version }}
           files: junit.xml
