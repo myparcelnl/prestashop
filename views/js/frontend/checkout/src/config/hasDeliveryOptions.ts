@@ -12,10 +12,7 @@ export const hasDeliveryOptions: PdkCheckoutConfigInput['hasDeliveryOptions'] = 
   const {shippingMethods} = useShippingMethodData();
   const settings = useSettings();
 
-  // Check if the cart allows delivery options (may be disabled by product settings).
   const cartAllowsDeliveryOptions = settings.hasDeliveryOptions;
-
-  // Check if the shipping method is a MyParcel carrier.
   const isMyParcelCarrier = shippingMethods.some((method) => method.value === shippingMethod);
 
   return cartAllowsDeliveryOptions && isMyParcelCarrier;

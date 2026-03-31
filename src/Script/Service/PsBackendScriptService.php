@@ -26,7 +26,9 @@ final class PsBackendScriptService extends PsScriptService implements PsScriptSe
         $controller->addJS("$adminPath/dist/index.iife.js");
 
         /** use new-theme */
-        $themeCss = sprintf('%s%s/themes/new-theme/public/theme.css', __PS_BASE_URI__, $controller->admin_webpath);
+        // PS 9 replaced admin_webpath with adminFolderName on LegacyControllerContext
+        $adminPath = $controller->admin_webpath ?? $controller->adminFolderName ?? '';
+        $themeCss  = sprintf('%s%s/themes/new-theme/public/theme.css', __PS_BASE_URI__, $adminPath);
         $controller->addCSS($themeCss, 'all', 1);
     }
 
@@ -36,7 +38,16 @@ final class PsBackendScriptService extends PsScriptService implements PsScriptSe
      *
      * @return void
      */
-    protected function addVue(AdminController $controller, string $version): void
+    /**
+     * No type hint: PS 1.7/8 passes AdminController, PS 9 passes LegacyControllerContextProxy.
+     * When dropping PS 1.7/8 support, type-hint to LegacyControllerContext instead.
+     *
+     * @param  \AdminController $controller
+     * @param  string           $version
+     *
+     * @return void
+     */
+    protected function addVue($controller, string $version): void
     {
         $controller->addJS($this->getVueCdnUrl($version), false);
     }
