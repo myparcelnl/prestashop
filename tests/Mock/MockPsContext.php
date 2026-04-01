@@ -40,6 +40,12 @@ abstract class MockPsContext extends BaseMock implements StaticMockInterface
         $this->link     = new Link();
         $this->smarty   = new Smarty();
         $this->language = new \Language(1);
+
+        $this->cart = new \Cart();
+        $this->cart->id = 1;
+
+        $this->currency = new \Currency();
+        $this->currency->iso_code = 'EUR';
     }
 
     public static function getContext(): MockPsContext
