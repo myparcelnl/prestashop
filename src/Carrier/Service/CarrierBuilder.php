@@ -181,12 +181,14 @@ final class CarrierBuilder
         $psCarrier->shipping_external    = true;
         $psCarrier->shipping_method      = 2;
 
-        foreach (PsLanguage::getLanguages() as $lang) {
-            $existingString = $psCarrier->delay[$lang['id_lang']] ?? null;
-            $newString      = Language::translate('carrier_delivery_time', $lang['iso_code']);
+        $delay = $psCarrier->delay ?? [];
 
-            $psCarrier->delay[$lang['id_lang']] = $existingString ?? $newString;
+        foreach (PsLanguage::getLanguages() as $lang) {
+            $delay[$lang['id_lang']] = $delay[$lang['id_lang']]
+                ?? Language::translate('carrier_delivery_time', $lang['iso_code']);
         }
+
+        $psCarrier->delay = $delay;
 
         $this->psCarrierService->updateOrAdd($psCarrier);
 
