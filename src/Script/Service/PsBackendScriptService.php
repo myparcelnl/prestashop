@@ -20,10 +20,10 @@ final class PsBackendScriptService extends PsScriptService implements PsScriptSe
     {
         $this->addVue($controller, Pdk::get('vueVersion'));
 
-        $adminPath = "{$path}views/js/backend/admin";
+        $modulePath = "{$path}views/js/backend/admin";
 
-        $controller->addCSS("$adminPath/dist/style.css");
-        $controller->addJS("$adminPath/dist/index.iife.js");
+        $controller->addCSS("$modulePath/dist/style.css");
+        $controller->addJS("$modulePath/dist/index.iife.js");
 
         /** use new-theme */
         // PS 9 replaced admin_webpath with adminFolderName on LegacyControllerContext
@@ -33,17 +33,11 @@ final class PsBackendScriptService extends PsScriptService implements PsScriptSe
     }
 
     /**
-     * @param  \AdminController $controller
-     * @param  string           $version
-     *
-     * @return void
-     */
-    /**
      * No type hint: PS 1.7/8 passes AdminController, PS 9 passes LegacyControllerContextProxy.
      * When dropping PS 1.7/8 support, type-hint to LegacyControllerContext instead.
      *
-     * @param  \AdminController $controller
-     * @param  string           $version
+     * @param  mixed  $controller
+     * @param  string $version
      *
      * @return void
      */
