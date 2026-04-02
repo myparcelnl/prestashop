@@ -5,13 +5,13 @@
   "repository": "github:myparcelnl/prestashop",
   "license": "MIT",
   "type": "module",
-  "packageManager": "yarn@4.3.1",
+  "packageManager": "yarn@4.12.0",
   "engines": {
     "node": "24.13.1"
   },
   "volta": {
     "node": "24.13.1",
-    "yarn": "4.3.1"
+    "yarn": "4.12.0"
   },
   "workspaces": [
     "views/js/**/*"
@@ -46,7 +46,8 @@
     "ws:test:run": "cd $0 && vitest run"
   },
   "resolutions": {
-    "eslint-plugin-prettier": "^4.2.1"
+    "eslint-plugin-prettier": "^4.2.1",
+    "tar": "7.5.11"
   },
   "lint-staged": {
     "*.{ts,vue,js,cjs,mjs}": "eslint --fix",
