@@ -93,6 +93,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           image: ${{ steps.setup.outputs.image }}
+          php-args: |
+            -d auto_prepend_file=tests/bootstrap.php
           pest-args: |
             --log-junit=junit.xml
 
