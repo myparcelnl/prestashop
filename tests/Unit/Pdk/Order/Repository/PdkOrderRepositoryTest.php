@@ -23,7 +23,7 @@ it('creates a valid pdk order', function (OrderFactory $orderFactory) {
     $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
 
     /** @var Order $psOrder */
-    $psOrder = $orderFactory->store();
+    $psOrder = $orderFactory->withReference('Prestashop: 1')->store();
 
     $pdkOrder = $orderRepository->get($psOrder);
 
