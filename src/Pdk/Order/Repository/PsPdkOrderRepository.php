@@ -106,7 +106,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
                     'shippingAddress'     => $this->addressAdapter->fromOrder($psOrder, 'shipping'),
                     'billingAddress'      => $this->addressAdapter->fromOrder($psOrder, 'billing'),
                     'shipments'           => $this->getShipments($psOrder),
-                    'referenceIdentifier' => "PrestaShop: $psOrder->id",
+                    'referenceIdentifier' => $psOrder->reference,
                     'shipmentPrice'       => $this->currencyService->convertToCents($psOrder->total_shipping_tax_incl),
                     'shipmentVat'         => $this->currencyService->convertToCents($psOrder->total_shipping_tax_excl),
                     'lines'               => $this->createOrderLines($orderProducts),
