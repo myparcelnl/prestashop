@@ -1,5 +1,7 @@
 export {default as PsCheckboxInput} from './PsCheckboxInput.vue';
 
+export {default as PsConceptBoxWrapper} from './PsConceptBoxWrapper.vue';
+
 export {default as PsDropoffInput} from './PsDropoffInput.vue';
 
 export {default as PsFormGroup} from './PsFormGroup.vue';
