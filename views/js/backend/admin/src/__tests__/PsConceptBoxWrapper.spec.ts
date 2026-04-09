@@ -1,6 +1,6 @@
 import {describe, it, expect} from 'vitest';
 import {mount} from '@vue/test-utils';
-import {defineComponent, h} from 'vue';
+import {defineComponent} from 'vue';
 import PsConceptBoxWrapper from '../components/pdk/PsConceptBoxWrapper.vue';
 
 const PdkBoxStub = defineComponent({
