@@ -77,6 +77,7 @@ final class PsAddressAdapter
                 'postalCode' => $address->postcode,
                 'person'     => trim(sprintf('%s %s', $address->firstname, $address->lastname)),
                 'phone'      => $address->phone,
+                'company'    => $address->company,
             ],
             $state ? [
                 'region' => $state->name,

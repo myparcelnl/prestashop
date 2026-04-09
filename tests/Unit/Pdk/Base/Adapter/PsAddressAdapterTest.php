@@ -64,5 +64,38 @@ it('creates address from ps address and ps order', function (AddressFactory $add
             'phone'      => '0612345678',
         ],
     ],
+    'company' => [
+        'addressFactory' => function () {
+            $customer = psFactory(Customer::class)
+                ->withFirstname('John')
+                ->withLastname('Doe')
+                ->withEmail('test@test.com');
+
+            $country = psFactory(Country::class)
+                ->withIsoCode('NL');
+
+            return psFactory(Address::class)
+                ->withCustomer($customer)
+                ->withCompany('My company')
+                ->withCountry($country)
+                ->withFirstname('John')
+                ->withLastname('Doe')
+                ->withAddress1('Keizersgracht 1')
+                ->withAddress2('A')
+                ->withCity('Amsterdam')
+                ->withPhone('0612345678')
+                ->withPostcode('1015CC');
+        },
+        'expectation'    => [
+            'cc'         => 'NL',
+            'city'       => 'Amsterdam',
+            'address1'   => 'Keizersgracht 1',
+            'address2'   => 'A',
+            'postalCode' => '1015CC',
+            'person'     => 'John Doe',
+            'phone'      => '0612345678',
+            'company'    => 'My company',
+        ],
+    ],
 
 ]);
