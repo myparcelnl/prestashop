@@ -44,6 +44,7 @@ import {
   PsTriStateInput,
   PsRadioInput,
   PsCheckboxInput,
+  PsConceptBoxWrapper,
   PsDropoffInput,
 } from './components';
 
@@ -54,6 +55,7 @@ window.addEventListener('load', () => {
 
     components: {
       [AdminComponent.Box]: Bootstrap4Box,
+      [AdminComponent.ConceptBoxWrapper]: PsConceptBoxWrapper,
       [AdminComponent.Button]: Bootstrap4Button,
       [AdminComponent.ButtonGroup]: Bootstrap4ButtonGroup,
       [AdminComponent.CheckboxGroup]: DefaultCheckboxGroup,

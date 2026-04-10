@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/myparcelnl/prestashop/compare/v5.0.1...v5.0.2) (2026-04-02)
+
+
+### :bug: Bug Fixes
+
+* add trunkrs to settings ([#489](https://github.com/myparcelnl/prestashop/issues/489)) ([c12a88b](https://github.com/myparcelnl/prestashop/commit/c12a88b662486a8b9fe2cf1e1acece0cb23b0973))
+* **security:** fix tar vulnerability ([#469](https://github.com/myparcelnl/prestashop/issues/469)) ([64b4a65](https://github.com/myparcelnl/prestashop/commit/64b4a6542463d317884f6b324318f0f2eaf1b9d3))
+
 ## [5.0.1](https://github.com/myparcelnl/prestashop/compare/v5.0.0...v5.0.1) (2026-03-19)
 
 ## [5.0.0](https://github.com/myparcelnl/prestashop/compare/v4.11.2...v5.0.0) (2026-02-17)
