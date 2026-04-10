@@ -35,7 +35,10 @@ return [
         'PrestaShop',
         'PrestaShopBundle',
         'Doctrine',
-        'Symfony',
+        'Symfony\\Bundle',
+        'Symfony\\Component',
+        'Symfony\\Contracts',
+        'Symfony\\Polyfill',
         'GuzzleHttp',
     ],
 ];
