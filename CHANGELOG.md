@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.3](https://github.com/myparcelnl/prestashop/compare/v5.0.2...v5.0.3) (2026-04-10)
+
+
+### :bug: Bug Fixes
+
+* add company name to address export ([#487](https://github.com/myparcelnl/prestashop/issues/487)) ([a8e41d8](https://github.com/myparcelnl/prestashop/commit/a8e41d8a0785977d3915aa02974082019efc9d5f))
+* prevent Psr17Factory error in ps 1.7 ([#490](https://github.com/myparcelnl/prestashop/issues/490)) ([ca2b850](https://github.com/myparcelnl/prestashop/commit/ca2b85078c20826f077e39966ff98f0e92f78bd4))
+* show modal and detail shipping details buttons ([#488](https://github.com/myparcelnl/prestashop/issues/488)) ([fed7a43](https://github.com/myparcelnl/prestashop/commit/fed7a43e4898e7c1dbfaa9a48a677c167aa26a7a))
+* use order identifier for reference on shipments ([#486](https://github.com/myparcelnl/prestashop/issues/486)) ([3e7192e](https://github.com/myparcelnl/prestashop/commit/3e7192e29e7ee3cde4c84ecb58cf43c47de05175))
+
 ## [5.0.2](https://github.com/myparcelnl/prestashop/compare/v5.0.1...v5.0.2) (2026-04-02)
 
 
