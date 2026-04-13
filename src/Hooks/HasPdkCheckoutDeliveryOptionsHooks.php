@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Hooks;
 use MyParcelNL\Pdk\App\Cart\Contract\PdkCartRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Frontend;
+use MyParcelNL\Pdk\Facade\FrontendData;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings;
@@ -140,7 +141,9 @@ trait HasPdkCheckoutDeliveryOptionsHooks
 
         $this->context->smarty->setEscapeHtml(false);
         $this->context->smarty->assign([
-            'carrier' => $carrierService->getMyParcelCarrierIdentifier($carrierId),
+            'carrier' => FrontendData::getLegacyCarrierIdentifier(
+                $carrierService->getMyParcelCarrierIdentifier($carrierId)
+            ),
         ]);
 
         return $this->display($this->name, 'views/templates/hook/carrier_data.tpl');

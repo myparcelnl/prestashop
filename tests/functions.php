@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollectionFactory;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Pdk\Settings\Model\Settings;
@@ -51,7 +52,6 @@ function setupCarrierActiveSettings(array $settings): SettingsFactory
         factory(CarrierCollection::class)->push(
             factory(Carrier::class)
                 ->fromPostNL()
-                ->withEnabled(true)
         )
     );
 
@@ -60,7 +60,7 @@ function setupCarrierActiveSettings(array $settings): SettingsFactory
             ->withId(12),
 
         psFactory(MyparcelnlCarrierMapping::class)
-            ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME)
+            ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL)
             ->withCarrierId(12),
     ]))->store();
 

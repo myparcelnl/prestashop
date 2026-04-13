@@ -13,8 +13,11 @@ use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Facade\FrontendData;
 use MyParcelNL\Pdk\Facade\Language;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Sdk\Support\Str;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
@@ -78,12 +81,22 @@ final class CarrierBuilder
     {
         /** @var FileSystemInterface $fileSystem */
         $fileSystem = Pdk::get(FileSystemInterface::class);
+        $logosDir   = Pdk::get('carrierLogosDirectory');
+        $logoName   = FrontendData::getLegacyCarrierIdentifier($this->myParcelCarrier->carrier);
 
         foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
-            $sourceFilename = Pdk::get('carrierLogosDirectory') . $this->myParcelCarrier->name . $fileExtension;
-            $destFilename   = _PS_SHIP_IMG_DIR_ . $this->psCarrier->id . $fileExtension;
+            $sourceFilename = $logosDir . $logoName . $fileExtension;
 
-            $fileSystem->put($destFilename, $fileSystem->get($sourceFilename));
+            if (! $fileSystem->fileExists($sourceFilename)) {
+                continue;
+            }
+
+            try {
+                $destFilename = _PS_SHIP_IMG_DIR_ . $this->psCarrier->id . $fileExtension;
+                $fileSystem->put($destFilename, $fileSystem->get($sourceFilename));
+            } catch (\Throwable $e) {
+                Logger::warning("Failed to copy carrier logo: $sourceFilename", ['exception' => $e]);
+            }
         }
     }
 
@@ -94,11 +107,11 @@ final class CarrierBuilder
     {
         $this->carrierMappingRepository->updateOrCreate(
             [
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->carrier,
             ],
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => (int) $this->psCarrier->id,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->carrier,
             ]
         );
     }
@@ -167,10 +180,12 @@ final class CarrierBuilder
     {
         $psCarrier = $this->getExistingPsCarrier() ?? $this->psCarrierService->create();
 
-        // Naming schema: Use existing $psCarrier name, or use the human name is provided, finally use the MyParcel carrier name as a fallback.
+        $carrierIdentifier = $this->myParcelCarrier->carrier;
+        $translationKey    = 'carrier_' . Str::snake(Str::lower($carrierIdentifier));
+        $translated        = Language::translate($translationKey);
+
         $psCarrier->name                 = $psCarrier->name
-            ?? $this->myParcelCarrier->human
-            ?? $this->myParcelCarrier->name;
+            ?? ($translated !== $translationKey ? $translated : $carrierIdentifier);
 
         $psCarrier->active               = $this->psCarrierService->carrierIsActive($this->myParcelCarrier);
         $psCarrier->deleted              = false;
@@ -181,12 +196,14 @@ final class CarrierBuilder
         $psCarrier->shipping_external    = true;
         $psCarrier->shipping_method      = 2;
 
+        $delay = $psCarrier->delay ?? [];
         foreach (PsLanguage::getLanguages() as $lang) {
-            $existingString = $psCarrier->delay[$lang['id_lang']] ?? null;
+            $existingString = $delay[$lang['id_lang']] ?? null;
             $newString      = Language::translate('carrier_delivery_time', $lang['iso_code']);
 
-            $psCarrier->delay[$lang['id_lang']] = $existingString ?? $newString;
+            $delay[$lang['id_lang']] = $existingString ?? $newString;
         }
+        $psCarrier->delay = $delay;
 
         $this->psCarrierService->updateOrAdd($psCarrier);
 
@@ -199,7 +216,7 @@ final class CarrierBuilder
     private function getExistingPsCarrier(): ?PsCarrier
     {
         $mapping = $this->carrierMappingRepository->findOneBy([
-            MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->externalIdentifier,
+            MyparcelnlCarrierMapping::MYPARCEL_CARRIER => $this->myParcelCarrier->carrier,
         ]);
 
         if ($mapping) {

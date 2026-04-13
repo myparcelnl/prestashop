@@ -11,6 +11,7 @@ use Exception;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
@@ -36,7 +37,7 @@ it('re-synchronises carrier id and logo when it is updated', function () {
 
     psFactory(MyparcelnlCarrierMapping::class)
         ->withCarrierId(14)
-        ->withMyparcelCarrier(Carrier::CARRIER_DPD_NAME)
+        ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::DPD)
         ->store();
 
     foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
@@ -52,7 +53,7 @@ it('re-synchronises carrier id and logo when it is updated', function () {
 
     /** @var MyparcelnlCarrierMapping $found */
     $found = $carrierMappingRepository->findOneBy([
-        MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_DPD_NAME,
+        MyparcelnlCarrierMapping::MYPARCEL_CARRIER => RefCapabilitiesSharedCarrierV2::DPD,
     ]);
 
     if (null === $found) {

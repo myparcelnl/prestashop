@@ -15,7 +15,7 @@
                     "id_zone": 2
                 }
             ],
-            "name": "postnl",
+            "name": "POSTNL",
             "active": false,
             "deleted": false,
             "external_module_name": "myparcelnl",
@@ -24,7 +24,11 @@
             "range_behavior": true,
             "shipping_external": true,
             "shipping_method": 2,
+            "delay": {
+                "1": "carrier_delivery_time"
+            },
             "id": 1,
+            "id_carrier": 1,
             "rangeWeights": [
                 {
                     "id_carrier": 1,
@@ -57,7 +61,7 @@
                     "id_zone": 2
                 }
             ],
-            "name": "dhlforyou",
+            "name": "DHL_FOR_YOU",
             "active": false,
             "deleted": false,
             "external_module_name": "myparcelnl",
@@ -66,7 +70,11 @@
             "range_behavior": true,
             "shipping_external": true,
             "shipping_method": 2,
+            "delay": {
+                "1": "carrier_delivery_time"
+            },
             "id": 2,
+            "id_carrier": 2,
             "rangeWeights": [
                 {
                     "id_carrier": 2,
@@ -81,48 +89,6 @@
                     "delimiter1": "0",
                     "delimiter2": "10000",
                     "id": 2
-                }
-            ]
-        },
-        {
-            "zones": [
-                {
-                    "id": 1,
-                    "active": true,
-                    "name": "Europe",
-                    "id_zone": 1
-                },
-                {
-                    "id": 2,
-                    "active": true,
-                    "name": "North America",
-                    "id_zone": 2
-                }
-            ],
-            "name": "dhlforyou",
-            "active": false,
-            "deleted": false,
-            "external_module_name": "myparcelnl",
-            "is_module": true,
-            "need_range": true,
-            "range_behavior": true,
-            "shipping_external": true,
-            "shipping_method": 2,
-            "id": 3,
-            "rangeWeights": [
-                {
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 3
-                }
-            ],
-            "rangePrices": [
-                {
-                    "id_carrier": 3,
-                    "delimiter1": "0",
-                    "delimiter2": "10000",
-                    "id": 3
                 }
             ]
         }
@@ -130,15 +96,11 @@
     "carrierMappings": [
         {
             "carrierId": 1,
-            "myparcelCarrier": "postnl"
+            "myparcelCarrier": "POSTNL"
         },
         {
             "carrierId": 2,
-            "myparcelCarrier": "dhlforyou"
-        },
-        {
-            "carrierId": 3,
-            "myparcelCarrier": "dhlforyou:8123"
+            "myparcelCarrier": "DHL_FOR_YOU"
         }
     ]
 }
