@@ -8,7 +8,6 @@ use Dispatcher;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Service\AbstractViewService;
 use RuntimeException;
-
 final class PsViewService extends AbstractViewService
 {
     /**
@@ -65,6 +64,19 @@ final class PsViewService extends AbstractViewService
      */
     private function getPage(): string
     {
+        // PS 9 uses Symfony routing; the legacy Dispatcher no longer resolves the controller name
+        // for Symfony-routed pages. Check the _legacy_controller request attribute first.
+        try {
+            $request = Pdk::get('getPsService')('request_stack')->getCurrentRequest();
+            $legacyController = $request ? $request->attributes->get('_legacy_controller') : null;
+
+            if ($legacyController) {
+                return $legacyController;
+            }
+        } catch (\Throwable $e) {
+            // request_stack may not be available on PS 1.7/8
+        }
+
         $dispatcher = Dispatcher::getInstance();
 
         if (! $dispatcher) {

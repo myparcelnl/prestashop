@@ -21,6 +21,23 @@ abstract class MockPsObjectModel extends BaseMock implements EntityInterface
     protected bool $hasCustomIdKey = false;
 
     /**
+     * @param  string $name
+     * @param  mixed  $value
+     *
+     * @return void
+     */
+    public function __set(string $name, $value): void
+    {
+        if ($name === 'id') {
+            $this->setId($value);
+
+            return;
+        }
+
+        parent::__set($name, $value);
+    }
+
+    /**
      * @param  null|int $id
      * @param  null|int $id_lang
      * @param  null|int $id_shop

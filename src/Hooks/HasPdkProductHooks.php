@@ -21,6 +21,14 @@ use Tools;
 trait HasPdkProductHooks
 {
     /**
+     * Stores the full rendered product settings HTML to be output via displayBackOfficeFooter,
+     * because PS9's product page runs displayAdminProductsExtra output through HTMLPurifier
+     * which strips data-pdk-context attributes.
+     *
+     * @var string
+     */
+    private static string $pendingProductSettingsHtml = '';
+    /**
      * Saves the MyParcel product settings when a product is updated.
      *
      * @param  array $params
@@ -116,7 +124,22 @@ trait HasPdkProductHooks
         $repository = Pdk::get(PdkProductRepositoryInterface::class);
         $product    = $repository->getProduct($idProduct);
 
-        return Frontend::renderProductSettings($product);
+        $html = Frontend::renderProductSettings($product);
+
+        // PS9 runs displayAdminProductsExtra output through HTMLPurifier, which strips
+        // data-pdk-context attributes. Render a placeholder here and output the real
+        // component via displayBackOfficeFooter with a script to move it into place.
+        // TODO: migrate to actionProductFormBuilderModifier for native Symfony form integration
+        //  @see https://devdocs.prestashop-project.org/9/modules/sample-modules/extend-product-page/
+        if (strpos($html, 'data-pdk-context') !== false
+            && preg_match('/id="([^"]+)"/', $html, $idMatch)
+        ) {
+            self::$pendingProductSettingsHtml = $html;
+
+            return sprintf('<div id="%s-placeholder"></div>', $idMatch[1]);
+        }
+
+        return $html;
     }
 
     /**
