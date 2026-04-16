@@ -283,7 +283,14 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
                 ->getResult();
 
             foreach ($batch as $entity) {
-                $callback($entity);
+                try {
+                    $callback($entity);
+                } catch (Throwable $e) {
+                    Logger::warning('Skipping entity during migration', [
+                        'entity' => get_class($entity),
+                        'error'  => $e->getMessage(),
+                    ]);
+                }
             }
 
             EntityManager::flush();

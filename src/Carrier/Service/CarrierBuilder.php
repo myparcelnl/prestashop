@@ -82,7 +82,7 @@ final class CarrierBuilder
         /** @var FileSystemInterface $fileSystem */
         $fileSystem = Pdk::get(FileSystemInterface::class);
         $logosDir   = Pdk::get('carrierLogosDirectory');
-        $logoName   = FrontendData::getLegacyCarrierIdentifier($this->myParcelCarrier->carrier);
+        $logoName   = basename(FrontendData::getLegacyCarrierIdentifier($this->myParcelCarrier->carrier));
 
         foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
             $sourceFilename = $logosDir . $logoName . $fileExtension;
