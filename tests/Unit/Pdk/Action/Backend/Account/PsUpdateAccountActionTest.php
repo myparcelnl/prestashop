@@ -11,7 +11,6 @@
     use MyParcelNL\Pdk\Carrier\Model\Carrier;
     use MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository;
     use MyParcelNL\Pdk\Facade\Pdk;
-    use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
     use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
     use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
     use Psr\Log\LoggerInterface;
@@ -45,29 +44,31 @@
 
         $reset = mockPdkProperty(CarrierCapabilitiesRepository::class, $mock);
 
-        /** @var PsUpdateAccountAction $action */
-        $action  = Pdk::get(PsUpdateAccountAction::class);
-        $request = new Request([], [], [], [], [], [], json_encode([
-            'data' => [
-                'account_settings' => [
-                    'apiKey' => TestBootstrapper::API_KEY_VALID,
+        try {
+            /** @var PsUpdateAccountAction $action */
+            $action  = Pdk::get(PsUpdateAccountAction::class);
+            $request = new Request([], [], [], [], [], [], json_encode([
+                'data' => [
+                    'account_settings' => [
+                        'apiKey' => TestBootstrapper::API_KEY_VALID,
+                    ],
                 ],
-            ],
-        ]));
+            ]));
 
-        // Should not throw — failures are caught and logged
-        $response = $action->handle($request);
+            // Should not throw — failures are caught and logged
+            $response = $action->handle($request);
 
-        expect($response->getStatusCode())->toBe(200);
+            expect($response->getStatusCode())->toBe(200);
 
-    // Error should be logged
-        /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockLogger $logger */
-        $logger    = Pdk::get(LoggerInterface::class);
-        $errorLogs = array_filter($logger->getLogs(), function (array $log) {
-            return 'error' === $log['level'];
-        });
+            // Error should be logged
+            /** @var \MyParcelNL\Pdk\Tests\Bootstrap\MockLogger $logger */
+            $logger    = Pdk::get(LoggerInterface::class);
+            $errorLogs = array_filter($logger->getLogs(), function (array $log) {
+                return 'error' === $log['level'];
+            });
 
-        expect($errorLogs)->not->toBeEmpty();
-
-        $reset();
+            expect($errorLogs)->not->toBeEmpty();
+        } finally {
+            $reset();
+        }
     });

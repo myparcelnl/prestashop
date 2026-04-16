@@ -72,9 +72,11 @@ it('runs upgrade with (invalid) old api key saved', function () {
 
     runUpgradeSuccessfully('4.0.0');
 
-    $errorLogs = \array_filter($logger->getLogs(), function (array $log) {
-        return $log['level'] === LogLevel::ERROR;
-    });
+    $errorLogs = $logger->getLogs(LogLevel::ERROR);
 
-    expect($errorLogs)->not->toBeEmpty();
+    $errorMessages = array_map(function (array $log) {
+        return $log['message'];
+    }, $errorLogs);
+
+    expect($errorMessages)->toContain('Account update partially failed');
 });

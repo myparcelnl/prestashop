@@ -42,6 +42,8 @@ final class PsUpdateAccountAction extends UpdateAccountAction
             parent::updateAndSaveAccount($accountSettings);
         } catch (Throwable $e) {
             Logger::error('Account update partially failed', ['exception' => $e]);
+
+            return;
         }
 
         /** @var string $uninstallMode */
