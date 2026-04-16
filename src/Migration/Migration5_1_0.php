@@ -12,7 +12,9 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\Pdk\AbstractPsPdkMigration;
+use MyParcelNL\PrestaShop\Repository\AbstractPsObjectRepository;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
+use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use Throwable;
@@ -28,6 +30,11 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
      * @var \MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository
      */
     private $carrierMappingRepository;
+
+    /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository
+     */
+    private $cartDeliveryOptionsRepository;
 
     /**
      * @var \MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository
@@ -50,16 +57,18 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
     private $settingsRepository;
 
     public function __construct(
-        PdkSettingsRepositoryInterface $settingsRepository,
-        PsCarrierMappingRepository     $carrierMappingRepository,
-        PsOrderDataRepository          $orderDataRepository,
-        PsOrderShipmentRepository      $orderShipmentRepository,
-        PdkAccountRepositoryInterface  $accountRepository,
-        CarrierCapabilitiesRepository  $carrierCapabilitiesRepository
+        PdkSettingsRepositoryInterface    $settingsRepository,
+        PsCarrierMappingRepository        $carrierMappingRepository,
+        PsCartDeliveryOptionsRepository   $cartDeliveryOptionsRepository,
+        PsOrderDataRepository             $orderDataRepository,
+        PsOrderShipmentRepository         $orderShipmentRepository,
+        PdkAccountRepositoryInterface     $accountRepository,
+        CarrierCapabilitiesRepository     $carrierCapabilitiesRepository
     ) {
         parent::__construct();
         $this->settingsRepository            = $settingsRepository;
         $this->carrierMappingRepository      = $carrierMappingRepository;
+        $this->cartDeliveryOptionsRepository = $cartDeliveryOptionsRepository;
         $this->orderDataRepository           = $orderDataRepository;
         $this->orderShipmentRepository       = $orderShipmentRepository;
         $this->accountRepository             = $accountRepository;
@@ -76,6 +85,7 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
         $this->migrateAccountData();
         $this->migrateCarrierSettings();
         $this->migrateCarrierMappings();
+        $this->migrateCartDeliveryOptions();
         $this->migrateOrderData();
         $this->migrateShipmentData();
     }
@@ -149,34 +159,57 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
     }
 
     /**
+     * Normalise the carrier field in cart delivery options from legacy formats to V2 SCREAMING_SNAKE_CASE.
+     */
+    private function migrateCartDeliveryOptions(): void
+    {
+        $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
+
+        $this->migrateInBatches($this->cartDeliveryOptionsRepository, function ($cartOption) use ($legacyToNewMap) {
+            $data   = $cartOption->getData();
+            $parsed = $this->parseLegacyCarrier($data['carrier'] ?? null);
+
+            if (! $parsed) {
+                return;
+            }
+
+            [$legacyName] = $parsed;
+            $newName = $legacyToNewMap[$legacyName] ?? $legacyName;
+
+            if ($newName === ($data['carrier'] ?? null)) {
+                return;
+            }
+
+            $data['carrier'] = $newName;
+            $cartOption->setData(json_encode($data));
+        });
+    }
+
+    /**
      * Normalise the carrier field in order data rows from legacy formats to V2 SCREAMING_SNAKE_CASE.
      */
     private function migrateOrderData(): void
     {
         $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
-        $allOrderData   = $this->orderDataRepository->all();
 
-        foreach ($allOrderData as $orderData) {
-            $data = $orderData->getData();
-
+        $this->migrateInBatches($this->orderDataRepository, function ($orderData) use ($legacyToNewMap) {
+            $data   = $orderData->getData();
             $parsed = $this->parseLegacyCarrier($data['deliveryOptions']['carrier'] ?? null);
 
             if (! $parsed) {
-                continue;
+                return;
             }
 
             [$legacyName] = $parsed;
             $newName = $legacyToNewMap[$legacyName] ?? $legacyName;
 
             if ($newName === ($data['deliveryOptions']['carrier'] ?? null)) {
-                continue;
+                return;
             }
 
             $data['deliveryOptions']['carrier'] = $newName;
             $orderData->setData(json_encode($data));
-        }
-
-        EntityManager::flush();
+        });
     }
 
     /**
@@ -186,9 +219,8 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
     private function migrateShipmentData(): void
     {
         $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
-        $allShipments   = $this->orderShipmentRepository->all();
 
-        foreach ($allShipments as $shipment) {
+        $this->migrateInBatches($this->orderShipmentRepository, function ($shipment) use ($legacyToNewMap) {
             $data    = $shipment->getData();
             $changed = false;
 
@@ -226,9 +258,39 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
             if ($changed) {
                 $shipment->setData(json_encode($data));
             }
-        }
+        });
+    }
 
-        EntityManager::flush();
+    /**
+     * Process entities from a repository in batches to limit memory usage.
+     *
+     * @param  \MyParcelNL\PrestaShop\Repository\AbstractPsObjectRepository $repository
+     * @param  callable                                                      $callback
+     * @param  int                                                           $batchSize
+     */
+    private function migrateInBatches(AbstractPsObjectRepository $repository, callable $callback, int $batchSize = 500): void
+    {
+        /** @var \Doctrine\ORM\EntityManager $em */
+        $em     = Pdk::get('ps.entityManager');
+        $qb     = $em->getRepository($repository->getEntityClass())->createQueryBuilder('e');
+        $offset = 0;
+
+        do {
+            $batch = $qb
+                ->setFirstResult($offset)
+                ->setMaxResults($batchSize)
+                ->getQuery()
+                ->getResult();
+
+            foreach ($batch as $entity) {
+                $callback($entity);
+            }
+
+            EntityManager::flush();
+            $em->clear();
+
+            $offset += $batchSize;
+        } while (count($batch) === $batchSize);
     }
 
     /**

@@ -10,7 +10,6 @@ use MyParcelNL\Pdk\App\ShippingMethod\Collection\PdkShippingMethodCollection;
 use MyParcelNL\Pdk\App\ShippingMethod\Contract\PdkShippingMethodRepositoryInterface;
 use MyParcelNL\Pdk\Base\Repository\Repository;
 use MyParcelNL\Pdk\Base\Support\Collection;
-use MyParcelNL\Pdk\Facade\Logger;
 
 final class PsShippingMethodRepository extends Repository implements PdkShippingMethodRepositoryInterface
 {

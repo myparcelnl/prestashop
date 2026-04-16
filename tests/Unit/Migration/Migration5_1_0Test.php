@@ -10,9 +10,11 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
+use MyParcelNL\PrestaShop\Entity\MyparcelnlCartDeliveryOptions;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
+use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
@@ -121,6 +123,43 @@ it('skips carrier mappings that are already V2 format', function () {
     expect($repo->all()->first()->getMyparcelCarrier())->toBe('POSTNL');
 });
 
+dataset('cart delivery options carrier variants', [
+    'plain legacy string'            => [['carrier' => 'postnl'], 'POSTNL'],
+    'object with externalIdentifier' => [['carrier' => ['externalIdentifier' => 'dhlforyou']], 'DHL_FOR_YOU'],
+    'object with carrier key'        => [['carrier' => ['carrier' => 'dhlparcelconnect']], 'DHL_PARCEL_CONNECT'],
+    'already V2 format'              => [['carrier' => 'POSTNL'], 'POSTNL'],
+]);
+
+it('normalises the carrier field in cart delivery options', function (array $cartData, string $expectedCarrier) {
+    (new FactoryCollection([
+        factory(MyparcelnlCartDeliveryOptions::class)
+            ->withCartId(1)
+            ->withData(json_encode($cartData)),
+    ]))->store();
+
+    $migration = Pdk::get(Migration5_1_0::class);
+    $migration->up();
+
+    $repo = Pdk::get(PsCartDeliveryOptionsRepository::class);
+    $cart = $repo->findOneBy(['cartId' => 1]);
+
+    expect($cart->getData()['carrier'])->toBe($expectedCarrier);
+})->with('cart delivery options carrier variants');
+
+it('skips cart delivery options without carrier field', function () {
+    (new FactoryCollection([
+        factory(MyparcelnlCartDeliveryOptions::class)
+            ->withCartId(1)
+            ->withData(json_encode(['deliveryType' => 'standard'])),
+    ]))->store();
+
+    $migration = Pdk::get(Migration5_1_0::class);
+    $migration->up();
+
+    $repo = Pdk::get(PsCartDeliveryOptionsRepository::class);
+    expect($repo->findOneBy(['cartId' => 1])->getData())->toBe(['deliveryType' => 'standard']);
+});
+
 dataset('order carrier variants', [
     'plain legacy string'               => [['deliveryOptions' => ['carrier' => 'postnl']], 'POSTNL'],
     'legacy string with contract suffix' => [['deliveryOptions' => ['carrier' => 'postnl:123']], 'POSTNL'],
@@ -185,6 +224,55 @@ it('normalises the carrier field in shipment data', function (array $shipmentDat
         expect($data[$key])->toBe($value);
     }
 })->with('shipment carrier variants');
+
+it('migrates multiple order data rows in a single run', function () {
+    (new FactoryCollection([
+        factory(MyparcelnlOrderData::class)
+            ->withOrderId(1)
+            ->withData(json_encode(['deliveryOptions' => ['carrier' => 'postnl']])),
+        factory(MyparcelnlOrderData::class)
+            ->withOrderId(2)
+            ->withData(json_encode(['deliveryOptions' => ['carrier' => 'dhlforyou']])),
+        factory(MyparcelnlOrderData::class)
+            ->withOrderId(3)
+            ->withData(json_encode(['deliveryOptions' => ['carrier' => 'POSTNL']])),
+    ]))->store();
+
+    $migration = Pdk::get(Migration5_1_0::class);
+    $migration->up();
+
+    $repo = Pdk::get(PsOrderDataRepository::class);
+
+    expect($repo->findOneBy(['orderId' => 1])->getData()['deliveryOptions']['carrier'])->toBe('POSTNL')
+        ->and($repo->findOneBy(['orderId' => 2])->getData()['deliveryOptions']['carrier'])->toBe('DHL_FOR_YOU')
+        ->and($repo->findOneBy(['orderId' => 3])->getData()['deliveryOptions']['carrier'])->toBe('POSTNL');
+});
+
+it('migrates multiple shipment data rows in a single run', function () {
+    (new FactoryCollection([
+        factory(MyparcelnlOrderShipment::class)
+            ->withShipmentId(100)
+            ->withOrderId(1)
+            ->withData(json_encode(['carrier' => 'postnl'])),
+        factory(MyparcelnlOrderShipment::class)
+            ->withShipmentId(101)
+            ->withOrderId(2)
+            ->withData(json_encode(['carrier' => 'dhlforyou'])),
+        factory(MyparcelnlOrderShipment::class)
+            ->withShipmentId(102)
+            ->withOrderId(3)
+            ->withData(json_encode(['carrier' => 'dhlparcelconnect'])),
+    ]))->store();
+
+    $migration = Pdk::get(Migration5_1_0::class);
+    $migration->up();
+
+    $repo = Pdk::get(PsOrderShipmentRepository::class);
+
+    expect($repo->findOneBy(['shipmentId' => 100])->getData()['carrier'])->toBe('POSTNL')
+        ->and($repo->findOneBy(['shipmentId' => 101])->getData()['carrier'])->toBe('DHL_FOR_YOU')
+        ->and($repo->findOneBy(['shipmentId' => 102])->getData()['carrier'])->toBe('DHL_PARCEL_CONNECT');
+});
 
 it('does not fail when no account is available during migration', function () {
     /** @var Migration5_1_0 $migration */
