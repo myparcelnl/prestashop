@@ -109,7 +109,12 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
 
             $this->accountRepository->store($account);
         } catch (Throwable $e) {
-            Logger::warning('Could not refresh account carrier data during migration', ['exception' => $e]);
+            Logger::warning('Could not refresh account carrier data during migration', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile() . ':' . $e->getLine(),
+                'class'   => get_class($e),
+                'trace'   => $e->getTraceAsString(),
+            ]);
         }
     }
 
