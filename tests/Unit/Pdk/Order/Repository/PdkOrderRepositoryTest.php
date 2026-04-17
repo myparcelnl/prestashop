@@ -8,15 +8,27 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
 use MyParcelNL\Pdk\Base\Support\Arr;
+use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
+use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Order;
 use OrderFactory;
+use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
+use function MyParcelNL\PrestaShop\setupAccountAndCarriers;
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 usesShared(new UsesMockPsPdkInstance());
+
+beforeEach(function () {
+    setupAccountAndCarriers(
+        factory(CarrierCollection::class)->push(
+            factory(Carrier::class)->fromPostNL()
+        )
+    );
+});
 
 it('creates a valid pdk order', function (OrderFactory $orderFactory) {
     /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */

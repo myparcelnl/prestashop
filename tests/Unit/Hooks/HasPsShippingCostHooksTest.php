@@ -10,7 +10,9 @@ use Cart;
 use CartFactory;
 use Context;
 use FrontController;
+use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\Settings;
@@ -24,6 +26,7 @@ use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
+use function MyParcelNL\PrestaShop\setupAccountAndCarriers;
 
 final class ClassWithTrait
 {
@@ -87,15 +90,19 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
 
     'carrier with linked myparcel carrier but no delivery options' => [
         function () {
+            setupAccountAndCarriers(
+                factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
+            );
+
             $psCarrier = psFactory(PsCarrier::class)->withId(93);
 
             (new FactoryCollection([
                 $psCarrier,
                 psFactory(MyparcelnlCarrierMapping::class)
                     ->withCarrierId(93)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_NAME),
+                    ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)->withCarrierPostNl([
-                    CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD => 2.95,
+                    CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 2.95,
                 ]),
             ]))->store();
 
@@ -107,24 +114,28 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
 
     'carrier with linked myparcel carrier and delivery options in values' => [
         function () {
+            setupAccountAndCarriers(
+                factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
+            );
+
             $psCarrier = psFactory(PsCarrier::class)->withId(93);
 
             (new FactoryCollection([
                 $psCarrier,
                 psFactory(MyparcelnlCarrierMapping::class)
                     ->withCarrierId(93)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME),
+                    ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)
                     ->withCarrierPostNl([
                         CarrierSettings::PRICE_SIGNATURE              => 0.45,
-                        CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD => 4.95,
+                        CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 4.95,
                     ]),
             ]))->store();
 
             return psFactory(Cart::class)->withCarrier($psCarrier);
         },
         'values' => [
-            DeliveryOptions::CARRIER          => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+            DeliveryOptions::CARRIER          => RefCapabilitiesSharedCarrierV2::POSTNL,
             DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::SHIPMENT_OPTIONS => [
                 ShipmentOptions::SIGNATURE => true,
@@ -173,22 +184,26 @@ it(
 )->with([
     'standard delivery with delivery options in values' => [
         function () {
+            setupAccountAndCarriers(
+                factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
+            );
+
             $psCarrier = psFactory(PsCarrier::class)->withId(93);
 
             (new FactoryCollection([
                 $psCarrier,
                 psFactory(MyparcelnlCarrierMapping::class)
                     ->withCarrierId(93)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_NAME),
+                    ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)->withCarrierPostNl([
-                    CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD => 2.95,
+                    CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 2.95,
                 ]),
             ]))->store();
 
             return psFactory(Cart::class)->withCarrier($psCarrier);
         },
         'values' => [
-            DeliveryOptions::CARRIER       => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+            DeliveryOptions::CARRIER       => RefCapabilitiesSharedCarrierV2::POSTNL,
             DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
         ],
         'cost'   => 2.95,
@@ -196,24 +211,28 @@ it(
 
     'carrier with linked myparcel carrier and delivery options in values' => [
         function () {
+            setupAccountAndCarriers(
+                factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
+            );
+
             $psCarrier = psFactory(PsCarrier::class)->withId(93);
 
             (new FactoryCollection([
                 $psCarrier,
                 psFactory(MyparcelnlCarrierMapping::class)
                     ->withCarrierId(93)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME),
+                    ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)
                     ->withCarrierPostNl([
                         CarrierSettings::PRICE_SIGNATURE              => 0.45,
-                        CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD => 4.95,
+                        CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 4.95,
                     ]),
             ]))->store();
 
             return psFactory(Cart::class)->withCarrier($psCarrier);
         },
         'values' => [
-            DeliveryOptions::CARRIER          => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+            DeliveryOptions::CARRIER          => RefCapabilitiesSharedCarrierV2::POSTNL,
             DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::SHIPMENT_OPTIONS => [
                 ShipmentOptions::SIGNATURE => true,

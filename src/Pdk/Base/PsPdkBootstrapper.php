@@ -9,6 +9,7 @@ use FileLogger;
 use Module;
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
+use MyParcelNL\PrestaShop\Pdk\Base\Service\DoctrineEntityRegistrar;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -207,7 +208,12 @@ class PsPdkBootstrapper extends PdkBootstrapper
             }),
 
             'ps.entityManager' => factory(function () {
-                return Pdk::get('getPsService')('doctrine.orm.entity_manager');
+                /** @var \Doctrine\ORM\EntityManagerInterface $em */
+                $em = Pdk::get('getPsService')('doctrine.orm.entity_manager');
+
+                DoctrineEntityRegistrar::register($em);
+
+                return $em;
             }),
 
             'ps.tabRepository' => factory(function () {

@@ -9,6 +9,7 @@ use DI\ContainerBuilder;
 use Link;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 use Smarty;
+use stdClass;
 use function DI\get;
 
 abstract class MockPsContext extends BaseMock implements StaticMockInterface
@@ -19,6 +20,16 @@ abstract class MockPsContext extends BaseMock implements StaticMockInterface
      * @var \DI\Container
      */
     public $container;
+
+    /**
+     * @var object
+     */
+    public $currency;
+
+    /**
+     * @var object
+     */
+    public $language;
 
     /**
      * @var Link
@@ -37,8 +48,16 @@ abstract class MockPsContext extends BaseMock implements StaticMockInterface
     {
         $this->setupContainer();
 
-        $this->link   = new Link();
-        $this->smarty = new Smarty();
+        $language     = new stdClass();
+        $language->id = 1;
+
+        $currency           = new stdClass();
+        $currency->iso_code = 'EUR';
+
+        $this->currency = $currency;
+        $this->language = $language;
+        $this->link     = new Link();
+        $this->smarty   = new Smarty();
     }
 
     public static function getContext(): MockPsContext

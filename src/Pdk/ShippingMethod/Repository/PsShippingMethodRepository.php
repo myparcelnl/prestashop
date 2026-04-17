@@ -20,7 +20,7 @@ final class PsShippingMethodRepository extends Repository implements PdkShipping
 
         $shippingMethods = (new Collection($carriers))
             ->filter(static function (array $shippingMethod) {
-                return 1 === $shippingMethod['active'];
+                return (int) $shippingMethod['active'] === 1;
             })
             ->map(static function (array $shippingMethod) {
                 return [
