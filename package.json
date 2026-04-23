@@ -47,7 +47,8 @@
   },
   "resolutions": {
     "eslint-plugin-prettier": "^4.2.1",
-    "tar": "7.5.11"
+    "tar": "7.5.11",
+    "axios": "1.15.0"
   },
   "lint-staged": {
     "*.{ts,vue,js,cjs,mjs}": "eslint --fix",
