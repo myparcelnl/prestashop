@@ -77,6 +77,40 @@ final class ModuleService
 
             throw new InstallationException(sprintf('Hook %s could not be registered', $hook));
         }
+
+        $this->ensureGroupRestrictions($instance);
+    }
+
+    /**
+     * PrestaShop authorizes front office modules per customer group. If a reinstall or upgrade left these rows empty,
+     * checkout hooks are silently skipped, so restore the default only when no restrictions exist at all.
+     *
+     * @param  \Module $module
+     *
+     * @return void
+     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
+     */
+    private function ensureGroupRestrictions(Module $module): void
+    {
+        if (! $module->id) {
+            return;
+        }
+
+        $restrictionCount = (int) \Db::getInstance()->getValue(sprintf(
+            'SELECT COUNT(*) FROM `%smodule_group` WHERE `id_module` = %d',
+            _DB_PREFIX_,
+            (int) $module->id
+        ));
+
+        if ($restrictionCount > 0) {
+            return;
+        }
+
+        if (! \Group::addRestrictionsForModule((int) $module->id, \Shop::getShops(true, null, true))) {
+            throw new InstallationException('Module group restrictions could not be restored');
+        }
+
+        Logger::debug('Module group restrictions restored');
     }
 
     /**
