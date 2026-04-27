@@ -10,7 +10,9 @@ use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Logger\AbstractLogger;
 use MyParcelNL\Sdk\Support\Arr;
+use PrestaShopLogger;
 use Psr\Log\LogLevel;
+use Throwable;
 
 final class PsLogger extends AbstractLogger
 {
@@ -29,7 +31,7 @@ final class PsLogger extends AbstractLogger
     ];
 
     /**
-     * @var \FileLogger[]
+     * @var array<string, null|\FileLogger>
      */
     private static array $loggers = [];
 
@@ -68,12 +70,26 @@ final class PsLogger extends AbstractLogger
      */
     public function log($level, $message, array $context = []): void
     {
-        $logger      = $this->getLogger($level);
         $fullMessage = empty($context)
             ? $message
             : sprintf('%s %s', $message, json_encode(Utils::filterNull($context)));
 
-        $logger->log($fullMessage, $this->mapLevel($level));
+        $logger = $this->getLogger($level);
+
+        if (! $logger) {
+            $this->logToPrestaShop($level, $fullMessage);
+
+            return;
+        }
+
+        try {
+            $logger->log($fullMessage, $this->mapLevel($level));
+        } catch (Throwable $e) {
+            $this->logToPrestaShop(
+                $level,
+                sprintf('%s Failed to write MyParcel log: %s', $fullMessage, $e->getMessage())
+            );
+        }
     }
 
     /**
@@ -87,7 +103,14 @@ final class PsLogger extends AbstractLogger
 
         // Create all log files in advance on dev for easier tail usage
         foreach (self::LOG_LEVELS as $level) {
-            $this->createLogFile($level);
+            try {
+                $this->createLogFile($level);
+            } catch (Throwable $e) {
+                $this->logToPrestaShop(
+                    LogLevel::WARNING,
+                    sprintf('Failed to prepare MyParcel log file for %s: %s', $level, $e->getMessage())
+                );
+            }
         }
     }
 
@@ -120,11 +143,11 @@ final class PsLogger extends AbstractLogger
     /**
      * @param  string $level
      *
-     * @return \FileLogger
+     * @return null|\FileLogger
      */
-    private function getLogger(string $level): FileLogger
+    private function getLogger(string $level): ?FileLogger
     {
-        if (! isset(self::$loggers[$level])) {
+        if (! array_key_exists($level, self::$loggers)) {
             self::$loggers[$level] = $this->initializeLogger($level);
         }
 
@@ -134,14 +157,34 @@ final class PsLogger extends AbstractLogger
     /**
      * @param  string $level
      *
-     * @return \FileLogger
+     * @return null|\FileLogger
      */
-    private function initializeLogger(string $level): FileLogger
+    private function initializeLogger(string $level): ?FileLogger
     {
-        $this->createLogFile($level);
+        try {
+            $this->createLogFile($level);
+        } catch (Throwable $e) {
+            $this->logToPrestaShop(
+                LogLevel::WARNING,
+                sprintf('Failed to prepare MyParcel log file for %s: %s', $level, $e->getMessage())
+            );
+
+            return null;
+        }
+
+        $file = $this->getLogFilename($level);
+
+        if (! is_writable(dirname($file))) {
+            $this->logToPrestaShop(
+                LogLevel::WARNING,
+                sprintf('MyParcel log directory is not writable: %s', dirname($file))
+            );
+
+            return null;
+        }
 
         $logger = new FileLogger($this->mapLevel($level));
-        $logger->setFilename($this->getLogFilename($level));
+        $logger->setFilename($file);
 
         return $logger;
     }
@@ -154,5 +197,46 @@ final class PsLogger extends AbstractLogger
     private function mapLevel(string $level): int
     {
         return Arr::get(Pdk::get('logLevelFilenameMap'), $level);
+    }
+
+    /**
+     * @param  string $level
+     * @param  mixed  $message
+     *
+     * @return void
+     */
+    private function logToPrestaShop(string $level, $message): void
+    {
+        if (! class_exists(PrestaShopLogger::class)) {
+            return;
+        }
+
+        try {
+            PrestaShopLogger::addLog((string) $message, $this->mapPrestaShopLevel($level));
+        } catch (Throwable $e) {
+            // Logging should never interrupt module install/update flows.
+        }
+    }
+
+    /**
+     * @param  string $level
+     *
+     * @return int
+     */
+    private function mapPrestaShopLevel(string $level): int
+    {
+        if (LogLevel::WARNING === $level) {
+            return PrestaShopLogger::LOG_SEVERITY_LEVEL_WARNING;
+        }
+
+        if (LogLevel::ERROR === $level) {
+            return PrestaShopLogger::LOG_SEVERITY_LEVEL_ERROR;
+        }
+
+        if (in_array($level, [LogLevel::CRITICAL, LogLevel::ALERT, LogLevel::EMERGENCY], true)) {
+            return PrestaShopLogger::LOG_SEVERITY_LEVEL_MAJOR;
+        }
+
+        return PrestaShopLogger::LOG_SEVERITY_LEVEL_INFORMATIVE;
     }
 }

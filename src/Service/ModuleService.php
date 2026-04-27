@@ -33,6 +33,7 @@ final class ModuleService
     {
         try {
             Installer::install($module);
+            $this->ensureGroupRestrictions($module);
         } catch (Throwable $e) {
             Logger::error('Failed to install module', ['exception' => $e]);
 
@@ -77,6 +78,52 @@ final class ModuleService
 
             throw new InstallationException(sprintf('Hook %s could not be registered', $hook));
         }
+
+        $this->ensureGroupRestrictions($instance);
+    }
+
+    /**
+     * PrestaShop authorizes front office modules per customer group. If a reinstall or upgrade left these rows empty
+     * for a shop, checkout hooks are silently skipped for that shop.
+     *
+     * @param  \Module $module
+     *
+     * @return void
+     * @throws \MyParcelNL\PrestaShop\Pdk\Installer\Exception\InstallationException
+     */
+    private function ensureGroupRestrictions(Module $module): void
+    {
+        if (! $module->id) {
+            return;
+        }
+
+        $shopIds = array_map('intval', \Shop::getShops(true, null, true));
+        $missingShopIds = [];
+
+        foreach ($shopIds as $shopId) {
+            $restrictionCount = (int) \Db::getInstance()->getValue(sprintf(
+                'SELECT COUNT(*) FROM `%smodule_group` WHERE `id_module` = %d AND `id_shop` = %d',
+                _DB_PREFIX_,
+                (int) $module->id,
+                $shopId
+            ));
+
+            if ($restrictionCount > 0) {
+                continue;
+            }
+
+            $missingShopIds[] = $shopId;
+        }
+
+        if (empty($missingShopIds)) {
+            return;
+        }
+
+        if (! \Group::addRestrictionsForModule((int) $module->id, $missingShopIds)) {
+            throw new InstallationException('Module group restrictions could not be restored');
+        }
+
+        Logger::debug(sprintf('Module group restrictions restored for shop(s): %s', implode(', ', $missingShopIds)));
     }
 
     /**

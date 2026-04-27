@@ -17,6 +17,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
+use MyParcelNL\Pdk\Settings\SettingsManager;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
@@ -53,13 +54,16 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
      */
     public function carrierIsActive(Carrier $carrier): bool
     {
-        $deliveryOptionsEnabled = Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
+        $deliveryOptionsEnabled = Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID, true);
 
         if (! $deliveryOptionsEnabled) {
             return false;
         }
 
-        $settings = Settings::get($carrier->carrier, CarrierSettings::ID);
+        $settings = array_replace(
+            Settings::get(SettingsManager::KEY_ALL, CarrierSettings::ID, []),
+            Settings::get($carrier->carrier, CarrierSettings::ID, [])
+        );
 
         $allowDeliveryOptions = Arr::get($settings, CarrierSettings::ALLOW_DELIVERY_OPTIONS);
         $allowPickupLocations = Arr::get($settings, CarrierSettings::ALLOW_PICKUP_LOCATIONS);
