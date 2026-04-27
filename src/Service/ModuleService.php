@@ -33,6 +33,7 @@ final class ModuleService
     {
         try {
             Installer::install($module);
+            $this->ensureGroupRestrictions($module);
         } catch (Throwable $e) {
             Logger::error('Failed to install module', ['exception' => $e]);
 
@@ -82,8 +83,8 @@ final class ModuleService
     }
 
     /**
-     * PrestaShop authorizes front office modules per customer group. If a reinstall or upgrade left these rows empty,
-     * checkout hooks are silently skipped, so restore the default only when no restrictions exist at all.
+     * PrestaShop authorizes front office modules per customer group. If a reinstall or upgrade left these rows empty
+     * for a shop, checkout hooks are silently skipped for that shop.
      *
      * @param  \Module $module
      *
@@ -96,21 +97,33 @@ final class ModuleService
             return;
         }
 
-        $restrictionCount = (int) \Db::getInstance()->getValue(sprintf(
-            'SELECT COUNT(*) FROM `%smodule_group` WHERE `id_module` = %d',
-            _DB_PREFIX_,
-            (int) $module->id
-        ));
+        $shopIds = array_map('intval', \Shop::getShops(true, null, true));
+        $missingShopIds = [];
 
-        if ($restrictionCount > 0) {
+        foreach ($shopIds as $shopId) {
+            $restrictionCount = (int) \Db::getInstance()->getValue(sprintf(
+                'SELECT COUNT(*) FROM `%smodule_group` WHERE `id_module` = %d AND `id_shop` = %d',
+                _DB_PREFIX_,
+                (int) $module->id,
+                $shopId
+            ));
+
+            if ($restrictionCount > 0) {
+                continue;
+            }
+
+            $missingShopIds[] = $shopId;
+        }
+
+        if (empty($missingShopIds)) {
             return;
         }
 
-        if (! \Group::addRestrictionsForModule((int) $module->id, \Shop::getShops(true, null, true))) {
+        if (! \Group::addRestrictionsForModule((int) $module->id, $missingShopIds)) {
             throw new InstallationException('Module group restrictions could not be restored');
         }
 
-        Logger::debug('Module group restrictions restored');
+        Logger::debug(sprintf('Module group restrictions restored for shop(s): %s', implode(', ', $missingShopIds)));
     }
 
     /**

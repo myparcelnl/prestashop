@@ -10,6 +10,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Collection\SettingsModelCollection;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Repository\AbstractPdkSettingsRepository;
+use MyParcelNL\Pdk\Settings\SettingsManager;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
@@ -86,6 +87,10 @@ final class PsPdkSettingsRepository extends AbstractPdkSettingsRepository
     private function onUpdateCarrierSettings(SettingsModelCollection $collection): void
     {
         $collection->each(function (CarrierSettings $settings, string $carrierIdentifier) {
+            if (SettingsManager::KEY_ALL === $carrierIdentifier) {
+                return;
+            }
+
             try {
                 $this->updatePsCarrier($carrierIdentifier);
             } catch (Throwable $e) {

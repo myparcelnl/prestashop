@@ -33,6 +33,8 @@ class MyParcelNL extends CarrierModule
 {
     public const MODULE_NAME = 'myparcelnl'; // name MUST MATCH folder and file name
 
+    private const PRESTASHOP_MAX_VERSION_LENGTH = 8;
+
     use HasModuleUpgradeOverrides;
 
     /**
@@ -97,10 +99,29 @@ class MyParcelNL extends CarrierModule
             /** @noinspection JsonEncodingApiUsageInspection */
             $composerData = json_decode(file_get_contents($filename), true);
 
-            self::$versionFromComposer = $composerData['version'];
+            self::$versionFromComposer = self::normalizePrestaShopVersion($composerData['version']);
         }
 
         return self::$versionFromComposer;
+    }
+
+    /**
+     * PrestaShop stores module versions in ps_module.version varchar(8). Build metadata must not be exposed here,
+     * otherwise PrestaShop truncates the value and can keep detecting the same module as upgradeable.
+     *
+     * @param  string $version
+     *
+     * @return string
+     */
+    private static function normalizePrestaShopVersion(string $version): string
+    {
+        $version = trim($version);
+
+        if (preg_match('/^\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)?/', $version, $matches)) {
+            $version = $matches[0];
+        }
+
+        return substr($version, 0, self::PRESTASHOP_MAX_VERSION_LENGTH);
     }
 
     /**

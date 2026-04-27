@@ -10,11 +10,16 @@ use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
+use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
+use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
+use MyParcelNL\Pdk\Settings\SettingsManager;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use Psr\Log\LoggerInterface;
 use RangePrice;
 use RangeWeight;
@@ -166,3 +171,64 @@ it('enables carriers based on settings', function (array $settings, bool $result
 
     expect($psCarrier->active)->toBe($result);
 })->with('carrierActiveSettings');
+
+it('uses global carrier settings when carrier-specific settings are missing', function () {
+    /** @var PdkSettingsRepositoryInterface $repository */
+    $repository = Pdk::get(PdkSettingsRepositoryInterface::class);
+
+    $repository->store(
+        Pdk::get('createSettingsKey')(CheckoutSettings::ID),
+        [
+            CheckoutSettings::ENABLE_DELIVERY_OPTIONS => true,
+        ]
+    );
+    $repository->store(
+        Pdk::get('createSettingsKey')(CarrierSettings::ID),
+        [
+            SettingsManager::KEY_ALL => (new CarrierSettings([
+                'id'                                      => SettingsManager::KEY_ALL,
+                CarrierSettings::DELIVERY_OPTIONS_ENABLED => true,
+                CarrierSettings::ALLOW_DELIVERY_OPTIONS   => true,
+            ]))->toStorableArray(),
+        ]
+    );
+
+    /** @var PsCarrierServiceInterface $service */
+    $service = Pdk::get(PsCarrierServiceInterface::class);
+
+    expect($service->carrierIsActive(new Carrier(['carrier' => RefCapabilitiesSharedCarrierV2::POSTNL])))
+        ->toBeTrue();
+});
+
+it('lets carrier-specific settings override global carrier settings', function () {
+    /** @var PdkSettingsRepositoryInterface $repository */
+    $repository = Pdk::get(PdkSettingsRepositoryInterface::class);
+
+    $repository->store(
+        Pdk::get('createSettingsKey')(CheckoutSettings::ID),
+        [
+            CheckoutSettings::ENABLE_DELIVERY_OPTIONS => true,
+        ]
+    );
+    $repository->store(
+        Pdk::get('createSettingsKey')(CarrierSettings::ID),
+        [
+            SettingsManager::KEY_ALL => (new CarrierSettings([
+                'id'                                      => SettingsManager::KEY_ALL,
+                CarrierSettings::DELIVERY_OPTIONS_ENABLED => true,
+                CarrierSettings::ALLOW_DELIVERY_OPTIONS   => true,
+            ]))->toStorableArray(),
+            RefCapabilitiesSharedCarrierV2::POSTNL => (new CarrierSettings([
+                'id'                                      => RefCapabilitiesSharedCarrierV2::POSTNL,
+                CarrierSettings::DELIVERY_OPTIONS_ENABLED => false,
+                CarrierSettings::ALLOW_DELIVERY_OPTIONS   => false,
+            ]))->toStorableArray(),
+        ]
+    );
+
+    /** @var PsCarrierServiceInterface $service */
+    $service = Pdk::get(PsCarrierServiceInterface::class);
+
+    expect($service->carrierIsActive(new Carrier(['carrier' => RefCapabilitiesSharedCarrierV2::POSTNL])))
+        ->toBeFalse();
+});
