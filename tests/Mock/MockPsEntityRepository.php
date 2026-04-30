@@ -11,7 +11,7 @@ use MyParcelNL\Sdk\Support\Str;
 /**
  * @template T of EntityInterface
  */
-class MockPsEntityRepository
+class MockPsEntityRepository extends \Doctrine\ORM\EntityRepository
 {
     /**
      * @var class-string<T>
