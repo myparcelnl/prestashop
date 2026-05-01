@@ -181,7 +181,6 @@ it('forwards versioning headers per ADR-011', function () {
     $response   = $controller->handleRequest();
 
     expect($response->getStatusCode())->toBe(200);
-    // Per ADR-011, version-negotiated responses include a Content-Type or similar versioning header.
-    $headers = $response->headers->all();
-    expect($headers)->toBeArray();
+    // Per ADR-011, the negotiated version is echoed back in the Content-Type header.
+    expect($response->headers->get('Content-Type'))->toContain('version=1');
 });
