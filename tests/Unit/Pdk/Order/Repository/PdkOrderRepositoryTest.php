@@ -57,3 +57,12 @@ it('creates a pdk order from order id', function () {
 
     expect($pdkOrder)->toBeInstanceOf(PdkOrder::class);
 });
+
+it('returns null from find() when order does not exist', function () {
+    /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
+    $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
+
+    $result = $orderRepository->find(99999);
+
+    expect($result)->toBeNull();
+});
