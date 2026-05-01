@@ -94,9 +94,15 @@ class MyParcelNLDeliveryOptionsModuleFrontController extends FrontControllerCore
      */
     private function getWebserviceAccountId(string $key)
     {
+        // Webservice keys are alphanumeric — reject anything else to prevent SQL injection.
+        if (! preg_match('/^[a-zA-Z0-9_]+$/', $key)) {
+            return false;
+        }
+
         $sql = new DbQuery();
         $sql->select('id_webservice_account');
         $sql->from('webservice_account');
+        $sql->where("`key` = '" . $key . "'");
         $sql->where('active = 1');
 
         $rows = Db::getInstance()->executeS($sql);
