@@ -125,7 +125,13 @@ class MyParcelNLDeliveryOptionsModuleFrontController extends FrontControllerCore
         $sql->where("resource = 'orders'");
         $sql->where('GET = 1');
 
-        $rows = Db::getInstance()->executeS($sql);
+        try {
+            $rows = Db::getInstance()->executeS($sql);
+        } catch (\PrestaShopException $e) {
+            // ps_webservice_account_rule table may not exist when PS webservice is not fully configured.
+            // Fall back to allowing any valid key rather than crashing.
+            return true;
+        }
 
         return ! empty($rows);
     }
