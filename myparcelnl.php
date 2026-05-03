@@ -67,7 +67,7 @@ class MyParcelNL extends CarrierModule
         $this->bootstrap              = true;
         $this->displayName            = 'MyParcel';
         $this->description            = 'MyParcel';
-        $this->tab                    = 'shipping_logistics';
+        $this->tab                    = 'AdminParentShipping';
         $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => '8.99.99'];
 
         $this->registerTabs();
