@@ -12,12 +12,12 @@ use Cart;
 use Cookie;
 use Country;
 use MyParcelNL\Pdk\Account\Model\Account;
-use MyParcelNL\Pdk\Account\Platform;
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Proposition\Proposition;
 use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use MyParcelNL\Sdk\Support\Arr;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
@@ -33,11 +33,11 @@ class WithHasPsCarrierListHooks
 it('filters carriers from delivery options list', function (
     string $isoCode,
     array  $filteredCarriers,
-    string $platform = Platform::MYPARCEL_NAME
+    string $platform = Proposition::MYPARCEL_NAME
 ) {
-    $platformId = Platform::MYPARCEL_ID;
-    if (Platform::SENDMYPARCEL_NAME === $platform) {
-        $platformId = Platform::SENDMYPARCEL_ID;
+    $platformId = Proposition::MYPARCEL_ID;
+    if (Proposition::SENDMYPARCEL_NAME === $platform) {
+        $platformId = Proposition::SENDMYPARCEL_ID;
     }
     Pdk::get(PropositionService::class)->setActivePropositionId($platformId);
 
@@ -46,13 +46,13 @@ it('filters carriers from delivery options list', function (
         ->store();
 
     $allCarriers = [
-        Carrier::CARRIER_BPOST_NAME,
-        Carrier::CARRIER_DHL_FOR_YOU_NAME,
-        sprintf('%s:1234', Carrier::CARRIER_DHL_FOR_YOU_NAME),
-        Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME,
-        Carrier::CARRIER_DPD_NAME,
-        Carrier::CARRIER_POSTNL_NAME,
-        Carrier::CARRIER_UPS_STANDARD_NAME,
+        RefCapabilitiesSharedCarrierV2::BPOST,
+        RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU,
+        sprintf('%s:1234', RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU),
+        RefCapabilitiesSharedCarrierV2::DHL_PARCEL_CONNECT,
+        RefCapabilitiesSharedCarrierV2::DPD,
+        RefCapabilitiesSharedCarrierV2::POSTNL,
+        RefCapabilitiesSharedCarrierV2::UPS_STANDARD,
     ];
 
     $deliveryOptionCarrierList = [
@@ -129,58 +129,58 @@ it('filters carriers from delivery options list', function (
     'NL' => [
         'country'          => 'NL',
         'filteredCarriers' => [
-            Carrier::CARRIER_DHL_FOR_YOU_NAME,
-            Carrier::CARRIER_DHL_FOR_YOU_NAME . ':1234',
-            Carrier::CARRIER_DPD_NAME,
-            Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_STANDARD_NAME,
+            RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU,
+            RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU . ':1234',
+            RefCapabilitiesSharedCarrierV2::DPD,
+            RefCapabilitiesSharedCarrierV2::POSTNL,
+            RefCapabilitiesSharedCarrierV2::UPS_STANDARD,
         ],
     ],
 
     'BE' => [
         'country'          => 'BE',
         'filteredCarriers' => [
-            Carrier::CARRIER_DHL_FOR_YOU_NAME,
-            Carrier::CARRIER_DHL_FOR_YOU_NAME . ':1234',
-            Carrier::CARRIER_DPD_NAME,
-            Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_STANDARD_NAME,
+            RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU,
+            RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU . ':1234',
+            RefCapabilitiesSharedCarrierV2::DPD,
+            RefCapabilitiesSharedCarrierV2::POSTNL,
+            RefCapabilitiesSharedCarrierV2::UPS_STANDARD,
         ],
     ],
 
     'BE (sendmyparcel)' => [
         'country'          => 'BE',
         'filteredCarriers' => [
-            Carrier::CARRIER_BPOST_NAME,
-            Carrier::CARRIER_DPD_NAME,
-            Carrier::CARRIER_POSTNL_NAME,
+            RefCapabilitiesSharedCarrierV2::BPOST,
+            RefCapabilitiesSharedCarrierV2::DPD,
+            RefCapabilitiesSharedCarrierV2::POSTNL,
         ],
-        'platform'         => Platform::SENDMYPARCEL_NAME,
+        'platform'         => Proposition::SENDMYPARCEL_NAME,
     ],
 
     'FR' => [
         'country'          => 'FR',
         'filteredCarriers' => [
-            Carrier::CARRIER_DHL_PARCEL_CONNECT_NAME,
-            Carrier::CARRIER_DPD_NAME,
-            Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_STANDARD_NAME,
+            RefCapabilitiesSharedCarrierV2::DHL_PARCEL_CONNECT,
+            RefCapabilitiesSharedCarrierV2::DPD,
+            RefCapabilitiesSharedCarrierV2::POSTNL,
+            RefCapabilitiesSharedCarrierV2::UPS_STANDARD,
         ],
     ],
 
     'US' => [
         'country'          => 'US',
         'filteredCarriers' => [
-            Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_STANDARD_NAME,
+            RefCapabilitiesSharedCarrierV2::POSTNL,
+            RefCapabilitiesSharedCarrierV2::UPS_STANDARD,
         ],
     ],
 
     'AX' => [
         'country'          => 'AX',
         'filteredCarriers' => [
-            Carrier::CARRIER_POSTNL_NAME,
-            Carrier::CARRIER_UPS_STANDARD_NAME,
+            RefCapabilitiesSharedCarrierV2::POSTNL,
+            RefCapabilitiesSharedCarrierV2::UPS_STANDARD,
         ],
     ],
 ]);

@@ -8,6 +8,8 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 use DateTime;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Arr;
+use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
+use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
@@ -15,11 +17,21 @@ use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Order;
+use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
+use function MyParcelNL\PrestaShop\setupAccountAndCarriers;
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 usesShared(new UsesMockPsPdkInstance());
+
+beforeEach(function () {
+    setupAccountAndCarriers(
+        factory(CarrierCollection::class)->push(
+            factory(Carrier::class)->fromPostNL()
+        )
+    );
+});
 
 it('migrates order shipments to pdk', function (array $orderLabels) {
     /** @var PdkOrderRepositoryInterface $pdkOrderRepository */

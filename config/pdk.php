@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use MyParcelNL\Pdk\Account\Platform;
+use MyParcelNL\Pdk\Proposition\Proposition;
 use MyParcelNL\Pdk\Api\Contract\ClientAdapterInterface;
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
 use MyParcelNL\Pdk\App\Action\Backend\Account\UpdateAccountAction;
@@ -26,7 +26,7 @@ use MyParcelNL\Pdk\Base\Contract\CronServiceInterface;
 use MyParcelNL\Pdk\Base\Contract\WeightServiceInterface;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use MyParcelNL\Pdk\Context\Contract\ContextServiceInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Frontend\Contract\FrontendRenderServiceInterface;
@@ -200,8 +200,8 @@ return [
      * @TODO Replace when Carrier Capabilities is available.
      */
     'countriesPerPlatformAndCarrier' => value([
-        Platform::MYPARCEL_NAME => [
-            Carrier::CARRIER_POSTNL_LEGACY_NAME             => [
+        Proposition::MYPARCEL_NAME => [
+            RefCapabilitiesSharedCarrierV2::POSTNL             => [
                 'deliveryCountries' => [
                     CountryCodes::CC_NL, // Netherlands
                     CountryCodes::CC_BE, // Belgium
@@ -215,7 +215,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME        => [
+            RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU      => [
                 'deliveryCountries' => [
                     CountryCodes::CC_NL, // Netherlands
                     CountryCodes::CC_BE, // Belgium
@@ -224,7 +224,7 @@ return [
                     CountryCodes::CC_NL, // Netherlands
                 ],
             ],
-            Carrier::CARRIER_DHL_PARCEL_CONNECT_LEGACY_NAME => [
+            RefCapabilitiesSharedCarrierV2::DHL_PARCEL_CONNECT => [
                 'deliveryCountries' => [
                     CountryCodes::CC_AT, // Austria
                     CountryCodes::CC_BG, // Bulgaria
@@ -268,7 +268,7 @@ return [
                     CountryCodes::CC_SE, // Sweden
                 ],
             ],
-            Carrier::CARRIER_DHL_EUROPLUS_LEGACY_NAME => [
+            RefCapabilitiesSharedCarrierV2::DHL_EUROPLUS => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BE, // Belgium
                     CountryCodes::CC_BG, // Bulgaria
@@ -299,7 +299,7 @@ return [
                 ],
                 'pickupCountries'   => [],
             ],
-            Carrier::CARRIER_UPS_EXPRESS_SAVER_LEGACY_NAME => [
+            RefCapabilitiesSharedCarrierV2::UPS_EXPRESS_SAVER => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BG, // Bulgaria
                     CountryCodes::CC_DE, // Germany
@@ -327,7 +327,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_UPS_STANDARD_LEGACY_NAME => [
+            RefCapabilitiesSharedCarrierV2::UPS_STANDARD => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BG, // Bulgaria
                     CountryCodes::CC_DE, // Germany
@@ -355,7 +355,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_DPD_LEGACY_NAME => [
+            RefCapabilitiesSharedCarrierV2::DPD => [
                 'deliveryCountries' => [
                     CountryCodes::CC_AT, // Austria
                     CountryCodes::CC_BE, // Belgium
@@ -405,7 +405,7 @@ return [
                     CountryCodes::CC_GB, // United Kingdom
                 ],
             ],
-            Carrier::CARRIER_GLS_NAME => [
+            RefCapabilitiesSharedCarrierV2::GLS => [
                 'deliveryCountries' => [
                     CountryCodes::CC_AT, // Austria
                     CountryCodes::CC_BE, // Belgium
@@ -459,7 +459,7 @@ return [
                     CountryCodes::CC_SK, // Slovakia
                 ],
             ],
-            Carrier::CARRIER_TRUNKRS_NAME => [
+            RefCapabilitiesSharedCarrierV2::TRUNKRS => [
                 'deliveryCountries' => [
                     CountryCodes::CC_NL,
                     CountryCodes::CC_BE
@@ -471,8 +471,8 @@ return [
             ],
         ],
 
-        Platform::SENDMYPARCEL_NAME => [
-            Carrier::CARRIER_BPOST_LEGACY_NAME  => [
+        Proposition::SENDMYPARCEL_NAME => [
+            RefCapabilitiesSharedCarrierV2::BPOST  => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BE, // Belgium
                     CountryCodes::CC_NL, // Netherlands
@@ -483,7 +483,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_POSTNL_LEGACY_NAME => [
+            RefCapabilitiesSharedCarrierV2::POSTNL => [
                 'deliveryCountries' => [
                     CountryCodes::CC_BE, // Belgium
                     CountryCodes::CC_NL, // Netherlands
@@ -494,7 +494,7 @@ return [
                 ],
                 'fakeDelivery'      => true,
             ],
-            Carrier::CARRIER_DPD_LEGACY_NAME    => [
+            RefCapabilitiesSharedCarrierV2::DPD    => [
                 'deliveryCountries' => [
                     CountryCodes::CC_AT, // Austria
                     CountryCodes::CC_BE, // Belgium
@@ -547,7 +547,7 @@ return [
         ],
 
         'myparcel-italie' => [
-            Carrier::CARRIER_BRT_LEGACY_NAME => [
+            RefCapabilitiesSharedCarrierV2::BRT => [
                 'deliveryCountries' => [
                     CountryCodes::CC_IT, // Italy
                 ],

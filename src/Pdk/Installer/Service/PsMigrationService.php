@@ -7,6 +7,7 @@ namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 use MyParcelNL\Pdk\App\Installer\Contract\MigrationServiceInterface;
 use MyParcelNL\PrestaShop\Migration\Migration4_0_0;
 use MyParcelNL\PrestaShop\Migration\Migration4_2_3;
+use MyParcelNL\PrestaShop\Migration\Migration5_1_0;
 
 final class PsMigrationService implements MigrationServiceInterface
 {
@@ -18,6 +19,7 @@ final class PsMigrationService implements MigrationServiceInterface
         return [
             Migration4_0_0::class,
             Migration4_2_3::class,
+            Migration5_1_0::class,
         ];
     }
 }
