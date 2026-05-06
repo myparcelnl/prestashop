@@ -5,15 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use DbQuery;
-use MyParcelNL\Pdk\Account\Platform as AccountPlatform;
-use MyParcelNL\Pdk\Base\Pdk;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
-use MyParcelNL\Pdk\Facade\Config;
 use MyParcelNL\Pdk\Facade\Logger;
-use MyParcelNL\Pdk\Facade\Pdk as FacadePdk;
-use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
@@ -24,8 +18,8 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
 {
     private const SETTING_PREFIX     = 'MYPARCELNL_';
     private const LEGACY_CARRIER_MAP = [
-        Carrier::CARRIER_POSTNL_NAME => 'POSTNL',
-        Carrier::CARRIER_DHL_NAME    => 'DHL',
+        'postnl'    => 'POSTNL',
+        'dhl'       => 'DHL',
     ];
 
     /**
@@ -91,16 +85,10 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
      */
     private function getCarriersToMigrate(Collection $carrierRows): Collection
     {
-        $mappings = $this->psCarrierMappingRepository->all();
-        $propositionService = FacadePdk::get(PropositionService::class);
-        $carriers = $propositionService->getCarriers();
-        // Set BE as active proposition to merge in its carriers as the migration could be for any platform and we do not know in advance.
-        $propositionService->setActivePropositionId(AccountPlatform::SENDMYPARCEL_ID);
-        $carriers = $carriers->merge($propositionService->getCarriers());
-        // Reset
-        $propositionService->clearActivePropositionId();
+        $mappings    = $this->psCarrierMappingRepository->all();
+        $legacyNames = new Collection(array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP));
 
-        return $carrierRows->reduce(function (Collection $carry, array $item) use ($carriers, $mappings, $propositionService) {
+        return $carrierRows->reduce(function (Collection $carry, array $item) use ($legacyNames, $mappings) {
             $oldCarrier = Str::after($item['name'], self::SETTING_PREFIX);
 
             $name = strtolower($oldCarrier);
@@ -112,10 +100,7 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
                 return $carry;
             }
 
-            $legacyNames = $carriers->map(function ($carrier) use ($propositionService) {
-                return $propositionService->mapNewToLegacyCarrierName($carrier->name);
-            });
-            if (!in_array($name, $legacyNames->toArray(), true)) {
+            if (! in_array($name, $legacyNames->toArray(), true)) {
                 Logger::debug("Carrier \"$oldCarrier\" not found in carriers.");
 
                 return $carry;
@@ -144,11 +129,13 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
      */
     private function getLegacyCarrierRows(): Collection
     {
-        $settingNames = (new Collection(Platform::getCarriers()))->map(static function ($carrier) {
-            $name = self::LEGACY_CARRIER_MAP[$carrier['name']] ?? strtoupper($carrier['name']);
+        $settingNames = (new Collection(array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP)))->map(
+            static function (string $legacyName) {
+                $name = self::LEGACY_CARRIER_MAP[$legacyName] ?? strtoupper($legacyName);
 
-            return self::SETTING_PREFIX . $name;
-        });
+                return self::SETTING_PREFIX . $name;
+            }
+        );
 
         return $this->getAllRows('configuration', function (DbQuery $query) use ($settingNames) {
             $query->where(sprintf('name IN ("%s")', implode('", "', $settingNames->toArray())));

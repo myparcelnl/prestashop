@@ -7,7 +7,6 @@ namespace MyParcelNL\PrestaShop\Hooks;
 use MyParcelNL\Pdk\App\Cart\Model\PdkCartFee;
 use MyParcelNL\Pdk\App\DeliveryOptions\Contract\DeliveryOptionsFeesServiceInterface;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
-use MyParcelNL\Pdk\Facade\FrontendData;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
@@ -49,7 +48,7 @@ trait HasPsShippingCostHooks
         if (! $carrier) {
             return $shippingCost;
         }
-        $carrier         = FrontendData::convertCarrierToLegacyFormat($carrier);
+
         $deliveryOptions = $this->getDeliveryOptions($carrier);
         $cacheKey        = md5(json_encode($deliveryOptions->toArrayWithoutNull()));
 
@@ -104,6 +103,10 @@ trait HasPsShippingCostHooks
             return new DeliveryOptions(json_decode($deliveryOptions, true));
         }
 
+        if (! $this->context->cart) {
+            return new DeliveryOptions(['carrier' => $carrier]);
+        }
+
         /** @var \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
         $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
         $dbDeliveryOptions             = $cartDeliveryOptionsRepository->findOneBy(
@@ -112,7 +115,7 @@ trait HasPsShippingCostHooks
 
         if (
             $dbDeliveryOptions
-            && $dbDeliveryOptions->getData()['carrier']['externalIdentifier'] === $carrier->externalIdentifier
+            && ($dbDeliveryOptions->getData()['carrier'] ?? null) === $carrier->carrier
         ) {
             return new DeliveryOptions($dbDeliveryOptions->getData());
         }

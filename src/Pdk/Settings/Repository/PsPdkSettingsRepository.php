@@ -108,7 +108,7 @@ final class PsPdkSettingsRepository extends AbstractPdkSettingsRepository
         /** @var \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface $carrierService */
         $carrierService = Pdk::get(PsCarrierServiceInterface::class);
 
-        $carrier = new Carrier(['externalIdentifier' => $carrierIdentifier]);
+        $carrier = new Carrier(['carrier' => $carrierIdentifier]);
 
         $psCarrier = $carrierService->getPsCarrier($carrier);
 

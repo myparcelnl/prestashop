@@ -6,23 +6,15 @@ namespace MyParcelNL\PrestaShop\Pdk\Installer\Service;
 
 use Context;
 use Currency;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\DocParser;
-use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use MyParcelNL\PrestaShop\Pdk\Base\Service\DoctrineEntityRegistrar;
 
 final class PsPreInstallService
 {
     /**
      * Do some preparations that are missing in the installation flow of PrestaShop.
-     *
-     * @return void
-     * @throws \Doctrine\Common\Annotations\AnnotationException
      */
     public function prepare(): void
     {
@@ -47,32 +39,11 @@ final class PsPreInstallService
         $context->currency = $context->currency ?? $psObjectModelService->create(Currency::class, 1);
     }
 
-    /**
-     * @return void
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     */
     private function prepareEntityManager(): void
     {
-        $appInfo = Pdk::getAppInfo();
-
         /** @var EntityManagerInterface $entityManager */
         $entityManager = Pdk::get('ps.entityManager');
 
-        $driverChain = $entityManager
-            ->getConfiguration()
-            ->getMetadataDriverImpl();
-
-        $docParser = new DocParser();
-        $reader    = new AnnotationReader($docParser);
-
-        if (class_exists(PsrCachedReader::class)) {
-            $reader = new PsrCachedReader($reader, new ArrayAdapter());
-        }
-
-        $driver = new AnnotationDriver($reader, ["{$appInfo->path}src/Entity"]);
-
-        if ($driverChain instanceof MappingDriverChain) {
-            $driverChain->addDriver($driver, 'MyParcelNL\PrestaShop\Entity');
-        }
+        DoctrineEntityRegistrar::register($entityManager);
     }
 }

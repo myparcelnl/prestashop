@@ -72,13 +72,11 @@ it('runs upgrade with (invalid) old api key saved', function () {
 
     runUpgradeSuccessfully('4.0.0');
 
-    $warningLogs = \array_filter($logger->getLogs(), function (array $log) {
-        return $log['level'] === LogLevel::WARNING;
-    });
+    $errorLogs = $logger->getLogs(LogLevel::ERROR);
 
-    $hasExpectedLog = \array_filter($warningLogs, function (array $log) {
-        return $log['message'] === '[PDK]: Existing API key is invalid';
-    });
+    $errorMessages = array_map(function (array $log) {
+        return $log['message'];
+    }, $errorLogs);
 
-    expect($hasExpectedLog)->toHaveCount(1);
+    expect($errorMessages)->toContain('Account update partially failed');
 });

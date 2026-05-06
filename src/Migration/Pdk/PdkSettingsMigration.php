@@ -158,7 +158,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'priceMondayDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_MONDAY,
+            CarrierSettings::PRICE_DELIVERY_TYPE_MONDAY_DELIVERY,
             new CastValue(CastValue::CAST_CENTS)
         );
 
@@ -170,7 +170,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'priceSaturdayDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_SATURDAY,
+            CarrierSettings::PRICE_DELIVERY_TYPE_SATURDAY_DELIVERY,
             new CastValue(CastValue::CAST_CENTS)
         );
 
@@ -182,7 +182,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'priceMorningDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_MORNING,
+            CarrierSettings::PRICE_DELIVERY_TYPE_MORNING_DELIVERY,
             new CastValue(CastValue::CAST_CENTS)
         );
 
@@ -194,7 +194,7 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'priceEveningDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_EVENING,
+            CarrierSettings::PRICE_DELIVERY_TYPE_EVENING_DELIVERY,
             new CastValue(CastValue::CAST_CENTS)
         );
 

@@ -345,8 +345,9 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
 
         $matches = array_map('trim', $matches);
 
-        [, $columns, $table] = $matches;
-        $where = $matches[3] ?? null;
+        $columns = $matches[1] ?? '*';
+        $table   = $matches[2] ?? '';
+        $where   = $matches[4] ?? '';
 
         $wheres = $this->resolveWhereString($where);
 

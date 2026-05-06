@@ -12,11 +12,9 @@ use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\AccountSettings;
-use MyParcelNL\Pdk\Facade\FrontendData;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings;
-use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
@@ -55,17 +53,13 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
      */
     public function carrierIsActive(Carrier $carrier): bool
     {
-        if (! $carrier->enabled) {
-            return false;
-        }
-
         $deliveryOptionsEnabled = Settings::get(CheckoutSettings::ENABLE_DELIVERY_OPTIONS, CheckoutSettings::ID);
 
         if (! $deliveryOptionsEnabled) {
             return false;
         }
 
-        $settings = Settings::get($carrier->externalIdentifier, CarrierSettings::ID);
+        $settings = Settings::get($carrier->carrier, CarrierSettings::ID);
 
         $allowDeliveryOptions = Arr::get($settings, CarrierSettings::ALLOW_DELIVERY_OPTIONS);
         $allowPickupLocations = Arr::get($settings, CarrierSettings::ALLOW_PICKUP_LOCATIONS);
@@ -86,7 +80,7 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
                 $builder = new CarrierBuilder($carrier);
                 $created = $builder->create();
 
-                Logger::debug(sprintf('Created carrier %s', $carrier->externalIdentifier));
+                Logger::debug(sprintf('Created carrier %s', $carrier->carrier));
 
                 return $created;
             }
@@ -112,7 +106,7 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     {
         $identifier = $this->getMyParcelCarrierIdentifier($input);
 
-        return $identifier ? new Carrier(['externalIdentifier' => $identifier]) : null;
+        return $identifier ? new Carrier(['carrier' => $identifier]) : null;
     }
 
     /**
@@ -137,7 +131,7 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     {
         $match = $this->carrierMappingRepository->firstWhere(
             MyparcelnlCarrierMapping::MYPARCEL_CARRIER,
-            $myParcelCarrier->externalIdentifier
+            $myParcelCarrier->carrier
         );
 
         return $match ? $this->get($match->getCarrierId()) : null;
@@ -178,10 +172,6 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
     public function updateCarriers(): void
     {
         $carriers = AccountSettings::getCarriers();
-
-        // Map to legacy carrier for BC compatibility
-        $carriers = FrontendData::carrierCollectionToLegacyFormat($carriers);
-
         $createdCarriers = $this->createOrUpdateCarriers($carriers);
         $this->deleteUnusedCarriers($createdCarriers);
     }

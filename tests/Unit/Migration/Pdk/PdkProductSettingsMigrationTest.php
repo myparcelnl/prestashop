@@ -61,6 +61,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             ProductSettings::EXCLUDE_PARCEL_LOCKERS   => TriStateService::INHERIT,
             ProductSettings::EXPORT_FRESH_FOOD        => TriStateService::INHERIT,
             ProductSettings::EXPORT_FROZEN            => TriStateService::INHERIT,
+            ProductSettings::EXPORT_COOLED_DELIVERY   => TriStateService::INHERIT,
         ], $result)
     );
 })->with([
