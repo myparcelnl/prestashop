@@ -60,6 +60,7 @@ trait HasPsCarrierListHooks
                     continue;
                 }
 
+                // Stored mappings may include a :contractId suffix (e.g. "DHL_FOR_YOU:1234").
                 [$v2Name] = explode(':', $carrierMapping->getMyparcelCarrier(), 2);
 
                 if (in_array($v2Name, $supported, true)) {
@@ -76,11 +77,11 @@ trait HasPsCarrierListHooks
      * hookActionFilterDeliveryOptionList; this hook is registered for compatibility
      * but produces no output.
      *
-     * @param  array $_params
+     * @param  array $params
      *
      * @return string
      */
-    public function hookDisplayCarrierList(array $_params): string
+    public function hookDisplayCarrierList(array $params): string
     {
         return '';
     }

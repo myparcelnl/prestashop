@@ -68,10 +68,13 @@ function fakeCapabilitiesRepositoryReturning(array $v2CarrierNames): CarrierCapa
 function fakeCapabilitiesRepositoryThrowing(): CarrierCapabilitiesRepository
 {
     return new class extends CarrierCapabilitiesRepository {
+        public int $callCount = 0;
+
         public function __construct() {}
 
         public function getCapabilitiesForRecipientCountry(string $cc): array
         {
+            $this->callCount++;
             throw new RuntimeException('Capabilities API returned 503');
         }
     };
@@ -249,15 +252,13 @@ it('keeps all carriers (fail-open) and logs an error when the capabilities call 
 it('does nothing and never calls capabilities when there are no carrier mappings', function () {
     [$params] = setupModuleWithMappings([]);
 
-    // Throwing repository: if the hook calls capabilities, the test fails on uncaught exception.
-    $reset = mockPdkProperty(
-        CarrierCapabilitiesRepository::class,
-        fakeCapabilitiesRepositoryThrowing()
-    );
+    $fake  = fakeCapabilitiesRepositoryThrowing();
+    $reset = mockPdkProperty(CarrierCapabilitiesRepository::class, $fake);
 
     try {
         (new WithHasPsCarrierListHooks())->hookActionFilterDeliveryOptionList($params);
 
+        expect($fake->callCount)->toBe(0);
         expect(Arr::first($params['delivery_option_list']))->toHaveLength(1); // only the PS-only carrier
     } finally {
         $reset();
