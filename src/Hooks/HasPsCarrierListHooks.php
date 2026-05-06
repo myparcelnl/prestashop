@@ -9,11 +9,13 @@ use Cart;
 use Country;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\PrestaShop\Configuration\Contract\PsConfigurationServiceInterface;
-use MyParcelNL\PrestaShop\Contract\PsCountryServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
+use Throwable;
 
 /**
  * @property \Context $context
@@ -21,7 +23,9 @@ use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 trait HasPsCarrierListHooks
 {
     /**
-     * Filters carriers from checkout based on country and if the carrier can ship there.
+     * Filter carriers from the checkout delivery-option list using the MyParcel
+     * capabilities API: a carrier is kept iff capabilities reports it for the cart's
+     * destination country.
      *
      * @param  array $params
      *
@@ -38,7 +42,14 @@ trait HasPsCarrierListHooks
             return;
         }
 
-        $country            = $this->getCountryFromCart($params['cart'] ?? $this->context->cart ?? new Cart());
+        $country   = $this->getCountryFromCart($params['cart'] ?? $this->context->cart ?? new Cart());
+        $supported = $this->getSupportedCarriersForCountry((string) $country->iso_code);
+
+        if ($supported === null) {
+            // Capabilities call failed — fail-open, keep every carrier visible.
+            return;
+        }
+
         $deliveryOptionList = $params['delivery_option_list'] ?? [];
 
         foreach ($deliveryOptionList as $addressId => $item) {
@@ -49,46 +60,62 @@ trait HasPsCarrierListHooks
                     continue;
                 }
 
-                $carrierName       = $carrierMapping->getMyparcelCarrier();
-                $allowedCountryIds = $this->getAllowedCountryIdsForCarrier($carrierName);
+                [$v2Name] = explode(':', $carrierMapping->getMyparcelCarrier(), 2);
 
-                if (in_array($country->id, array_values($allowedCountryIds), true)) {
+                if (in_array($v2Name, $supported, true)) {
                     continue;
                 }
 
-                // Delete the carrier from the list if it can't ship to the current country.
                 unset($params['delivery_option_list'][$addressId][$key]);
             }
         }
     }
 
     /**
-     * Hook for displaying content in the carrier list.
-     * This hook is registered but the functionality is handled by actionFilterDeliveryOptionList.
+     * Hook for displaying content in the carrier list. Filtering is handled by
+     * hookActionFilterDeliveryOptionList; this hook is registered for compatibility
+     * but produces no output.
      *
-     * @param array $params
+     * @param  array $params
+     *
      * @return string
      */
     public function hookDisplayCarrierList(array $params): string
     {
-        // The actual carrier filtering logic is handled by hookActionFilterDeliveryOptionList
-        // This hook is here for compatibility but doesn't need to output anything
         return '';
     }
 
     /**
-     * @param  string $carrierName
+     * Returns the V2 carrier names that capabilities lists as supported for the
+     * given destination country, or null if the API call failed (fail-open signal).
      *
-     * @return int[]
+     * @param  string $countryIso ISO 3166-1 alpha-2 destination country code
+     *
+     * @return null|string[]
      */
-    private function getAllowedCountryIdsForCarrier(string $carrierName): array
+    private function getSupportedCarriersForCountry(string $countryIso): ?array
     {
-        /** @var \MyParcelNL\PrestaShop\Contract\PsCountryServiceInterface $psCountryService */
-        $psCountryService = Pdk::get(PsCountryServiceInterface::class);
+        /** @var \MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository $repository */
+        $repository = Pdk::get(CarrierCapabilitiesRepository::class);
 
-        $isoCodes = $psCountryService->getCountriesForCarrier($carrierName);
+        try {
+            $capabilities = $repository->getCapabilitiesForRecipientCountry($countryIso);
+        } catch (Throwable $exception) {
+            Logger::error('Failed to fetch carrier capabilities for country.', [
+                'country' => $countryIso,
+                'message' => $exception->getMessage(),
+            ]);
 
-        return $psCountryService->getCountryIdsByIsoCodes($isoCodes);
+            return null;
+        }
+
+        $names = [];
+
+        foreach ($capabilities as $capability) {
+            $names[$capability->getCarrier()] = true;
+        }
+
+        return array_keys($names);
     }
 
     /**
