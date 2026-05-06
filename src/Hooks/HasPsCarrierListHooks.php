@@ -76,11 +76,11 @@ trait HasPsCarrierListHooks
      * hookActionFilterDeliveryOptionList; this hook is registered for compatibility
      * but produces no output.
      *
-     * @param  array $params
+     * @param  array $_params
      *
      * @return string
      */
-    public function hookDisplayCarrierList(array $params): string
+    public function hookDisplayCarrierList(array $_params): string
     {
         return '';
     }
@@ -112,7 +112,7 @@ trait HasPsCarrierListHooks
         $names = [];
 
         foreach ($capabilities as $capability) {
-            $names[$capability->getCarrier()] = true;
+            $names[(string) $capability->getCarrier()] = true;
         }
 
         return array_keys($names);
