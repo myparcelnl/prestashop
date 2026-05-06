@@ -23,20 +23,20 @@ class MyParcelNLDeliveryOptionsModuleFrontController extends FrontControllerCore
                 ['type' => null, 'title' => 'Service Unavailable', 'status' => 503, 'detail' => 'Module is not enabled'],
                 503
             ))->send();
-            die(1);
+            die();
         }
 
         $response = $this->handleRequest();
         $response->send();
-        die(1);
+        die();
     }
 
     /**
-     * Separated from initContent() for testability (die(1) and module check cannot be tested).
+     * Separated from initContent() for testability (die() and module check cannot be tested).
      */
     public function handleRequest(): Response
     {
-        $authError = $this->authenticate();
+        $authError = $this->getAuthError();
         if ($authError !== null) {
             return $authError;
         }
@@ -47,11 +47,14 @@ class MyParcelNLDeliveryOptionsModuleFrontController extends FrontControllerCore
         return $handler->handle($request);
     }
 
-    private function authenticate(): ?Response
+    private function getAuthError(): ?Response
     {
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION']
+            ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+            ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? '') : '')
+            ?? '';
 
-        if (! str_starts_with($authHeader, 'Basic ')) {
+        if (strncmp($authHeader, 'Basic ', 6) !== 0) {
             return new JsonResponse(
                 ['type' => null, 'title' => 'Unauthorized', 'status' => 401, 'detail' => 'Missing or invalid Authorization header'],
                 401,
@@ -59,7 +62,8 @@ class MyParcelNLDeliveryOptionsModuleFrontController extends FrontControllerCore
             );
         }
 
-        $key = rtrim((string) base64_decode(substr($authHeader, 6), true), ':');
+        $decoded = (string) base64_decode(substr($authHeader, 6), true);
+        $key     = explode(':', $decoded, 2)[0];
 
         if (! $key) {
             return new JsonResponse(
@@ -129,8 +133,7 @@ class MyParcelNLDeliveryOptionsModuleFrontController extends FrontControllerCore
             $rows = Db::getInstance()->executeS($sql);
         } catch (\PrestaShopException $e) {
             // ps_webservice_account_rule table may not exist when PS webservice is not fully configured.
-            // Fall back to allowing any valid key rather than crashing.
-            return true;
+            return false;
         }
 
         return ! empty($rows);
