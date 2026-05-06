@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Entity;
 
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use MyParcelNL\PrestaShop\Tests\Factory\AbstractPsEntityFactory;
 
 /**
@@ -17,37 +17,37 @@ final class MyparcelnlCarrierMappingFactory extends AbstractPsEntityFactory
 {
     public function fromBpost(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_BPOST_LEGACY_NAME, $contractId);
+        return $this->fromCarrier(RefCapabilitiesSharedCarrierV2::BPOST, $contractId);
     }
 
     public function fromDhlEuroplus(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_EUROPLUS_LEGACY_NAME, $contractId);
+        return $this->fromCarrier(RefCapabilitiesSharedCarrierV2::DHL_EUROPLUS, $contractId);
     }
 
     public function fromDhlForYou(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME, $contractId);
+        return $this->fromCarrier(RefCapabilitiesSharedCarrierV2::DHL_FOR_YOU, $contractId);
     }
 
     public function fromDhlParcelConnect(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DHL_PARCEL_CONNECT_LEGACY_NAME, $contractId);
+        return $this->fromCarrier(RefCapabilitiesSharedCarrierV2::DHL_PARCEL_CONNECT, $contractId);
     }
 
     public function fromDpd(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_DPD_LEGACY_NAME, $contractId);
+        return $this->fromCarrier(RefCapabilitiesSharedCarrierV2::DPD, $contractId);
     }
 
     public function fromPostNL(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME, $contractId);
+        return $this->fromCarrier(RefCapabilitiesSharedCarrierV2::POSTNL, $contractId);
     }
 
     public function fromUps(int $contractId = null): self
     {
-        return $this->fromCarrier(Carrier::CARRIER_UPS_STANDARD_LEGACY_NAME, $contractId);
+        return $this->fromCarrier(RefCapabilitiesSharedCarrierV2::UPS_STANDARD, $contractId);
     }
 
     protected function getEntityClass(): string

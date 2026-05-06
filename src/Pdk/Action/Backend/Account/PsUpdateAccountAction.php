@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Action\Backend\Account;
 
 use MyParcelNL\Pdk\App\Action\Backend\Account\UpdateAccountAction;
+use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\AccountSettings;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
@@ -12,6 +13,7 @@ use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 final class PsUpdateAccountAction extends UpdateAccountAction
 {
@@ -36,15 +38,25 @@ final class PsUpdateAccountAction extends UpdateAccountAction
      */
     protected function updateAndSaveAccount(AccountSettings $accountSettings): void
     {
-        parent::updateAndSaveAccount($accountSettings);
+        try {
+            parent::updateAndSaveAccount($accountSettings);
+        } catch (Throwable $e) {
+            Logger::error('Account update partially failed', ['exception' => $e]);
+
+            return;
+        }
 
         /** @var string $uninstallMode */
         $uninstallMode = Pdk::get('updateAccountModeUninstall');
 
         if ($this->mode !== $uninstallMode) {
-            /** @var PsCarrierServiceInterface $carrierService */
-            $carrierService = Pdk::get(PsCarrierServiceInterface::class);
-            $carrierService->updateCarriers();
+            try {
+                /** @var PsCarrierServiceInterface $carrierService */
+                $carrierService = Pdk::get(PsCarrierServiceInterface::class);
+                $carrierService->updateCarriers();
+            } catch (Throwable $e) {
+                Logger::error('Failed to update carriers', ['exception' => $e]);
+            }
 
             MyParcelModule::registerHooks();
         }

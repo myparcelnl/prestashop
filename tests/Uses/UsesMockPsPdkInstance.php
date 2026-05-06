@@ -14,7 +14,8 @@ use Group;
 use Lang;
 use Manufacturer;
 use MyParcelNL;
-use MyParcelNL\Pdk\Account\Platform;
+use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Proposition\Proposition;
 use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
@@ -82,12 +83,11 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
         $fileSystem = Pdk::get(FileSystemInterface::class);
 
         $propositionService = Pdk::get(PropositionService::class);
-        $propositionService->setActivePropositionId(Platform::MYPARCEL_ID);
-        $propositionCarriers  = $propositionService->getCarriers(true);
+        $propositionService->setActivePropositionId(Proposition::MYPARCEL_ID);
 
-        foreach ($propositionCarriers as $carrier) {
+        foreach (array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP) as $carrierName) {
             foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
-                $filename = Pdk::get('carrierLogosDirectory') . $propositionService->mapNewToLegacyCarrierName($carrier->name) . $fileExtension;
+                $filename = Pdk::get('carrierLogosDirectory') . $carrierName . $fileExtension;
 
                 $fileSystem->put($filename, '[IMAGE]');
             }

@@ -157,6 +157,7 @@ final class PsInstallerService extends InstallerService
          * Always register hooks, since the methods may have changed. PrestaShop checks if hook is already registered.
          */
         MyParcelModule::registerHooks();
+        Tools::clearSf2Cache();
     }
 
     private function installDatabase(): void

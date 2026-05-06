@@ -40,5 +40,7 @@ return [
         'Symfony\\Contracts',
         'Symfony\\Polyfill',
         'GuzzleHttp',
+        'Psr\\Http\\Message',
+        'Psr\\Log',
     ],
 ];

@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Generator;
-use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Facade\Platform;
 use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
@@ -84,14 +83,19 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
             'carrier',
             DeliveryOptions::CARRIER,
             new TransformValue(function ($value) use ($propositionService) {
-                $carriers     = new Collection($propositionService->getCarriers());
-                $carrierNames = $carriers->pluck('name')->map(
-                    fn ($name) => $propositionService->mapNewToLegacyCarrierName($name)
-                );
+                $legacyNames = array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
 
-                return in_array($value, $carrierNames->toArray(), true)
-                    ? $value
-                    : $propositionService->mapNewToLegacyCarrierName($propositionService->getDefaultCarrier()->name);
+                if (in_array($value, $legacyNames, true)) {
+                    return $value;
+                }
+
+                try {
+                    $defaultCarrier = $propositionService->getDefaultCarrier();
+
+                    return Carrier::CARRIER_NAME_TO_LEGACY_MAP[$defaultCarrier->carrier] ?? $value;
+                } catch (\Throwable $e) {
+                    return $value;
+                }
             })
         );
 

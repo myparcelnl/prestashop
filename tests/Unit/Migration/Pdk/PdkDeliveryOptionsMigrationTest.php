@@ -8,10 +8,9 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Utils;
+use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Shipment\Model\ShipmentOptions;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
@@ -20,10 +19,21 @@ use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Order as PsOrder;
+use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
+use function MyParcelNL\PrestaShop\setupAccountAndCarriers;
 
 usesShared(new UsesMockPsPdkInstance());
+
+beforeEach(function () {
+    setupAccountAndCarriers(
+        factory(CarrierCollection::class)->push(
+            factory(Carrier::class)->fromPostNL(),
+            factory(Carrier::class)->fromDhlForYou()
+        )
+    );
+});
 
 /**
  * JSON encodes input if it's an array, merging it with given default values. Otherwise, just returns input.
@@ -104,17 +114,12 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         ShipmentOptions::FROZEN            => TriStateService::INHERIT,
         ShipmentOptions::PRIORITY_DELIVERY => TriStateService::INHERIT,
         ShipmentOptions::SATURDAY_DELIVERY => TriStateService::INHERIT,
+        ShipmentOptions::COOLED_DELIVERY   => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
-
-    $propositionService = Pdk::get(PropositionService::class);
 
     $fullResult = array_replace(
         array_replace([
-            DeliveryOptions::CARRIER       => [
-                'externalIdentifier' => $propositionService->mapNewToLegacyCarrierName(
-                    $propositionService->getDefaultCarrier()->name
-                ),
-            ],
+            DeliveryOptions::CARRIER       => 'POSTNL',
             DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::LABEL_AMOUNT  => 1,
             DeliveryOptions::PACKAGE_TYPE  => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,
@@ -132,7 +137,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER => ['externalIdentifier' => Carrier::CARRIER_POSTNL_LEGACY_NAME],
+                DeliveryOptions::CARRIER => 'POSTNL',
             ],
         ],
 
@@ -145,7 +150,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER       => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER       => 'DHL_FOR_YOU',
                 DeliveryOptions::DATE          => '2077-04-07 00:00:00',
                 DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_MORNING_NAME,
             ],
@@ -160,7 +165,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             ],
 
             'result' => [
-                DeliveryOptions::CARRIER      => ['externalIdentifier' => Carrier::CARRIER_POSTNL_LEGACY_NAME],
+                DeliveryOptions::CARRIER      => 'POSTNL',
                 DeliveryOptions::LABEL_AMOUNT => 5,
             ],
         ],
@@ -184,7 +189,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER          => 'DHL_FOR_YOU',
                 DeliveryOptions::SHIPMENT_OPTIONS => [
                     ShipmentOptions::INSURANCE         => 2000,
                     ShipmentOptions::AGE_CHECK         => TriStateService::ENABLED,
@@ -218,7 +223,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER          => 'DHL_FOR_YOU',
                 DeliveryOptions::SHIPMENT_OPTIONS => [
                     ShipmentOptions::INSURANCE         => 0,
                     ShipmentOptions::AGE_CHECK         => TriStateService::DISABLED,
@@ -254,7 +259,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER         => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER         => 'DHL_FOR_YOU',
                 DeliveryOptions::PICKUP_LOCATION => [
                     'boxNumber'       => 'box_number',
                     'cc'              => 'cc',
