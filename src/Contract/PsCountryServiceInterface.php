@@ -12,15 +12,6 @@ use Country as PsCountry;
 interface PsCountryServiceInterface extends PsSpecificObjectModelServiceInterface
 {
     /**
-     * @TODO: Replace this when Carrier Capabilities service is implemented.
-     *
-     * @param  string $carrierName
-     *
-     * @return array
-     */
-    public function getCountriesForCarrier(string $carrierName): array;
-
-    /**
      * @param  string $isoCode
      *
      * @return ?int

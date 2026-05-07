@@ -6,10 +6,6 @@ namespace MyParcelNL\PrestaShop\Service;
 
 use Country;
 use Country as PsCountry;
-use MyParcelNL\Pdk\Base\Service\CountryCodes;
-use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\PrestaShop\Contract\PsCountryServiceInterface;
 use MyParcelNL\Sdk\Support\Str;
 
@@ -23,40 +19,6 @@ final class PsCountryService extends PsSpecificObjectModelService implements PsC
      * @var array<string, int|false>
      */
     private static array $countryIdIsoCache = [];
-
-    /**
-     * @TODO: Remove this when Carrier Capabilities service is implemented.
-     *
-     * @param  string $carrierName
-     *
-     * @return array
-     */
-    public function getCountriesForCarrier(string $carrierName): array
-    {
-        $propositionService = Pdk::get(PropositionService::class);
-
-        // Resolve carrier identifier
-        [$resolvedCarrierName] = explode(':', $carrierName);
-
-        $propositionName     = $propositionService->getPropositionConfig()->proposition->key;
-        $allCarrierCountries = Pdk::get('countriesPerPlatformAndCarrier')[$propositionName] ?? [];
-        $countriesForCarrier = $allCarrierCountries[$resolvedCarrierName] ?? [];
-
-        if (true === ($countriesForCarrier['fakeDelivery'] ?? null)) {
-            $allCountries = CountryCodes::ALL;
-        } else {
-            $allCountries = array_merge(
-                $countriesForCarrier['deliveryCountries'] ?? [],
-                $countriesForCarrier['pickupCountries'] ?? []
-            );
-
-            // remove duplicates and sort
-            $allCountries = array_unique($allCountries);
-            sort($allCountries);
-        }
-
-        return $allCountries;
-    }
 
     /**
      * @param  string $isoCode
