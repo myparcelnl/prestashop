@@ -119,6 +119,20 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     }
 
     /**
+     * @param  string|int $id
+     *
+     * @return null|\MyParcelNL\Pdk\App\Order\Model\PdkOrder
+     */
+    public function find($id): ?PdkOrder
+    {
+        if (! $this->psOrderService->exists($id)) {
+            return null;
+        }
+
+        return $this->get($id);
+    }
+
+    /**
      * @param  \MyParcelNL\Pdk\App\Order\Model\PdkOrder $order
      *
      * @return \MyParcelNL\Pdk\App\Order\Model\PdkOrder

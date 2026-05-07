@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0704fdcfb5ed33422ebc655e8e4702c4",
+    "content-hash": "6d254d5e841be70de70d236929cd5408",
     "packages": [
         {
             "name": "alcohol/iso4217",
@@ -900,16 +900,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "3.4.1",
+            "version": "3.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "c0331d7b9184edfa1942550e674f3980e0fb6e84"
+                "reference": "5ced437915b2a0d6daec5fe6928243a1a104dc47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/c0331d7b9184edfa1942550e674f3980e0fb6e84",
-                "reference": "c0331d7b9184edfa1942550e674f3980e0fb6e84",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/5ced437915b2a0d6daec5fe6928243a1a104dc47",
+                "reference": "5ced437915b2a0d6daec5fe6928243a1a104dc47",
                 "shasum": ""
             },
             "require": {
@@ -959,9 +959,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v3.4.1"
+                "source": "https://github.com/myparcelnl/pdk/tree/v3.5.0"
             },
-            "time": "2026-04-02T07:54:54+00:00"
+            "time": "2026-04-30T16:38:59+00:00"
         },
         {
             "name": "myparcelnl/sdk",
@@ -5696,9 +5696,9 @@
     "platform": {
         "php": ">=7.4.0"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
