@@ -20,6 +20,7 @@ final class PsOrderDataRepository extends AbstractPsObjectRepository
      */
     public function findOneByApiIdentifier(string $apiIdentifier): ?MyparcelnlOrderData
     {
+        // The test repository does not implement Doctrine query builders.
         if (! method_exists($this->entityRepository, 'createQueryBuilder')) {
             return $this
                 ->all()
