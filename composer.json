@@ -1,6 +1,6 @@
 {
   "name": "myparcelnl/prestashop-module",
-  "version": "5.0.3",
+  "version": "5.1.0",
   "license": "MIT",
   "type": "prestashop-module",
   "require": {
