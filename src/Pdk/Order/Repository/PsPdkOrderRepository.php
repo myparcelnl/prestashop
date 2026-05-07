@@ -16,6 +16,7 @@ use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
+use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use MyParcelNL\PrestaShop\Service\PsProductService;
 use Order as PsOrder;
@@ -48,6 +49,11 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     private $psOrderShipmentRepository;
 
     /**
+     * @var \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository
+     */
+    private $psOrderDataRepository;
+
+    /**
      * @var \MyParcelNL\PrestaShop\Service\PsProductService
      */
     private PsProductService $psProductService;
@@ -55,6 +61,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     /**
      * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                       $storage
      * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository      $psOrderShipmentRepository
+     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository          $psOrderDataRepository
      * @param  \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface           $currencyService
      * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $productRepository
      * @param  \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter         $addressAdapter
@@ -64,6 +71,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     public function __construct(
         MemoryCacheStorage            $storage,
         PsOrderShipmentRepository     $psOrderShipmentRepository,
+        PsOrderDataRepository         $psOrderDataRepository,
         CurrencyServiceInterface      $currencyService,
         PdkProductRepositoryInterface $productRepository,
         PsAddressAdapter              $addressAdapter,
@@ -72,6 +80,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
     ) {
         parent::__construct($storage);
         $this->psOrderShipmentRepository = $psOrderShipmentRepository;
+        $this->psOrderDataRepository     = $psOrderDataRepository;
         $this->currencyService           = $currencyService;
         $this->productRepository         = $productRepository;
         $this->addressAdapter            = $addressAdapter;
@@ -116,6 +125,29 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository
                 ], $orderData)
             );
         });
+    }
+
+    /**
+     * @param  string $uuid
+     *
+     * @return null|\MyParcelNL\Pdk\App\Order\Model\PdkOrder
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function getByApiIdentifier(string $uuid): ?PdkOrder
+    {
+        $orderData = $this->psOrderDataRepository->findOneByApiIdentifier($uuid);
+
+        if (! $orderData) {
+            return null;
+        }
+
+        try {
+            return $this->get($orderData->getOrderId());
+        } catch (InvalidArgumentException $e) {
+            return null;
+        }
     }
 
     /**
