@@ -35,7 +35,7 @@ function validAuthHeader(): string
 function insertValidWebserviceAccount(): void
 {
     MockPsDb::insertRow('webservice_account', ['id_webservice_account' => 1, 'key' => 'VALID_KEY', 'active' => 1]);
-    MockPsDb::insertRow('webservice_account_rule', ['id_webservice_account' => 1, 'resource' => 'orders', 'GET' => 1]);
+    MockPsDb::insertRow('webservice_permission', ['id_webservice_account' => 1, 'resource' => 'orders', 'method' => 'GET']);
 }
 
 /**
@@ -130,7 +130,7 @@ it('returns 401 when webservice key is invalid', function () {
 it('returns 403 when webservice key lacks orders GET permission', function () {
     $_SERVER['HTTP_AUTHORIZATION'] = validAuthHeader();
     MockPsDb::insertRow('webservice_account', ['id_webservice_account' => 1, 'key' => 'VALID_KEY', 'active' => 1]);
-    // No webservice_account_rule row — no GET permission on orders.
+    // No webservice_permission row — no GET permission on orders.
 
     /** @var MyParcelNLDeliveryOptionsModuleFrontController $controller */
     $controller = new MyParcelNLDeliveryOptionsModuleFrontController();

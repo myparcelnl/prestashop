@@ -120,19 +120,16 @@ class MyParcelNLDeliveryOptionsModuleFrontController extends FrontControllerCore
 
     private function hasOrdersGetPermission(int $idAccount): bool
     {
-        // NOTE: SELECT id_webservice_account (not `GET`) so MockPsDb can parse the column.
-        // GET = 1 in WHERE works because both are word characters matched by the mock's regex.
         $sql = new DbQuery();
         $sql->select('id_webservice_account');
-        $sql->from('webservice_account_rule');
+        $sql->from('webservice_permission');
         $sql->where('id_webservice_account = ' . (int) $idAccount);
         $sql->where("resource = 'orders'");
-        $sql->where('GET = 1');
+        $sql->where("method = 'GET'");
 
         try {
             $rows = Db::getInstance()->executeS($sql);
         } catch (\PrestaShopException $e) {
-            // ps_webservice_account_rule table may not exist when PS webservice is not fully configured.
             return false;
         }
 
