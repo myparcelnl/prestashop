@@ -41,9 +41,10 @@ final class PsPreInstallService
 
     private function prepareEntityManager(): void
     {
-        /** @var EntityManagerInterface $entityManager */
         $entityManager = Pdk::get('ps.entityManager');
 
-        DoctrineEntityRegistrar::register($entityManager);
+        if ($entityManager instanceof EntityManagerInterface) {
+            DoctrineEntityRegistrar::register($entityManager);
+        }
     }
 }

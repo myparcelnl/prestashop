@@ -78,5 +78,5 @@ it('runs upgrade with (invalid) old api key saved', function () {
         return $log['message'];
     }, $errorLogs);
 
-    expect($errorMessages)->toContain('Account update partially failed');
+    expect($errorMessages)->toContain('[PDK]: Account update partially failed');
 });

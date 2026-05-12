@@ -543,13 +543,16 @@
         {
             "name": "justinrainbow/json-schema",
             "version": "5.3.4",
+            "version": "5.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jsonrainbow/json-schema.git",
-                "reference": "7df70ffaf31d98726801b4bc099e1fbdbe2e5e54"
+                "reference": "7df70ffaf31d98726801b4bc099e1fbdbe2e5e54""reference": "7df70ffaf31d98726801b4bc099e1fbdbe2e5e54"
             },
             "dist": {
                 "type": "zip",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/7df70ffaf31d98726801b4bc099e1fbdbe2e5e54",
+                "reference": "7df70ffaf31d98726801b4bc099e1fbdbe2e5e54",
                 "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/7df70ffaf31d98726801b4bc099e1fbdbe2e5e54",
                 "reference": "7df70ffaf31d98726801b4bc099e1fbdbe2e5e54",
                 "shasum": ""
@@ -601,9 +604,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
-                "source": "https://github.com/jsonrainbow/json-schema/tree/5.3.4"
+                "source": "https://github.com/jsonrainbow/json-schema/tree/5.3.4""source": "https://github.com/jsonrainbow/json-schema/tree/5.3.4"
             },
-            "time": "2026-05-04T18:54:58+00:00"
+            "time": "2026-05-04T18:54:58+00:00""time": "2026-05-04T18:54:58+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -900,16 +903,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "3.5.1",
+            "version": "dev-v4-capabilities",
             "source": {
                 "type": "git",
-                "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "74bebb92fcbb9ef8618ded126ed124ecdc1b267a"
+                "url": "https://github.com/myparcelnl/pdk",
+                "reference": "933c582d42b018627cd95be0d4fefc2629c7f4c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/74bebb92fcbb9ef8618ded126ed124ecdc1b267a",
-                "reference": "74bebb92fcbb9ef8618ded126ed124ecdc1b267a",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/933c582d42b018627cd95be0d4fefc2629c7f4c7",
+                "reference": "933c582d42b018627cd95be0d4fefc2629c7f4c7",
                 "shasum": ""
             },
             "require": {
@@ -945,7 +948,61 @@
                     "MyParcelNL\\Pdk\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "MyParcelNL\\Pdk\\": [
+                        "tests/Unit/",
+                        "tests/factories"
+                    ],
+                    "MyParcelNL\\Pdk\\Console\\": "private/",
+                    "MyParcelNL\\Pdk\\Tests\\": "tests/"
+                },
+                "files": [
+                    "tests/functions.php",
+                    "tests/usesShared.php"
+                ]
+            },
+            "scripts": {
+                "analyse": [
+                    "php -dmemory_limit=-1 vendor/bin/phpstan analyse"
+                ],
+                "analyse:generate": [
+                    "composer run analyse -- --generate-baseline phpstan-baseline.php --allow-empty-baseline"
+                ],
+                "analyze": [
+                    "composer run analyse"
+                ],
+                "analyze:generate": [
+                    "composer run analyse:generate"
+                ],
+                "console": [
+                    "php bin/console"
+                ],
+                "post-autoload-dump": [
+                    "composer console generate:ide-helper"
+                ],
+                "quality": [
+                    "rector process --dry-run"
+                ],
+                "quality:fix": [
+                    "rector process"
+                ],
+                "test": [
+                    "composer run test:unit && composer run test:integration"
+                ],
+                "test:integration": [
+                    "behat"
+                ],
+                "test:unit": [
+                    "php -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest"
+                ],
+                "test:unit:coverage": [
+                    "php -dmemory_limit=512M -dpcov.enabled=1 vendor/bin/pest --coverage-clover clover.xml"
+                ],
+                "test:unit:snapshot": [
+                    "pest -d --update-snapshots"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -957,11 +1014,7 @@
             ],
             "description": "MyParcel Plugin Development Kit",
             "homepage": "https://myparcel.nl",
-            "support": {
-                "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v3.5.1"
-            },
-            "time": "2026-05-12T07:51:19+00:00"
+            "time": "2026-05-11T10:01:09+00:00"
         },
         {
             "name": "myparcelnl/sdk",
@@ -2111,13 +2164,16 @@
         {
             "name": "symfony/polyfill-ctype",
             "version": "v1.37.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "141046a8f9477948ff284fa65be2095baafb94f2"
+                "reference": "141046a8f9477948ff284fa65be2095baafb94f2""reference": "141046a8f9477948ff284fa65be2095baafb94f2"
             },
             "dist": {
                 "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/141046a8f9477948ff284fa65be2095baafb94f2",
+                "reference": "141046a8f9477948ff284fa65be2095baafb94f2",
                 "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/141046a8f9477948ff284fa65be2095baafb94f2",
                 "reference": "141046a8f9477948ff284fa65be2095baafb94f2",
                 "shasum": ""
@@ -2169,7 +2225,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.37.0""source": "https://github.com/symfony/polyfill-ctype/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -2189,18 +2245,21 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T16:19:22+00:00"
+            "time": "2026-04-10T16:19:22+00:00""time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
             "version": "v1.37.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315"
+                "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315""reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315"
             },
             "dist": {
                 "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/6a21eb99c6973357967f6ce3708cd55a6bec6315",
+                "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315",
                 "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/6a21eb99c6973357967f6ce3708cd55a6bec6315",
                 "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315",
                 "shasum": ""
@@ -2254,7 +2313,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.37.0""source": "https://github.com/symfony/polyfill-mbstring/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -2274,18 +2333,21 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T17:25:58+00:00"
+            "time": "2026-04-10T17:25:58+00:00""time": "2026-04-10T17:25:58+00:00"
         },
         {
             "name": "symfony/polyfill-php80",
             "version": "v1.37.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411"
+                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411""reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411"
             },
             "dist": {
                 "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
+                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
                 "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
                 "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
                 "shasum": ""
@@ -2338,7 +2400,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0""source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -2358,7 +2420,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T16:19:22+00:00"
+            "time": "2026-04-10T16:19:22+00:00""time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/psr-http-message-bridge",
@@ -4950,16 +5012,16 @@
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-            "version": "v1.33.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
-                "reference": "380872130d3a5dd3ace2f4010d95125fde5d5c70"
+                "reference": "4864388bfbd3001ce88e234fab652acd91fdc57e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/380872130d3a5dd3ace2f4010d95125fde5d5c70",
-                "reference": "380872130d3a5dd3ace2f4010d95125fde5d5c70",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/4864388bfbd3001ce88e234fab652acd91fdc57e",
+                "reference": "4864388bfbd3001ce88e234fab652acd91fdc57e",
                 "shasum": ""
             },
             "require": {
@@ -5008,7 +5070,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -5028,10 +5090,11 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-27T09:58:17+00:00"
+            "time": "2026-04-26T13:13:48+00:00"
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
+            "version": "v1.37.0",
             "version": "v1.37.0",
             "source": {
                 "type": "git",
@@ -5093,7 +5156,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.37.0""source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -5691,11 +5754,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
-        "myparcelnl/sdk": 10
+        "myparcelnl/pdk": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4.0"
@@ -5704,5 +5767,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.9.0""plugin-api-version": "2.9.0"
 }

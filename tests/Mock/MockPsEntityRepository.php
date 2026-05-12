@@ -90,4 +90,16 @@ class MockPsEntityRepository extends \Doctrine\ORM\EntityRepository
     {
         MockPsEntities::add($this->entity);
     }
+
+    /**
+     * Return a minimal fluent QueryBuilder mock backed by findAll(). The migration code
+     * uses setFirstResult/setMaxResults/getQuery()->getResult() for batched iteration —
+     * the mock honours both offsets so multi-batch test scenarios converge.
+     *
+     * @param  string $alias unused; matches the Doctrine signature
+     */
+    public function createQueryBuilder(string $alias): MockPsQueryBuilder
+    {
+        return new MockPsQueryBuilder($this->findAll());
+    }
 }

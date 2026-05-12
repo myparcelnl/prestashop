@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use MyParcelNL\Pdk\App\Options\Definition\PriorityDeliveryDefinition;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
@@ -62,6 +63,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             ProductSettings::EXPORT_FRESH_FOOD        => TriStateService::INHERIT,
             ProductSettings::EXPORT_FROZEN            => TriStateService::INHERIT,
             ProductSettings::EXPORT_COOLED_DELIVERY   => TriStateService::INHERIT,
+            (new PriorityDeliveryDefinition())->getProductSettingsKey() => TriStateService::INHERIT,
         ], $result)
     );
 })->with([
