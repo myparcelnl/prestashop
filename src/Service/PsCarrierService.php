@@ -9,6 +9,7 @@ use Context;
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Base\Support\SettingKey;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\AccountSettings;
@@ -17,6 +18,8 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefTypesDeliveryTypeV2;
 use MyParcelNL\PrestaShop\Carrier\Service\CarrierBuilder;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
@@ -61,8 +64,8 @@ final class PsCarrierService extends PsSpecificObjectModelService implements PsC
 
         $settings = Settings::get($carrier->carrier, CarrierSettings::ID);
 
-        $allowDeliveryOptions = Arr::get($settings, CarrierSettings::ALLOW_DELIVERY_OPTIONS);
-        $allowPickupLocations = Arr::get($settings, CarrierSettings::ALLOW_PICKUP_LOCATIONS);
+        $allowDeliveryOptions = Arr::get($settings, SettingKey::allow(DeliveryOptions::DELIVERY_OPTION_ALLOW_HOME));
+        $allowPickupLocations = Arr::get($settings, SettingKey::allow(RefTypesDeliveryTypeV2::PICKUP));
 
         return Arr::get($settings, CarrierSettings::DELIVERY_OPTIONS_ENABLED)
             && ($allowDeliveryOptions || $allowPickupLocations);

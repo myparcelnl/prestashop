@@ -10,14 +10,16 @@ use Cart;
 use CartFactory;
 use Context;
 use FrontController;
+use MyParcelNL\Pdk\App\Options\Definition\SignatureDefinition;
+use MyParcelNL\Pdk\Base\Support\SettingKey;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefTypesDeliveryTypeV2;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
-use MyParcelNL\Pdk\Shipment\Model\ShipmentOptions;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
@@ -102,7 +104,7 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
                     ->withCarrierId(93)
                     ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)->withCarrierPostNl([
-                    CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 2.95,
+                    SettingKey::priceDeliveryType(RefTypesDeliveryTypeV2::STANDARD) => 2.95,
                 ]),
             ]))->store();
 
@@ -127,8 +129,8 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
                     ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)
                     ->withCarrierPostNl([
-                        CarrierSettings::PRICE_SIGNATURE              => 0.45,
-                        CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 4.95,
+                        (new SignatureDefinition())->getPriceSettingsKey()              => 0.45,
+                        SettingKey::priceDeliveryType(RefTypesDeliveryTypeV2::STANDARD) => 4.95,
                     ]),
             ]))->store();
 
@@ -138,7 +140,7 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
             DeliveryOptions::CARRIER          => RefCapabilitiesSharedCarrierV2::POSTNL,
             DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::SHIPMENT_OPTIONS => [
-                ShipmentOptions::SIGNATURE => true,
+                (new SignatureDefinition())->getShipmentOptionsKey() => true,
             ],
         ],
         'cost'   => 5.4,
@@ -196,7 +198,7 @@ it(
                     ->withCarrierId(93)
                     ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)->withCarrierPostNl([
-                    CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 2.95,
+                    SettingKey::priceDeliveryType(RefTypesDeliveryTypeV2::STANDARD) => 2.95,
                 ]),
             ]))->store();
 
@@ -224,8 +226,8 @@ it(
                     ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL),
                 factory(Settings::class)
                     ->withCarrierPostNl([
-                        CarrierSettings::PRICE_SIGNATURE              => 0.45,
-                        CarrierSettings::PRICE_DELIVERY_TYPE_STANDARD_DELIVERY => 4.95,
+                        (new SignatureDefinition())->getPriceSettingsKey()              => 0.45,
+                        SettingKey::priceDeliveryType(RefTypesDeliveryTypeV2::STANDARD) => 4.95,
                     ]),
             ]))->store();
 
@@ -235,7 +237,7 @@ it(
             DeliveryOptions::CARRIER          => RefCapabilitiesSharedCarrierV2::POSTNL,
             DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::SHIPMENT_OPTIONS => [
-                ShipmentOptions::SIGNATURE => true,
+                (new SignatureDefinition())->getShipmentOptionsKey() => true,
             ],
         ],
         'cost'   => 5.4,

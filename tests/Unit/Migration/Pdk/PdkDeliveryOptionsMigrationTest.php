@@ -6,6 +6,23 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use MyParcelNL\Pdk\App\Options\Definition\AgeCheckDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\CollectDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\CooledDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\DirectReturnDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\ExcludeParcelLockersDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\FreshFoodDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\FrozenDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\HideSenderDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\InsuranceDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\LargeFormatDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\OnlyRecipientDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\PriorityDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\ReceiptCodeDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SameDayDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SaturdayDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SignatureDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\TrackedDefinition;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
@@ -97,24 +114,24 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
     $deliveryOptionsArray = $order->deliveryOptions->toStorableArray();
 
     $finalShipmentOptions = Utils::filterNull(array_replace([
-        ShipmentOptions::AGE_CHECK         => TriStateService::INHERIT,
-        ShipmentOptions::DIRECT_RETURN     => TriStateService::INHERIT,
-        ShipmentOptions::HIDE_SENDER       => TriStateService::INHERIT,
-        ShipmentOptions::INSURANCE         => TriStateService::INHERIT,
-        ShipmentOptions::LABEL_DESCRIPTION => TriStateService::INHERIT,
-        ShipmentOptions::LARGE_FORMAT      => TriStateService::INHERIT,
-        ShipmentOptions::ONLY_RECIPIENT    => TriStateService::INHERIT,
-        ShipmentOptions::RECEIPT_CODE      => TriStateService::INHERIT,
-        ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::INHERIT,
-        ShipmentOptions::SIGNATURE         => TriStateService::INHERIT,
-        ShipmentOptions::TRACKED           => TriStateService::INHERIT,
-        ShipmentOptions::COLLECT           => TriStateService::INHERIT,
-        ShipmentOptions::EXCLUDE_PARCEL_LOCKERS => TriStateService::INHERIT,
-        ShipmentOptions::FRESH_FOOD        => TriStateService::INHERIT,
-        ShipmentOptions::FROZEN            => TriStateService::INHERIT,
-        ShipmentOptions::PRIORITY_DELIVERY => TriStateService::INHERIT,
-        ShipmentOptions::SATURDAY_DELIVERY => TriStateService::INHERIT,
-        ShipmentOptions::COOLED_DELIVERY   => TriStateService::INHERIT,
+        (new AgeCheckDefinition())->getShipmentOptionsKey()            => TriStateService::INHERIT,
+        (new DirectReturnDefinition())->getShipmentOptionsKey()        => TriStateService::INHERIT,
+        (new HideSenderDefinition())->getShipmentOptionsKey()          => TriStateService::INHERIT,
+        (new InsuranceDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
+        ShipmentOptions::LABEL_DESCRIPTION                             => TriStateService::INHERIT,
+        (new LargeFormatDefinition())->getShipmentOptionsKey()         => TriStateService::INHERIT,
+        (new OnlyRecipientDefinition())->getShipmentOptionsKey()       => TriStateService::INHERIT,
+        (new ReceiptCodeDefinition())->getShipmentOptionsKey()         => TriStateService::INHERIT,
+        (new SameDayDeliveryDefinition())->getShipmentOptionsKey()     => TriStateService::INHERIT,
+        (new SignatureDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
+        (new TrackedDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
+        (new CollectDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
+        (new ExcludeParcelLockersDefinition())->getShipmentOptionsKey() => TriStateService::INHERIT,
+        (new FreshFoodDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
+        (new FrozenDefinition())->getShipmentOptionsKey()              => TriStateService::INHERIT,
+        (new PriorityDeliveryDefinition())->getShipmentOptionsKey()    => TriStateService::INHERIT,
+        (new SaturdayDeliveryDefinition())->getShipmentOptionsKey()    => TriStateService::INHERIT,
+        (new CooledDeliveryDefinition())->getShipmentOptionsKey()      => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
 
     $fullResult = array_replace(
@@ -191,15 +208,15 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'result' => [
                 DeliveryOptions::CARRIER          => 'DHL_FOR_YOU',
                 DeliveryOptions::SHIPMENT_OPTIONS => [
-                    ShipmentOptions::INSURANCE         => 2000,
-                    ShipmentOptions::AGE_CHECK         => TriStateService::ENABLED,
-                    ShipmentOptions::HIDE_SENDER       => TriStateService::ENABLED,
-                    ShipmentOptions::LARGE_FORMAT      => TriStateService::ENABLED,
-                    ShipmentOptions::ONLY_RECIPIENT    => TriStateService::ENABLED,
-                    ShipmentOptions::DIRECT_RETURN     => TriStateService::ENABLED,
-                    ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::ENABLED,
-                    ShipmentOptions::SIGNATURE         => TriStateService::ENABLED,
-                    ShipmentOptions::LABEL_DESCRIPTION => 'hello',
+                    (new InsuranceDefinition())->getShipmentOptionsKey()       => 2000,
+                    (new AgeCheckDefinition())->getShipmentOptionsKey()        => TriStateService::ENABLED,
+                    (new HideSenderDefinition())->getShipmentOptionsKey()      => TriStateService::ENABLED,
+                    (new LargeFormatDefinition())->getShipmentOptionsKey()     => TriStateService::ENABLED,
+                    (new OnlyRecipientDefinition())->getShipmentOptionsKey()   => TriStateService::ENABLED,
+                    (new DirectReturnDefinition())->getShipmentOptionsKey()    => TriStateService::ENABLED,
+                    (new SameDayDeliveryDefinition())->getShipmentOptionsKey() => TriStateService::ENABLED,
+                    (new SignatureDefinition())->getShipmentOptionsKey()       => TriStateService::ENABLED,
+                    ShipmentOptions::LABEL_DESCRIPTION                         => 'hello',
                 ],
             ],
         ],
@@ -225,15 +242,15 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'result' => [
                 DeliveryOptions::CARRIER          => 'DHL_FOR_YOU',
                 DeliveryOptions::SHIPMENT_OPTIONS => [
-                    ShipmentOptions::INSURANCE         => 0,
-                    ShipmentOptions::AGE_CHECK         => TriStateService::DISABLED,
-                    ShipmentOptions::HIDE_SENDER       => TriStateService::DISABLED,
-                    ShipmentOptions::LARGE_FORMAT      => TriStateService::DISABLED,
-                    ShipmentOptions::ONLY_RECIPIENT    => TriStateService::DISABLED,
-                    ShipmentOptions::DIRECT_RETURN     => TriStateService::DISABLED,
-                    ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::DISABLED,
-                    ShipmentOptions::SIGNATURE         => TriStateService::DISABLED,
-                    ShipmentOptions::LABEL_DESCRIPTION => 'hello',
+                    (new InsuranceDefinition())->getShipmentOptionsKey()       => 0,
+                    (new AgeCheckDefinition())->getShipmentOptionsKey()        => TriStateService::DISABLED,
+                    (new HideSenderDefinition())->getShipmentOptionsKey()      => TriStateService::DISABLED,
+                    (new LargeFormatDefinition())->getShipmentOptionsKey()     => TriStateService::DISABLED,
+                    (new OnlyRecipientDefinition())->getShipmentOptionsKey()   => TriStateService::DISABLED,
+                    (new DirectReturnDefinition())->getShipmentOptionsKey()    => TriStateService::DISABLED,
+                    (new SameDayDeliveryDefinition())->getShipmentOptionsKey() => TriStateService::DISABLED,
+                    (new SignatureDefinition())->getShipmentOptionsKey()       => TriStateService::DISABLED,
+                    ShipmentOptions::LABEL_DESCRIPTION                         => 'hello',
                 ],
             ],
         ],
