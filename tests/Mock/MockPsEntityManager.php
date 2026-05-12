@@ -46,4 +46,13 @@ final class MockPsEntityManager extends BaseMock implements StaticMockInterface
     {
         MockPsEntities::addOrUpdate($entity);
     }
+
+    /**
+     * Doctrine clears its identity map after a batch flush. The in-memory MockPsEntities
+     * store has no identity map to clear, so this is a no-op kept for interface parity
+     * with the migration batching code.
+     */
+    public function clear(): void
+    {
+    }
 }

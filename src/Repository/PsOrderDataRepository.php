@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Repository;
 
+use Doctrine\ORM\EntityRepository;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
 
 /**
@@ -20,8 +21,10 @@ final class PsOrderDataRepository extends AbstractPsObjectRepository
      */
     public function findOneByApiIdentifier(string $apiIdentifier): ?MyparcelnlOrderData
     {
-        // The test repository does not implement Doctrine query builders.
-        if (! method_exists($this->entityRepository, 'createQueryBuilder')) {
+        // The test mock repository exposes createQueryBuilder for batched-iteration
+        // scenarios but does not implement DQL where/parameter binding, so route
+        // any non-Doctrine repository through an in-memory match instead.
+        if (! $this->entityRepository instanceof EntityRepository) {
             return $this
                 ->all()
                 ->first(static function (MyparcelnlOrderData $orderData) use ($apiIdentifier): bool {
