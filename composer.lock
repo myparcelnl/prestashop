@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "56812bda7c5ed76fff62e2d0e252111c",
+    "content-hash": "1bb6666f7357e8cb7ed142f0d512cb9f",
     "packages": [
         {
             "name": "alcohol/iso4217",
@@ -542,16 +542,16 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "5.3.3",
+            "version": "5.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jsonrainbow/json-schema.git",
-                "reference": "a0b7c13588b102d7d6536823e96d1c88d3dba85e"
+                "reference": "7df70ffaf31d98726801b4bc099e1fbdbe2e5e54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/a0b7c13588b102d7d6536823e96d1c88d3dba85e",
-                "reference": "a0b7c13588b102d7d6536823e96d1c88d3dba85e",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/7df70ffaf31d98726801b4bc099e1fbdbe2e5e54",
+                "reference": "7df70ffaf31d98726801b4bc099e1fbdbe2e5e54",
                 "shasum": ""
             },
             "require": {
@@ -601,9 +601,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
-                "source": "https://github.com/jsonrainbow/json-schema/tree/5.3.3"
+                "source": "https://github.com/jsonrainbow/json-schema/tree/5.3.4"
             },
-            "time": "2026-03-24T18:47:53+00:00"
+            "time": "2026-05-04T18:54:58+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -900,16 +900,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "3.5.0",
+            "version": "3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "5ced437915b2a0d6daec5fe6928243a1a104dc47"
+                "reference": "74bebb92fcbb9ef8618ded126ed124ecdc1b267a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/5ced437915b2a0d6daec5fe6928243a1a104dc47",
-                "reference": "5ced437915b2a0d6daec5fe6928243a1a104dc47",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/74bebb92fcbb9ef8618ded126ed124ecdc1b267a",
+                "reference": "74bebb92fcbb9ef8618ded126ed124ecdc1b267a",
                 "shasum": ""
             },
             "require": {
@@ -959,9 +959,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v3.5.0"
+                "source": "https://github.com/myparcelnl/pdk/tree/v3.5.1"
             },
-            "time": "2026-04-30T16:38:59+00:00"
+            "time": "2026-05-12T07:51:19+00:00"
         },
         {
             "name": "myparcelnl/sdk",
