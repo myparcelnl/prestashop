@@ -6,7 +6,6 @@ on:
       - main
       - beta
       - alpha
-      - capabilities
 
   workflow_dispatch:
 
