@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Router\Service;
 
 use Context;
+use Link;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use Symfony\Component\Config\FileLocator;
@@ -17,16 +18,6 @@ final class Ps8RouterService extends PsRouterService
      * @var \Symfony\Component\Routing\Router
      */
     private Router $router;
-
-    /**
-     * On the checkout (order) page the Symfony container isn't available, so we
-     * build a standalone Router from routes.yml. That router has no knowledge of
-     * the /modules/ prefix PrestaShop applies when it imports module routes, so
-     * we track it and prepend the prefix ourselves.
-     *
-     * @var bool
-     */
-    private bool $useModulePrefix = false;
 
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface $storage
@@ -47,9 +38,18 @@ final class Ps8RouterService extends PsRouterService
      */
     protected function generateRoute(string $route): string
     {
-        $url = $this->router->generate($route);
+        // On the checkout page the Symfony container isn't available, so the
+        // myparcelnl_frontend route (module front controller) must be resolved via
+        // Link::getModuleLink() — the only way to get a URL that works on any PS
+        // installation regardless of URL-rewriting or nginx configuration.
+        if ($this->isCheckoutPage() && Pdk::get('routeNameFrontend') === $route) {
+            /** @var Link $link */
+            $link = Context::getContext()->link;
 
-        return $this->useModulePrefix ? '/modules' . $url : $url;
+            return $link->getModuleLink('myparcelnl', 'frontend');
+        }
+
+        return $this->router->generate($route);
     }
 
     /**
@@ -62,17 +62,22 @@ final class Ps8RouterService extends PsRouterService
         /** @var \Psr\Container\ContainerInterface $container */
         $container = Pdk::get('ps.container');
 
-        $controller = Context::getContext()->controller;
-
-        if ('order' === $controller->php_self) {
-            $routesDirectory       = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
-            $locator               = new FileLocator([$routesDirectory]);
-            $loader                = new YamlFileLoader($locator);
-            $this->useModulePrefix = true;
+        if ($this->isCheckoutPage()) {
+            $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
+            $locator         = new FileLocator([$routesDirectory]);
+            $loader          = new YamlFileLoader($locator);
 
             return new Router($loader, 'routes.yml');
         }
 
         return $container->get('prestashop.router');
+    }
+
+    /**
+     * @return bool
+     */
+    private function isCheckoutPage(): bool
+    {
+        return 'order' === Context::getContext()->controller->php_self;
     }
 }
