@@ -19,6 +19,16 @@ final class Ps8RouterService extends PsRouterService
     private Router $router;
 
     /**
+     * On the checkout (order) page the Symfony container isn't available, so we
+     * build a standalone Router from routes.yml. That router has no knowledge of
+     * the /modules/ prefix PrestaShop applies when it imports module routes, so
+     * we track it and prepend the prefix ourselves.
+     *
+     * @var bool
+     */
+    private bool $useModulePrefix = false;
+
+    /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface $storage
      *
      * @throws \Psr\Container\ContainerExceptionInterface
@@ -37,7 +47,9 @@ final class Ps8RouterService extends PsRouterService
      */
     protected function generateRoute(string $route): string
     {
-        return $this->router->generate($route);
+        $url = $this->router->generate($route);
+
+        return $this->useModulePrefix ? '/modules' . $url : $url;
     }
 
     /**
@@ -53,9 +65,10 @@ final class Ps8RouterService extends PsRouterService
         $controller = Context::getContext()->controller;
 
         if ('order' === $controller->php_self) {
-            $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
-            $locator         = new FileLocator([$routesDirectory]);
-            $loader          = new YamlFileLoader($locator);
+            $routesDirectory       = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
+            $locator               = new FileLocator([$routesDirectory]);
+            $loader                = new YamlFileLoader($locator);
+            $this->useModulePrefix = true;
 
             return new Router($loader, 'routes.yml');
         }
