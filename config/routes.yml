@@ -14,7 +14,7 @@ myparcelnl_settings:
     _legacy_link: 'MyParcelNLAdminSettings'
 
 ##
-# Route for the front-end page, used to render delivery options on checkout
+# Route for calling PDK frontend actions
 ##
 myparcelnl_frontend:
   path: myparcelnl/frontend
@@ -23,7 +23,7 @@ myparcelnl_frontend:
     _controller: 'MyParcelNL\PrestaShop\Controller\AdminMyParcelFrontController::index'
 
 ##
-# The controller that executes all PDK actions
+# The controller that executes all backend PDK actions
 ##
 myparcelnl_pdk:
   path: myparcelnl/pdk
