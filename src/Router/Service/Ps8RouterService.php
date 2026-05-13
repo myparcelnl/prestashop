@@ -78,6 +78,6 @@ final class Ps8RouterService extends PsRouterService
      */
     private function isCheckoutPage(): bool
     {
-        return 'order' === Context::getContext()->controller->php_self;
+        return 'order' === (Context::getContext()->controller->php_self ?? null);
     }
 }

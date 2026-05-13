@@ -21,9 +21,9 @@ final class AdminMyParcelFrontController extends AbstractAdminController
             $endpoint = Pdk::get(PdkEndpoint::class);
             $response = $endpoint->call($request, PdkEndpoint::CONTEXT_FRONTEND);
         } catch (Throwable $e) {
-            Logger::error($e->getMessage(), ['values' => $_REQUEST]);
+            Logger::error($e->getMessage(), ['action' => $_REQUEST['action'] ?? 'unknown']);
 
-            return new Response($e->getMessage(), 400);
+            return new Response('An error occurred', 400);
         }
 
         EntityManager::flush();

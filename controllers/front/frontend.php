@@ -26,9 +26,9 @@ class MyParcelNLFrontendModuleFrontController extends ModuleFrontController
             $request  = Request::createFromGlobals();
             $endpoint = Pdk::get(PdkEndpoint::class);
             $response = $endpoint->call($request, PdkEndpoint::CONTEXT_FRONTEND);
-        } catch (Throwable $e) {
-            Logger::error($e->getMessage(), ['values' => $_REQUEST]);
-            $this->sendResponse(400, $e->getMessage());
+        } catch (\Throwable $e) {
+            Logger::error($e->getMessage(), ['action' => $_REQUEST['action'] ?? 'unknown']);
+            $this->sendResponse(400, 'An error occurred');
         }
 
         EntityManager::flush();
