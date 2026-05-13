@@ -17,7 +17,7 @@ myparcelnl_settings:
 # Route for the front-end page, used to render delivery options on checkout
 ##
 myparcelnl_frontend:
-  path: myparcelnl/views
+  path: myparcelnl/frontend
   methods: [GET, POST]
   defaults:
     _controller: 'MyParcelNL\PrestaShop\Controller\AdminMyParcelFrontController::index'
