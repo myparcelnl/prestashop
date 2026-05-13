@@ -18,7 +18,7 @@ myparcelnl_settings:
 ##
 myparcelnl_frontend:
   path: myparcelnl/views
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'MyParcelNL\PrestaShop\Controller\AdminMyParcelFrontController::index'
 
