@@ -6,7 +6,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/myparcelnl/pdk",
+      "url": "git@github.com:myparcelnl/pdk.git",
       "no-api": true
     }
   ],
