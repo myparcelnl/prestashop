@@ -24,7 +24,11 @@
             "range_behavior": true,
             "shipping_external": true,
             "shipping_method": 2,
+            "delay": {
+                "1": "carrier_delivery_time"
+            },
             "id": 1,
+            "id_carrier": 1,
             "rangeWeights": [
                 {
                     "id_carrier": 1,
@@ -66,7 +70,11 @@
             "range_behavior": true,
             "shipping_external": true,
             "shipping_method": 2,
+            "delay": {
+                "1": "carrier_delivery_time"
+            },
             "id": 2,
+            "id_carrier": 2,
             "rangeWeights": [
                 {
                     "id_carrier": 2,
@@ -108,7 +116,11 @@
             "range_behavior": true,
             "shipping_external": true,
             "shipping_method": 2,
+            "delay": {
+                "1": "carrier_delivery_time"
+            },
             "id": 3,
+            "id_carrier": 3,
             "rangeWeights": [
                 {
                     "id_carrier": 3,

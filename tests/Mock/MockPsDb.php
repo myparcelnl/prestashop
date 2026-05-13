@@ -154,6 +154,10 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
     {
         $find = static function (array $item, array $where) {
             foreach ($where as $key => $value) {
+                if (! array_key_exists($key, $item)) {
+                    return false;
+                }
+
                 if (is_array($value) && ! in_array($item[$key], $value, true)) {
                     continue;
                 }
@@ -341,7 +345,8 @@ abstract class MockPsDb extends BaseMock implements StaticMockInterface
 
         $matches = array_map('trim', $matches);
 
-        [, $columns, $table, $where] = $matches;
+        [, $columns, $table] = $matches;
+        $where = $matches[3] ?? null;
 
         $wheres = $this->resolveWhereString($where);
 
