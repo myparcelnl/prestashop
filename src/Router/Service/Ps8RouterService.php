@@ -38,11 +38,10 @@ final class Ps8RouterService extends PsRouterService
      */
     protected function generateRoute(string $route): string
     {
-        // On the checkout page the Symfony container isn't available, so the
-        // myparcelnl_frontend route (module front controller) must be resolved via
-        // Link::getModuleLink() — the only way to get a URL that works on any PS
+        // The frontend endpoint is a module front controller, not a Symfony route.
+        // Link::getModuleLink() is the only reliable way to resolve it on any PS
         // installation regardless of URL-rewriting or nginx configuration.
-        if ($this->isCheckoutPage() && Pdk::get('routeNameFrontend') === $route) {
+        if (Pdk::get('routeNameFrontend') === $route) {
             /** @var Link $link */
             $link = Context::getContext()->link;
 

@@ -14,15 +14,6 @@ myparcelnl_settings:
     _legacy_link: 'MyParcelNLAdminSettings'
 
 ##
-# Route for calling PDK frontend actions
-##
-myparcelnl_frontend:
-  path: myparcelnl/frontend
-  methods: [GET, POST]
-  defaults:
-    _controller: 'MyParcelNL\PrestaShop\Controller\AdminMyParcelFrontController::index'
-
-##
 # The controller that executes all backend PDK actions
 ##
 myparcelnl_pdk:
