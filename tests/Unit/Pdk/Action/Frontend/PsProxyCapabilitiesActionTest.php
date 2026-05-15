@@ -27,7 +27,14 @@ dataset('frontend endpoint urls', [
 
 it('builds the frontend endpoint URL from the router service', function (string $url, array $parameters, string $expectBase) {
     $routerService = new class ($url, $parameters) implements PsRouterServiceInterface {
-        public function __construct(private string $url, private array $parameters) {}
+        private string $url;
+        private array $parameters;
+
+        public function __construct(string $url, array $parameters)
+        {
+            $this->url        = $url;
+            $this->parameters = $parameters;
+        }
 
         public function getBaseUrl(string $route): string
         {
