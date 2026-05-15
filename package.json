@@ -46,7 +46,6 @@
     "ws:test:run": "cd $0 && vitest run"
   },
   "resolutions": {
-    "@myparcel-dev/delivery-options": "^7.0.0",
     "eslint-plugin-prettier": "^4.2.1",
     "tar": "7.5.11",
     "axios": "1.15.0"

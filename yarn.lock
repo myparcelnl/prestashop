@@ -811,28 +811,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myparcel-dev/delivery-options@npm:^7.0.0":
-  version: 7.3.0
-  resolution: "@myparcel-dev/delivery-options@npm:7.3.0"
+"@myparcel-dev/delivery-options@npm:^6.25.0":
+  version: 6.26.1
+  resolution: "@myparcel-dev/delivery-options@npm:6.26.1"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.9.0"
-    "@myparcel-dev/do-shared": "npm:^7.3.0"
+    "@myparcel-dev/do-shared": "npm:^6.26.1"
     "@myparcel-dev/sdk": "npm:^5.0.0"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
     "@vueuse/core": "npm:^10.0.0"
     leaflet: "npm:^1.9.4"
     radash: "npm:^12.0.0"
     vue: "npm:^3.5.26"
-  checksum: 10c0/5e9e298a14df330fd3eacabfb725084440f0fe7436531e8fe872a0b44e5cc5c9ab6ebc254a99f1c4bb2d3feffe51edea12c5e0bb0e5a1aead7200f8dcc14fc6c
+  checksum: 10c0/51bac53a2d1e9c5981f3994b85162dba61fe9b1547af4d3e84273f7aef0525adadb6ac4bc7c2325c013e5e560456be8900bbbaa1d975405b09e4013982be2480
   languageName: node
   linkType: hard
 
-"@myparcel-dev/do-shared@npm:^7.3.0":
-  version: 7.3.0
-  resolution: "@myparcel-dev/do-shared@npm:7.3.0"
+"@myparcel-dev/do-shared@npm:^6.26.1":
+  version: 6.26.1
+  resolution: "@myparcel-dev/do-shared@npm:6.26.1"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.9.0"
-    "@myparcel-dev/do-shared": "npm:^7.3.0"
+    "@myparcel-dev/do-shared": "npm:^6.26.1"
     "@myparcel-dev/sdk": "npm:^5.0.0"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
     "@vueuse/core": "npm:^10.6.0"
@@ -841,7 +841,7 @@ __metadata:
     radash: "npm:^12.0.0"
     vue: "npm:^3.5.26"
     vue-tsc: "npm:^3.2.2"
-  checksum: 10c0/7aec2aa978cf084cea191021a43df27c923db64c82c00d8398c6d15c12e8710c3cfe7f365af5c5d8c6d903a7bf68256225cb60939eec0f192c9b8e247b2e748e
+  checksum: 10c0/90b505e636e252062db57c51e941766253b7b1a9ab0f62b42a12308ddf066251556fa96821d1c70901ab4aafffdfc8bb35205a4dc0ebef3bb6a859e2ba570e3b
   languageName: node
   linkType: hard
 
@@ -1244,7 +1244,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@myparcel-prestashop/frontend-checkout@workspace:views/js/frontend/checkout"
   dependencies:
-    "@myparcel-dev/delivery-options": "npm:^7.0.0"
     "@myparcel-dev/pdk-checkout": "npm:^1.7.3"
     "@myparcel-prestashop/vite-config": "workspace:*"
     "@types/jquery": "npm:^3.5.16"
