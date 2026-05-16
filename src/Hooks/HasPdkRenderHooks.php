@@ -51,8 +51,22 @@ trait HasPdkRenderHooks
             return '';
         }
 
-        // Always use PDK's standard rendering system - it handles minimal vs full boot internally
-        return Frontend::renderInitScript();
+        $html = Frontend::renderInitScript();
+
+        // PS9's product page runs displayAdminProductsExtra output through HTMLPurifier,
+        // which strips data-pdk-context. Render the component here (not purified) and
+        // move it into the placeholder rendered by displayAdminProductsExtra.
+        // TODO: remove when migrated to actionProductFormBuilderModifier
+        if (self::$pendingProductSettingsHtml) {
+            $html .= self::$pendingProductSettingsHtml;
+
+            if (preg_match('/id="([^"]+)"/', self::$pendingProductSettingsHtml, $idMatch)) {
+                $id = $idMatch[1];
+                $html .= "<script>document.getElementById('{$id}-placeholder')?.replaceWith(document.getElementById('{$id}'));</script>";
+            }
+        }
+
+        return $html;
     }
 
     /**

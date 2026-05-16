@@ -1,0 +1,21 @@
+services:
+  MyParcelNL\PrestaShop\Controller\SettingsController:
+    class: MyParcelNL\PrestaShop\Controller\SettingsController
+    autowire: true
+    autoconfigure: true
+    public: true
+    tags: ['controller.service_arguments']
+
+  MyParcelNL\PrestaShop\Controller\PdkController:
+    class: MyParcelNL\PrestaShop\Controller\PdkController
+    autowire: true
+    autoconfigure: true
+    public: true
+    tags: ['controller.service_arguments']
+
+  MyParcelNL\PrestaShop\Controller\WebhookController:
+    class: MyParcelNL\PrestaShop\Controller\WebhookController
+    autowire: true
+    autoconfigure: true
+    public: true
+    tags: ['controller.service_arguments']

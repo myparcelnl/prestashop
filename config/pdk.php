@@ -590,7 +590,7 @@ return [
      */
     'createSettingsKey' => factory(function (): callable {
         return static function (string $key): string {
-            return sprintf('_%s_%s', MyParcelNL::MODULE_NAME, $key);
+            return sprintf('_%s_%s', \MyParcelNL::MODULE_NAME, $key);
         };
     }),
 ];

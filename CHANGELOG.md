@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.0](https://github.com/myparcelnl/prestashop/compare/v5.0.3...v5.1.0) (2026-05-07)
+
+
+### :bug: Bug Fixes
+
+* **security:** fix CVE-2026-40175 and CVE-2025-62718 ([#503](https://github.com/myparcelnl/prestashop/issues/503)) ([4357dc6](https://github.com/myparcelnl/prestashop/commit/4357dc6810196760e3e7ad4eb330ae27ed3647cd))
+
+
+### :sparkles: New Features
+
+* add (default) export priority delivery setting ([#499](https://github.com/myparcelnl/prestashop/issues/499)) ([958cce3](https://github.com/myparcelnl/prestashop/commit/958cce376792e103051793eab0579b8f6d499d07))
+
 ## [5.0.3](https://github.com/myparcelnl/prestashop/compare/v5.0.2...v5.0.3) (2026-04-10)
 
 

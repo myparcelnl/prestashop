@@ -37,6 +37,19 @@ class AnnotationReader extends BaseMock { }
 
 class PsrCachedReader extends BaseMock { }
 
+namespace Doctrine\ORM;
+
+use Exception;
+use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
+
+class EntityManager extends BaseMock { }
+
+class EntityRepository extends BaseMock { }
+
+class EntityNotFoundException extends Exception { }
+
+interface EntityManagerInterface { }
+
 namespace Doctrine\ORM\Mapping\Driver;
 
 use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
