@@ -10,7 +10,6 @@ use MyParcelNL\Pdk\App\Options\Definition\AgeCheckDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\CollectDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\CooledDeliveryDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\DirectReturnDefinition;
-use MyParcelNL\Pdk\App\Options\Definition\ExcludeParcelLockersDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\FreshFoodDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\FrozenDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\HideSenderDefinition;
@@ -126,7 +125,6 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         (new SignatureDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
         (new TrackedDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
         (new CollectDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
-        (new ExcludeParcelLockersDefinition())->getShipmentOptionsKey() => TriStateService::INHERIT,
         (new FreshFoodDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
         (new FrozenDefinition())->getShipmentOptionsKey()              => TriStateService::INHERIT,
         (new PriorityDeliveryDefinition())->getShipmentOptionsKey()    => TriStateService::INHERIT,
