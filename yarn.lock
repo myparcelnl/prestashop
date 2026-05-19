@@ -812,27 +812,27 @@ __metadata:
   linkType: hard
 
 "@myparcel-dev/delivery-options@npm:^6.25.0":
-  version: 6.25.0
-  resolution: "@myparcel-dev/delivery-options@npm:6.25.0"
+  version: 6.26.1
+  resolution: "@myparcel-dev/delivery-options@npm:6.26.1"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.9.0"
-    "@myparcel-dev/do-shared": "npm:^6.25.0"
+    "@myparcel-dev/do-shared": "npm:^6.26.1"
     "@myparcel-dev/sdk": "npm:^5.0.0"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
     "@vueuse/core": "npm:^10.0.0"
     leaflet: "npm:^1.9.4"
     radash: "npm:^12.0.0"
     vue: "npm:^3.5.26"
-  checksum: 10c0/0a1324d312fb8a5a77298d7a32b6acaefa20269fc73c7f0ac74b2b29097fa48970ad9eeea06ee7eaecf7949502089f0e959b4e0acedb4ab31438c01004357a70
+  checksum: 10c0/51bac53a2d1e9c5981f3994b85162dba61fe9b1547af4d3e84273f7aef0525adadb6ac4bc7c2325c013e5e560456be8900bbbaa1d975405b09e4013982be2480
   languageName: node
   linkType: hard
 
-"@myparcel-dev/do-shared@npm:^6.25.0":
-  version: 6.25.0
-  resolution: "@myparcel-dev/do-shared@npm:6.25.0"
+"@myparcel-dev/do-shared@npm:^6.26.1":
+  version: 6.26.1
+  resolution: "@myparcel-dev/do-shared@npm:6.26.1"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.9.0"
-    "@myparcel-dev/do-shared": "npm:^6.25.0"
+    "@myparcel-dev/do-shared": "npm:^6.26.1"
     "@myparcel-dev/sdk": "npm:^5.0.0"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
     "@vueuse/core": "npm:^10.6.0"
@@ -841,7 +841,7 @@ __metadata:
     radash: "npm:^12.0.0"
     vue: "npm:^3.5.26"
     vue-tsc: "npm:^3.2.2"
-  checksum: 10c0/c87b42eabf563930727cf0ecec251ed15331f30d58105eada807f70094cfe12a13546162db6ea0f6875bec847c263747f1b622117f292b564fb164b5af1b3a03
+  checksum: 10c0/90b505e636e252062db57c51e941766253b7b1a9ab0f62b42a12308ddf066251556fa96821d1c70901ab4aafffdfc8bb35205a4dc0ebef3bb6a859e2ba570e3b
   languageName: node
   linkType: hard
 
