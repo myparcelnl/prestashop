@@ -3,13 +3,6 @@
   "version": "5.2.1",
   "license": "MIT",
   "type": "prestashop-module",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@github.com:myparcelnl/pdk.git",
-      "no-api": true
-    }
-  ],
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
