@@ -90,6 +90,7 @@ use function MyParcelNL\PrestaShop\psVersionFactory;
 return [
     'defaultCutoffTime'        => value('17:00'),
     'defaultCutoffTimeSameDay' => value('10:00'),
+    'deliveryOptionsVersion'   => value('7'),
 
     /**
      * Migrations

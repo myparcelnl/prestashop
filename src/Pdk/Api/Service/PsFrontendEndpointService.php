@@ -22,8 +22,8 @@ final class PsFrontendEndpointService extends AbstractFrontendEndpointService
     {
         $route = Pdk::get('routeNameFrontend');
 
-        $this->baseUrl              = $psRouterService->getBaseUrl($route);
-        $this->parameters['_token'] = $psRouterService->getRouteToken($route);
+        $this->baseUrl    = $psRouterService->getBaseUrl($route);
+        $this->parameters = array_filter(array_merge($this->parameters, $psRouterService->getRouteParameters($route)));
     }
 
     /**
