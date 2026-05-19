@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Generator;
+use MyParcelNL\Pdk\App\Options\Definition\AgeCheckDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\DirectReturnDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\InsuranceDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\LargeFormatDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\OnlyRecipientDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SignatureDefinition;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
@@ -57,6 +63,13 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
      */
     private function getProductSettingsTransformationMap(): Generator
     {
+        $ageCheckDef      = new AgeCheckDefinition();
+        $onlyRecipientDef = new OnlyRecipientDefinition();
+        $directReturnDef  = new DirectReturnDefinition();
+        $signatureDef     = new SignatureDefinition();
+        $insuranceDef     = new InsuranceDefinition();
+        $largeFormatDef   = new LargeFormatDefinition();
+
         yield new MigratableValue(
             'MYPARCELNL_PACKAGE_TYPE',
             ProductSettings::PACKAGE_TYPE,
@@ -65,37 +78,37 @@ final class PdkProductSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'MYPARCELNL_AGE_CHECK',
-            ProductSettings::EXPORT_AGE_CHECK,
+            $ageCheckDef->getProductSettingsKey(),
             new ToTriStateValue()
         );
 
         yield new MigratableValue(
             'MYPARCELNL_RECIPIENT_ONLY',
-            ProductSettings::EXPORT_ONLY_RECIPIENT,
+            $onlyRecipientDef->getProductSettingsKey(),
             new ToTriStateValue()
         );
 
         yield new MigratableValue(
             'MYPARCELNL_RETURN_PACKAGE',
-            ProductSettings::EXPORT_RETURN,
+            $directReturnDef->getProductSettingsKey(),
             new ToTriStateValue()
         );
 
         yield new MigratableValue(
             'MYPARCELNL_SIGNATURE_REQUIRED',
-            ProductSettings::EXPORT_SIGNATURE,
+            $signatureDef->getProductSettingsKey(),
             new ToTriStateValue()
         );
 
         yield new MigratableValue(
             'MYPARCELNL_INSURANCE',
-            ProductSettings::EXPORT_INSURANCE,
+            $insuranceDef->getProductSettingsKey(),
             new ToTriStateValue()
         );
 
         yield new MigratableValue(
             'MYPARCELNL_PACKAGE_FORMAT',
-            ProductSettings::EXPORT_LARGE_FORMAT,
+            $largeFormatDef->getProductSettingsKey(),
             new TransformValue(function ($value) {
                 switch ((int) $value) {
                     case 1:

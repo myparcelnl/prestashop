@@ -903,13 +903,13 @@
             "version": "dev-v4-capabilities",
             "source": {
                 "type": "git",
-                "url": "git@github.com:myparcelnl/pdk.git",
-                "reference": "933c582d42b018627cd95be0d4fefc2629c7f4c7"
+                "url": "https://github.com/myparcelnl/pdk.git",
+                "reference": "5ef7c12013af2d09c643748ad9424229c94da093"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/933c582d42b018627cd95be0d4fefc2629c7f4c7",
-                "reference": "933c582d42b018627cd95be0d4fefc2629c7f4c7",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/5ef7c12013af2d09c643748ad9424229c94da093",
+                "reference": "5ef7c12013af2d09c643748ad9424229c94da093",
                 "shasum": ""
             },
             "require": {
@@ -945,61 +945,7 @@
                     "MyParcelNL\\Pdk\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "MyParcelNL\\Pdk\\": [
-                        "tests/Unit/",
-                        "tests/factories"
-                    ],
-                    "MyParcelNL\\Pdk\\Console\\": "private/",
-                    "MyParcelNL\\Pdk\\Tests\\": "tests/"
-                },
-                "files": [
-                    "tests/functions.php",
-                    "tests/usesShared.php"
-                ]
-            },
-            "scripts": {
-                "analyse": [
-                    "php -dmemory_limit=-1 vendor/bin/phpstan analyse"
-                ],
-                "analyse:generate": [
-                    "composer run analyse -- --generate-baseline phpstan-baseline.php --allow-empty-baseline"
-                ],
-                "analyze": [
-                    "composer run analyse"
-                ],
-                "analyze:generate": [
-                    "composer run analyse:generate"
-                ],
-                "console": [
-                    "php bin/console"
-                ],
-                "post-autoload-dump": [
-                    "composer console generate:ide-helper"
-                ],
-                "quality": [
-                    "rector process --dry-run"
-                ],
-                "quality:fix": [
-                    "rector process"
-                ],
-                "test": [
-                    "composer run test:unit && composer run test:integration"
-                ],
-                "test:integration": [
-                    "behat"
-                ],
-                "test:unit": [
-                    "php -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest"
-                ],
-                "test:unit:coverage": [
-                    "php -dmemory_limit=512M -dpcov.enabled=1 vendor/bin/pest --coverage-clover clover.xml"
-                ],
-                "test:unit:snapshot": [
-                    "pest -d --update-snapshots"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1011,20 +957,24 @@
             ],
             "description": "MyParcel Plugin Development Kit",
             "homepage": "https://myparcel.nl",
-            "time": "2026-05-11T10:01:09+00:00"
+            "support": {
+                "issues": "https://github.com/myparcelnl/pdk/issues",
+                "source": "https://github.com/myparcelnl/pdk/tree/v4-capabilities"
+            },
+            "time": "2026-05-19T10:46:53+00:00"
         },
         {
             "name": "myparcelnl/sdk",
-            "version": "11.0.0-beta.17",
+            "version": "11.0.0-beta.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/sdk.git",
-                "reference": "c0698350227d2bbb9767467454aa2334ca45963f"
+                "reference": "a834d606bbb2ee8b51d87f68c07ad1aa1ca23e2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/c0698350227d2bbb9767467454aa2334ca45963f",
-                "reference": "c0698350227d2bbb9767467454aa2334ca45963f",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/a834d606bbb2ee8b51d87f68c07ad1aa1ca23e2e",
+                "reference": "a834d606bbb2ee8b51d87f68c07ad1aa1ca23e2e",
                 "shasum": ""
             },
             "require": {
@@ -1075,9 +1025,9 @@
             ],
             "support": {
                 "issues": "https://github.com/myparcelnl/sdk/issues",
-                "source": "https://github.com/myparcelnl/sdk/tree/v11.0.0-beta.17"
+                "source": "https://github.com/myparcelnl/sdk/tree/v11.0.0-beta.18"
             },
-            "time": "2026-04-16T04:18:50+00:00"
+            "time": "2026-05-15T14:57:32+00:00"
         },
         {
             "name": "php-di/invoker",

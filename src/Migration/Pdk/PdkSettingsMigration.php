@@ -7,8 +7,16 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 use DateTime;
 use DbQuery;
 use Generator;
+use MyParcelNL\Pdk\App\Options\Definition\AgeCheckDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\DirectReturnDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\InsuranceDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\LargeFormatDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\OnlyRecipientDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SaturdayDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SignatureDefinition;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Base\Support\SettingKey;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Facade\Settings as SettingsFacade;
@@ -19,7 +27,9 @@ use MyParcelNL\Pdk\Settings\Model\CustomsSettings;
 use MyParcelNL\Pdk\Settings\Model\LabelSettings;
 use MyParcelNL\Pdk\Settings\Model\OrderSettings;
 use MyParcelNL\Pdk\Settings\Model\Settings;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefTypesDeliveryTypeV2;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
@@ -72,6 +82,14 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
      */
     private function getCarrierSettingsTransformationMap(): Generator
     {
+        $ageCheckDef       = new AgeCheckDefinition();
+        $insuranceDef      = new InsuranceDefinition();
+        $largeFormatDef    = new LargeFormatDefinition();
+        $onlyRecipientDef  = new OnlyRecipientDefinition();
+        $directReturnDef   = new DirectReturnDefinition();
+        $signatureDef      = new SignatureDefinition();
+        $saturdayDef       = new SaturdayDeliveryDefinition();
+
         yield new MigratableValue(
             'MYPARCELNL_PACKAGE_TYPE',
             CarrierSettings::DEFAULT_PACKAGE_TYPE,
@@ -80,13 +98,13 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'MYPARCELNL_AGE_CHECK',
-            CarrierSettings::EXPORT_AGE_CHECK,
+            $ageCheckDef->getCarrierSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'MYPARCELNL_INSURANCE',
-            CarrierSettings::EXPORT_INSURANCE,
+            $insuranceDef->getCarrierSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
@@ -116,25 +134,25 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'MYPARCELNL_PACKAGE_FORMAT',
-            CarrierSettings::EXPORT_LARGE_FORMAT,
+            $largeFormatDef->getCarrierSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'MYPARCELNL_RECIPIENT_ONLY',
-            CarrierSettings::EXPORT_ONLY_RECIPIENT,
+            $onlyRecipientDef->getCarrierSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'MYPARCELNL_RETURN_PACKAGE',
-            CarrierSettings::EXPORT_RETURN,
+            $directReturnDef->getCarrierSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'MYPARCELNL_SIGNATURE_REQUIRED',
-            CarrierSettings::EXPORT_SIGNATURE,
+            $signatureDef->getCarrierSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
@@ -152,85 +170,85 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
 
         yield new MigratableValue(
             'allowMondayDelivery',
-            CarrierSettings::ALLOW_MONDAY_DELIVERY,
+            SettingKey::allow(DeliveryOptions::DELIVERY_OPTION_MONDAY),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'priceMondayDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_MONDAY_DELIVERY,
+            SettingKey::priceDeliveryType(DeliveryOptions::DELIVERY_OPTION_MONDAY),
             new CastValue(CastValue::CAST_CENTS)
         );
 
         yield new MigratableValue(
             'allowSaturdayDelivery',
-            CarrierSettings::ALLOW_SATURDAY_DELIVERY,
+            $saturdayDef->getAllowSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'priceSaturdayDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_SATURDAY_DELIVERY,
+            SettingKey::priceDeliveryType(DeliveryOptions::DELIVERY_OPTION_SATURDAY),
             new CastValue(CastValue::CAST_CENTS)
         );
 
         yield new MigratableValue(
             'allowMorningDelivery',
-            CarrierSettings::ALLOW_MORNING_DELIVERY,
+            SettingKey::allow(RefTypesDeliveryTypeV2::MORNING),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'priceMorningDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_MORNING_DELIVERY,
+            SettingKey::priceDeliveryType(RefTypesDeliveryTypeV2::MORNING),
             new CastValue(CastValue::CAST_CENTS)
         );
 
         yield new MigratableValue(
             'allowEveningDelivery',
-            CarrierSettings::ALLOW_EVENING_DELIVERY,
+            SettingKey::allow(RefTypesDeliveryTypeV2::EVENING),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'priceEveningDelivery',
-            CarrierSettings::PRICE_DELIVERY_TYPE_EVENING_DELIVERY,
+            SettingKey::priceDeliveryType(RefTypesDeliveryTypeV2::EVENING),
             new CastValue(CastValue::CAST_CENTS)
         );
 
         yield new MigratableValue(
             'allowOnlyRecipient',
-            CarrierSettings::ALLOW_ONLY_RECIPIENT,
+            $onlyRecipientDef->getAllowSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'priceOnlyRecipient',
-            CarrierSettings::PRICE_ONLY_RECIPIENT,
+            $onlyRecipientDef->getPriceSettingsKey(),
             new CastValue(CastValue::CAST_CENTS)
         );
 
         yield new MigratableValue(
             'allowSignature',
-            CarrierSettings::ALLOW_SIGNATURE,
+            $signatureDef->getAllowSettingsKey(),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'priceSignature',
-            CarrierSettings::PRICE_SIGNATURE,
+            $signatureDef->getPriceSettingsKey(),
             new CastValue(CastValue::CAST_CENTS)
         );
 
         yield new MigratableValue(
             'allowPickupPoints',
-            CarrierSettings::ALLOW_PICKUP_LOCATIONS,
+            SettingKey::allow(RefTypesDeliveryTypeV2::PICKUP),
             new CastValue(CastValue::CAST_BOOL)
         );
 
         yield new MigratableValue(
             'pricePickup',
-            CarrierSettings::PRICE_DELIVERY_TYPE_PICKUP,
+            SettingKey::priceDeliveryType(RefTypesDeliveryTypeV2::PICKUP),
             new CastValue(CastValue::CAST_CENTS)
         );
 
@@ -285,8 +303,8 @@ final class PdkSettingsMigration extends AbstractPsPdkMigration
                 $carry[$carrierName] = array_replace(
                     $this->valueMigrator->transform($oldSettings, $this->getCarrierSettingsTransformationMap()),
                     [
-                        CarrierSettings::ALLOW_DELIVERY_OPTIONS => ! empty($oldSettings['dropOffDays']),
-                        CarrierSettings::DROP_OFF_POSSIBILITIES => $this->transformDropOffPossibilities($oldSettings),
+                        SettingKey::allow(DeliveryOptions::DELIVERY_OPTION_ALLOW_HOME) => ! empty($oldSettings['dropOffDays']),
+                        CarrierSettings::DROP_OFF_POSSIBILITIES                        => $this->transformDropOffPossibilities($oldSettings),
                     ]
                 );
 
