@@ -15,6 +15,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
 use Order;
+use function MyParcelNL\Pdk\Tests\mockPdkProperty;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
 
@@ -106,6 +107,9 @@ function storeOrderWithCountry(): Order
 
     seedOrderDataEntity($order->id);
     TestBootstrapper::hasAccount();
+    // Bypass the orderCalculators chain (CapabilitiesPackageTypeCalculator makes live API
+    // calls). UsesMockPsPdkInstance rebuilds the container per test so no reset is needed.
+    mockPdkProperty('orderCalculators', []);
 
     return $order;
 }
