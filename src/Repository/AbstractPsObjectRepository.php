@@ -66,14 +66,6 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
     }
 
     /**
-     * @return class-string<T>
-     */
-    public function getEntityClass(): string
-    {
-        return $this->entity;
-    }
-
-    /**
      * @return \MyParcelNL\Pdk\Base\Support\Collection
      */
     public function all(): Collection
