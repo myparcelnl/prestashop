@@ -13,6 +13,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsEntities;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
 use Order;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
@@ -104,6 +105,7 @@ function storeOrderWithCountry(): Order
     MockPsObjectModels::update($order);
 
     seedOrderDataEntity($order->id);
+    TestBootstrapper::hasAccount();
 
     return $order;
 }
