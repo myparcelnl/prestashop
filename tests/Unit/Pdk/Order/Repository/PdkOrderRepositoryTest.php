@@ -121,3 +121,12 @@ it('returns null when api identifier belongs to a missing order', function () {
 
     expect($orderRepository->getByApiIdentifier('api-uuid-string'))->toBeNull();
 });
+
+it('returns null from find() when order does not exist', function () {
+    /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
+    $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
+
+    $result = $orderRepository->find(99999);
+
+    expect($result)->toBeNull();
+});
