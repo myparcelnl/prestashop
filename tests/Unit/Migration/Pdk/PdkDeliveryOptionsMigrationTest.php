@@ -6,12 +6,27 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
+use MyParcelNL\Pdk\App\Options\Definition\AgeCheckDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\CollectDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\CooledDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\DirectReturnDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\FreshFoodDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\FrozenDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\HideSenderDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\InsuranceDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\LargeFormatDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\OnlyRecipientDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\PriorityDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\ReceiptCodeDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SameDayDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SaturdayDeliveryDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\SignatureDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\TrackedDefinition;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Utils;
+use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Shipment\Model\ShipmentOptions;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
@@ -20,10 +35,21 @@ use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Order as PsOrder;
+use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
+use function MyParcelNL\PrestaShop\setupAccountAndCarriers;
 
 usesShared(new UsesMockPsPdkInstance());
+
+beforeEach(function () {
+    setupAccountAndCarriers(
+        factory(CarrierCollection::class)->push(
+            factory(Carrier::class)->fromPostNL(),
+            factory(Carrier::class)->fromDhlForYou()
+        )
+    );
+});
 
 /**
  * JSON encodes input if it's an array, merging it with given default values. Otherwise, just returns input.
@@ -87,34 +113,28 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
     $deliveryOptionsArray = $order->deliveryOptions->toStorableArray();
 
     $finalShipmentOptions = Utils::filterNull(array_replace([
-        ShipmentOptions::AGE_CHECK         => TriStateService::INHERIT,
-        ShipmentOptions::DIRECT_RETURN     => TriStateService::INHERIT,
-        ShipmentOptions::HIDE_SENDER       => TriStateService::INHERIT,
-        ShipmentOptions::INSURANCE         => TriStateService::INHERIT,
-        ShipmentOptions::LABEL_DESCRIPTION => TriStateService::INHERIT,
-        ShipmentOptions::LARGE_FORMAT      => TriStateService::INHERIT,
-        ShipmentOptions::ONLY_RECIPIENT    => TriStateService::INHERIT,
-        ShipmentOptions::RECEIPT_CODE      => TriStateService::INHERIT,
-        ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::INHERIT,
-        ShipmentOptions::SIGNATURE         => TriStateService::INHERIT,
-        ShipmentOptions::TRACKED           => TriStateService::INHERIT,
-        ShipmentOptions::COLLECT           => TriStateService::INHERIT,
-        ShipmentOptions::EXCLUDE_PARCEL_LOCKERS => TriStateService::INHERIT,
-        ShipmentOptions::FRESH_FOOD        => TriStateService::INHERIT,
-        ShipmentOptions::FROZEN            => TriStateService::INHERIT,
-        ShipmentOptions::PRIORITY_DELIVERY => TriStateService::INHERIT,
-        ShipmentOptions::SATURDAY_DELIVERY => TriStateService::INHERIT,
+        (new AgeCheckDefinition())->getShipmentOptionsKey()            => TriStateService::INHERIT,
+        (new DirectReturnDefinition())->getShipmentOptionsKey()        => TriStateService::INHERIT,
+        (new HideSenderDefinition())->getShipmentOptionsKey()          => TriStateService::INHERIT,
+        (new InsuranceDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
+        ShipmentOptions::LABEL_DESCRIPTION                             => TriStateService::INHERIT,
+        (new LargeFormatDefinition())->getShipmentOptionsKey()         => TriStateService::INHERIT,
+        (new OnlyRecipientDefinition())->getShipmentOptionsKey()       => TriStateService::INHERIT,
+        (new ReceiptCodeDefinition())->getShipmentOptionsKey()         => TriStateService::INHERIT,
+        (new SameDayDeliveryDefinition())->getShipmentOptionsKey()     => TriStateService::INHERIT,
+        (new SignatureDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
+        (new TrackedDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
+        (new CollectDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
+        (new FreshFoodDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
+        (new FrozenDefinition())->getShipmentOptionsKey()              => TriStateService::INHERIT,
+        (new PriorityDeliveryDefinition())->getShipmentOptionsKey()    => TriStateService::INHERIT,
+        (new SaturdayDeliveryDefinition())->getShipmentOptionsKey()    => TriStateService::INHERIT,
+        (new CooledDeliveryDefinition())->getShipmentOptionsKey()      => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
-
-    $propositionService = Pdk::get(PropositionService::class);
 
     $fullResult = array_replace(
         array_replace([
-            DeliveryOptions::CARRIER       => [
-                'externalIdentifier' => $propositionService->mapNewToLegacyCarrierName(
-                    $propositionService->getDefaultCarrier()->name
-                ),
-            ],
+            DeliveryOptions::CARRIER       => 'POSTNL',
             DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
             DeliveryOptions::LABEL_AMOUNT  => 1,
             DeliveryOptions::PACKAGE_TYPE  => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,
@@ -132,7 +152,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER => ['externalIdentifier' => Carrier::CARRIER_POSTNL_LEGACY_NAME],
+                DeliveryOptions::CARRIER => 'POSTNL',
             ],
         ],
 
@@ -145,7 +165,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER       => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER       => 'DHL_FOR_YOU',
                 DeliveryOptions::DATE          => '2077-04-07 00:00:00',
                 DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_MORNING_NAME,
             ],
@@ -160,7 +180,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             ],
 
             'result' => [
-                DeliveryOptions::CARRIER      => ['externalIdentifier' => Carrier::CARRIER_POSTNL_LEGACY_NAME],
+                DeliveryOptions::CARRIER      => 'POSTNL',
                 DeliveryOptions::LABEL_AMOUNT => 5,
             ],
         ],
@@ -184,17 +204,17 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER          => 'DHL_FOR_YOU',
                 DeliveryOptions::SHIPMENT_OPTIONS => [
-                    ShipmentOptions::INSURANCE         => 2000,
-                    ShipmentOptions::AGE_CHECK         => TriStateService::ENABLED,
-                    ShipmentOptions::HIDE_SENDER       => TriStateService::ENABLED,
-                    ShipmentOptions::LARGE_FORMAT      => TriStateService::ENABLED,
-                    ShipmentOptions::ONLY_RECIPIENT    => TriStateService::ENABLED,
-                    ShipmentOptions::DIRECT_RETURN     => TriStateService::ENABLED,
-                    ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::ENABLED,
-                    ShipmentOptions::SIGNATURE         => TriStateService::ENABLED,
-                    ShipmentOptions::LABEL_DESCRIPTION => 'hello',
+                    (new InsuranceDefinition())->getShipmentOptionsKey()       => 2000,
+                    (new AgeCheckDefinition())->getShipmentOptionsKey()        => TriStateService::ENABLED,
+                    (new HideSenderDefinition())->getShipmentOptionsKey()      => TriStateService::ENABLED,
+                    (new LargeFormatDefinition())->getShipmentOptionsKey()     => TriStateService::ENABLED,
+                    (new OnlyRecipientDefinition())->getShipmentOptionsKey()   => TriStateService::ENABLED,
+                    (new DirectReturnDefinition())->getShipmentOptionsKey()    => TriStateService::ENABLED,
+                    (new SameDayDeliveryDefinition())->getShipmentOptionsKey() => TriStateService::ENABLED,
+                    (new SignatureDefinition())->getShipmentOptionsKey()       => TriStateService::ENABLED,
+                    ShipmentOptions::LABEL_DESCRIPTION                         => 'hello',
                 ],
             ],
         ],
@@ -218,17 +238,17 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER          => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER          => 'DHL_FOR_YOU',
                 DeliveryOptions::SHIPMENT_OPTIONS => [
-                    ShipmentOptions::INSURANCE         => 0,
-                    ShipmentOptions::AGE_CHECK         => TriStateService::DISABLED,
-                    ShipmentOptions::HIDE_SENDER       => TriStateService::DISABLED,
-                    ShipmentOptions::LARGE_FORMAT      => TriStateService::DISABLED,
-                    ShipmentOptions::ONLY_RECIPIENT    => TriStateService::DISABLED,
-                    ShipmentOptions::DIRECT_RETURN     => TriStateService::DISABLED,
-                    ShipmentOptions::SAME_DAY_DELIVERY => TriStateService::DISABLED,
-                    ShipmentOptions::SIGNATURE         => TriStateService::DISABLED,
-                    ShipmentOptions::LABEL_DESCRIPTION => 'hello',
+                    (new InsuranceDefinition())->getShipmentOptionsKey()       => 0,
+                    (new AgeCheckDefinition())->getShipmentOptionsKey()        => TriStateService::DISABLED,
+                    (new HideSenderDefinition())->getShipmentOptionsKey()      => TriStateService::DISABLED,
+                    (new LargeFormatDefinition())->getShipmentOptionsKey()     => TriStateService::DISABLED,
+                    (new OnlyRecipientDefinition())->getShipmentOptionsKey()   => TriStateService::DISABLED,
+                    (new DirectReturnDefinition())->getShipmentOptionsKey()    => TriStateService::DISABLED,
+                    (new SameDayDeliveryDefinition())->getShipmentOptionsKey() => TriStateService::DISABLED,
+                    (new SignatureDefinition())->getShipmentOptionsKey()       => TriStateService::DISABLED,
+                    ShipmentOptions::LABEL_DESCRIPTION                         => 'hello',
                 ],
             ],
         ],
@@ -254,7 +274,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'extra_options'     => [],
 
             'result' => [
-                DeliveryOptions::CARRIER         => ['externalIdentifier' => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME],
+                DeliveryOptions::CARRIER         => 'DHL_FOR_YOU',
                 DeliveryOptions::PICKUP_LOCATION => [
                     'boxNumber'       => 'box_number',
                     'cc'              => 'cc',

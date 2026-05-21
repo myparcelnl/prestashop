@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Tests\Mock;
 
 use Carrier;
+use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use ObjectModel;
 use Zone;
 
-/**
- * @method static Carrier[] getCarriers()
- */
 abstract class MockPsCarrier extends ObjectModel
 {
     public const PS_CARRIERS_ONLY                           = 1;
@@ -23,6 +21,23 @@ abstract class MockPsCarrier extends ObjectModel
     public $attributes = [
         'zones' => [],
     ];
+
+    /**
+     * Mimics PrestaShop's Carrier::getCarriers() which returns arrays with id_carrier key.
+     *
+     * @return array
+     */
+    public static function getCarriers(): array
+    {
+        return MockPsObjectModels::getByClass(static::class)
+            ->map(function (ObjectModel $carrier) {
+                $array               = $carrier->toArray(Arrayable::SKIP_NULL);
+                $array['id_carrier'] = $array['id'] ?? null;
+
+                return $array;
+            })
+            ->toArray();
+    }
 
     /**
      * @param  int      $reference

@@ -2,8 +2,14 @@
 
 declare(strict_types=1);
 
+use MyParcelNL\Pdk\Base\Support\SettingKey;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefTypesDeliveryTypeV2;
+
+$allowDeliveryOptionsKey  = SettingKey::allow(DeliveryOptions::DELIVERY_OPTION_ALLOW_HOME);
+$allowPickupLocationsKey  = SettingKey::allow(RefTypesDeliveryTypeV2::PICKUP);
 
 dataset('carrierActiveSettings', [
     'all false' => [
@@ -21,8 +27,8 @@ dataset('carrierActiveSettings', [
     'only enabled in carrier' => [
         'settings' => [
             CarrierSettings::DELIVERY_OPTIONS_ENABLED => true,
-            CarrierSettings::ALLOW_DELIVERY_OPTIONS   => true,
-            CarrierSettings::ALLOW_PICKUP_LOCATIONS   => true,
+            $allowDeliveryOptionsKey                  => true,
+            $allowPickupLocationsKey                  => true,
         ],
         'result'   => false,
     ],
@@ -39,7 +45,7 @@ dataset('carrierActiveSettings', [
         'settings' => [
             CheckoutSettings::ENABLE_DELIVERY_OPTIONS => true,
             CarrierSettings::DELIVERY_OPTIONS_ENABLED => true,
-            CarrierSettings::ALLOW_DELIVERY_OPTIONS   => true,
+            $allowDeliveryOptionsKey                  => true,
         ],
         'result'   => true,
     ],
@@ -48,7 +54,7 @@ dataset('carrierActiveSettings', [
         'settings' => [
             CheckoutSettings::ENABLE_DELIVERY_OPTIONS => true,
             CarrierSettings::DELIVERY_OPTIONS_ENABLED => true,
-            CarrierSettings::ALLOW_PICKUP_LOCATIONS   => true,
+            $allowPickupLocationsKey                  => true,
         ],
         'result'   => true,
     ],
@@ -57,8 +63,8 @@ dataset('carrierActiveSettings', [
         'settings' => [
             CheckoutSettings::ENABLE_DELIVERY_OPTIONS => true,
             CarrierSettings::DELIVERY_OPTIONS_ENABLED => true,
-            CarrierSettings::ALLOW_DELIVERY_OPTIONS   => true,
-            CarrierSettings::ALLOW_PICKUP_LOCATIONS   => true,
+            $allowDeliveryOptionsKey                  => true,
+            $allowPickupLocationsKey                  => true,
         ],
         'result'   => true,
     ],

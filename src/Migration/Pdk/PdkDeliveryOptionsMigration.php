@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Generator;
-use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Facade\AccountSettings;
 use MyParcelNL\Pdk\Facade\Logger;
-use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Facade\Platform;
-use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
@@ -79,19 +77,28 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
      */
     private function getDeliveryOptionsTransformationMap(): Generator
     {
-        $propositionService = Pdk::get(PropositionService::class);
         yield new MigratableValue(
             'carrier',
             DeliveryOptions::CARRIER,
-            new TransformValue(function ($value) use ($propositionService) {
-                $carriers     = new Collection($propositionService->getCarriers());
-                $carrierNames = $carriers->pluck('name')->map(
-                    fn ($name) => $propositionService->mapNewToLegacyCarrierName($name)
-                );
+            new TransformValue(function ($value) {
+                $legacyNames = array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
 
-                return in_array($value, $carrierNames->toArray(), true)
-                    ? $value
-                    : $propositionService->mapNewToLegacyCarrierName($propositionService->getDefaultCarrier()->name);
+                if (in_array($value, $legacyNames, true)) {
+                    return $value;
+                }
+
+                try {
+                    $shop           = AccountSettings::getShop();
+                    $defaultCarrier = $shop ? $shop->defaultCarrier : null;
+
+                    if ($defaultCarrier === null) {
+                        return $value;
+                    }
+
+                    return Carrier::CARRIER_NAME_TO_LEGACY_MAP[$defaultCarrier] ?? $value;
+                } catch (\Throwable $e) {
+                    return $value;
+                }
             })
         );
 

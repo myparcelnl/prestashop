@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Router\Service;
 
 use Context;
+use Link;
+use MyParcelNL\Pdk\Facade\Pdk;
 
 final class Ps17RouterService extends PsRouterService
 {
@@ -15,11 +17,14 @@ final class Ps17RouterService extends PsRouterService
      */
     protected function generateRoute(string $route): string
     {
-        /** @var \LinkCore $link */
+        /** @var Link $link */
         $link = Context::getContext()->link;
 
+        if (Pdk::get('routeNameFrontend') === $route) {
+            return $link->getModuleLink('myparcelnl', 'frontend');
+        }
+
         if (! defined('_PS_ADMIN_DIR_')) {
-            // Do not generate admin links in the frontend. There are currently no frontend endpoints anyway.
             return '';
         }
 
