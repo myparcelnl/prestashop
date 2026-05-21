@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.0](https://github.com/myparcelnl/prestashop/compare/v5.1.0...v5.2.0) (2026-05-21)
+
+
+### :sparkles: New Features
+
+* bump @tootallnate/once from 2.0.0 to 2.0.1 ([#514](https://github.com/myparcelnl/prestashop/issues/514)) ([727e18e](https://github.com/myparcelnl/prestashop/commit/727e18e943f4ba5b55951f9f5c8d7dfda9f9c29b))
+* **carrier:** allow GLS in delivery options on checkout ([#522](https://github.com/myparcelnl/prestashop/issues/522)) ([ecb1cd9](https://github.com/myparcelnl/prestashop/commit/ecb1cd95aef9a1307ddf8ed139be5df06733d38d))
+* support prestashop 9 and php 8.5 ([#483](https://github.com/myparcelnl/prestashop/issues/483)) ([0eb31a2](https://github.com/myparcelnl/prestashop/commit/0eb31a2b0a0436a034155c845017e648b0db32e8)), closes [#415](https://github.com/myparcelnl/prestashop/issues/415) [#459](https://github.com/myparcelnl/prestashop/issues/459) [#234](https://github.com/myparcelnl/prestashop/issues/234)
+
 ## [5.1.0](https://github.com/myparcelnl/prestashop/compare/v5.0.3...v5.1.0) (2026-05-07)
 
 
