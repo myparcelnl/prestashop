@@ -904,12 +904,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "5ef7c12013af2d09c643748ad9424229c94da093"
+                "reference": "0839b492bbe1fbb3fe4c31c8029b24a6ee931d6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/5ef7c12013af2d09c643748ad9424229c94da093",
-                "reference": "5ef7c12013af2d09c643748ad9424229c94da093",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/0839b492bbe1fbb3fe4c31c8029b24a6ee931d6f",
+                "reference": "0839b492bbe1fbb3fe4c31c8029b24a6ee931d6f",
                 "shasum": ""
             },
             "require": {
@@ -918,7 +918,7 @@
                 "fruitcake/php-cors": "^1.2",
                 "justinrainbow/json-schema": "^5.2",
                 "league/openapi-psr7-validator": "^0.22.0",
-                "myparcelnl/sdk": "^11.0.0-beta.1",
+                "myparcelnl/sdk": "^11.0.0-beta.19@beta",
                 "php": ">=7.4.0",
                 "php-di/php-di": "^6.0.0",
                 "psr/log": "^1.0.0 || ^2.0.0 || ^3.0.0",
@@ -961,20 +961,20 @@
                 "issues": "https://github.com/myparcelnl/pdk/issues",
                 "source": "https://github.com/myparcelnl/pdk/tree/v4-capabilities"
             },
-            "time": "2026-05-19T10:46:53+00:00"
+            "time": "2026-05-21T15:15:51+00:00"
         },
         {
             "name": "myparcelnl/sdk",
-            "version": "11.0.0-beta.18",
+            "version": "11.0.0-beta.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/sdk.git",
-                "reference": "a834d606bbb2ee8b51d87f68c07ad1aa1ca23e2e"
+                "reference": "1a3baf80d5cb7e93c71d3888350f05c13930a797"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/a834d606bbb2ee8b51d87f68c07ad1aa1ca23e2e",
-                "reference": "a834d606bbb2ee8b51d87f68c07ad1aa1ca23e2e",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/1a3baf80d5cb7e93c71d3888350f05c13930a797",
+                "reference": "1a3baf80d5cb7e93c71d3888350f05c13930a797",
                 "shasum": ""
             },
             "require": {
@@ -1025,9 +1025,9 @@
             ],
             "support": {
                 "issues": "https://github.com/myparcelnl/sdk/issues",
-                "source": "https://github.com/myparcelnl/sdk/tree/v11.0.0-beta.18"
+                "source": "https://github.com/myparcelnl/sdk/tree/v11.0.0-beta.19"
             },
-            "time": "2026-05-15T14:57:32+00:00"
+            "time": "2026-05-21T10:27:10+00:00"
         },
         {
             "name": "php-di/invoker",
@@ -2451,16 +2451,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v5.4.45",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "a454d47278cc16a5db371fe73ae66a78a633371e"
+                "reference": "b0b27055f055f0d314c5c68ed0c10f0bbd90aee0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/a454d47278cc16a5db371fe73ae66a78a633371e",
-                "reference": "a454d47278cc16a5db371fe73ae66a78a633371e",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/b0b27055f055f0d314c5c68ed0c10f0bbd90aee0",
+                "reference": "b0b27055f055f0d314c5c68ed0c10f0bbd90aee0",
                 "shasum": ""
             },
             "require": {
@@ -2506,7 +2506,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v5.4.45"
+                "source": "https://github.com/symfony/yaml/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -2518,11 +2518,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-25T14:11:13+00:00"
+            "time": "2026-05-15T06:40:16+00:00"
         },
         {
             "name": "webmozart/assert",
