@@ -39,12 +39,16 @@ class WithHasPsCarrierListHooks
 }
 
 /**
- * Build a CarrierCapabilitiesRepository test double whose `getCapabilitiesForRecipientCountry()`
- * returns one stub object per V2 carrier name. The hook only reads `getCarrier()` on the result.
+ * Build a CarrierCapabilitiesRepository test double that overrides the real public API
+ * (`getCapabilities(array $args): array`). Records the args of the most recent call so
+ * tests can assert the hook passes the cart's destination country. The hook only reads
+ * `getCarrier()` on each returned item.
  */
 function fakeCapabilitiesRepositoryReturning(array $v2CarrierNames): CarrierCapabilitiesRepository
 {
     return new class($v2CarrierNames) extends CarrierCapabilitiesRepository {
+        public array  $lastArgs = [];
+        public int    $callCount = 0;
         private array $v2CarrierNames;
 
         public function __construct(array $v2CarrierNames)
@@ -52,8 +56,11 @@ function fakeCapabilitiesRepositoryReturning(array $v2CarrierNames): CarrierCapa
             $this->v2CarrierNames = $v2CarrierNames;
         }
 
-        public function getCapabilitiesForRecipientCountry(string $cc): array
+        public function getCapabilities(array $args): array
         {
+            $this->callCount++;
+            $this->lastArgs = $args;
+
             return array_map(static function (string $name) {
                 return new class($name) {
                     private string $name;
@@ -72,7 +79,7 @@ function fakeCapabilitiesRepositoryThrowing(): CarrierCapabilitiesRepository
 
         public function __construct() {}
 
-        public function getCapabilitiesForRecipientCountry(string $cc): array
+        public function getCapabilities(array $args): array
         {
             $this->callCount++;
             throw new RuntimeException('Capabilities API returned 503');
@@ -244,6 +251,24 @@ it('keeps all carriers (fail-open) and logs an error when the capabilities call 
         });
 
         expect($errorLogs)->not->toBeEmpty();
+    } finally {
+        $reset();
+    }
+});
+
+it('forwards the cart delivery country to the capabilities API', function () {
+    [$params] = setupModuleWithMappings([RefCapabilitiesSharedCarrierV2::POSTNL], 'BE');
+
+    $fake  = fakeCapabilitiesRepositoryReturning([RefCapabilitiesSharedCarrierV2::POSTNL]);
+    $reset = mockPdkProperty(CarrierCapabilitiesRepository::class, $fake);
+
+    try {
+        (new WithHasPsCarrierListHooks())->hookActionFilterDeliveryOptionList($params);
+
+        expect($fake->callCount)->toBe(1);
+        expect($fake->lastArgs)->toHaveKey('recipient');
+        expect($fake->lastArgs['recipient'])->toHaveKey('country_code');
+        expect($fake->lastArgs['recipient']['country_code'])->toBe('BE');
     } finally {
         $reset();
     }
