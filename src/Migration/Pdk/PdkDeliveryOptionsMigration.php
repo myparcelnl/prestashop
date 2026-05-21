@@ -6,9 +6,8 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Generator;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Pdk\Facade\AccountSettings;
 use MyParcelNL\Pdk\Facade\Logger;
-use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
@@ -78,11 +77,10 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
      */
     private function getDeliveryOptionsTransformationMap(): Generator
     {
-        $propositionService = Pdk::get(PropositionService::class);
         yield new MigratableValue(
             'carrier',
             DeliveryOptions::CARRIER,
-            new TransformValue(function ($value) use ($propositionService) {
+            new TransformValue(function ($value) {
                 $legacyNames = array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
 
                 if (in_array($value, $legacyNames, true)) {
@@ -90,9 +88,14 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
                 }
 
                 try {
-                    $defaultCarrier = $propositionService->getDefaultCarrier();
+                    $shop           = AccountSettings::getShop();
+                    $defaultCarrier = $shop ? $shop->defaultCarrier : null;
 
-                    return Carrier::CARRIER_NAME_TO_LEGACY_MAP[$defaultCarrier->carrier] ?? $value;
+                    if ($defaultCarrier === null) {
+                        return $value;
+                    }
+
+                    return Carrier::CARRIER_NAME_TO_LEGACY_MAP[$defaultCarrier] ?? $value;
                 } catch (\Throwable $e) {
                     return $value;
                 }
