@@ -100,7 +100,9 @@ trait HasPsCarrierListHooks
         $repository = Pdk::get(CarrierCapabilitiesRepository::class);
 
         try {
-            $capabilities = $repository->getCapabilitiesForRecipientCountry($countryIso);
+            $capabilities = $repository->getCapabilities([
+                'recipient' => ['country_code' => $countryIso],
+            ]);
         } catch (Throwable $exception) {
             Logger::error('Failed to fetch carrier capabilities for country.', [
                 'country' => $countryIso,
