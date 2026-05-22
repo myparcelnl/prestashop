@@ -21,14 +21,6 @@ use Tools;
 trait HasPdkProductHooks
 {
     /**
-     * Stores the full rendered product settings HTML to be output via displayBackOfficeFooter,
-     * because PS9's product page runs displayAdminProductsExtra output through HTMLPurifier
-     * which strips data-pdk-context attributes.
-     *
-     * @var string
-     */
-    private static string $pendingProductSettingsHtml = '';
-    /**
      * Saves the MyParcel product settings when a product is updated.
      *
      * @param  array $params
@@ -126,15 +118,18 @@ trait HasPdkProductHooks
 
         $html = Frontend::renderProductSettings($product);
 
-        // PS9 runs displayAdminProductsExtra output through HTMLPurifier, which strips
-        // data-pdk-context attributes. Render a placeholder here and output the real
-        // component via displayBackOfficeFooter with a script to move it into place.
-        // TODO: migrate to actionProductFormBuilderModifier for native Symfony form integration
-        //  @see https://devdocs.prestashop-project.org/9/modules/sample-modules/extend-product-page/
-        if (strpos($html, 'data-pdk-context') !== false
+        // PS9 strips data-pdk-context via HTMLPurifier; use a placeholder and flush the real
+        // component from displayBackOfficeFooter (see HasPdkRenderHooks). PS 1.7/8 render the
+        // hook output raw, so emit it inline — the footer-flush mechanism doesn't work on
+        // PS8 product page V1 anyway (hook fires after the legacy footer; stash is still empty).
+        //
+        // TODO: migrate to actionProductFormBuilderModifier for native PS9 form integration.
+        if (
+            version_compare(_PS_VERSION_, '9.0.0', '>=')
+            && strpos($html, 'data-pdk-context') !== false
             && preg_match('/id="([^"]+)"/', $html, $idMatch)
         ) {
-            self::$pendingProductSettingsHtml = $html;
+            PendingProductSettings::set($html);
 
             return sprintf('<div id="%s-placeholder"></div>', $idMatch[1]);
         }
