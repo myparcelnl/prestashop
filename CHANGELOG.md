@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.1](https://github.com/myparcelnl/prestashop/compare/v5.2.0...v5.2.1) (2026-05-28)
+
+
+### :bug: Bug Fixes
+
+* **api:** saving the API key on PrestaShop below version 9 no longer throws a type error ([b9bd07b](https://github.com/myparcelnl/prestashop/commit/b9bd07b3aeaf60601378df2f8acbc73973c59993)), closes [#483](https://github.com/myparcelnl/prestashop/issues/483)
+* **product-page:** emit product-settings inline on PS 1.7/8 (INT-1595) ([df9728b](https://github.com/myparcelnl/prestashop/commit/df9728be0d6c6517da78743d2e3998997550b504)), closes [#483](https://github.com/myparcelnl/prestashop/issues/483)
+
 ## [5.2.0](https://github.com/myparcelnl/prestashop/compare/v5.1.0...v5.2.0) (2026-05-21)
 
 
