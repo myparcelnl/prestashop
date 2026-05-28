@@ -52,7 +52,6 @@ use MyParcelNL\PrestaShop\Migration\Pdk\PdkProductSettingsMigration;
 use MyParcelNL\PrestaShop\Migration\Pdk\PdkSettingsMigration;
 use MyParcelNL\PrestaShop\Pdk\Account\Repository\PsPdkAccountRepository;
 use MyParcelNL\PrestaShop\Pdk\Action\Backend\Account\PsUpdateAccountAction;
-use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle5ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Adapter\Guzzle7ClientAdapter;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsBackendEndpointService;
 use MyParcelNL\PrestaShop\Pdk\Api\Service\PsFrontendEndpointService;
@@ -161,10 +160,7 @@ return [
     /**
      * Miscellaneous
      */
-    ClientAdapterInterface::class               => psVersionFactory([
-        ['class' => Guzzle7ClientAdapter::class, 'version' => 8],
-        ['class' => Guzzle5ClientAdapter::class],
-    ]),
+    ClientAdapterInterface::class               => get(Guzzle7ClientAdapter::class),
 
     LoggerInterface::class           => get(PsLogger::class),
     MigrationServiceInterface::class => get(PsMigrationService::class),
