@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Pdk\Base;
 
 use DI\Definition\Helper\FactoryDefinitionHelper;
+use Doctrine\ORM\EntityManagerInterface;
 use FileLogger;
 use Module;
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\PdkBootstrapper;
+use MyParcelNL\PrestaShop\Pdk\Base\Service\DoctrineEntityRegistrar;
 use MyParcelNL\Pdk\Base\Service\CountryCodes;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Pdk;
@@ -207,7 +209,13 @@ class PsPdkBootstrapper extends PdkBootstrapper
             }),
 
             'ps.entityManager' => factory(function () {
-                return Pdk::get('getPsService')('doctrine.orm.entity_manager');
+                $em = Pdk::get('getPsService')('doctrine.orm.entity_manager');
+
+                if ($em instanceof EntityManagerInterface) {
+                    DoctrineEntityRegistrar::register($em);
+                }
+
+                return $em;
             }),
 
             'ps.tabRepository' => factory(function () {

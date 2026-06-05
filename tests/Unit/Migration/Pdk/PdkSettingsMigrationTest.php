@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Carrier as PsCarrier;
+use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
@@ -13,7 +14,6 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
-use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 usesShared(new UsesMockPsPdkInstance());
 
@@ -196,5 +196,82 @@ it('migrates settings to pdk', function () {
         ->all()
         ->toArrayWithoutNull();
 
-    assertMatchesJsonSnapshot(json_encode($settings));
+    // Migration outcomes. We assert only the keys the migration is responsible for —
+    // PDK-provided defaults are intentionally not asserted here so this test does not
+    // churn when PDK adds new fields.
+    $expected = [
+        'account.apiKey'                            => 'api_key',
+        'account.apiKeyValid'                       => true,
+
+        'order.conceptShipments'                    => true,
+        'order.statusOnLabelCreate'                 => 'status_3',
+        'order.statusWhenDelivered'                 => 'status_5',
+
+        'label.description'                         => '[ORDER_ID] [ORDER_ID]',
+        'label.format'                              => 'a6',
+        'label.output'                              => 'open',
+        'label.position'                            => 3,
+        'label.prompt'                              => true,
+
+        'customs.countryOfOrigin'                   => 'DE',
+        'customs.customsCode'                       => '1234',
+        'customs.packageContents'                   => '1',
+
+        'checkout.deliveryOptionsHeader'            => 'delivery options here',
+        'checkout.priceType'                        => 'surcharge',
+
+        // Carrier 4 → postnl
+        'carrier.postnl.cutoffTime'                 => '16:00',
+        'carrier.postnl.defaultPackageType'         => 'letter',
+        'carrier.postnl.deliveryDaysWindow'         => 3,
+        'carrier.postnl.dropOffDelay'               => 2,
+        'carrier.postnl.exportAgeCheck'             => 1,
+        'carrier.postnl.exportInsurance'            => 1,
+        'carrier.postnl.exportInsuranceFromAmount'  => 100,
+        'carrier.postnl.exportInsuranceUpTo'        => 5000000,
+        'carrier.postnl.exportInsuranceUpToEu'      => 1000000,
+        'carrier.postnl.exportInsuranceUpToUnique'  => 2000000,
+        'carrier.postnl.exportLargeFormat'          => 1,
+        'carrier.postnl.exportOnlyRecipient'        => 1,
+        'carrier.postnl.exportReturn'               => 1,
+        'carrier.postnl.exportSignature'            => 1,
+        'carrier.postnl.allowEveningDelivery'       => true,
+        'carrier.postnl.allowMondayDelivery'        => true,
+        'carrier.postnl.allowMorningDelivery'      => true,
+        'carrier.postnl.allowOnlyRecipient'         => true,
+        'carrier.postnl.allowPickupLocations'       => true,
+        'carrier.postnl.allowSaturdayDelivery'      => true,
+        'carrier.postnl.allowSignature'             => true,
+        'carrier.postnl.priceDeliveryTypeEvening'   => 249.0,
+        'carrier.postnl.priceDeliveryTypeMonday'    => 229.0,
+        'carrier.postnl.priceDeliveryTypeMorning'   => 219.0,
+        'carrier.postnl.priceDeliveryTypePickup'    => -100.0,
+        'carrier.postnl.priceDeliveryTypeSaturday'  => 299.0,
+        'carrier.postnl.priceOnlyRecipient'         => 99.0,
+        'carrier.postnl.priceSignature'             => 59.0,
+
+        // Carrier 8 → dhlforyou
+        'carrier.dhlforyou.cutoffTime'              => '16:00',
+        'carrier.dhlforyou.defaultPackageType'      => 'mailbox',
+        'carrier.dhlforyou.deliveryDaysWindow'      => -1,
+        'carrier.dhlforyou.dropOffDelay'            => 0,
+        'carrier.dhlforyou.exportLargeFormat'       => 1,
+        'carrier.dhlforyou.exportReturnLargeFormat' => 1,
+        'carrier.dhlforyou.exportReturnPackageType' => 'mailbox',
+        'carrier.dhlforyou.allowOnlyRecipient'      => true,
+        'carrier.dhlforyou.allowPickupLocations'    => true,
+        'carrier.dhlforyou.allowSaturdayDelivery'   => true,
+        'carrier.dhlforyou.allowSignature'          => true,
+        'carrier.dhlforyou.priceDeliveryTypeEvening' => 200.0,
+        'carrier.dhlforyou.priceDeliveryTypeMonday' => 180.0,
+        'carrier.dhlforyou.priceDeliveryTypeMorning' => 230.0,
+        'carrier.dhlforyou.priceDeliveryTypePickup' => 0.0,
+        'carrier.dhlforyou.priceDeliveryTypeSaturday' => 300.0,
+        'carrier.dhlforyou.priceOnlyRecipient'      => 90.0,
+        'carrier.dhlforyou.priceSignature'          => 40.0,
+    ];
+
+    foreach ($expected as $path => $value) {
+        expect(Arr::get($settings, $path), $path)->toBe($value);
+    }
 });
