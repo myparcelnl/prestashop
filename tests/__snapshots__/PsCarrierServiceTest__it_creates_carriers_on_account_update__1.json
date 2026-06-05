@@ -27,11 +27,7 @@
             "delay": {
                 "1": "carrier_delivery_time"
             },
-            "delay": {
-                "1": "carrier_delivery_time"
-            },
             "id": 1,
-            "id_carrier": 1,
             "id_carrier": 1,
             "rangeWeights": [
                 {
@@ -77,11 +73,7 @@
             "delay": {
                 "1": "carrier_delivery_time"
             },
-            "delay": {
-                "1": "carrier_delivery_time"
-            },
             "id": 2,
-            "id_carrier": 2,
             "id_carrier": 2,
             "rangeWeights": [
                 {
