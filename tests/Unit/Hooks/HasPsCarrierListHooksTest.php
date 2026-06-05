@@ -274,6 +274,27 @@ it('forwards the cart delivery country to the capabilities API', function () {
     }
 });
 
+it('leaves delivery options without a carrier_list untouched instead of erroring', function () {
+    [$params] = setupModuleWithMappings([RefCapabilitiesSharedCarrierV2::POSTNL]);
+
+    // A delivery option entry that has no carrier_list at all (e.g. friendly-URL / edge data).
+    $params['delivery_option_list'][2]['99,'] = [];
+
+    $reset = mockPdkProperty(
+        CarrierCapabilitiesRepository::class,
+        fakeCapabilitiesRepositoryReturning([RefCapabilitiesSharedCarrierV2::POSTNL])
+    );
+
+    try {
+        (new WithHasPsCarrierListHooks())->hookActionFilterDeliveryOptionList($params);
+
+        // The malformed entry must survive: getCarrierMapping() returns null, so it is skipped.
+        expect($params['delivery_option_list'][2])->toHaveKey('99,');
+    } finally {
+        $reset();
+    }
+});
+
 it('does nothing and never calls capabilities when there are no carrier mappings', function () {
     [$params] = setupModuleWithMappings([]);
 

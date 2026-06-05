@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Hooks;
 
 use Address;
+use Carrier;
 use Cart;
 use Country;
 use MyParcelNL\Pdk\Base\Support\Arr;
@@ -133,8 +134,12 @@ trait HasPsCarrierListHooks
     ): ?MyparcelnlCarrierMapping {
         $carrierArray = Arr::first($carrierList);
 
-        /** @var \Carrier $psCarrier */
+        /** @var null|\Carrier $psCarrier */
         $psCarrier = $carrierArray['instance'] ?? null;
+
+        if (! $psCarrier instanceof Carrier) {
+            return null;
+        }
 
         return $mappings
             ->filter(function (MyparcelnlCarrierMapping $mapping) use ($psCarrier) {
