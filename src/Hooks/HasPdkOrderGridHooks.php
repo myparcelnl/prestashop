@@ -55,11 +55,13 @@ trait HasPdkOrderGridHooks
 
         // Amend the record collection with myparcel data.
         $params['presented_grid']['data']['records'] = new RecordCollection(
-            array_map(static function (array $row) use ($pdkOrders, $repository) {
+            array_map(static function (array $row) use ($pdkOrders) {
                 // Find the specific order in the already loaded collection of pdk orders, so we don't have to load it again.
-                $order = $pdkOrders->firstWhere('externalIdentifier', (string) $row['id_order']);
+                $order = $pdkOrders->firstWhere('externalIdentifier', (int) $row['id_order']);
 
-                $row['myparcel'] = Frontend::renderOrderListItem($order);
+                if ($order) {
+                    $row['myparcel'] = Frontend::renderOrderListItem($order);
+                }
 
                 return $row;
             }, $params['presented_grid']['data']['records']->all())
