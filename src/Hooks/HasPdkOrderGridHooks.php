@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Hooks;
 
 use MyParcelNL;
+use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Frontend;
 use MyParcelNL\Pdk\Facade\Language;
@@ -47,11 +48,16 @@ trait HasPdkOrderGridHooks
      */
     public function hookActionOrderGridPresenterModifier(array &$params): void
     {
+        /** @var PdkOrderRepositoryInterface $repository */
+        $repository = Pdk::get(PdkOrderRepositoryInterface::class);
+        /** @var PdkOrderCollection $pdkOrders */
+        $pdkOrders = $repository->fromOrderGridCollection($params['presented_grid']['data']['records']);
+
+        // Amend the record collection with myparcel data.
         $params['presented_grid']['data']['records'] = new RecordCollection(
-            array_map(static function (array $row) {
-                /** @var PdkOrderRepositoryInterface $repository */
-                $repository = Pdk::get(PdkOrderRepositoryInterface::class);
-                $order      = $repository->get($row['id_order']);
+            array_map(static function (array $row) use ($pdkOrders, $repository) {
+                // Find the specific order in the already loaded collection of pdk orders, so we don't have to load it again.
+                $order = $pdkOrders->firstWhere('externalIdentifier', (string) $row['id_order']);
 
                 $row['myparcel'] = Frontend::renderOrderListItem($order);
 

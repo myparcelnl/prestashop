@@ -18,6 +18,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsLink;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsOrder;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsPrestaShopCollection;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsRangeObjectModel;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsSmarty;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsTools;
@@ -53,6 +54,11 @@ final class Db extends DbCore { }
 abstract class DbQueryCore extends MockPsDbQuery { }
 
 final class DbQuery extends DbQueryCore { }
+
+/** @see \PrestaShopCollectionCore */
+abstract class PrestaShopCollectionCore extends MockPsPrestaShopCollection { }
+
+final class PrestaShopCollection extends PrestaShopCollectionCore { }
 
 /** @see \ToolsCore */
 abstract class ToolsCore extends MockPsTools { }
