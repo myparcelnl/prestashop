@@ -15,6 +15,17 @@ final class PsOrderDataRepository extends AbstractPsObjectRepository
     protected $entity = MyparcelnlOrderData::class;
 
     /**
+     * Order data is keyed by the order id (it is the entity's primary key), so findAll() matches
+     * against orderId rather than the default 'id'.
+     *
+     * @return string
+     */
+    protected function getIdentifierColumn(): string
+    {
+        return 'orderId';
+    }
+
+    /**
      * @param  string $apiIdentifier
      *
      * @return null|\MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData

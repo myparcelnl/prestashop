@@ -11,6 +11,12 @@ use MyParcelNL\PrestaShop\Contract\PsSpecificObjectModelServiceInterface;
 use ObjectModel;
 
 /**
+ * Locks the generic {@see PsObjectModelService} to one model type.
+ *
+ * Each subclass fixes its model by implementing getClass() (e.g. PsOrderService returns
+ * Order::class). From then on you call get($id) instead of get(Order::class, $id) — every
+ * method here just forwards to the generic service with that class filled in for you.
+ *
  * @template T of ObjectModel
  * @extends \MyParcelNL\PrestaShop\Contract\PsSpecificObjectModelServiceInterface<T>
  */

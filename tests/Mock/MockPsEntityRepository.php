@@ -62,7 +62,14 @@ class MockPsEntityRepository extends \Doctrine\ORM\EntityRepository
                 static function (object $object) use ($criteria) {
                     foreach ($criteria as $key => $value) {
                         $getter = sprintf('get%s', Str::studly($key));
-                        if ($object->{$getter}() === $value) {
+                        $actual = $object->{$getter}();
+
+                        // Mirror Doctrine: an array criterion matches any of its values (WHERE IN).
+                        $matches = is_array($value)
+                            ? in_array($actual, $value, true)
+                            : $actual === $value;
+
+                        if ($matches) {
                             continue;
                         }
 

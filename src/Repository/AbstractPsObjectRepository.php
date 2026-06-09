@@ -74,6 +74,25 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
     }
 
     /**
+     * Fetch records whose identifier column matches one of the given ids, in a single query.
+     *
+     * Follows Laravel's findMany() convention: an empty id set returns an empty collection rather
+     * than every record — call all() for that. The column matched against is getIdentifierColumn().
+     *
+     * @param  int[] $ids
+     *
+     * @return \MyParcelNL\Pdk\Base\Support\Collection<T>
+     */
+    public function findAll(array $ids = []): Collection
+    {
+        if (empty($ids)) {
+            return new Collection([]);
+        }
+
+        return $this->where($this->getIdentifierColumn(), array_map('intval', $ids));
+    }
+
+    /**
      * @param  array $values
      *
      * @return null|T
@@ -196,6 +215,17 @@ abstract class AbstractPsObjectRepository implements PsObjectRepositoryInterface
     public function where(string $key, $value): Collection
     {
         return new Collection($this->getEntityRepository()->findBy([$key => $value]));
+    }
+
+    /**
+     * The entity property findAll() matches ids against. Defaults to 'id' — Eloquent's conventional
+     * primary key — and is overridden per repository when the identifier column differs.
+     *
+     * @return string
+     */
+    protected function getIdentifierColumn(): string
+    {
+        return 'id';
     }
 
     /**
