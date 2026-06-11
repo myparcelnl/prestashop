@@ -34,8 +34,8 @@ it('remaps legacy carrier setting keys to V2 format', function () {
         'dhlparcelconnect' => ['delivery_enabled' => '0'],
     ]);
 
-    /** @var Migration5_1_0 $migration */
-    $migration = Pdk::get(Migration5_1_0::class);
+    /** @var Migration5_3_0 $migration */
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $result = $settingsRepo->get($settingsKey);
@@ -51,8 +51,8 @@ it('remaps legacy carrier setting keys to V2 format', function () {
 });
 
 it('does not fail when carrier settings are empty', function () {
-    /** @var Migration5_1_0 $migration */
-    $migration = Pdk::get(Migration5_1_0::class);
+    /** @var Migration5_3_0 $migration */
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     /** @var \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface $settingsRepo */
@@ -72,8 +72,8 @@ it('preserves settings that already use V2 key format', function () {
         'BPOST'  => ['delivery_enabled' => '1'],
     ]);
 
-    /** @var Migration5_1_0 $migration */
-    $migration = Pdk::get(Migration5_1_0::class);
+    /** @var Migration5_3_0 $migration */
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $result = $settingsRepo->get($settingsKey);
@@ -96,7 +96,7 @@ it('migrates carrier mapping table entries to V2 names', function () {
             ->withCarrierId(24),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo     = Pdk::get(PsCarrierMappingRepository::class);
@@ -116,11 +116,41 @@ it('skips carrier mappings that are already V2 format', function () {
             ->withCarrierId(21),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo = Pdk::get(PsCarrierMappingRepository::class);
     expect($repo->all()->first()->getMyparcelCarrier())->toBe('POSTNL');
+});
+
+it('does not remap a legacy carrier mapping when its V2 target already exists', function () {
+    // A shop that carried both the old (legacy-named) and new (V2-named) PS carriers across
+    // the transition. Renaming the legacy row to V2 would collide with the existing V2 row on
+    // the UNIQUE(myparcel_carrier) key, so the legacy row must be left as-is instead.
+    (new FactoryCollection([
+        factory(MyparcelnlCarrierMapping::class)
+            ->withMyparcelCarrier('dhlforyou')
+            ->withCarrierId(7),
+        factory(MyparcelnlCarrierMapping::class)
+            ->withMyparcelCarrier('DHL_FOR_YOU')
+            ->withCarrierId(13),
+        // A legacy row with no V2 counterpart must still migrate normally.
+        factory(MyparcelnlCarrierMapping::class)
+            ->withMyparcelCarrier('postnl')
+            ->withCarrierId(5),
+    ]))->store();
+
+    Pdk::get(Migration5_3_0::class)->up();
+
+    $repo    = Pdk::get(PsCarrierMappingRepository::class);
+    $byId = [];
+    foreach ($repo->all() as $mapping) {
+        $byId[$mapping->getCarrierId()] = $mapping->getMyparcelCarrier();
+    }
+
+    expect($byId[7])->toBe('dhlforyou')          // skipped — V2 target already taken
+        ->and($byId[13])->toBe('DHL_FOR_YOU')    // pre-existing V2 row untouched
+        ->and($byId[5])->toBe('POSTNL');         // no conflict — migrated as usual
 });
 
 dataset('cart delivery options carrier variants', [
@@ -137,7 +167,7 @@ it('normalises the carrier field in cart delivery options', function (array $car
             ->withData(json_encode($cartData)),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo = Pdk::get(PsCartDeliveryOptionsRepository::class);
@@ -153,7 +183,7 @@ it('skips cart delivery options without carrier field', function () {
             ->withData(json_encode(['deliveryType' => 'standard'])),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo = Pdk::get(PsCartDeliveryOptionsRepository::class);
@@ -175,7 +205,7 @@ it('normalises the carrier field in order data', function (array $orderData, str
             ->withData(json_encode($orderData)),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo  = Pdk::get(PsOrderDataRepository::class);
@@ -191,7 +221,7 @@ it('skips order data rows without deliveryOptions', function () {
             ->withData(json_encode(['notes' => 'test'])),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo = Pdk::get(PsOrderDataRepository::class);
@@ -214,7 +244,7 @@ it('normalises the carrier field in shipment data', function (array $shipmentDat
             ->withData(json_encode($shipmentData)),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo = Pdk::get(PsOrderShipmentRepository::class);
@@ -238,7 +268,7 @@ it('migrates multiple order data rows in a single run', function () {
             ->withData(json_encode(['deliveryOptions' => ['carrier' => 'POSTNL']])),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo = Pdk::get(PsOrderDataRepository::class);
@@ -264,7 +294,7 @@ it('migrates multiple shipment data rows in a single run', function () {
             ->withData(json_encode(['carrier' => 'dhlparcelconnect'])),
     ]))->store();
 
-    $migration = Pdk::get(Migration5_1_0::class);
+    $migration = Pdk::get(Migration5_3_0::class);
     $migration->up();
 
     $repo = Pdk::get(PsOrderShipmentRepository::class);
@@ -275,8 +305,8 @@ it('migrates multiple shipment data rows in a single run', function () {
 });
 
 it('does not fail when no account is available during migration', function () {
-    /** @var Migration5_1_0 $migration */
-    $migration = Pdk::get(Migration5_1_0::class);
+    /** @var Migration5_3_0 $migration */
+    $migration = Pdk::get(Migration5_3_0::class);
 
     // migrateAccountData is wrapped in try/catch; no account configured means it silently returns
     expect(fn() => $migration->up())->not->toThrow(\Throwable::class);
@@ -284,4 +314,50 @@ it('does not fail when no account is available during migration', function () {
     /** @var \MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface $accountRepo */
     $accountRepo = Pdk::get(PdkAccountRepositoryInterface::class);
     expect($accountRepo->getAccount())->toBeNull();
+});
+
+it('resumes order data migration from a stored cursor, skipping rows at or below it', function () {
+    (new FactoryCollection([
+        factory(MyparcelnlOrderData::class)
+            ->withOrderId(1)
+            ->withData(json_encode(['deliveryOptions' => ['carrier' => 'postnl']])),
+        factory(MyparcelnlOrderData::class)
+            ->withOrderId(2)
+            ->withData(json_encode(['deliveryOptions' => ['carrier' => 'dhlforyou']])),
+    ]))->store();
+
+    /** @var \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface $settingsRepo */
+    $settingsRepo = Pdk::get(PdkSettingsRepositoryInterface::class);
+
+    // Simulate a prior run that timed out after processing order 1.
+    $settingsRepo->store(Pdk::get('createSettingsKey')('migration_5_3_0_cursor_order_data'), 1);
+
+    Pdk::get(Migration5_3_0::class)->up();
+
+    $repo = Pdk::get(PsOrderDataRepository::class);
+
+    // Order 1 is at/below the cursor → skipped → stays legacy.
+    // Order 2 is above the cursor → migrated to V2.
+    expect($repo->findOneBy(['orderId' => 1])->getData()['deliveryOptions']['carrier'])->toBe('postnl')
+        ->and($repo->findOneBy(['orderId' => 2])->getData()['deliveryOptions']['carrier'])->toBe('DHL_FOR_YOU');
+});
+
+it('clears the migration cursor after a completed run', function () {
+    (new FactoryCollection([
+        factory(MyparcelnlOrderData::class)
+            ->withOrderId(1)
+            ->withData(json_encode(['deliveryOptions' => ['carrier' => 'postnl']])),
+    ]))->store();
+
+    /** @var \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface $settingsRepo */
+    $settingsRepo = Pdk::get(PdkSettingsRepositoryInterface::class);
+    $cursorKey    = Pdk::get('createSettingsKey')('migration_5_3_0_cursor_order_data');
+
+    // A leftover cursor from an interrupted run must be cleared once the migration completes,
+    // so a future migration does not skip rows.
+    $settingsRepo->store($cursorKey, 99);
+
+    Pdk::get(Migration5_3_0::class)->up();
+
+    expect($settingsRepo->get($cursorKey))->toBeEmpty();
 });

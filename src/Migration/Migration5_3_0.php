@@ -19,7 +19,7 @@ use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use Throwable;
 
-final class Migration5_1_0 extends AbstractPsPdkMigration
+final class Migration5_3_0 extends AbstractPsPdkMigration
 {
     /**
      * @var \MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface
@@ -77,7 +77,7 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
 
     public function getVersion(): string
     {
-        return '5.1.0';
+        return '5.3.0';
     }
 
     public function up(): void
@@ -88,6 +88,7 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
         $this->migrateCartDeliveryOptions();
         $this->migrateOrderData();
         $this->migrateShipmentData();
+        $this->clearCursors();
     }
 
     /**
@@ -143,11 +144,21 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
 
     /**
      * Update myparcel_carrier column values in the carrier mapping table from legacy to V2 names.
+     *
+     * The myparcel_carrier column is UNIQUE. A shop that carried both the old (legacy-named) and new
+     * (V2-named) PrestaShop carriers across the transition has both rows present, so renaming a legacy
+     * row to a V2 name that another row already holds would violate the constraint and abort the whole
+     * migration. Such a legacy row is left untouched (and logged) rather than remapped.
      */
     private function migrateCarrierMappings(): void
     {
         $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
         $mappings       = $this->carrierMappingRepository->all();
+
+        $usedNames = [];
+        foreach ($mappings as $mapping) {
+            $usedNames[$mapping->getMyparcelCarrier()] = true;
+        }
 
         foreach ($mappings as $mapping) {
             $currentName = $mapping->getMyparcelCarrier();
@@ -157,7 +168,17 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
                 continue;
             }
 
+            if (isset($usedNames[$newName])) {
+                Logger::warning('Skipping carrier mapping migration; target name already in use', [
+                    'from' => $currentName,
+                    'to'   => $newName,
+                ]);
+                continue;
+            }
+
             $mapping->setMyparcelCarrier($newName);
+            unset($usedNames[$currentName]);
+            $usedNames[$newName] = true;
         }
 
         EntityManager::flush();
@@ -170,7 +191,7 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
     {
         $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
 
-        $this->migrateInBatches($this->cartDeliveryOptionsRepository, function ($cartOption) use ($legacyToNewMap) {
+        $this->migrateInBatches($this->cartDeliveryOptionsRepository, 'cartId', 'cart_delivery_options', function ($cartOption) use ($legacyToNewMap) {
             $data   = $cartOption->getData();
             $parsed = $this->parseLegacyCarrier($data['carrier'] ?? null);
 
@@ -197,7 +218,7 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
     {
         $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
 
-        $this->migrateInBatches($this->orderDataRepository, function ($orderData) use ($legacyToNewMap) {
+        $this->migrateInBatches($this->orderDataRepository, 'orderId', 'order_data', function ($orderData) use ($legacyToNewMap) {
             $data   = $orderData->getData();
             $parsed = $this->parseLegacyCarrier($data['deliveryOptions']['carrier'] ?? null);
 
@@ -225,7 +246,7 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
     {
         $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
 
-        $this->migrateInBatches($this->orderShipmentRepository, function ($shipment) use ($legacyToNewMap) {
+        $this->migrateInBatches($this->orderShipmentRepository, 'shipmentId', 'order_shipment', function ($shipment) use ($legacyToNewMap) {
             $data    = $shipment->getData();
             $changed = false;
 
@@ -269,20 +290,38 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
     /**
      * Process entities from a repository in batches to limit memory usage.
      *
+     * Uses keyset pagination on the entity identifier (WHERE id > :cursor ORDER BY id) rather than
+     * OFFSET, both to avoid the deep-offset scan cost on large tables and to give a stable cursor to
+     * persist. Progress is stored after each flushed batch so that a run interrupted by a timeout on a
+     * very large shop resumes where it left off on the next upgrade attempt instead of restarting. The
+     * cursor is only ever written after the batch is committed, so it can never point past uncommitted
+     * data; combined with the idempotent transforms, re-processing an already-migrated row is harmless.
+     *
      * @param  \MyParcelNL\PrestaShop\Repository\AbstractPsObjectRepository $repository
-     * @param  callable                                                      $callback
-     * @param  int                                                           $batchSize
+     * @param  string                                                       $idField    Doctrine identifier field, e.g. "orderId"
+     * @param  string                                                       $cursorName Unique name for the persisted progress cursor
+     * @param  callable                                                     $callback
+     * @param  int                                                          $batchSize
      */
-    private function migrateInBatches(AbstractPsObjectRepository $repository, callable $callback, int $batchSize = 500): void
-    {
+    private function migrateInBatches(
+        AbstractPsObjectRepository $repository,
+        string                     $idField,
+        string                     $cursorName,
+        callable                   $callback,
+        int                        $batchSize = 500
+    ): void {
         /** @var \Doctrine\ORM\EntityManager $em */
-        $em     = Pdk::get('ps.entityManager');
-        $qb     = $em->getRepository($repository->getEntityClass())->createQueryBuilder('e');
-        $offset = 0;
+        $em        = Pdk::get('ps.entityManager');
+        $cursorKey = $this->cursorKey($cursorName);
+        $idGetter  = 'get' . ucfirst($idField);
+        $cursor    = (int) $this->settingsRepository->get($cursorKey);
 
         do {
-            $batch = $qb
-                ->setFirstResult($offset)
+            $batch = $em->getRepository($repository->getEntityClass())
+                ->createQueryBuilder('e')
+                ->where(sprintf('e.%s > :cursor', $idField))
+                ->setParameter('cursor', $cursor)
+                ->orderBy(sprintf('e.%s', $idField), 'ASC')
                 ->setMaxResults($batchSize)
                 ->getQuery()
                 ->getResult();
@@ -296,13 +335,36 @@ final class Migration5_1_0 extends AbstractPsPdkMigration
                         'error'  => $e->getMessage(),
                     ]);
                 }
+
+                // Advance past this row regardless of callback outcome, so a poison row is not retried forever.
+                $cursor = $entity->{$idGetter}();
             }
 
             EntityManager::flush();
             $em->clear();
 
-            $offset += $batchSize;
+            // Persist progress only after the batch is committed; re-runs resume from here.
+            $this->settingsRepository->store($cursorKey, $cursor);
         } while (count($batch) === $batchSize);
+    }
+
+    /**
+     * Build the settings key used to persist a per-table batch-migration progress cursor.
+     */
+    private function cursorKey(string $cursorName): string
+    {
+        return Pdk::get('createSettingsKey')('migration_5_3_0_cursor_' . $cursorName);
+    }
+
+    /**
+     * Remove the persisted progress cursors once the migration has run to completion, so a future
+     * migration does not skip rows based on a stale cursor.
+     */
+    private function clearCursors(): void
+    {
+        foreach (['cart_delivery_options', 'order_data', 'order_shipment'] as $cursorName) {
+            $this->settingsRepository->store($this->cursorKey($cursorName), null);
+        }
     }
 
     /**

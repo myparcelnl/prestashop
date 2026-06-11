@@ -100,8 +100,9 @@ class MockPsEntityRepository extends \Doctrine\ORM\EntityRepository
 
     /**
      * Return a minimal fluent QueryBuilder mock backed by findAll(). The migration code
-     * uses setFirstResult/setMaxResults/getQuery()->getResult() for batched iteration —
-     * the mock honours both offsets so multi-batch test scenarios converge.
+     * uses where()/setParameter()/orderBy()/setMaxResults()/getQuery()->getResult() for
+     * keyset-paginated batched iteration — the mock mirrors that so multi-batch and
+     * resume-from-cursor test scenarios converge.
      *
      * @param  string $alias unused; matches the Doctrine signature
      */

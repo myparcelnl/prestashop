@@ -88,7 +88,7 @@ function fakeCapabilitiesRepositoryThrowing(): CarrierCapabilitiesRepository
 }
 
 /**
- * Standard fixture: install N carrier mappings (V2 names — Migration5_1_0 has already run by now),
+ * Standard fixture: install N carrier mappings (V2 names — Migration5_3_0 has already run by now),
  * one PS-only carrier (no mapping) that must always survive, and a delivery address in the given country.
  *
  * @return array{0: array, 1: array<string,int>}  [hookParams, v2Name => psCarrierId map]
