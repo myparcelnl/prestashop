@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.0](https://github.com/myparcelnl/prestashop/compare/v5.2.1...v5.3.0) (2026-06-11)
+
+
+### :sparkles: New Features
+
+* bump setasign/fpdi from 2.6.6 to 2.6.7 ([#525](https://github.com/myparcelnl/prestashop/issues/525)) ([8c04169](https://github.com/myparcelnl/prestashop/commit/8c04169c0ef14a3fc2e8616527d8db645b882ee2))
+* bump symfony/yaml from 5.4.45 to 5.4.53 ([#531](https://github.com/myparcelnl/prestashop/issues/531)) ([9038268](https://github.com/myparcelnl/prestashop/commit/9038268636af6d875c8afcfca9d34aa2a9dfe5ae))
+* **capabilities:** drive carriers, delivery options, and shipment options from the MyParcel API ([#519](https://github.com/myparcelnl/prestashop/issues/519)) ([43c24c4](https://github.com/myparcelnl/prestashop/commit/43c24c404ee257228002482ddd61c3771b277ff5)), closes [myparcelnl/pdk#459](https://github.com/myparcelnl/pdk/issues/459) [myparcelnl/js-pdk#346](https://github.com/myparcelnl/js-pdk/issues/346)
+* **perf:** improve the performance of the order grid when loading many orders ([#543](https://github.com/myparcelnl/prestashop/issues/543)) ([698978c](https://github.com/myparcelnl/prestashop/commit/698978c66a14b949a55d7a580c5496c01f0952d0))
+
 ## [5.2.1](https://github.com/myparcelnl/prestashop/compare/v5.2.0...v5.2.1) (2026-05-28)
 
 
