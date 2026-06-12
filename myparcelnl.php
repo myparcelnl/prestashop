@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection AutoloadingIssuesInspection */
 
 declare(strict_types=1);
@@ -68,7 +69,7 @@ class MyParcelNL extends CarrierModule
         $this->displayName            = 'MyParcel';
         $this->description            = 'MyParcel';
         $this->tab                    = 'AdminParentShipping';
-        $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => '8.99.99'];
+        $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => '9.99.99'];
 
         $this->registerTabs();
 
@@ -157,8 +158,8 @@ class MyParcelNL extends CarrierModule
         }
 
         return $this->withErrorHandling(function () {
-                Installer::uninstall($this);
-            })
+            Installer::uninstall($this);
+        })
             && parent::uninstall();
     }
 
