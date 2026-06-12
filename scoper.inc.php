@@ -38,6 +38,8 @@ return [
         'Symfony\\Bundle',
         'Symfony\\Component',
         'Symfony\\Contracts',
-        'Symfony\\Polyfill'
+        'Symfony\\Polyfill',
+        'Psr\\Http\\Message',
+        'Psr\\Log',
     ],
 ];

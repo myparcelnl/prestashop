@@ -62,7 +62,14 @@ class MockPsEntityRepository extends \Doctrine\ORM\EntityRepository
                 static function (object $object) use ($criteria) {
                     foreach ($criteria as $key => $value) {
                         $getter = sprintf('get%s', Str::studly($key));
-                        if ($object->{$getter}() === $value) {
+                        $actual = $object->{$getter}();
+
+                        // Mirror Doctrine: an array criterion matches any of its values (WHERE IN).
+                        $matches = is_array($value)
+                            ? in_array($actual, $value, true)
+                            : $actual === $value;
+
+                        if ($matches) {
                             continue;
                         }
 
@@ -89,5 +96,18 @@ class MockPsEntityRepository extends \Doctrine\ORM\EntityRepository
     public function persist(): void
     {
         MockPsEntities::add($this->entity);
+    }
+
+    /**
+     * Return a minimal fluent QueryBuilder mock backed by findAll(). The migration code
+     * uses where()/setParameter()/orderBy()/setMaxResults()/getQuery()->getResult() for
+     * keyset-paginated batched iteration — the mock mirrors that so multi-batch and
+     * resume-from-cursor test scenarios converge.
+     *
+     * @param  string $alias unused; matches the Doctrine signature
+     */
+    public function createQueryBuilder(string $alias): MockPsQueryBuilder
+    {
+        return new MockPsQueryBuilder($this->findAll());
     }
 }

@@ -6,18 +6,10 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Service;
 
 use Carrier as PsCarrier;
-use MyParcelNL\Pdk\App\Api\Backend\PdkBackendActions;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
-use MyParcelNL\Pdk\Facade\Actions;
 use MyParcelNL\Pdk\Facade\Pdk;
-use MyParcelNL\Pdk\Tests\Api\Response\ExampleAclResponse;
-use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetAccountsResponse;
-use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierConfigurationResponse;
-use MyParcelNL\Pdk\Tests\Api\Response\ExampleGetCarrierOptionsResponse;
-use MyParcelNL\Pdk\Tests\Api\Response\ExamplePrinterGroupIdResponse;
-use MyParcelNL\Pdk\Tests\Bootstrap\MockApi;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
@@ -68,39 +60,18 @@ function doSnapshotTest(Collection $carrierMappings, Collection $psCarriers): vo
 }
 
 it('creates carriers on account update', function () {
-    $carriers = setupAccountAndCarriers(
+    setupAccountAndCarriers(
         factory(CarrierCollection::class)->push(
             factory(Carrier::class)
-                ->fromPostNL()
-                ->withHuman('PostNL'),
+                ->fromPostNL(),
             factory(Carrier::class)
                 ->fromDhlForYou()
-                ->withContractId(8123)
-                ->withHuman('Dhl custom'),
-            factory(Carrier::class)
-                ->fromDhlForYou()
-                ->withHuman('Dhl')
         )
     );
 
-    $carrierOptions = $carriers->map(function (Carrier $carrier) {
-        return [
-            'id'         => $carrier->contractId ?? $carrier->id,
-            'carrier_id' => $carrier->id,
-            'enabled'    => (int) $carrier->enabled,
-            'type'       => $carrier->type,
-        ];
-    });
-
-    MockApi::enqueue(
-        new ExampleGetAccountsResponse(),
-        new ExampleGetCarrierConfigurationResponse(),
-        new ExampleGetCarrierOptionsResponse($carrierOptions->toArrayWithoutNull()),
-        new ExampleAclResponse(),
-        new ExamplePrinterGroupIdResponse([])
-    );
-
-    Actions::execute(PdkBackendActions::UPDATE_ACCOUNT);
+    /** @var PsCarrierServiceInterface $service */
+    $service = Pdk::get(PsCarrierServiceInterface::class);
+    $service->updateCarriers();
 
     /** @var PsCarrierMappingRepository $repository */
     $repository      = Pdk::get(PsCarrierMappingRepository::class);
@@ -108,9 +79,9 @@ it('creates carriers on account update', function () {
     $psCarriers      = new Collection(PsCarrier::getCarriers(0));
 
     expect($carrierMappings->count())
-        ->toBe(3)
+        ->toBe(2)
         ->and($psCarriers->count())
-        ->toBe(3);
+        ->toBe(2);
 
     doSnapshotTest($carrierMappings, $psCarriers);
 });
@@ -119,9 +90,7 @@ it('does not create duplicate carriers', function () {
     setupAccountAndCarriers(
         factory(CarrierCollection::class)->push(
             factory(Carrier::class)
-                ->withName(Carrier::CARRIER_POSTNL_NAME)
-                ->withId(12)
-                ->withContractId(23)
+                ->fromPostNL()
         )
     );
 
@@ -145,26 +114,23 @@ it('does not create duplicate carriers', function () {
 
 it('updates existing carrier if mapping already exists', function () {
     (new FactoryCollection([
-        psFactory(PsCarrier::class)->withId(10),
-        psFactory(PsCarrier::class)->withId(11),
+        psFactory(PsCarrier::class)->withId(10)->withName('This Is PostNL'),
+        psFactory(PsCarrier::class)->withId(11)->withName('This Is DhLForYou'),
 
         psFactory(MyparcelnlCarrierMapping::class)
             ->fromPostNL()
             ->withCarrierId(10),
         psFactory(MyparcelnlCarrierMapping::class)
-            ->fromDhlForYou(8123)
+            ->fromDhlForYou()
             ->withCarrierId(11),
     ]))->store();
 
     setupAccountAndCarriers(
         factory(CarrierCollection::class)->push(
             factory(Carrier::class)
-                ->fromPostNL()
-                ->withHuman('This Is PostNL'),
+                ->fromPostNL(),
             factory(Carrier::class)
                 ->fromDhlForYou()
-                ->withContractId(8123)
-                ->withHuman('This Is DhLForYou')
         )
     );
 

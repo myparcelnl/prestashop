@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Router\Service;
 
 use Context;
+use Link;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use Symfony\Component\Config\FileLocator;
@@ -37,6 +38,16 @@ final class Ps8RouterService extends PsRouterService
      */
     protected function generateRoute(string $route): string
     {
+        // The frontend endpoint is a module front controller, not a Symfony route.
+        // Link::getModuleLink() is the only reliable way to resolve it on any PS
+        // installation regardless of URL-rewriting or nginx configuration.
+        if (Pdk::get('routeNameFrontend') === $route) {
+            /** @var Link $link */
+            $link = Context::getContext()->link;
+
+            return $link->getModuleLink('myparcelnl', 'frontend');
+        }
+
         return $this->router->generate($route);
     }
 
@@ -50,9 +61,7 @@ final class Ps8RouterService extends PsRouterService
         /** @var \Psr\Container\ContainerInterface $container */
         $container = Pdk::get('ps.container');
 
-        $controller = Context::getContext()->controller;
-
-        if ('order' === $controller->php_self) {
+        if ($this->isCheckoutPage()) {
             $routesDirectory = _PS_ROOT_DIR_ . '/modules/myparcelnl/config';
             $locator         = new FileLocator([$routesDirectory]);
             $loader          = new YamlFileLoader($locator);
@@ -61,5 +70,13 @@ final class Ps8RouterService extends PsRouterService
         }
 
         return $container->get('prestashop.router');
+    }
+
+    /**
+     * @return bool
+     */
+    private function isCheckoutPage(): bool
+    {
+        return 'order' === (Context::getContext()->controller->php_self ?? null);
     }
 }

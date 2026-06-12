@@ -105,9 +105,10 @@ final class PsObjectModelService implements PsObjectModelServiceInterface
         $id = $this->getId($class, $input);
 
         if ($id) {
+            // Instantiating the model with the id will automatically load it from the database
             $model = new $class($id);
-
-            return $this->exists($class, $model) ? $model : null;
+            // Double check this is an existing model and not just a local copy
+            return $this->isModel($class, $model) && $model->id ? $model : null;
         }
 
         return null;

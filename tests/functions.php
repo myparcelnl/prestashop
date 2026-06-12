@@ -9,13 +9,17 @@ use Carrier as PsCarrier;
 use MyParcelNL\Pdk\Account\Collection\ShopCollection;
 use MyParcelNL\Pdk\Account\Model\Shop;
 use MyParcelNL\Pdk\Base\Support\Collection;
+use MyParcelNL\Pdk\Base\Support\SettingKey;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollectionFactory;
 use MyParcelNL\Pdk\Carrier\Model\Carrier;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefTypesDeliveryTypeV2;
 use MyParcelNL\Pdk\Settings\Model\CarrierSettings;
 use MyParcelNL\Pdk\Settings\Model\CheckoutSettings;
 use MyParcelNL\Pdk\Settings\Model\Settings;
 use MyParcelNL\Pdk\Settings\Model\SettingsFactory;
+use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Tests\Bootstrap\TestBootstrapper;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Entity\EntityInterface;
@@ -51,7 +55,6 @@ function setupCarrierActiveSettings(array $settings): SettingsFactory
         factory(CarrierCollection::class)->push(
             factory(Carrier::class)
                 ->fromPostNL()
-                ->withEnabled(true)
         )
     );
 
@@ -60,9 +63,12 @@ function setupCarrierActiveSettings(array $settings): SettingsFactory
             ->withId(12),
 
         psFactory(MyparcelnlCarrierMapping::class)
-            ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME)
+            ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL)
             ->withCarrierId(12),
     ]))->store();
+
+    $allowDeliveryOptionsKey = SettingKey::allow(DeliveryOptions::DELIVERY_OPTION_ALLOW_HOME);
+    $allowPickupLocationsKey = SettingKey::allow(RefTypesDeliveryTypeV2::PICKUP);
 
     return factory(Settings::class)
         ->withCheckout([
@@ -70,7 +76,7 @@ function setupCarrierActiveSettings(array $settings): SettingsFactory
         ])
         ->withCarrierPostNl([
             CarrierSettings::DELIVERY_OPTIONS_ENABLED => $settings[CarrierSettings::DELIVERY_OPTIONS_ENABLED] ?? false,
-            CarrierSettings::ALLOW_DELIVERY_OPTIONS   => $settings[CarrierSettings::ALLOW_DELIVERY_OPTIONS] ?? false,
-            CarrierSettings::ALLOW_PICKUP_LOCATIONS   => $settings[CarrierSettings::ALLOW_PICKUP_LOCATIONS] ?? false,
+            $allowDeliveryOptionsKey                  => $settings[$allowDeliveryOptionsKey] ?? false,
+            $allowPickupLocationsKey                  => $settings[$allowPickupLocationsKey] ?? false,
         ]);
 }

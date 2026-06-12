@@ -34,11 +34,21 @@ abstract class PsRouterService extends Repository implements PsRouterServiceInte
      */
     public function getRouteToken(string $route): string
     {
+        return $this->getRouteParameters($route)['_token'] ?? '';
+    }
+
+    /**
+     * @param  string $route
+     *
+     * @return array<string, string>
+     */
+    public function getRouteParameters(string $route): array
+    {
         $query = [];
 
         parse_str(parse_url($this->generateRouteCached($route), PHP_URL_QUERY) ?? '', $query);
 
-        return $query['_token'] ?? '';
+        return $query;
     }
 
     /**

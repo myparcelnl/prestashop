@@ -61,3 +61,33 @@ namespace Symfony\Component\Cache\Adapter;
 use MyParcelNL\PrestaShop\Tests\Mock\BaseMock;
 
 class ArrayAdapter extends BaseMock { }
+
+namespace PrestaShop\PrestaShop\Core\Grid\Record;
+
+/**
+ * Minimal stand-in for PrestaShop's grid RecordCollection: holds raw record arrays and exposes
+ * them via all(), which is the only part the module's order-grid hook consumes.
+ */
+class RecordCollection
+{
+    /**
+     * @var array
+     */
+    private $items;
+
+    /**
+     * @param  array $records
+     */
+    public function __construct(array $records = [])
+    {
+        $this->items = $records;
+    }
+
+    /**
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->items;
+    }
+}

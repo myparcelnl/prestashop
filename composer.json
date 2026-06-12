@@ -1,10 +1,12 @@
 {
   "name": "myparcelnl/prestashop-module",
-  "version": "5.1.0",
+  "version": "5.3.0",
   "license": "MIT",
   "type": "prestashop-module",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "require": {
-    "myparcelnl/pdk": "^3.4.1",
+    "myparcelnl/pdk": "^4.0.0",
     "myparcelnl/sdk": "^11.0.0-beta.1",
     "php": ">=7.4.0"
   },
