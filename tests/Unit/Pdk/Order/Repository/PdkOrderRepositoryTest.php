@@ -26,6 +26,8 @@ use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use Address;
+use Country;
 use Order;
 use OrderFactory;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
@@ -247,21 +249,33 @@ it('throws from findOrFail when the order does not exist', function () {
     $orderRepository->findOrFail(99999);
 })->throws(ModelNotFoundException::class);
 
-it('getMany delegates to findAll', function () {
-    /** @var Order $orderA */
-    $orderA = psFactory(Order::class)->store();
-    /** @var Order $orderB */
-    $orderB = psFactory(Order::class)->store();
+it('loads full order data when fetching many orders', function () {
+    /** @var Country $country */
+    $country = psFactory(Country::class)
+        ->withIsoCode('NL')
+        ->store();
+
+    /** @var Address $deliveryAddress */
+    $deliveryAddress = psFactory(Address::class)
+        ->withCountry($country)
+        ->store();
+
+    /** @var Order $order */
+    $order = psFactory(Order::class)
+        ->withAddressDelivery($deliveryAddress)
+        ->store();
 
     /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
     $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
 
-    $result = $orderRepository->getMany([(int) $orderA->id, (int) $orderB->id]);
+    $result = $orderRepository->getMany([(int) $order->id]);
 
     expect($result)
         ->toBeInstanceOf(PdkOrderCollection::class)
         ->and($result->count())
-        ->toBe(2);
+        ->toBe(1)
+        ->and($result->first()->shippingAddress->cc)
+        ->toBe('NL');
 });
 
 it('builds pdk orders from an order-grid record collection', function () {
