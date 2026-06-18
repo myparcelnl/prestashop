@@ -38,8 +38,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Running PDK console commands
 
-This module is built on the [MyParcel PDK](https://github.com/myparcelnl/pdk). With the PDK linked locally for development (`pdk-dev-on`), you can run any PDK console command from the module root:
-
+This module is built on the [MyParcel PDK](https://github.com/myparcelnl/pdk). With the PDK linked locally for development (`pdk-dev-on`) **and its dependencies installed** (run `composer install` in the linked PDK repo), you can run any PDK console command from the module root:
 ```sh
 composer console <command>
 ```
