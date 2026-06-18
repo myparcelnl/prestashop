@@ -13,7 +13,6 @@ use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderRepository;
 use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
 use MyParcelNL\Pdk\Base\Exception\ModelNotFoundException;
 use MyParcelNL\Pdk\Base\Support\Collection;
-use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Shipment\Model\Shipment;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
@@ -128,16 +127,17 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements P
     }
 
     /**
-     * Get multiple items by their identifier,
-     * proxies to findAll() for backward compatibility until getMany() is removed in favor of findAll()
-     * in the next major version.
+     * Get multiple fully-detailed orders by their identifier.
+     *
+     * Action flows such as export need addresses, lines and prices. Keep findAll() as the
+     * lightweight list-level lookup used by the order grid.
      *
      * @param string|string[] $orderIds
      * @return PdkOrderCollection
      */
     public function getMany($orderIds): PdkOrderCollection
     {
-        return $this->findAll(Utils::toArray($orderIds));
+        return parent::getMany($orderIds);
     }
 
     /**
