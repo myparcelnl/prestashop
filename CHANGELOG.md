@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.1](https://github.com/myparcelnl/prestashop/compare/v5.3.0...v5.3.1) (2026-06-18)
+
+
+### :bug: Bug Fixes
+
+* **admin:** restore myparcel config link under "shipping" menu in admin ([#511](https://github.com/myparcelnl/prestashop/issues/511)) ([9c7bc52](https://github.com/myparcelnl/prestashop/commit/9c7bc52f54b6e85ae7c3ffa2330e95925ec4a75e))
+* **order:** load full orders for export ([#553](https://github.com/myparcelnl/prestashop/issues/553)) ([d0069f3](https://github.com/myparcelnl/prestashop/commit/d0069f38691c44e5d733eb3b198494294aa40f76)), closes [#543](https://github.com/myparcelnl/prestashop/issues/543) [#491](https://github.com/myparcelnl/prestashop/issues/491)
+
 ## [5.3.0](https://github.com/myparcelnl/prestashop/compare/v5.2.1...v5.3.0) (2026-06-11)
 
 
