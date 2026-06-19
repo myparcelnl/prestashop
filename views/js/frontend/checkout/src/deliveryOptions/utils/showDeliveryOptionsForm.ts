@@ -7,5 +7,9 @@ export const showDeliveryOptionsForm = (): void => {
     return;
   }
 
+  // Some themes nest .carrier-extra-content inside .delivery-option, which breaks
+  // the theme's own updatedDeliveryForm handler that is supposed to reveal it after a carrier switch.
+  $wrapper.parents('.carrier-extra-content:hidden').show();
+
   $wrapper.stop().show();
 };
