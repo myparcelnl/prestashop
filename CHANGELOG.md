@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.0](https://github.com/myparcelnl/prestashop/compare/v5.3.1...v5.4.0) (2026-06-19)
+
+
+### :sparkles: New Features
+
+* add support for custom themes delivery options checkout form ([#549](https://github.com/myparcelnl/prestashop/issues/549)) ([ebc80ff](https://github.com/myparcelnl/prestashop/commit/ebc80ffe5e68ffde45dc10fea6e2e052db2432a1))
+
 ## [5.3.1](https://github.com/myparcelnl/prestashop/compare/v5.3.0...v5.3.1) (2026-06-18)
 
 
