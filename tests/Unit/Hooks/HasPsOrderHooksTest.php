@@ -46,6 +46,7 @@ it('transfers delivery options from cart to order on validate', function () {
     expect($record)->not->toBeNull();
     $data = $record->getData();
     expect($data)->toHaveKey('deliveryOptions');
+    expect($data['deliveryOptions'])->toMatchArray($rawDeliveryOptions);
 });
 
 it('does not create order data record when no cart delivery options exist', function () {
@@ -62,5 +63,10 @@ it('does not create order data record when no cart delivery options exist', func
 });
 
 it('does nothing when order param is missing', function () {
-    expect(fn() => (new ClassWithPsOrderHooks())->hookActionValidateOrder([]))->not->toThrow(\Throwable::class);
+    (new ClassWithPsOrderHooks())->hookActionValidateOrder([]);
+
+    /** @var PsOrderDataRepository $orderDataRepo */
+    $orderDataRepo = Pdk::get(PsOrderDataRepository::class);
+
+    expect($orderDataRepo->all())->toBeEmpty();
 });
