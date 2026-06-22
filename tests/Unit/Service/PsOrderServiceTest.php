@@ -38,6 +38,10 @@ it('returns delivery options and persists order data when cart delivery options 
     $cart  = psFactory(\Cart::class)->store();
     $order = psFactory(\Order::class)->withIdCart($cart->id)->store();
 
+    // A plain array literal is used instead of DeliveryOptions::toStorableArray():
+    // the latter resolves the carrier from the repository and throws
+    // ModelNotFoundException in the PDK 4.0.1 mock environment. The code under test
+    // stores the cart's raw data verbatim, so the exact shape here is what matters.
     $rawDeliveryOptions = [
         DeliveryOptions::CARRIER       => 'postnl',
         DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
@@ -56,6 +60,7 @@ it('returns delivery options and persists order data when cart delivery options 
     $result = $orderService->getOrderData($order->id);
 
     expect($result)->toHaveKey('deliveryOptions');
+    expect($result['deliveryOptions'])->toMatchArray($rawDeliveryOptions);
 
     /** @var PsOrderDataRepository $orderDataRepo */
     $orderDataRepo = Pdk::get(PsOrderDataRepository::class);
