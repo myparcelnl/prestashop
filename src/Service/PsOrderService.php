@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Service;
 
-use InvalidArgumentException;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
@@ -82,7 +81,7 @@ final class PsOrderService extends PsSpecificObjectModelService implements PsOrd
         $fromOrder = $this->psOrderDataRepository->findOneBy(['orderId' => $this->getId($input)]);
 
         if (! $fromOrder) {
-            throw new InvalidArgumentException('Order could not be found');
+            return [];
         }
 
         return $fromOrder->getNotes();
@@ -138,13 +137,15 @@ final class PsOrderService extends PsSpecificObjectModelService implements PsOrd
         $id       = $this->getId($order);
         $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['cartId' => $order->id_cart]);
 
-        if ($fromCart) {
-            Logger::debug("[Order $id] Delivery options found in cart, saving to order");
-        } else {
-            Logger::debug("[Order $id] Saving empty order data to order");
+        if (! $fromCart) {
+            Logger::debug("[Order $id] No cart delivery options found, returning empty");
+
+            return [];
         }
 
-        $orderData = $fromCart ? ['deliveryOptions' => $fromCart->getData()] : [];
+        Logger::debug("[Order $id] Delivery options found in cart, saving to order");
+
+        $orderData = ['deliveryOptions' => $fromCart->getData()];
 
         $this->updateOrderData($order, $orderData);
 
