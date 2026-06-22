@@ -15,17 +15,17 @@ use Throwable;
 trait HasPsOrderHooks
 {
     /**
-     * Eagerly transfers delivery options from the cart to the order when the order is validated.
-     * Prevents the race condition where the lazy fallback in PsOrderService::getFromCart() runs
-     * before cart delivery options are available and persists an empty record.
+     * Eagerly transfers delivery options from the cart to the order when the order is validated,
+     * so the admin order grid shows the correct carrier and options on first render instead of
+     * relying on the lazy fallback in PsOrderService::getFromCart() (which remains as a safety net).
      *
-     * @param  array{order: Order} $params
+     * @param  array{order?: Order} $params
      *
      * @return void
      */
     public function hookActionValidateOrder(array $params): void
     {
-        /** @var Order $order */
+        /** @var Order|null $order */
         $order = $params['order'] ?? null;
 
         if (! $order instanceof Order) {
