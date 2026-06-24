@@ -16,6 +16,7 @@
     "spatie/pest-plugin-snapshots": "^1.1.0"
   },
   "scripts": {
+    "console": "php vendor/myparcelnl/pdk/bin/console",
     "test": "php -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest",
     "test:snapshots": "php -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest -d --update-snapshots",
     "test:coverage": "php -dpcov.enabled=1 -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest --coverage-clover=clover.xml --coverage-html=coverage"

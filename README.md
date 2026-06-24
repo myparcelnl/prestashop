@@ -36,6 +36,15 @@ When upgrading to v4.x it may be necessary to first clear the cache of Prestasho
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+## Running PDK console commands
+
+This module is built on the [MyParcel PDK](https://github.com/myparcelnl/pdk). With the PDK linked locally for development (`pdk-dev-on`) **and its dependencies installed** (run `composer install` in the linked PDK repo), you can run any PDK console command from the module root:
+```sh
+composer console <command>
+```
+
+Run `composer console list` to see all available commands, or `composer console help <command>` for a command's full usage.
+
 ## Versions
 
 The 1.7 module was initially considered a completely standalone module from the old 1.6 version, and released as version 1.0. This has caused some confusion among users as well as our developers and support team. This will also be able to cause issues in the future when we release new versions that include migrations based on the previously installed version of the module.
