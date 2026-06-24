@@ -19,6 +19,11 @@ trait HasPsOrderHooks
      * so the admin order grid shows the correct carrier and options on first render instead of
      * relying on the lazy fallback in PsOrderService::getFromCart() (which remains as a safety net).
      *
+     * This hook fires exactly once per order, dispatched from PaymentModule::validateOrder() during
+     * the checkout payment flow — before the order is ever accessible in the back-office. Admin order
+     * modifications go through different hooks (hookActionUpdateOrder etc.), so there is no risk of
+     * overwriting manually changed order data.
+     *
      * @param  array{order?: Order} $params
      *
      * @return void
