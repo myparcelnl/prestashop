@@ -49,7 +49,7 @@ it('transfers delivery options from cart to order on validate', function () {
     expect($data['deliveryOptions'])->toMatchArray($rawDeliveryOptions);
 });
 
-it('does not create order data record when no cart delivery options exist', function () {
+it('persists an empty order data record when no cart delivery options exist', function () {
     $cart  = psFactory(\Cart::class)->store();
     $order = psFactory(Order::class)->withIdCart($cart->id)->store();
 
@@ -59,7 +59,10 @@ it('does not create order data record when no cart delivery options exist', func
     $orderDataRepo = Pdk::get(PsOrderDataRepository::class);
     $record        = $orderDataRepo->findOneBy(['orderId' => $order->id]);
 
-    expect($record)->toBeNull();
+    // Marks the order as "processed" even without delivery options, so getOrderData does
+    // not have to re-query the cart on every read.
+    expect($record)->not->toBeNull();
+    expect($record->getData())->toBe([]);
 });
 
 it('does nothing when order param is missing', function () {

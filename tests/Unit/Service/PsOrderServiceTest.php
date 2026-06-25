@@ -17,7 +17,7 @@ use function MyParcelNL\PrestaShop\psFactory;
 
 usesShared(new UsesMockPsPdkInstance());
 
-it('returns empty array and does NOT persist order data when no cart delivery options exist', function () {
+it('persists an empty order data record when no cart delivery options exist', function () {
     $order = psFactory(\Order::class)->store();
 
     /** @var PsOrderServiceInterface $orderService */
@@ -27,11 +27,14 @@ it('returns empty array and does NOT persist order data when no cart delivery op
 
     expect($result)->toBe([]);
 
+    // The order is marked "processed" by persisting an empty record, so subsequent reads
+    // return the stored value instead of re-querying the cart on every getOrderData call.
     /** @var PsOrderDataRepository $orderDataRepo */
     $orderDataRepo = Pdk::get(PsOrderDataRepository::class);
     $record = $orderDataRepo->findOneBy(['orderId' => $order->id]);
 
-    expect($record)->toBeNull();
+    expect($record)->not->toBeNull();
+    expect($record->getData())->toBe([]);
 });
 
 it('returns delivery options and persists order data when cart delivery options exist', function () {
