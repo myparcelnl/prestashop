@@ -17,5 +17,6 @@
     "displayHeader",
     "actionFilterDeliveryOptionList",
     "displayCarrierList",
-    "actionCarrierUpdate"
+    "actionCarrierUpdate",
+    "actionValidateOrder"
 ]
