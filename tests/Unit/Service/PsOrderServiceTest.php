@@ -45,9 +45,12 @@ it('returns delivery options and persists order data when cart delivery options 
     // the latter resolves the carrier from the repository and throws
     // ModelNotFoundException in the PDK 4.0.1 mock environment. The code under test
     // stores the cart's raw data verbatim, so the exact shape here is what matters.
+    //
+    // Deliberately non-default values (not postnl / standard) so the test proves the actual
+    // stored options are round-tripped, and cannot pass on coincidentally-correct defaults.
     $rawDeliveryOptions = [
-        DeliveryOptions::CARRIER       => 'postnl',
-        DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+        DeliveryOptions::CARRIER       => 'dpd',
+        DeliveryOptions::DELIVERY_TYPE => 'morning',
     ];
 
     /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepo */

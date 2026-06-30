@@ -25,9 +25,11 @@ it('transfers delivery options from cart to order on validate', function () {
     $cart  = psFactory(\Cart::class)->store();
     $order = psFactory(Order::class)->withIdCart($cart->id)->store();
 
+    // Deliberately non-default values (not postnl / standard) so the test proves the actual
+    // stored options are round-tripped, and cannot pass on coincidentally-correct defaults.
     $rawDeliveryOptions = [
-        DeliveryOptions::CARRIER       => 'postnl',
-        DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+        DeliveryOptions::CARRIER       => 'dpd',
+        DeliveryOptions::DELIVERY_TYPE => 'morning',
     ];
 
     /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepo */
