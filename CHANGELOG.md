@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.1](https://github.com/myparcelnl/prestashop/compare/v5.4.0...v5.4.1) (2026-06-30)
+
+
+### :bug: Bug Fixes
+
+* make checkout delivery options available on the order immediately ([#560](https://github.com/myparcelnl/prestashop/issues/560)) ([9e816f7](https://github.com/myparcelnl/prestashop/commit/9e816f76fd653af7733ce5c1e993117fd29de95f))
+* show delivery options on initial checkout load ([#568](https://github.com/myparcelnl/prestashop/issues/568)) ([e247034](https://github.com/myparcelnl/prestashop/commit/e24703404508283f3724eaa2fcef001062e677f2))
+
 ## [5.4.0](https://github.com/myparcelnl/prestashop/compare/v5.3.1...v5.4.0) (2026-06-19)
 
 
