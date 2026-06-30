@@ -2,6 +2,7 @@ import {useDeliveryOptionsStore} from '@myparcel-dev/pdk-checkout';
 import {getCurrentShippingMethod} from '../../utils';
 import {toggleDeliveryOptions} from './toggleDeliveryOptions';
 import {moveDeliveryOptionsForm} from './moveDeliveryOptionsForm';
+import {showDeliveryOptionsForm} from './showDeliveryOptionsForm';
 
 export const updateDeliveryOptionsDiv = (mode = 'move'): void => {
   const currentShippingMethod = getCurrentShippingMethod();
@@ -17,4 +18,8 @@ export const updateDeliveryOptionsDiv = (mode = 'move'): void => {
   void deliveryOptionsStore.set(newState);
 
   moveDeliveryOptionsForm(currentShippingMethod.row, mode);
+
+  if (newState.enabled) {
+    showDeliveryOptionsForm();
+  }
 };

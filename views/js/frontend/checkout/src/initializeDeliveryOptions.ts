@@ -10,7 +10,6 @@ import {
   getDefaultDeliveryOptionsConfig,
   onShippingMethodChange,
   onDeliveryOptionsOutputChange,
-  showDeliveryOptionsForm,
   updateDeliveryOptionsDiv,
 } from './deliveryOptions';
 
@@ -26,5 +25,5 @@ export const initializeDeliveryOptions = (): void => {
   checkoutStore.on(StoreListener.Update, onShippingMethodChange);
   deliveryOptionsStore.on(StoreListener.Update, onDeliveryOptionsOutputChange);
 
-  window.prestashop.on('updatedDeliveryForm', debounce(showDeliveryOptionsForm, 300));
+  window.prestashop.on('updatedDeliveryForm', debounce(() => updateDeliveryOptionsDiv(), 300));
 };
