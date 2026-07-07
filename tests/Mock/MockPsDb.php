@@ -7,7 +7,6 @@ namespace MyParcelNL\PrestaShop\Tests\Mock;
 use DbQuery;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
-use MyParcelNL\Sdk\Concerns\HasInstance;
 use MyParcelNL\Sdk\Support\Str;
 use PDOStatement;
 use PrestaShopException;
@@ -15,12 +14,32 @@ use Throwable;
 
 abstract class MockPsDb extends BaseMock implements StaticMockInterface
 {
-    use HasInstance;
+    /**
+     * @var static
+     */
+    protected static $instance;
 
     /**
      * @var array<string, array>[]
      */
     private static $database = [];
+
+    /**
+     * Replaces the singleton behavior of Db::getInstance(). Inlined from the
+     * MyParcelNL\Sdk\Concerns\HasInstance trait, which was removed from the sdk in v11.0.0-beta.28.
+     *
+     * @param  mixed ...$arguments
+     *
+     * @return static
+     */
+    public static function getInstance(...$arguments)
+    {
+        if (! static::$instance) {
+            static::$instance = new static(...$arguments);
+        }
+
+        return static::$instance;
+    }
 
     /**
      * @param  string     $table
