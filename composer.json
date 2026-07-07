@@ -6,8 +6,8 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "myparcelnl/pdk": "^4.0.0",
-    "myparcelnl/sdk": "^11.0.0-beta.1",
+    "myparcelnl/pdk": "^4.1.1",
+    "myparcelnl/sdk": "^11.0.0-beta.28",
     "php": ">=7.4.0"
   },
   "require-dev": {
