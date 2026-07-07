@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.0](https://github.com/myparcelnl/prestashop/compare/v5.4.1...v5.5.0) (2026-07-07)
+
+
+### :sparkles: New Features
+
+* **pdk:** update PDK from 4.0.1 to 4.1.1 ([#576](https://github.com/myparcelnl/prestashop/issues/576)) ([c50ed02](https://github.com/myparcelnl/prestashop/commit/c50ed022d2967f8aaf40cc8b9783e3a5b97b4d18))
+
 ## [5.4.1](https://github.com/myparcelnl/prestashop/compare/v5.4.0...v5.4.1) (2026-06-30)
 
 
