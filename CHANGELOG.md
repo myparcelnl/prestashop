@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.1](https://github.com/myparcelnl/prestashop/compare/v5.5.0...v5.5.1) (2026-07-09)
+
+
+### :bug: Bug Fixes
+
+* fix issues with stale cache causing issues when updating the plugin ([#579](https://github.com/myparcelnl/prestashop/issues/579)) ([b0b2713](https://github.com/myparcelnl/prestashop/commit/b0b27132ee6bed9b83f8797d550d48c9014fdac9))
+
 ## [5.5.0](https://github.com/myparcelnl/prestashop/compare/v5.4.1...v5.5.0) (2026-07-07)
 
 
