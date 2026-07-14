@@ -31,12 +31,14 @@
         "postalCode": "2132JE",
         "street": "Antareslaan 31 (Billing)",
         "streetAdditionalInfo": "(Billing)",
+        "isBusiness": false,
         "person": "Meredith Mailbox"
     },
     "shippingAddress": {
         "city": "Hoofddorp",
         "postalCode": "2132JE",
         "street": "Antareslaan 31",
+        "isBusiness": false,
         "person": "Meredith Mailbox"
     },
     "shipments": [],

@@ -94,9 +94,10 @@ function fakeCapabilitiesRepositoryThrowing(): CarrierCapabilitiesRepository
  * @return array{0: array, 1: array<string,int>}  [hookParams, v2Name => psCarrierId map]
  */
 function setupModuleWithMappings(
-    array  $mappingV2Names,
-    string $deliveryCountryIso = 'NL',
-    string $proposition = Proposition::MYPARCEL_NAME
+    array   $mappingV2Names,
+    string  $deliveryCountryIso = 'NL',
+    string  $proposition = Proposition::MYPARCEL_NAME,
+    ?string $company = null
 ): array {
     $propositionId = Proposition::SENDMYPARCEL_NAME === $proposition
         ? Proposition::SENDMYPARCEL_ID
@@ -129,9 +130,14 @@ function setupModuleWithMappings(
         $index++;
     }
 
-    $deliveryAddress = psFactory(Address::class)
-        ->withIdCountry(Country::getByIso($deliveryCountryIso))
-        ->store();
+    $deliveryAddressFactory = psFactory(Address::class)
+        ->withIdCountry(Country::getByIso($deliveryCountryIso));
+
+    if (null !== $company) {
+        $deliveryAddressFactory = $deliveryAddressFactory->withCompany($company);
+    }
+
+    $deliveryAddress = $deliveryAddressFactory->store();
 
     $params = [
         'altern'               => 1,
@@ -273,6 +279,24 @@ it('forwards the cart delivery country to the capabilities API', function () {
         $reset();
     }
 });
+
+it('forwards the business flag derived from the delivery address company', function (?string $company, bool $expected) {
+    [$params] = setupModuleWithMappings([RefCapabilitiesSharedCarrierV2::POSTNL], 'NL', Proposition::MYPARCEL_NAME, $company);
+
+    $fake  = fakeCapabilitiesRepositoryReturning([RefCapabilitiesSharedCarrierV2::POSTNL]);
+    $reset = mockPdkProperty(CarrierCapabilitiesRepository::class, $fake);
+
+    try {
+        (new WithHasPsCarrierListHooks())->hookActionFilterDeliveryOptionList($params);
+
+        expect($fake->lastArgs['recipient'])->toHaveKey('is_business', $expected);
+    } finally {
+        $reset();
+    }
+})->with([
+    'business (company entered)' => ['Acme B.V.', true],
+    'consumer (no company)'      => [null, false],
+]);
 
 it('leaves delivery options without a carrier_list untouched instead of erroring', function () {
     [$params] = setupModuleWithMappings([RefCapabilitiesSharedCarrierV2::POSTNL]);
