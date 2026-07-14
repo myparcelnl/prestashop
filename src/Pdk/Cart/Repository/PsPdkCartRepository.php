@@ -60,6 +60,9 @@ class PsPdkCartRepository extends AbstractPdkCartRepository
                         'cc'         => Country::getIsoById($address->id_country),
                         'postalCode' => $address->postcode,
                         'fullStreet' => $address->address1,
+                        // The PDK Address derives isBusiness from a company name and drops the name
+                        // itself, so passing it keeps the cart PII-free while flagging B2B recipients.
+                        'company'    => $address->company,
                     ],
                 ],
                 'lines'                 => array_map(function ($item) {
