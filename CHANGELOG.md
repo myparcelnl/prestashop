@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.2](https://github.com/myparcelnl/prestashop/compare/v5.5.1...v5.5.2) (2026-07-16)
+
+
+### :bug: Bug Fixes
+
+* **api:** fix `isBusiness` defaulting to `true` in capabilities, fix new carriers breaking the plugin ([#588](https://github.com/myparcelnl/prestashop/issues/588)) ([e174456](https://github.com/myparcelnl/prestashop/commit/e17445688b4afc334f15779991b9c1e8df68b711))
+* **settings:** prevent an empty settings page when an error occurs ([#585](https://github.com/myparcelnl/prestashop/issues/585)) ([6fab39f](https://github.com/myparcelnl/prestashop/commit/6fab39f057fd72c3969286da126b72d197a99ebd))
+
 ## [5.5.1](https://github.com/myparcelnl/prestashop/compare/v5.5.0...v5.5.1) (2026-07-09)
 
 
