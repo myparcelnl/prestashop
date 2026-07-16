@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.3](https://github.com/myparcelnl/prestashop/compare/v5.5.2...v5.5.3) (2026-07-16)
+
+
+### :bug: Bug Fixes
+
+* **checkout:** prevent the full address being filled into 'street' when separate fields were enabled ([#596](https://github.com/myparcelnl/prestashop/issues/596)) ([e5ca04d](https://github.com/myparcelnl/prestashop/commit/e5ca04de41b36818d0df88cb78852aca5fdce3a0))
+
 ## [5.5.2](https://github.com/myparcelnl/prestashop/compare/v5.5.1...v5.5.2) (2026-07-16)
 
 
