@@ -19,7 +19,7 @@
   "devDependencies": {
     "@myparcel-dev/pdk-admin-component-tests": "^2.0.0",
     "@vitejs/plugin-vue": "^5.0.0",
-    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "autoprefixer": "^10.4.14",
     "happy-dom": "^15.10.2",
     "postcss": "^8.4.21",
