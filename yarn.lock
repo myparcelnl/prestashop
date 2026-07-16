@@ -1346,6 +1346,7 @@ __metadata:
     nx: "npm:^18.0.0"
     prettier: "npm:^3.5.3"
     sharp: "npm:^0.34.2"
+    typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
 
