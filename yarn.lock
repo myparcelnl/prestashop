@@ -1203,12 +1203,12 @@ __metadata:
   linkType: hard
 
 "@myparcel-dev/sdk@npm:^5.0.0, @myparcel-dev/sdk@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "@myparcel-dev/sdk@npm:5.1.0"
+  version: 5.1.2
+  resolution: "@myparcel-dev/sdk@npm:5.1.2"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.7.0"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
-  checksum: 10c0/c518a06b3c54827bdcf8e22418ef844c3bc1490a52086a612d7576ba4561488aa512b4aed37dbbb9ccdb65f060edf5232e0905b4980ddd8b4c1bb1cf6fec2630
+  checksum: 10c0/66daea50f4d36dfbe8272d1412b3b3f0d0c73f25e543a8f9b762abcbbfc6bd9168e2c57727d1f7e2f2394c827e1f0cd8b00ed326bc1fa78f8a35093880198944
   languageName: node
   linkType: hard
 
