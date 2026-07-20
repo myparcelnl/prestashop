@@ -1203,12 +1203,12 @@ __metadata:
   linkType: hard
 
 "@myparcel-dev/sdk@npm:^5.0.0, @myparcel-dev/sdk@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "@myparcel-dev/sdk@npm:5.1.0"
+  version: 5.1.2
+  resolution: "@myparcel-dev/sdk@npm:5.1.2"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.7.0"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
-  checksum: 10c0/c518a06b3c54827bdcf8e22418ef844c3bc1490a52086a612d7576ba4561488aa512b4aed37dbbb9ccdb65f060edf5232e0905b4980ddd8b4c1bb1cf6fec2630
+  checksum: 10c0/66daea50f4d36dfbe8272d1412b3b3f0d0c73f25e543a8f9b762abcbbfc6bd9168e2c57727d1f7e2f2394c827e1f0cd8b00ed326bc1fa78f8a35093880198944
   languageName: node
   linkType: hard
 
@@ -9324,12 +9324,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.3.12":
-  version: 3.3.12
-  resolution: "nanoid@npm:3.3.12"
+"nanoid@npm:^3.3.16":
+  version: 3.3.16
+  resolution: "nanoid@npm:3.3.16"
   bin:
     nanoid: bin/nanoid.cjs
-  checksum: 10c0/ba142b7b39e11e80c16dd74b0365d407880c87c1cf7e1480956981ae940ee36060fa5b6f092cd1e315184dd19244c657bd017d03327bd3c62247d691c5e8edfb
+  checksum: 10c0/bbf2dcffe22d2b62d16de2711752070b539c0f644c7916f823ad6521986b2078cbe524f2d6240f58c46e9141ea0c7b87a029e100c0f7f175228cacaf30e41bba
   languageName: node
   linkType: hard
 
@@ -10686,13 +10686,13 @@ __metadata:
   linkType: hard
 
 "postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.43, postcss@npm:^8.5.15, postcss@npm:^8.5.19":
-  version: 8.5.19
-  resolution: "postcss@npm:8.5.19"
+  version: 8.5.20
+  resolution: "postcss@npm:8.5.20"
   dependencies:
-    nanoid: "npm:^3.3.12"
+    nanoid: "npm:^3.3.16"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10c0/302af9e4dfa8cce4f43af1798576b3a77ab7b23abac5522328c6c7a830d49b31281cba9d6071e478e6970a05ef82346d1570b8fbffae912f26a4f1a1a07f0a44
+  checksum: 10c0/9c7a0e32c77ac54c5613f974e6ccc97d4a70fdb3bf242617f3fb4d652e5c62a37c86c589e6e7a2d1e7120f80bc169cdf673482b88bd75020d2a44899fa569c13
   languageName: node
   linkType: hard
 
