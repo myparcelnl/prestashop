@@ -25,6 +25,14 @@ use function MyParcelNL\PrestaShop\setupAccountAndCarriers;
 
 usesShared(new UsesMockPsPdkInstance());
 
+beforeEach(function () {
+    // Needed so DeliveryOptions can resolve the PostNL carrier when serializing cart data below;
+    // this does NOT by itself create a myparcelnl_carrier_mapping row.
+    setupAccountAndCarriers(
+        factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
+    );
+});
+
 function storeCartDeliveryOptions(int $cartId): void
 {
     /** @var PsCartDeliveryOptionsRepository $repository */
@@ -42,10 +50,6 @@ function storeCartDeliveryOptions(int $cartId): void
 }
 
 it('copies delivery options from cart to order when order carrier is a myparcel carrier', function () {
-    setupAccountAndCarriers(
-        factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
-    );
-
     $psCarrier = psFactory(PsCarrier::class)
         ->withId(93)
         ->store();
@@ -77,12 +81,6 @@ it('copies delivery options from cart to order when order carrier is a myparcel 
 });
 
 it('does not copy delivery options from cart when order carrier is not a myparcel carrier', function () {
-    // Needed so DeliveryOptions can resolve the PostNL carrier when serializing the stale
-    // cart data below; this does NOT create a myparcelnl_carrier_mapping row.
-    setupAccountAndCarriers(
-        factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
-    );
-
     // Carrier 94 deliberately has NO row in myparcelnl_carrier_mapping.
     $psCarrier = psFactory(PsCarrier::class)
         ->withId(94)

@@ -49,6 +49,10 @@ final class MockPsEntityManager extends \Doctrine\ORM\EntityManager implements S
 
     public function remove($entity): void
     {
+        if (! isset($entity->id)) {
+            return;
+        }
+
         MockPsEntities::getByClass(get_class($entity))
             ->forget($entity->id);
     }

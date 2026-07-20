@@ -13,6 +13,7 @@ use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
+use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use Order;
@@ -27,6 +28,14 @@ final class CheckoutHooksTestClass
 }
 
 usesShared(new UsesMockPsPdkInstance());
+
+beforeEach(function () {
+    // Needed so DeliveryOptions can resolve the PostNL carrier when serializing the stale
+    // cart data used below; this does NOT by itself create a myparcelnl_carrier_mapping row.
+    setupAccountAndCarriers(
+        factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
+    );
+});
 
 function storeCheckoutCartDeliveryOptions(int $cartId): void
 {
@@ -44,14 +53,8 @@ function storeCheckoutCartDeliveryOptions(int $cartId): void
     );
 }
 
-it('deletes cart delivery options when order is validated with a non-myparcel carrier', function () {
-    // Needed so DeliveryOptions can resolve the PostNL carrier when serializing the stale
-    // cart data below; this does NOT create a myparcelnl_carrier_mapping row.
-    setupAccountAndCarriers(
-        factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
-    );
-
-    // Carrier 94 has no myparcel carrier mapping.
+it('writes an empty order data row and keeps the cart row when order is validated with a non-myparcel carrier', function () {
+    // Carrier 94 deliberately has no myparcel carrier mapping.
     $psCarrier = psFactory(PsCarrier::class)
         ->withId(94)
         ->store();
@@ -67,6 +70,7 @@ it('deletes cart delivery options when order is validated with a non-myparcel ca
         ->withIdCart((int) $cart->id)
         ->store();
 
+    // Stale options from a MyParcel carrier that was selected earlier in checkout.
     storeCheckoutCartDeliveryOptions((int) $cart->id);
 
     (new CheckoutHooksTestClass())->hookActionValidateOrder([
@@ -74,17 +78,22 @@ it('deletes cart delivery options when order is validated with a non-myparcel ca
         'order' => $order,
     ]);
 
-    /** @var PsCartDeliveryOptionsRepository $repository */
-    $repository = Pdk::get(PsCartDeliveryOptionsRepository::class);
+    /** @var PsOrderDataRepository $orderDataRepository */
+    $orderDataRepository = Pdk::get(PsOrderDataRepository::class);
+    $orderData           = $orderDataRepository->findOneBy(['orderId' => (int) $order->id]);
 
-    expect($repository->findOneBy(['cartId' => (int) $cart->id]))->toBeNull();
+    expect($orderData)->not->toBeNull();
+    expect($orderData->getData())->toBe([]);
+
+    // The cart row must NOT be deleted: another order created from the same (split) cart may
+    // still need to copy it, and deleting it here would race with that sibling order.
+    /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
+    $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
+
+    expect($cartDeliveryOptionsRepository->findOneBy(['cartId' => (int) $cart->id]))->not->toBeNull();
 });
 
-it('keeps cart delivery options when order is validated with a myparcel carrier', function () {
-    setupAccountAndCarriers(
-        factory(CarrierCollection::class)->push(factory(Carrier::class)->fromPostNL())
-    );
-
+it('eagerly copies cart delivery options to the order data row when order is validated with a myparcel carrier and a cart row exists', function () {
     $psCarrier = psFactory(PsCarrier::class)
         ->withId(93)
         ->store();
@@ -112,8 +121,55 @@ it('keeps cart delivery options when order is validated with a myparcel carrier'
         'order' => $order,
     ]);
 
-    /** @var PsCartDeliveryOptionsRepository $repository */
-    $repository = Pdk::get(PsCartDeliveryOptionsRepository::class);
+    /** @var PsOrderDataRepository $orderDataRepository */
+    $orderDataRepository = Pdk::get(PsOrderDataRepository::class);
+    $orderData           = $orderDataRepository->findOneBy(['orderId' => (int) $order->id]);
 
-    expect($repository->findOneBy(['cartId' => (int) $cart->id]))->not->toBeNull();
+    expect($orderData)->not->toBeNull();
+    expect($orderData->getData())->toHaveKey('deliveryOptions');
+    expect($orderData->getData()['deliveryOptions'])->not->toBeEmpty();
+    expect($orderData->getData()['deliveryOptions']['carrier'] ?? null)->toBe(RefCapabilitiesSharedCarrierV2::POSTNL);
+
+    // The cart row is left in place; there is no cleanup mechanism for cart rows and the lazy
+    // fallback in PsOrderService::getFromCart() may still rely on it being there.
+    /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepository */
+    $cartDeliveryOptionsRepository = Pdk::get(PsCartDeliveryOptionsRepository::class);
+
+    expect($cartDeliveryOptionsRepository->findOneBy(['cartId' => (int) $cart->id]))->not->toBeNull();
+});
+
+it('does not write an order data row when order is validated with a myparcel carrier and no cart row exists', function () {
+    $psCarrier = psFactory(PsCarrier::class)
+        ->withId(93)
+        ->store();
+
+    psFactory(MyparcelnlCarrierMapping::class)
+        ->withCarrierId(93)
+        ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL)
+        ->store();
+
+    /** @var Cart $cart */
+    $cart = psFactory(Cart::class)
+        ->withCarrier($psCarrier)
+        ->store();
+
+    /** @var Order $order */
+    $order = psFactory(Order::class)
+        ->withIdCarrier(93)
+        ->withIdCart((int) $cart->id)
+        ->store();
+
+    // No cart row was ever saved for this cart, e.g. the customer picked the MyParcel carrier
+    // without ever opening the delivery options widget.
+
+    (new CheckoutHooksTestClass())->hookActionValidateOrder([
+        'cart'  => $cart,
+        'order' => $order,
+    ]);
+
+    /** @var PsOrderDataRepository $orderDataRepository */
+    $orderDataRepository = Pdk::get(PsOrderDataRepository::class);
+
+    // Nothing to copy; the lazy guard in PsOrderService::getFromCart() remains the fallback.
+    expect($orderDataRepository->findOneBy(['orderId' => (int) $order->id]))->toBeNull();
 });
