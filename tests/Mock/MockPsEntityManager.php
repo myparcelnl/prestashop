@@ -47,6 +47,12 @@ final class MockPsEntityManager extends \Doctrine\ORM\EntityManager implements S
         MockPsEntities::addOrUpdate($entity);
     }
 
+    public function remove($entity): void
+    {
+        MockPsEntities::getByClass(get_class($entity))
+            ->forget($entity->id);
+    }
+
     /**
      * Doctrine clears its identity map after a batch flush. The in-memory MockPsEntities
      * store has no identity map to clear, so this is a no-op kept for interface parity

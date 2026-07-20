@@ -2,6 +2,7 @@
     "displayBeforeCarrier",
     "displayCarrierExtraContent",
     "actionCarrierProcess",
+    "actionValidateOrder",
     "actionOrderGridDefinitionModifier",
     "actionOrderGridPresenterModifier",
     "actionObjectCustomerMessageAddAfter",
