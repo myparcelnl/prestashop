@@ -87,6 +87,34 @@ it('creates a pdk order from order id', function () {
     expect($pdkOrder)->toBeInstanceOf(PdkOrder::class);
 });
 
+it('creates a pdk order from order reference', function () {
+    /** @var Order $psOrder */
+    $psOrder = psFactory(Order::class)
+        ->withReference('TILKNEGHQ')
+        ->store();
+
+    /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
+    $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
+
+    $pdkOrder = $orderRepository->get('TILKNEGHQ');
+
+    expect($pdkOrder)
+        ->toBeInstanceOf(PdkOrder::class)
+        ->and((int) $pdkOrder->externalIdentifier)
+        ->toBe((int) $psOrder->id);
+});
+
+it('throws when order reference does not match any order', function () {
+    psFactory(Order::class)
+        ->withReference('TILKNEGHQ')
+        ->store();
+
+    /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
+    $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
+
+    $orderRepository->get('UNKNOWNREF');
+})->throws(InvalidArgumentException::class, 'Order not found');
+
 it('finds a pdk order by api identifier', function () {
     /** @var Order $psOrder */
     $psOrder = psFactory(Order::class)->store();

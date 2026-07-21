@@ -111,7 +111,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements P
     public function get($input): PdkOrder
     {
         /** @var \Order $psOrder */
-        $psOrder = $this->psOrderService->get($input);
+        $psOrder = $this->psOrderService->get($this->resolveOrderReference($input));
 
         if (! $psOrder) {
             throw new InvalidArgumentException('Order not found');
@@ -240,6 +240,32 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements P
         }
 
         return $this->assembleOrders($basesByOrderId, ['notes' => []]);
+    }
+
+    /**
+     * Sales-channel (order mode v2) webhooks identify the order by the PrestaShop order
+     * reference (e.g. "TILKNEGHQ") instead of the numeric order id. References are never fully
+     * numeric, so non-numeric string input is resolved through Order::getByReference(); ids,
+     * numeric strings and models pass through untouched. An unknown reference falls through so
+     * get() raises its usual "Order not found".
+     *
+     * When a cart was split into multiple orders they share one reference; the first order is
+     * used, matching the webhook's link-first-shipment-to-first-order behaviour.
+     *
+     * @param  string|int|\Order $input
+     *
+     * @return string|int|\Order
+     */
+    private function resolveOrderReference($input)
+    {
+        if (! is_string($input) || '' === $input || ctype_digit($input)) {
+            return $input;
+        }
+
+        $matches = PsOrder::getByReference($input)
+            ->getResults();
+
+        return $matches[0] ?? $input;
     }
 
     /**
