@@ -1203,12 +1203,12 @@ __metadata:
   linkType: hard
 
 "@myparcel-dev/sdk@npm:^5.0.0, @myparcel-dev/sdk@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "@myparcel-dev/sdk@npm:5.1.0"
+  version: 5.1.2
+  resolution: "@myparcel-dev/sdk@npm:5.1.2"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.7.0"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
-  checksum: 10c0/c518a06b3c54827bdcf8e22418ef844c3bc1490a52086a612d7576ba4561488aa512b4aed37dbbb9ccdb65f060edf5232e0905b4980ddd8b4c1bb1cf6fec2630
+  checksum: 10c0/66daea50f4d36dfbe8272d1412b3b3f0d0c73f25e543a8f9b762abcbbfc6bd9168e2c57727d1f7e2f2394c827e1f0cd8b00ed326bc1fa78f8a35093880198944
   languageName: node
   linkType: hard
 
@@ -3456,9 +3456,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/language-core@npm:3.3.7":
-  version: 3.3.7
-  resolution: "@vue/language-core@npm:3.3.7"
+"@vue/language-core@npm:3.3.8":
+  version: 3.3.8
+  resolution: "@vue/language-core@npm:3.3.8"
   dependencies:
     "@volar/language-core": "npm:2.4.28"
     "@vue/compiler-dom": "npm:^3.5.0"
@@ -3467,7 +3467,7 @@ __metadata:
     muggle-string: "npm:^0.4.1"
     path-browserify: "npm:^1.0.1"
     picomatch: "npm:^4.0.4"
-  checksum: 10c0/9f8128c2b71f83750af69d240e898fadcbd825c9749fc7b72b1b68e5c7d231462a9482ae469dbaa66104641adb57314678cbc591bb0a931c57e53af19cf938bd
+  checksum: 10c0/2e321f027dfb10f28cb6052629e1f1fba3e12b659284c68755097aa678ea56c190dd43aad2da1fb237debc399fd7ab2922d7e576a4eb072c5f094cdaea412b2d
   languageName: node
   linkType: hard
 
@@ -9324,12 +9324,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.3.12":
-  version: 3.3.12
-  resolution: "nanoid@npm:3.3.12"
+"nanoid@npm:^3.3.16":
+  version: 3.3.16
+  resolution: "nanoid@npm:3.3.16"
   bin:
     nanoid: bin/nanoid.cjs
-  checksum: 10c0/ba142b7b39e11e80c16dd74b0365d407880c87c1cf7e1480956981ae940ee36060fa5b6f092cd1e315184dd19244c657bd017d03327bd3c62247d691c5e8edfb
+  checksum: 10c0/bbf2dcffe22d2b62d16de2711752070b539c0f644c7916f823ad6521986b2078cbe524f2d6240f58c46e9141ea0c7b87a029e100c0f7f175228cacaf30e41bba
   languageName: node
   linkType: hard
 
@@ -10686,13 +10686,13 @@ __metadata:
   linkType: hard
 
 "postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.43, postcss@npm:^8.5.15, postcss@npm:^8.5.19":
-  version: 8.5.19
-  resolution: "postcss@npm:8.5.19"
+  version: 8.5.22
+  resolution: "postcss@npm:8.5.22"
   dependencies:
-    nanoid: "npm:^3.3.12"
+    nanoid: "npm:^3.3.16"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10c0/302af9e4dfa8cce4f43af1798576b3a77ab7b23abac5522328c6c7a830d49b31281cba9d6071e478e6970a05ef82346d1570b8fbffae912f26a4f1a1a07f0a44
+  checksum: 10c0/9e143ee457988049d5f187116fd37f2750ae9d8d71cc99eae690b776e549e134b34086cbaa2f0360ecd1729b15d918227bd0fc3a2ffbe341f7212d0827080793
   languageName: node
   linkType: hard
 
@@ -10713,11 +10713,11 @@ __metadata:
   linkType: hard
 
 "prettier@npm:^3.5.3":
-  version: 3.9.5
-  resolution: "prettier@npm:3.9.5"
+  version: 3.9.6
+  resolution: "prettier@npm:3.9.6"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10c0/0349dd9e6d8010965de6f69e6b6ee2484b8caf78c66675afced6c75ad60ff24c3a2a4f41153fb8adeaee4d8f539641b48cebc71d283cec4d146e9962126c5ceb
+  checksum: 10c0/9f7ddae234035868f3daab3dc34e6de7e54622185afb017378029f0c09a9c023248ccf6f34def0b17a0538e18c47aa1b3188bab72965d1bf735919baa0747e99
   languageName: node
   linkType: hard
 
@@ -11434,8 +11434,8 @@ __metadata:
   linkType: hard
 
 "sass@npm:^1.58.2":
-  version: 1.101.0
-  resolution: "sass@npm:1.101.0"
+  version: 1.101.3
+  resolution: "sass@npm:1.101.3"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^5.0.0"
@@ -11446,7 +11446,7 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10c0/1fbbcef2f767dec4d97773a2a084f4e1ef2e4abecf574e08743e52237069f1129a6b43b07b5c23aa3bcbf395509e40db758d9748a07940da227aa1626329a74d
+  checksum: 10c0/a1ae0d12511f7bb3b49bc0bc3c126093078b0c901608b5f45c03dfec82b4afdef2887f4699188e818b0ce159c5f6eee297282a387e19a264f4dd41437329e1b8
   languageName: node
   linkType: hard
 
@@ -13335,16 +13335,16 @@ __metadata:
   linkType: hard
 
 "vue-tsc@npm:^3.0.4, vue-tsc@npm:^3.2.2":
-  version: 3.3.7
-  resolution: "vue-tsc@npm:3.3.7"
+  version: 3.3.8
+  resolution: "vue-tsc@npm:3.3.8"
   dependencies:
     "@volar/typescript": "npm:2.4.28"
-    "@vue/language-core": "npm:3.3.7"
+    "@vue/language-core": "npm:3.3.8"
   peerDependencies:
     typescript: ">=5.0.0"
   bin:
     vue-tsc: bin/vue-tsc.js
-  checksum: 10c0/35bbda9142e0b2212826ef77e9cdf49dd90fe82c40e909ea228dc100e9a10b179edda814938b0237c981e5688a419bd2f557f643a05675379c4b05cbde4019e3
+  checksum: 10c0/5fe554acf49758aa906b350adeed3bbf8cc46ca824126220aad301e351ffe8a051b7a17c73fc88157023090278bdc29a7724d4f621faade91e80b0e8bbf957ee
   languageName: node
   linkType: hard
 
