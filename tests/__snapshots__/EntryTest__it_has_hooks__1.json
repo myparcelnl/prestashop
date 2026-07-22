@@ -2,7 +2,6 @@
     "displayBeforeCarrier",
     "displayCarrierExtraContent",
     "actionCarrierProcess",
-    "actionValidateOrder",
     "actionOrderGridDefinitionModifier",
     "actionOrderGridPresenterModifier",
     "actionObjectCustomerMessageAddAfter",
@@ -18,5 +17,6 @@
     "displayHeader",
     "actionFilterDeliveryOptionList",
     "displayCarrierList",
-    "actionCarrierUpdate"
+    "actionCarrierUpdate",
+    "actionValidateOrder"
 ]

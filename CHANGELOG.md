@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.3](https://github.com/myparcelnl/prestashop/compare/v5.5.2...v5.5.3) (2026-07-16)
+
+
+### :bug: Bug Fixes
+
+* **checkout:** prevent the full address being filled into 'street' when separate fields were enabled ([#596](https://github.com/myparcelnl/prestashop/issues/596)) ([e5ca04d](https://github.com/myparcelnl/prestashop/commit/e5ca04de41b36818d0df88cb78852aca5fdce3a0))
+
+## [5.5.2](https://github.com/myparcelnl/prestashop/compare/v5.5.1...v5.5.2) (2026-07-16)
+
+
+### :bug: Bug Fixes
+
+* **api:** fix `isBusiness` defaulting to `true` in capabilities, fix new carriers breaking the plugin ([#588](https://github.com/myparcelnl/prestashop/issues/588)) ([e174456](https://github.com/myparcelnl/prestashop/commit/e17445688b4afc334f15779991b9c1e8df68b711))
+* **settings:** prevent an empty settings page when an error occurs ([#585](https://github.com/myparcelnl/prestashop/issues/585)) ([6fab39f](https://github.com/myparcelnl/prestashop/commit/6fab39f057fd72c3969286da126b72d197a99ebd))
+
+## [5.5.1](https://github.com/myparcelnl/prestashop/compare/v5.5.0...v5.5.1) (2026-07-09)
+
+
+### :bug: Bug Fixes
+
+* fix issues with stale cache causing issues when updating the plugin ([#579](https://github.com/myparcelnl/prestashop/issues/579)) ([b0b2713](https://github.com/myparcelnl/prestashop/commit/b0b27132ee6bed9b83f8797d550d48c9014fdac9))
+
+## [5.5.0](https://github.com/myparcelnl/prestashop/compare/v5.4.1...v5.5.0) (2026-07-07)
+
+
+### :sparkles: New Features
+
+* **pdk:** update PDK from 4.0.1 to 4.1.1 ([#576](https://github.com/myparcelnl/prestashop/issues/576)) ([c50ed02](https://github.com/myparcelnl/prestashop/commit/c50ed022d2967f8aaf40cc8b9783e3a5b97b4d18))
+
+## [5.4.1](https://github.com/myparcelnl/prestashop/compare/v5.4.0...v5.4.1) (2026-06-30)
+
+
+### :bug: Bug Fixes
+
+* make checkout delivery options available on the order immediately ([#560](https://github.com/myparcelnl/prestashop/issues/560)) ([9e816f7](https://github.com/myparcelnl/prestashop/commit/9e816f76fd653af7733ce5c1e993117fd29de95f))
+* show delivery options on initial checkout load ([#568](https://github.com/myparcelnl/prestashop/issues/568)) ([e247034](https://github.com/myparcelnl/prestashop/commit/e24703404508283f3724eaa2fcef001062e677f2))
+
 ## [5.4.0](https://github.com/myparcelnl/prestashop/compare/v5.3.1...v5.4.0) (2026-06-19)
 
 

@@ -33,6 +33,24 @@ beforeEach(function () {
     );
 });
 
+/**
+ * Creates a PS carrier with a myparcelnl_carrier_mapping row, so the carrier counts as
+ * MyParcel-linked for the guard in PsOrderService::getFromCart().
+ */
+function createMappedPsCarrier(int $carrierId): PsCarrier
+{
+    $psCarrier = psFactory(PsCarrier::class)
+        ->withId($carrierId)
+        ->store();
+
+    psFactory(MyparcelnlCarrierMapping::class)
+        ->withCarrierId($carrierId)
+        ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL)
+        ->store();
+
+    return $psCarrier;
+}
+
 function storeCartDeliveryOptions(int $cartId): void
 {
     /** @var PsCartDeliveryOptionsRepository $repository */
@@ -49,15 +67,28 @@ function storeCartDeliveryOptions(int $cartId): void
     );
 }
 
-it('copies delivery options from cart to order when order carrier is a myparcel carrier', function () {
-    $psCarrier = psFactory(PsCarrier::class)
-        ->withId(93)
-        ->store();
+it('persists an empty order data record when no cart delivery options exist', function () {
+    $order = psFactory(Order::class)->store();
 
-    psFactory(MyparcelnlCarrierMapping::class)
-        ->withCarrierId(93)
-        ->withMyparcelCarrier(RefCapabilitiesSharedCarrierV2::POSTNL)
-        ->store();
+    /** @var PsOrderServiceInterface $orderService */
+    $orderService = Pdk::get(PsOrderServiceInterface::class);
+
+    $result = $orderService->getOrderData($order->id);
+
+    expect($result)->toBe([]);
+
+    // The order is marked "processed" by persisting an empty record, so subsequent reads
+    // return the stored value instead of re-querying the cart on every getOrderData call.
+    /** @var PsOrderDataRepository $orderDataRepo */
+    $orderDataRepo = Pdk::get(PsOrderDataRepository::class);
+    $record        = $orderDataRepo->findOneBy(['orderId' => $order->id]);
+
+    expect($record)->not->toBeNull();
+    expect($record->getData())->toBe([]);
+});
+
+it('returns delivery options and persists order data when order carrier is a myparcel carrier', function () {
+    $psCarrier = createMappedPsCarrier(93);
 
     /** @var Cart $cart */
     $cart = psFactory(Cart::class)
@@ -70,14 +101,36 @@ it('copies delivery options from cart to order when order carrier is a myparcel 
         ->withIdCart((int) $cart->id)
         ->store();
 
-    storeCartDeliveryOptions((int) $cart->id);
+    // A plain array literal is used instead of DeliveryOptions::toStorableArray(): the code
+    // under test stores the cart's raw data verbatim, so the exact shape here is what matters.
+    //
+    // Deliberately non-default values (not postnl / standard) so the test proves the actual
+    // stored options are round-tripped, and cannot pass on coincidentally-correct defaults.
+    $rawDeliveryOptions = [
+        DeliveryOptions::CARRIER       => 'dpd',
+        DeliveryOptions::DELIVERY_TYPE => 'morning',
+    ];
+
+    /** @var PsCartDeliveryOptionsRepository $cartDeliveryOptionsRepo */
+    $cartDeliveryOptionsRepo = Pdk::get(PsCartDeliveryOptionsRepository::class);
+    $cartDeliveryOptionsRepo->updateOrCreate(
+        ['cartId' => (int) $cart->id],
+        ['data'   => json_encode($rawDeliveryOptions)]
+    );
 
     /** @var PsOrderServiceInterface $orderService */
     $orderService = Pdk::get(PsOrderServiceInterface::class);
 
-    $orderData = $orderService->getOrderData($order);
+    $result = $orderService->getOrderData($order->id);
 
-    expect($orderData)->toHaveKey('deliveryOptions');
+    expect($result)->toHaveKey('deliveryOptions');
+    expect($result['deliveryOptions'])->toMatchArray($rawDeliveryOptions);
+
+    /** @var PsOrderDataRepository $orderDataRepo */
+    $orderDataRepo = Pdk::get(PsOrderDataRepository::class);
+    $record        = $orderDataRepo->findOneBy(['orderId' => (int) $order->id]);
+
+    expect($record)->not->toBeNull();
 });
 
 it('does not copy delivery options from cart when order carrier is not a myparcel carrier', function () {

@@ -1,13 +1,13 @@
 {
   "name": "myparcelnl/prestashop-module",
-  "version": "5.4.0",
+  "version": "5.5.3",
   "license": "MIT",
   "type": "prestashop-module",
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "myparcelnl/pdk": "^4.0.0",
-    "myparcelnl/sdk": "^11.0.0-beta.1",
+    "myparcelnl/pdk": "^4.2.1",
+    "myparcelnl/sdk": "^11.0.0-beta.28",
     "php": ">=7.4.0"
   },
   "require-dev": {
@@ -16,6 +16,7 @@
     "spatie/pest-plugin-snapshots": "^1.1.0"
   },
   "scripts": {
+    "console": "php vendor/myparcelnl/pdk/bin/console",
     "test": "php -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest",
     "test:snapshots": "php -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest -d --update-snapshots",
     "test:coverage": "php -dpcov.enabled=1 -d auto_prepend_file=tests/bootstrap.php vendor/bin/pest --coverage-clover=clover.xml --coverage-html=coverage"

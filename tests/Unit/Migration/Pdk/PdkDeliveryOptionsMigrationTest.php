@@ -8,7 +8,6 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use MyParcelNL\Pdk\App\Options\Definition\AgeCheckDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\CollectDefinition;
-use MyParcelNL\Pdk\App\Options\Definition\CooledDeliveryDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\DirectReturnDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\FreshFoodDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\FrozenDefinition;
@@ -129,7 +128,6 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         (new FrozenDefinition())->getShipmentOptionsKey()              => TriStateService::INHERIT,
         (new PriorityDeliveryDefinition())->getShipmentOptionsKey()    => TriStateService::INHERIT,
         (new SaturdayDeliveryDefinition())->getShipmentOptionsKey()    => TriStateService::INHERIT,
-        (new CooledDeliveryDefinition())->getShipmentOptionsKey()      => TriStateService::INHERIT,
     ], $result[DeliveryOptions::SHIPMENT_OPTIONS] ?? []));
 
     $fullResult = array_replace(

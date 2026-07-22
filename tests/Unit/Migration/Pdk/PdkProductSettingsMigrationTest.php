@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use MyParcelNL\Pdk\App\Options\Definition\AgeCheckDefinition;
-use MyParcelNL\Pdk\App\Options\Definition\CooledDeliveryDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\DirectReturnDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\FreshFoodDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\FrozenDefinition;
@@ -73,7 +72,6 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             ProductSettings::EXCLUDE_PARCEL_LOCKERS                       => TriStateService::INHERIT,
             (new FreshFoodDefinition())->getProductSettingsKey()          => TriStateService::INHERIT,
             (new FrozenDefinition())->getProductSettingsKey()             => TriStateService::INHERIT,
-            (new CooledDeliveryDefinition())->getProductSettingsKey()     => TriStateService::INHERIT,
             (new PriorityDeliveryDefinition())->getProductSettingsKey()   => TriStateService::INHERIT,
         ], $result)
     );
