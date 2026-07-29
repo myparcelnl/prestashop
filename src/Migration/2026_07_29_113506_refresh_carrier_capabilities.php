@@ -24,7 +24,6 @@ return new class extends AbstractTimestampedMigration {
         $account           = $accountRepository->getAccount(true);
         // PHPStan types Account::$shops as a non-null ShopCollection, but the guard is kept
         // intentionally to stay safe against partial/corrupted account data during upgrade.
-        // @phpstan-ignore booleanAnd.rightAlwaysTrue
         $shop = $account && $account->shops ? $account->shops->first() : null;
 
         if (! $shop) {
@@ -42,7 +41,10 @@ return new class extends AbstractTimestampedMigration {
             // Re-throw so the migration is not marked as applied, letting it retry on the next
             // load instead of leaving the carriers on the old shape.
             Logger::warning('Failed to refresh carrier capabilities; migration will retry.', [
-                'exception' => $exception->getMessage(),
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile() . ':' . $exception->getLine(),
+                'class'   => get_class($exception),
+                'trace'   => $exception->getTraceAsString(),
             ]);
 
             throw $exception;
