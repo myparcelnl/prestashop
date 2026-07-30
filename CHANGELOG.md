@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.4](https://github.com/myparcelnl/prestashop/compare/v5.5.3...v5.5.4) (2026-07-30)
+
+
+### :bug: Bug Fixes
+
+* **webhook:** resolve order reference to order id in order mode v2  ([#618](https://github.com/myparcelnl/prestashop/issues/618)) ([9a9d5d3](https://github.com/myparcelnl/prestashop/commit/9a9d5d3beb6768ce1ba40fb0a39f251cc64b6b20))
+
 ## [5.5.3](https://github.com/myparcelnl/prestashop/compare/v5.5.2...v5.5.3) (2026-07-16)
 
 
