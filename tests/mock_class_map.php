@@ -11,6 +11,7 @@ use MyParcelNL\PrestaShop\Tests\Mock\MockPsController;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCountry;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCustomerMessage;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsDispatcher;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDbQuery;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsFileLogger;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsLanguage;
@@ -54,6 +55,11 @@ final class Db extends DbCore { }
 abstract class DbQueryCore extends MockPsDbQuery { }
 
 final class DbQuery extends DbQueryCore { }
+
+/** @see \DispatcherCore */
+abstract class DispatcherCore extends MockPsDispatcher { }
+
+final class Dispatcher extends DispatcherCore { }
 
 /** @see \PrestaShopCollectionCore */
 abstract class PrestaShopCollectionCore extends MockPsPrestaShopCollection { }
