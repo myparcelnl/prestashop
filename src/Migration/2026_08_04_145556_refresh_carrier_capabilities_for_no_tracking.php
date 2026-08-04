@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
+use MyParcelNL\Pdk\App\Installer\Migration\AbstractTimestampedMigration;
+use MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository;
+use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\Pdk\Facade\Pdk;
+
+/**
+ * Re-fetches the stored carrier data so it holds the no tracking option.
+ *
+ * The capabilities response depends on the feature flag we now send: with it on, the API returns
+ * "noTracking" and drops "tracked". Carrier data stored before the flag therefore holds the old option
+ * and none of the new one, so the option would count as unavailable and never appear in the settings.
+ *
+ * Asking for fresh data is the point. Contract definitions are cached, and a cached pre-flag copy would
+ * be re-stored unchanged, which is exactly the state this migration exists to replace.
+ *
+ * A failure is reported rather than thrown. This runs synchronously during the upgrade, so throwing would
+ * leave any shop without a working API key unable to finish upgrading. Reporting it keeps the migration
+ * unrecorded, so it is attempted again on the next load until it succeeds, and the rest of the upgrade
+ * proceeds meanwhile.
+ */
+return new class extends AbstractTimestampedMigration {
+    public function up(): void
+    {
+        /** @var PdkAccountRepositoryInterface $accountRepository */
+        $accountRepository = Pdk::get(PdkAccountRepositoryInterface::class);
+        $account           = $accountRepository->getAccount(true);
+        $shop              = $account ? $account->shops->first() : null;
+
+        if (! $shop) {
+            Logger::debug('No account or shop available; skipping carrier capabilities refresh.');
+
+            return;
+        }
+
+        /** @var CarrierCapabilitiesRepository $capabilitiesRepository */
+        $capabilitiesRepository = Pdk::get(CarrierCapabilitiesRepository::class);
+
+        try {
+            $shop->carriers = $capabilitiesRepository->getContractDefinitions(null, true);
+        } catch (Throwable $exception) {
+            // Report the failure rather than throwing: the upgrade carries on, nothing is stored so the
+            // existing carrier data is left intact, and the migration stays unrecorded so it is attempted
+            // again on the next load. Until it succeeds the option simply does not appear, which is the
+            // safe direction: tracking stays on.
+            $this->markFailed('Could not refresh carrier capabilities for the no tracking option.', [
+                'exception' => $exception->getMessage(),
+                'class'     => get_class($exception),
+            ]);
+
+            return;
+        }
+
+        $accountRepository->store($account);
+    }
+};
