@@ -19,8 +19,10 @@ use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use RuntimeException;
 
 use function MyParcelNL\Pdk\Tests\factory;
+use function MyParcelNL\Pdk\Tests\mockPdkProperties;
 use function MyParcelNL\Pdk\Tests\usesShared;
 
 usesShared(new UsesMockPsPdkInstance());
@@ -73,6 +75,25 @@ dataset('carrier tracking values', [
     'tracking off becomes opt-out on' => [TriStateService::DISABLED, TriStateService::ENABLED],
     'not set stays not set'           => [TriStateService::INHERIT, TriStateService::INHERIT],
 ]);
+
+it('reports failure without throwing when a store cannot be read', function () {
+    // A store that blows up must not leave the shop unable to finish upgrading. Progress is kept by the
+    // batch cursors, so the retry resumes.
+    mockPdkProperties([
+        PsProductSettingsRepository::class => new class {
+            public function getEntityClass(): string
+            {
+                throw new RuntimeException('Database unavailable');
+            }
+        },
+    ]);
+
+    $migration = loadInvertMigration();
+
+    $migration->up();
+
+    expect($migration->hasFailed())->toBeTrue();
+});
 
 it('flips the option in carrier settings', function (int $stored, int $expected) {
     /** @var PdkSettingsRepositoryInterface $settingsRepository */
