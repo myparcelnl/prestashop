@@ -16,7 +16,7 @@ use MyParcelNL\Pdk\App\Options\Definition\LargeFormatDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\OnlyRecipientDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\PriorityDeliveryDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\SignatureDefinition;
-use MyParcelNL\Pdk\App\Options\Definition\TrackedDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\NoTrackingDefinition;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
@@ -65,7 +65,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             (new OnlyRecipientDefinition())->getProductSettingsKey()      => TriStateService::INHERIT,
             (new DirectReturnDefinition())->getProductSettingsKey()       => TriStateService::INHERIT,
             (new SignatureDefinition())->getProductSettingsKey()          => TriStateService::INHERIT,
-            (new TrackedDefinition())->getProductSettingsKey()            => TriStateService::INHERIT,
+            (new NoTrackingDefinition())->getProductSettingsKey()            => TriStateService::INHERIT,
             ProductSettings::FIT_IN_DIGITAL_STAMP                         => TriStateService::INHERIT,
             ProductSettings::FIT_IN_MAILBOX                               => TriStateService::INHERIT,
             ProductSettings::PACKAGE_TYPE                                 => TriStateService::INHERIT,
