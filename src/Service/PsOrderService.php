@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Service;
 
 use InvalidArgumentException;
 use MyParcelNL\Pdk\Facade\Logger;
+use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface;
 use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
@@ -30,18 +31,26 @@ final class PsOrderService extends PsSpecificObjectModelService implements PsOrd
     private $psOrderDataRepository;
 
     /**
+     * @var \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface
+     */
+    private $psCarrierService;
+
+    /**
      * @param  \MyParcelNL\PrestaShop\Contract\PsObjectModelServiceInterface     $psObjectModelService
      * @param  \MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository
      * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository           $psOrderDataRepository
+     * @param  \MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface         $psCarrierService
      */
     public function __construct(
         PsObjectModelServiceInterface   $psObjectModelService,
         PsCartDeliveryOptionsRepository $psCartDeliveryOptionsRepository,
-        PsOrderDataRepository           $psOrderDataRepository
+        PsOrderDataRepository           $psOrderDataRepository,
+        PsCarrierServiceInterface       $psCarrierService
     ) {
         parent::__construct($psObjectModelService);
         $this->psCartDeliveryOptionsRepository = $psCartDeliveryOptionsRepository;
         $this->psOrderDataRepository           = $psOrderDataRepository;
+        $this->psCarrierService                = $psCarrierService;
     }
 
     /**
@@ -134,9 +143,12 @@ final class PsOrderService extends PsSpecificObjectModelService implements PsOrd
     private function getFromCart($input): array
     {
         /** @var Order $order */
-        $order    = $this->get($input);
-        $id       = $this->getId($order);
-        $fromCart = $this->psCartDeliveryOptionsRepository->findOneBy(['cartId' => $order->id_cart]);
+        $order = $this->get($input);
+        $id    = $this->getId($order);
+
+        $fromCart = $this->psCarrierService->isMyParcelCarrier((int) $order->id_carrier)
+            ? $this->psCartDeliveryOptionsRepository->findOneBy(['cartId' => $order->id_cart])
+            : null;
 
         if ($fromCart) {
             Logger::debug("[Order $id] Delivery options found in cart, saving to order");
