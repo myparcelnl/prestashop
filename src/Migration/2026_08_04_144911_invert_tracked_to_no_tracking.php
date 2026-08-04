@@ -43,10 +43,20 @@ return new class extends AbstractTimestampedMigration {
 
     public function up(): void
     {
-        $this->invertCarrierSettings();
-        $this->invertProductSettings();
-        $this->invertOrderData();
-        $this->invertOrderShipments();
+        try {
+            $this->invertCarrierSettings();
+            $this->invertProductSettings();
+            $this->invertOrderData();
+            $this->invertOrderShipments();
+        } catch (Throwable $exception) {
+            // Report rather than throw, so a failure cannot leave the shop unable to finish upgrading.
+            // Progress is kept: each pass stores its cursor after every committed batch and the old key is
+            // dropped as each record is written, so the retry resumes instead of redoing the work.
+            $this->markFailed('Could not convert stored tracking choices to no tracking.', [
+                'exception' => $exception->getMessage(),
+                'class'     => get_class($exception),
+            ]);
+        }
     }
 
     /**
