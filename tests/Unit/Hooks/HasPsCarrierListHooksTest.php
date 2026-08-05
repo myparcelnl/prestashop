@@ -289,7 +289,8 @@ it('forwards the business flag derived from the delivery address company', funct
     try {
         (new WithHasPsCarrierListHooks())->hookActionFilterDeliveryOptionList($params);
 
-        expect($fake->lastArgs['recipient'])->toHaveKey('is_business', $expected);
+        expect($fake->lastArgs['recipient'])->toHaveKey('is_business');
+        expect($fake->lastArgs['recipient']['is_business'])->toBe($expected);
     } finally {
         $reset();
     }
