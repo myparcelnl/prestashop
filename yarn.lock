@@ -1289,8 +1289,8 @@ __metadata:
   linkType: hard
 
 "@myparcel-dev/pdk-app-builder@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "@myparcel-dev/pdk-app-builder@npm:4.1.0"
+  version: 4.1.2
+  resolution: "@myparcel-dev/pdk-app-builder@npm:4.1.2"
   dependencies:
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
     "@yarnpkg/parsers": "npm:^3.0.0"
@@ -1303,69 +1303,69 @@ __metadata:
     mypa-google-docs-importer: "npm:^1.0.1"
     radash: "npm:^12.1.0"
     semver: "npm:^7.5.4"
-    supports-color: "npm:^9.3.1"
+    supports-color: "npm:^11.0.0"
   bin:
     pdk-builder: ./bin/index.js
-  checksum: 10c0/cdba62074a2832d2344ee3b6e754aa981ca91fedef7945bde74290e3d1c0ab0becc24cca29de968f1821dc9d63272b05eef5be5ad05eb37fa74528cb64f9658c
+  checksum: 10c0/f23d07b2f51461481f41c5bb391b0e64223215066b141bb4cfdbc31669e29787c7f1f4c503eb04d18106b36d587fbff90759231389e57cc4b75e7be699e10aa2
   languageName: node
   linkType: hard
 
-"@myparcel-dev/pdk-checkout-common@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@myparcel-dev/pdk-checkout-common@npm:2.0.1"
+"@myparcel-dev/pdk-checkout-common@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@myparcel-dev/pdk-checkout-common@npm:2.0.3"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.7.0"
     "@myparcel-dev/delivery-options": "npm:^6.25.0"
-    "@myparcel-dev/pdk-common": "npm:^2.0.0"
+    "@myparcel-dev/pdk-common": "npm:^2.1.0"
     typescript: "npm:^5.2.2"
-  checksum: 10c0/45ba5581ea077ad7f1817ffa43ec716451e617ea9bb8d54d0c4272c27c926d46f2e116416570c5af0cf209930f70c47c48211ffbf1bffa561533ae3775ddd815
+  checksum: 10c0/921d438db9e3cc4bad2e666473137757ae8968bf18417ab0218fc24be94a7e68544a13fe6711673df70da2aef8769d5ebed1df5bd6a06ceab06b104c1461f4a6
   languageName: node
   linkType: hard
 
-"@myparcel-dev/pdk-checkout-delivery-options@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@myparcel-dev/pdk-checkout-delivery-options@npm:2.0.1"
+"@myparcel-dev/pdk-checkout-delivery-options@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@myparcel-dev/pdk-checkout-delivery-options@npm:2.0.3"
   dependencies:
     "@myparcel-dev/delivery-options": "npm:^7.0.0"
-    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.1"
+    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.3"
     "@myparcel-dev/ts-utils": "npm:^1.15.0"
-  checksum: 10c0/e23743c9e6a7f8734882fb0f867f62525c4be2b710a7f16ae1d46d846d12bef9939f9b3269995967c7f0109e84e419beb3cdefbdc2dade4ff4bd3afbe712d0fd
+  checksum: 10c0/8af4603a9c5ffa1c864eb50d1658b36dd4e682e2b362b2830b458dad68c14b00aa951f411aed9bcfc9e6960449d43bd24f3d266873b394c6a43580fcc20d32e5
   languageName: node
   linkType: hard
 
-"@myparcel-dev/pdk-checkout-separate-address-fields@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@myparcel-dev/pdk-checkout-separate-address-fields@npm:2.0.1"
+"@myparcel-dev/pdk-checkout-separate-address-fields@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@myparcel-dev/pdk-checkout-separate-address-fields@npm:2.0.3"
   dependencies:
-    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.1"
-  checksum: 10c0/e78e6f4bca496eee998ec36713ac4dc0417860a409f3775a3bd6902f1aae4c3ee4ac8d38fcd4d283ec2b0b82f871f3200270acad04cc7891e7b4c732a31d6021
+    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.3"
+  checksum: 10c0/7e51068edbf11bda15260cd45150bb3e38cbcfee6e39ecf8b7b136903c71907979e1a232f5967144583d0c82681190c4e35ab97a2a3654445aab83ef80bcb999
   languageName: node
   linkType: hard
 
-"@myparcel-dev/pdk-checkout-tax-fields@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@myparcel-dev/pdk-checkout-tax-fields@npm:2.0.1"
+"@myparcel-dev/pdk-checkout-tax-fields@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@myparcel-dev/pdk-checkout-tax-fields@npm:2.0.3"
   dependencies:
     "@myparcel-dev/constants": "npm:^2.7.0"
-    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.1"
-  checksum: 10c0/120b28054df10f25a7bd3c87f2b02786cbfa1d7850a04a94f4dc5e3547bf6def21897fc398e2ba8a1140209efd6b2c83073b76d44d2e1f25c7ef17c4f5107fdf
+    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.3"
+  checksum: 10c0/2fb3e257a0fc4bd24e9b11b51c3482748762f0875086697b83dadb861cbece14b6b020f14421dce7edcb2a407d639b58a6174a3b8f0ab9465bfad86cbe9c9c24
   languageName: node
   linkType: hard
 
 "@myparcel-dev/pdk-checkout@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "@myparcel-dev/pdk-checkout@npm:2.0.1"
+  version: 2.0.3
+  resolution: "@myparcel-dev/pdk-checkout@npm:2.0.3"
   dependencies:
-    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.1"
-    "@myparcel-dev/pdk-checkout-delivery-options": "npm:^2.0.1"
-    "@myparcel-dev/pdk-checkout-separate-address-fields": "npm:^2.0.1"
-    "@myparcel-dev/pdk-checkout-tax-fields": "npm:^2.0.1"
-    "@myparcel-dev/pdk-common": "npm:^2.0.0"
-  checksum: 10c0/fcf6b0847d65192ffffb26e9ee0b035356a91aa102b060381c84875523425fef5792f9ea10bc56233fd4c46ef53a199af64d758e47e9fc9051561c488abfd232
+    "@myparcel-dev/pdk-checkout-common": "npm:^2.0.3"
+    "@myparcel-dev/pdk-checkout-delivery-options": "npm:^2.0.3"
+    "@myparcel-dev/pdk-checkout-separate-address-fields": "npm:^2.0.3"
+    "@myparcel-dev/pdk-checkout-tax-fields": "npm:^2.0.3"
+    "@myparcel-dev/pdk-common": "npm:^2.1.0"
+  checksum: 10c0/7a24eeadcb7b729d4a25cac1f622917943b8c5135d2cc1ee4c4dd633e323e6f13e06aaac2f144389c0c5895f0c643c5af75e343b09545ac436cf16273aa23177
   languageName: node
   linkType: hard
 
-"@myparcel-dev/pdk-common@npm:^2.0.0, @myparcel-dev/pdk-common@npm:^2.1.0":
+"@myparcel-dev/pdk-common@npm:^2.1.0":
   version: 2.1.0
   resolution: "@myparcel-dev/pdk-common@npm:2.1.0"
   dependencies:
@@ -12808,6 +12808,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"supports-color@npm:^11.0.0":
+  version: 11.0.0
+  resolution: "supports-color@npm:11.0.0"
+  checksum: 10c0/f89d815d18d5508da54db73d762fa6d6418bced383694a4e05a56331075069010d9f501e6755b14617a00317553a498f07281933be72428eff136dbfe6a80128
+  languageName: node
+  linkType: hard
+
 "supports-color@npm:^5.3.0":
   version: 5.5.0
   resolution: "supports-color@npm:5.5.0"
@@ -12826,7 +12833,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supports-color@npm:^9.3.1, supports-color@npm:^9.4.0":
+"supports-color@npm:^9.4.0":
   version: 9.4.0
   resolution: "supports-color@npm:9.4.0"
   checksum: 10c0/6c24e6b2b64c6a60e5248490cfa50de5924da32cf09ae357ad8ebbf305cc5d2717ba705a9d4cb397d80bbf39417e8fdc8d7a0ce18bd0041bf7b5b456229164e4
