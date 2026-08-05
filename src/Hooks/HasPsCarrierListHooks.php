@@ -8,6 +8,7 @@ use Address;
 use Carrier;
 use Cart;
 use Country;
+use MyParcelNL\Pdk\Base\Model\Address as PdkAddress;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository;
@@ -43,8 +44,9 @@ trait HasPsCarrierListHooks
             return;
         }
 
-        $country   = $this->getCountryFromCart($params['cart'] ?? $this->context->cart ?? new Cart());
-        $supported = $this->getSupportedCarriersForCountry((string) $country->iso_code);
+        $cart      = $params['cart'] ?? $this->context->cart ?? new Cart();
+        $country   = $this->getCountryFromCart($cart);
+        $supported = $this->getSupportedCarriersForCountry((string) $country->iso_code, $this->cartIsBusiness($cart));
 
         if ($supported === null) {
             // Capabilities call failed — fail-open, keep every carrier visible.
@@ -92,17 +94,18 @@ trait HasPsCarrierListHooks
      * given destination country, or null if the API call failed (fail-open signal).
      *
      * @param  string $countryIso ISO 3166-1 alpha-2 destination country code
+     * @param  bool   $isBusiness Whether the cart's recipient is a business
      *
      * @return null|string[]
      */
-    private function getSupportedCarriersForCountry(string $countryIso): ?array
+    private function getSupportedCarriersForCountry(string $countryIso, bool $isBusiness): ?array
     {
         /** @var \MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository $repository */
         $repository = Pdk::get(CarrierCapabilitiesRepository::class);
 
         try {
             $capabilities = $repository->getCapabilities([
-                'recipient' => ['country_code' => $countryIso],
+                'recipient' => ['country_code' => $countryIso, 'is_business' => $isBusiness],
             ]);
         } catch (Throwable $exception) {
             Logger::error('Failed to fetch carrier capabilities for country.', [
@@ -167,5 +170,24 @@ trait HasPsCarrierListHooks
         }
 
         return $country;
+    }
+
+    /**
+     * Whether the cart's delivery address is a business, derived from its company name via the
+     * PDK Address rule so detection stays in one place. No delivery address or company → consumer.
+     *
+     * @param  \Cart $cart
+     *
+     * @return bool
+     */
+    private function cartIsBusiness(Cart $cart): bool
+    {
+        if (! $cart->id_address_delivery) {
+            return false;
+        }
+
+        $company = (new Address($cart->id_address_delivery))->company;
+
+        return (new PdkAddress(['company' => $company]))->isBusiness;
     }
 }
