@@ -115,11 +115,13 @@ class BatchEntityMigrator
     }
 
     /**
-     * The settings key a cursor is stored under. Namespaced per migration so two migrations walking the
-     * same table cannot read each other's progress.
+     * The settings key a cursor is stored under.
+     *
+     * Callers should pass a cursor name that is unique per migration (for example include the migration
+     * id), so independent migrations cannot read each other's progress.
      */
     private function cursorKey(string $cursorName): string
     {
-        return Pdk::get('createSettingsKey')('no_tracking_cursor_' . $cursorName);
+        return Pdk::get('createSettingsKey')('batch_entity_migrator_cursor_' . $cursorName);
     }
 }
