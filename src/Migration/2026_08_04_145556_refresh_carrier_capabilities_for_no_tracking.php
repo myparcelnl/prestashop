@@ -28,9 +28,19 @@ return new class extends AbstractTimestampedMigration {
     {
         /** @var PdkAccountRepositoryInterface $accountRepository */
         $accountRepository = Pdk::get(PdkAccountRepositoryInterface::class);
-        $account           = $accountRepository->getAccount(true);
-        $shop              = $account ? $account->shops->first() : null;
 
+        try {
+            $account = $accountRepository->getAccount(true);
+        } catch (Throwable $exception) {
+            $this->markFailed('Could not refresh carrier capabilities for the no tracking option.', [
+                'exception' => $exception->getMessage(),
+                'class'     => get_class($exception),
+            ]);
+
+            return;
+        }
+
+        $shop = $account ? $account->shops->first() : null
         if (! $shop) {
             Logger::debug('No account or shop available; skipping carrier capabilities refresh.');
 
