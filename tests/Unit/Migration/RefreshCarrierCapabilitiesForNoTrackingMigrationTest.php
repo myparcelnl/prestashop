@@ -98,6 +98,25 @@ it('asks for fresh contract definitions rather than the cached copy', function (
     expect($spy->freshRequested)->toBeTrue();
 });
 
+it('reports failure without throwing when the account cannot be refreshed', function () {
+    // The forced account refresh calls the API, so it can fail on its own before the carrier definitions
+    // are ever asked for. That path has to report failure too, rather than abort the upgrade.
+    mockPdkProperties([
+        PdkAccountRepositoryInterface::class => new class {
+            public function getAccount(bool $fresh = false)
+            {
+                throw new RuntimeException('Accounts endpoint unavailable');
+            }
+        },
+    ]);
+
+    $migration = loadRefreshMigration();
+
+    $migration->up();
+
+    expect($migration->hasFailed())->toBeTrue();
+});
+
 it('reports failure without throwing when fetching carrier definitions fails', function () {
     TestBootstrapper::hasAccount();
     // getAccount(true) forces a refresh, which calls the accounts endpoint.
