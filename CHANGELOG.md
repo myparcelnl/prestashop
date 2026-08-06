@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.0](https://github.com/myparcelnl/prestashop/compare/v5.5.4...v5.6.0) (2026-08-06)
+
+
+### :bug: Bug Fixes
+
+* don't attach MyParcel delivery options to orders with a non-MyParcel carrier ([#613](https://github.com/myparcelnl/prestashop/issues/613)) ([700e381](https://github.com/myparcelnl/prestashop/commit/700e38103cc77e92fd352cd0bd2bce99aa1fdaf1))
+
+
+### :sparkles: New Features
+
+* **checkout:** show the right delivery options for business and consumer orders ([#587](https://github.com/myparcelnl/prestashop/issues/587)) ([3f8adac](https://github.com/myparcelnl/prestashop/commit/3f8adac594651aa3641af19404510cd5929ad04e))
+
 ## [5.5.4](https://github.com/myparcelnl/prestashop/compare/v5.5.3...v5.5.4) (2026-07-30)
 
 
