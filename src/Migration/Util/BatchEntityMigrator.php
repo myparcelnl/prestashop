@@ -46,11 +46,14 @@ class BatchEntityMigrator
      * Hand every row of $repository to $callback, in committed batches, resuming from a stored cursor.
      *
      * The callback receives one entity and may mutate it; flushing is handled here. Return values are
-     * ignored, so a callback that decides a row needs no change can simply return.
+     * ignored, so a callback that decides a row needs no change can simply return. A row whose callback
+     * throws is logged and left unchanged, and the cursor still advances past it, so one unparseable
+     * record cannot block the migration forever.
      *
      * @param  AbstractPsObjectRepository $repository
      * @param  string                     $idField    Doctrine identifier field, e.g. "orderId"
-     * @param  string                     $cursorName Unique name for the persisted progress cursor
+     * @param  string                     $cursorName Unique per migration, so two cannot read each
+     *                                                other's progress
      * @param  callable                   $callback   fn(object $entity): void
      * @param  int                        $batchSize
      *
@@ -84,6 +87,10 @@ class BatchEntityMigrator
                 try {
                     $callback($entity);
                 } catch (Throwable $exception) {
+                    // Drop it from the unit of work, so whatever the callback changed before throwing is
+                    // not flushed with the rest of the batch. Skipped has to mean unchanged.
+                    $entityManager->detach($entity);
+
                     Logger::warning('Skipping entity during migration', [
                         'entity' => get_class($entity),
                         'cursor' => $cursorName,
