@@ -40,7 +40,8 @@ return new class extends AbstractTimestampedMigration {
             return;
         }
 
-        $shop = $account ? $account->shops->first() : null
+        $shop = $account ? $account->shops->first() : null;
+
         if (! $shop) {
             Logger::debug('No account or shop available; skipping carrier capabilities refresh.');
 
