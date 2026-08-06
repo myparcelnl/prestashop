@@ -112,7 +112,7 @@ return new class extends AbstractTimestampedMigration {
         $migrator->each(
             Pdk::get(PsProductSettingsRepository::class),
             'productId',
-            'product_settings',
+            'no_tracking_product_settings',
             function ($entity) use ($newKey): void {
                 $data     = $entity->getData();
                 $settings = $data['settings'] ?? null;
@@ -129,7 +129,7 @@ return new class extends AbstractTimestampedMigration {
             }
         );
 
-        $migrator->clearCursor('product_settings');
+        $migrator->clearCursor('no_tracking_product_settings');
     }
 
     /**
@@ -142,7 +142,7 @@ return new class extends AbstractTimestampedMigration {
         $migrator->each(
             Pdk::get(PsOrderDataRepository::class),
             'orderId',
-            'order_data',
+            'no_tracking_order_data',
             function ($entity): void {
                 $data = $entity->getData();
 
@@ -152,7 +152,7 @@ return new class extends AbstractTimestampedMigration {
             }
         );
 
-        $migrator->clearCursor('order_data');
+        $migrator->clearCursor('no_tracking_order_data');
     }
 
     /**
@@ -170,7 +170,7 @@ return new class extends AbstractTimestampedMigration {
         $migrator->each(
             Pdk::get(PsOrderShipmentRepository::class),
             'shipmentId',
-            'order_shipment',
+            'no_tracking_order_shipment',
             function ($entity): void {
                 $data = $entity->getData();
 
@@ -180,7 +180,7 @@ return new class extends AbstractTimestampedMigration {
             }
         );
 
-        $migrator->clearCursor('order_shipment');
+        $migrator->clearCursor('no_tracking_order_shipment');
     }
 
     private function batchMigrator(): BatchEntityMigrator
