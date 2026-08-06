@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.0](https://github.com/myparcelnl/prestashop/compare/v5.6.0...v5.7.0) (2026-08-06)
+
+
+### :sparkles: New Features
+
+* send width, height and length during export ([#642](https://github.com/myparcelnl/prestashop/issues/642)) ([0819366](https://github.com/myparcelnl/prestashop/commit/08193660dc7798b621b50d70e59b6c31395ae12e))
+
 ## [5.6.0](https://github.com/myparcelnl/prestashop/compare/v5.5.4...v5.6.0) (2026-08-06)
 
 
