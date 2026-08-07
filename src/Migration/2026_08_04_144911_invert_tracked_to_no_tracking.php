@@ -31,14 +31,10 @@ use MyParcelNL\PrestaShop\Repository\PsProductSettingsRepository;
  */
 return new class extends AbstractTimestampedMigration {
     /**
-     * The key the option used to be stored under in settings. A literal on purpose: NoTrackingDefinition
-     * replaced TrackedDefinition, so there is no class left to derive it from.
+     * The keys the option used to be stored under, in settings and on a shipment's options. Literals on
+     * purpose: NoTrackingDefinition replaced TrackedDefinition, so there is nothing left to derive from.
      */
-    private const LEGACY_SETTING_KEY = 'exportTracked';
-
-    /**
-     * The same option on a shipment's options, which spelled it differently.
-     */
+    private const LEGACY_SETTING_KEY         = 'exportTracked';
     private const LEGACY_SHIPMENT_OPTION_KEY = 'tracked';
 
     public function up(): void
@@ -46,8 +42,14 @@ return new class extends AbstractTimestampedMigration {
         try {
             $this->invertCarrierSettings();
             $this->invertProductSettings();
-            $this->invertOrderData();
-            $this->invertOrderShipments();
+
+            // The choice made for an order, then how each shipment created from it actually went out.
+            $this->invertDeliveryOptionRows(PsOrderDataRepository::class, 'orderId', 'no_tracking_order_data');
+            $this->invertDeliveryOptionRows(
+                PsOrderShipmentRepository::class,
+                'shipmentId',
+                'no_tracking_order_shipment'
+            );
         } catch (Throwable $exception) {
             // Report rather than throw, so a failure cannot leave the shop unable to finish upgrading.
             // Progress is kept: each pass stores its cursor after every committed batch and the old key is
@@ -60,10 +62,8 @@ return new class extends AbstractTimestampedMigration {
     }
 
     /**
-     * Carrier settings are one stored blob keyed by carrier, so this runs inline.
-     *
-     * Carriers without the old key are left alone, and the old key is dropped once converted, so running
-     * this again is a no-op rather than a second flip.
+     * Carrier settings are one stored blob keyed by carrier, so this runs inline. The old key is dropped
+     * once converted, so running it again is a no-op rather than a second flip.
      */
     private function invertCarrierSettings(): void
     {
@@ -133,44 +133,21 @@ return new class extends AbstractTimestampedMigration {
     }
 
     /**
-     * The choice made for an order, which still drives a re-export.
-     */
-    private function invertOrderData(): void
-    {
-        $migrator = $this->batchMigrator();
-
-        $migrator->each(
-            Pdk::get(PsOrderDataRepository::class),
-            'orderId',
-            'no_tracking_order_data',
-            function ($entity): void {
-                $data = $entity->getData();
-
-                if ($this->invertShipmentOption($data)) {
-                    $entity->setData(json_encode($data));
-                }
-            }
-        );
-
-        $migrator->clearCursor('no_tracking_order_data');
-    }
-
-    /**
-     * How each shipment went out. One row per shipment here, unlike WooCommerce where a single record
-     * holds them all, so there is no inner loop.
+     * Both order data and stored shipments keep the option in the same place in their JSON, one row per
+     * record, so they convert the same way.
      *
      * These records round-trip through the PDK models, which no longer know the old key, so leaving it
      * would drop it on the next read and erase it on the next save. Flipping it states the same fact in
      * the vocabulary the code now uses.
      */
-    private function invertOrderShipments(): void
+    private function invertDeliveryOptionRows(string $repository, string $idField, string $cursorName): void
     {
         $migrator = $this->batchMigrator();
 
         $migrator->each(
-            Pdk::get(PsOrderShipmentRepository::class),
-            'shipmentId',
-            'no_tracking_order_shipment',
+            Pdk::get($repository),
+            $idField,
+            $cursorName,
             function ($entity): void {
                 $data = $entity->getData();
 
@@ -180,7 +157,7 @@ return new class extends AbstractTimestampedMigration {
             }
         );
 
-        $migrator->clearCursor('no_tracking_order_shipment');
+        $migrator->clearCursor($cursorName);
     }
 
     private function batchMigrator(): BatchEntityMigrator
@@ -189,10 +166,8 @@ return new class extends AbstractTimestampedMigration {
     }
 
     /**
-     * Flip the option inside a record holding delivery options, in place.
-     *
-     * Order data and stored shipments nest it the same way, because both carry DeliveryOptions which
-     * carries ShipmentOptions.
+     * Order data and stored shipments nest the option the same way, because both carry DeliveryOptions
+     * which carries ShipmentOptions.
      *
      * @param  array $record Modified in place when it held an old value
      *
@@ -217,12 +192,10 @@ return new class extends AbstractTimestampedMigration {
     }
 
     /**
-     * Flip an explicit choice, leaving "not set" alone.
+     * Flip an explicit choice, leaving "not set" alone: inherit means the merchant never chose, so
+     * inverting it would invent a preference.
      *
-     * Inherit means the merchant never chose, so inverting it would invent a preference. Values are cast
-     * because older stored settings hold them as strings.
-     *
-     * @param  mixed $value
+     * @param  mixed $value Cast, because older stored settings hold these as strings
      */
     private function invert($value): int
     {
