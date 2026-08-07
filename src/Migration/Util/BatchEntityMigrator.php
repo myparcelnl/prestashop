@@ -14,21 +14,13 @@ use Throwable;
 /**
  * Walks a repository in batches so a migration can touch every row without exhausting memory or time.
  *
- * PrestaShop has no working scheduler — PsCronService::schedule() is an unimplemented stub — so a
- * migration that has to visit every order cannot hand the work to cron the way the WooCommerce plugin
- * does. It runs inline instead, and stays survivable by being resumable.
+ * PrestaShop has no working scheduler — PsCronService::schedule() is an unimplemented stub — so the work
+ * runs inline and stays survivable by being resumable instead. Keyset pagination gives a stable cursor
+ * worth persisting, and it is written only once a batch is committed, so a run killed by a timeout
+ * resumes where it stopped.
  *
- * Keyset pagination (`WHERE id > :cursor ORDER BY id`) is used rather than OFFSET, both to avoid the
- * deep-offset scan cost on large tables and to give a stable cursor worth persisting. The cursor is
- * written only after a batch is committed, so it can never point past uncommitted data, and a run killed
- * by a timeout resumes where it stopped rather than starting over.
- *
- * A row whose callback throws is logged and skipped, and the cursor still advances past it, so one
- * unparseable record cannot block the migration forever.
- *
- * This mirrors Migration5_3_0::migrateInBatches(), which is private to a migration that has already run
- * for merchants and is therefore left untouched. The duplication is deliberate: reaching into a released
- * migration to extract a helper risks changing behaviour for shops that are mid-upgrade.
+ * Mirrors Migration5_3_0::migrateInBatches() on purpose: that one is private to a migration merchants
+ * have already run, and reaching into it risks changing behaviour for shops mid-upgrade.
  */
 class BatchEntityMigrator
 {
@@ -121,12 +113,6 @@ class BatchEntityMigrator
         $this->settingsRepository->store($this->cursorKey($cursorName), null);
     }
 
-    /**
-     * The settings key a cursor is stored under.
-     *
-     * Callers should pass a cursor name that is unique per migration (for example include the migration
-     * id), so independent migrations cannot read each other's progress.
-     */
     private function cursorKey(string $cursorName): string
     {
         return Pdk::get('createSettingsKey')('batch_entity_migrator_cursor_' . $cursorName);
