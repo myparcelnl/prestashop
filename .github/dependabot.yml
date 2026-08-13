@@ -45,8 +45,10 @@ updates:
     open-pull-requests-limit: 20
     cooldown:
       exclude:
-          - "@myparcel-pdk/*"
-          - "@myparcel-dev/pdk-*"
+        - "@myparcel/*"
+        - "@myparcel-dev/*"
+        - "@myparcel-eslint/*"
+        - "@myparcel-pdk/*"
     groups:
       minor-js-updates:
         applies-to: version-updates
