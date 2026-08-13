@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.1](https://github.com/myparcelnl/prestashop/compare/v5.7.0...v5.7.1) (2026-08-13)
+
+
+### :bug: Bug Fixes
+
+* **insurance:** fix an issue where insurance settings were not respected on export - [#648](https://github.com/myparcelnl/prestashop/issues/648) ([6887e37](https://github.com/myparcelnl/prestashop/commit/6887e376209bf20fc6e42226957813609061a665))
+* **settings:** render same-day settings for carriers (trunkrs) with same-day delivery type ([e0a9f48](https://github.com/myparcelnl/prestashop/commit/e0a9f48faac2be09ec247508af72a97f31369626))
+
 ## [5.7.0](https://github.com/myparcelnl/prestashop/compare/v5.6.0...v5.7.0) (2026-08-06)
 
 
