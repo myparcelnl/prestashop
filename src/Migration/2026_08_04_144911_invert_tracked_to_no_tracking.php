@@ -37,6 +37,13 @@ return new class extends AbstractTimestampedMigration {
     private const LEGACY_SETTING_KEY         = 'exportTracked';
     private const LEGACY_SHIPMENT_OPTION_KEY = 'tracked';
 
+    /**
+     * One cursor per pass, so a pass that stopped early resumes where it left off.
+     */
+    private const CURSOR_PRODUCT_SETTINGS = 'no_tracking_product_settings';
+    private const CURSOR_ORDER_DATA       = 'no_tracking_order_data';
+    private const CURSOR_ORDER_SHIPMENT   = 'no_tracking_order_shipment';
+
     public function up(): void
     {
         try {
@@ -44,12 +51,14 @@ return new class extends AbstractTimestampedMigration {
             $this->invertProductSettings();
 
             // The choice made for an order, then how each shipment created from it actually went out.
-            $this->invertDeliveryOptionRows(PsOrderDataRepository::class, 'orderId', 'no_tracking_order_data');
+            $this->invertDeliveryOptionRows(PsOrderDataRepository::class, 'orderId', self::CURSOR_ORDER_DATA);
             $this->invertDeliveryOptionRows(
                 PsOrderShipmentRepository::class,
                 'shipmentId',
-                'no_tracking_order_shipment'
+                self::CURSOR_ORDER_SHIPMENT
             );
+
+            $this->clearCursors();
         } catch (Throwable $exception) {
             // Report rather than throw, so a failure cannot leave the shop unable to finish upgrading.
             // Progress is kept: each pass stores its cursor after every committed batch and the old key is
@@ -112,7 +121,7 @@ return new class extends AbstractTimestampedMigration {
         $migrator->each(
             Pdk::get(PsProductSettingsRepository::class),
             'productId',
-            'no_tracking_product_settings',
+            self::CURSOR_PRODUCT_SETTINGS,
             function ($entity) use ($newKey): void {
                 $data     = $entity->getData();
                 $settings = $data['settings'] ?? null;
@@ -128,8 +137,6 @@ return new class extends AbstractTimestampedMigration {
                 $entity->setData(json_encode($data));
             }
         );
-
-        $migrator->clearCursor('no_tracking_product_settings');
     }
 
     /**
@@ -156,13 +163,26 @@ return new class extends AbstractTimestampedMigration {
                 }
             }
         );
-
-        $migrator->clearCursor($cursorName);
     }
 
     private function batchMigrator(): BatchEntityMigrator
     {
         return Pdk::get(BatchEntityMigrator::class);
+    }
+
+    /**
+     * Drop the cursors, once every pass is through.
+     *
+     * Clearing a cursor as its own pass ends would make a later failure re-walk the finished passes from
+     * the start, which is the full table scan the batching exists to avoid.
+     */
+    private function clearCursors(): void
+    {
+        $migrator = $this->batchMigrator();
+
+        foreach ([self::CURSOR_PRODUCT_SETTINGS, self::CURSOR_ORDER_DATA, self::CURSOR_ORDER_SHIPMENT] as $cursor) {
+            $migrator->clearCursor($cursor);
+        }
     }
 
     /**
