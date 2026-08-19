@@ -112,6 +112,13 @@ class PsPdkBootstrapper extends PdkBootstrapper
             'carrierLogoFileExtensions' => value(['.png', '.jpg']),
 
             /**
+             * Migrations
+             */
+
+            // The pdk defaults this to its own package root, where no module migration lives.
+            'migrationDirectory' => value(sprintf('%s/src/Migration', rtrim($path, '/'))),
+
+            /**
              * The symfony routes that are used by the pdk. Must match the routes in config/routes.yml.
              *
              * @see config/routes.yml

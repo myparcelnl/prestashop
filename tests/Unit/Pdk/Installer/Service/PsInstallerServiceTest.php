@@ -12,6 +12,7 @@ use MyParcelNL\Pdk\Base\Contract\Arrayable;
 use MyParcelNL\Pdk\Base\Support\Collection;
 use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Pdk;
+use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Facade\MyParcelModule;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsObjectModels;
@@ -111,4 +112,23 @@ it('installs: doesn\'t add same tab twice', function () {
     expect($tabRepository->findByModule(\MyParcelNL::MODULE_NAME))->toHaveCount(1);
     Installer::install($module);
     expect($tabRepository->findByModule(\MyParcelNL::MODULE_NAME))->toHaveCount(1);
+});
+
+it('installs: records the timestamped migrations of the module', function () {
+    /** @var \MyParcelNL $module */
+    $module = Pdk::get('moduleInstance');
+
+    $timestamped = array_map(function (string $path): string {
+        return pathinfo($path, PATHINFO_FILENAME);
+    }, glob(__DIR__ . '/../../../../../src/Migration/[0-9]*.php') ?: []);
+
+    // Guards the assertion below against passing on an empty set.
+    expect($timestamped)->not->toBeEmpty();
+
+    Installer::install($module);
+
+    /** @var \MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface $settings */
+    $settings = Pdk::get(PdkSettingsRepositoryInterface::class);
+
+    expect($settings->get(Pdk::get('settingKeyAppliedMigrations')))->toContain(...$timestamped);
 });

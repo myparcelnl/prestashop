@@ -10,6 +10,7 @@ use MyParcelNL\Pdk\Base\Concern\PdkInterface;
 use MyParcelNL\Pdk\Base\Contract\ConfigInterface;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
 use MyParcelNL\Pdk\Language\Contract\LanguageServiceInterface;
+use MyParcelNL\Pdk\SdkApi\Contract\SdkClientFactoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
 use MyParcelNL\Pdk\Storage\MemoryCacheStorage;
 use MyParcelNL\Pdk\Tests\Api\Guzzle7ClientAdapter;
@@ -20,6 +21,7 @@ use MyParcelNL\Pdk\Tests\Bootstrap\MockLanguageService;
 use MyParcelNL\Pdk\Tests\Bootstrap\MockLogger;
 use MyParcelNL\Pdk\Tests\Bootstrap\MockMemoryCacheStorage;
 use MyParcelNL\Pdk\Tests\Bootstrap\MockPdk;
+use MyParcelNL\Pdk\Tests\SdkApi\MockSdkClientFactory;
 use MyParcelNL\PrestaShop\Pdk\Base\PsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\Contract\StaticMockInterface;
 use Psr\Log\LoggerInterface;
@@ -80,6 +82,9 @@ final class MockPsPdkBootstrapper extends PsPdkBootstrapper implements StaticMoc
                 PdkInterface::class             => get(MockPdk::class),
                 StorageInterface::class         => get(MockMemoryCacheStorage::class),
                 LanguageServiceInterface::class => get(MockLanguageService::class),
+                // Covers every SdkApi service at once, the same way the client adapter above
+                // covers every legacy API service. Without it they reach the live API.
+                SdkClientFactoryInterface::class => get(MockSdkClientFactory::class),
             ],
             self::$config
         );
