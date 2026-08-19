@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91999e85f4b2b870d7c5c99ed0f972d3",
+    "content-hash": "fd0cadaf14601d7a8ae44113441b29bc",
     "packages": [
         {
             "name": "fruitcake/php-cors",
@@ -471,16 +471,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "4.7.2",
+            "version": "4.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "a09bcabdb311b48e0a8ddae0eb58274b85f20e69"
+                "reference": "17a4165408c5b46efb1136f5a7f90c7022af88a8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/a09bcabdb311b48e0a8ddae0eb58274b85f20e69",
-                "reference": "a09bcabdb311b48e0a8ddae0eb58274b85f20e69",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/17a4165408c5b46efb1136f5a7f90c7022af88a8",
+                "reference": "17a4165408c5b46efb1136f5a7f90c7022af88a8",
                 "shasum": ""
             },
             "require": {
@@ -527,9 +527,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v4.7.2"
+                "source": "https://github.com/myparcelnl/pdk/tree/v4.7.4"
             },
-            "time": "2026-08-12T09:40:29+00:00"
+            "time": "2026-08-19T11:14:15+00:00"
         },
         {
             "name": "myparcelnl/sdk",
@@ -4773,15 +4773,15 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4.0"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
