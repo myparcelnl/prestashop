@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.2](https://github.com/myparcelnl/prestashop/compare/v5.7.1...v5.7.2) (2026-08-20)
+
+
+### :bug: Bug Fixes
+
+* **insurance:** refresh stored carrier data so we stop using depreated insurance amounts ([#624](https://github.com/myparcelnl/prestashop/issues/624)) ([889293c](https://github.com/myparcelnl/prestashop/commit/889293c2fd4bb1ba8ab7cc7e7cb566abe8811f11)), closes [myparcelnl/pdk#511](https://github.com/myparcelnl/pdk/issues/511) [myparcelnl/pdk#511](https://github.com/myparcelnl/pdk/issues/511) [myparcelnl/js-pdk#383](https://github.com/myparcelnl/js-pdk/issues/383)
+
 ## [5.7.1](https://github.com/myparcelnl/prestashop/compare/v5.7.0...v5.7.1) (2026-08-13)
 
 
