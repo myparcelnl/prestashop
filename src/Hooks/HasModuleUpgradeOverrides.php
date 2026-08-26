@@ -6,6 +6,7 @@ namespace MyParcelNL\PrestaShop\Hooks;
 
 use MyParcelNL;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
+use MyParcelNL\Pdk\Facade\Installer;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use Throwable;
@@ -23,6 +24,24 @@ trait HasModuleUpgradeOverrides
      */
     public static function upgradeModuleVersion($name, $version): bool
     {
+        // Leave the registered version behind while migrations still have work. canBeUpgraded()
+        // compares it with the version on disk, so PrestaShop keeps offering the upgrade and the
+        // merchant can run it again to finish. Bumping it here would hide the button and strand
+        // whatever is left unconverted.
+        //
+        // There is no limit on the number of attempts, on purpose. A shop whose migration cannot
+        // finish keeps being offered the upgrade, and every attempt logs the warning below. Giving up
+        // after a few tries would hide the problem and leave the records half converted, which is the
+        // outcome this guard exists to prevent.
+        if (static::hasPendingMigrations()) {
+            Logger::warning('Migrations are not finished, so the registered module version stays as it is.', [
+                'module'  => $name,
+                'version' => $version,
+            ]);
+
+            return false;
+        }
+
         $result = parent::upgradeModuleVersion($name, $version);
 
         try {
@@ -92,6 +111,28 @@ trait HasModuleUpgradeOverrides
         $fileSystem->put(static::getUpgradeFileName(), strtr($content, [
             '__VERSION__' => str_replace(['.', '-', '+'], '_', static::getVersionFromComposer()),
         ]));
+    }
+
+    /**
+     * Whether the installer still has migrations to run.
+     *
+     * Answers false when it cannot tell. An installer that stays silent must not keep the module
+     * upgradable for ever, and a PDK without this check behaves as it always did.
+     *
+     * @return bool
+     */
+    private static function hasPendingMigrations(): bool
+    {
+        try {
+            return (bool) Installer::hasPendingMigrations();
+        } catch (Throwable $e) {
+            Logger::error("Could not read pending migrations: {$e->getMessage()}", [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return false;
+        }
     }
 
     /**
