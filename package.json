@@ -1,6 +1,6 @@
 {
   "name": "@myparcel-prestashop/monorepo",
-  "version": "5.7.2",
+  "version": "5.7.3",
   "private": true,
   "repository": "github:myparcelnl/prestashop",
   "license": "MIT",

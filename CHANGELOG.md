@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.3](https://github.com/myparcelnl/prestashop/compare/v5.7.2...v5.7.3) (2026-08-27)
+
+
+### :bug: Bug Fixes
+
+* **orders:** import same-day, early-morning, fresh and frozen delivery options (pdk 4.7.5)   ([#666](https://github.com/myparcelnl/prestashop/issues/666)) ([7d6a869](https://github.com/myparcelnl/prestashop/commit/7d6a86973f5da1f998d0b7e81a6d2832564bc0d5))
+
 ## [5.7.2](https://github.com/myparcelnl/prestashop/compare/v5.7.1...v5.7.2) (2026-08-20)
 
 
