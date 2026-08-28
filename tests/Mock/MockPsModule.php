@@ -23,6 +23,13 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
     protected static $instances = [];
 
     /**
+     * Records the version writes, so a test can tell whether the module bumped its registered version.
+     *
+     * @var array<string, string>
+     */
+    protected static $registeredVersions = [];
+
+    /**
      * @var \DI\Container
      */
     public $container;
@@ -67,7 +74,8 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
 
     public static function reset(): void
     {
-        static::$instances = [];
+        static::$instances          = [];
+        static::$registeredVersions = [];
     }
 
     /**
@@ -94,6 +102,28 @@ abstract class MockPsModule extends BaseMock implements StaticMockInterface
      */
     protected static function loadUpgradeVersionList($module_name, $module_version, $registered_version)
     {
+        return true;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getRegisteredVersions(): array
+    {
+        return static::$registeredVersions;
+    }
+
+    /**
+     * @param  string $name
+     * @param  string $version
+     *
+     * @return bool
+     * @see \ModuleCore::upgradeModuleVersion()
+     */
+    public static function upgradeModuleVersion($name, $version): bool
+    {
+        static::$registeredVersions[$name] = $version;
+
         return true;
     }
 
