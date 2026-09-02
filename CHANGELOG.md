@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.4](https://github.com/myparcelnl/prestashop/compare/v5.7.3...v5.7.4) (2026-09-02)
+
+
+### :bug: Bug Fixes
+
+* **installer:** keep the upgrade available until migrations finish ([#668](https://github.com/myparcelnl/prestashop/issues/668)) ([3ea7d78](https://github.com/myparcelnl/prestashop/commit/3ea7d78c367f01145feff9f29d5ecace96bd079c))
+
 ## [5.7.3](https://github.com/myparcelnl/prestashop/compare/v5.7.2...v5.7.3) (2026-08-27)
 
 
