@@ -11,6 +11,7 @@ use MyParcelNL\Pdk\App\Cart\Model\PdkCart;
 use MyParcelNL\Pdk\App\Cart\Repository\AbstractPdkCartRepository;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
+use MyParcelNL\PrestaShop\Pdk\Base\Service\PsWeightService;
 use PrestaShop\PrestaShop\Adapter\Entity\Country;
 
 class PsPdkCartRepository extends AbstractPdkCartRepository
@@ -20,16 +21,22 @@ class PsPdkCartRepository extends AbstractPdkCartRepository
      */
     private $productRepository;
 
+    /** @var PsWeightService */
+    private $weightService;
+
     /**
      * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                $storage
      * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $productRepository
+     * @param  PsWeightService                                                  $weightService
      */
     public function __construct(
         StorageInterface              $storage,
-        PdkProductRepositoryInterface $productRepository
+        PdkProductRepositoryInterface $productRepository,
+        PsWeightService               $weightService
     ) {
         parent::__construct($storage);
         $this->productRepository = $productRepository;
+        $this->weightService     = $weightService;
     }
 
     /**
@@ -66,7 +73,18 @@ class PsPdkCartRepository extends AbstractPdkCartRepository
                     ],
                 ],
                 'lines'                 => array_map(function ($item) {
-                    $product = $this->productRepository->getProduct($item['id_product']);
+                    // getProducts() already includes combination and customization weight in shop units.
+                    // Keep the per-line weight off the cached base product and other variants of it.
+                    $product = clone $this->productRepository->getProduct($item['id_product']);
+
+                    if (array_key_exists('weight', $item)) {
+                        $product->weight = is_numeric($item['weight']) && $item['weight'] > 0
+                            ? $this->weightService->convertToGrams((float) $item['weight'])
+                            : 0;
+                    } elseif (! empty($item['id_product_attribute']) || ! empty($item['id_customization'])) {
+                        // The base product cannot establish a known weight for a missing variant weight.
+                        $product->weight = 0;
+                    }
 
                     return [
                         'quantity'      => (int) $item['cart_quantity'],
