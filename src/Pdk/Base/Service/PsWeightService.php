@@ -11,13 +11,15 @@ class PsWeightService extends WeightService
 {
     /**
      * @param  int|float $weight
-     * @param  string    $unit leave empty, prestashop configured weight unit will be used
+     * @param  string    $unit Leave empty to use the PrestaShop configured weight unit
      *
      * @return int
      */
     public function convertToGrams($weight, string $unit = ''): int
     {
-        return parent::convertToGrams($weight, $this->normalizeUnit(strtolower(Configuration::get('PS_WEIGHT_UNIT'))));
+        $resolvedUnit = $unit ?: (string) Configuration::get('PS_WEIGHT_UNIT');
+
+        return parent::convertToGrams($weight, $this->normalizeUnit(strtolower($resolvedUnit)));
     }
 
     /**
