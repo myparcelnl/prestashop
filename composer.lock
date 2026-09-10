@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d62bf8d467d20245216108a48e30f31c",
+    "content-hash": "d72cab3bfffa2df7d6209b4b2e7da501",
     "packages": [
         {
             "name": "fruitcake/php-cors",
@@ -471,16 +471,16 @@
         },
         {
             "name": "myparcelnl/pdk",
-            "version": "4.8.1",
+            "version": "4.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/pdk.git",
-                "reference": "42368edf7fb6faba28ab7bbc639e9a036c0e3d3e"
+                "reference": "52926a9d8ff9ae5a5202ea5c00d09ac098116471"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/42368edf7fb6faba28ab7bbc639e9a036c0e3d3e",
-                "reference": "42368edf7fb6faba28ab7bbc639e9a036c0e3d3e",
+                "url": "https://api.github.com/repos/myparcelnl/pdk/zipball/52926a9d8ff9ae5a5202ea5c00d09ac098116471",
+                "reference": "52926a9d8ff9ae5a5202ea5c00d09ac098116471",
                 "shasum": ""
             },
             "require": {
@@ -498,10 +498,10 @@
                 "guzzlehttp/guzzle": "^7.5",
                 "league/openapi-psr7-validator": "^0.24",
                 "mockery/mockery": "^1.6",
-                "myparcelnl/devtools": "^1.0.0",
                 "nette/robot-loader": "^3.0.0",
                 "pestphp/pest": "^1.0.0",
                 "phpdocumentor/reflection-docblock": "^5.0.0",
+                "phpmd/phpmd": "^2.15",
                 "phpstan/phpstan": "^1.0.0",
                 "rector/rector": "^1.0.0",
                 "spatie/pest-plugin-snapshots": "^1.0.0",
@@ -528,9 +528,9 @@
             "homepage": "https://myparcel.nl",
             "support": {
                 "issues": "https://github.com/myparcelnl/pdk/issues",
-                "source": "https://github.com/myparcelnl/pdk/tree/v4.8.1"
+                "source": "https://github.com/myparcelnl/pdk/tree/v4.8.3"
             },
-            "time": "2026-09-04T16:18:37+00:00"
+            "time": "2026-09-10T16:15:59+00:00"
         },
         {
             "name": "myparcelnl/sdk",
