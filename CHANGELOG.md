@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.5](https://github.com/myparcelnl/prestashop/compare/v5.7.4...v5.7.5) (2026-09-10)
+
 ## [5.7.4](https://github.com/myparcelnl/prestashop/compare/v5.7.3...v5.7.4) (2026-09-02)
 
 
