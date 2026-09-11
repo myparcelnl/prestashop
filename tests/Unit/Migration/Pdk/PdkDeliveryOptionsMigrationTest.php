@@ -20,7 +20,7 @@ use MyParcelNL\Pdk\App\Options\Definition\ReceiptCodeDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\SameDayDeliveryDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\SaturdayDeliveryDefinition;
 use MyParcelNL\Pdk\App\Options\Definition\SignatureDefinition;
-use MyParcelNL\Pdk\App\Options\Definition\TrackedDefinition;
+use MyParcelNL\Pdk\App\Options\Definition\NoTrackingDefinition;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
 use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
@@ -122,7 +122,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
         (new ReceiptCodeDefinition())->getShipmentOptionsKey()         => TriStateService::INHERIT,
         (new SameDayDeliveryDefinition())->getShipmentOptionsKey()     => TriStateService::INHERIT,
         (new SignatureDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
-        (new TrackedDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
+        (new NoTrackingDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
         (new CollectDefinition())->getShipmentOptionsKey()             => TriStateService::INHERIT,
         (new FreshFoodDefinition())->getShipmentOptionsKey()           => TriStateService::INHERIT,
         (new FrozenDefinition())->getShipmentOptionsKey()              => TriStateService::INHERIT,

@@ -36,7 +36,7 @@
         $mock = new class extends CarrierCapabilitiesRepository {
             public function __construct() {}
 
-            public function getContractDefinitions(?string $carrier = null): CarrierCollection
+            public function getContractDefinitions(?string $carrier = null, bool $fresh = false): CarrierCollection
             {
                 throw new RuntimeException('API returned 401: Permission Denied');
             }
