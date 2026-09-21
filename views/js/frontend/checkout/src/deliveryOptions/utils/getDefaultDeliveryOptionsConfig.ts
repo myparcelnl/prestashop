@@ -1,14 +1,15 @@
-import {useDeliveryOptionsStore} from '@myparcel-dev/pdk-checkout';
+import {
+  useCheckoutStore,
+  useDeliveryOptionsStore,
+} from '@myparcel-dev/pdk-checkout';
 import {type InputDeliveryOptionsConfiguration} from '@myparcel-dev/delivery-options';
 
-let configuration: InputDeliveryOptionsConfiguration | undefined;
+export const getDefaultDeliveryOptionsConfig =
+  (): InputDeliveryOptionsConfiguration => {
+    const {configuration} = useDeliveryOptionsStore().state;
+    const {context} = useCheckoutStore().state;
 
-export const getDefaultDeliveryOptionsConfig = (): InputDeliveryOptionsConfiguration => {
-  if (!configuration) {
-    const deliveryOptionsStore = useDeliveryOptionsStore();
-
-    configuration = deliveryOptionsStore.state.configuration;
-  }
-
-  return configuration;
-};
+    // The widget configuration is narrowed to one carrier. The fresh checkout
+    // context retains all carriers for switching shipping methods after cart changes.
+    return {...configuration, config: context.config ?? configuration.config};
+  };
