@@ -45,6 +45,7 @@ describe('PrestaShop checkout context integration', () => {
   };
 
   beforeEach(async () => {
+    document.body.innerHTML = '';
     handlers = {};
     context = makeContext(30000);
     tests.getMockCheckoutContext.mockReturnValueOnce(context);
