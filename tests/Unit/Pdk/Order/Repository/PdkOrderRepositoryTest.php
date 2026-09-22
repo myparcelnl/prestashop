@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 
+use DateTimeImmutable;
 use InvalidArgumentException;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
@@ -344,8 +345,51 @@ it('builds pdk orders from an order-grid record collection', function () {
         ->and((int) $result->first()->externalIdentifier)
         ->toBe((int) $order->id)
         ->and($result->first()->referenceIdentifier)
-        ->toBe('REF-GRID');
+        ->toBe('REF-GRID')
+        ->and($result->first()->orderDate->format('Y-m-d H:i:s'))
+        ->toBe('2020-01-01 10:00:00');
 });
+
+it('sets the order date from the prestashop order', function () {
+    /** @var Order $psOrder */
+    $psOrder = psFactory(Order::class)
+        ->withDateAdd('2024-05-06 07:08:09')
+        ->store();
+
+    /** @var PdkOrderRepositoryInterface $orderRepository */
+    $orderRepository = Pdk::get(PdkOrderRepositoryInterface::class);
+
+    $orderDate = $orderRepository->get($psOrder)->orderDate;
+
+    expect($orderDate)
+        ->toBeInstanceOf(DateTimeImmutable::class)
+        ->and($orderDate->format('Y-m-d H:i:s'))
+        ->toBe('2024-05-06 07:08:09');
+});
+
+it('leaves the order date empty when prestashop has no usable date', function (string $dateAdd) {
+    /** @var Order $order */
+    $order = psFactory(Order::class)->store();
+
+    /** @var \MyParcelNL\PrestaShop\Pdk\Order\Repository\PsPdkOrderRepository $orderRepository */
+    $orderRepository = Pdk::get(PsPdkOrderRepository::class);
+
+    $collection = new RecordCollection([
+        [
+            'id_order'  => (int) $order->id,
+            'reference' => 'REF-GRID',
+            'date_add'  => $dateAdd,
+            'payment'   => 'Cash on delivery',
+        ],
+    ]);
+
+    $result = $orderRepository->fromOrderGridCollection($collection);
+
+    expect($result->first()->orderDate)->toBeNull();
+})->with([
+    'empty date' => '',
+    'zero date'  => '0000-00-00 00:00:00',
+]);
 
 it('returns an empty collection from all() when there are no orders', function () {
     /** @var \MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface $orderRepository */
