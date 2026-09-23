@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.8.0](https://github.com/myparcelnl/prestashop/compare/v5.7.5...v5.8.0) (2026-09-23)
+
+
+### :sparkles: New Features
+
+* **shipments:** enable tracking by default for shipments that support it ([#639](https://github.com/myparcelnl/prestashop/issues/639)) ([fabc5fc](https://github.com/myparcelnl/prestashop/commit/fabc5fc62c15eb72b29dc836f185bc85917733d0))
+
+
+### :bug: Bug Fixes
+
+* **customs:** limit item description length ([#689](https://github.com/myparcelnl/prestashop/issues/689)) ([38fc695](https://github.com/myparcelnl/prestashop/commit/38fc695987e78c877dd023c7dd262aa833c391c3))
+
 ## [5.7.5](https://github.com/myparcelnl/prestashop/compare/v5.7.4...v5.7.5) (2026-09-10)
 
 ## [5.7.4](https://github.com/myparcelnl/prestashop/compare/v5.7.3...v5.7.4) (2026-09-02)
