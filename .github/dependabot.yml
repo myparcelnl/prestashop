@@ -33,9 +33,7 @@ updates:
           - 'myparcelnl/pdk'
 
   - package-ecosystem: 'npm'
-    directories:
-      - '/'
-      - 'views/**/*'
+    directory: '/'
     schedule:
       interval: 'daily'
     commit-message:
