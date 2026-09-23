@@ -534,16 +534,16 @@
         },
         {
             "name": "myparcelnl/sdk",
-            "version": "11.0.0-beta.34",
+            "version": "11.0.0-beta.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/sdk.git",
-                "reference": "fbfa9d083fd1de24a5b00e945be9a31e139e16d8"
+                "reference": "3302189066ec59913e73682193c2dd89b41212e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/fbfa9d083fd1de24a5b00e945be9a31e139e16d8",
-                "reference": "fbfa9d083fd1de24a5b00e945be9a31e139e16d8",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/3302189066ec59913e73682193c2dd89b41212e6",
+                "reference": "3302189066ec59913e73682193c2dd89b41212e6",
                 "shasum": ""
             },
             "require": {
@@ -599,9 +599,9 @@
             ],
             "support": {
                 "issues": "https://github.com/myparcelnl/sdk/issues",
-                "source": "https://github.com/myparcelnl/sdk/tree/v11.0.0-beta.34"
+                "source": "https://github.com/myparcelnl/sdk/tree/v11.0.0-beta.35"
             },
-            "time": "2026-09-15T12:47:39+00:00"
+            "time": "2026-09-18T09:39:20+00:00"
         },
         {
             "name": "php-di/invoker",
