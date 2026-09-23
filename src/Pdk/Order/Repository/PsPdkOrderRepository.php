@@ -430,6 +430,7 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements P
             'shipmentPrice'       => $this->currencyService->convertToCents($psOrder->total_shipping_tax_incl),
             'shipmentVat'         => $this->currencyService->convertToCents($psOrder->total_shipping_tax_excl),
             'lines'               => $this->createOrderLines($orderProducts),
+            'orderDate'           => $this->getDate($psOrder->date_add),
             'invoiceId'           => $psOrder->id,
             'invoiceDate'         => $psOrder->date_add,
             'paymentMethod'       => $psOrder->payment,
@@ -452,10 +453,26 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements P
         return [
             'externalIdentifier'  => $record['id_order'],
             'referenceIdentifier' => $record['reference'],
+            'orderDate'           => $this->getDate($record['date_add'] ?? null),
             'invoiceId'           => $record['id_order'],
             'invoiceDate'         => $record['date_add'],
             'paymentMethod'       => $record['payment'],
         ];
+    }
+
+    /**
+     * Empty and zero dates must become null: the PDK datetime cast silently turns anything it
+     * cannot parse into "now", which would export a wrong order date instead of none.
+     *
+     * @param  null|string $dateAdd
+     *
+     * @return null|string
+     */
+    private function getDate(?string $dateAdd): ?string
+    {
+        $date = trim((string) $dateAdd);
+
+        return '' === $date || 0 === strpos($date, '0000-00-00') ? null : $date;
     }
 
     /**
