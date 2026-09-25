@@ -26,7 +26,7 @@ const makeContext = (value: number | null) => {
   const context = tests.getMockCheckoutContext();
   context.config = {
     ...context.config,
-    physicalProperties: value === null ? null : {weight: {value, unit: 'g'}},
+    physicalProperties: value === null ? null : {weight: value},
     carrierSettings: {dpd: {pricePickup: 2}, postnl: {pricePickup: 5}},
   };
   context.settings.actions.baseUrl = '/module/myparcelnl';

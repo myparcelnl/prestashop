@@ -26,7 +26,7 @@ describe('updateDeliveryOptions', () => {
   beforeEach(() => {
     mocks.currentMethod.mockReturnValue({carrier: 'dpd'});
     mocks.context.config = {
-      physicalProperties: {weight: {value: 30000, unit: 'g'}},
+      physicalProperties: {weight: 30000},
       carrierSettings: {dpd: {pricePickup: 1}, postnl: {pricePickup: 2}},
     };
     mocks.deliveryOptions.state.configuration.config = {
