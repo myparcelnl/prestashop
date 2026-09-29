@@ -18,6 +18,7 @@ use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use MyParcelNL\PrestaShop\Service\PsProductService;
+use MyParcelNL\PrestaShop\Tests\Mock\MockPsConfiguration;
 use MyParcelNL\PrestaShop\Tests\Mock\ThrowingPsOrderService;
 use MyParcelNL\Pdk\Base\Support\Arr;
 use MyParcelNL\Pdk\Carrier\Collection\CarrierCollection;
@@ -32,6 +33,7 @@ use Country;
 use Order;
 use OrderFactory;
 use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
+use Product;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
@@ -453,3 +455,37 @@ it('re-throws unexpected exceptions from find() instead of returning null', func
     expect(fn () => $orderRepository->find(1))
         ->toThrow(InvalidArgumentException::class, ThrowingPsOrderService::MESSAGE);
 });
+
+it('uses the order line weight of a combination or customization without changing the base product', function (
+    array $line,
+    int   $expectedWeight
+) {
+    MockPsConfiguration::set('PS_WEIGHT_UNIT', 'kg');
+    $product = psFactory(Product::class)->withWeight(21)->withActive(true)->withAvailableForOrder(true)->store();
+
+    /** @var Order $psOrder */
+    $psOrder = psFactory(Order::class)->store();
+    // getProducts() reads the 'products' attribute (BaseMock::__call). PrestaShop returns order_detail rows.
+    $psOrder->products = [
+        $line + [
+            'id_product'       => $product->id,
+            'product_id'       => $product->id,
+            'product_quantity' => 1,
+            'product_price'    => 10,
+            'product_price_wt' => 12.1,
+            'tax_rate'         => 21,
+        ],
+    ];
+
+    $productRepository = Pdk::get(PdkProductRepositoryInterface::class);
+    $pdkOrder          = Pdk::get(PdkOrderRepositoryInterface::class)->get($psOrder);
+
+    expect($pdkOrder->lines->getTotalWeight())->toBe($expectedWeight)
+        ->and($productRepository->getProduct($product->id)->weight)->toBe(21000);
+})->with([
+    'lighter combination'          => [['product_attribute_id' => 42, 'product_weight' => '19'], 19000],
+    'customization'                => [['id_customization' => 7, 'product_weight' => '21.5'], 21500],
+    'quantity included once'       => [['product_attribute_id' => 42, 'product_weight' => '10', 'product_quantity' => 3], 30000],
+    'missing combination weight'   => [['product_attribute_id' => 42, 'product_weight' => '0'], 0],
+    'simple product'               => [['product_attribute_id' => 0, 'product_weight' => '20'], 21000],
+]);
