@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b01b6898d03958ccb35031e52424b95f",
+    "content-hash": "b8dd49c05cf96939e028a59404d14331",
     "packages": [
         {
             "name": "fruitcake/php-cors",
