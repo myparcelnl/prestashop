@@ -56,10 +56,10 @@ it('maps the delivery address company to the pdk cart as isBusiness, without sto
     'consumer (no company)'      => [null, false],
 ]);
 
-it('uses the resolved cart line weight without changing the base product', function (
-    array $line,
+it('uses the cart line weight of a combination or customization without changing the base product', function (
+    array  $line,
     string $unit,
-    int $expectedWeight
+    int    $expectedWeight
 ) {
     MockPsConfiguration::set('PS_WEIGHT_UNIT', $unit);
     $product = psFactory(Product::class)->withWeight(21)->withActive(true)->withAvailableForOrder(true)->store();
@@ -77,20 +77,21 @@ it('uses the resolved cart line weight without changing the base product', funct
         ->and($baseProduct->weight)->toBe($baseWeight)
         ->and($productRepository->getProduct($product->id)->weight)->toBe($baseWeight);
 })->with([
-    'lighter combination'             => [['id_product_attribute' => 42, 'weight' => '19'], 'kg', 19000],
-    'heavier combination'             => [['id_product_attribute' => 42, 'weight' => '22'], 'kg', 22000],
+    'lighter combination'                => [['id_product_attribute' => 42, 'weight' => '19'], 'kg', 19000],
+    'heavier combination'                => [['id_product_attribute' => 42, 'weight' => '22'], 'kg', 22000],
     // PrestaShop adds the combination's impact to the base weight before returning these fields.
-    'zero combination weight impact'  => [['id_product_attribute' => 42, 'weight_attribute' => '21', 'weight' => '21'], 'kg', 21000],
-    'customization included once'     => [['id_customization' => 7, 'weight' => '21.001'], 'kg', 21001],
-    'quantity included once'          => [['weight' => '10', 'cart_quantity' => 3], 'kg', 30000],
-    'explicit one gram'               => [['weight' => '1'], 'g', 1],
-    'zero stays unknown'              => [['weight' => '0'], 'kg', 0],
-    'null stays unknown'              => [['weight' => null], 'kg', 0],
-    'malformed stays unknown'         => [['weight' => 'unknown'], 'kg', 0],
-    'negative stays unknown'          => [['weight' => -1], 'kg', 0],
-    'missing combination weight'      => [['id_product_attribute' => 42], 'kg', 0],
-    'missing customization weight'    => [['id_customization' => 7], 'kg', 0],
-    'simple product legacy fallback'  => [[], 'kg', 21000],
+    'zero combination weight impact'     => [['id_product_attribute' => 42, 'weight_attribute' => '21', 'weight' => '21'], 'kg', 21000],
+    'customization included once'        => [['id_customization' => 7, 'weight' => '21.001'], 'kg', 21001],
+    'quantity included once'             => [['id_product_attribute' => 42, 'weight' => '10', 'cart_quantity' => 3], 'kg', 30000],
+    'explicit one gram'                  => [['id_product_attribute' => 42, 'weight' => '1'], 'g', 1],
+    'zero combination weight'            => [['id_product_attribute' => 42, 'weight' => '0'], 'kg', 0],
+    'null combination weight'            => [['id_product_attribute' => 42, 'weight' => null], 'kg', 0],
+    'malformed combination weight'       => [['id_product_attribute' => 42, 'weight' => 'unknown'], 'kg', 0],
+    'negative combination weight'        => [['id_product_attribute' => 42, 'weight' => -1], 'kg', 0],
+    'missing combination weight'         => [['id_product_attribute' => 42], 'kg', 0],
+    'missing customization weight'       => [['id_customization' => 7], 'kg', 0],
+    'simple product'                     => [['weight' => '21'], 'kg', 21000],
+    'simple product without line weight' => [[], 'kg', 21000],
 ]);
 
 it('keeps two combinations of the same product independent', function () {
