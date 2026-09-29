@@ -97,6 +97,38 @@ class PsPdkProductRepository extends AbstractPdkPdkProductRepository
     }
 
     /**
+     * Get the product of a cart line or an order line, with the weight of one item on that line.
+     *
+     * A combination and a customization can change the weight of a product. PrestaShop adds those
+     * weight impacts to the product weight and stores the result on the cart line and on the order
+     * line. A line without a combination or a customization weighs the same as the base product.
+     * The cached base product keeps its own weight.
+     *
+     * @param  int|string            $identifier      The product id
+     * @param  int                   $combinationId   The id_product_attribute of the line, 0 for none
+     * @param  int                   $customizationId The id_customization of the line, 0 for none
+     * @param  null|int|float|string $lineWeight      The weight of one item in the shop weight unit
+     *
+     * @return \MyParcelNL\Pdk\App\Order\Model\PdkProduct
+     */
+    public function getLineProduct($identifier, int $combinationId, int $customizationId, $lineWeight): PdkProduct
+    {
+        $product = $this->getProduct($identifier);
+
+        if (! $combinationId && ! $customizationId) {
+            return $product;
+        }
+
+        $lineProduct = clone $product;
+        // Without a line weight the weight is unknown: the base product weight is wrong for a combination.
+        $lineProduct->weight = is_numeric($lineWeight) && $lineWeight > 0
+            ? $this->weightService->convertToGrams((float) $lineWeight)
+            : 0;
+
+        return $lineProduct;
+    }
+
+    /**
      * @param  int|string $identifier
      *
      * @return \MyParcelNL\Pdk\Settings\Model\ProductSettings
