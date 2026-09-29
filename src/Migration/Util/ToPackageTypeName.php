@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MyParcelNL\PrestaShop\Migration\Util;
 
-use MyParcelNL\Pdk\Base\Support\Utils;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
+use MyParcelNL\Sdk\Services\Mapping\ApiMapperService;
 
 final class ToPackageTypeName extends TransformValue
 {
@@ -30,7 +30,11 @@ final class ToPackageTypeName extends TransformValue
      */
     protected function convert($value)
     {
-        return Utils::convertToName($value, DeliveryOptions::PACKAGE_TYPES_NAMES_IDS_MAP) ?? $this->defaultValue;
+        $mapper = ApiMapperService::forPackageType();
+        $id     = is_numeric($value) ? (int) $value : $mapper->idFromLegacyName((string) $value);
+        $name   = null === $id ? null : $mapper->legacyNameFromId($id);
+
+        return $name ?? $this->defaultValue;
     }
 }
 

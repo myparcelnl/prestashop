@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Generator;
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\AccountSettings;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
@@ -13,11 +12,13 @@ use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Migration\Util\CastValue;
 use MyParcelNL\PrestaShop\Migration\Util\DataMigrator;
+use MyParcelNL\PrestaShop\Migration\Util\LegacyCarrierNames;
 use MyParcelNL\PrestaShop\Migration\Util\MigratableValue;
 use MyParcelNL\PrestaShop\Migration\Util\ToDeliveryTypeName;
 use MyParcelNL\PrestaShop\Migration\Util\ToPackageTypeName;
 use MyParcelNL\PrestaShop\Migration\Util\TransformValue;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
+use MyParcelNL\Sdk\Services\Mapping\ApiMapperService;
 
 final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
 {
@@ -81,7 +82,7 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
             'carrier',
             DeliveryOptions::CARRIER,
             new TransformValue(function ($value) {
-                $legacyNames = array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
+                $legacyNames = array_keys(LegacyCarrierNames::toV2Map());
 
                 if (in_array($value, $legacyNames, true)) {
                     return $value;
@@ -95,7 +96,7 @@ final class PdkDeliveryOptionsMigration extends AbstractPsPdkMigration
                         return $value;
                     }
 
-                    return Carrier::CARRIER_NAME_TO_LEGACY_MAP[$defaultCarrier] ?? $value;
+                    return ApiMapperService::forCarrier()->legacyNameFromV2Name($defaultCarrier) ?? $value;
                 } catch (\Throwable $e) {
                     return $value;
                 }

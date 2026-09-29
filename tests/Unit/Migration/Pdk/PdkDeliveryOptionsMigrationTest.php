@@ -145,7 +145,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
     ->with([
         'defaults' => [
             'delivery_settings' => [
-                'carrier' => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+                'carrier' => 'postnl',
             ],
             'extra_options'     => [],
 
@@ -171,7 +171,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'different label amount' => [
             'delivery_settings' => [
-                'carrier' => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+                'carrier' => 'postnl',
             ],
             'extra_options'     => [
                 'labelAmount' => 5,
@@ -185,7 +185,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'all shipment options enabled' => [
             'delivery_settings' => [
-                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
+                'carrier'         => 'dhlforyou',
                 'shipmentOptions' => [
                     'signature'         => true,
                     'insurance'         => 2000,
@@ -219,7 +219,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'all shipment options disabled' => [
             'delivery_settings' => [
-                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
+                'carrier'         => 'dhlforyou',
                 'shipmentOptions' => [
                     'signature'         => false,
                     'insurance'         => 0,
@@ -253,7 +253,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'pickup location' => [
             'delivery_settings' => [
-                'carrier'        => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
+                'carrier'        => 'dhlforyou',
                 'pickupLocation' => [
                     'box_number'        => 'box_number',
                     'cc'                => 'cc',
