@@ -6,11 +6,11 @@ namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use DbQuery;
 use MyParcelNL\Pdk\Base\Support\Collection;
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\PrestaShop\Contract\PsCarrierServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
+use MyParcelNL\PrestaShop\Migration\Util\LegacyCarrierNames;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use MyParcelNL\Sdk\Support\Str;
 
@@ -86,7 +86,7 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
     private function getCarriersToMigrate(Collection $carrierRows): Collection
     {
         $mappings    = $this->psCarrierMappingRepository->all();
-        $legacyNames = new Collection(array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP));
+        $legacyNames = new Collection(array_keys(LegacyCarrierNames::toV2Map()));
 
         return $carrierRows->reduce(function (Collection $carry, array $item) use ($legacyNames, $mappings) {
             $oldCarrier = Str::after($item['name'], self::SETTING_PREFIX);
@@ -129,7 +129,7 @@ final class PdkCarrierMigration extends AbstractPsPdkMigration
      */
     private function getLegacyCarrierRows(): Collection
     {
-        $settingNames = (new Collection(array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP)))->map(
+        $settingNames = (new Collection(array_keys(LegacyCarrierNames::toV2Map())))->map(
             static function (string $legacyName) {
                 $name = self::LEGACY_CARRIER_MAP[$legacyName] ?? strtoupper($legacyName);
 

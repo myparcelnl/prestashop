@@ -6,7 +6,6 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration\Pdk;
 
 use Carrier as PsCarrier;
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
@@ -64,15 +63,15 @@ it('migrates carriers to pdk', function (
         'expected'      => [
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 21,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => 'postnl',
             ],
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 22,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => 'dhlforyou',
             ],
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 24,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_BPOST_LEGACY_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => 'bpost',
             ],
         ],
     ],
@@ -94,7 +93,7 @@ it('migrates carriers to pdk', function (
             return [
                 factory(PsCarrier::class)->withId(21),
                 factory(MyparcelnlCarrierMapping::class)
-                    ->withMyparcelCarrier(Carrier::CARRIER_POSTNL_LEGACY_NAME)
+                    ->withMyparcelCarrier('postnl')
                     ->withCarrierId(40),
             ];
         },
@@ -104,7 +103,7 @@ it('migrates carriers to pdk', function (
         'expected'      => [
             [
                 MyparcelnlCarrierMapping::CARRIER_ID       => 40,
-                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+                MyparcelnlCarrierMapping::MYPARCEL_CARRIER => 'postnl',
             ],
         ],
     ],
