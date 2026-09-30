@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.8.1](https://github.com/myparcelnl/prestashop/compare/v5.8.0...v5.8.1) (2026-09-30)
+
+
+### :bug: Bug Fixes
+
+* **admin:** update js-pdk for label printing and shipment options fixes ([#706](https://github.com/myparcelnl/prestashop/issues/706)) ([e840be2](https://github.com/myparcelnl/prestashop/commit/e840be266ab56561cf11f0555cae247d46891f52))
+* show order date in myparcel backoffice order v1 ([#691](https://github.com/myparcelnl/prestashop/issues/691)) ([46cc9bd](https://github.com/myparcelnl/prestashop/commit/46cc9bd09cb76b1dc7005d74a9f7d76b58664d07))
+
 ## [5.8.0](https://github.com/myparcelnl/prestashop/compare/v5.7.5...v5.8.0) (2026-09-23)
 
 
