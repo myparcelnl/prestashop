@@ -7,7 +7,6 @@ namespace MyParcelNL\PrestaShop\Pdk\Order\Repository;
 use InvalidArgumentException;
 use MyParcelNL\Pdk\App\Order\Collection\PdkOrderCollection;
 use MyParcelNL\Pdk\App\Order\Contract\PdkOrderRepositoryInterface;
-use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\App\Order\Model\PdkOrder;
 use MyParcelNL\Pdk\App\Order\Repository\AbstractPdkOrderRepository;
 use MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface;
@@ -19,6 +18,7 @@ use MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderData;
 use MyParcelNL\PrestaShop\Entity\MyparcelnlOrderShipment;
 use MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter;
+use MyParcelNL\PrestaShop\Pdk\Product\Repository\PsPdkProductRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository;
 use MyParcelNL\PrestaShop\Service\PsProductService;
@@ -29,7 +29,7 @@ use PrestaShopCollection;
 final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements PdkOrderRepositoryInterface
 {
     /**
-     * @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface
+     * @var \MyParcelNL\PrestaShop\Pdk\Product\Repository\PsPdkProductRepository
      */
     protected $productRepository;
 
@@ -64,21 +64,21 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements P
     private PsProductService $psProductService;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                       $storage
-     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository      $psOrderShipmentRepository
-     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository          $psOrderDataRepository
-     * @param  \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface           $currencyService
-     * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $productRepository
-     * @param  \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter         $addressAdapter
-     * @param  \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface          $psOrderService
-     * @param  \MyParcelNL\PrestaShop\Service\PsProductService                  $psProductService
+     * @param  \MyParcelNL\Pdk\Storage\MemoryCacheStorage                           $storage
+     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderShipmentRepository          $psOrderShipmentRepository
+     * @param  \MyParcelNL\PrestaShop\Repository\PsOrderDataRepository              $psOrderDataRepository
+     * @param  \MyParcelNL\Pdk\Base\Contract\CurrencyServiceInterface               $currencyService
+     * @param  \MyParcelNL\PrestaShop\Pdk\Product\Repository\PsPdkProductRepository $productRepository
+     * @param  \MyParcelNL\PrestaShop\Pdk\Base\Adapter\PsAddressAdapter             $addressAdapter
+     * @param  \MyParcelNL\PrestaShop\Contract\PsOrderServiceInterface              $psOrderService
+     * @param  \MyParcelNL\PrestaShop\Service\PsProductService                      $psProductService
      */
     public function __construct(
         MemoryCacheStorage            $storage,
         PsOrderShipmentRepository     $psOrderShipmentRepository,
         PsOrderDataRepository         $psOrderDataRepository,
         CurrencyServiceInterface      $currencyService,
-        PdkProductRepositoryInterface $productRepository,
+        PsPdkProductRepository        $productRepository,
         PsAddressAdapter              $addressAdapter,
         PsOrderServiceInterface       $psOrderService,
         PsProductService              $psProductService
@@ -541,7 +541,12 @@ final class PsPdkOrderRepository extends AbstractPdkOrderRepository implements P
                     'quantity'      => $product['product_quantity'] ?? 1,
                     'price'         => $this->currencyService->convertToCents($product['product_price'] ?? 0),
                     'priceAfterVat' => $this->currencyService->convertToCents($product['product_price_wt'] ?? 0),
-                    'product'       => $this->productRepository->getProduct($product['product_id'] ?? 0),
+                    'product'       => $this->productRepository->getLineProduct(
+                        $product['product_id'] ?? 0,
+                        (int) ($product['product_attribute_id'] ?? 0),
+                        (int) ($product['id_customization'] ?? 0),
+                        $product['product_weight'] ?? null
+                    ),
                     'vatRate'       => $product['tax_rate'] ?? 0,
                 ];
             })
