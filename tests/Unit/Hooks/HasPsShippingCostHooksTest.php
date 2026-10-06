@@ -25,6 +25,7 @@ use MyParcelNL\PrestaShop\Entity\MyparcelnlCarrierMapping;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsTools;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentDefsDeliveryOptionsDeliveryNameV2;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
@@ -138,7 +139,7 @@ it('calculates shipping costs', function (CartFactory $cartFactory, array $deliv
         },
         'values' => [
             DeliveryOptions::CARRIER          => RefCapabilitiesSharedCarrierV2::POSTNL,
-            DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::DELIVERY_TYPE    => ShipmentDefsDeliveryOptionsDeliveryNameV2::STANDARD,
             DeliveryOptions::SHIPMENT_OPTIONS => [
                 (new SignatureDefinition())->getShipmentOptionsKey() => true,
             ],
@@ -206,7 +207,7 @@ it(
         },
         'values' => [
             DeliveryOptions::CARRIER       => RefCapabilitiesSharedCarrierV2::POSTNL,
-            DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::DELIVERY_TYPE => ShipmentDefsDeliveryOptionsDeliveryNameV2::STANDARD,
         ],
         'cost'   => 2.95,
     ],
@@ -235,7 +236,7 @@ it(
         },
         'values' => [
             DeliveryOptions::CARRIER          => RefCapabilitiesSharedCarrierV2::POSTNL,
-            DeliveryOptions::DELIVERY_TYPE    => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::DELIVERY_TYPE    => ShipmentDefsDeliveryOptionsDeliveryNameV2::STANDARD,
             DeliveryOptions::SHIPMENT_OPTIONS => [
                 (new SignatureDefinition())->getShipmentOptionsKey() => true,
             ],

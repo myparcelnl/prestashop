@@ -34,6 +34,8 @@ use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use Order as PsOrder;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentResponsesDeliveryOptionsPackageTypeV2;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentDefsDeliveryOptionsDeliveryNameV2;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
@@ -133,9 +135,9 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
     $fullResult = array_replace(
         array_replace([
             DeliveryOptions::CARRIER       => 'POSTNL',
-            DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::DELIVERY_TYPE => ShipmentDefsDeliveryOptionsDeliveryNameV2::STANDARD,
             DeliveryOptions::LABEL_AMOUNT  => 1,
-            DeliveryOptions::PACKAGE_TYPE  => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,
+            DeliveryOptions::PACKAGE_TYPE  => ShipmentResponsesDeliveryOptionsPackageTypeV2::PACKAGE,
         ], $result),
         [DeliveryOptions::SHIPMENT_OPTIONS => $finalShipmentOptions]
     );
@@ -165,7 +167,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'result' => [
                 DeliveryOptions::CARRIER       => 'DHL_FOR_YOU',
                 DeliveryOptions::DATE          => '2077-04-07 00:00:00',
-                DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_MORNING_NAME,
+                DeliveryOptions::DELIVERY_TYPE => ShipmentDefsDeliveryOptionsDeliveryNameV2::MORNING,
             ],
         ],
 

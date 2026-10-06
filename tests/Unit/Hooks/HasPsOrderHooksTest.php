@@ -17,6 +17,7 @@ use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
 use Order;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentDefsDeliveryOptionsDeliveryNameV2;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
@@ -113,7 +114,7 @@ it('persists an empty order data record when order carrier is not a myparcel car
         ['cartId' => (int) $cart->id],
         ['data'   => json_encode([
             DeliveryOptions::CARRIER       => RefCapabilitiesSharedCarrierV2::POSTNL,
-            DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::DELIVERY_TYPE => ShipmentDefsDeliveryOptionsDeliveryNameV2::STANDARD,
         ])]
     );
 
