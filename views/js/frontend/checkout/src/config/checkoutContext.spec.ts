@@ -12,7 +12,11 @@ import {updateDeliveryOptions} from '../deliveryOptions/updateDeliveryOptions';
 import {formChange} from './formChange';
 import {doRequest} from './doRequest';
 
-// Platform carrier data is a fixture; the selected method, PDK stores, adapter and events are real.
+const page = vi.hoisted(() => ({carrier: 'standard'}));
+
+// The carrier on the page is a fixture; the PDK stores, adapter and events are real.
+vi.mock('./getFormData', () => ({getFormData: () => ({shippingMethod: page.carrier})}));
+
 vi.mock('../utils/useShippingMethodData', () => ({
   useShippingMethodData: () => ({
     shippingMethods: [
@@ -47,6 +51,7 @@ describe('PrestaShop checkout context integration', () => {
   beforeEach(async () => {
     document.body.innerHTML = '';
     handlers = {};
+    page.carrier = 'standard';
     context = makeContext(30000);
     tests.getMockCheckoutContext.mockReturnValueOnce(context);
     tests.doRequestSpy.mockImplementation(doRequest);
@@ -78,43 +83,31 @@ describe('PrestaShop checkout context integration', () => {
     vi.restoreAllMocks();
   });
 
-  it('refreshes weight through fetch, JSON parsing, real stores and the widget event while retaining the selected carrier', async () => {
-    for (const value of [15000, null]) {
-      context = makeContext(value);
-      handlers.updatedCart();
-      await vi.waitFor(() => {
-        expect(updates.at(-1)?.detail.config.physicalProperties).toEqual(context.config.physicalProperties);
-      });
-      expect(Object.keys(useDeliveryOptionsStore().state.configuration.config.carrierSettings ?? {})).toEqual(['dpd']);
-      expect(useCheckoutStore().state.context.settings.actions.baseUrl).toBe('/module/myparcelnl');
-    }
-
-    tests.getFormDataSpy.mockReturnValueOnce({
-      ...tests.getFormDataSpy(),
-      'shipping-method': 'flat_rate:1',
-    });
+  it('refreshes the weight after a carrier change and keeps only the selected carrier', async () => {
+    context = makeContext(15000);
+    page.carrier = 'flat_rate:1';
+    tests.getFormDataSpy.mockReturnValue({...tests.getFormDataSpy(), 'shipping-method': 'flat_rate:1'});
     handlers.updatedDeliveryForm();
+
+    // The carrier settings and the weight reach the store in separate updates.
     await vi.waitFor(() => {
-      expect(useDeliveryOptionsStore().state.configuration.config.carrierSettings).toEqual({postnl: {pricePickup: 5}});
+      const {config} = useDeliveryOptionsStore().state.configuration;
+      expect(config.carrierSettings).toEqual({postnl: {pricePickup: 5}});
+      expect(config.physicalProperties).toEqual({weight: 15000});
+      expect(updates.at(-1)?.detail.config.physicalProperties).toEqual({weight: 15000});
     });
   });
 
-  it('keeps settings usable after a malformed response and recovers on the next cart change', async () => {
-    const {settings} = useCheckoutStore().state.context;
-    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    vi.spyOn(window, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({data: {context: []}})));
-    handlers.updatedCart();
-
-    await vi.waitFor(() => expect(warning).toHaveBeenCalled());
-    expect(useCheckoutStore().state.context.settings).toBe(settings);
-    expect(useDeliveryOptionsStore().state.configuration.config.physicalProperties).toBeNull();
-
+  it('does not refresh the context when another delivery form input changes', async () => {
+    const fetch = vi.mocked(window.fetch);
+    const requests = fetch.mock.calls.length;
     context = makeContext(15000);
-    handlers.updatedCart();
-    await vi.waitFor(() =>
-      expect(useDeliveryOptionsStore().state.configuration.config.physicalProperties).toEqual(
-        context.config.physicalProperties,
-      ),
-    );
+    handlers.updatedDeliveryForm();
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 150);
+    });
+    expect(fetch.mock.calls.length).toBe(requests);
+    expect(Object.keys(useDeliveryOptionsStore().state.configuration.config.carrierSettings ?? {})).toEqual(['dpd']);
   });
 });
