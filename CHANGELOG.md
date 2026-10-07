@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.8.2](https://github.com/myparcelnl/prestashop/compare/v5.8.1...v5.8.2) (2026-10-07)
+
+
+### :bug: Bug Fixes
+
+* **delivery-options:** no longer move delivery dates to next week after the cutoff time (pdk 4.9.4) ([#719](https://github.com/myparcelnl/prestashop/issues/719)) ([b2e4dab](https://github.com/myparcelnl/prestashop/commit/b2e4dabac31ddde8484a9e45c95bb2f7567b6211)), closes [myparcelnl/pdk#542](https://github.com/myparcelnl/pdk/issues/542) [#634](https://github.com/myparcelnl/prestashop/issues/634) [myparcelnl/pdk#547](https://github.com/myparcelnl/pdk/issues/547) [myparcelnl/pdk#549](https://github.com/myparcelnl/pdk/issues/549)
+
 ## [5.8.1](https://github.com/myparcelnl/prestashop/compare/v5.8.0...v5.8.1) (2026-09-30)
 
 
