@@ -17,6 +17,7 @@ use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
 use MyParcelNL\PrestaShop\Repository\PsOrderDataRepository;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
 use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\RefCapabilitiesSharedCarrierV2;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentDefsDeliveryOptionsDeliveryNameV2;
 use Order;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
@@ -58,7 +59,7 @@ function storeCartDeliveryOptions(int $cartId): void
 
     $deliveryOptions = new DeliveryOptions([
         'carrier'      => RefCapabilitiesSharedCarrierV2::POSTNL,
-        'deliveryType' => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+        'deliveryType' => ShipmentDefsDeliveryOptionsDeliveryNameV2::STANDARD,
     ]);
 
     $repository->updateOrCreate(

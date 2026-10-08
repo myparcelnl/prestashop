@@ -33,6 +33,8 @@ use MyParcelNL\Pdk\Types\Service\TriStateService;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentDefsDeliveryOptionsDeliveryNameV2;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentResponsesDeliveryOptionsPackageTypeV2;
 use Order as PsOrder;
 use function MyParcelNL\Pdk\Tests\factory;
 use function MyParcelNL\Pdk\Tests\usesShared;
@@ -133,9 +135,9 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
     $fullResult = array_replace(
         array_replace([
             DeliveryOptions::CARRIER       => 'POSTNL',
-            DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_STANDARD_NAME,
+            DeliveryOptions::DELIVERY_TYPE => ShipmentDefsDeliveryOptionsDeliveryNameV2::STANDARD,
             DeliveryOptions::LABEL_AMOUNT  => 1,
-            DeliveryOptions::PACKAGE_TYPE  => DeliveryOptions::PACKAGE_TYPE_PACKAGE_NAME,
+            DeliveryOptions::PACKAGE_TYPE  => ShipmentResponsesDeliveryOptionsPackageTypeV2::PACKAGE,
         ], $result),
         [DeliveryOptions::SHIPMENT_OPTIONS => $finalShipmentOptions]
     );
@@ -145,7 +147,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
     ->with([
         'defaults' => [
             'delivery_settings' => [
-                'carrier' => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+                'carrier' => 'postnl',
             ],
             'extra_options'     => [],
 
@@ -165,13 +167,13 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
             'result' => [
                 DeliveryOptions::CARRIER       => 'DHL_FOR_YOU',
                 DeliveryOptions::DATE          => '2077-04-07 00:00:00',
-                DeliveryOptions::DELIVERY_TYPE => DeliveryOptions::DELIVERY_TYPE_MORNING_NAME,
+                DeliveryOptions::DELIVERY_TYPE => ShipmentDefsDeliveryOptionsDeliveryNameV2::MORNING,
             ],
         ],
 
         'different label amount' => [
             'delivery_settings' => [
-                'carrier' => Carrier::CARRIER_POSTNL_LEGACY_NAME,
+                'carrier' => 'postnl',
             ],
             'extra_options'     => [
                 'labelAmount' => 5,
@@ -185,7 +187,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'all shipment options enabled' => [
             'delivery_settings' => [
-                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
+                'carrier'         => 'dhlforyou',
                 'shipmentOptions' => [
                     'signature'         => true,
                     'insurance'         => 2000,
@@ -219,7 +221,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'all shipment options disabled' => [
             'delivery_settings' => [
-                'carrier'         => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
+                'carrier'         => 'dhlforyou',
                 'shipmentOptions' => [
                     'signature'         => false,
                     'insurance'         => 0,
@@ -253,7 +255,7 @@ it('migrates delivery options to pdk', function ($deliverySettings, $extraOption
 
         'pickup location' => [
             'delivery_settings' => [
-                'carrier'        => Carrier::CARRIER_DHL_FOR_YOU_LEGACY_NAME,
+                'carrier'        => 'dhlforyou',
                 'pickupLocation' => [
                     'box_number'        => 'box_number',
                     'cc'                => 'cc',

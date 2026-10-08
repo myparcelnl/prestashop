@@ -20,11 +20,11 @@ use MyParcelNL\Pdk\App\Options\Definition\NoTrackingDefinition;
 use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Model\ProductSettings;
-use MyParcelNL\Pdk\Shipment\Model\DeliveryOptions;
 use MyParcelNL\Pdk\Types\Service\TriStateService;
 use MyParcelNL\PrestaShop\Migration\AbstractPsMigration;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsDb;
 use MyParcelNL\PrestaShop\Tests\Uses\UsesMockPsPdkInstance;
+use MyParcelNL\Sdk\Client\Generated\CoreApi\Model\ShipmentResponsesDeliveryOptionsPackageTypeV2;
 use Product;
 use function MyParcelNL\Pdk\Tests\usesShared;
 use function MyParcelNL\PrestaShop\psFactory;
@@ -91,7 +91,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
         ],
 
         'result' => [
-            ProductSettings::PACKAGE_TYPE                                 => DeliveryOptions::PACKAGE_TYPE_MAILBOX_NAME,
+            ProductSettings::PACKAGE_TYPE                                 => ShipmentResponsesDeliveryOptionsPackageTypeV2::MAILBOX,
             ProductSettings::COUNTRY_OF_ORIGIN                            => 'DE',
             ProductSettings::CUSTOMS_CODE                                 => '123',
             (new AgeCheckDefinition())->getProductSettingsKey()           => TriStateService::ENABLED,

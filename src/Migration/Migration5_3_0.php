@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MyParcelNL\PrestaShop\Migration;
 
 use MyParcelNL\Pdk\App\Account\Contract\PdkAccountRepositoryInterface;
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Carrier\Repository\CarrierCapabilitiesRepository;
 use MyParcelNL\Pdk\Facade\Logger;
 use MyParcelNL\Pdk\Facade\Pdk;
 use MyParcelNL\Pdk\Settings\Contract\PdkSettingsRepositoryInterface;
 use MyParcelNL\PrestaShop\Facade\EntityManager;
 use MyParcelNL\PrestaShop\Migration\Pdk\AbstractPsPdkMigration;
+use MyParcelNL\PrestaShop\Migration\Util\LegacyCarrierNames;
 use MyParcelNL\PrestaShop\Repository\AbstractPsObjectRepository;
 use MyParcelNL\PrestaShop\Repository\PsCarrierMappingRepository;
 use MyParcelNL\PrestaShop\Repository\PsCartDeliveryOptionsRepository;
@@ -131,7 +131,7 @@ final class Migration5_3_0 extends AbstractPsPdkMigration
             return;
         }
 
-        $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
+        $legacyToNewMap = LegacyCarrierNames::toV2Map();
 
         $migratedSettings = [];
         foreach ($currentSettings as $key => $carrierData) {
@@ -152,7 +152,7 @@ final class Migration5_3_0 extends AbstractPsPdkMigration
      */
     private function migrateCarrierMappings(): void
     {
-        $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
+        $legacyToNewMap = LegacyCarrierNames::toV2Map();
         $mappings       = $this->carrierMappingRepository->all();
 
         $usedNames = [];
@@ -189,7 +189,7 @@ final class Migration5_3_0 extends AbstractPsPdkMigration
      */
     private function migrateCartDeliveryOptions(): void
     {
-        $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
+        $legacyToNewMap = LegacyCarrierNames::toV2Map();
 
         $this->migrateInBatches($this->cartDeliveryOptionsRepository, 'cartId', 'cart_delivery_options', function ($cartOption) use ($legacyToNewMap) {
             $data   = $cartOption->getData();
@@ -216,7 +216,7 @@ final class Migration5_3_0 extends AbstractPsPdkMigration
      */
     private function migrateOrderData(): void
     {
-        $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
+        $legacyToNewMap = LegacyCarrierNames::toV2Map();
 
         $this->migrateInBatches($this->orderDataRepository, 'orderId', 'order_data', function ($orderData) use ($legacyToNewMap) {
             $data   = $orderData->getData();
@@ -244,7 +244,7 @@ final class Migration5_3_0 extends AbstractPsPdkMigration
      */
     private function migrateShipmentData(): void
     {
-        $legacyToNewMap = array_flip(Carrier::CARRIER_NAME_TO_LEGACY_MAP);
+        $legacyToNewMap = LegacyCarrierNames::toV2Map();
 
         $this->migrateInBatches($this->orderShipmentRepository, 'shipmentId', 'order_shipment', function ($shipment) use ($legacyToNewMap) {
             $data    = $shipment->getData();

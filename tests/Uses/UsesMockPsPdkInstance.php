@@ -14,7 +14,6 @@ use Group;
 use Lang;
 use Manufacturer;
 use MyParcelNL;
-use MyParcelNL\Pdk\Carrier\Model\Carrier;
 use MyParcelNL\Pdk\Proposition\Proposition;
 use MyParcelNL\Pdk\Base\Facade;
 use MyParcelNL\Pdk\Base\FileSystemInterface;
@@ -27,6 +26,7 @@ use MyParcelNL\Pdk\Proposition\Service\PropositionService;
 use MyParcelNL\Pdk\Tests\Factory\Collection\FactoryCollection;
 use MyParcelNL\Pdk\Tests\Factory\SharedFactoryState;
 use MyParcelNL\Pdk\Tests\Uses\UsesEachMockPdkInstance;
+use MyParcelNL\PrestaShop\Migration\Util\LegacyCarrierNames;
 use MyParcelNL\PrestaShop\Tests\Bootstrap\MockPsPdkBootstrapper;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsCountries;
 use MyParcelNL\PrestaShop\Tests\Mock\MockPsModule;
@@ -85,7 +85,7 @@ class UsesMockPsPdkInstance extends UsesEachMockPdkInstance
         $propositionService = Pdk::get(PropositionService::class);
         $propositionService->setActivePropositionId(Proposition::MYPARCEL_ID);
 
-        foreach (array_values(Carrier::CARRIER_NAME_TO_LEGACY_MAP) as $carrierName) {
+        foreach (array_keys(LegacyCarrierNames::toV2Map()) as $carrierName) {
             foreach (Pdk::get('carrierLogoFileExtensions') as $fileExtension) {
                 $filename = Pdk::get('carrierLogosDirectory') . $carrierName . $fileExtension;
 
