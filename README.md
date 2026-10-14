@@ -60,7 +60,6 @@ To avoid this, we've decided to update the versioning of the module. The new ver
 
 We chose to only update [the changelog](./CHANGELOG.md), the repository tags and not touch anything else, to avoid any potential issues with the module's users and further confusion. We've also merged the history of the old 1.6 module into this repository. This way, anyone interested can see the full history of the module in one place. We've been using semantic version since version 3.2.0 (previously 1.2.0) and we will continue to do so, just with the updated versioning.
 
-[Bug report for v4.0.0-beta.x form]: https://github.com/myparcelnl/prestashop/issues/new?labels=pdk&template=ZZ-BUG-REPORT-NEW.yml
 [MyParcel Developer Portal]: https://developer.myparcel.nl
 [MyParcel Plugin Development Kit]: https://developer.myparcel.nl/documentation/52.pdk/
 [PrestaShop module guide]: https://developer.myparcel.nl/nl/documentatie/11.prestashop.html
