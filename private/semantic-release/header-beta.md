@@ -6,7 +6,7 @@ For a less bug-prone experience, we recommend you use the stable or release cand
 
 If you do choose to install this version, we would love to hear your feedback. Please report any issues you encounter using the [Bug report for v4.0.0-beta.x form] or by sending an email to [support@myparcel.nl]. Use in production is at your own risk.
 
-[Bug report for v4.0.0-beta.x form]: https://github.com/myparcelnl/prestashop/issues/new?labels=pdk&template=ZZ-BUG-REPORT-NEW.yml
+[Bug report for v4.0.0-beta.x form]: https://github.com/myparcelnl/prestashop/issues/new?labels=bug&template=BUG-REPORT.yml
 [MyParcel Plugin Development Kit]: https://developer.myparcel.nl/documentation/52.pdk/
 [pinned issue]: https://github.com/myparcelnl/prestashop/issues/226
 [releases]: https://github.com/myparcelnl/prestashop/releases
