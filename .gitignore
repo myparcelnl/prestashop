@@ -22,8 +22,6 @@ vendor/
 # Upgrade files are written dynamically. See MyParcelNL::loadUpgradeVersionList()
 upgrade/
 
-views/**/tsconfig.json
-
 # Intellij
 .idea/deployment.xml
 .idea/phpspec.xml
