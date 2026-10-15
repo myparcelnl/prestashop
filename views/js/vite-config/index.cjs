@@ -20,7 +20,8 @@ const createDefaultConfig = (env) => {
       reporters: ['default', ['junit', {outputFile: './junit.xml'}]],
       passWithNoTests: true,
       coverage: {
-        all: true,
+        include: ['src/**/*.{ts,vue}'],
+        exclude: ['src/**/*.d.ts'],
         enabled: false,
         reporter: ['text', 'clover'],
       },
