@@ -1,4 +1,3 @@
-const customTsConfig = require('vite-plugin-custom-tsconfig');
 const {mergeConfig} = require('vite');
 
 /**
@@ -17,7 +16,6 @@ const createDefaultConfig = (env) => {
         external: ['vite', 'vitest'],
       },
     },
-    plugins: [customTsConfig()],
     test: {
       reporters: ['default', ['junit', {outputFile: './junit.xml'}]],
       passWithNoTests: true,

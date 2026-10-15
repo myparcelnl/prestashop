@@ -1281,7 +1281,6 @@ __metadata:
   resolution: "@myparcel-prestashop/vite-config@workspace:views/js/vite-config"
   dependencies:
     vite: "npm:^5.0.0"
-    vite-plugin-custom-tsconfig: "npm:^1.0.4"
   languageName: unknown
   linkType: soft
 
@@ -13029,13 +13028,6 @@ __metadata:
   bin:
     vite-node: vite-node.mjs
   checksum: 10c0/4d96da9f11bd0df8b60c46e65a740edaad7dd2d1aff3cdb3da5714ea8c10b5f2683111b60bfe45545c7e8c1f33e7e8a5095573d5e9ba55f50a845233292c2e02
-  languageName: node
-  linkType: hard
-
-"vite-plugin-custom-tsconfig@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "vite-plugin-custom-tsconfig@npm:1.0.4"
-  checksum: 10c0/ff6076bb29108d81d23038aa01de6c3b44aa749dd05a5f3a3457373609ce7cdef283c0036c74c29daf519e5a56a8fabe5e297c7c806d9dec1e906b8b398eeace
   languageName: node
   linkType: hard
 
