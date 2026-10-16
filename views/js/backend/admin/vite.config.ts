@@ -11,6 +11,8 @@ export default createViteConfig({
     lib: {
       name: 'MyParcelPrestaShopAdmin',
       fileName: 'index',
+      // PsBackendScriptService loads dist/style.css
+      cssFileName: 'style',
       entry: 'src/main.ts',
       formats: ['iife'],
     },
