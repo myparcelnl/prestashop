@@ -9,24 +9,24 @@ use Cart;
 use InvalidArgumentException;
 use MyParcelNL\Pdk\App\Cart\Model\PdkCart;
 use MyParcelNL\Pdk\App\Cart\Repository\AbstractPdkCartRepository;
-use MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface;
 use MyParcelNL\Pdk\Storage\Contract\StorageInterface;
+use MyParcelNL\PrestaShop\Pdk\Product\Repository\PsPdkProductRepository;
 use PrestaShop\PrestaShop\Adapter\Entity\Country;
 
 class PsPdkCartRepository extends AbstractPdkCartRepository
 {
     /**
-     * @var \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface
+     * @var \MyParcelNL\PrestaShop\Pdk\Product\Repository\PsPdkProductRepository
      */
     private $productRepository;
 
     /**
-     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                $storage
-     * @param  \MyParcelNL\Pdk\App\Order\Contract\PdkProductRepositoryInterface $productRepository
+     * @param  \MyParcelNL\Pdk\Storage\Contract\StorageInterface                   $storage
+     * @param  \MyParcelNL\PrestaShop\Pdk\Product\Repository\PsPdkProductRepository $productRepository
      */
     public function __construct(
-        StorageInterface              $storage,
-        PdkProductRepositoryInterface $productRepository
+        StorageInterface       $storage,
+        PsPdkProductRepository $productRepository
     ) {
         parent::__construct($storage);
         $this->productRepository = $productRepository;
@@ -66,7 +66,12 @@ class PsPdkCartRepository extends AbstractPdkCartRepository
                     ],
                 ],
                 'lines'                 => array_map(function ($item) {
-                    $product = $this->productRepository->getProduct($item['id_product']);
+                    $product = $this->productRepository->getLineProduct(
+                        $item['id_product'],
+                        (int) ($item['id_product_attribute'] ?? 0),
+                        (int) ($item['id_customization'] ?? 0),
+                        $item['weight'] ?? null
+                    );
 
                     return [
                         'quantity'      => (int) $item['cart_quantity'],
