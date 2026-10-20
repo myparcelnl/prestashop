@@ -12,7 +12,7 @@ export const doRequest = async <E extends FrontendEndpoint>(
   });
 
   if (response.ok) {
-    return response as FrontendEndpointResponse<E>;
+    return response.json();
   }
 
   throw new Error('Request failed');
