@@ -81,6 +81,8 @@ describe('PrestaShop checkout context integration', () => {
   afterEach(() => {
     document.removeEventListener(UPDATE_CONFIG_IN, receive);
     vi.restoreAllMocks();
+    // vitest 4 no longer resets vi.fn spies in restoreAllMocks, and the PDK test spies are shared.
+    tests.getFormDataSpy.mockReset();
   });
 
   it('refreshes the weight after a carrier change and keeps only the selected carrier', async () => {
