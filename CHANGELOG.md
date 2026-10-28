@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.10.0](https://github.com/myparcelnl/prestashop/compare/v5.9.0...v5.10.0) (2026-10-28)
+
+### :sparkles: New Features
+
+* **admin:** allow dynamic request headers ([#769](https://github.com/myparcelnl/prestashop/issues/769)) ([6811885](https://github.com/myparcelnl/prestashop/commit/6811885c9ca728a2ad30798edae5d5b1c471d2f1))
+
+### :bug: Bug Fixes
+
+* **insurance:** only apply what insurance requires to an insured shipment ([#770](https://github.com/myparcelnl/prestashop/issues/770)) ([e8f44e5](https://github.com/myparcelnl/prestashop/commit/e8f44e595433a76b528fecb277951d79f9a6b46f))
+
 ## [5.9.0](https://github.com/myparcelnl/prestashop/compare/v5.8.2...v5.9.0) (2026-10-21)
 
 ### :sparkles: New Features
