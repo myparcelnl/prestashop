@@ -56,6 +56,33 @@ describe('pdkCheckoutInitialize', () => {
     expect(await isResolved(promise)).toBe(true);
   });
 
+  describe('when the theme inserts the delivery step later', () => {
+    // happy-dom does not deliver MutationObserver records while fake timers are active.
+    beforeEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('resolves when the inserted step is already current', async () => {
+      const promise = pdkCheckoutInitialize();
+      document.body.innerHTML = '<section id="checkout-delivery-step" class="js-current-step"></section>';
+      await expect(promise).resolves.toBeUndefined();
+    });
+
+    it('resolves when the inserted step becomes current', async () => {
+      let resolved = false;
+      const promise = pdkCheckoutInitialize().then(() => {
+        resolved = true;
+      });
+      document.body.innerHTML = STEPS;
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10);
+      });
+      expect(resolved).toBe(false);
+      document.querySelector('#checkout-delivery-step')?.classList.add('js-current-step');
+      await expect(promise).resolves.toBeUndefined();
+    });
+  });
+
   it('resolves after the fallback delay when the theme has no delivery step', async () => {
     const promise = pdkCheckoutInitialize();
     expect(await isResolved(promise)).toBe(false);
