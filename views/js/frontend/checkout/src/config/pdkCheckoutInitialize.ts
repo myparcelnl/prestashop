@@ -38,6 +38,11 @@ export const pdkCheckoutInitialize = (): Promise<void> => {
     // PS 9 (Hummingbird): steps are Bootstrap Tabs, no changedCheckoutStep event is emitted.
     // Observe the delivery step element for the js-current-step class being added.
     const observeDeliveryStep = (element: Element) => {
+      if (isDeliveryStep()) {
+        done();
+        return;
+      }
+
       const observer = new MutationObserver(() => {
         if (isDeliveryStep()) {
           done();
