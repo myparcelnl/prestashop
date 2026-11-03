@@ -1,4 +1,6 @@
-const isDeliveryStep = () => document.querySelector('#checkout-delivery-step.js-current-step');
+import {DELIVERY_STEP_SELECTOR} from '../utils';
+
+const isDeliveryStep = () => document.querySelector(`${DELIVERY_STEP_SELECTOR}.js-current-step`);
 
 export const pdkCheckoutInitialize = (): Promise<void> => {
   return new Promise((resolve) => {
@@ -18,8 +20,13 @@ export const pdkCheckoutInitialize = (): Promise<void> => {
       resolve();
     };
 
-    // Deadlock prevention: if nothing resolves within 10s, give up and proceed.
-    setTimeout(done, 10_000);
+    // Deadlock prevention for themes without a delivery step. When the step exists but another step is current,
+    // keep waiting: initializing there updates the delivery form, which makes core.js reload the checkout.
+    setTimeout(() => {
+      if (!document.querySelector(DELIVERY_STEP_SELECTOR)) {
+        done();
+      }
+    }, 10_000);
 
     // PS 1.7/8: step changes emit 'changedCheckoutStep' via prestashop.on()
     window.prestashop.on('changedCheckoutStep', () => {
@@ -41,7 +48,7 @@ export const pdkCheckoutInitialize = (): Promise<void> => {
       observer.observe(element, {attributes: true, attributeFilter: ['class']});
     };
 
-    const deliveryStep = document.querySelector('#checkout-delivery-step');
+    const deliveryStep = document.querySelector(DELIVERY_STEP_SELECTOR);
 
     if (deliveryStep) {
       observeDeliveryStep(deliveryStep);
@@ -50,7 +57,7 @@ export const pdkCheckoutInitialize = (): Promise<void> => {
 
     // Element not yet in DOM — observe body for it to appear (e.g. non-Hummingbird PS9 themes)
     const bodyObserver = new MutationObserver(() => {
-      const step = document.querySelector('#checkout-delivery-step');
+      const step = document.querySelector(DELIVERY_STEP_SELECTOR);
 
       if (step) {
         bodyObserver.disconnect();
