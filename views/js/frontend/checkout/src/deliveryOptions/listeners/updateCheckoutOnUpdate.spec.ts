@@ -50,6 +50,13 @@ describe('onDeliveryOptionsOutputChange', () => {
     expect(mocks.trigger).toHaveBeenCalledWith('change');
   });
 
+  it('does not update the delivery form when the output did not change', async () => {
+    setCurrentStep('delivery');
+    onDeliveryOptionsOutputChange(state('standard'), state('standard'));
+    await vi.runAllTimersAsync();
+    expect(mocks.trigger).not.toHaveBeenCalled();
+  });
+
   it('does not update the delivery form on the payment step', async () => {
     setCurrentStep('payment');
     onDeliveryOptionsOutputChange(state('morning'), state('standard'));
