@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.11.0](https://github.com/myparcelnl/prestashop/compare/v5.10.0...v5.11.0) (2026-11-04)
+
+### :sparkles: New Features
+
+* **customs:** send the external product reference per customs item ([#779](https://github.com/myparcelnl/prestashop/issues/779)) ([2b01ffe](https://github.com/myparcelnl/prestashop/commit/2b01ffe03a7d407280a024332ba6e2e5b7836c7f))
+
 ## [5.10.0](https://github.com/myparcelnl/prestashop/compare/v5.9.0...v5.10.0) (2026-10-28)
 
 ### :sparkles: New Features
