@@ -58,6 +58,7 @@ it('migrates product settings to pdk', function (array $productConfigurations, a
             ProductSettings::CUSTOMS_CODE                                 => TriStateService::INHERIT,
             ProductSettings::DISABLE_DELIVERY_OPTIONS                     => TriStateService::INHERIT,
             ProductSettings::DROP_OFF_DELAY                               => TriStateService::INHERIT,
+            ProductSettings::EXTERNAL_PRODUCT_REFERENCE                   => TriStateService::INHERIT,
             (new AgeCheckDefinition())->getProductSettingsKey()           => TriStateService::INHERIT,
             (new HideSenderDefinition())->getProductSettingsKey()         => TriStateService::INHERIT,
             (new InsuranceDefinition())->getProductSettingsKey()          => TriStateService::INHERIT,
