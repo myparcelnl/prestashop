@@ -5,13 +5,15 @@ import {
   type StoreCallbackUpdate,
 } from '@myparcel-dev/pdk-checkout';
 import {objectIsEqual} from '@myparcel-dev/ts-utils';
-import {getCurrentShippingMethod} from '../../utils';
+import {getCurrentShippingMethod, isDeliveryStepActive} from '../../utils';
 
 const CHECKOUT_UPDATE_DELAY = 200;
 
 export const onDeliveryOptionsOutputChange: StoreCallbackUpdate<DeliveryOptionsStoreState> = debounce(
   (newState, oldState) => {
-    if (objectIsEqual(newState.output, oldState?.output)) {
+    // A delivery form change on another step makes PrestaShop's core.js reload the checkout on the delivery step.
+    // Check here, not before the debounce: the customer can continue to the next step during the delay.
+    if (objectIsEqual(newState.output, oldState?.output) || !isDeliveryStepActive()) {
       return;
     }
 
