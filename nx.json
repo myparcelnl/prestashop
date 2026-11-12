@@ -27,35 +27,26 @@
   },
   "targetDefaults": {
     "build": {
+      "cache": true,
       "inputs": ["production"],
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/dist"]
     },
     "build:dev": {
+      "cache": true,
       "inputs": ["production"],
       "dependsOn": ["^build:dev"],
       "outputs": ["{projectRoot}/dist"]
     },
     "test:run": {
+      "cache": true,
       "inputs": ["test"]
     },
     "test:coverage": {
+      "cache": true,
       "inputs": ["test"],
       "outputs": ["{projectRoot}/coverage", "{projectRoot}/junit.xml"]
     }
   },
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": [
-          "build",
-          "build:dev",
-          "test:run",
-          "test:coverage"
-        ],
-        "parallel": 10
-      }
-    }
-  }
+  "parallel": 10
 }
