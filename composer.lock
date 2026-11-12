@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c21cf0302e02bda76249e1ca769b6a7b",
+    "content-hash": "9caf06a6abfd19b198f414011d4275df",
     "packages": [
         {
             "name": "fruitcake/php-cors",
@@ -1145,16 +1145,16 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v5.4.54",
+            "version": "v5.4.56",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "ec778b2a79fb1c571a23275a41865a17653b9138"
+                "reference": "6c66f8dc46282c3cae6a851aa051927800c4bf7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/ec778b2a79fb1c571a23275a41865a17653b9138",
-                "reference": "ec778b2a79fb1c571a23275a41865a17653b9138",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/6c66f8dc46282c3cae6a851aa051927800c4bf7b",
+                "reference": "6c66f8dc46282c3cae6a851aa051927800c4bf7b",
                 "shasum": ""
             },
             "require": {
@@ -1201,7 +1201,7 @@
             "description": "Defines an object-oriented layer for the HTTP specification",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-foundation/tree/v5.4.54"
+                "source": "https://github.com/symfony/http-foundation/tree/v5.4.56"
             },
             "funding": [
                 {
@@ -1221,7 +1221,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-30T11:07:08+00:00"
+            "time": "2026-11-04T07:37:33+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -4257,16 +4257,16 @@
         },
         {
             "name": "symfony/serializer",
-            "version": "v5.4.55",
+            "version": "v5.4.56",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "77536a1e458a905a319c4ac934443c4c36b71cfb"
+                "reference": "ffaeb561f97bb0045f1f9720a5224607816a75ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/77536a1e458a905a319c4ac934443c4c36b71cfb",
-                "reference": "77536a1e458a905a319c4ac934443c4c36b71cfb",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/ffaeb561f97bb0045f1f9720a5224607816a75ee",
+                "reference": "ffaeb561f97bb0045f1f9720a5224607816a75ee",
                 "shasum": ""
             },
             "require": {
@@ -4296,7 +4296,7 @@
                 "symfony/form": "^4.4|^5.0|^6.0",
                 "symfony/http-foundation": "^4.4|^5.0|^6.0",
                 "symfony/http-kernel": "^4.4|^5.0|^6.0",
-                "symfony/mime": "^4.4|^5.0|^6.0",
+                "symfony/mime": "^5.2|^6.0",
                 "symfony/property-access": "^5.4.26|^6.3",
                 "symfony/property-info": "^5.4.24|^6.2.11,<6.4.43",
                 "symfony/uid": "^5.3|^6.0",
@@ -4340,7 +4340,7 @@
             "description": "Handles serializing and deserializing data structures, including object graphs, into array structures or other formats like XML and JSON.",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/serializer/tree/v5.4.55"
+                "source": "https://github.com/symfony/serializer/tree/v5.4.56"
             },
             "funding": [
                 {
@@ -4360,7 +4360,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-25T07:40:17+00:00"
+            "time": "2026-11-04T07:38:25+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -4533,16 +4533,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v5.4.52",
+            "version": "v5.4.56",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "b0b27055f055f0d314c5c68ed0c10f0bbd90aee0"
+                "reference": "8ff81e554b0d78653a146b35e344e0a022d7e838"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/b0b27055f055f0d314c5c68ed0c10f0bbd90aee0",
-                "reference": "b0b27055f055f0d314c5c68ed0c10f0bbd90aee0",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/8ff81e554b0d78653a146b35e344e0a022d7e838",
+                "reference": "8ff81e554b0d78653a146b35e344e0a022d7e838",
                 "shasum": ""
             },
             "require": {
@@ -4588,7 +4588,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v5.4.52"
+                "source": "https://github.com/symfony/yaml/tree/v5.4.56"
             },
             "funding": [
                 {
@@ -4608,7 +4608,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-15T06:40:16+00:00"
+            "time": "2026-11-03T13:19:21+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -4673,5 +4673,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
