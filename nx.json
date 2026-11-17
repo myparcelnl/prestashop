@@ -28,15 +28,9 @@
   "targetDefaults": {
     "build": {
       "cache": true,
-      "inputs": [
-        "production"
-      ],
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "inputs": ["production"],
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
@@ -45,15 +39,9 @@
     },
     "build:dev": {
       "cache": true,
-      "inputs": [
-        "production"
-      ],
-      "dependsOn": [
-        "^build:dev"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "inputs": ["production"],
+      "dependsOn": ["^build:dev"],
+      "outputs": ["{projectRoot}/dist"],
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
@@ -67,9 +55,7 @@
         "command": "vitest run"
       },
       "cache": true,
-      "inputs": [
-        "test"
-      ]
+      "inputs": ["test"]
     },
     "test:coverage": {
       "executor": "nx:run-commands",
@@ -78,13 +64,8 @@
         "command": "vitest run --coverage"
       },
       "cache": true,
-      "inputs": [
-        "test"
-      ],
-      "outputs": [
-        "{projectRoot}/coverage",
-        "{projectRoot}/junit.xml"
-      ]
+      "inputs": ["test"],
+      "outputs": ["{projectRoot}/coverage", "{projectRoot}/junit.xml"]
     },
     "test": {
       "executor": "nx:run-commands",
