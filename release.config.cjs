@@ -29,7 +29,7 @@ module.exports = {
     addReleaseNotesGeneratorPlugin({header: path.resolve(__dirname, `private/semantic-release/header-${branch}.md`)}),
     addChangelogPlugin(),
     addExecPlugin({
-      prepareCmd: `yarn pdk-builder release --version $\{nextRelease.version} -v && mkdir -p ./artifacts && cd dist && zip -r ../artifacts/myparcel-prestashop-$\{nextRelease.version}.zip .`,
+      prepareCmd: `pnpm pdk-builder release --version $\{nextRelease.version} -v && mkdir -p ./artifacts && cd dist && zip -r ../artifacts/myparcel-prestashop-$\{nextRelease.version}.zip .`,
     }),
     addGitHubPlugin({
       assets: [

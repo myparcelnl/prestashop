@@ -3,9 +3,9 @@
 ## Prerequisites
 
 - [Docker]
-- [Volta] or [Node]
-
-> If you don't want to use Volta, make sure to use the Node version in the `volta.node` key in [./package.json].
+- [Node] 24, version 24.21 or later
+- [pnpm] 12, version 12.11 or later
+- No Volta on your machine. Its `yarn` does not go through corepack, so the `packageManager` field in `package.json` does not stop it.
 
 ## Steps
 
@@ -17,16 +17,16 @@ Install composer dependencies with Docker:
 docker compose up php
 ```
 
-Install yarn dependencies:
+Install pnpm dependencies:
 
 ```shell
-yarn
+pnpm install
 ```
 
 ### Build the module
 
 ```shell
-yarn build
+pnpm build
 ```
 
 This will build the module and output a version for each platform to the `dist` folder.
@@ -44,7 +44,13 @@ You should always run the automated tests.
 To run the frontend tests:
 
 ```shell
-yarn test:run
+pnpm test:run
+```
+
+The JavaScript packages in `views/js/` share the nx targets `build`, `build:dev`, `test`, `test:coverage` and `test:run`. The command of each target is in `targetDefaults` in `nx.json`. A package lists the targets it uses under `nx.targets` in its `package.json`. To run a target for one package:
+
+```shell
+pnpm nx test:run @myparcel-prestashop/frontend-checkout
 ```
 
 To run the PHP tests:
@@ -64,13 +70,13 @@ This is only sufficient if you're running PrestaShop locally and your source dir
 Run this after every change:
 
 ```shell
-yarn build
+pnpm build
 ```
 
 Or run this to monitor your changes and rebuild automatically:
 
 ```shell
-yarn watch
+pnpm watch
 ```
 
 ##### Using a remote PrestaShop instance
@@ -78,7 +84,7 @@ yarn watch
 Build module files:
 
 ```shell
-yarn build
+pnpm build
 ```
 
 The folder structure should look like this:
@@ -97,5 +103,5 @@ You can also upload the module folder manually using FTP.
 [conventional commits]: https://www.conventionalcommits.org/
 [docker]: https://www.docker.com/
 [eslint]: https://eslint.org/
-[volta]: https://volta.sh/
+[pnpm]: https://pnpm.io/
 [node]: https://nodejs.org/

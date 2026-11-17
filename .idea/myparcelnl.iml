@@ -14,7 +14,6 @@
       <excludePattern pattern="dist" />
       <excludePattern pattern="cache" />
       <excludePattern pattern="coverage" />
-      <excludePattern pattern=".yarn" />
       <excludePattern pattern=".tmp" />
     </content>
     <orderEntry type="inheritedJdk" />

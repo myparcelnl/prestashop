@@ -23,7 +23,7 @@ How they connect:
 - The widget and the js-pdk admin get carrier capabilities by POSTing to the PDK `proxyCapabilities` action (`PdkCapabilitiesActions`).
 - Carriers, delivery types and package types come from the SDK. Do not add definitions of them to the PDK or the plugins.
 
-For local development, `pdk-dev-on` links local checkouts of the PDK and js-pdk into a plugin. It adds a composer `path` repository to `composer.json` and yarn `portal:` links to `package.json`. Never commit these changes. Suggest it only when the task needs changes in the PDK or js-pdk, or needs to test such changes in a plugin. MyParcel employees can find the setup in [Local PDK in PDK plugin](https://myparcelnl.atlassian.net/wiki/spaces/IG/pages/319422473).
+For local development, `pdk-dev-on` links local checkouts of the PDK and js-pdk into a plugin. It adds a composer `path` repository to `composer.json` and `portal:` links to `package.json`. Never commit these changes. Suggest it only when the task needs changes in the PDK or js-pdk, or needs to test such changes in a plugin. MyParcel employees can find the setup in [Local PDK in PDK plugin](https://myparcelnl.atlassian.net/wiki/spaces/IG/pages/319422473).
 
 The delivery options widget has no link command. To test a local build, serve `apps/delivery-options/dist` from a delivery-options checkout and override `deliveryOptionsCdnUrlJs`, `deliveryOptionsCdnUrlJsLib` and `deliveryOptionsCdnUrlCss` in the plugin's `config/pdk.php`. Never commit these overrides. This works only locally: there is no way to give a tester a plugin build with a custom widget version.
 
@@ -63,13 +63,13 @@ Do not run `composer test` or `vendor/bin/pest` directly on the host — the con
 The admin and checkout UIs are built with Vite/Vue via the js-pdk. If the admin page renders but shows empty content (empty `data-pdk-context`, no Vue components), the JS assets need to be (re)built:
 
 ```sh
-yarn install
-yarn translations:import
-yarn build
+pnpm install
+pnpm translations:import
+pnpm build
 ```
 
-- `yarn translations:import` generates `config/pdk/translations/en.json` (required by the PDK context service)
-- `yarn build` compiles all JS workspaces under `views/js/` into their `dist/` directories
+- `pnpm translations:import` generates `config/pdk/translations/en.json` (required by the PDK context service)
+- `pnpm build` compiles all JS workspaces under `views/js/` into their `dist/` directories
 
 ## PrestaShop JS/CSS Cache
 
