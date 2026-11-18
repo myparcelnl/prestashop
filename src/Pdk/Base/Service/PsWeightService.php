@@ -10,14 +10,22 @@ use MyParcelNL\Pdk\Base\Service\WeightService;
 class PsWeightService extends WeightService
 {
     /**
+     * Convert a weight to grams. Pass the unit when the weight has one of its own, such as a weight
+     * limit from the capabilities API. Leave the unit empty for a weight in the PrestaShop weight unit
+     * (PS_WEIGHT_UNIT), such as a product weight.
+     *
      * @param  int|float $weight
-     * @param  string    $unit leave empty, prestashop configured weight unit will be used
+     * @param  string    $unit one of the WeightServiceInterface::UNIT_* constants, or empty for PS_WEIGHT_UNIT
      *
      * @return int
      */
     public function convertToGrams($weight, string $unit = ''): int
     {
-        return parent::convertToGrams($weight, $this->normalizeUnit(strtolower(Configuration::get('PS_WEIGHT_UNIT'))));
+        if ('' === $unit) {
+            $unit = $this->normalizeUnit(strtolower((string) Configuration::get('PS_WEIGHT_UNIT')));
+        }
+
+        return parent::convertToGrams($weight, $unit);
     }
 
     /**
