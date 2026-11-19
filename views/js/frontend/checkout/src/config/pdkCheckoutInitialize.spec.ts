@@ -1,92 +1,72 @@
 /** @vitest-environment happy-dom */
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {mockLayout} from '../utils/__tests__/mockLayout';
 import {pdkCheckoutInitialize} from './pdkCheckoutInitialize';
 
-const STEPS = `
-  <section id="checkout-delivery-step" class="checkout-step"></section>
-  <section id="checkout-payment-step" class="checkout-step js-current-step"></section>
-`;
+const HIDDEN_FORM = '<section id="step" hidden><form id="js-delivery"></form></section>';
 
-const isResolved = async (promise: Promise<void>): Promise<boolean> => {
-  let resolved = false;
+const track = (promise: Promise<void>) => {
+  const state = {resolved: false};
   void promise.then(() => {
-    resolved = true;
+    state.resolved = true;
   });
-  await vi.advanceTimersByTimeAsync(0);
-  return resolved;
+  return state;
 };
 
 describe('pdkCheckoutInitialize', () => {
-  let events: Record<string, () => void>;
-
   beforeEach(() => {
     vi.useFakeTimers();
-    events = {};
-    Object.assign(window, {
-      prestashop: {
-        on: (event: string, handler: () => void) => {
-          events[event] = handler;
-        },
-      },
-    });
+    mockLayout();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
     document.body.innerHTML = '';
   });
 
-  it('resolves at once when the delivery step is current', async () => {
-    document.body.innerHTML = '<section id="checkout-delivery-step" class="js-current-step"></section>';
-    expect(await isResolved(pdkCheckoutInitialize())).toBe(true);
+  it('resolves at once when the delivery form is visible', async () => {
+    document.body.innerHTML = '<section><form id="js-delivery"></form></section>';
+    const state = track(pdkCheckoutInitialize());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(state.resolved).toBe(true);
   });
 
-  it('does not resolve on the payment step, also not after the fallback delay', async () => {
-    document.body.innerHTML = STEPS;
-    const promise = pdkCheckoutInitialize();
+  it('waits while the delivery form is not in the page yet', async () => {
+    const state = track(pdkCheckoutInitialize());
     await vi.advanceTimersByTimeAsync(60_000);
-    expect(await isResolved(promise)).toBe(false);
+    expect(state.resolved).toBe(false);
   });
 
-  it('resolves when the customer goes back to the delivery step', async () => {
-    document.body.innerHTML = STEPS;
-    const promise = pdkCheckoutInitialize();
-    document.querySelector('#checkout-delivery-step')?.classList.add('js-current-step');
-    events.changedCheckoutStep?.();
-    expect(await isResolved(promise)).toBe(true);
+  it('does not resolve while the delivery form stays hidden', async () => {
+    document.body.innerHTML = HIDDEN_FORM;
+    const state = track(pdkCheckoutInitialize());
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(state.resolved).toBe(false);
   });
 
-  describe('when the theme inserts the delivery step later', () => {
-    // happy-dom does not deliver MutationObserver records while fake timers are active.
-    beforeEach(() => {
-      vi.useRealTimers();
-    });
-
-    it('resolves when the inserted step is already current', async () => {
-      const promise = pdkCheckoutInitialize();
-      document.body.innerHTML = '<section id="checkout-delivery-step" class="js-current-step"></section>';
-      await expect(promise).resolves.toBeUndefined();
-    });
-
-    it('resolves when the inserted step becomes current', async () => {
-      let resolved = false;
-      const promise = pdkCheckoutInitialize().then(() => {
-        resolved = true;
-      });
-      document.body.innerHTML = STEPS;
-      await new Promise((resolve) => {
-        setTimeout(resolve, 10);
-      });
-      expect(resolved).toBe(false);
-      document.querySelector('#checkout-delivery-step')?.classList.add('js-current-step');
-      await expect(promise).resolves.toBeUndefined();
-    });
+  it('resolves within one interval after the delivery form becomes visible', async () => {
+    document.body.innerHTML = HIDDEN_FORM;
+    const state = track(pdkCheckoutInitialize());
+    await vi.advanceTimersByTimeAsync(1_000);
+    document.querySelector('#step')?.removeAttribute('hidden');
+    await vi.advanceTimersByTimeAsync(250);
+    expect(state.resolved).toBe(true);
   });
 
-  it('resolves after the fallback delay when the theme has no delivery step', async () => {
-    const promise = pdkCheckoutInitialize();
-    expect(await isResolved(promise)).toBe(false);
-    await vi.advanceTimersByTimeAsync(10_000);
-    expect(await isResolved(promise)).toBe(true);
+  it('resolves when the theme replaces the delivery form with a visible one', async () => {
+    document.body.innerHTML = HIDDEN_FORM;
+    const state = track(pdkCheckoutInitialize());
+    document.body.innerHTML = '<section><form id="js-delivery"></form></section>';
+    await vi.advanceTimersByTimeAsync(250);
+    expect(state.resolved).toBe(true);
+  });
+
+  it('stops polling after it resolves', async () => {
+    document.body.innerHTML = HIDDEN_FORM;
+    void pdkCheckoutInitialize();
+    document.querySelector('#step')?.removeAttribute('hidden');
+    await vi.advanceTimersByTimeAsync(250);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

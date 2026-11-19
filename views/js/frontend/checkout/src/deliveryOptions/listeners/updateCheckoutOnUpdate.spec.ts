@@ -1,6 +1,7 @@
 /** @vitest-environment happy-dom */
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {type DeliveryOptionsStoreState} from '@myparcel-dev/pdk-checkout';
+import {mockLayout} from '../../utils/__tests__/mockLayout';
 import {onDeliveryOptionsOutputChange} from './updateCheckoutOnUpdate';
 
 const mocks = vi.hoisted(() => ({trigger: vi.fn()}));
@@ -25,14 +26,15 @@ const state = (deliveryType: string) => ({output: {deliveryType}}) as unknown as
 
 const setCurrentStep = (step: 'delivery' | 'payment') => {
   document.body.innerHTML = `
-    <section id="checkout-delivery-step" class="${step === 'delivery' ? 'js-current-step' : ''}"></section>
-    <section id="checkout-payment-step" class="${step === 'payment' ? 'js-current-step' : ''}"></section>
+    <section id="checkout-delivery-step" ${step === 'delivery' ? '' : 'hidden'}><form id="js-delivery"></form></section>
+    <section id="checkout-payment-step" ${step === 'payment' ? '' : 'hidden'}></section>
   `;
 };
 
 describe('onDeliveryOptionsOutputChange', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    mockLayout();
     mocks.trigger.mockReset();
     vi.stubGlobal('$', () => ({trigger: mocks.trigger}));
   });
@@ -40,6 +42,7 @@ describe('onDeliveryOptionsOutputChange', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
     document.body.innerHTML = '';
   });
 
@@ -64,7 +67,7 @@ describe('onDeliveryOptionsOutputChange', () => {
     expect(mocks.trigger).not.toHaveBeenCalled();
   });
 
-  it('checks the step when the debounce ends, not when the output changes', async () => {
+  it('checks the visibility when the debounce ends, not when the output changes', async () => {
     setCurrentStep('delivery');
     onDeliveryOptionsOutputChange(state('morning'), state('standard'));
     setCurrentStep('payment');
@@ -72,9 +75,9 @@ describe('onDeliveryOptionsOutputChange', () => {
     expect(mocks.trigger).not.toHaveBeenCalled();
   });
 
-  it('updates the delivery form when the theme has no delivery step', async () => {
+  it('does not update the delivery form when it is not in the page', async () => {
     onDeliveryOptionsOutputChange(state('morning'), state('standard'));
     await vi.runAllTimersAsync();
-    expect(mocks.trigger).toHaveBeenCalledWith('change');
+    expect(mocks.trigger).not.toHaveBeenCalled();
   });
 });
