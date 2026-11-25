@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.11.1](https://github.com/myparcelnl/prestashop/compare/v5.11.0...v5.11.1) (2026-11-25)
+
+### :bug: Bug Fixes
+
+* **admin:** offer the €100 insurance tier in the shipment options form ([#782](https://github.com/myparcelnl/prestashop/issues/782)) ([98dd62b](https://github.com/myparcelnl/prestashop/commit/98dd62b2e92dd5e19df977bcf0589651085acf0a))
+* **checkout:** fix carrier weight limits for every shop weight unit ([#793](https://github.com/myparcelnl/prestashop/issues/793)) ([2b301d7](https://github.com/myparcelnl/prestashop/commit/2b301d7a71b00b0e558ac95bdf95e2abbeacd5c0)), closes [#791](https://github.com/myparcelnl/prestashop/issues/791)
+* **checkout:** fix checkout jumping back from payment to shipping ([#778](https://github.com/myparcelnl/prestashop/issues/778)) ([431a717](https://github.com/myparcelnl/prestashop/commit/431a7174ae4041dee1981018401ddde684ac221b)), closes [#774](https://github.com/myparcelnl/prestashop/issues/774)
+
 ## [5.11.0](https://github.com/myparcelnl/prestashop/compare/v5.10.0...v5.11.0) (2026-11-04)
 
 ### :sparkles: New Features
