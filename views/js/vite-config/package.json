@@ -6,7 +6,7 @@
   "main": "index.cjs",
   "types": "index.d.ts",
   "dependencies": {
-    "vite": "^6.4.3"
+    "vite": "^8.3.8"
   },
   "devDependencies": {
     "vitest": "^4.1.11"
