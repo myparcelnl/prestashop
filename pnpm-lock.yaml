@@ -277,8 +277,8 @@ importers:
         specifier: workspace:*
         version: link:../../vite-config
       '@vitejs/plugin-vue':
-        specifier: ^5.0.0
-        version: 5.2.4(vite@6.4.5(@types/node@20.19.43)(jiti@1.21.7)(lightningcss@1.33.0)(sass@1.108.2)(yaml@2.9.1))(vue@3.5.46(typescript@5.9.3))
+        specifier: ^6.0.11
+        version: 6.0.11(vite@6.4.5(@types/node@20.19.43)(jiti@1.21.7)(lightningcss@1.33.0)(sass@1.108.2)(yaml@2.9.1))(vue@3.5.46(typescript@5.9.3))
       '@vitest/coverage-v8':
         specifier: ^4.1.11
         version: 4.1.12(vitest@4.1.12)
@@ -1205,6 +1205,9 @@ packages:
     resolution: {integrity: sha512-//0sR/cow/s4ICQaYoAobOl4aU8cjU6x/V24V7XkKotb9+O+3zySIYp146vpaobYHnxa4pZX8NkV54Z5AwbDKA==}
     engines: {node: '>=12'}
 
+  '@rolldown/pluginutils@1.1.1':
+    resolution: {integrity: sha512-glFIJDvLNDtJhT9qrMFWLPbvS+skxgt4L0K8Ei2YtnhPysAJnsI7nyxSJxKj4ADeKX0OLjC4ntRkwpLOoS3rwA==}
+
   '@rollup/rollup-android-arm-eabi@4.64.12':
     resolution: {integrity: sha512-Z8lz+5UOiCJLonjeqwJlhUtHA/Sr6R1AidkccQxdWF0nigNzP81aLoU+udgOaGfL5s1uzFXzcux/pCwGAMu0lw==}
     cpu: [arm]
@@ -1539,12 +1542,12 @@ packages:
   '@ungap/structured-clone@1.4.0':
     resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
 
-  '@vitejs/plugin-vue@5.2.4':
-    resolution: {integrity: sha512-7Yx/SXSOcQq5HiiV3orevHUFn+pmMB4cgbEkDYgnkUWb0WfeQ/wa2yFv6D5ICiCQOVpjA7vYDXrC7AGO8yjDHA==}
-    engines: {node: ^18.0.0 || >=20.0.0}
+  '@vitejs/plugin-vue@6.0.11':
+    resolution: {integrity: sha512-m48lskIUJGlB6qUiYhDMI8nd2ngeidz2U4nKTjqI13cFMu5rH8JeEILPkDtK9Fk/TjBA2pkj8AlbenqDaKu+ww==}
+    engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      vite: ^5.0.0 || ^6.0.0
-      vue: ^3.2.25
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+      vue: ^3.2.25 || ^3.6.0-rc.15
 
   '@vitest/coverage-v8@4.1.12':
     resolution: {integrity: sha512-6S7/iVknKglLAxMFxQGNppBI0iqJS2NgM6FBxavitj7KaDq/vywOWGf6dGu7F2L1Qy0G6S3uTp7aGshHrzK8JA==}
@@ -5704,6 +5707,8 @@ snapshots:
       '@pnpm/network.ca-file': 1.0.2
       config-chain: 1.1.13
 
+  '@rolldown/pluginutils@1.1.1': {}
+
   '@rollup/rollup-android-arm-eabi@4.64.12':
     optional: true
 
@@ -6045,8 +6050,9 @@ snapshots:
 
   '@ungap/structured-clone@1.4.0': {}
 
-  '@vitejs/plugin-vue@5.2.4(vite@6.4.5(@types/node@20.19.43)(jiti@1.21.7)(lightningcss@1.33.0)(sass@1.108.2)(yaml@2.9.1))(vue@3.5.46(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.11(vite@6.4.5(@types/node@20.19.43)(jiti@1.21.7)(lightningcss@1.33.0)(sass@1.108.2)(yaml@2.9.1))(vue@3.5.46(typescript@5.9.3))':
     dependencies:
+      '@rolldown/pluginutils': 1.1.1
       vite: 6.4.5(@types/node@20.19.43)(jiti@1.21.7)(lightningcss@1.33.0)(sass@1.108.2)(yaml@2.9.1)
       vue: 3.5.46(typescript@5.9.3)
 
